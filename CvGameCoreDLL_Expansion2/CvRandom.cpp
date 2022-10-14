@@ -18,7 +18,7 @@
 
 // include this after all other headers!
 #include "LintFree.h"
-
+#define _DEBUG
 #define RANDOM_A      (1103515245)
 #define RANDOM_C      (12345)
 #define RANDOM_SHIFT  (16)

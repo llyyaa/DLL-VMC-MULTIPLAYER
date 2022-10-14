@@ -902,7 +902,7 @@ bool CvDllGameContext::RandomNumberGeneratorSyncCheck(PlayerTypes ePlayer, ICvRa
 	{
 		FILogFile* logFile = LOGFILEMGR.GetLog("net_message_debug.log", 0);
 
-		char formatBuf[128] = {"\0"};
+		char formatBuf[128] = {"Null"};
 		std::string rngLogMessage = "Game Random Number Generators are out of sync : local.seed=";
 		rngLogMessage += _itoa_s(localSimRandomNumberGenerator.getSeed(), formatBuf, 10);
 		rngLogMessage += ", remote.seed=";
