@@ -673,6 +673,7 @@
 #define MOD_EVENTS_BATTLES                          gCustomMods.isEVENTS_BATTLES()
 //   GameEvents.BattleDamageDelta.Add(function(iRole, iBaseDamage) return 0 end)
 #define MOD_EVENTS_BATTLES_DAMAGE                   (MOD_EVENTS_BATTLES && gCustomMods.isEVENTS_BATTLES_DAMAGE())
+#define MOD_EVENTS_BATTLES_CUSTOM_DAMAGE            (MOD_EVENTS_BATTLES && gCustomMods.isEVENTS_BATTLES_CUSTOM_DAMAGE())
 
 // Minor bug fixes (missing catch-all else clauses, etc) (v30 onwards)
 #define MOD_BUGFIX_MINOR 							(true)
@@ -1345,6 +1346,7 @@ public:
 	MOD_OPT_DECL(EVENTS_CUSTOM_MISSIONS);
 	MOD_OPT_DECL(EVENTS_BATTLES);
 	MOD_OPT_DECL(EVENTS_BATTLES_DAMAGE);
+	MOD_OPT_DECL(EVENTS_BATTLES_CUSTOM_DAMAGE);
 
 	MOD_OPT_DECL(API_PLAYER_LOGS);
 	MOD_OPT_DECL(API_ESPIONAGE);
