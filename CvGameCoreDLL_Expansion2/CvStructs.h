@@ -348,6 +348,8 @@ public:
 	int getMaxDamageMemberCount() const;
 	void setDamageMemberCount(int iDamageMemberCount);
 
+	void setBattleUnitInfo(BattleUnitTypes unitType, int& iPlayerID, int& iUnitOrCityID, bool& bIsCity) const;
+
 protected:
 	CvUnit* 	m_pUnits[BATTLE_UNIT_COUNT];					//!< The units involved
 	CvCity* 	m_pCities[BATTLE_UNIT_COUNT];					//!< The cities involved
