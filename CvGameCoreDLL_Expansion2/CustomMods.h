@@ -946,11 +946,12 @@ enum BattleTypeTypes
 #define GAMEEVENT_BarbariansCampGetSpawnUnit	"BarbariansCampGetSpawnUnit",	"iii"
 #define GAMEEVENT_BarbariansSpawnedUnit			"BarbariansSpawnedUnit",		"iii"
 #define GAMEEVENT_BattleDamageDelta				"BattleDamageDelta",			"ii"
-// BattleCustomDamage(iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity, 
+// BattleCustomDamage(iThisBattleType, iDamage,
+//                    iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity, 
 //                    iDefensePlayerID, iDefenseUnitOrCityID, bDefenseIsCity,
 //                    iInterceptorPlayerID, iInterceptorUnitOrCityID, bInterceptorIsCity,
-//                    iThisBattleType, iDamage) -> iDamageDelta
-#define GAMEEVENT_BattleCustomDamage			"BattleDamageDelta",			"iibiibiibii"
+//                    ) -> iDamageDelta
+#define GAMEEVENT_BattleCustomDamage			"BattleDamageDelta",			"iiiibiibiib"
 #define GAMEEVENT_BattleFinished				"BattleFinished",				""
 #define GAMEEVENT_BattleJoined					"BattleJoined",					"iiib"
 #define GAMEEVENT_BattleStarted					"BattleStarted",				"iii"

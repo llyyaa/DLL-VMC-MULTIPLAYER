@@ -436,10 +436,10 @@ int CvCombatInfo::getDamageInflicted(BattleUnitTypes unitType) const
 
 		int iDelta = 0;
 		if (GAMEEVENTINVOKE_VALUE(iDelta, GAMEEVENT_BattleCustomDamage, 
+								iThisBattleType, iDamage,
 			                    iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity,
 			                    iDefensePlayerID, iDefenseUnitOrCityID, bDefenseIsCity,
-			                    iInterceptorPlayerID, iInterceptorUnitOrCityID, bInterceptorIsCity,
-			                    iThisBattleType, iDamage) == GAMEEVENTRETURN_VALUE) {
+			                    iInterceptorPlayerID, iInterceptorUnitOrCityID, bInterceptorIsCity) == GAMEEVENTRETURN_VALUE) {
 			iDamage += iDelta;
 		}
 	}
