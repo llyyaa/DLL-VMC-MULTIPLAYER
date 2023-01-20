@@ -372,7 +372,7 @@ int CvCombatInfo::getDamageInflicted(BattleUnitTypes unitType) const
 #if defined(MOD_EVENTS_BATTLES)
 	int iDamage = m_iDamageInflicted[unitType];
 
-	if (MOD_EVENTS_BATTLES_DAMAGE) {
+	if (MOD_EVENTS_BATTLES_DAMAGE && MOD_EVENTS_BATTLES_CUSTOM_DAMAGE) {
 		int iValue = 0;
 		if (GAMEEVENTINVOKE_VALUE(iValue, GAMEEVENT_BattleDamageDelta, unitType, iDamage) == GAMEEVENTRETURN_VALUE) {
 			if (iValue != 0) {
