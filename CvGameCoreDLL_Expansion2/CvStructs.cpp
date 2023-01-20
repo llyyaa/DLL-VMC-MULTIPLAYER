@@ -530,7 +530,7 @@ void CvCombatInfo::setUpdateGlobal(BattleUnitTypes unitType, bool bUpdateGlobal)
 	m_bUpdateGlobal[unitType] = bUpdateGlobal;
 }
 
-bool CvCombatInfo::getBattleType() const
+BattleTypeTypes CvCombatInfo::getBattleType() const
 {
 	return m_eBattleType;
 }

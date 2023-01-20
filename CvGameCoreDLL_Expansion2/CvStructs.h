@@ -336,7 +336,7 @@ public:
 	bool getUpdateGlobal(BattleUnitTypes unitType) const;
 	void setUpdateGlobal(BattleUnitTypes unitType, bool bUpdateGlobal);
 
-	bool getBattleType() const;
+	BattleTypeTypes getBattleType() const;
 	void setBattleType(const BattleTypeTypes battleType);
 
 	bool getVisualizeCombat() const;
