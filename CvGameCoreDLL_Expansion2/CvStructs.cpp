@@ -174,6 +174,12 @@ void checkBattleUnitType(BattleUnitTypes unitType)
 	CvAssertMsg((unitType >= 0) && (unitType < BATTLE_UNIT_COUNT), "Invalid battle unit type.");
 }
 
+void checkBattleType(const BattleTypeTypes battleType)
+{
+	DEBUG_VARIABLE(battleType);
+	CvAssertMsg((battleType >= 0) && (battleType <= BATTLE_TYPE_NUKE), "Invalid battle type.");
+}
+
 //------------------------------------------------------------------------------------------------
 // FUNCTION:    CvCombatInfo::CvCombatInfo
 //! \brief      Constructor
@@ -189,7 +195,8 @@ CvCombatInfo::CvCombatInfo() :
 	m_iNuclearDamageLevel(0),
 	m_bVisualize(false),
 	m_bAttackedAdvancedVis(false),
-	m_iDamageMemberCount(0)
+	m_iDamageMemberCount(0),
+	m_eBattleType(BattleTypeTypes::BATTLE_TYPE_MELEE)
 {
 	for(int i=0; i<BATTLE_UNIT_COUNT; i++)
 	{
@@ -521,6 +528,17 @@ void CvCombatInfo::setUpdateGlobal(BattleUnitTypes unitType, bool bUpdateGlobal)
 {
 	checkBattleUnitType(unitType);
 	m_bUpdateGlobal[unitType] = bUpdateGlobal;
+}
+
+bool CvCombatInfo::getBattleType() const
+{
+	return m_eBattleType;
+}
+
+void CvCombatInfo::setBattleType(const BattleTypeTypes battleType)
+{
+	checkBattleType(battleType);
+	m_eBattleType = battleType;
 }
 
 bool CvCombatInfo::getVisualizeCombat() const

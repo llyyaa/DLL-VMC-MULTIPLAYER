@@ -336,6 +336,9 @@ public:
 	bool getUpdateGlobal(BattleUnitTypes unitType) const;
 	void setUpdateGlobal(BattleUnitTypes unitType, bool bUpdateGlobal);
 
+	bool getBattleType() const;
+	void setBattleType(const BattleTypeTypes battleType);
+
 	bool getVisualizeCombat() const;
 	void setVisualizeCombat(bool bVisualize);
 
@@ -376,6 +379,8 @@ protected:
 	bool		m_bVisualize;									//!< The combat should be visualized
 
 	bool		m_bAttackedAdvancedVis;							//!< If true, the attacker has already advanced its visualization of the unit (happened during combat sim).
+
+	BattleTypeTypes m_eBattleType;								//!< The type of battle that is occurring
 
 	CvCombatMemberEntry	m_kCombatMembers[BATTLE_UNIT_COUNT];
 	// Units/cities damaged in the attack.  0 for most attacks that have just the normal defenders.  Primarily used with area attacks such as the various nuclear attacks.
