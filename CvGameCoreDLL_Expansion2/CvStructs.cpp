@@ -349,10 +349,11 @@ bool CvCombatInfo::getDefenderCaptured() const
 	return m_bDefenderCaptured;
 }
 
-void CvCombatInfo::setBattleUnitInfo(BattleUnitTypes unitType, int& iPlayerID, int& iUnitOrCityID, bool& bIsCity) const
+void CvCombatInfo::setBattleUnitInfo(BattleUnitTypes unitType, int& iPlayerID, int& iUnitOrCityID, bool& bIsCity, int& originalInflictDamage) const
 {
 	auto unit = getUnit(unitType);
 	bIsCity = unit == nullptr;
+	originalInflictDamage = m_iDamageInflicted[unitType];
 
 	if (unit == nullptr)
 	{
@@ -422,31 +423,34 @@ int CvCombatInfo::getDamageInflicted(BattleUnitTypes unitType) const
 #ifdef MOD_EVENTS_BATTLES_CUSTOM_DAMAGE
 	if (MOD_EVENTS_BATTLES_CUSTOM_DAMAGE)
 	{
-		// BattleCustomDamage(iAttackPlayerID, iAttackUnitID, bAttackIsCity, 
-		//                    iDefensePlayerID, iDefenseUnitID, bDefenseIsCity,
-		//                    iInterceptorPlayerID, iInterceptorUnitID, bInterceptorIsCity,
-		//                    iThisBattleType, iDamage) -> iDamageDelta
 		int iAttackPlayerID = 0;
 		int iAttackUnitOrCityID = 0;
 		bool bAttackIsCity = false;
+		int iAttackDamage = 0;
+
 		int iDefensePlayerID = 0;
 		int iDefenseUnitOrCityID = 0;
 		bool bDefenseIsCity = false;
+		int iDefenseDamage = 0;
+
 		int iInterceptorPlayerID = 0;
 		int iInterceptorUnitOrCityID = 0;
 		bool bInterceptorIsCity = false;
-		BattleUnitTypes iThisBattleType = unitType;
+		int iInterceptorDamage = 0;
 
-		setBattleUnitInfo(BATTLE_UNIT_ATTACKER, iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity);
-		setBattleUnitInfo(BATTLE_UNIT_DEFENDER, iDefensePlayerID, iDefenseUnitOrCityID, bDefenseIsCity);
-		setBattleUnitInfo(BATTLE_UNIT_INTERCEPTOR, iInterceptorPlayerID, iInterceptorUnitOrCityID, bInterceptorIsCity);
+		BattleUnitTypes iBattleUnitType = unitType;
+		BattleTypeTypes iBattleType = getBattleType();
+
+		setBattleUnitInfo(BATTLE_UNIT_ATTACKER, iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity, iAttackDamage);
+		setBattleUnitInfo(BATTLE_UNIT_DEFENDER, iDefensePlayerID, iDefenseUnitOrCityID, bDefenseIsCity, iDefenseDamage);
+		setBattleUnitInfo(BATTLE_UNIT_INTERCEPTOR, iInterceptorPlayerID, iInterceptorUnitOrCityID, bInterceptorIsCity, iInterceptorDamage);
 
 		int iDelta = 0;
 		if (GAMEEVENTINVOKE_VALUE(iDelta, GAMEEVENT_BattleCustomDamage, 
-								iThisBattleType, iDamage,
-			                    iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity,
-			                    iDefensePlayerID, iDefenseUnitOrCityID, bDefenseIsCity,
-			                    iInterceptorPlayerID, iInterceptorUnitOrCityID, bInterceptorIsCity) == GAMEEVENTRETURN_VALUE) {
+								iBattleUnitType, iBattleType,
+								iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity, iAttackDamage,
+								iDefensePlayerID, iDefenseUnitOrCityID, bDefenseIsCity, iDefenseDamage,
+								iInterceptorPlayerID, iInterceptorUnitOrCityID, bInterceptorIsCity, iInterceptorDamage) == GAMEEVENTRETURN_VALUE) {
 			iDamage += iDelta;
 		}
 	}

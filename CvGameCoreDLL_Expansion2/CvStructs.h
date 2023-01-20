@@ -351,7 +351,7 @@ public:
 	int getMaxDamageMemberCount() const;
 	void setDamageMemberCount(int iDamageMemberCount);
 
-	void setBattleUnitInfo(BattleUnitTypes unitType, int& iPlayerID, int& iUnitOrCityID, bool& bIsCity) const;
+	void setBattleUnitInfo(BattleUnitTypes unitType, int& iPlayerID, int& iUnitOrCityID, bool& bIsCity, int& originalInflictDamage) const;
 
 protected:
 	CvUnit* 	m_pUnits[BATTLE_UNIT_COUNT];					//!< The units involved
