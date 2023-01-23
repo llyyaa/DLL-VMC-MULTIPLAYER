@@ -117,9 +117,6 @@ protected:
 
 	static int lGetExoticGoodsGoldAmount(lua_State* L);
 	static int lGetExoticGoodsXPAmount(lua_State* L);
-	static int lChangeNumExoticGoods(lua_State* L);
-	static int lGetNumExoticGoodsMax(lua_State* L);
-	static int lGetNumExoticGoods(lua_State* L);
 
 	static int lCanAirBomb(lua_State* L);
 	static int lCanAirBombAt(lua_State* L);
