@@ -1759,6 +1759,20 @@ void CvCity::doTurn()
 		iBuildingDefense *= (100 + m_pCityBuildings->GetBuildingDefenseMod());
 		iBuildingDefense /= 100;
 		iHitsHealed += iBuildingDefense / 500;
+
+		//cities heal much faster if process defense
+
+
+		if (getProductionProcess() != NO_PROCESS)
+		{
+			CvProcessInfo* pkProcessInfo = GC.getProcessInfo(getProductionProcess());
+			if (pkProcessInfo && pkProcessInfo->getDefenseValue() != 0)
+			{
+				int iPile = getYieldRate(YIELD_PRODUCTION, false) * pkProcessInfo->getDefenseValue();
+				iHitsHealed += iPile / 100;
+			}
+		}
+
 		changeDamage(-iHitsHealed);
 	}
 	if(getDamage() < 0)
@@ -11802,6 +11816,16 @@ void CvCity::updateStrengthValue()
 
 	iStrengthValue += iBuildingDefense;
 
+	if (getProductionProcess() != NO_PROCESS)
+	{
+		CvProcessInfo* pkProcessInfo = GC.getProcessInfo(getProductionProcess());
+		if (pkProcessInfo && pkProcessInfo->getDefenseValue() != 0)
+		{
+			
+			iStrengthValue += (getYieldRate(YIELD_PRODUCTION, false) * pkProcessInfo->getDefenseValue());
+		}
+	}
+
 	// Garrisoned Unit
 	CvUnit* pGarrisonedUnit = GetGarrisonedUnit();
 	int iStrengthFromUnits = 0;
@@ -11867,6 +11891,17 @@ int CvCity::getStrengthValue(bool bForRangeStrike) const
 		int iValue = m_iStrengthValue;
 
 		iValue -= m_pCityBuildings->GetBuildingDefense();
+
+
+		if (getProductionProcess() != NO_PROCESS)
+		{
+			CvProcessInfo* pkProcessInfo = GC.getProcessInfo(getProductionProcess());
+			if (pkProcessInfo && pkProcessInfo->getDefenseValue() != 0)
+			{
+				iValue -= ((getYieldRate(YIELD_PRODUCTION, false) * pkProcessInfo->getDefenseValue()) / 100);
+			}
+		}
+
 
 		CvAssertMsg(iValue > 0, "City strength should always be greater than zero. Please show Jon this and send your last 5 autosaves.");
 
@@ -13008,6 +13043,15 @@ void CvCity::pushOrder(OrderTypes eOrder, int iData1, int iData2, bool bSave, bo
 		startHeadOrder();
 	}
 
+	if (eOrder == ORDER_MAINTAIN && (ProcessTypes)iData1 != NO_PROCESS)
+	{
+		CvProcessInfo* pkProcessInfo = GC.getProcessInfo((ProcessTypes)iData1);
+		if (pkProcessInfo && pkProcessInfo->getDefenseValue() != 0)
+		{
+			updateStrengthValue();
+		}
+	}
+
 	if((getTeam() == GC.getGame().getActiveTeam()) || GC.getGame().isDebugMode())
 	{
 		if(isCitySelected())
@@ -13081,7 +13125,7 @@ void CvCity::popOrder(int iNum, bool bFinish, bool bChoose)
 	{
 		pushOrder(pOrderNode->eOrderType, pOrderNode->iData1, pOrderNode->iData2, true, false, true);
 	}
-
+	bool bUpdateStrength = false;
 	eTrainUnit = NO_UNIT;
 	eConstructBuilding = NO_BUILDING;
 	eCreateProject = NO_PROJECT;
@@ -13355,6 +13399,16 @@ void CvCity::popOrder(int iNum, bool bFinish, bool bChoose)
 		break;
 
 	case ORDER_MAINTAIN:
+
+		if ((ProcessTypes)pOrderNode->iData1 != NO_PROCESS)
+		{
+			CvProcessInfo* pkProcessInfo = GC.getProcessInfo((ProcessTypes)pOrderNode->iData1);
+			if (pkProcessInfo && pkProcessInfo->getDefenseValue() != 0)
+			{
+				bUpdateStrength = true;
+			}
+		}
+
 		break;
 
 	default:
@@ -13454,7 +13508,10 @@ void CvCity::popOrder(int iNum, bool bFinish, bool bChoose)
 			DLLUI->AddCityMessage(0, GetIDInfo(), getOwner(), false, GC.getEVENT_MESSAGE_TIME(), localizedText.toUTF8()/*, szSound, MESSAGE_TYPE_MINOR_EVENT, szIcon, (ColorTypes)GC.getInfoTypeForString("COLOR_WHITE"), getX(), getY(), true, true*/);
 		}
 	}
-
+	if (bUpdateStrength)
+	{
+		updateStrengthValue();
+	}
 	if((getTeam() == GC.getGame().getActiveTeam()) || GC.getGame().isDebugMode())
 	{
 		if(isCitySelected())
