@@ -2273,6 +2273,9 @@ bool CvPlot::canHaveImprovement(ImprovementTypes eImprovement, TeamTypes eTeam, 
 	CvAssertMsg(getTerrainType() != NO_TERRAIN, "TerrainType is not assigned a valid value");
 #endif
 
+
+
+
 	bValid = false;
 
 	if(isCity())
@@ -5719,7 +5722,11 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 
 				if(getFeatureType() != NO_FEATURE)
 				{
-					if(GC.getFeatureInfo(getFeatureType())->IsNaturalWonder())
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+					if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder(true))
+#else
+					if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder())
+#endif
 					{
 						bShouldUpdateHappiness = true;
 					}
@@ -6336,16 +6343,24 @@ void CvPlot::setFeatureType(FeatureTypes eNewValue, int iVariety)
 		if(eNewValue != NO_FEATURE)
 		{
 			// Now a Natural Wonder here
-			if((eOldFeature == NO_FEATURE || !GC.getFeatureInfo(eOldFeature)->IsNaturalWonder()) && GC.getFeatureInfo(eNewValue)->IsNaturalWonder())
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+			if ((eOldFeature == NO_FEATURE || !GC.getFeatureInfo(eOldFeature)->IsNaturalWonder(true)) && GC.getFeatureInfo(eNewValue)->IsNaturalWonder(true))
+#else
+			if ((eOldFeature == NO_FEATURE || !GC.getFeatureInfo(eOldFeature)->IsNaturalWonder()) && GC.getFeatureInfo(eNewValue)->IsNaturalWonder())
+#endif
 			{
 				GC.getMap().ChangeNumNaturalWonders(1);
 				GC.getMap().getArea(getArea())->ChangeNumNaturalWonders(1);
 			}
 		}
-		if(eOldFeature != NO_FEATURE)
+		if (eOldFeature != NO_FEATURE)
 		{
 			// Was a Natural Wonder, isn't any more
-			if(GC.getFeatureInfo(eOldFeature)->IsNaturalWonder() && (eNewValue == NO_FEATURE || !GC.getFeatureInfo(eNewValue)->IsNaturalWonder()))
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+			if (GC.getFeatureInfo(eOldFeature)->IsNaturalWonder(true) && (eNewValue == NO_FEATURE || !GC.getFeatureInfo(eNewValue)->IsNaturalWonder(true)))
+#else
+			if (GC.getFeatureInfo(eOldFeature)->IsNaturalWonder() && (eNewValue == NO_FEATURE || !GC.getFeatureInfo(eNewValue)->IsNaturalWonder()))
+#endif
 			{
 				GC.getMap().ChangeNumNaturalWonders(-1);
 				GC.getMap().getArea(getArea())->ChangeNumNaturalWonders(-1);
@@ -6373,14 +6388,19 @@ void CvPlot::setFeatureType(FeatureTypes eNewValue, int iVariety)
 
 //	--------------------------------------------------------------------------------
 /// Does this plot have a natural wonder?
-bool CvPlot::IsNaturalWonder() const
+bool CvPlot::IsNaturalWonder(bool orPseudoNatural) const
 {
 	FeatureTypes eFeature = getFeatureType();
 
 	if(eFeature == NO_FEATURE)
 		return false;
 
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+	return GC.getFeatureInfo(eFeature)->IsNaturalWonder() || (orPseudoNatural && GC.getFeatureInfo(eFeature)->IsPseudoNaturalWonder());
+#else
+	orPseudoNatural; //ignore this
 	return GC.getFeatureInfo(eFeature)->IsNaturalWonder();
+#endif
 }
 
 //	--------------------------------------------------------------------------------
@@ -9278,7 +9298,11 @@ bool CvPlot::setRevealed(TeamTypes eTeam, bool bNewValue, bool bTerrainOnly, Tea
 		{
 			if(getFeatureType() != NO_FEATURE)
 			{
-				if(GC.getFeatureInfo(getFeatureType())->IsNaturalWonder())
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+				if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder(true))
+#else
+				if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder())
+#endif
 				{
 					GET_TEAM(eTeam).ChangeNumNaturalWondersDiscovered(1);
 
