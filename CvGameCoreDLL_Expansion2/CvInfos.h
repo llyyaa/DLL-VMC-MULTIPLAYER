@@ -1478,6 +1478,9 @@ public:
 	int getInfluenceCost() const;
 	int getAdvancedStartRemoveCost() const;
 	int getTurnDamage() const;
+#if defined(MOD_ROG_CORE)
+	int getPromotionIfOwned() const;
+#endif
 #if defined(MOD_API_PLOT_BASED_DAMAGE)
 	int getExtraTurnDamage() const;
 #endif
@@ -1506,6 +1509,7 @@ public:
 #else
 	bool IsNaturalWonder() const;
 #endif
+
 
 	const char* getArtDefineTag() const;
 	void setArtDefineTag(const char* szTag);
@@ -1555,7 +1559,9 @@ protected:
 	int m_iInBorderHappiness;
 	int m_iOccurrenceFrequency;
 	int m_iAdjacentUnitFreePromotion;
-
+#if defined(MOD_ROG_CORE)
+	int m_iPromotionIfOwned;
+#endif
 	bool m_bYieldNotAdditive;
 	bool m_bNoCoast;
 	bool m_bNoRiver;

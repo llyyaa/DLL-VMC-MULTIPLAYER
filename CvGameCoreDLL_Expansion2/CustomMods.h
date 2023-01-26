@@ -208,6 +208,11 @@
 // Ability to add new natural wonder features with graphics
 #define MOD_PSEUDO_NATURAL_WONDER					gCustomMods.isPSEUDO_NATURAL_WONDER()
 
+// Various new tables and logics for plots
+#define MOD_PLOTS_EXTENSIONS						gCustomMods.isPLOTS_EXTENSIONS()
+
+// Various new tables and function
+#define MOD_ROG_CORE						        gCustomMods.isROG_CORE()
 
 // Great Works can generate different yields than just culture (v25)
 #define MOD_GLOBAL_GREATWORK_YIELDTYPES             gCustomMods.isGLOBAL_GREATWORK_YIELDTYPES() 
@@ -1227,7 +1232,8 @@ public:
 	MOD_OPT_DECL(GLOBAL_NUKES_MELT_ICE); 
 
 	MOD_OPT_DECL(PSEUDO_NATURAL_WONDER);
-
+	MOD_OPT_DECL(PLOTS_EXTENSIONS);
+	MOD_OPT_DECL(ROG_CORE);
 	MOD_OPT_DECL(GLOBAL_GREATWORK_YIELDTYPES); 
 	MOD_OPT_DECL(GLOBAL_NO_LOST_GREATWORKS); 
 	MOD_OPT_DECL(GLOBAL_EXCLUDE_FROM_GIFTS);

@@ -5349,9 +5349,46 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 		{
 			setOwnershipDuration(0);
 
+#if defined(MOD_ROG_CORE)
+			FeatureTypes eFeature = getFeatureType();
+			CvFeatureInfo* pFeatureInfo = GC.getFeatureInfo(eFeature);
+
+			if (pFeatureInfo && eNewValue != NO_PLAYER)
+			{
+				if (pFeatureInfo->getInBorderHappiness() > 0)
+					GET_PLAYER(eNewValue).SetNaturalWonderOwned(eFeature, true);
+
+				PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
+				if (eFreePromotion != NO_PROMOTION)
+				{
+					if (!GET_PLAYER(eNewValue).IsFreePromotion(eFreePromotion))
+					{
+						GET_PLAYER(eNewValue).ChangeFreePromotionCount(eFreePromotion, 1);
+					}
+				}
+			}
+#endif
 			// Plot was owned by someone else
 			if(isOwned())
 			{
+#if defined(MOD_ROG_CORE)
+				if (pFeatureInfo && eOldOwner != NO_PLAYER)
+				{
+					if (pFeatureInfo->getInBorderHappiness() > 0)
+						GET_PLAYER(eOldOwner).SetNaturalWonderOwned(eFeature, false);
+
+					PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
+					if (eFreePromotion != NO_PROMOTION)
+					{
+						if (GET_PLAYER(eOldOwner).IsFreePromotion(eFreePromotion))
+						{
+							GET_PLAYER(eOldOwner).ChangeFreePromotionCount(eFreePromotion, -1);
+						}
+
+					}
+			}
+#endif
+
 #if defined(MOD_API_EXTENSIONS)
 				changeAdjacentSight(getTeam(), GC.getPLOT_VISIBILITY_RANGE(), false, NO_INVISIBLE, NO_DIRECTION);
 #else
@@ -6377,6 +6414,33 @@ void CvPlot::setFeatureType(FeatureTypes eNewValue, int iVariety)
 				}
 			}
 		}
+#if defined(MOD_PLOTS_EXTENSIONS)
+		if (MOD_PLOTS_EXTENSIONS)
+		{
+			// update adjacent tiles if there is a change for adjacent plot yields
+			for (int iI = 0; iI < GC.getNumPlotInfos(); iI++)\
+			{
+				PlotTypes ePlot = (PlotTypes)iI;
+
+				if (ePlot == NO_PLOT)
+				{
+					continue;
+				}
+
+				if (GC.getPlotInfo(ePlot)->IsAdjacentFeatureYieldChange(eOldFeature) || GC.getPlotInfo(ePlot)->IsAdjacentFeatureYieldChange(eNewValue))
+				{
+					for (int iJ = 0; iJ < NUM_DIRECTION_TYPES; iJ++)
+					{
+						CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iJ));
+						if (pAdjacentPlot && pAdjacentPlot->getPlotType() == ePlot)
+						{
+							pAdjacentPlot->updateYield();
+						}
+					}
+				}
+			}
+		}
+#endif
 
 #if defined(MOD_EVENTS_TILE_IMPROVEMENTS)
 		if (MOD_EVENTS_TILE_IMPROVEMENTS) {
@@ -8170,6 +8234,31 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 	{
 		iYield += ((bIgnoreFeature || (getFeatureType() == NO_FEATURE)) ? GC.getTerrainInfo(getTerrainType())->getCoastalLandYieldChange(eYield) : GC.getFeatureInfo(getFeatureType())->getCoastalLandYieldChange(eYield));
 	}
+
+#if defined(MOD_PLOTS_EXTENSIONS)
+	if (MOD_PLOTS_EXTENSIONS)
+	{
+		PlotTypes ePlot = getPlotType();
+		if (ePlot != NO_PLOT && GC.getPlotInfo(ePlot)->IsAdjacentFeatureYieldChange())
+		{
+			// yield from adjacent features
+			bool bNaturalWonderPlot = IsNaturalWonder();
+			for (int iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
+			{
+				CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+
+				if (pAdjacentPlot == NULL)
+					continue;
+
+				if (pAdjacentPlot->getFeatureType() != NO_FEATURE)
+				{
+					iYield += GC.getPlotInfo(ePlot)->GetAdjacentFeatureYieldChange(pAdjacentPlot->getFeatureType(), eYield, bNaturalWonderPlot);
+				}
+			}
+		}
+	}
+#endif
+
 
 	if(eTeam != NO_TEAM)
 	{

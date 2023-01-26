@@ -144,6 +144,12 @@ public:
 	BuildingTypes GetSpecificBuildingType(const char* szBuildingClass, bool hideAssert = false);
 #endif
 
+#if defined(MOD_ROG_CORE)
+	void SetNaturalWonderOwned(FeatureTypes eFeature, bool bValue);
+#endif
+	
+	
+
 	CvPlot *GetGreatAdmiralSpawnPlot (CvUnit *pUnit);
 
 	int GetNumBuilders() const;
@@ -1887,6 +1893,10 @@ protected:
 		}
 	};
 
+
+
+
+
 	FAutoArchiveClassContainer<CvPlayer> m_syncArchive;
 
 	FAutoVariable<PlayerTypes, CvPlayer> m_eID;
@@ -2084,7 +2094,18 @@ protected:
 	int m_iLifetimeCombatExperienceTimes100;
 	int m_iNavalCombatExperienceTimes100;
 #endif
+	
+#if defined(MOD_ROG_CORE)
+	std::vector<FeatureTypes> m_ownedNaturalWonders;
+#endif
+	
+
+//#if defined(MOD_ROG_CORE)
+	//FAutoVariable<std::vector<int>, FeatureTypes> m_ownedNaturalWonders;
+//#endif
 	int m_iBorderObstacleCount;
+
+
 	FAutoVariable<int, CvPlayer> m_iPopRushHurryCount;
 	FAutoVariable<int, CvPlayer> m_iTotalImprovementsBuilt;
 	FAutoVariable<int, CvPlayer> m_iNextOperationID;
