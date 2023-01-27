@@ -4888,9 +4888,7 @@ CvFeatureInfo::CvFeatureInfo() :
 	m_bPseudoNaturalWonder(false),
 #endif
 
-#if defined(MOD_ROG_CORE)
-	m_iPromotionIfOwned(NO_PROMOTION),
-#endif
+
 	m_piRiverYieldChange(NULL),
 	m_piHillsYieldChange(NULL),
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -4961,12 +4959,7 @@ int CvFeatureInfo::getDefenseModifier() const
 	return m_iDefenseModifier;
 }
 
-#if defined(MOD_ROG_CORE)
-int CvFeatureInfo::getPromotionIfOwned() const
-{
-	return m_iPromotionIfOwned;
-}
-#endif
+
 //------------------------------------------------------------------------------
 int CvFeatureInfo::getInfluenceCost() const
 {
@@ -5253,10 +5246,6 @@ bool CvFeatureInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #endif
 
 
-#if defined(MOD_ROG_CORE)
-	szTextVal = kResults.GetText("FreePromotionIfOwned");
-	m_iPromotionIfOwned = GC.getInfoTypeForString(szTextVal, true);
-#endif
 
 	m_strEffectType = kResults.GetText("EffectType");
 	m_strEffectTypeTag = kResults.GetText("EffectTypeTag");

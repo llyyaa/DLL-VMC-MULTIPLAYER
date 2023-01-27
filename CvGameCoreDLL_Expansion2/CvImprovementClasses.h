@@ -182,6 +182,17 @@ public:
 	int GetAdjacentImprovementYieldChanges(int i, int j) const;
 #endif
 
+#if defined(MOD_ROG_CORE)
+	int GetAdjacentResourceYieldChanges(int i, int j) const;
+	int* GetAdjacentResourceYieldChangesArray(int i);
+	int GetAdjacentTerrainYieldChanges(int i, int j) const;
+	int* GetAdjacentTerrainYieldChangesArray(int i);
+	int GetAdjacentFeatureYieldChanges(int i, int j) const;
+	int* GetAdjacentFeatureYieldChangesArray(int i);
+	int GetFeatureYieldChanges(int i, int j) const;
+	int* GetFeatureYieldChangesArray(int i);
+#endif
+
 	int GetTechYieldChanges(int i, int j) const;
 	int* GetTechYieldChangesArray(int i);
 	int GetTechNoFreshWaterYieldChanges(int i, int j) const;
@@ -312,6 +323,12 @@ protected:
 	int** m_ppiAdjacentImprovementYieldChanges;
 #endif
 
+#if defined(MOD_ROG_CORE)
+	int** m_ppiAdjacentTerrainYieldChanges;
+	int** m_ppiAdjacentResourceYieldChanges;
+	int** m_ppiAdjacentFeatureYieldChanges;
+	int** m_ppiFeatureYieldChanges;
+#endif
 	int** m_ppiTechYieldChanges;
 	int** m_ppiTechNoFreshWaterYieldChanges;
 	int** m_ppiTechFreshWaterYieldChanges;

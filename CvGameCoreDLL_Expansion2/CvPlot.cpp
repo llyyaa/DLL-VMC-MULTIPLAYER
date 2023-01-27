@@ -4887,6 +4887,94 @@ void CvPlot::changeUpgradeProgress(int iChange)
 	setUpgradeProgress(getUpgradeProgress() + iChange);
 }
 
+
+#if defined(MOD_ROG_CORE)
+int CvPlot::ComputeYieldFromAdjacentResource(CvImprovementEntry& kImprovement, YieldTypes eYield, TeamTypes eTeam) const
+{
+	CvPlot* pAdjacentPlot = NULL;
+	int iRtnValue = 0;
+
+	for (int iJ = 0; iJ < GC.getNumResourceInfos(); iJ++)
+	{
+		ResourceTypes eResource = (ResourceTypes)iJ;
+		if (eResource != NO_RESOURCE)
+		{
+			if (kImprovement.GetAdjacentResourceYieldChanges(eResource, eYield) > 0)
+			{
+				for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+				{
+					pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+					if (pAdjacentPlot && pAdjacentPlot->getResourceType(eTeam) == eResource)
+					{
+						iRtnValue += kImprovement.GetAdjacentResourceYieldChanges(eResource, eYield);
+					}
+				}
+			}
+		}
+	}
+
+	return iRtnValue;
+}
+#endif
+
+#if defined(MOD_ROG_CORE)
+int CvPlot::ComputeYieldFromAdjacentTerrain(CvImprovementEntry& kImprovement, YieldTypes eYield) const
+{
+	CvPlot* pAdjacentPlot = NULL;
+	int iRtnValue = 0;
+
+	for (int iJ = 0; iJ < GC.getNumTerrainInfos(); iJ++)
+	{
+		TerrainTypes eTerrain = (TerrainTypes)iJ;
+		if (eTerrain != NO_TERRAIN)
+		{
+			if (kImprovement.GetAdjacentTerrainYieldChanges(eTerrain, eYield) > 0)
+			{
+				for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+				{
+					pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+					if (pAdjacentPlot && pAdjacentPlot->getTerrainType() == eTerrain)
+					{
+						iRtnValue += kImprovement.GetAdjacentTerrainYieldChanges(eTerrain, eYield);
+					}
+				}
+			}
+		}
+	}
+
+	return iRtnValue;
+}
+#endif
+#if defined(MOD_ROG_CORE)
+int CvPlot::ComputeYieldFromAdjacentFeature(CvImprovementEntry& kImprovement, YieldTypes eYield) const
+{
+	CvPlot* pAdjacentPlot = NULL;
+	int iRtnValue = 0;
+
+	for (int iJ = 0; iJ < GC.getNumFeatureInfos(); iJ++)
+	{
+		FeatureTypes eFeature = (FeatureTypes)iJ;
+		if (eFeature != NO_FEATURE)
+		{
+			if (kImprovement.GetAdjacentFeatureYieldChanges(eFeature, eYield) > 0)
+			{
+				for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+				{
+					pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+					if (pAdjacentPlot && pAdjacentPlot->getFeatureType() == eFeature)
+					{
+						iRtnValue += kImprovement.GetAdjacentFeatureYieldChanges(eFeature, eYield);
+					}
+				}
+			}
+		}
+	}
+
+	return iRtnValue;
+}
+#endif
+
+
 //	--------------------------------------------------------------------------------
 #if defined(MOD_API_UNIFIED_YIELDS)
 int CvPlot::ComputeYieldFromAdjacentImprovement(CvImprovementEntry& kImprovement, ImprovementTypes eValue, YieldTypes eYield) const
@@ -5349,45 +5437,11 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 		{
 			setOwnershipDuration(0);
 
-#if defined(MOD_ROG_CORE)
-			FeatureTypes eFeature = getFeatureType();
-			CvFeatureInfo* pFeatureInfo = GC.getFeatureInfo(eFeature);
 
-			if (pFeatureInfo && eNewValue != NO_PLAYER)
-			{
-				if (pFeatureInfo->getInBorderHappiness() > 0)
-					GET_PLAYER(eNewValue).SetNaturalWonderOwned(eFeature, true);
-
-				PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
-				if (eFreePromotion != NO_PROMOTION)
-				{
-					if (!GET_PLAYER(eNewValue).IsFreePromotion(eFreePromotion))
-					{
-						GET_PLAYER(eNewValue).ChangeFreePromotionCount(eFreePromotion, 1);
-					}
-				}
-			}
-#endif
 			// Plot was owned by someone else
 			if(isOwned())
 			{
-#if defined(MOD_ROG_CORE)
-				if (pFeatureInfo && eOldOwner != NO_PLAYER)
-				{
-					if (pFeatureInfo->getInBorderHappiness() > 0)
-						GET_PLAYER(eOldOwner).SetNaturalWonderOwned(eFeature, false);
 
-					PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
-					if (eFreePromotion != NO_PROMOTION)
-					{
-						if (GET_PLAYER(eOldOwner).IsFreePromotion(eFreePromotion))
-						{
-							GET_PLAYER(eOldOwner).ChangeFreePromotionCount(eFreePromotion, -1);
-						}
-
-					}
-			}
-#endif
 
 #if defined(MOD_API_EXTENSIONS)
 				changeAdjacentSight(getTeam(), GC.getPLOT_VISIBILITY_RANGE(), false, NO_INVISIBLE, NO_DIRECTION);
@@ -6914,6 +6968,165 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue, PlayerTypes eBuilder
 			}
 #endif
 
+#if defined(MOD_ROG_CORE)
+			if (eBuilder != NO_PLAYER && eNewValue != NO_IMPROVEMENT && getOwner() == eBuilder)
+			{
+				CvImprovementEntry* pImprovement2 = GC.getImprovementInfo(eNewValue);
+				if (pImprovement2)
+				{
+					for (int iJ = 0; iJ < NUM_DIRECTION_TYPES; ++iJ)
+					{
+						CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iJ));
+						// Do not change!!
+						if (pAdjacentPlot != NULL && pAdjacentPlot->getResourceType() != NO_RESOURCE)
+						{
+							bool bUp = false;
+							for (int iK = 0; iK < NUM_YIELD_TYPES; ++iK)
+							{
+
+
+								ResourceTypes eResource = pAdjacentPlot->getResourceType(GET_PLAYER(eBuilder).getTeam());
+								if (eResource != NO_RESOURCE && pImprovement2->GetAdjacentResourceYieldChanges(eResource, (YieldTypes)iK) > 0)
+								{
+									bUp = true;
+									break;
+								}
+							}
+							if (bUp)
+							{
+								pAdjacentPlot->updateYield();
+							}
+						}
+					}
+				}
+			}
+			if (eBuilder != NO_PLAYER && eOldImprovement != NO_IMPROVEMENT && getOwner() == eBuilder)
+			{
+				CvImprovementEntry* pImprovement2 = GC.getImprovementInfo(eOldImprovement);
+				if (pImprovement2)
+				{
+					for (int iJ = 0; iJ < NUM_DIRECTION_TYPES; ++iJ)
+					{
+						CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iJ));
+
+						if (pAdjacentPlot != NULL && pAdjacentPlot->getResourceType() != NO_RESOURCE)
+						{
+							bool bUp = false;
+							for (int iK = 0; iK < NUM_YIELD_TYPES; ++iK)
+							{
+							
+
+								if (pImprovement2->GetAdjacentResourceYieldChanges(pAdjacentPlot->getResourceType(), (YieldTypes)iK) > 0)
+								{
+									bUp = true;
+									break;
+								}
+							}
+							if (bUp)
+							{
+								pAdjacentPlot->updateYield();
+							}
+						}
+					}
+				}
+			}
+			if (eBuilder != NO_PLAYER && eNewValue != NO_IMPROVEMENT && getOwner() == eBuilder)
+			{
+				CvImprovementEntry* pImprovement2 = GC.getImprovementInfo(eNewValue);
+				if (pImprovement2)
+				{
+					for (int iJ = 0; iJ < NUM_DIRECTION_TYPES; ++iJ)
+					{
+						CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iJ));
+
+						if (pAdjacentPlot != NULL && pAdjacentPlot->getTerrainType() != NO_TERRAIN && pAdjacentPlot->getOwner() == eBuilder)
+						{
+							bool bUp = false;
+							for (int iK = 0; iK < NUM_YIELD_TYPES; ++iK)
+							{
+								
+
+								if (pImprovement2->GetAdjacentTerrainYieldChanges(pAdjacentPlot->getTerrainType(), (YieldTypes)iK) > 0)
+								{
+									bUp = true;
+									break;
+								}
+							}
+							if (bUp)
+							{
+								pAdjacentPlot->updateYield();
+							}
+						}
+						if (pAdjacentPlot != NULL && pAdjacentPlot->getFeatureType() != NO_FEATURE && pAdjacentPlot->getOwner() == eBuilder)
+						{
+							bool bUp2 = false;
+							for (int iK = 0; iK < NUM_YIELD_TYPES; ++iK)
+							{
+							
+
+								if (pImprovement2->GetAdjacentFeatureYieldChanges(pAdjacentPlot->getFeatureType(), (YieldTypes)iK) > 0)
+								{
+									bUp2 = true;
+									break;
+								}
+							}
+							if (bUp2)
+							{
+								pAdjacentPlot->updateYield();
+							}
+						}
+					}
+				}
+			}
+			if (eBuilder != NO_PLAYER && eOldImprovement != NO_IMPROVEMENT && getOwner() == eBuilder)
+			{
+				CvImprovementEntry* pImprovement2 = GC.getImprovementInfo(eOldImprovement);
+				if (pImprovement2)
+				{
+					for (int iJ = 0; iJ < NUM_DIRECTION_TYPES; ++iJ)
+					{
+						CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iJ));
+
+						if (pAdjacentPlot != NULL && pAdjacentPlot->getTerrainType() != NO_TERRAIN && pAdjacentPlot->getOwner() == eBuilder)
+						{
+							bool bUp = false;
+							for (int iK = 0; iK < NUM_YIELD_TYPES; ++iK)
+							{
+								
+
+								if (pImprovement2->GetAdjacentTerrainYieldChanges(pAdjacentPlot->getTerrainType(), (YieldTypes)iK) > 0)
+								{
+									bUp = true;
+									break;
+								}
+							}
+							if (bUp)
+							{
+								pAdjacentPlot->updateYield();
+							}
+						}
+						if (pAdjacentPlot != NULL && pAdjacentPlot->getFeatureType() != NO_FEATURE && pAdjacentPlot->getOwner() == eBuilder)
+						{
+							bool bUp2 = false;
+							for (int iK = 0; iK < NUM_YIELD_TYPES; ++iK)
+							{
+							
+
+								if (pImprovement2->GetAdjacentFeatureYieldChanges(pAdjacentPlot->getFeatureType(), (YieldTypes)iK) > 0)
+								{
+									bUp2 = true;
+									break;
+								}
+							}
+							if (bUp2)
+							{
+								pAdjacentPlot->updateYield();
+							}
+						}
+					}
+				}
+			}
+#endif
 
 			// Someone owns this plot
 			if(owningPlayerID != NO_PLAYER)
@@ -8312,6 +8525,36 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 		}
 	}
 
+	//if (getOwner() == ePlayer)
+	//{
+		//for (iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
+		//{
+			//CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+
+			//if (pAdjacentPlot == NULL)
+				//continue;
+
+			//if (pAdjacentPlot->getImprovementType() != NO_IMPROVEMENT && pAdjacentPlot->getOwner() == ePlayer)
+			//{
+				//CvImprovementEntry* pImprovement2 = GC.getImprovementInfo(pAdjacentPlot->getImprovementType());
+				//if (pImprovement2)
+				//{
+					//iYield += pImprovement2->GetAdjacentImprovementYieldChanges(eImprovement, eYield);
+				//}
+
+				//if (pAdjacentPlot->getFeatureType() != NO_FEATURE)
+				//{
+					//iYield += pImprovement->GetAdjacentFeatureYieldChanges(pAdjacentPlot->getFeatureType(), eYield);
+				//}
+
+				//if (pAdjacentPlot->getResourceType(kPlayer.getTeam()) != NO_RESOURCE)
+				//{
+					//iYield += pImprovement->GetAdjacentResourceYieldChanges(pAdjacentPlot->getResourceType(), eYield);
+				//}
+			//}
+		//}
+	
+
 	if(isRiverSide())
 	{
 		iYield += pImprovement->GetRiverSideYieldChange(eYield);
@@ -8326,7 +8569,13 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 	{
 		iYield += pImprovement->GetHillsYieldChange(eYield);
 	}
-	
+#if defined(MOD_ROG_CORE)
+	if (getFeatureType() != NO_FEATURE)
+	{
+		iYield += pImprovement->GetFeatureYieldChanges(getFeatureType(), eYield);
+	}
+#endif
+
 	// Check to see if there's a bonus to apply before doing any looping
 	if(pImprovement->GetAdjacentCityYieldChange(eYield) > 0 ||
 	        pImprovement->GetAdjacentMountainYieldChange(eYield) > 0)
@@ -8574,6 +8823,8 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 				iYield += GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_EXTRA_CULTURE_FROM_IMPROVEMENTS);
 				iYield += GET_PLAYER(getOwner()).GetPlayerPolicies()->GetImprovementCultureChange(eImprovement);
 			}
+
+
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 			if (getOwner() == ePlayer)
 			{
@@ -8595,6 +8846,38 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 				}
 			}
 #endif
+
+#if defined(MOD_ROG_CORE)
+			if (getOwner() == ePlayer)
+			{
+				CvPlayerAI& kPlayer = GET_PLAYER(ePlayer);
+				for (int iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
+				{
+					CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+
+					if (pAdjacentPlot == NULL)
+						continue;
+
+					if (pAdjacentPlot->getFeatureType() != NO_FEATURE)
+					{
+						iYield += pImprovement->GetAdjacentFeatureYieldChanges(pAdjacentPlot->getFeatureType(), eYield);
+					}
+
+					if (pAdjacentPlot->getTerrainType() != NO_TERRAIN)
+					{
+						iYield += pImprovement->GetAdjacentTerrainYieldChanges(pAdjacentPlot->getTerrainType(), eYield);
+					}
+
+					if (pAdjacentPlot->getResourceType(kPlayer.getTeam()) != NO_RESOURCE)
+					{
+						iYield += pImprovement->GetAdjacentResourceYieldChanges(pAdjacentPlot->getResourceType(), eYield);
+					}
+					
+				}
+			}
+#endif
+
+
 		}
 	}
 
@@ -12363,3 +12646,6 @@ int CvPlot::ComputeYieldFromOtherAdjacentImprovement(CvImprovementEntry& kImprov
 	return iRtnValue;
 }
 #endif
+
+
+

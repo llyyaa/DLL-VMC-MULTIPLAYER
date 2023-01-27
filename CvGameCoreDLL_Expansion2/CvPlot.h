@@ -381,6 +381,9 @@ public:
 	int ComputeCultureFromAdjacentImprovement(CvImprovementEntry& kImprovement, ImprovementTypes eValue) const;
 #endif
 
+
+
+
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	int getAdditionalUnitsFromImprovement() const;
 	void calculateAdditionalUnitsFromImprovement();
@@ -863,6 +866,12 @@ public:
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 	int CvPlot::ComputeYieldFromOtherAdjacentImprovement(CvImprovementEntry& kImprovement, YieldTypes eYield) const;
 #endif
+#if defined(MOD_ROG_CORE)
+	int ComputeYieldFromAdjacentTerrain(CvImprovementEntry& kImprovement, YieldTypes eYield) const;
+	int ComputeYieldFromAdjacentResource(CvImprovementEntry& kImprovement, YieldTypes eYield, TeamTypes eTeam) const;
+	int ComputeYieldFromAdjacentFeature(CvImprovementEntry& kImprovement, YieldTypes eYield) const;
+#endif
+
 protected:
 	class PlotBoolField
 	{

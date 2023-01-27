@@ -12403,22 +12403,6 @@ int CvPlayer::GetHappinessFromNaturalWonders() const
 	return iHappiness;
 }
 
-#if defined(MOD_ROG_CORE)
-void CvPlayer::SetNaturalWonderOwned(FeatureTypes eFeature, bool bValue)
-{
-	VALIDATE_OBJECT
-		CvAssertMsg(eFeature >= 0, "eFeature is expected to be non-negative (invalid Index)");
-	CvAssertMsg(eFeature < GC.getNumFeatureInfos(), "eEvent is expected to be within maximum bounds (invalid Index)");
-
-	vector<FeatureTypes>::const_iterator it = std::find(m_ownedNaturalWonders.begin(), m_ownedNaturalWonders.end(), eFeature);
-
-	if (bValue && it == m_ownedNaturalWonders.end())
-		m_ownedNaturalWonders.push_back(eFeature);
-	else if (!bValue && it != m_ownedNaturalWonders.end())
-		m_ownedNaturalWonders.erase(it);
-}
-#endif
-
 
 //	--------------------------------------------------------------------------------
 /// Extra Happiness from every connected Luxury
