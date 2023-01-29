@@ -5437,12 +5437,46 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 		{
 			setOwnershipDuration(0);
 
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+			FeatureTypes eFeature = getFeatureType();
+			CvFeatureInfo* pFeatureInfo = GC.getFeatureInfo(eFeature);
+
+			if (pFeatureInfo && eNewValue != NO_PLAYER)
+			{
+				if (pFeatureInfo->getInBorderHappiness() > 0)
+					GET_PLAYER(eNewValue).SetNaturalWonderOwned(eFeature, true);
+
+				PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
+				if (eFreePromotion != NO_PROMOTION)
+				{
+					if (!GET_PLAYER(eNewValue).IsFreePromotion(eFreePromotion))
+					{
+						GET_PLAYER(eNewValue).ChangeFreePromotionCount(eFreePromotion, 1);
+					}
+				}
+			}
+#endif
 
 			// Plot was owned by someone else
 			if(isOwned())
 			{
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+				if (pFeatureInfo && eOldOwner != NO_PLAYER)
+				{
+					if (pFeatureInfo->getInBorderHappiness() > 0)
+						GET_PLAYER(eOldOwner).SetNaturalWonderOwned(eFeature, false);
 
+					PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
+					if (eFreePromotion != NO_PROMOTION)
+					{
+						if (GET_PLAYER(eOldOwner).IsFreePromotion(eFreePromotion))
+						{
+							GET_PLAYER(eOldOwner).ChangeFreePromotionCount(eFreePromotion, -1);
+						}
 
+					}
+				}
+#endif
 #if defined(MOD_API_EXTENSIONS)
 				changeAdjacentSight(getTeam(), GC.getPLOT_VISIBILITY_RANGE(), false, NO_INVISIBLE, NO_DIRECTION);
 #else

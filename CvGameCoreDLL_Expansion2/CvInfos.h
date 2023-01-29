@@ -1502,6 +1502,7 @@ public:
 	bool IsRough() const;
 
 #if defined(MOD_PSEUDO_NATURAL_WONDER)
+	int  getPromotionIfOwned() const;
 	bool IsNaturalWonder(bool orPseudoNatural = false) const;
 	bool IsPseudoNaturalWonder() const;
 #else
@@ -1574,6 +1575,7 @@ protected:
 	bool m_bNaturalWonder;
 #if defined(MOD_PSEUDO_NATURAL_WONDER)
 	bool m_bPseudoNaturalWonder;
+	int m_iPromotionIfOwned;
 #endif
 	// Set each time the game is started
 	bool m_bClearable;

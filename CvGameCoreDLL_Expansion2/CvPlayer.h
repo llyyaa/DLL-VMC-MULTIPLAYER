@@ -620,6 +620,12 @@ public:
 #else
 	void setHasPolicy(PolicyTypes eIndex, bool bNewValue);
 #endif
+
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+	void SetNaturalWonderOwned(FeatureTypes eFeature, bool bValue);
+#endif
+
+
 	int getNextPolicyCost() const;
 	void DoUpdateNextPolicyCost();
 	bool canAdoptPolicy(PolicyTypes ePolicy) const;
@@ -2164,6 +2170,25 @@ protected:
 	FAutoVariable<bool, CvPlayer> m_bHasAdoptedStateReligion;
 	FAutoVariable<bool, CvPlayer> m_bAlliesGreatPersonBiasApplied;
 
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+	//SYNC_ARCHIVE_VAR(std::vector<FeatureTypes>, m_ownedNaturalWonders)
+	//std::vector<FeatureTypes> m_ownedNaturalWonders;
+	//SYNC_ARCHIVE_VAR(ImprovementTypes, m_eCombatBonusImprovement)
+	//FAutoVariable<ImprovementTypes, CvUnit> m_eCombatBonusImprovement;
+
+	//std::vector<UnitAITypes> m_neededUnitAITypes;
+	//SYNC_ARCHIVE_VAR(std::vector<UnitAITypes>, m_neededUnitAITypes)
+	// 
+	//std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiCityYieldFromUnimprovedFeature;
+	//FAutoVariable< std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > >, CvPlayer> m_ppaaiImprovementYieldChange;
+
+	//std::vector<FeatureTypes> m_ownedNaturalWonders;
+
+	//FAutoVariable<std::vector<FeatureTypes>, CvPlayer> m_ownedNaturalWonders;
+
+	std::vector<FeatureTypes> m_ownedNaturalWonders;
+
+#endif
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiCityYieldChange;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiCoastalCityYieldChange;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiCapitalYieldChange;

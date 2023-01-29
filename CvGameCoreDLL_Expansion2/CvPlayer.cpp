@@ -238,6 +238,10 @@ CvPlayer::CvPlayer() :
 	, m_iGreatScientistsCreated(0)
 	, m_iGreatEngineersCreated(0)
 #endif
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+	//, m_ownedNaturalWonders("CvPlayer::m_ownedNaturalWonders", m_syncArchive)
+	, m_ownedNaturalWonders()
+#endif
 	, m_iGreatWritersCreated(0)
 	, m_iGreatArtistsCreated(0)
 	, m_iGreatMusiciansCreated(0)
@@ -1177,6 +1181,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiExtraYieldThreshold.clear();
 	m_aiExtraYieldThreshold.resize(NUM_YIELD_TYPES, 0);
 
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+	m_ownedNaturalWonders.clear();
+#endif
 	m_aiSpecialistExtraYield.clear();
 	m_aiSpecialistExtraYield.resize(NUM_YIELD_TYPES, 0);
 
@@ -12366,6 +12373,7 @@ int CvPlayer::GetHappinessFromNaturalWonders() const
 		iHappiness /= 100;
 	}
 
+
 	for(int iI = 0; iI < GC.getMap().numPlots(); iI++)
 	{
 		CvPlot* pPlot = GC.getMap().plotByIndexUnchecked(iI);
@@ -12403,6 +12411,21 @@ int CvPlayer::GetHappinessFromNaturalWonders() const
 	return iHappiness;
 }
 
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
+void CvPlayer::SetNaturalWonderOwned(FeatureTypes eFeature, bool bValue)
+{
+	VALIDATE_OBJECT
+		CvAssertMsg(eFeature >= 0, "eFeature is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eFeature < GC.getNumFeatureInfos(), "eEvent is expected to be within maximum bounds (invalid Index)");
+
+	vector<FeatureTypes>::const_iterator it = std::find(m_ownedNaturalWonders.begin(), m_ownedNaturalWonders.end(), eFeature);
+
+	if (bValue && it == m_ownedNaturalWonders.end())
+		m_ownedNaturalWonders.push_back(eFeature);
+	else if (!bValue && it != m_ownedNaturalWonders.end())
+		m_ownedNaturalWonders.erase(it);
+}
+#endif
 
 //	--------------------------------------------------------------------------------
 /// Extra Happiness from every connected Luxury
@@ -24960,6 +24983,10 @@ void CvPlayer::Read(FDataStream& kStream)
 	MOD_SERIALIZE_READ(52, kStream, m_iGreatScientistsCreated, 0);
 	MOD_SERIALIZE_READ(52, kStream, m_iGreatEngineersCreated, 0);
 #endif
+//#if defined(MOD_PSEUDO_NATURAL_WONDER)
+	//kStream >> m_ownedNaturalWonders;
+//#endif
+
 	kStream >> m_iGreatWritersCreated;
 	kStream >> m_iGreatArtistsCreated;
 	kStream >> m_iGreatMusiciansCreated;

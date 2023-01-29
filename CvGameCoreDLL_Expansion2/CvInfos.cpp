@@ -4885,6 +4885,7 @@ CvFeatureInfo::CvFeatureInfo() :
 	m_iEffectProbability(0),
 	m_piYieldChange(NULL),
 #if defined(MOD_PSEUDO_NATURAL_WONDER)
+	m_iPromotionIfOwned(NO_PROMOTION),
 	m_bPseudoNaturalWonder(false),
 #endif
 
@@ -5069,6 +5070,13 @@ bool CvFeatureInfo::IsRough() const
 }
 //------------------------------------------------------------------------------
 #if defined(MOD_PSEUDO_NATURAL_WONDER)
+int CvFeatureInfo::getPromotionIfOwned() const
+{
+	return m_iPromotionIfOwned;
+}
+#endif
+
+#if defined(MOD_PSEUDO_NATURAL_WONDER)
 bool CvFeatureInfo::IsNaturalWonder(bool orPseudoNatural) const
 #else
 bool CvFeatureInfo::IsNaturalWonder() const
@@ -5242,6 +5250,9 @@ bool CvFeatureInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_bRough = kResults.GetBool("Rough");
 	m_bNaturalWonder = kResults.GetBool("NaturalWonder");
 #if defined(MOD_PSEUDO_NATURAL_WONDER)
+	szTextVal = kResults.GetText("FreePromotionIfOwned");
+	m_iPromotionIfOwned = GC.getInfoTypeForString(szTextVal, true);
+
 	m_bPseudoNaturalWonder = kResults.GetBool("PseudoNaturalWonder");
 #endif
 
