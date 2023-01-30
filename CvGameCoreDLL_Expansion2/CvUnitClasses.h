@@ -186,11 +186,6 @@ public:
 
 	UnitMoveRate GetMoveRate(int numHexes) const;
 
-#ifdef MOD_BALANCE_CORE
-	int GetScalingFromOwnedImprovements(int i) const;
-	int GetScaleFromNumGWs() const;
-#endif
-
 private:
 
 	int m_iProductionCost;
@@ -346,11 +341,6 @@ private:
 	CvString* m_paszMiddleArtDefineTags;
 	CvString* m_paszUnitNames;
 	GreatWorkType* m_paeGreatWorks;
-
-#ifdef MOD_BALANCE_CORE
-	int* m_piScalingFromOwnedImprovements;
-	int m_iScaleFromNumGWs;
-#endif
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -368,10 +368,6 @@ public:
 	int GetConversionStrength() const;
 #endif
 
-#ifdef MOD_BALANCE_CORE
-	int GetScaleAmount(int iAmountToScale) const;
-#endif
-
 	bool canDiscover(const CvPlot* pPlot, bool bTestVisible = false) const;
 	int getDiscoverAmount();
 	bool discover();
