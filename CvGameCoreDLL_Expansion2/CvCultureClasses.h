@@ -82,7 +82,7 @@ public:
 
 	bool SwapGreatWorks (PlayerTypes ePlayer1, int iWork1, PlayerTypes ePlayer2, int iWork2);
 	void MoveGreatWorks(PlayerTypes ePlayer, int iCity1, int iBuildingClass1, int iWorkIndex1, 
-																					 int iCity2, int iBuildingClass2, int iWorkIndex2);
+		int iCity2, int iBuildingClass2, int iWorkIndex2);
 	GreatWorkList m_CurrentGreatWorks;
 
 	// Culture Victory
@@ -182,7 +182,12 @@ public:
 	// Great Work routines
 	bool HasAvailableGreatWorkSlot(GreatWorkSlotType eGreatWorkSlot);
 	int GetNumAvailableGreatWorkSlots(GreatWorkSlotType eGreatWorkSlot) const;
-	CvCity *GetClosestAvailableGreatWorkSlot(int iX, int iY, GreatWorkSlotType eGreatWorkSlot, BuildingClassTypes *eBuildingClass, int *iSlot) const;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	CvCity* GetClosestAvailableGreatWorkSlot(int iX, int iY, GreatWorkSlotType eGreatWorkSlot, BuildingTypes* eBuilding, int* iSlot) const;
+#else
+	CvCity* GetClosestAvailableGreatWorkSlot(int iX, int iY, GreatWorkSlotType eGreatWorkSlot, BuildingClassTypes* eBuildingClass, int* iSlot) const;
+#endif
+	
 	int GetNumGreatWorks() const;
 	int GetNumGreatWorkSlots() const;
 	int GetNumGreatWorkSlots(GreatWorkSlotType eGreatWorkSlot) const;
@@ -344,11 +349,15 @@ public:
 	CvString GetTourismTooltip();
 	CvString GetFilledSlotsTooltip();
 	CvString GetTotalSlotsTooltip();
-
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	bool IsThemingBonusPossible(BuildingTypes eBuilding) const;
+	int GetThemingBonus(BuildingTypes eBuilding) const;
+	CvString GetThemingTooltip(BuildingTypes eBuilding) const;
+#else
 	bool IsThemingBonusPossible(BuildingClassTypes eBuildingClass) const;
 	int GetThemingBonus(BuildingClassTypes eBuildingClass) const;
 	CvString GetThemingTooltip(BuildingClassTypes eBuildingClass) const;
-
+#endif
 	int GetCultureFromWonders() const;
 	int GetCultureFromNaturalWonders() const;
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -360,8 +369,11 @@ public:
 	void LogGreatWorks (FILogFile* pLog);
 
 private:
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	int GetThemingBonusIndex(BuildingTypes eBuilding) const;
+#else
 	int GetThemingBonusIndex(BuildingClassTypes eBuildingClass) const;
-
+#endif
 	CvCity *m_pCity;
 };
 

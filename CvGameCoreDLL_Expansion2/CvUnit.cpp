@@ -7280,13 +7280,21 @@ bool CvUnit::createGreatWork()
 #else
 	CvPlayer &kPlayer = GET_PLAYER(m_eOwner);
 #endif
-	BuildingClassTypes eBuildingClass = NO_BUILDINGCLASS; // Passed by reference below
+
+
+	
 	int iSlot = -1; // Passed by reference below
 	GreatWorkType eGreatWorkType = GetGreatWork();
 	GreatWorkClass eClass = CultureHelpers::GetGreatWorkClass(eGreatWorkType);
 	GreatWorkSlotType eGreatWorkSlot = CultureHelpers::GetGreatWorkSlot(eGreatWorkType);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	BuildingTypes eBuildingType = NO_BUILDING; // Passed by reference below
+	CvCity* pCity = kPlayer.GetCulture()->GetClosestAvailableGreatWorkSlot(getX(), getY(), eGreatWorkSlot, &eBuildingType, &iSlot);
+#else
+	BuildingClassTypes eBuildingClass = NO_BUILDINGCLASS; // Passed by reference below
+	CvCity* pCity = kPlayer.GetCulture()->GetClosestAvailableGreatWorkSlot(getX(), getY(), eGreatWorkSlot, &eBuildingClass, &iSlot);
+#endif
 	
-	CvCity *pCity = kPlayer.GetCulture()->GetClosestAvailableGreatWorkSlot(getX(), getY(), eGreatWorkSlot, &eBuildingClass, &iSlot);
 	if (pCity)
 	{
 #if defined(MOD_BUGFIX_USE_GETTERS)
@@ -7294,7 +7302,12 @@ bool CvUnit::createGreatWork()
 #else
 		int iGWindex = pCulture->CreateGreatWork(eGreatWorkType, eClass, m_eOwner, kPlayer.GetCurrentEra(), getName());
 #endif
+
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		pCity->GetCityBuildings()->SetBuildingGreatWork(eBuildingType, iSlot, iGWindex);
+#else
 		pCity->GetCityBuildings()->SetBuildingGreatWork(eBuildingClass, iSlot, iGWindex);
+#endif
 
 		if(pPlot->isActiveVisible(false))
 		{

@@ -1099,6 +1099,15 @@ protected:
 	static int lGetWarmongerPreviewString(lua_State* L);
 	static int lGetLiberationPreviewString(lua_State* L);
 
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	static int lGetWhetherAcquiredOtherCIVsUniqueBuilding(lua_State* L);
+	static int lGetWhetherAcquiredOtherCIVsUniqueUnit(lua_State* L);
+	static int lGetWhetherAcquiredOtherCIVsUniqueImprovement(lua_State* L);
+	static int lSetAcquiredOtherCIVsUniqueBuilding(lua_State* L);
+	static int lSetAcquiredOtherCIVsUniqueUnit(lua_State* L);
+	static int lSetAcquiredOtherCIVsUniqueImprovement(lua_State* L);
+#endif
+
 
 #if defined(MOD_API_LUA_EXTENSIONS)
 	LUAAPIEXTN(AddMessage, void, sMessage);

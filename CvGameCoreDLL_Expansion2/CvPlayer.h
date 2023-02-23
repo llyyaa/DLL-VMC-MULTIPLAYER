@@ -1849,6 +1849,20 @@ public:
 	bool GetCanFoundMountainCity() const;
 #endif
 
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	bool GetWhetherAcquiredOtherCIVsUniqueBuilding(CivilizationTypes civID) const;
+	bool GetWhetherAcquiredOtherCIVsUniqueUnit(CivilizationTypes civID) const;
+	bool GetWhetherAcquiredOtherCIVsUniqueImprovement(CivilizationTypes civID) const;
+
+	std::vector<int>& GetListOfAcquiredOtherCIVsUniqueBuilding();
+	std::vector<int>& GetListOfAcquiredOtherCIVsUniqueUnit();
+	std::vector<int>& GetListOfAcquiredOtherCIVsUniqueImprovement();
+
+	void SetAcquiredOtherCIVsUniqueBuilding(CivilizationTypes civID, bool acquired);
+	void SetAcquiredOtherCIVsUniqueUnit(CivilizationTypes civID, bool acquired);
+	void SetAcquiredOtherCIVsUniqueImprovement(CivilizationTypes civID, bool acquired);
+#endif
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2380,6 +2394,13 @@ protected:
 	friend const CvUnit* GetPlayerUnit(const IDInfo& unit);
 
 	CvPlayerAchievements m_kPlayerAchievements;
+
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	std::vector<int> m_piAcquiredUniqueBuildings;
+	std::vector<int> m_piAcquiredUniqueUnits;
+	std::vector<int> m_piAcquiredUniqueImprovements;
+#endif
+
 };
 
 extern bool CancelActivePlayerEndTurn();

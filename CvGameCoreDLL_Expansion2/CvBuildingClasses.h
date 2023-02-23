@@ -230,6 +230,10 @@ public:
 	int GetExtraLeagueVotes() const;
 	int GetPreferredDisplayPosition() const;
 	int GetPortraitIndex() const;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	CivilizationTypes GetUniqueBuildingOwnerCiv() const;
+	void SetUniqueBuildingOwnerCiv(CivilizationTypes civOwner);
+#endif
 	bool IsTeamShare() const;
 	bool IsWater() const;
 	bool IsRiver() const;
@@ -479,6 +483,10 @@ private:
 	int m_iPreferredDisplayPosition;
 	int m_iPortraitIndex;
 
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	CivilizationTypes m_iUniqueBuildingOwnerCiv;
+#endif
+
 	bool m_bTeamShare;
 	bool m_bWater;
 	bool m_bRiver;
@@ -668,21 +676,39 @@ public:
 	int GetNumFreeBuilding(BuildingTypes eIndex) const;
 	void SetNumFreeBuilding(BuildingTypes eIndex, int iNewValue);
 
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	int GetNumRealBuildingClasses(BuildingClassTypes eIndex) const;
+	int GetNumFreeBuildingClasses(BuildingClassTypes eIndex) const;
+
+	int GetNumBuildingClass(BuildingClassTypes eIndex) const;
+	int GetNumActiveBuildingClass(BuildingClassTypes eIndex) const;
+#endif
+
 	int GetBuildingYieldChange(BuildingClassTypes eBuildingClass, YieldTypes eYield) const;
 	void SetBuildingYieldChange(BuildingClassTypes eBuildingClass, YieldTypes eYield, int iChange);
 	void ChangeBuildingYieldChange(BuildingClassTypes eBuildingClass, YieldTypes eYield, int iChange);
-
-	int GetBuildingGreatWork(BuildingClassTypes eBuildingClass, int iSlot) const;
-	void SetBuildingGreatWork(BuildingClassTypes eBuildingClass, int iSlot, int iGreatWorkIndex);
-	bool IsHoldingGreatWork(BuildingClassTypes eBuildingClass) const;
-	int GetNumGreatWorksInBuilding(BuildingClassTypes eBuildingClass) const;
   
 	bool HasAnyAvailableGreatWorkSlot() const;
 	bool HasAvailableGreatWorkSlot(GreatWorkSlotType eGreatWorkSlot) const;
 	int GetNumAvailableGreatWorkSlots() const;
 	int GetNumAvailableGreatWorkSlots(GreatWorkSlotType eGreatWorkSlot) const;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	int GetBuildingGreatWork(BuildingTypes eBuilding, int iSlot) const;
+	void SetBuildingGreatWork(BuildingTypes eBuilding, int iSlot, int iGreatWorkIndex);
+
+	bool GetNextAvailableGreatWorkSlot(BuildingTypes* eBuildingClass, int* iSlot) const;
+	bool GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWorkSlot, BuildingTypes* eBuildingClass, int* iSlot) const;
+	bool IsHoldingGreatWork(BuildingTypes eBuilding) const;
+	int GetNumGreatWorksInBuilding(BuildingTypes eBuilding) const;
+#else
+	void SetBuildingGreatWork(BuildingClassTypes eBuildingClass, int iSlot, int iGreatWorkIndex);
+	int GetBuildingGreatWork(BuildingClassTypes eBuildingClass, int iSlot) const;
+
 	bool GetNextAvailableGreatWorkSlot(BuildingClassTypes *eBuildingClass, int *iSlot) const;
 	bool GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWorkSlot, BuildingClassTypes *eBuildingClass, int *iSlot) const;
+	bool IsHoldingGreatWork(BuildingClassTypes eBuildingClass) const;
+	int GetNumGreatWorksInBuilding(BuildingClassTypes eBuildingClass) const;
+#endif
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES) || defined(MOD_API_UNIFIED_YIELDS)
 	int GetYieldFromGreatWorks(YieldTypes eYield) const;
@@ -743,6 +769,11 @@ private:
 	int* m_paiBuildingOriginalTime;
 	int* m_paiNumRealBuilding;
 	int* m_paiNumFreeBuilding;
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	std::vector<int> m_paiNumRealBuildingClasses;
+	std::vector<int> m_paiNumFreeBuildingClasses;
+#endif
 
 	std::vector<BuildingYieldChange> m_aBuildingYieldChange;
 	std::vector<BuildingGreatWork> m_aBuildingGreatWork;

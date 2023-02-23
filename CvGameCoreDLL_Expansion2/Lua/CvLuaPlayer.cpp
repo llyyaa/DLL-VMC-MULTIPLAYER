@@ -119,6 +119,11 @@ void CvLuaPlayer::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetNumMayaBoosts);
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetNumFaithGreatPeople);
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetEmbarkedGraphicOverride);
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetAcquiredOtherCIVsUniqueBuilding);
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetAcquiredOtherCIVsUniqueUnit);
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetAcquiredOtherCIVsUniqueImprovement);
+#endif
 
 }
 
@@ -1253,6 +1258,15 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 #ifdef MOD_API_RELIGION_EXTENSIONS
 	Method(IsSecondReligionPantheon);
 #endif // MOD_API_RELIGION_EXTENSIONS
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	Method(GetWhetherAcquiredOtherCIVsUniqueBuilding);
+	Method(GetWhetherAcquiredOtherCIVsUniqueUnit);
+	Method(GetWhetherAcquiredOtherCIVsUniqueImprovement);
+	Method(SetAcquiredOtherCIVsUniqueBuilding);
+	Method(SetAcquiredOtherCIVsUniqueUnit);
+	Method(SetAcquiredOtherCIVsUniqueImprovement);
+#endif
 
 }
 //------------------------------------------------------------------------------
@@ -2896,7 +2910,12 @@ int CvLuaPlayer::lGetCityOfClosestGreatWorkSlot(lua_State* L)
 	int iX = lua_tointeger(L, 2);
 	int iY = lua_tointeger(L, 3);
 	GreatWorkSlotType eGreatWorkSlot = static_cast<GreatWorkSlotType>(lua_tointeger(L, 4));
+	
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	BuildingTypes eBuildingClass;
+#else
 	BuildingClassTypes eBuildingClass;
+#endif
 	int iSlot;
 	CvCity* pkCity = pkPlayer->GetCulture()->GetClosestAvailableGreatWorkSlot(iX, iY, eGreatWorkSlot, &eBuildingClass, &iSlot);
 	if (pkCity)
@@ -2917,7 +2936,11 @@ int CvLuaPlayer::lGetBuildingOfClosestGreatWorkSlot(lua_State* L)
 	int iX = lua_tointeger(L, 2);
 	int iY = lua_tointeger(L, 3);
 	GreatWorkSlotType eGreatWorkSlot = static_cast<GreatWorkSlotType>(lua_tointeger(L, 4));
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	BuildingTypes eBuildingClass;
+#else
 	BuildingClassTypes eBuildingClass;
+#endif
 	int iSlot;
 	CvCity* pkCity = pkPlayer->GetCulture()->GetClosestAvailableGreatWorkSlot(iX, iY, eGreatWorkSlot, &eBuildingClass, &iSlot);
 	CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(pkPlayer->getCivilizationType());
@@ -4938,13 +4961,48 @@ int CvLuaPlayer::lGetGreatWorks(lua_State* L)
 	CvCity* pCity = NULL;
 	for (pCity = pkPlayer->firstCity(&iCityLoop); pCity != NULL; pCity = pkPlayer->nextCity(&iCityLoop))
 	{
-		for(int iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		for (int iBuildingLoop = 0; iBuildingLoop < GC.getNumBuildingInfos(); iBuildingLoop++)
+		{
+			CvBuildingEntry* pkBuilding = GC.getBuildingInfo(BuildingTypes(iBuildingLoop));
+			if (pkBuilding)
+			{
+				if (pCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iBuildingLoop)) > 0)
+				{
+
+					int iNumSlots = pkBuilding->GetGreatWorkCount();
+					for (int iI = 0; iI < iNumSlots; iI++)
+					{
+						int iGreatWorkIndex = pCity->GetCityBuildings()->GetBuildingGreatWork(BuildingTypes(iBuildingLoop), iI);
+						if (iGreatWorkIndex != -1)
+						{
+							if (GC.getGame().GetGameCulture()->m_CurrentGreatWorks[iGreatWorkIndex].m_eClassType == eGreatWorkClass)
+							{
+								lua_createtable(L, 0, 0);
+								const int t = lua_gettop(L);
+								lua_pushinteger(L, iGreatWorkIndex);
+								lua_setfield(L, t, "Index");
+								lua_pushinteger(L, GC.getGame().GetGameCulture()->m_CurrentGreatWorks[iGreatWorkIndex].m_ePlayer);
+								lua_setfield(L, t, "Creator");
+								int iEra = GC.getGame().GetGameCulture()->m_CurrentGreatWorks[iGreatWorkIndex].m_eEra;
+								lua_pushinteger(L, iEra);
+								lua_setfield(L, t, "Era");
+								lua_rawseti(L, -2, index++);
+							}
+						}
+					}
+				}
+			}
+			
+	}
+#else
+		for (int iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
 		{
 			CvCivilizationInfo& playerCivilizationInfo = pkPlayer->getCivilizationInfo();
 			BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings((BuildingClassTypes)iBuildingClassLoop);
 			if (eBuilding != NO_BUILDING)
 			{
-				CvBuildingEntry *pkBuilding = GC.getBuildingInfo(eBuilding);
+				CvBuildingEntry* pkBuilding = GC.getBuildingInfo(eBuilding);
 				if (pkBuilding)
 				{
 					if (pCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
@@ -4974,6 +5032,8 @@ int CvLuaPlayer::lGetGreatWorks(lua_State* L)
 				}
 			}
 		}
+#endif
+		
 	}
 
 	return 1;
@@ -12239,3 +12299,37 @@ int CvLuaPlayer::lGetMinorAllyCount(lua_State* L)
 
 	return 1;
 }
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+int CvLuaPlayer::lGetWhetherAcquiredOtherCIVsUniqueBuilding(lua_State* L){
+	return BasicLuaMethod(L, &CvPlayer::GetWhetherAcquiredOtherCIVsUniqueBuilding);
+}
+int CvLuaPlayer::lGetWhetherAcquiredOtherCIVsUniqueUnit(lua_State* L) {
+	return BasicLuaMethod(L, &CvPlayer::GetWhetherAcquiredOtherCIVsUniqueUnit);
+}
+int CvLuaPlayer::lGetWhetherAcquiredOtherCIVsUniqueImprovement(lua_State* L) {
+	return BasicLuaMethod(L, &CvPlayer::GetWhetherAcquiredOtherCIVsUniqueImprovement);
+}
+	
+int CvLuaPlayer::lSetAcquiredOtherCIVsUniqueBuilding(lua_State* L) {
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	CivilizationTypes civID = (CivilizationTypes)lua_tointeger(L, 2);
+	bool newValue = lua_toboolean(L, 3);
+	pkPlayer->SetAcquiredOtherCIVsUniqueBuilding(civID, newValue);
+	return 0;
+}
+int CvLuaPlayer::lSetAcquiredOtherCIVsUniqueUnit(lua_State* L) {
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	CivilizationTypes civID = (CivilizationTypes)lua_tointeger(L, 2);
+	bool newValue = lua_toboolean(L, 3);
+	pkPlayer->SetAcquiredOtherCIVsUniqueUnit(civID, newValue);
+	return 0;
+}
+int CvLuaPlayer::lSetAcquiredOtherCIVsUniqueImprovement(lua_State* L) {
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	CivilizationTypes civID = (CivilizationTypes)lua_tointeger(L, 2);
+	bool newValue = lua_toboolean(L, 3);
+	pkPlayer->SetAcquiredOtherCIVsUniqueImprovement(civID, newValue);
+	return 0;
+}
+#endif

@@ -576,7 +576,7 @@ void CvDllNetMessageHandler::ResponseSwapGreatWorks(PlayerTypes ePlayer1, int iW
 
 //------------------------------------------------------------------------------
 void CvDllNetMessageHandler::ResponseMoveGreatWorks(PlayerTypes ePlayer, int iCity1, int iBuildingClass1, int iWorkIndex1, 
-																																				 int iCity2, int iBuildingClass2, int iWorkIndex2)
+	int iCity2, int iBuildingClass2, int iWorkIndex2)
 {
 	GC.getGame().GetGameCulture()->MoveGreatWorks(ePlayer, iCity1, iBuildingClass1, iWorkIndex1, iCity2, iBuildingClass2, iWorkIndex2);
 }

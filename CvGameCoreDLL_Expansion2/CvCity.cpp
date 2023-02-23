@@ -2868,6 +2868,14 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 	{
 		return false;
 	}
+	auto type = GC.getBuildingInfo(eBuilding)->GetBuildingClassType();
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+		if (GetCityBuildings()->GetNumBuildingClass((BuildingClassTypes)type) > 0) {
+			return false;
+		}
+	}
+#endif
 
 #if defined(MOD_API_EXTENSIONS)
 	if (!bWillPurchase && pkBuildingInfo->IsPurchaseOnly())
@@ -6381,7 +6389,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 	CvTeam& owningTeam = GET_TEAM(getTeam());
 	CvCivilizationInfo& thisCiv = getCivilizationInfo();
 
-	if(!(owningTeam.isObsoleteBuilding(eBuilding)) || bObsolete)
+	auto isObsoleteForOwningTeam = (owningTeam.isObsoleteBuilding(eBuilding));
+
+	if(!isObsoleteForOwningTeam || bObsolete)
 	{
 		// One-shot items
 		if(bFirst && iChange > 0)
@@ -6530,7 +6540,11 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			{
 				GreatWorkClass eClass = CultureHelpers::GetGreatWorkClass(eGWType);
 				int iGWindex = 	GC.getGame().GetGameCulture()->CreateGreatWork(eGWType, eClass, m_eOwner, owningPlayer.GetCurrentEra(), pBuildingInfo->GetDescription());
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+				m_pCityBuildings->SetBuildingGreatWork(eBuilding, 0, iGWindex);
+#else
 				m_pCityBuildings->SetBuildingGreatWork(eBuildingClass, 0, iGWindex);
+#endif
 			}
 
 			// Tech boost for science buildings in capital
@@ -11408,7 +11422,11 @@ int CvCity::getDomainFreeExperienceFromGreatWorks(DomainTypes eIndex) const
 		{
 			if (pInfo->GetDomainFreeExperiencePerGreatWork(eIndex) != 0)
 			{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+				int iGreatWorks = GetCityBuildings()->GetNumGreatWorksInBuilding((BuildingTypes)iBuilding);
+#else
 				int iGreatWorks = GetCityBuildings()->GetNumGreatWorksInBuilding((BuildingClassTypes)pInfo->GetBuildingClassType());
+#endif
 				iXP += (iGreatWorks * pInfo->GetDomainFreeExperiencePerGreatWork(eIndex));
 			}
 		}

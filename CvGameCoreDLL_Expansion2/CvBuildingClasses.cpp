@@ -130,6 +130,9 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iExtraLeagueVotes(0),
 	m_iPreferredDisplayPosition(0),
 	m_iPortraitIndex(-1),
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	m_iUniqueBuildingOwnerCiv(NO_CIVILIZATION),
+#endif
 	m_bTeamShare(false),
 	m_bWater(false),
 	m_bRiver(false),
@@ -1541,6 +1544,16 @@ int CvBuildingEntry::GetXBuiltTriggersIdeologyChoice() const
 {
 	return m_iXBuiltTriggersIdeologyChoice;
 }
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+CivilizationTypes CvBuildingEntry::GetUniqueBuildingOwnerCiv() const {
+	return m_iUniqueBuildingOwnerCiv;
+}
+
+void CvBuildingEntry::SetUniqueBuildingOwnerCiv(CivilizationTypes civOwner) {
+	m_iUniqueBuildingOwnerCiv = civOwner;
+}
+#endif
+
 
 /// Extra votes to use in leagues
 int CvBuildingEntry::GetExtraLeagueVotes() const
@@ -2370,6 +2383,10 @@ CvCityBuildings::CvCityBuildings():
 	m_paiBuildingOriginalTime(NULL),
 	m_paiNumRealBuilding(NULL),
 	m_paiNumFreeBuilding(NULL),
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	m_paiNumRealBuildingClasses(0),
+	m_paiNumFreeBuildingClasses(0),
+#endif
 	m_iNumBuildings(0),
 	m_iBuildingProductionModifier(0),
 	m_iBuildingDefense(0),
@@ -2398,7 +2415,7 @@ void CvCityBuildings::Init(CvBuildingXMLEntries* pBuildings, CvCity* pCity)
 	// Initialize status arrays
 
 	int iNumBuildings = m_pBuildings->GetNumBuildings();
-
+	
 	CvAssertMsg((0 < iNumBuildings),  "m_pBuildings->GetNumBuildings() is not greater than zero but an array is being allocated in CvCityBuildings::Init");
 
 	CvAssertMsg(m_paiBuildingProduction==NULL, "about to leak memory, CvCityBuildings::m_paiBuildingProduction");
@@ -2419,6 +2436,14 @@ void CvCityBuildings::Init(CvBuildingXMLEntries* pBuildings, CvCity* pCity)
 	CvAssertMsg(m_paiNumFreeBuilding==NULL, "about to leak memory, CvCityBuildings::m_paiNumFreeBuilding");
 	m_paiNumFreeBuilding = FNEW(int[iNumBuildings], c_eCiv5GameplayDLL, 0);
 
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	
+	m_paiNumRealBuildingClasses.clear();
+	m_paiNumRealBuildingClasses.resize(GC.getNumBuildingClassInfos());
+	m_paiNumFreeBuildingClasses.clear();
+	m_paiNumFreeBuildingClasses.resize(GC.getNumBuildingClassInfos());
+	
+#endif
 	m_aBuildingYieldChange.clear();
 	m_aBuildingGreatWork.clear();
 
@@ -2434,6 +2459,11 @@ void CvCityBuildings::Uninit()
 	SAFE_DELETE_ARRAY(m_paiBuildingOriginalTime);
 	SAFE_DELETE_ARRAY(m_paiNumRealBuilding);
 	SAFE_DELETE_ARRAY(m_paiNumFreeBuilding);
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	m_paiNumRealBuildingClasses.clear();
+	m_paiNumFreeBuildingClasses.clear();
+#endif
 }
 
 /// Reset status arrays to all false
@@ -2461,6 +2491,14 @@ void CvCityBuildings::Reset()
 		m_paiNumRealBuilding[iI] = 0;
 		m_paiNumFreeBuilding[iI] = 0;
 	}
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+	{
+		m_paiNumRealBuildingClasses[iI] = 0;
+		m_paiNumFreeBuildingClasses[iI] = 0;
+	}	
+#endif
 }
 
 /// Serialization read
@@ -2489,6 +2527,11 @@ void CvCityBuildings::Read(FDataStream& kStream)
 	BuildingArrayHelpers::Read(kStream, m_paiBuildingOriginalTime);
 	BuildingArrayHelpers::Read(kStream, m_paiNumRealBuilding);
 	BuildingArrayHelpers::Read(kStream, m_paiNumFreeBuilding);
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	kStream >> m_paiNumRealBuildingClasses;
+	kStream >> m_paiNumFreeBuildingClasses;
+#endif
 
 	kStream >> m_aBuildingYieldChange;
 	kStream >> m_aBuildingGreatWork;
@@ -2528,6 +2571,11 @@ void CvCityBuildings::Write(FDataStream& kStream)
 	BuildingArrayHelpers::Write(kStream, m_paiBuildingOriginalTime, iNumBuildings);
 	BuildingArrayHelpers::Write(kStream, m_paiNumRealBuilding, iNumBuildings);
 	BuildingArrayHelpers::Write(kStream, m_paiNumFreeBuilding, iNumBuildings);
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	kStream << m_paiNumRealBuildingClasses;
+	kStream << m_paiNumFreeBuildingClasses;
+#endif
 
 	kStream << m_aBuildingYieldChange;
 	kStream << m_aBuildingGreatWork;
@@ -2604,8 +2652,12 @@ bool CvCityBuildings::IsBuildingSellable(const CvBuildingEntry& kBuilding) const
 	}
 
 	// Great Work present in this one?
-	const BuildingClassTypes buildingClassType = (BuildingClassTypes) kBuilding.GetBuildingClassType();
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	if (IsHoldingGreatWork((BuildingTypes)kBuilding.GetID()))
+#else
+	const BuildingClassTypes buildingClassType = (BuildingClassTypes)kBuilding.GetBuildingClassType();
 	if (IsHoldingGreatWork(buildingClassType))
+#endif
 	{
 		return false;
 	}
@@ -2854,6 +2906,9 @@ void CvCityBuildings::SetNumRealBuildingTimed(BuildingTypes eIndex, int iNewValu
 		int iOldNumBuilding = GetNumBuilding(eIndex);
 
 		m_paiNumRealBuilding[eIndex] = iNewValue;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		m_paiNumRealBuildingClasses[buildingClassType] += iChangeNumRealBuilding;
+#endif
 
 		if(GetNumRealBuilding(eIndex) > 0)
 		{
@@ -3095,7 +3150,11 @@ void CvCityBuildings::SetNumFreeBuilding(BuildingTypes eIndex, int iNewValue)
 		int iChangeNumFreeBuilding = iNewValue - GetNumFreeBuilding(eIndex);
 		
 		m_paiNumFreeBuilding[eIndex] = iNewValue;
-
+		CvBuildingEntry* buildingEntry = GC.getBuildingInfo(eIndex);
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		const BuildingClassTypes buildingClassType = (BuildingClassTypes)buildingEntry->GetBuildingClassType();
+		m_paiNumFreeBuildingClasses[buildingClassType] += iChangeNumFreeBuilding;
+#endif
 		// Process building effects
 		m_pCity->processBuilding(eIndex, iChangeNumFreeBuilding, true);
 #else
@@ -3120,7 +3179,7 @@ void CvCityBuildings::SetNumFreeBuilding(BuildingTypes eIndex, int iNewValue)
 #endif
 
 #if defined(MOD_BUGFIX_MINOR)
-		CvBuildingEntry* buildingEntry = GC.getBuildingInfo(eIndex);
+		//CvBuildingEntry* buildingEntry = GC.getBuildingInfo(eIndex);
 		if(buildingEntry->IsCityWall())
 		{
 			auto_ptr<ICvPlot1> pDllPlot(new CvDllPlot(m_pCity->plot()));
@@ -3135,6 +3194,48 @@ void CvCityBuildings::SetNumFreeBuilding(BuildingTypes eIndex, int iNewValue)
 #endif
 	}
 }
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+int CvCityBuildings::GetNumRealBuildingClasses(BuildingClassTypes eIndex) const {
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumBuildingClassInfos(), "eIndex expected to be < GC.getNumBuildingClassInfos()");
+	return m_paiNumRealBuildingClasses[eIndex];
+}
+int CvCityBuildings::GetNumFreeBuildingClasses(BuildingClassTypes eIndex) const {
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumBuildingClassInfos(), "eIndex expected to be < GC.getNumBuildingClassInfos()");
+	return m_paiNumFreeBuildingClasses[eIndex];
+}
+
+
+int CvCityBuildings::GetNumBuildingClass(BuildingClassTypes eIndex) const {
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumBuildingClassInfos(), "eIndex expected to be < GC.getNumBuildingClassInfos()");
+
+	if (GC.getCITY_MAX_NUM_BUILDINGS() <= 1)
+	{
+		return std::max(GetNumRealBuildingClasses(eIndex), GetNumFreeBuildingClasses(eIndex));
+	}
+	else
+	{
+		return (GetNumRealBuildingClasses(eIndex) + GetNumFreeBuildingClasses(eIndex));
+	}
+}
+
+int CvCityBuildings::GetNumActiveBuildingClass(BuildingClassTypes eIndex) const {
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumBuildingClassInfos(), "eIndex expected to be < GC.getNumBuildingClassInfos()");
+	int rtn = 0;
+	auto buildingClassEntry = GC.getBuildingClassInfo(eIndex);
+	auto& buildingVec = buildingClassEntry->GetConntainingBuildings();
+	for (auto& it = buildingVec.begin(); it != buildingVec.end(); it++) {
+		rtn += GetNumActiveBuilding((BuildingTypes)(*it));
+	}
+	return rtn;
+}
+
+#endif
+
 /// Accessor: Get yield boost for a specific building by yield type
 int CvCityBuildings::GetBuildingYieldChange(BuildingClassTypes eBuildingClass, YieldTypes eYield) const
 {
@@ -3168,15 +3269,21 @@ void CvCityBuildings::SetBuildingYieldChange(BuildingClassTypes eBuildingClass, 
 				{
 					(*it).iChange = iChange;
 				}
-
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+				auto activeBuildingClassNum = GetNumActiveBuildingClass(eBuildingClass);
+				if (activeBuildingClassNum > 0) {
+					m_pCity->ChangeBaseYieldRateFromBuildings(eYield, (iChange - iOldChange) * activeBuildingClassNum);
+				}
+#else
 				BuildingTypes eBuilding = (BuildingTypes)GC.getCivilizationInfo(m_pCity->getCivilizationType())->getCivilizationBuildings(eBuildingClass);
-				if(NO_BUILDING != eBuilding)
+				if (NO_BUILDING != eBuilding)
 				{
-					if(GetNumActiveBuilding(eBuilding) > 0)
+					if (GetNumActiveBuilding(eBuilding) > 0)
 					{
 						m_pCity->ChangeBaseYieldRateFromBuildings(eYield, (iChange - iOldChange) * GetNumActiveBuilding(eBuilding));
 					}
 				}
+#endif
 			}
 
 			return;
@@ -3191,6 +3298,13 @@ void CvCityBuildings::SetBuildingYieldChange(BuildingClassTypes eBuildingClass, 
 		kChange.iChange = iChange;
 		m_aBuildingYieldChange.push_back(kChange);
 
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		auto activeBuildingClassNum = GetNumActiveBuildingClass(eBuildingClass);
+		if (activeBuildingClassNum > 0) {
+			m_pCity->ChangeBaseYieldRateFromBuildings(eYield, iChange * activeBuildingClassNum);
+		}
+#else
+
 		BuildingTypes eBuilding = (BuildingTypes)m_pCity->getCivilizationInfo().getCivilizationBuildings(eBuildingClass);
 		if(NO_BUILDING != eBuilding)
 		{
@@ -3199,6 +3313,7 @@ void CvCityBuildings::SetBuildingYieldChange(BuildingClassTypes eBuildingClass, 
 				m_pCity->ChangeBaseYieldRateFromBuildings(eYield, iChange * GetNumActiveBuilding(eBuilding));
 			}
 		}
+#endif
 	}
 }
 
@@ -3209,25 +3324,63 @@ void CvCityBuildings::ChangeBuildingYieldChange(BuildingClassTypes eBuildingClas
 }
 
 /// Accessor: Get Great Work in a specific building by slot index
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+int CvCityBuildings::GetBuildingGreatWork(BuildingTypes eBuilding, int iSlot) const
+#else
 int CvCityBuildings::GetBuildingGreatWork(BuildingClassTypes eBuildingClass, int iSlot) const
+#endif
+
 {
 	for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 	{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		if ((*it).eBuilding == eBuilding && (*it).iSlot == iSlot)
+		{
+			return (*it).iGreatWorkIndex;
+		}
+#else
 		if((*it).eBuildingClass == eBuildingClass && (*it).iSlot == iSlot)
 		{
 			return (*it).iGreatWorkIndex;
 		}
+#endif
 	}
 
 	return -1;
 }
 
 /// Accessor: Set yield boost for a specific building by yield type
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+void CvCityBuildings::SetBuildingGreatWork(BuildingTypes eBuilding, int iSlot, int iGreatWorkIndex)
+#else
 void CvCityBuildings::SetBuildingGreatWork(BuildingClassTypes eBuildingClass, int iSlot, int iGreatWorkIndex)
+#endif
+
 {
 	for(std::vector<BuildingGreatWork>::iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 	{
-		if((*it).eBuildingClass == eBuildingClass && (*it).iSlot == iSlot)
+
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		if ((*it).eBuilding == eBuilding && (*it).iSlot == iSlot)
+		{
+			int iOldGreatWorkIndex = (*it).iGreatWorkIndex;
+			if (iOldGreatWorkIndex != iGreatWorkIndex)
+			{
+				if (iGreatWorkIndex == -1)
+				{
+					m_aBuildingGreatWork.erase(it);
+				}
+				else
+				{
+					(*it).iGreatWorkIndex = iGreatWorkIndex;
+				}
+			}
+
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+			return;
+	}
+#else
+		if ((*it).eBuildingClass == eBuildingClass && (*it).iSlot == iSlot)
 		{
 			int iOldGreatWorkIndex = (*it).iGreatWorkIndex;
 			if (iOldGreatWorkIndex != iGreatWorkIndex)
@@ -3245,12 +3398,17 @@ void CvCityBuildings::SetBuildingGreatWork(BuildingClassTypes eBuildingClass, in
 			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
 			return;
 		}
+#endif
 	}
 
 	if (iGreatWorkIndex != -1)
 	{
 		BuildingGreatWork kWork;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		kWork.eBuilding = eBuilding;
+#else
 		kWork.eBuildingClass = eBuildingClass;
+#endif
 		kWork.iSlot = iSlot;
 		kWork.iGreatWorkIndex = iGreatWorkIndex;
 		m_aBuildingGreatWork.push_back(kWork);
@@ -3260,28 +3418,51 @@ void CvCityBuildings::SetBuildingGreatWork(BuildingClassTypes eBuildingClass, in
 }
 
 /// Accessor: Is there a Great Work inside this building?
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+bool CvCityBuildings::IsHoldingGreatWork(BuildingTypes eBuilding) const
+#else
 bool CvCityBuildings::IsHoldingGreatWork(BuildingClassTypes eBuildingClass) const
+#endif
 {
 	for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 	{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		if (GC.getBuildingInfo((*it).eBuilding)->GetID() == eBuilding)
+		{
+			return true;
+		}
+#else
 		if((*it).eBuildingClass == eBuildingClass)
 		{
 			return true;
 		}
+#endif
 	}
 	return false;
 }
 
 /// Accessor: How many Great Works are inside this building?
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+int CvCityBuildings::GetNumGreatWorksInBuilding(BuildingTypes eBuilding) const
+#else
 int CvCityBuildings::GetNumGreatWorksInBuilding(BuildingClassTypes eBuildingClass) const
+#endif
 {
 	int iCount = 0;
+
 	for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 	{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		if (GC.getBuildingInfo((*it).eBuilding)->GetID() == eBuilding)
+		{
+			iCount++;
+		}
+#else
 		if((*it).eBuildingClass == eBuildingClass)
 		{
 			iCount++;
 		}
+#endif
 	}
 	return iCount;
 }
@@ -3289,7 +3470,11 @@ int CvCityBuildings::GetNumGreatWorksInBuilding(BuildingClassTypes eBuildingClas
 /// Accessor: Is there a Great Work slot somewhere in the city?
 bool CvCityBuildings::HasAnyAvailableGreatWorkSlot() const
 {
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	BuildingTypes eBuildingClass = NO_BUILDING;
+#else
 	BuildingClassTypes eBuildingClass = NO_BUILDINGCLASS; // Passed by reference below
+#endif
 	int iSlot = -1; // Passed by reference below
 
 	return GetNextAvailableGreatWorkSlot (&eBuildingClass, &iSlot);
@@ -3298,7 +3483,11 @@ bool CvCityBuildings::HasAnyAvailableGreatWorkSlot() const
 /// Accessor: Is there a Great Work slot of this type somewhere in the city?
 bool CvCityBuildings::HasAvailableGreatWorkSlot(GreatWorkSlotType eSlotType) const
 {
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	BuildingTypes eBuildingClass = NO_BUILDING;
+#else
 	BuildingClassTypes eBuildingClass = NO_BUILDINGCLASS; // Passed by reference below
+#endif
 	int iSlot = -1; // Passed by reference below
 
 	return GetNextAvailableGreatWorkSlot (eSlotType, &eBuildingClass, &iSlot);
@@ -3308,24 +3497,43 @@ bool CvCityBuildings::HasAvailableGreatWorkSlot(GreatWorkSlotType eSlotType) con
 int CvCityBuildings::GetNumAvailableGreatWorkSlots() const
 {
 	int iCount = 0;
-
-	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+	CvCivilizationInfo* pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
+	if (!pkCivInfo) return iCount;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
 	{
-		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-		CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
+		if (GetNumBuilding(BuildingTypes(iI)) > 0)
+		{
+			CvBuildingEntry* pkBuilding = GC.getBuildingInfo(BuildingTypes(iI));
+			if (pkBuilding)
+			{
+				int iNumSlots = pkBuilding->GetGreatWorkCount();
+				int iNumOpenSlots = iNumSlots - GetNumGreatWorksInBuilding(BuildingTypes(iI));
+				if (iNumOpenSlots > 0)
+				{
+					iCount += iNumOpenSlots;
+				}
+			}
+		}
+	}
+#else
+	for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+	{
+		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes)iI;
+		CvCivilizationInfo* pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
 		if (pkCivInfo)
 		{
 			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eLoopBuildingClass);
-			if(NO_BUILDING != eBuilding)
+			if (NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)
 				{
-					CvBuildingEntry *pkBuilding = GC.getBuildingInfo(eBuilding);
+					CvBuildingEntry* pkBuilding = GC.getBuildingInfo(eBuilding);
 					if (pkBuilding)
 					{
 						int iNumSlots = pkBuilding->GetGreatWorkCount();
 						int iNumOpenSlots = iNumSlots - GetNumGreatWorksInBuilding(eLoopBuildingClass);
-						if(iNumOpenSlots > 0)
+						if (iNumOpenSlots > 0)
 						{
 							iCount += iNumOpenSlots;
 						}
@@ -3334,6 +3542,8 @@ int CvCityBuildings::GetNumAvailableGreatWorkSlots() const
 			}
 		}
 	}
+#endif
+	
 
 	return iCount;
 }
@@ -3342,26 +3552,48 @@ int CvCityBuildings::GetNumAvailableGreatWorkSlots() const
 int CvCityBuildings::GetNumAvailableGreatWorkSlots(GreatWorkSlotType eSlotType) const
 {
 	int iCount = 0;
-
-	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+	CvCivilizationInfo* pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
+	if (!pkCivInfo) return iCount;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
 	{
-		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-		CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
+		if (GetNumBuilding((BuildingTypes)iI) > 0)
+		{
+			CvBuildingEntry* pkBuilding = GC.getBuildingInfo((BuildingTypes)iI);
+			if (pkBuilding)
+			{
+				if (pkBuilding->GetGreatWorkSlotType() == eSlotType)
+				{
+					int iNumSlots = pkBuilding->GetGreatWorkCount();
+					int iNumOpenSlots = iNumSlots - GetNumGreatWorksInBuilding((BuildingTypes)iI);
+					if (iNumOpenSlots > 0)
+					{
+						iCount += iNumOpenSlots;
+					}
+				}
+			}
+		}
+	}
+#else
+	for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+	{
+		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes)iI;
+		CvCivilizationInfo* pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
 		if (pkCivInfo)
 		{
 			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eLoopBuildingClass);
-			if(NO_BUILDING != eBuilding)
+			if (NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)
 				{
-					CvBuildingEntry *pkBuilding = GC.getBuildingInfo(eBuilding);
+					CvBuildingEntry* pkBuilding = GC.getBuildingInfo(eBuilding);
 					if (pkBuilding)
 					{
 						if (pkBuilding->GetGreatWorkSlotType() == eSlotType)
 						{
 							int iNumSlots = pkBuilding->GetGreatWorkCount();
 							int iNumOpenSlots = iNumSlots - GetNumGreatWorksInBuilding(eLoopBuildingClass);
-							if(iNumOpenSlots > 0)
+							if (iNumOpenSlots > 0)
 							{
 								iCount += iNumOpenSlots;
 							}
@@ -3371,27 +3603,54 @@ int CvCityBuildings::GetNumAvailableGreatWorkSlots(GreatWorkSlotType eSlotType) 
 			}
 		}
 	}
-
+#endif
 	return iCount;
 }
 
 /// Accessor: Is there a Great Work slot of this type somewhere in the city?
-bool CvCityBuildings::GetNextAvailableGreatWorkSlot(BuildingClassTypes *eBuildingClass, int *iSlot) const
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+bool CvCityBuildings::GetNextAvailableGreatWorkSlot(BuildingTypes* eBuilding, int* iSlot) const
+#else
+bool CvCityBuildings::GetNextAvailableGreatWorkSlot(BuildingClassTypes* eBuildingClass, int* iSlot) const
+#endif
 {
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	if (eBuilding && iSlot)
+	{
+		for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+		{
+			BuildingTypes eLoopBuilding = (BuildingTypes)iI;
+			
+			if (GetNumBuilding(eLoopBuilding) > 0)
+			{
+				int iNumSlots = GC.getBuildingInfo(eLoopBuilding)->GetGreatWorkCount();
+				for (int jJ = 0; jJ < iNumSlots; jJ++)
+				{
+					if (GetBuildingGreatWork(eLoopBuilding, jJ) == NO_GREAT_WORK)
+					{
+						*eBuilding = eLoopBuilding;
+						*iSlot = jJ;
+						return true;
+					}
+				}
+			}
+		}
+}
+#else
 	if (eBuildingClass && iSlot)
 	{
-		for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+		for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
-			BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
+			BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes)iI;
 			BuildingTypes eBuilding = (BuildingTypes)GC.getCivilizationInfo(m_pCity->getCivilizationType())->getCivilizationBuildings(eLoopBuildingClass);
-			if(NO_BUILDING != eBuilding)
+			if (NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)
 				{
 					int iNumSlots = GC.getBuildingInfo(eBuilding)->GetGreatWorkCount();
 					for (int jJ = 0; jJ < iNumSlots; jJ++)
 					{
-						if (GetBuildingGreatWork (eLoopBuildingClass, jJ) == NO_GREAT_WORK)
+						if (GetBuildingGreatWork(eLoopBuildingClass, jJ) == NO_GREAT_WORK)
 						{
 							*eBuildingClass = eLoopBuildingClass;
 							*iSlot = jJ;
@@ -3402,13 +3661,44 @@ bool CvCityBuildings::GetNextAvailableGreatWorkSlot(BuildingClassTypes *eBuildin
 			}
 		}
 	}
+#endif
+	
 
 	return false;
 }
 
 /// Accessor: Is there a Great Work slot of this type somewhere in the city?
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+bool CvCityBuildings::GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWorkSlot, BuildingTypes* eBuilding, int* iSlot) const
+#else
 bool CvCityBuildings::GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWorkSlot, BuildingClassTypes *eBuildingClass, int *iSlot) const
+#endif
 {
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	if (eBuilding && iSlot)
+	{
+		for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+		{
+			if (GetNumBuilding((BuildingTypes)iI) > 0)
+			{
+				if (GC.getBuildingInfo(*eBuilding)->GetGreatWorkSlotType() == eGreatWorkSlot)
+				{
+					int iNumSlots = GC.getBuildingInfo((BuildingTypes)iI)->GetGreatWorkCount();
+					for (int jJ = 0; jJ < iNumSlots; jJ++)
+					{
+						if (GetBuildingGreatWork((BuildingTypes)iI, jJ) == NO_GREAT_WORK)
+						{
+							*eBuilding = (BuildingTypes)iI;
+							*iSlot = jJ;
+							return true;
+						}
+					}
+				}
+			}
+			
+		}
+	}
+#else
 	if (eBuildingClass && iSlot)
 	{
 		for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
@@ -3436,6 +3726,7 @@ bool CvCityBuildings::GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWork
 			}
 		}
 	}
+#endif
 
 	return false;
 }
@@ -3471,6 +3762,19 @@ int CvCityBuildings::GetYieldFromGreatWorks(YieldTypes eYield) const
 	{
 		for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 		{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			auto eBuilding = (*it).eBuilding;
+			CvBuildingEntry* pkInfo = GC.getBuildingInfo(eBuilding);
+			if (pkInfo)
+			{
+				iWorkCount++;
+				if ((MOD_GLOBAL_GREATWORK_YIELDTYPES && eYield == pkInfo->GetGreatWorkYieldType()) || (!MOD_GLOBAL_GREATWORK_YIELDTYPES && eYield == YIELD_CULTURE))
+				{
+					iBuildingCount++;
+				}
+			}
+#else
+
 			BuildingClassTypes eBldgClass = (*it).eBuildingClass;
 			CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
 			if (pkClassInfo)
@@ -3480,13 +3784,13 @@ int CvCityBuildings::GetYieldFromGreatWorks(YieldTypes eYield) const
 				if (pkInfo)
 				{
 					iWorkCount++;
-					
 					if ((MOD_GLOBAL_GREATWORK_YIELDTYPES && eYield == pkInfo->GetGreatWorkYieldType()) || (!MOD_GLOBAL_GREATWORK_YIELDTYPES && eYield == YIELD_CULTURE))
 					{
 						iBuildingCount++;
 					}
 				}
 			}
+#endif
 		}
 	}
 	int iRtnValue = (iWorkCount * iYieldPerWork) + (iBuildingCount * iYieldPerBuilding);
@@ -3533,12 +3837,23 @@ int CvCityBuildings::GetNumGreatWorks() const
 	{
 		for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 		{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			auto eBuilding = (*it).eBuilding;
+			CvBuildingEntry* pkInfo = GC.getBuildingInfo(eBuilding);
+			if (pkInfo)
+			{
+				if (bIgnoreYield || pkInfo->GetGreatWorkYieldType() != NO_YIELD)
+				{
+					iRtnValue++;
+				}
+			}
+#else
 			BuildingClassTypes eBldgClass = (*it).eBuildingClass;
-			CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
+			CvBuildingClassInfo* pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
 			if (pkClassInfo)
 			{
 				BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
-				CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
+				CvBuildingEntry* pkInfo = GC.getBuildingInfo(eBuilding);
 				if (pkInfo)
 				{
 					if (bIgnoreYield || pkInfo->GetGreatWorkYieldType() != NO_YIELD)
@@ -3547,6 +3862,8 @@ int CvCityBuildings::GetNumGreatWorks() const
 					}
 				}
 			}
+#endif
+			
 		}
 	}
 	return iRtnValue;
@@ -3566,12 +3883,23 @@ int CvCityBuildings::GetNumGreatWorks(GreatWorkSlotType eGreatWorkSlot) const
 	{
 		for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 		{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			auto eBuilding = (*it).eBuilding;
+			CvBuildingEntry* pkInfo = GC.getBuildingInfo(eBuilding);
+			if (pkInfo)
+			{
+				if (pkInfo->GetGreatWorkSlotType() == eGreatWorkSlot)
+				{
+					iRtnValue++;
+				}
+			}
+#else
 			BuildingClassTypes eBldgClass = (*it).eBuildingClass;
-			CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
+			CvBuildingClassInfo* pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
 			if (pkClassInfo)
 			{
 				BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
-				CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
+				CvBuildingEntry* pkInfo = GC.getBuildingInfo(eBuilding);
 				if (pkInfo)
 				{
 					if (pkInfo->GetGreatWorkSlotType() == eGreatWorkSlot)
@@ -3580,6 +3908,8 @@ int CvCityBuildings::GetNumGreatWorks(GreatWorkSlotType eGreatWorkSlot) const
 					}
 				}
 			}
+#endif
+			
 		}
 	}
 	return iRtnValue;
@@ -3625,20 +3955,43 @@ int CvCityBuildings::GetThemingBonuses() const
 #endif
 {
 	int iBonus = 0;
-
-	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
 	{
-		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-		CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
+		CvCivilizationInfo* pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
+		if (pkCivInfo)
+		{
+			if (GetNumBuilding((BuildingTypes)iI) > 0)
+			{
+#if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
+				CvBuildingEntry* pkInfo = GC.getBuildingInfo((BuildingTypes)iI);
+				if (pkInfo)
+				{
+					if (pkInfo->GetGreatWorkYieldType() == eYield)
+					{
+						iBonus += m_pCity->GetCityCulture()->GetThemingBonus((BuildingTypes)iI);
+					}
+				}
+#else
+				iBonus += m_pCity->GetCityCulture()->GetThemingBonus(eLoopBuildingClass);
+#endif
+			}
+		}
+	}
+#else
+	for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+	{
+		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes)iI;
+		CvCivilizationInfo* pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
 		if (pkCivInfo)
 		{
 			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eLoopBuildingClass);
-			if(NO_BUILDING != eBuilding)
+			if (NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)
 				{
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
-					CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
+					CvBuildingEntry* pkInfo = GC.getBuildingInfo(eBuilding);
 					if (pkInfo)
 					{
 						if (pkInfo->GetGreatWorkYieldType() == eYield)
@@ -3653,7 +4006,8 @@ int CvCityBuildings::GetThemingBonuses() const
 			}
 		}
 	}
-
+#endif
+	
 	return iBonus;
 }
 

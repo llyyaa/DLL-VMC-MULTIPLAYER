@@ -481,6 +481,12 @@ CvPlayer::CvPlayer() :
 	, m_iFaithPurchaseIndex(0)
 	, m_bProcessedAutoMoves(false)
 	, m_kPlayerAchievements(*this)
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	, m_piAcquiredUniqueBuildings(0)
+	, m_piAcquiredUniqueUnits(0)
+	, m_piAcquiredUniqueImprovements(0)
+#endif 
+
 {
 	m_pPlayerPolicies = FNEW(CvPlayerPolicies, c_eCiv5GameplayDLL, 0);
 	m_pEconomicAI = FNEW(CvEconomicAI, c_eCiv5GameplayDLL, 0);
@@ -1123,6 +1129,12 @@ void CvPlayer::uninit()
 	m_bAlliesGreatPersonBiasApplied = false;
 	m_lastGameTurnInitialAIProcessed = -1;
 
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	m_piAcquiredUniqueBuildings.clear();
+	m_piAcquiredUniqueUnits.clear();
+	m_piAcquiredUniqueImprovements.clear();
+#endif 
+
 	m_eID = NO_PLAYER;
 }
 
@@ -1482,6 +1494,23 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	{
 		AI_reset();
 	}
+
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+		m_piAcquiredUniqueBuildings.clear();
+		m_piAcquiredUniqueBuildings.resize(GC.getNumCivilizationInfos());
+		m_piAcquiredUniqueUnits.clear();
+		m_piAcquiredUniqueUnits.resize(GC.getNumCivilizationInfos());
+		m_piAcquiredUniqueImprovements.clear();
+		m_piAcquiredUniqueImprovements.resize(GC.getNumCivilizationInfos());
+		for (size_t i = 0; i < GC.getNumCivilizationInfos(); i++) {
+			m_piAcquiredUniqueBuildings[i] = 0;
+			m_piAcquiredUniqueUnits[i] = 0;
+			m_piAcquiredUniqueImprovements[i] = 0;
+		}
+	}
+#endif
 }
 
 //	--------------------------------------------------------------------------------
@@ -2272,7 +2301,12 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 			{
 				for (int jJ = 0; jJ < pkBuilding->GetGreatWorkCount(); jJ++)
 				{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+					int iGreatWork = pOldCity->GetCityBuildings()->GetBuildingGreatWork((BuildingTypes)iI, jJ);
+#else
 					int iGreatWork = pOldCity->GetCityBuildings()->GetBuildingGreatWork((BuildingClassTypes)pkBuilding->GetBuildingClassType(), jJ);
+#endif
+					
 					if (iGreatWork != NO_GREAT_WORK)
 					{
 						CopyGreatWorkData kData;
@@ -2826,7 +2860,12 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 								{
 									if (paGreatWorkData[jJ].m_eBuildingType == iI)
 									{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+										pNewCity->GetCityBuildings()->SetBuildingGreatWork(BuildingTypes(iI), paGreatWorkData[jJ].m_iSlot, paGreatWorkData[jJ].m_iGreatWork);
+#else
 										pNewCity->GetCityBuildings()->SetBuildingGreatWork(eBuildingClass, paGreatWorkData[jJ].m_iSlot, paGreatWorkData[jJ].m_iGreatWork);
+#endif
+										
 										paGreatWorkData[jJ].m_bTransferred = true;
 										iCaptureGreatWorks++;
 									}
@@ -2849,24 +2888,48 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	{
 		if (!paGreatWorkData[jJ].m_bTransferred)
 		{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			BuildingTypes eBuildingRef = NO_BUILDING;
+#else
 			BuildingClassTypes eBuildingClass = NO_BUILDINGCLASS; // Passed by reference below
+#endif
+			
 			int iSlot = -1; // Passed by reference below
 			GreatWorkType eType = GC.getGame().GetGameCulture()->m_CurrentGreatWorks[paGreatWorkData[jJ].m_iGreatWork].m_eType;
 			GreatWorkSlotType eGreatWorkSlot = CultureHelpers::GetGreatWorkSlot(eType);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			if (pNewCity->GetCityBuildings()->GetNextAvailableGreatWorkSlot(eGreatWorkSlot, &eBuildingRef, &iSlot))
+			{
+				pNewCity->GetCityBuildings()->SetBuildingGreatWork(eBuildingRef, iSlot, paGreatWorkData[jJ].m_iGreatWork);
+#else
 			if (pNewCity->GetCityBuildings()->GetNextAvailableGreatWorkSlot(eGreatWorkSlot, &eBuildingClass, &iSlot))
 			{
 				pNewCity->GetCityBuildings()->SetBuildingGreatWork(eBuildingClass, iSlot, paGreatWorkData[jJ].m_iGreatWork);
+#endif
+			
+			
 				paGreatWorkData[jJ].m_bTransferred = true;
 				iCaptureGreatWorks++;
 			}
 			else
 			{
-				BuildingClassTypes eGWBuildingClass;
+				
 				int iGWSlot;
-				CvCity *pGWCity = GetCulture()->GetClosestAvailableGreatWorkSlot(pCityPlot->getX(), pCityPlot->getY(), eGreatWorkSlot, &eGWBuildingClass, &iGWSlot);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+				BuildingTypes eGWBuildingType = NO_BUILDING;
+				CvCity* pGWCity = GetCulture()->GetClosestAvailableGreatWorkSlot(pCityPlot->getX(), pCityPlot->getY(), eGreatWorkSlot, &eGWBuildingType, &iGWSlot);
+				if (pGWCity)
+				{
+					pGWCity->GetCityBuildings()->SetBuildingGreatWork(eGWBuildingType, iGWSlot, paGreatWorkData[jJ].m_iGreatWork);
+#else
+				BuildingClassTypes eGWBuildingClass;
+				CvCity* pGWCity = GetCulture()->GetClosestAvailableGreatWorkSlot(pCityPlot->getX(), pCityPlot->getY(), eGreatWorkSlot, &eGWBuildingClass, &iGWSlot);
 				if (pGWCity)
 				{
 					pGWCity->GetCityBuildings()->SetBuildingGreatWork(eGWBuildingClass, iGWSlot, paGreatWorkData[jJ].m_iGreatWork);
+#endif
+				
+				
 					paGreatWorkData[jJ].m_bTransferred = true;
 					iCaptureGreatWorks++;
 				}
@@ -7771,7 +7834,13 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 		// If the player isn't allowed to train this Unit (via XML) then return false
 		if(eThisPlayersUnitType != eUnit)
 		{
-			return false;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+			if (!GetWhetherAcquiredOtherCIVsUniqueUnit(pUnitInfoPtr->GetUniqueUnitOwnerCiv())) {
+#endif
+				return false;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+			}
+#endif
 		}
 	}
 
@@ -8059,7 +8128,7 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 	}
 
 	CvBuildingEntry& pBuildingInfo = *pkBuildingInfo;
-
+	
 	int iI;
 	CvTeam& currentTeam = GET_TEAM(getTeam());
 
@@ -8069,7 +8138,13 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 	// Checks to make sure civilization doesn't have an override that prevents construction of this building
 	if(getCivilizationInfo().getCivilizationBuildings(eBuildingClass) != eBuilding)
 	{
-		return false;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		if (!GetWhetherAcquiredOtherCIVsUniqueBuilding(pkBuildingInfo->GetUniqueBuildingOwnerCiv())) {
+#endif
+			return false;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		}
+#endif
 	}
 
 	if(!bIgnoreCost)
@@ -9547,7 +9622,13 @@ bool CvPlayer::canBuild(const CvPlot* pPlot, BuildTypes eBuild, bool bTestEra, b
 			CivilizationTypes eCiv = pkEntry->GetRequiredCivilization();
 			if(eCiv != getCivilizationType())
 			{
-				return false;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+				if (!GetWhetherAcquiredOtherCIVsUniqueImprovement(eCiv)) {
+#endif 
+					return false;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+				}
+#endif 
 			}
 		}
 	}
@@ -25491,6 +25572,13 @@ void CvPlayer::Read(FDataStream& kStream)
 	}
 
 	kStream >> m_strEmbarkedGraphicOverride;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+		kStream >> m_piAcquiredUniqueBuildings;
+		kStream >> m_piAcquiredUniqueUnits;
+		kStream >> m_piAcquiredUniqueImprovements;
+	}
+#endif
 	m_kPlayerAchievements.Read(kStream);
 
 	if(GetID() < MAX_MAJOR_CIVS)
@@ -25997,6 +26085,14 @@ void CvPlayer::Write(FDataStream& kStream) const
 	}
 
 	kStream << m_strEmbarkedGraphicOverride;
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+		kStream << m_piAcquiredUniqueBuildings;
+		kStream << m_piAcquiredUniqueUnits;
+		kStream << m_piAcquiredUniqueImprovements;
+	}
+#endif
 
 	m_kPlayerAchievements.Write(kStream);
 }
@@ -28839,6 +28935,53 @@ void CvPlayer::ChangeInternalTradeRouteDestYieldRate(const YieldTypes eYieldType
 	if (iChange > 0)
 	{
 		m_piInternalTradeRouteDestYieldRate[static_cast<int>(eYieldType)] += iChange;
+	}
+}
+#endif
+
+
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+bool CvPlayer::GetWhetherAcquiredOtherCIVsUniqueBuilding(CivilizationTypes civID) const {
+	if (civID < 0 || civID >= GC.getNumCivilizationInfos()) return false;
+	return MOD_API_ACQUIRE_UNIQUE_ITEMS ? m_piAcquiredUniqueBuildings[civID] > 0 : false;
+}
+bool CvPlayer::GetWhetherAcquiredOtherCIVsUniqueUnit(CivilizationTypes civID) const {
+	if (civID < 0 || civID >= GC.getNumCivilizationInfos()) return false;
+	return MOD_API_ACQUIRE_UNIQUE_ITEMS ? m_piAcquiredUniqueUnits[civID] > 0 : false;
+}
+bool CvPlayer::GetWhetherAcquiredOtherCIVsUniqueImprovement(CivilizationTypes civID) const{
+	if (civID < 0 || civID >= GC.getNumCivilizationInfos()) return false;
+	return MOD_API_ACQUIRE_UNIQUE_ITEMS ? m_piAcquiredUniqueImprovements[civID] > 0 : false;
+}
+
+std::vector<int>& CvPlayer::GetListOfAcquiredOtherCIVsUniqueBuilding() {
+	return m_piAcquiredUniqueBuildings;
+}
+
+std::vector<int>& CvPlayer::GetListOfAcquiredOtherCIVsUniqueUnit() {
+	return m_piAcquiredUniqueUnits;
+}
+
+std::vector<int>& CvPlayer::GetListOfAcquiredOtherCIVsUniqueImprovement() {
+	return m_piAcquiredUniqueImprovements;
+}
+	 
+void CvPlayer::SetAcquiredOtherCIVsUniqueBuilding(CivilizationTypes civID, bool acquired) {
+	if (civID < 0 || civID >= GC.getNumCivilizationInfos()) return;
+	if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+		m_piAcquiredUniqueBuildings[civID] = acquired ? 1 : 0;
+	}
+}
+void CvPlayer::SetAcquiredOtherCIVsUniqueUnit(CivilizationTypes civID, bool acquired) {
+	if (civID < 0 || civID >= GC.getNumCivilizationInfos()) return;
+	if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+		m_piAcquiredUniqueUnits[civID] = acquired ? 1 : 0;
+	}
+}
+void CvPlayer::SetAcquiredOtherCIVsUniqueImprovement(CivilizationTypes civID, bool acquired) {
+	if (civID < 0 || civID >= GC.getNumCivilizationInfos()) return;
+	if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+		m_piAcquiredUniqueImprovements[civID] = acquired ? 1 : 0;
 	}
 }
 #endif

@@ -316,6 +316,21 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	PrefetchCollection(GC.getBuildingClassInfo(), "BuildingClasses");
 	PrefetchCollection(GC.getBuildingInfo(), "Buildings");
 
+	//Build association between buildings and their classes
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (size_t i = 0; i < GC.getNumBuildingInfos(); i++) {
+		auto buildingEntry = GC.getBuildingInfo((BuildingTypes)i);
+		auto buildingClassEntry = GC.getBuildingClassInfo((BuildingClassTypes)(buildingEntry->GetBuildingClassType()));
+		buildingClassEntry->ChangeNumContainingBuildings(1);
+		buildingClassEntry->GetConntainingBuildings().push_back(buildingEntry->GetID());
+	}
+
+	for (size_t i = 0; i < GC.getNumBuildingClassInfos(); i++) {
+		auto entry = GC.getBuildingClassInfo((BuildingClassTypes)i);
+		entry->GetConntainingBuildings().resize(entry->GetNumContainingBuildings());
+	}
+#endif
+
 	//GameInfo
 	PrefetchCollection(GC.getEmphasisInfo(), "EmphasizeInfos");
 	PrefetchCollection(GC.getEraInfo(), "Eras");

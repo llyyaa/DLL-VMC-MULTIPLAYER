@@ -1714,11 +1714,32 @@ CvBuildingClassInfo::CvBuildingClassInfo() :
 	m_bMonument(false),
 	m_piVictoryThreshold(NULL)
 {
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	m_iNumContainingBuildings = 0;
+	m_piConntainingBuildings.clear();
+#endif
 }
+
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+std::vector<int>& CvBuildingClassInfo::GetConntainingBuildings() {
+	return m_piConntainingBuildings;
+}
+
+int CvBuildingClassInfo::GetNumContainingBuildings() const {
+	return m_iNumContainingBuildings;
+}
+void CvBuildingClassInfo::ChangeNumContainingBuildings(int iChange) {
+	m_iNumContainingBuildings += iChange;
+}
+
+#endif
 //------------------------------------------------------------------------------
 CvBuildingClassInfo::~CvBuildingClassInfo()
 {
 	SAFE_DELETE_ARRAY(m_piVictoryThreshold);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	m_piConntainingBuildings.clear();
+#endif
 }
 //------------------------------------------------------------------------------
 int CvBuildingClassInfo::getMaxGlobalInstances() const
@@ -2377,6 +2398,12 @@ bool CvCivilizationInfo::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 			m_piCivilizationBuildings[idx] = buildingID;
 			m_CivilizationBuildingOverridden[idx] = true;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+			if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+				auto buildingInfo = GC.getBuildingInfo((BuildingTypes)buildingID);
+				if(buildingInfo) buildingInfo->SetUniqueBuildingOwnerCiv((CivilizationTypes)GetID());
+			}
+#endif
 		}
 
 		pResults->Reset();
@@ -2407,6 +2434,12 @@ bool CvCivilizationInfo::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 			m_piCivilizationUnits[idx] = unitID;
 			m_CivilizationUnitOverridden[idx] = true;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+			if (MOD_API_ACQUIRE_UNIQUE_ITEMS) {
+				auto unitInfo = GC.getUnitInfo((UnitTypes)unitID);
+				if (unitInfo) unitInfo->SetUniqueUnitOwnerCiv((CivilizationTypes)GetID());
+			}
+#endif
 		}
 
 		pResults->Reset();

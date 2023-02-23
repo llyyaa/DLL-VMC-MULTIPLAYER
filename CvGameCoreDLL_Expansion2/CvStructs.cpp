@@ -154,7 +154,12 @@ FDataStream& operator<<(FDataStream& kStream, const BuildingYieldChange& readFro
 
 FDataStream& operator>>(FDataStream& kStream, BuildingGreatWork& writeTo)
 {
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	kStream >> writeTo.eBuilding;
+#else
 	kStream >> writeTo.eBuildingClass;
+#endif
+	
 	kStream >> writeTo.iSlot;
 	kStream >> writeTo.iGreatWorkIndex;
 	return kStream;
@@ -162,7 +167,11 @@ FDataStream& operator>>(FDataStream& kStream, BuildingGreatWork& writeTo)
 
 FDataStream& operator<<(FDataStream& kStream, const BuildingGreatWork& readFrom)
 {
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	kStream << readFrom.eBuilding;
+#else
 	kStream << readFrom.eBuildingClass;
+#endif
 	kStream << readFrom.iSlot;
 	kStream << readFrom.iGreatWorkIndex;
 	return kStream;

@@ -92,6 +92,9 @@
 // Enables the LUA Extensions API
 #define MOD_API_LUA_EXTENSIONS                      gCustomMods.isAPI_LUA_EXTENSIONS()
 
+// Enables players to acquire unique units/buildings/improvements of other CIVs.
+#define MOD_API_ACQUIRE_UNIQUE_ITEMS                gCustomMods.isAPI_ACQUIRE_UNIQUE_ITEMS()
+
 // Enables the Unified Yields extensions - thanks to bane_, JFD and Ulixes for extensive testing (v54)
 #define MOD_API_UNIFIED_YIELDS                      (true)
 // Enables the Unified Yields (YIELD_TOURISM) extensions (v56)
@@ -1398,6 +1401,7 @@ public:
 	MOD_OPT_DECL(API_PROMOTION_TO_PROMOTION_MODIFIERS);
 	MOD_OPT_DECL(API_UNIT_CANNOT_BE_RANGED_ATTACKED);
 	MOD_OPT_DECL(API_MP_PLOT_SIGNAL);
+	MOD_OPT_DECL(API_ACQUIRE_UNIQUE_ITEMS);
 	MOD_OPT_DECL(API_TRADE_ROUTE_YIELD_RATE);
 
 	MOD_OPT_DECL(CONFIG_GAME_IN_XML);

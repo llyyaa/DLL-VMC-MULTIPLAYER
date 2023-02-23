@@ -121,6 +121,9 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_bRangeAttackOnlyInDomain(false),
 	m_bTrade(false),
 	m_iNumExoticGoods(0),
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	m_iUniqueUnitOwnerCiv(NO_CIVILIZATION),
+#endif
 	m_pbUpgradeUnitClass(NULL),
 	m_pbUnitAIType(NULL),
 	m_pbNotUnitAIType(NULL),
@@ -1775,6 +1778,16 @@ UnitMoveRate CvUnitEntry::GetMoveRate(int numHexes) const
 		numHexes = 11;
 	return m_unitMoveRate[numHexes];
 }
+
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+CivilizationTypes CvUnitEntry::GetUniqueUnitOwnerCiv() const {
+	return m_iUniqueUnitOwnerCiv;
+}
+
+void CvUnitEntry::SetUniqueUnitOwnerCiv(CivilizationTypes civOwner) {
+	m_iUniqueUnitOwnerCiv = civOwner;
+}
+#endif
 
 //=====================================
 // CvUnitXMLEntries

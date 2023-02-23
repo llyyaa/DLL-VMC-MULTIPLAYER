@@ -2560,8 +2560,14 @@ int CvLuaCity::lIsThemingBonusPossible(lua_State* L)
 {
 	bool bPossible;
 	CvCity* pkCity = GetInstance(L);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	const BuildingTypes iIndex = toValue<BuildingTypes>(L, 2);
+	bPossible = pkCity->GetCityCulture()->IsThemingBonusPossible(iIndex);
+#else
 	const BuildingClassTypes iIndex = toValue<BuildingClassTypes>(L, 2);
 	bPossible = pkCity->GetCityCulture()->IsThemingBonusPossible(iIndex);
+#endif
+	
 	lua_pushboolean(L, bPossible);
 	return 1;
 }
@@ -2571,8 +2577,14 @@ int CvLuaCity::lGetThemingBonus(lua_State* L)
 {
 	int iBonus;
 	CvCity* pkCity = GetInstance(L);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	const BuildingTypes iIndex = toValue<BuildingTypes>(L, 2);
+	iBonus = pkCity->GetCityCulture()->GetThemingBonus(iIndex);
+#else
 	const BuildingClassTypes iIndex = toValue<BuildingClassTypes>(L, 2);
 	iBonus = pkCity->GetCityCulture()->GetThemingBonus(iIndex);
+#endif
+	
 	lua_pushinteger(L, iBonus);
 	return 1;
 }
@@ -2582,8 +2594,14 @@ int CvLuaCity::lGetThemingTooltip(lua_State* L)
 {
 	CvString toolTip;
 	CvCity* pkCity = GetInstance(L);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	const BuildingTypes iIndex = toValue<BuildingTypes>(L, 2);
+	toolTip = pkCity->GetCityCulture()->GetThemingTooltip(iIndex);
+#else
 	const BuildingClassTypes iIndex = toValue<BuildingClassTypes>(L, 2);
 	toolTip = pkCity->GetCityCulture()->GetThemingTooltip(iIndex);
+#endif
+	
 	lua_pushstring(L, toolTip.c_str());
 	return 1;
 }
@@ -4149,9 +4167,15 @@ int CvLuaCity::lGetTotalBaseBuildingMaintenance(lua_State* L)
 int CvLuaCity::lGetBuildingGreatWork(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	const BuildingTypes iIndex = toValue<BuildingTypes>(L, 2);
+	const int iSlot = lua_tointeger(L, 3);
+	const int iResult = pkCity->GetCityBuildings()->GetBuildingGreatWork(iIndex, iSlot);
+#else
 	const BuildingClassTypes iIndex = toValue<BuildingClassTypes>(L, 2);
 	const int iSlot = lua_tointeger(L, 3);
 	const int iResult = pkCity->GetCityBuildings()->GetBuildingGreatWork(iIndex, iSlot);
+#endif
 	lua_pushinteger(L, iResult);
 	return 1;
 }
@@ -4160,7 +4184,11 @@ int CvLuaCity::lGetBuildingGreatWork(lua_State* L)
 int CvLuaCity::lSetBuildingGreatWork(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	const BuildingTypes iIndex = toValue<BuildingTypes>(L, 2);
+#else
 	const BuildingClassTypes iIndex = toValue<BuildingClassTypes>(L, 2);
+#endif
 	const int iSlot = lua_tointeger(L, 3);
 	const int iGreatWorkIndex = lua_tointeger(L, 4);
 	if(iIndex != NO_BUILDING)
@@ -4175,11 +4203,21 @@ int CvLuaCity::lIsHoldingGreatWork(lua_State* L)
 {
 	bool bResult = false;
 	CvCity* pkCity = GetInstance(L);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	const BuildingTypes iIndex = toValue<BuildingTypes>(L, 2);
+	if (iIndex != NO_BUILDING)
+	{
+		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(iIndex);
+		if (pkBuildingInfo)
+#else
 	const BuildingClassTypes iIndex = toValue<BuildingClassTypes>(L, 2);
-	if(iIndex != NO_BUILDINGCLASS)
+	if (iIndex != NO_BUILDINGCLASS)
 	{
 		CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(iIndex);
-		if(pkBuildingClassInfo)
+		if (pkBuildingClassInfo)
+#endif
+	
+		
 		{
 			bResult = pkCity->GetCityBuildings()->IsHoldingGreatWork(iIndex);
 		}
@@ -4192,7 +4230,11 @@ int CvLuaCity::lIsHoldingGreatWork(lua_State* L)
 int CvLuaCity::lGetNumGreatWorksInBuilding(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	const BuildingTypes iIndex = toValue<BuildingTypes>(L, 2);
+#else
 	const BuildingClassTypes iIndex = toValue<BuildingClassTypes>(L, 2);
+#endif
 	const int iResult = pkCity->GetCityBuildings()->GetNumGreatWorksInBuilding(iIndex);
 	lua_pushinteger(L, iResult);
 	return 1;

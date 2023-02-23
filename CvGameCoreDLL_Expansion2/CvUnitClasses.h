@@ -191,6 +191,11 @@ public:
 	int GetScaleFromNumGWs() const;
 #endif
 
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	CivilizationTypes GetUniqueUnitOwnerCiv() const;
+	void SetUniqueUnitOwnerCiv(CivilizationTypes civOwner);
+#endif
+
 private:
 
 	int m_iProductionCost;
@@ -313,6 +318,10 @@ private:
 
 	int m_iUnitFlagIconOffset;
 	int m_iUnitPortraitOffset;
+
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	CivilizationTypes m_iUniqueUnitOwnerCiv;
+#endif
 
 	CvString m_strUnitArtInfoTag;
 	bool m_bUnitArtInfoCulturalVariation;

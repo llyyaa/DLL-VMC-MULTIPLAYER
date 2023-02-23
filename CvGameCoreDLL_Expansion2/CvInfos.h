@@ -511,6 +511,12 @@ public:
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	std::vector<int>& GetConntainingBuildings();
+	int GetNumContainingBuildings() const;
+	void ChangeNumContainingBuildings(int iNewValue);
+#endif
+
 protected:
 	int m_iMaxGlobalInstances;
 	int m_iMaxTeamInstances;
@@ -525,6 +531,10 @@ protected:
 	int* m_piVictoryThreshold;
 
 private:
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	std::vector<int> m_piConntainingBuildings;
+	int m_iNumContainingBuildings;
+#endif
 	CvBuildingClassInfo(const CvBuildingClassInfo&);
 	CvBuildingClassInfo& operator=(const CvBuildingClassInfo&);
 };

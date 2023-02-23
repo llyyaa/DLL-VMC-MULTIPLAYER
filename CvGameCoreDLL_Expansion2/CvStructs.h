@@ -172,13 +172,22 @@ FDataStream& operator>>(FDataStream&, BuildingYieldChange&);
 struct BuildingGreatWork
 {
 	BuildingGreatWork()
-		: eBuildingClass(NO_BUILDINGCLASS)
+		: 
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		eBuilding(NO_BUILDING)
+#else
+		eBuildingClass(NO_BUILDINGCLASS)
+#endif
 		, iSlot(-1)
 		, iGreatWorkIndex(-1)
 	{
 	}
-
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	BuildingTypes eBuilding;
+#else
 	BuildingClassTypes eBuildingClass;
+#endif
+	
 	int iSlot;
 	int iGreatWorkIndex;
 };
