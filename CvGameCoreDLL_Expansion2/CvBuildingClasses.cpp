@@ -3227,7 +3227,7 @@ int CvCityBuildings::GetNumActiveBuildingClass(BuildingClassTypes eIndex) const 
 	CvAssertMsg(eIndex < GC.getNumBuildingClassInfos(), "eIndex expected to be < GC.getNumBuildingClassInfos()");
 	int rtn = 0;
 	auto buildingClassEntry = GC.getBuildingClassInfo(eIndex);
-	auto& buildingVec = buildingClassEntry->GetConntainingBuildings();
+	const auto& buildingVec = buildingClassEntry->GetConntainingBuildings();
 	for (auto& it = buildingVec.begin(); it != buildingVec.end(); it++) {
 		rtn += GetNumActiveBuilding((BuildingTypes)(*it));
 	}
@@ -3681,7 +3681,7 @@ bool CvCityBuildings::GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWork
 		{
 			if (GetNumBuilding((BuildingTypes)iI) > 0)
 			{
-				if (GC.getBuildingInfo(*eBuilding)->GetGreatWorkSlotType() == eGreatWorkSlot)
+				if (GC.getBuildingInfo((BuildingTypes)iI)->GetGreatWorkSlotType() == eGreatWorkSlot)
 				{
 					int iNumSlots = GC.getBuildingInfo((BuildingTypes)iI)->GetGreatWorkCount();
 					for (int jJ = 0; jJ < iNumSlots; jJ++)
@@ -4015,7 +4015,28 @@ int CvCityBuildings::GetThemingBonuses() const
 int CvCityBuildings::GetNumBuildingsFromFaith() const
 {
 	int iRtnValue = 0;
-
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+	{
+		BuildingTypes eLoopBuilding = (BuildingTypes)iI;
+		CvCivilizationInfo* pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
+		if (pkCivInfo)
+		{
+			if (GetNumBuilding(eLoopBuilding) > 0)
+			{
+				CvBuildingEntry* pkEntry = GC.getBuildingInfo(eLoopBuilding);
+				if (pkEntry)
+				{
+					if (pkEntry->GetFaithCost() > 0 && pkEntry->IsUnlockedByBelief() && pkEntry->GetProductionCost() == -1)
+					{
+						iRtnValue++;
+					}
+				}
+			}
+			
+		}
+	}
+#else
 	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 	{
 		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
@@ -4039,7 +4060,7 @@ int CvCityBuildings::GetNumBuildingsFromFaith() const
 			}
 		}
 	}
-
+#endif
 	return iRtnValue;
 }
 
@@ -4047,7 +4068,35 @@ int CvCityBuildings::GetNumBuildingsFromFaith() const
 int CvCityBuildings::GetCityStateTradeRouteProductionModifier() const
 {
 	int iRtnValue = 0;
-
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+	{
+		BuildingTypes eLoopBuilding = (BuildingTypes)iI;
+		CvCivilizationInfo* pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
+		if (pkCivInfo)
+		{
+			
+			if (GetNumBuilding(eLoopBuilding) > 0)
+			{
+				CvBuildingEntry* pkEntry = GC.getBuildingInfo(eLoopBuilding);
+				if (pkEntry)
+				{
+					int iProductionModifier = pkEntry->GetCityStateTradeRouteProductionModifier();
+					int iCityStates = GET_PLAYER(m_pCity->getOwner()).GetTrade()->GetNumberOfCityStateTradeRoutes();
+					if (iProductionModifier > 0 && iCityStates > 0)
+					{
+#if defined(MOD_BUGFIX_MINOR)
+						iRtnValue = iProductionModifier * iCityStates * GetNumBuilding(eLoopBuilding);
+#else
+						iRtnValue = iProductionModifier * iCityStates;
+#endif
+					}
+				}
+			}
+			
+		}
+	}
+#else
 	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 	{
 		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
@@ -4077,7 +4126,7 @@ int CvCityBuildings::GetCityStateTradeRouteProductionModifier() const
 			}
 		}
 	}
-
+#endif
 	return iRtnValue;
 }
 

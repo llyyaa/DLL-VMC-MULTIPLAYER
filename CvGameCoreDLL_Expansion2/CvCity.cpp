@@ -2761,9 +2761,25 @@ bool CvCity::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool b
 			// Requires Building
 			if(thisUnitInfo.GetBuildingClassRequireds(eBuildingClass))
 			{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+				
+				auto buildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
+				const auto& buildingVec = buildingClassInfo->GetConntainingBuildings();
+				bool cond = true;
 				const BuildingTypes ePrereqBuilding = (BuildingTypes)(thisCivilization.getCivilizationBuildings(eBuildingClass));
-
-				if(GetCityBuildings()->GetNumBuilding(ePrereqBuilding) == 0)
+				for (auto& ite = buildingVec.begin(); ite != buildingVec.end(); ite++) {
+					if (GetCityBuildings()->GetNumBuilding(BuildingTypes(*ite)) > 0) {
+						cond = false;
+						break;
+					}
+				}
+				
+#else
+				const BuildingTypes ePrereqBuilding = (BuildingTypes)(thisCivilization.getCivilizationBuildings(eBuildingClass));
+				bool cond = GetCityBuildings()->GetNumBuilding(ePrereqBuilding) == 0;
+#endif
+				
+				if(cond)
 				{
 					CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(ePrereqBuilding);
 					if(pkBuildingInfo)
@@ -2924,15 +2940,32 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 
 		if(pkBuildingInfo->IsBuildingClassNeededInCity(iI))
 		{
-			ePrereqBuilding = ((BuildingTypes)(thisCivInfo.getCivilizationBuildings(iI)));
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			const auto& buildingVec = pkBuildingClassInfo->GetConntainingBuildings();
+			bool noPrereqCond = true;
+			for (auto& ite = buildingVec.begin(); ite != buildingVec.end(); ite++) {
+				if (GetCityBuildings()->GetNumBuilding(BuildingTypes(*ite)) > 0) {
+					noPrereqCond = false;
+					break;
+				}
+			}
 
-			if(ePrereqBuilding != NO_BUILDING)
+			if (noPrereqCond)
 			{
-				if(0 == m_pCityBuildings->GetNumBuilding(ePrereqBuilding) /* && (bContinue || (getFirstBuildingOrder(ePrereqBuilding) == -1))*/)
+				return false;
+			}
+			
+#else
+			ePrereqBuilding = ((BuildingTypes)(thisCivInfo.getCivilizationBuildings(iI)));
+			if (ePrereqBuilding != NO_BUILDING)
+			{
+				if (0 == m_pCityBuildings->GetNumBuilding(ePrereqBuilding) /* && (bContinue || (getFirstBuildingOrder(ePrereqBuilding) == -1))*/)
 				{
 					return false;
 				}
 			}
+#endif
+			
 		}
 	}
 
@@ -2991,8 +3024,22 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 
 		if(eLockedBuildingClass != NO_BUILDINGCLASS)
 		{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			const auto buildingClassInfo = GC.getBuildingClassInfo(eLockedBuildingClass);
+			if (!buildingClassInfo) continue;
+			const auto& buildingVec = buildingClassInfo->GetConntainingBuildings();
+			for (auto& ite = buildingVec.begin(); ite != buildingVec.end(); ite++) {
+				if (*ite != NO_BUILDING)
+				{
+					if (m_pCityBuildings->GetNumBuilding((BuildingTypes(*ite))) > 0)
+					{
+						return false;
+					}
+				}
+			}
+			
+#else
 			BuildingTypes eLockedBuilding = (BuildingTypes)(thisCivInfo.getCivilizationBuildings(eLockedBuildingClass));
-
 			if(eLockedBuilding != NO_BUILDING)
 			{
 				if(m_pCityBuildings->GetNumBuilding(eLockedBuilding) > 0)
@@ -3000,6 +3047,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 					return false;
 				}
 			}
+#endif
 		}
 	}
 
@@ -5149,7 +5197,11 @@ int CvCity::GetFaithPurchaseCost(UnitTypes eUnit, bool bIncludeBeliefDiscounts)
 #endif
 					}
 				}
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+				else if (eThisPlayersUnitType == eUnit || kPlayer.GetWhetherAcquiredOtherCIVsUniqueUnit(pkUnitInfo->GetUniqueUnitOwnerCiv()))
+#else
 				else if (eThisPlayersUnitType == eUnit)
+#endif
 				{
 					PolicyBranchTypes eBranch = NO_POLICY_BRANCH_TYPE;
 					int iNum = 0;
@@ -6183,7 +6235,25 @@ UnitTypes CvCity::getConscriptUnit() const
 	VALIDATE_OBJECT
 	UnitTypes eBestUnit = NO_UNIT;
 	int iBestValue = 0;
-
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (int iI = 0; iI < GC.getNumUnitInfos(); iI++)
+	{
+		
+		CvUnitEntry* pkUnitInfo = GC.getUnitInfo(UnitTypes(iI));
+		if (pkUnitInfo)
+		{
+			if (canTrain(UnitTypes(iI)))
+			{
+				const int iValue = pkUnitInfo->GetConscriptionValue();
+				if (iValue > iBestValue)
+				{
+					iBestValue = iValue;
+					eBestUnit = UnitTypes(iI);
+				}
+			}
+		}
+	}
+#else
 	for(int iI = 0; iI < GC.getNumUnitClassInfos(); iI++)
 	{
 		const UnitClassTypes eUnitClass = static_cast<UnitClassTypes>(iI);
@@ -6209,7 +6279,7 @@ UnitTypes CvCity::getConscriptUnit() const
 			}
 		}
 	}
-
+#endif
 	return eBestUnit;
 }
 
@@ -6526,7 +6596,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			if(eFreeBuildingClassThisCity != NO_BUILDINGCLASS)
 			{
 				BuildingTypes eFreeBuildingThisCity = (BuildingTypes)(thisCiv.getCivilizationBuildings(eFreeBuildingClassThisCity));
-
+				//Unhanged for unique items.
 				if (eFreeBuildingThisCity != NO_BUILDING)
 				{
 					m_pCityBuildings->SetNumRealBuilding(eFreeBuildingThisCity, 0);
@@ -7195,7 +7265,40 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 					{
 						continue;
 					}
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+					const auto& buildingVec = pkBuildingClassInfo->GetConntainingBuildings();
+					for (auto& ite = buildingVec.begin(); ite != buildingVec.end(); ite++) {
+						BuildingTypes eBuilding = (BuildingTypes)(*ite);
+						if (eBuilding != NO_BUILDING)
+						{
+							if (GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
+							{
+								int iYieldFromBuilding = pReligion->m_Beliefs.GetBuildingClassYieldChange(eBuildingClass, (YieldTypes)iYield, iFollowers);
+#if defined(MOD_BUGFIX_MINOR)
+								iYieldFromBuilding *= GetCityBuildings()->GetNumBuilding(eBuilding);
+#endif
 
+								if (isWorldWonderClass(*pkBuildingClassInfo))
+								{
+									iYieldFromBuilding += pReligion->m_Beliefs.GetYieldChangeWorldWonder((YieldTypes)iYield);
+								}
+
+								switch (iYield)
+								{
+								case YIELD_CULTURE:
+									ChangeJONSCulturePerTurnFromReligion(iYieldFromBuilding);
+									break;
+								case YIELD_FAITH:
+									ChangeFaithPerTurnFromReligion(iYieldFromBuilding);
+									break;
+								default:
+									ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iYieldFromBuilding);
+									break;
+								}
+							}
+						}
+					}
+#else
 					CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
 					BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
 
@@ -7227,6 +7330,7 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 							}
 						}
 					}
+#endif
 				}
 			}
 		}
@@ -9548,10 +9652,30 @@ void CvCity::changeFreeExperience(int iChange)
 //	--------------------------------------------------------------------------------
 bool CvCity::CanAirlift() const
 {
+	CvPlayer &kPlayer = GET_PLAYER(getOwner());
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	int iBuildingLoop;
+	BuildingTypes eBuilding;
+	for (iBuildingLoop = 0; iBuildingLoop < GC.getNumBuildingInfos(); iBuildingLoop++)
+	{
+		eBuilding = (BuildingTypes)iBuildingLoop;
+		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
+
+		if (eBuilding != NO_BUILDING && GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
+		{
+			if (!pkBuildingInfo)
+			{
+				continue;
+			}
+			if (pkBuildingInfo->IsAirlift())
+			{
+				return true;
+			}
+		}
+	}
+#else
 	int iBuildingClassLoop;
 	BuildingClassTypes eBuildingClass;
-	CvPlayer &kPlayer = GET_PLAYER(getOwner());
-
 	for(iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
 	{
 		eBuildingClass = (BuildingClassTypes) iBuildingClassLoop;
@@ -9577,6 +9701,7 @@ bool CvCity::CanAirlift() const
 			}
 		}
 	}
+#endif
 
 #if defined(MOD_EVENTS_CITY_AIRLIFT)
 	if (MOD_EVENTS_CITY_AIRLIFT) {
@@ -9930,6 +10055,28 @@ int CvCity::GetLocalHappiness() const
 			}
 
 			// Buildings
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			for (int jJ = 0; jJ < GC.getNumBuildingInfos(); jJ++)
+			{
+				BuildingTypes eBuildingType = (BuildingTypes)jJ;
+				auto eBuildingEntry = GC.getBuildingInfo(eBuildingType);
+				if (!eBuildingEntry) continue;
+				auto eBuildingClassType = (BuildingClassTypes)eBuildingEntry->GetBuildingClassType();
+				auto eBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClassType);
+				if (!eBuildingClassInfo) continue;
+				if (eBuildingType != NO_BUILDING)
+				{
+					if (GetCityBuildings()->GetNumBuilding(eBuildingType) > 0)
+					{
+#if defined(MOD_BUGFIX_MINOR)
+						iHappinessFromReligion += pReligion->m_Beliefs.GetBuildingClassHappiness(eBuildingClassType, iFollowers) * GetCityBuildings()->GetNumBuilding(eBuildingType);
+#else
+						iHappinessFromReligion += pReligion->m_Beliefs.GetBuildingClassHappiness(eBuildingClassType, iFollowers);
+#endif
+					}
+				}
+			}
+#else
 			for(int jJ = 0; jJ < GC.getNumBuildingClassInfos(); jJ++)
 			{
 				BuildingClassTypes eBuildingClass = (BuildingClassTypes)jJ;
@@ -9955,6 +10102,7 @@ int CvCity::GetLocalHappiness() const
 					}
 				}
 			}
+#endif
 		}
 		iLocalHappiness += iHappinessFromReligion;
 	}
@@ -9971,6 +10119,25 @@ int CvCity::GetLocalHappiness() const
 		{
 			if(kPlayer.GetPlayerPolicies()->HasPolicy(ePolicy) && !kPlayer.GetPlayerPolicies()->IsPolicyBlocked(ePolicy))
 			{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+				for (int iBuildingLoop = 0; iBuildingLoop < GC.getNumBuildingInfos(); iBuildingLoop++)
+				{
+					if ((BuildingTypes)iBuildingLoop != NO_BUILDING && GetCityBuildings()->GetNumBuilding((BuildingTypes)iBuildingLoop) > 0) // slewis - added the NO_BUILDING check for the ConquestDLX scenario which has civ specific wonders
+					{
+						auto eBuildingEntry = GC.getBuildingInfo((BuildingTypes)iBuildingLoop);
+						if (!eBuildingEntry) continue;
+						auto classType = eBuildingEntry->GetBuildingClassType();
+						if (pkPolicyInfo->GetBuildingClassHappiness(classType) != 0)
+						{
+#if defined(MOD_BUGFIX_MINOR)
+							iSpecialPolicyBuildingHappiness += pkPolicyInfo->GetBuildingClassHappiness(classType) * GetCityBuildings()->GetNumBuilding((BuildingTypes)iBuildingLoop);
+#else
+							iSpecialPolicyBuildingHappiness += pkPolicyInfo->GetBuildingClassHappiness(classType);
+#endif
+						}
+					}
+				}
+#else
 				for(iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
 				{
 					eBuildingClass = (BuildingClassTypes) iBuildingClassLoop;
@@ -9994,6 +10161,7 @@ int CvCity::GetLocalHappiness() const
 						}
 					}
 				}
+#endif
 			}
 		}
 	}
@@ -13091,9 +13259,11 @@ void CvCity::pushOrder(OrderTypes eOrder, int iData1, int iData2, bool bSave, bo
 				{
 					iData2 = pkUnitInfo->GetDefaultUnitAIType();
 				}
-
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+				GET_PLAYER(getOwner()).changeUnitMaking((UnitTypes)iData1, 1);
+#else
 				GET_PLAYER(getOwner()).changeUnitClassMaking(((UnitClassTypes)(pkUnitInfo->GetUnitClassType())), 1);
-
+#endif
 				bValid = true;
 			}
 		}
@@ -13105,8 +13275,11 @@ void CvCity::pushOrder(OrderTypes eOrder, int iData1, int iData2, bool bSave, bo
 			CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo((BuildingTypes)iData1);
 			if(pkBuildingInfo)
 			{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+				GET_PLAYER(getOwner()).changeBuildingMaking((BuildingTypes)(pkBuildingInfo->GetID()), 1);
+#else
 				GET_PLAYER(getOwner()).changeBuildingClassMaking(((BuildingClassTypes)(pkBuildingInfo->GetBuildingClassType())), 1);
-
+#endif
 				bValid = true;
 			}
 		}
@@ -13253,9 +13426,11 @@ void CvCity::popOrder(int iNum, bool bFinish, bool bChoose)
 		eTrainAIUnit = ((UnitAITypes)(pOrderNode->iData2));
 		CvAssertMsg(eTrainUnit != NO_UNIT, "eTrainUnit is expected to be assigned a valid unit type");
 		CvAssertMsg(eTrainAIUnit != NO_UNITAI, "eTrainAIUnit is expected to be assigned a valid unit AI type");
-
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		kOwner.changeUnitMaking((UnitTypes)(pOrderNode->iData1), -1);
+#else
 		kOwner.changeUnitClassMaking(((UnitClassTypes)(GC.getUnitInfo(eTrainUnit)->GetUnitClassType())), -1);
-
+#endif
 		if(bFinish)
 		{
 			int iResult = CreateUnit(eTrainUnit, eTrainAIUnit);
@@ -13328,8 +13503,11 @@ void CvCity::popOrder(int iNum, bool bFinish, bool bChoose)
 
 		if(pkBuildingInfo)
 		{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+			kOwner.changeBuildingMaking(((BuildingTypes)(pkBuildingInfo->GetID())), -1);
+#else
 			kOwner.changeBuildingClassMaking(((BuildingClassTypes)(pkBuildingInfo->GetBuildingClassType())), -1);
-
+#endif
 			if(bFinish)
 			{
 				bool bResult = CreateBuilding(eConstructBuilding);
@@ -14317,6 +14495,28 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 				// Does this city have prereq buildings?
 				int iNumBuildingClassInfos = GC.getNumBuildingClassInfos();
 				BuildingTypes ePrereqBuilding;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+				for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+				{
+					CvBuildingEntry* pkBuildingEntry = GC.getBuildingInfo((BuildingTypes)iI);
+					if (!pkBuildingEntry)
+					{
+						continue;
+					}
+
+					if (pkBuildingInfo->IsBuildingClassNeededInCity(pkBuildingEntry->GetBuildingClassType()))
+					{
+
+						if (ePrereqBuilding != NO_BUILDING)
+						{
+							if (0 == m_pCityBuildings->GetNumBuilding((BuildingTypes)iI))
+							{
+								return false;
+							}
+						}
+					}
+				}
+#else
 				for(int iI = 0; iI < iNumBuildingClassInfos; iI++)
 				{
 					CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo((BuildingClassTypes)iI);
@@ -14339,6 +14539,7 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 						}
 					}
 				}
+#endif
 #if !defined(MOD_BUGFIX_MINOR)
 			}
 #endif
@@ -15034,9 +15235,14 @@ bool CvCity::doCheckProduction()
 						{
 							if(pOrderNode->iData1 == iI)
 							{
-								thisPlayer.changeUnitClassMaking(((UnitClassTypes)(GC.getUnitInfo((UnitTypes)(pOrderNode->iData1))->GetUnitClassType())), -1);
 								pOrderNode->iData1 = eUpgradeUnit;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+								thisPlayer.changeUnitMaking((UnitTypes)(pOrderNode->iData1), -1);
+								thisPlayer.changeUnitMaking((UnitTypes)(pOrderNode->iData1), 1);
+#else
+								thisPlayer.changeUnitClassMaking(((UnitClassTypes)(GC.getUnitInfo((UnitTypes)(pOrderNode->iData1))->GetUnitClassType())), -1);
 								thisPlayer.changeUnitClassMaking(((UnitClassTypes)(GC.getUnitInfo((UnitTypes)(pOrderNode->iData1))->GetUnitClassType())), 1);
+#endif
 							}
 						}
 
@@ -15084,13 +15290,16 @@ bool CvCity::doCheckProduction()
 
 										if(NULL != pkOrderBuildingInfo && NULL != pkUpgradeBuildingInfo)
 										{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+											thisPlayer.changeBuildingMaking((BuildingTypes)pkOrderBuildingInfo->GetID(), -1);
+											thisPlayer.changeBuildingMaking((BuildingTypes)pkUpgradeBuildingInfo->GetID(), 1);
+#else
 											const BuildingClassTypes eOrderBuildingClass = (BuildingClassTypes)pkOrderBuildingInfo->GetBuildingClassType();
 											const BuildingClassTypes eUpgradeBuildingClass = (BuildingClassTypes)pkUpgradeBuildingInfo->GetBuildingClassType();
-
 											thisPlayer.changeBuildingClassMaking(eOrderBuildingClass, -1);
-											pOrderNode->iData1 = eUpgradeBuilding;
 											thisPlayer.changeBuildingClassMaking(eUpgradeBuildingClass, 1);
-
+#endif
+											pOrderNode->iData1 = eUpgradeBuilding;
 										}
 									}
 								}
@@ -15551,13 +15760,32 @@ void CvCity::read(FDataStream& kStream)
 	if (uiVersion < 6)
 	{
 		CvCivilizationInfo& thisCivInfo = *GC.getCivilizationInfo(getCivilizationType());
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+		{
+			BuildingTypes eBuildingType = (BuildingTypes)iI;
+			CvBuildingEntry* pkEntry = GC.getBuildingInfo(eBuildingType);
+			if (pkEntry)
+			{
+				if (pkEntry->GetAirModifier() > 0 && m_pCityBuildings->GetNumBuilding(eBuildingType) > 0)
+				{
+#if defined(MOD_BUGFIX_MINOR)
+					m_iMaxAirUnits += pkEntry->GetAirModifier() * m_pCityBuildings->GetNumBuilding(eBuildingType);
+#else
+					m_iMaxAirUnits += pkEntry->GetAirModifier();
+#endif
+				}
+			}
+			
+		}
+#else
 		for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
 			BuildingClassTypes eBuildingClass = (BuildingClassTypes)iI;
 			BuildingTypes eBuilding = (BuildingTypes)(thisCivInfo.getCivilizationBuildings(eBuildingClass));
 			if (eBuilding != NO_BUILDING)
 			{
-				CvBuildingEntry *pkEntry = GC.getBuildingInfo(eBuilding);
+				CvBuildingEntry* pkEntry = GC.getBuildingInfo(eBuilding);
 				if (pkEntry)
 				{
 					if (pkEntry->GetAirModifier() > 0 && m_pCityBuildings->GetNumBuilding(eBuilding) > 0)
@@ -15571,6 +15799,8 @@ void CvCity::read(FDataStream& kStream)
 				}
 			}
 		}
+#endif
+		
 	}
 
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiUnitProduction.dirtyGet());
@@ -17433,7 +17663,19 @@ bool CvCity::HasBuilding(BuildingTypes iBuildingType) const
 
 bool CvCity::HasBuildingClass(BuildingClassTypes iBuildingClassType) const
 {
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	auto eBuildingClassInfo = GC.getBuildingClassInfo(iBuildingClassType);
+	if (!eBuildingClassInfo) return false;
+	const auto& buildingVec = eBuildingClassInfo->GetConntainingBuildings();
+	for (auto& ite = buildingVec.begin(); ite != buildingVec.end(); ite++) {
+		if (HasBuilding((BuildingTypes)(*ite))) {
+			return true;
+		}
+	}
+	return false;
+#else
 	return HasBuilding((BuildingTypes) getCivilizationInfo().getCivilizationBuildings(iBuildingClassType));
+#endif
 }
 
 bool CvCity::HasAnyWonder() const

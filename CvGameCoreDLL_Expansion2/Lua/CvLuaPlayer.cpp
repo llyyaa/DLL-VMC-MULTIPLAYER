@@ -10497,7 +10497,20 @@ int CvLuaPlayer::lGetPlayerBuildingClassHappiness(lua_State* L)
 	if(pkPlayer)
 	{
 		int iChange = 0;
-
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+		{
+			auto pkBuildingInfo = GC.getBuildingInfo(BuildingTypes(iI));
+			if (!pkBuildingInfo)
+			{
+				continue;
+			}
+			if (pkPlayer->countNumBuildings(BuildingTypes(iI)) > 0)
+			{
+				iChange += pkBuildingInfo->GetBuildingClassHappiness(eOtherBuildingClass);
+			}
+		}
+#else
 		for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
 			BuildingClassTypes eParentBuildingClass = (BuildingClassTypes) iI;
@@ -10518,6 +10531,7 @@ int CvLuaPlayer::lGetPlayerBuildingClassHappiness(lua_State* L)
 				}
 			}
 		}
+#endif
 
 		lua_pushinteger(L, iChange);
 

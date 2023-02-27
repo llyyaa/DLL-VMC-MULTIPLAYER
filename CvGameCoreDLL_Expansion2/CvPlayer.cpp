@@ -434,6 +434,10 @@ CvPlayer::CvPlayer() :
 	, m_paiUnitClassMaking("CvPlayer::m_paiUnitClassMaking", m_syncArchive, true)
 	, m_paiBuildingClassCount("CvPlayer::m_paiBuildingClassCount", m_syncArchive)
 	, m_paiBuildingClassMaking("CvPlayer::m_paiBuildingClassMaking", m_syncArchive, true)
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	, m_paiBuildingMaking(0)
+	, m_paiUnitMaking(0)
+#endif
 	, m_paiProjectMaking("CvPlayer::m_paiProjectMaking", m_syncArchive)
 	, m_paiHurryCount("CvPlayer::m_paiHurryCount", m_syncArchive)
 	, m_paiHurryModifier("CvPlayer::m_paiHurryModifier", m_syncArchive)
@@ -760,6 +764,10 @@ void CvPlayer::uninit()
 	m_paiUnitCombatFreeExperiences.clear();
 	m_paiUnitClassCount.clear();
 	m_paiUnitClassMaking.clear();
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	m_paiBuildingMaking.clear();
+	m_paiUnitMaking.clear();
+#endif
 	m_paiBuildingClassCount.clear();
 	m_paiBuildingClassMaking.clear();
 	m_paiProjectMaking.clear();
@@ -1267,6 +1275,13 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 		m_paiBuildingClassMaking.clear();
 		m_paiBuildingClassMaking.resize(GC.getNumBuildingClassInfos(), 0);
+
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		m_paiBuildingMaking.clear();
+		m_paiBuildingMaking.resize(GC.getNumBuildingInfos());
+		m_paiUnitMaking.clear();
+		m_paiUnitMaking.resize(GC.getNumUnitInfos());
+#endif
 
 		m_paiProjectMaking.clear();
 		m_paiProjectMaking.resize(GC.getNumProjectInfos(), 0);
@@ -8154,7 +8169,7 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 			return false;
 		}
 	}
-
+	
 	PolicyBranchTypes eBranch = (PolicyBranchTypes)pBuildingInfo.GetPolicyBranchType();
 	if (eBranch != NO_POLICY_BRANCH_TYPE)
 	{
@@ -8190,12 +8205,24 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 
 	if(eReplacementBuildingClass != NO_BUILDINGCLASS)
 	{
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		auto buildingClassInfo = GC.getBuildingClassInfo(eReplacementBuildingClass);
+		const auto& containingBuildingVec = buildingClassInfo->GetConntainingBuildings();
+		for (auto& ite = containingBuildingVec.begin(); ite != containingBuildingVec.end(); ite++) {
+			if (canConstruct(BuildingTypes(*ite)))
+			{
+				return false;
+			}
+		}
+		
+#else
 		BuildingTypes eUpgradeBuilding = ((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(eReplacementBuildingClass)));
 
 		if(canConstruct(eUpgradeBuilding))
 		{
 			return false;
 		}
+#endif
 	}
 
 	if(pBuildingInfo.GetVictoryPrereq() != NO_VICTORY)
@@ -8248,7 +8275,6 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 		// Num buildings in the empire... uhhh, how is this different from the very last check in this function? (JON: It doesn't appear to be used, but I can't say for sure :)
 		CvCivilizationInfo& civilizationInfo = getCivilizationInfo();
 		int numBuildingClassInfos = GC.getNumBuildingClassInfos();
-
 		for(iI = 0; iI < numBuildingClassInfos; iI++)
 		{
 			CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo((BuildingClassTypes)iI);
@@ -8336,7 +8362,7 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 		// How does this differ from the check above?
 		BuildingTypes ePrereqBuilding;
 		int iNumNeeded;
-		for(iI = 0; iI < numBuildingClassInfos; iI++)
+		for(iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
 			iNumNeeded = getBuildingClassPrereqBuilding(eBuilding, ((BuildingClassTypes)iI), bContinue);
 			//int iNumHave = getBuildingClassCount((BuildingClassTypes)iI);
@@ -9244,9 +9270,23 @@ void CvPlayer::removeBuildingClass(BuildingClassTypes eBuildingClass)
 	CvCity* pLoopCity;
 	BuildingTypes eBuilding;
 	int iLoop;
-
+	auto buildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
 	eBuilding = ((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(eBuildingClass)));
-
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	if (buildingClassInfo) {
+		const auto& containingVec = buildingClassInfo->GetConntainingBuildings();
+		for (auto& ite = containingVec.begin(); ite != containingVec.end(); ite++) {
+			for (pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+			{
+				if (pLoopCity->GetCityBuildings()->GetNumRealBuilding(BuildingTypes(*ite)) > 0)
+				{
+					pLoopCity->GetCityBuildings()->SetNumRealBuilding(BuildingTypes(*ite), 0);
+					break;
+				}
+			}
+		}
+	}
+#else
 	if(eBuilding != NO_BUILDING)
 	{
 		for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
@@ -9258,6 +9298,7 @@ void CvPlayer::removeBuildingClass(BuildingClassTypes eBuildingClass)
 			}
 		}
 	}
+#endif
 }
 
 //	--------------------------------------------------------------------------------
@@ -9507,6 +9548,50 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 	{
 		// Building modifiers
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		for (iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+		{
+			CvBuildingEntry* pkBuilding = GC.getBuildingInfo((BuildingTypes)iI);
+			if (pkBuilding)
+			{
+				
+				iBuildingCount = pLoopCity->GetCityBuildings()->GetNumRealBuilding((BuildingTypes)iI);
+
+				if (iBuildingCount > 0)
+				{
+					pLoopCity->ChangeJONSCulturePerTurnFromBuildings(pBuildingInfo->GetBuildingClassYieldChange(pkBuilding->GetBuildingClassType(), YIELD_CULTURE) * iBuildingCount * iChange);
+
+					// Building Class Yield Stuff
+					for (iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
+					{
+						switch (iJ)
+						{
+						case YIELD_CULTURE:
+						{
+							// Skip, handled above
+							break;
+						}
+						case YIELD_FAITH:
+						{
+							pLoopCity->ChangeFaithPerTurnFromBuildings(pBuildingInfo->GetBuildingClassYieldChange(pkBuilding->GetBuildingClassType(), iJ) * iBuildingCount * iChange);
+							break;
+						}
+						default:
+						{
+							YieldTypes eYield = (YieldTypes)iJ;
+							int iYieldChange = pBuildingInfo->GetBuildingClassYieldChange(pkBuilding->GetBuildingClassType(), eYield);
+							if (iYieldChange > 0)
+							{
+								pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYieldChange * iBuildingCount * iChange);
+							}
+						}
+						}
+					}
+				}
+			}
+			
+		}
+#else
 		BuildingClassTypes eBuildingClass;
 		for(iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
@@ -9561,6 +9646,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 				}
 			}
 		}
+#endif
 	}
 }
 
@@ -12258,6 +12344,29 @@ int CvPlayer::GetHappinessFromBuildings() const
 
 	// Building Class Mods
 	int iSpecialBuildingHappiness = 0;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+	{
+		CvBuildingEntry* pkBuilding = GC.getBuildingInfo(BuildingTypes(iI));
+		if (pkBuilding && countNumBuildings(BuildingTypes(iI)))
+		{
+			for (int jJ = 0; jJ < GC.getNumBuildingClassInfos(); jJ++)
+			{
+				BuildingClassTypes eBuildingClassThatGivesHappiness = (BuildingClassTypes)jJ;
+				int iHappinessPerBuilding = pkBuilding->GetBuildingClassHappiness(eBuildingClassThatGivesHappiness);
+				auto buildingClassInfo = GC.getBuildingClassInfo(eBuildingClassThatGivesHappiness);
+				if (iHappinessPerBuilding > 0 && buildingClassInfo)
+				{
+					const auto& containingVec = buildingClassInfo->GetConntainingBuildings();
+					for (auto& ite = containingVec.begin(); ite != containingVec.end(); ite++) {
+						iSpecialBuildingHappiness += iHappinessPerBuilding * countNumBuildings(BuildingTypes(*ite));
+					}
+				}
+			}
+		}
+		
+	}
+#else
 	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 	{
 		eBuildingClass = (BuildingClassTypes) iI;
@@ -12290,6 +12399,7 @@ int CvPlayer::GetHappinessFromBuildings() const
 			}
 		}
 	}
+#endif
 	iHappiness += iSpecialBuildingHappiness;
 
 	const CvCity* pLoopCity;
@@ -20717,7 +20827,7 @@ void CvPlayer::changeUnitClassMaking(UnitClassTypes eIndex, int iChange)
 	{
 		m_paiUnitClassMaking.setAt(eIndex, m_paiUnitClassMaking[eIndex] + iChange);
 		CvAssert(getUnitClassMaking(eIndex) >= 0);
-
+#ifndef MOD_API_ACQUIRE_UNIQUE_ITEMS
 		CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
 		UnitTypes eUnit = static_cast<UnitTypes>(playerCivilizationInfo.getCivilizationUnits(eIndex));
 		CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUnit);
@@ -20748,6 +20858,7 @@ void CvPlayer::changeUnitClassMaking(UnitClassTypes eIndex, int iChange)
 				GC.GetEngineUserInterface()->setDirty(Help_DIRTY_BIT, true);
 			}
 		}
+#endif
 	}
 }
 
@@ -20821,7 +20932,7 @@ void CvPlayer::changeBuildingClassMaking(BuildingClassTypes eIndex, int iChange)
 	{
 		m_paiBuildingClassMaking.setAt(eIndex, m_paiBuildingClassMaking[eIndex] + iChange);
 		CvAssert(getBuildingClassMaking(eIndex) >= 0);
-
+#ifndef  MOD_API_ACQUIRE_UNIQUE_ITEMS
 		const BuildingTypes eBuilding = (BuildingTypes) getCivilizationInfo().getCivilizationBuildings(eIndex);
 		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
 		if(pkBuildingInfo)
@@ -20847,8 +20958,95 @@ void CvPlayer::changeBuildingClassMaking(BuildingClassTypes eIndex, int iChange)
 		{
 			GC.GetEngineUserInterface()->setDirty(Help_DIRTY_BIT, true);
 		}
+#endif
 	}
 }
+
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+int CvPlayer::getBuildingMaking(BuildingTypes eIndex) const {
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumBuildingInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_paiBuildingMaking[eIndex];
+}
+void CvPlayer::changeBuildingMaking(BuildingTypes eIndex, int iChange) {
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumBuildingInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	if (iChange != 0)
+	{
+		m_paiBuildingMaking[eIndex] += iChange;
+		CvAssert(getBuildingMaking(eIndex) >= 0);
+		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eIndex);
+		if (pkBuildingInfo)
+		{
+			changeBuildingClassMaking(BuildingClassTypes(pkBuildingInfo->GetBuildingClassType()), iChange);
+			// Update the amount of a Resource used up by Buildings in Production
+			for (int iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
+			{
+				const ResourceTypes eResource = static_cast<ResourceTypes>(iResourceLoop);
+				CvResourceInfo* pkResourceInfo = GC.getResourceInfo(eResource);
+				if (pkResourceInfo)
+				{
+					if (pkBuildingInfo->GetResourceQuantityRequirement(iResourceLoop) > 0)
+					{
+						changeNumResourceUsed(eResource, iChange * pkBuildingInfo->GetResourceQuantityRequirement(iResourceLoop));
+					}
+				}
+
+			}
+		}
+
+
+		if (GetID() == GC.getGame().getActivePlayer())
+		{
+			GC.GetEngineUserInterface()->setDirty(Help_DIRTY_BIT, true);
+		}
+	}
+}
+
+int CvPlayer::getUnitMaking(UnitTypes eIndex) const {
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumUnitInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_paiUnitMaking[eIndex];
+}
+void CvPlayer::changeUnitMaking(UnitTypes eIndex, int iChange) {
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumUnitInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	if (iChange != 0)
+	{
+		m_paiUnitMaking[eIndex] += iChange;
+		CvAssert(getUnitMaking(eIndex) >= 0);
+		CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eIndex);
+		if (pkUnitInfo)
+		{
+			changeUnitClassMaking((UnitClassTypes)pkUnitInfo->GetUnitClassType(), iChange);
+			// Builder Limit
+			if (pkUnitInfo->GetWorkRate() > 0 && pkUnitInfo->GetDomainType() == DOMAIN_LAND)
+			{
+				ChangeNumBuilders(iChange);
+			}
+
+			// Update the amount of a Resource used up by Units in Production
+			for (int iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
+			{
+				ResourceTypes eResource = static_cast<ResourceTypes>(iResourceLoop);
+				CvResourceInfo* pkResource = GC.getResourceInfo(eResource);
+				if (pkResource)
+				{
+					if (pkUnitInfo->GetResourceQuantityRequirement(iResourceLoop) > 0)
+					{
+						changeNumResourceUsed(eResource, iChange * pkUnitInfo->GetResourceQuantityRequirement(iResourceLoop));
+					}
+				}
+			}
+
+			if (GetID() == GC.getGame().getActivePlayer())
+			{
+				GC.GetEngineUserInterface()->setDirty(Help_DIRTY_BIT, true);
+			}
+		}
+	}
+}
+#endif
 
 
 //	--------------------------------------------------------------------------------
@@ -22028,6 +22226,18 @@ CvCity* CvPlayer::GetFirstCityWithBuildingClass(BuildingClassTypes eBuildingClas
 	int iLoop;
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 	{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		auto buildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
+		if (buildingClassInfo) {
+			const auto& containingVec = buildingClassInfo->GetConntainingBuildings();
+			for (auto& ite = containingVec.begin(); ite != containingVec.end(); ite++) {
+				if (pLoopCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)(*ite)) > 0)
+				{
+					return pLoopCity;
+				}
+			}
+		}
+#else
 		CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
 		BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings((BuildingClassTypes)eBuildingClass);
 		if (eBuilding != NO_BUILDING)
@@ -22037,6 +22247,7 @@ CvCity* CvPlayer::GetFirstCityWithBuildingClass(BuildingClassTypes eBuildingClas
 				return pLoopCity;
 			}
 		}
+#endif
 	}
 	return false;
 }
@@ -23392,7 +23603,11 @@ int CvPlayer::getAdvancedStartBuildingCost(BuildingTypes eBuilding, bool bAdd, C
 							{
 								if(pkBuildingLoopInfo->IsBuildingClassNeededInCity(iBuildingClassPrereqLoop))
 								{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+									if (iBuildingClassPrereqLoop == pkBuildingInfo->GetBuildingClassType())
+#else
 									if((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(iBuildingClassPrereqLoop)) == eBuilding)
+#endif
 									{
 										return -1;
 									}
@@ -24180,8 +24395,6 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		}
 	}
 
-	BuildingClassTypes eBuildingClass;
-	BuildingTypes eBuilding;
 	int iBuildingCount;
 	int iYieldMod;
 	int iYieldChange;
@@ -24253,6 +24466,90 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 #endif
 
 		// Building modifiers
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+		BuildingTypes eBuildingType;
+		for (iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+		{
+			eBuildingType = (BuildingTypes)iI;
+
+			CvBuildingEntry* pkBuilding = GC.getBuildingInfo(eBuildingType);
+			if (pkBuilding)
+			{
+				iBuildingCount = pLoopCity->GetCityBuildings()->GetNumBuilding(eBuildingType);
+
+				if (iBuildingCount > 0)
+				{
+					auto buildingClassInfo = GC.getBuildingClassInfo((BuildingClassTypes)pkBuilding->GetBuildingClassType());
+#if defined(MOD_API_UNIFIED_YIELDS)
+					if (isWorldWonderClass(pkBuilding->GetBuildingClassInfo())) {
+						iTotalWonders += iBuildingCount;
+					}
+#endif
+#if defined(MOD_API_UNIFIED_YIELDS)
+				iYieldMod = pPolicy->GetBuildingClassYieldModifiers((BuildingClassTypes)pkBuilding->GetBuildingClassType(), YIELD_CULTURE);
+					if (iYieldMod > 0)
+					{
+						pLoopCity->changeYieldRateModifier(YIELD_CULTURE, iYieldMod * iBuildingCount * iChange);
+					}
+					iYieldChange = pPolicy->GetBuildingClassCultureChange((BuildingClassTypes)pkBuilding->GetBuildingClassType());
+					iYieldChange += pPolicy->GetBuildingClassYieldChanges((BuildingClassTypes)pkBuilding->GetBuildingClassType(), YIELD_CULTURE);
+					if (iYieldChange != 0)
+					{
+						pLoopCity->ChangeJONSCulturePerTurnFromPolicies(iYieldChange * iBuildingCount * iChange);
+					}
+#else
+					pLoopCity->ChangeJONSCulturePerTurnFromPolicies(pPolicy->GetBuildingClassCultureChange((BuildingClassTypes)pkBuilding->GetBuildingClassType()) * iBuildingCount * iChange);
+#endif
+
+					// Building Class Yield Stuff
+					for (iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
+					{
+						switch (iJ)
+						{
+						case YIELD_CULTURE:
+							// Skip, handled above
+							break;
+						case YIELD_FAITH:
+#if defined(MOD_API_UNIFIED_YIELDS)
+						{
+							eYield = (YieldTypes)iJ;
+							iYieldMod = pPolicy->GetBuildingClassYieldModifiers((BuildingClassTypes)pkBuilding->GetBuildingClassType(), eYield);
+							if (iYieldMod > 0)
+							{
+								pLoopCity->changeYieldRateModifier(eYield, iYieldMod * iBuildingCount * iChange);
+							}
+							iYieldChange = pPolicy->GetBuildingClassYieldChanges((BuildingClassTypes)pkBuilding->GetBuildingClassType(), eYield);
+							if (iYieldChange != 0)
+							{
+								pLoopCity->ChangeFaithPerTurnFromPolicies(iYieldChange * iBuildingCount * iChange);
+							}
+						}
+#else
+							pLoopCity->ChangeFaithPerTurnFromPolicies(pPolicy->GetBuildingClassYieldChanges((BuildingClassTypes)pkBuilding->GetBuildingClassType(), iJ) * iBuildingCount * iChange);
+#endif
+							break;
+						default:
+						{
+							eYield = (YieldTypes)iJ;
+							iYieldMod = pPolicy->GetBuildingClassYieldModifiers((BuildingClassTypes)pkBuilding->GetBuildingClassType(), eYield);
+							if (iYieldMod > 0)
+							{
+								pLoopCity->changeYieldRateModifier(eYield, iYieldMod * iBuildingCount * iChange);
+							}
+							iYieldChange = pPolicy->GetBuildingClassYieldChanges((BuildingClassTypes)pkBuilding->GetBuildingClassType(), eYield);
+							if (iYieldChange != 0)
+							{
+								pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYieldChange * iBuildingCount * iChange);
+							}
+						}
+						}
+					}
+				}
+			}
+		}
+#else
+		BuildingClassTypes eBuildingClass;
+		BuildingTypes eBuilding;
 		for(iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
 			eBuildingClass = (BuildingClassTypes) iI;
@@ -24343,6 +24640,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 				}
 			}
 		}
+#endif
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 		if (iTotalWonders > 0) {
@@ -25385,6 +25683,10 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_paiUnitClassMaking;
 	kStream >> m_paiBuildingClassCount;
 	kStream >> m_paiBuildingClassMaking;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	kStream >> m_paiBuildingMaking;
+	kStream >> m_paiUnitMaking;
+#endif
 	kStream >> m_paiProjectMaking;
 	kStream >> m_paiHurryCount;
 	kStream >> m_paiHurryModifier;
@@ -25915,6 +26217,10 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_paiUnitClassMaking;
 	kStream << m_paiBuildingClassCount;
 	kStream << m_paiBuildingClassMaking;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	kStream << m_paiBuildingMaking;
+	kStream << m_paiUnitMaking;
+#endif
 	kStream << m_paiProjectMaking;
 	kStream << m_paiHurryCount;
 	kStream << m_paiHurryModifier;
@@ -26482,6 +26788,7 @@ int CvPlayer::getNewCityProductionValue() const
 	}
 
 	int iValue = 0;
+
 	for(int iJ = 0; iJ < GC.getNumBuildingClassInfos(); iJ++)
 	{
 		const BuildingClassTypes eBuildingClass = static_cast<BuildingClassTypes>(iJ);

@@ -6499,7 +6499,15 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 					iTempValue /= 2;
 				}
 			}
-
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+			auto& bVec = pkBuildingClassInfo->GetConntainingBuildings();
+			for (auto& ite = bVec.begin(); ite != bVec.end(); ite++) {
+				if (pCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(*ite)) > 0)
+				{
+					iTempValue *= 2;
+				}
+			}
+#else
 			BuildingTypes eBuilding = (BuildingTypes)m_pPlayer->getCivilizationInfo().getCivilizationBuildings(jJ);
 			if (eBuilding != NO_BUILDING)
 			{
@@ -6508,6 +6516,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 					iTempValue *= 2;
 				}
 			}
+#endif
 
 			if(pkBuildingClassInfo->getMaxPlayerInstances() == 1)
 			{
@@ -6582,6 +6591,32 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	{
 		if (pEntry->IsBuildingClassEnabled(iI))
 		{
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+			auto buildingClassInfo = GC.getBuildingClassInfo(BuildingClassTypes(iI));
+			if (!buildingClassInfo) continue;
+			auto& bVec = buildingClassInfo->GetConntainingBuildings();
+			for (auto& ite = bVec.begin(); ite != bVec.end(); ite++) {
+				CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(BuildingTypes(*ite));
+
+				if (pBuildingEntry && pFlavorManager && 
+					((BuildingTypes)m_pPlayer->getCivilizationInfo().getCivilizationBuildings(iI) == BuildingTypes(*ite) || 
+						m_pPlayer->GetWhetherAcquiredOtherCIVsUniqueBuilding(pBuildingEntry->GetUniqueBuildingOwnerCiv())))
+				{
+					for (int iFlavorLoop = 0; iFlavorLoop < GC.getNumFlavorTypes(); iFlavorLoop++)
+					{
+						int iFlavorValue = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)iFlavorLoop) * pBuildingEntry->GetFlavorValue(iFlavorLoop);
+
+						// If can also be built with hammers, much less valuable
+						if (pBuildingEntry->GetProductionCost() > 0)
+						{
+							iFlavorValue /= 10;
+						}
+						iRtnValue += iFlavorValue;
+					}
+				}
+			}
+			
+#else
 			BuildingTypes eBuilding = (BuildingTypes)m_pPlayer->getCivilizationInfo().getCivilizationBuildings(iI);
 			CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(eBuilding);
 
@@ -6599,6 +6634,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 					iRtnValue += iFlavorValue;
 				}
 			}
+#endif
 		}
 	}
 
@@ -6948,6 +6984,35 @@ bool CvReligionAI::AreAllOurCitiesHaveFaithBuilding(ReligionTypes eReligion, boo
 {
 	bool bRtnValue = true;
 	BuildingClassTypes eFaithBuildingClass = FaithBuildingAvailable(eReligion);
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	auto buildingClassInfo = GC.getBuildingClassInfo(eFaithBuildingClass);
+	if (eFaithBuildingClass == NO_BUILDINGCLASS || !buildingClassInfo)
+	{
+		return true;
+	}
+	auto& bVec = buildingClassInfo->GetConntainingBuildings();
+	int iLoop;
+	CvCity* pLoopCity;
+	for (pLoopCity = m_pPlayer->firstCity(&iLoop); pLoopCity != NULL; pLoopCity = m_pPlayer->nextCity(&iLoop))
+	{
+		bool has = false;
+		if (pLoopCity->GetCityReligions()->GetReligiousMajority() == eReligion)
+		{
+			if (bIncludePuppets || !pLoopCity->IsPuppet())
+			{
+
+				for (auto& ite = bVec.begin(); ite != bVec.end(); ite++) {
+					if (pLoopCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)*ite) >= 1)
+					{
+						has = true;
+						break;
+					}
+				}
+				if (!has) return false;
+			}
+		}
+	}
+#else
 	BuildingTypes eFaithBuilding = (BuildingTypes)m_pPlayer->getCivilizationInfo().getCivilizationBuildings(eFaithBuildingClass);
 
 	if(eFaithBuildingClass == NO_BUILDINGCLASS || eFaithBuilding == NO_BUILDING)
@@ -6971,7 +7036,7 @@ bool CvReligionAI::AreAllOurCitiesHaveFaithBuilding(ReligionTypes eReligion, boo
 			}
 		}
 	}
-
+#endif
 	return bRtnValue;
 }
 

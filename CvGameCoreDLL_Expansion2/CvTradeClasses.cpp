@@ -123,6 +123,26 @@ bool CvGameTrade::CanCreateTradeRoute(CvCity* pOriginCity, CvCity* pDestCity, Do
 		if (eConnectionType == TRADE_CONNECTION_FOOD)
 		{
 			bool bAllowsFoodConnection = false;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+			for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+			{
+				CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(BuildingTypes(iI));
+				if (!pBuildingEntry)
+				{
+					continue;
+				}
+
+				if (pBuildingEntry && pBuildingEntry->AllowsFoodTradeRoutes())
+				{
+					if (pOriginCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI)) > 0)
+					{
+						bAllowsFoodConnection = true;
+						break;
+					}
+				}
+				
+			}
+#else
 			for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 			{
 				BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
@@ -143,7 +163,7 @@ bool CvGameTrade::CanCreateTradeRoute(CvCity* pOriginCity, CvCity* pDestCity, Do
 					}
 				}
 			}
-
+#endif
 			if (!bAllowsFoodConnection)
 			{
 				return false;
@@ -152,6 +172,26 @@ bool CvGameTrade::CanCreateTradeRoute(CvCity* pOriginCity, CvCity* pDestCity, Do
 		else if (eConnectionType == TRADE_CONNECTION_PRODUCTION)
 		{
 			bool bAllowsProductionConnection = false;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+			for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+			{
+				CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(BuildingTypes(iI));
+				if (!pBuildingEntry)
+				{
+					continue;
+				}
+
+				if (pBuildingEntry && pBuildingEntry->AllowsProductionTradeRoutes())
+				{
+					if (pOriginCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI)) > 0)
+					{
+						bAllowsProductionConnection = true;
+						break;
+					}
+				}
+				
+			}
+#else
 			for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 			{
 				BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
@@ -172,7 +212,7 @@ bool CvGameTrade::CanCreateTradeRoute(CvCity* pOriginCity, CvCity* pDestCity, Do
 					}
 				}
 			}
-
+#endif
 			if (!bAllowsProductionConnection)
 			{
 				return false;
@@ -2200,6 +2240,37 @@ int CvPlayerTrade::GetTradeConnectionYourBuildingValueTimes100(const TradeConnec
 	if (bAsOriginPlayer)
 	{
 		CvCity* pOriginCity = CvGameTrade::GetOriginCity(kTradeConnection);
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+		{
+			CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(BuildingTypes(iI));
+			if (!pBuildingEntry)
+			{
+				continue;
+			}
+
+			if (pBuildingEntry && pOriginCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI)))
+			{
+				if (pBuildingEntry->GetTradeRouteSeaGoldBonus() > 0 && kTradeConnection.m_eDomain == DOMAIN_SEA)
+				{
+#if defined(MOD_BUGFIX_MINOR)
+					iBonus += pBuildingEntry->GetTradeRouteSeaGoldBonus() * pOriginCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI));
+#else
+					iBonus += pBuildingEntry->GetTradeRouteSeaGoldBonus();
+#endif
+				}
+				else if (pBuildingEntry->GetTradeRouteLandGoldBonus() > 0 && kTradeConnection.m_eDomain == DOMAIN_LAND)
+				{
+#if defined(MOD_BUGFIX_MINOR)
+					iBonus += pBuildingEntry->GetTradeRouteLandGoldBonus() * pOriginCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI));
+#else
+					iBonus += pBuildingEntry->GetTradeRouteLandGoldBonus();
+#endif
+				}
+			}
+			
+		}
+#else
 		for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
 			BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
@@ -2232,6 +2303,7 @@ int CvPlayerTrade::GetTradeConnectionYourBuildingValueTimes100(const TradeConnec
 				}
 			}
 		}
+#endif
 	}
 
 	if (bAsOriginPlayer)
@@ -3673,6 +3745,36 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 	}
 	
 	int iRangeModifier = 0;
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+	for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+	{
+		CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(BuildingTypes(iI));
+		if (!pBuildingEntry)
+		{
+			continue;
+		}
+
+		if (pBuildingEntry && pOriginCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI)))
+		{
+			if (pBuildingEntry->GetTradeRouteSeaDistanceModifier() > 0 && eDomain == DOMAIN_SEA)
+			{
+#if defined(MOD_BUGFIX_MINOR)
+				iRangeModifier += pBuildingEntry->GetTradeRouteSeaDistanceModifier() * pOriginCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI));
+#else
+				iRangeModifier += pBuildingEntry->GetTradeRouteSeaDistanceModifier();
+#endif
+			}
+			else if (pBuildingEntry->GetTradeRouteLandDistanceModifier() > 0 && eDomain == DOMAIN_LAND)
+			{
+#if defined(MOD_BUGFIX_MINOR)
+				iRangeModifier += pBuildingEntry->GetTradeRouteLandDistanceModifier() * pOriginCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI));
+#else
+				iRangeModifier += pBuildingEntry->GetTradeRouteLandDistanceModifier();
+#endif
+			}
+		}
+	}
+#else
 	for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 	{
 		BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
@@ -3705,6 +3807,7 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 			}
 		}
 	}
+#endif
 
 	iRange = iBaseRange;
 	iRange += iTraitRange;
@@ -3785,6 +3888,33 @@ uint CvPlayerTrade::GetNumTradeRoutesPossible (void)
 	CvCity* pLoopCity;
 	for(pLoopCity = m_pPlayer->firstCity(&iLoop); pLoopCity != NULL; pLoopCity = m_pPlayer->nextCity(&iLoop))
 	{
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+		{
+			CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(BuildingTypes(iI));
+			if (!pBuildingEntry)
+			{
+				continue;
+			}
+
+			if (pBuildingEntry)
+			{
+				if (pLoopCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI)))
+				{
+					int iNumRouteBonus = pBuildingEntry->GetNumTradeRouteBonus();
+					if (iNumRouteBonus != 0)
+					{
+#if defined(MOD_BUGFIX_MINOR)
+						iNumRoutes += (iNumRouteBonus * pLoopCity->GetCityBuildings()->GetNumBuilding(BuildingTypes(iI)));
+#else
+						iNumRoutes += iNumRouteBonus;
+#endif
+					}
+				}
+			}
+			
+		}
+#else
 		for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
 			BuildingTypes eBuilding = (BuildingTypes)kCivInfo.getCivilizationBuildings(iI);
@@ -3813,6 +3943,7 @@ uint CvPlayerTrade::GetNumTradeRoutesPossible (void)
 				}
 			}
 		}
+#endif
 	}
 
 	int iModifier = 100 + m_pPlayer->GetPlayerTraits()->GetNumTradeRoutesModifier();

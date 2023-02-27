@@ -681,8 +681,6 @@ int CvPolicyAI::GetBranchBuildingHappiness(CvPlayer* pPlayer, PolicyBranchTypes 
 {
 	// Policy Building Mods
 	int iSpecialPolicyBuildingHappiness = 0;
-	int iBuildingClassLoop;
-	BuildingClassTypes eBuildingClass;
 	for(int iPolicyLoop = 0; iPolicyLoop < GC.getNumPolicyInfos(); iPolicyLoop++)
 	{
 		PolicyTypes ePolicy = (PolicyTypes)iPolicyLoop;
@@ -691,6 +689,35 @@ int CvPolicyAI::GetBranchBuildingHappiness(CvPlayer* pPlayer, PolicyBranchTypes 
 		{
 			if (pkPolicyInfo->GetPolicyBranchType() == eBranch)
 			{
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+				for (int iBuildingLoop = 0; iBuildingLoop < GC.getNumBuildingInfos(); iBuildingLoop++)
+				{
+					auto buildingType = (BuildingTypes)iBuildingLoop;
+					auto buildingEntry = GC.getBuildingInfo(buildingType);
+					if (!buildingEntry)
+					{
+						continue;
+					}
+					if (!pPlayer->GetWhetherAcquiredOtherCIVsUniqueBuilding(buildingEntry->GetUniqueBuildingOwnerCiv()) && 
+						buildingType != (BuildingTypes)pPlayer->getCivilizationInfo().getCivilizationBuildings((BuildingClassTypes)buildingEntry->GetBuildingClassType())) {
+						continue;
+					}
+					if (pkPolicyInfo->GetBuildingClassHappiness((BuildingClassTypes)buildingEntry->GetBuildingClassType()) != 0)
+					{
+						CvCity* pCity;
+						int iLoop;
+						for (pCity = pPlayer->firstCity(&iLoop); pCity != NULL; pCity = pPlayer->nextCity(&iLoop))
+						{
+							if (pCity->GetCityBuildings()->GetNumBuilding(buildingType) > 0)
+							{
+								iSpecialPolicyBuildingHappiness += pkPolicyInfo->GetBuildingClassHappiness((BuildingClassTypes)buildingEntry->GetBuildingClassType());
+							}
+						}
+					}
+				}
+#else
+				BuildingClassTypes eBuildingClass;
+				int iBuildingClassLoop;
 				for(iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
 				{
 					eBuildingClass = (BuildingClassTypes) iBuildingClassLoop;
@@ -718,9 +745,11 @@ int CvPolicyAI::GetBranchBuildingHappiness(CvPlayer* pPlayer, PolicyBranchTypes 
 						}
 					}
 				}
+#endif
 			}
 		}
 	}
+
 	return iSpecialPolicyBuildingHappiness;
 }
 

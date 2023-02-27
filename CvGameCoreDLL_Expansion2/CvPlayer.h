@@ -1350,6 +1350,14 @@ public:
 	void changeBuildingClassMaking(BuildingClassTypes eIndex, int iChange);
 	int getBuildingClassCountPlusMaking(BuildingClassTypes eIndex) const;
 
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	int getBuildingMaking(BuildingTypes eIndex) const;
+	void changeBuildingMaking(BuildingTypes eIndex, int iChange);
+	int getUnitMaking(UnitTypes eIndex) const;
+	void changeUnitMaking(UnitTypes eIndex, int iChange);
+
+#endif
+
 	int getProjectMaking(ProjectTypes eIndex) const;
 	void changeProjectMaking(ProjectTypes eIndex, int iChange);
 
@@ -2224,6 +2232,10 @@ protected:
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiUnitClassMaking;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiBuildingClassCount;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiBuildingClassMaking;
+#ifdef  MOD_API_ACQUIRE_UNIQUE_ITEMS
+	std::vector<int> m_paiBuildingMaking;
+	std::vector<int> m_paiUnitMaking;
+#endif
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiProjectMaking;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiHurryCount;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiHurryModifier;

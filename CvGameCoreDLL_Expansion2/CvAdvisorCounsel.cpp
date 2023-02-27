@@ -374,7 +374,10 @@ void CvAdvisorCounsel::BuildCounselList(PlayerTypes ePlayer)
 						UnitTypes eCivUnit = ((UnitTypes)(GET_PLAYER(ePlayer).getCivilizationInfo().getCivilizationUnits(pUnitEntry->GetUnitClassType())));
 						if(eUnitType != eCivUnit)
 						{
-							continue;
+#if defined(MOD_BUGFIX_MINOR)
+							if(!GET_PLAYER(ePlayer).GetWhetherAcquiredOtherCIVsUniqueUnit(pUnitEntry->GetUniqueUnitOwnerCiv()))
+#endif
+								continue;
 						}
 
 						int iCombatValue = MAX(pUnitEntry->GetCombat(), pUnitEntry->GetRangedCombat());

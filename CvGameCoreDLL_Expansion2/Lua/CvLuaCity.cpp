@@ -1940,10 +1940,15 @@ int CvLuaCity::lGetNumBuildingClass(lua_State* L)
 	const BuildingClassTypes eBuildingClassType = (BuildingClassTypes)lua_tointeger(L, 2);
 	if(eBuildingClassType != NO_BUILDINGCLASS)
 	{
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		const int iResult = pkCity->GetCityBuildings()->GetNumBuildingClass(eBuildingClassType);
+		lua_pushinteger(L, iResult);
+#else
 		CvCivilizationInfo& playerCivilizationInfo = GET_PLAYER(pkCity->getOwner()).getCivilizationInfo();
 		BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClassType);
 		const int iResult = pkCity->GetCityBuildings()->GetNumBuilding(eBuilding);
 		lua_pushinteger(L, iResult);
+#endif
 	}
 	else
 	{
@@ -1959,10 +1964,15 @@ int CvLuaCity::lIsHasBuildingClass(lua_State* L)
 	const BuildingClassTypes eBuildingClassType = (BuildingClassTypes)lua_tointeger(L, 2);
 	if(eBuildingClassType != NO_BUILDINGCLASS)
 	{
+#ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
+		const bool bResult = pkCity->GetCityBuildings()->GetNumBuildingClass(eBuildingClassType);
+		lua_pushboolean(L, bResult);
+#else
 		CvCivilizationInfo& playerCivilizationInfo = GET_PLAYER(pkCity->getOwner()).getCivilizationInfo();
 		BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClassType);
 		const bool bResult = pkCity->GetCityBuildings()->GetNumBuilding(eBuilding);
 		lua_pushboolean(L, bResult);
+#endif
 	}
 	else
 	{
