@@ -7850,7 +7850,7 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 		if(eThisPlayersUnitType != eUnit)
 		{
 #ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
-			if (!GetWhetherAcquiredOtherCIVsUniqueUnit(pUnitInfoPtr->GetUniqueUnitOwnerCiv())) {
+			if (!MOD_API_ACQUIRE_UNIQUE_ITEMS || !GetWhetherAcquiredOtherCIVsUniqueUnit(pUnitInfoPtr->GetUniqueUnitOwnerCiv())) {
 #endif
 				return false;
 #ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
@@ -8154,7 +8154,7 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 	if(getCivilizationInfo().getCivilizationBuildings(eBuildingClass) != eBuilding)
 	{
 #ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
-		if (!GetWhetherAcquiredOtherCIVsUniqueBuilding(pkBuildingInfo->GetUniqueBuildingOwnerCiv())) {
+		if (!MOD_API_ACQUIRE_UNIQUE_ITEMS || !GetWhetherAcquiredOtherCIVsUniqueBuilding(pkBuildingInfo->GetUniqueBuildingOwnerCiv())) {
 #endif
 			return false;
 #ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
@@ -9709,7 +9709,7 @@ bool CvPlayer::canBuild(const CvPlot* pPlot, BuildTypes eBuild, bool bTestEra, b
 			if(eCiv != getCivilizationType())
 			{
 #ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS
-				if (!GetWhetherAcquiredOtherCIVsUniqueImprovement(eCiv)) {
+				if (!MOD_API_ACQUIRE_UNIQUE_ITEMS ||!GetWhetherAcquiredOtherCIVsUniqueImprovement(eCiv)) {
 #endif 
 					return false;
 #ifdef MOD_API_ACQUIRE_UNIQUE_ITEMS

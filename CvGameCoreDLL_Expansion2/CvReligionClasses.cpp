@@ -6600,7 +6600,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 
 				if (pBuildingEntry && pFlavorManager && 
 					((BuildingTypes)m_pPlayer->getCivilizationInfo().getCivilizationBuildings(iI) == BuildingTypes(*ite) || 
-						m_pPlayer->GetWhetherAcquiredOtherCIVsUniqueBuilding(pBuildingEntry->GetUniqueBuildingOwnerCiv())))
+						(MOD_API_ACQUIRE_UNIQUE_ITEMS && m_pPlayer->GetWhetherAcquiredOtherCIVsUniqueBuilding(pBuildingEntry->GetUniqueBuildingOwnerCiv()))))
 				{
 					for (int iFlavorLoop = 0; iFlavorLoop < GC.getNumFlavorTypes(); iFlavorLoop++)
 					{
