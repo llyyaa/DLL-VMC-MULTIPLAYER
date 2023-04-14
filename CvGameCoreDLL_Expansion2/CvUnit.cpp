@@ -7119,7 +7119,7 @@ bool CvUnit::canChangeTradeUnitHomeCityAt(const CvPlot* pPlot, int iX, int iY) c
 #if defined(MOD_BUGFIX_MINOR)
 		// The path finder permits routes between cities on lakes,
 		// so we'd better allow cargo ships to be relocated there!
-		if (!pToCity->isCoastal(0))
+		if (!pToCity->isCoastal(0) && !pToPlot->isWater())
 #else
 		if (!pToCity->isCoastal())
 #endif
