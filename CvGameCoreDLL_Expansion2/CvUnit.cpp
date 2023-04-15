@@ -6188,7 +6188,18 @@ void CvUnit::DoAttrition()
 		{
 			strAppendText =  GetLocalizedText("TXT_KEY_MISC_YOU_UNIT_WAS_DAMAGED_ATTRITION");
 #if defined(MOD_API_UNIT_STATS)
+	#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+			if (MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && AI_getUnitAIType() == UNITAI_SETTLE && GET_MY_PLAYER().GetCanFoundMountainCity())
+			{
+				// Do nothing, Inca's Settle should not get mountains damage taken at the end of the turn
+			}
+			else
+			{
+				changeDamage(50, NO_PLAYER, -1, 0.0, &strAppendText);
+			}		
+	#else
 			changeDamage(50, NO_PLAYER, -1, 0.0, &strAppendText);
+	#endif
 #else
 			changeDamage(50, NO_PLAYER, 0.0, &strAppendText);
 #endif
