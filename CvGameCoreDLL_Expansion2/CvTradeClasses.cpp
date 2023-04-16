@@ -498,6 +498,7 @@ bool CvGameTrade::IsValidTradeRoutePath (CvCity* pOriginCity, CvCity* pDestCity,
 	if (eDomain == DOMAIN_SEA)
 	{
 		// Both must be on the coast (a lake is ok)  A better check would be to see if they are adjacent to the same water body.
+
 		if(pOriginCity->isCoastal(0) && pDestCity->isCoastal(0))	
 		{
 			bSuccess = GC.GetInternationalTradeRouteWaterFinder().GeneratePath(iOriginX, iOriginY, iDestX, iDestY, eOriginPlayer, false);
