@@ -8055,20 +8055,18 @@ int CvLuaPlayer::lGetUnitsListFromHasPromotion(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	const PromotionTypes ePromotion = (PromotionTypes)lua_tointeger(L, 2);
-	CvUnit* pkUnit = NULL;
 
 	lua_createtable(L, 0, 0);
 	const int t = lua_gettop(L);
 	int idx = 1;
 
-	std::vector<CvUnit*> unitsListFromHasPromotion;
-	pkPlayer->GetUnitsListFromHasPromotion(ePromotion, unitsListFromHasPromotion);
+	std::vector<const CvUnit*> unitsListFromHasPromotion;
+	pkPlayer->getUnitsListFromHasPromotion(ePromotion, unitsListFromHasPromotion);
 
-	for(std::vector<CvUnit*>::iterator it = unitsListFromHasPromotion.begin();
+	for(std::vector<const CvUnit*>::iterator it = unitsListFromHasPromotion.begin();
 	        it!= unitsListFromHasPromotion.end(); ++it)
 	{
-		CvUnit* pkUnit = (*it);
-		CvLuaUnit::Push(L, pkUnit);
+		CvLuaUnit::Push(L, const_cast<CvUnit*>(*it));
 		lua_rawseti(L, t, idx++);
 	}
 	return 1;

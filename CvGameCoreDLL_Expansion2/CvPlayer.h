@@ -1363,7 +1363,7 @@ public:
 
 	int getUnitClassCount(UnitClassTypes eIndex) const;
 	int getUnitCountFromHasPromotion(PromotionTypes ePromotion) const;
-	void GetUnitsListFromHasPromotion(PromotionTypes ePromotion,std::vector<CvUnit*>& unitsListFromHasPromotion);
+	void getUnitsListFromHasPromotion(PromotionTypes ePromotion, std::vector<const CvUnit*>& unitsListFromHasPromotion) const;
 	bool isUnitClassMaxedOut(UnitClassTypes eIndex, int iExtra = 0) const;
 	void changeUnitClassCount(UnitClassTypes eIndex, int iChange);
 	int getUnitClassMaking(UnitClassTypes eIndex) const;

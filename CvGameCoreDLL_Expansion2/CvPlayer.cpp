@@ -20884,14 +20884,14 @@ int CvPlayer::getUnitCountFromHasPromotion(PromotionTypes ePromotion) const
 }
 
 //	--------------------------------------------------------------------------------
-void CvPlayer::GetUnitsListFromHasPromotion(PromotionTypes ePromotion,std::vector<CvUnit*>& unitsListFromHasPromotion)
+void CvPlayer::getUnitsListFromHasPromotion(PromotionTypes ePromotion, std::vector<const CvUnit*>& unitsListFromHasPromotion) const
 { 
 	CvAssertMsg(ePromotion >= 0, "ePromotion is expected to be non-negative (invalid Index)");
 	CvAssertMsg(ePromotion < GC.getNumPromotionInfos(), "ePromotion is expected to be within maximum bounds (invalid Index)");
 	int iLoop;
-	CvUnit* pLoopUnit;
+	const CvUnit* pLoopUnit;
 
-	unitsListFromHasPromotion.erase(unitsListFromHasPromotion.begin(), unitsListFromHasPromotion.end());
+	unitsListFromHasPromotion.clear();
     for(pLoopUnit = firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = nextUnit(&iLoop))
 	{
 		//IS Unit has this promotion ?
