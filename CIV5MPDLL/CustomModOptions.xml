@@ -25,7 +25,7 @@
 	<!-- If A declares war on B that preempts a co-op war, A is locked into the war for the same number of turns as if they had agreed to the co-op war (v86) -->
     <!-- See also: "Global - Early Coop War Lock" -->
     
-    <Row Class="5" Name="GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY" Value="1"/>
+    <Row Class="5" Name="GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY" Value="0"/>
 
     <Row Class="5" Name="GLOBAL_EARLY_COOP_WAR_LOCK" Value="0"/>
 
@@ -228,7 +228,7 @@
 
     <!-- Separates the Engineer, Scientist and Merchant GP counters (v52) -->
     <!-- See also: "Global - Separate GP Counters" -->
-    <Row Class="6" Name="GLOBAL_SEPARATE_GP_COUNTERS" Value="1"/>
+    <Row Class="6" Name="GLOBAL_SEPARATE_GP_COUNTERS" Value="0"/>
 
     <!-- Removes free GP (from buildings, policies, traits, etc) from the GP counters (v61) -->
     <!-- See also: "Global - Truly Free Great People" -->
@@ -287,9 +287,9 @@
     <!-- See also: "Traits - Extra Supply" -->
     <Row Class="6" Name="TRAITS_EXTRA_SUPPLY" Value="0" DbUpdates="1"/>
 
-    <Row Class="6" Name="TRAITS_CAN_FOUND_MOUNTAIN_CITY" Value="1" DbUpdates="1"/>
+    <Row Class="6" Name="TRAITS_CAN_FOUND_MOUNTAIN_CITY" Value="0" DbUpdates="1"/>
 
-	<Row Class="6" Name="TRAITS_CAN_FOUND_COAST_CITY" Value="1" DbUpdates="1"/>
+	<Row Class="6" Name="TRAITS_CAN_FOUND_COAST_CITY" Value="0" DbUpdates="1"/>
 
 	<!-- Permits cities to work more rings (v19) -->
     <!-- See also: "Global - City Working Distance" -->
@@ -317,7 +317,7 @@
     <!-- Permits variable recon ranges by creating extra recon range promotions (like extra sight range) (v19) -->
     <!-- See also: "Promotions - Heli AirRecon" -->
     <!-- See also: "Promotions - Jet Long Range Recon" -->
-    <Row Class="2" Name="PROMOTIONS_VARIABLE_RECON" Value="1" DbUpdates="1"/>
+    <Row Class="2" Name="PROMOTIONS_VARIABLE_RECON" Value="0" DbUpdates="1"/>
     <!-- Permits land units to cross mountains (like the Carthage trait) (v19) -->
     <!-- See also: "Improvement - Tunnel" -->
     <!-- See also: "Promotions - Terrain Crossing" -->
@@ -404,8 +404,8 @@
     <!-- Permits hovering units to attack coastal shipping (v19) -->
     <!-- See also: "Units - Steampunk Airships" -->
     <Row Class="6" Name="UNITS_HOVERING_COASTAL_ATTACKS" Value="0"/>
-    <Row Class="0" Name="UNITS_HOVERING_COASTAL_ATTACKS_RANGE" Value="1"/>
-    <Row Class="0" Name="UNITS_HOVERING_COASTAL_ATTACKS_MULTIPLIER" Value="1"/>
+    <Row Class="0" Name="UNITS_HOVERING_COASTAL_ATTACKS_RANGE" Value="0"/>
+    <Row Class="0" Name="UNITS_HOVERING_COASTAL_ATTACKS_MULTIPLIER" Value="0"/>
     <Row Class="0" Name="UNITS_HOVERING_COASTAL_ATTACKS_DIVISOR" Value="2"/>
 
     <!-- Removes religion preference (v19) -->
@@ -514,8 +514,8 @@
     <!--   GameEvents.MinorGift.Add(function(iMinor, iMajor, iData2, iData3, iFlags, bOpt1, bOpt2, sType) end) -->
     <Row Class="3" Name="EVENTS_MINORS_GIFTS" Value="0"/>
 
-	<Row Class="3" Name="EVENTS_BATTLES_CUSTOM_DAMAGE" Value="1"/>
-    <Row Class="3" Name="MOD_EVENTS_BATTLES" Value="1"/>
+	<Row Class="3" Name="EVENTS_BATTLES_CUSTOM_DAMAGE" Value="0"/>
+    <Row Class="3" Name="MOD_EVENTS_BATTLES" Value="0"/>
 
     <!-- Events sent on interaction with City States (v68) -->
 	<!--   GameEvents.PlayerCanProtect.Add(function(iMajor, iMinor) return true end) -->
@@ -534,7 +534,7 @@
 	<!--   GameEvents.PlayerCanTransitMinorCity.Add(function(iMajor, iMinor, iCity, iPlotX, iPlotY) return true end) (v74) -->
 	<!--   GameEvents.UnitCanTransitMinorCity.Add(function(iPlayer, iUnit, iCS, iCity, iPlotX, iPlotY) return true end) (v74) -->
 	<!--   GameEvents.PlayerCompletedQuest.Add(function(iPlayer, iCS, iQuestType, iStartTurn, iOldInfluence, iNewInfluence) end) (CIV5MPDLL) -->
-	<Row Class="3" Name="EVENTS_MINORS_INTERACTION" Value="1"/>
+	<Row Class="3" Name="EVENTS_MINORS_INTERACTION" Value="0"/>
 
     <!-- Events sent by City State quests (v81) -->
 	<!--   ASSUMPTION: There is only one active quest of any given MinorCivQuestTypes per major, that is, (iMajor, iMinor, iQuest) is unique -->
@@ -578,7 +578,7 @@
     <Row Class="3" Name="EVENTS_GREAT_PEOPLE" Value="0"/>
 
 
-    <Row Class="3" Name="EVENTS_DISCOVER" Value="1"/>
+    <Row Class="3" Name="EVENTS_DISCOVER" Value="0"/>
 
 
     <!-- Events sent when a player is about to found a religion (v19) -->
@@ -624,7 +624,7 @@
     <!--   GameEvents.PlayerGoldenAge.Add(function(iPlayer, bStart, iTurns) end) -->
     <Row Class="3" Name="EVENTS_GOLDEN_AGE" Value="0"/>
 
-    <Row Class="3" Name="EVENTS_WLTKD" Value="1"/>
+    <Row Class="3" Name="EVENTS_WLTKD" Value="0"/>
 
     <!-- Events sent after a city produces/buys/sells something (v19) -->
     <!--   GameEvents.CityTrained.Add(function(iPlayer, iCity, iUnit, bGold, bFaith) end) -->
@@ -783,7 +783,7 @@
 
     <!-- Event sent to see if a command is valid (v46) -->
     <!--   GameEvents.CanDoCommand.Add(function(iPlayer, iUnit, iCommand, iData1, iData2, iPlotX, iPlotY, bTestVisible) return true end) -->
-    <Row Class="3" Name="EVENTS_COMMAND" Value="1"/>
+    <Row Class="3" Name="EVENTS_COMMAND" Value="0"/>
 
     <!-- Events sent for custom missions (v46) -->
     <!--   CUSTOM_MISSION_NO_ACTION       = 0 -->
@@ -824,14 +824,14 @@
 
     <!-- Enables the Plot Yield tables (v35) -->
     <!-- See also: "Religion - Bonus Beliefs" -->
-    <Row Class="2" Name="API_PLOT_YIELDS" Value="1" DbUpdates="1"/>
+    <Row Class="2" Name="API_PLOT_YIELDS" Value="0" DbUpdates="1"/>
 
     <!-- * Enables the Unified Yields extensions (v54) -->
-    <Row Class="2" Name="API_UNIFIED_YIELDS" Value="1" DbUpdates="1"/>
+    <Row Class="2" Name="API_UNIFIED_YIELDS" Value="0" DbUpdates="1"/>
     <!-- * Enables the Unified Yields (YIELD_TOURISM) extensions (v56) -->
-    <Row Class="2" Name="API_UNIFIED_YIELDS_TOURISM" Value="1" DbUpdates="1"/>
+    <Row Class="2" Name="API_UNIFIED_YIELDS_TOURISM" Value="0" DbUpdates="1"/>
     <!-- * Enables the Unified Yields (YIELD_GOLDEN_AGE_POINTS) extensions (v57) -->
-    <Row Class="2" Name="API_UNIFIED_YIELDS_GOLDEN_AGE" Value="1" DbUpdates="1"/>
+    <Row Class="2" Name="API_UNIFIED_YIELDS_GOLDEN_AGE" Value="0" DbUpdates="1"/>
 
     <!-- Enables the Achievements table (v45) -->
     <Row Class="2" Name="API_ACHIEVEMENTS" Value="0" DbUpdates="1"/>
@@ -842,44 +842,44 @@
     <!-- * Enables the Espionage API (v19) -->
     <!-- See also: "Global - Espionage Race" -->
     <!-- See also: "Global - Espionage Mapping" -->
-    <Row Class="2" Name="API_ESPIONAGE" Value="1"/>
+    <Row Class="2" Name="API_ESPIONAGE" Value="0"/>
 
     <!-- * Enables the Trade Routes API (v23) -->
     <!-- See also: "UI - Trade Routes Enhancements" -->
-    <Row Class="2" Name="API_TRADEROUTES" Value="1"/>
+    <Row Class="2" Name="API_TRADEROUTES" Value="0"/>
 
     <!-- * Enables the Religion API (v19) -->
     <!-- See also: "Religion - Natural Wonder Epiphany" -->
-    <Row Class="2" Name="API_RELIGION" Value="1"/>
+    <Row Class="2" Name="API_RELIGION" Value="0"/>
 
     <!-- * Enables the LUA Extensions API - see http://forums.civfanatics.com/showthread.php?t=492305 (v19) -->
-    <Row Class="2" Name="API_LUA_EXTENSIONS" Value="1"/>
+    <Row Class="2" Name="API_LUA_EXTENSIONS" Value="0"/>
     <!-- * Enables the Extensions API (v19) -->
     <!-- See also: "Unique Building - Cistern" -->
-    <Row Class="2" Name="API_EXTENSIONS" Value="1"/>
+    <Row Class="2" Name="API_EXTENSIONS" Value="0"/>
     <!-- function City:GetMajorReligionPantheonBelief() return BeliefType -->
     <!-- function City:IsHasMajorBelief(eBelief) true/false -->
     <!-- function City:IsHasSecondaryBelief(eBelief) true/false -->
     <!-- function City:IsSecondaryReligionActive() true/false -->
     <!-- function Player:IsSecondaryReligionActive() true/false -->
-    <Row Class="2" Name="API_RELIGION_EXTENSIONS" Value="1"/>
+    <Row Class="2" Name="API_RELIGION_EXTENSIONS" Value="0"/>
 
     <!-- * Push various hard-coded values controlling the game out into XML - see DB/CONFIG/GameInXml.sql for specific values (v53) -->
-    <Row Class="2" Name="CONFIG_GAME_IN_XML" Value="1"/>
+    <Row Class="2" Name="CONFIG_GAME_IN_XML" Value="0"/>
     <!-- * Push various hard-coded values controlling the AI out into XML - see DB/CONFIG/AiInXml.sql for specific values (v19) -->
-    <Row Class="2" Name="CONFIG_AI_IN_XML" Value="1"/>
+    <Row Class="2" Name="CONFIG_AI_IN_XML" Value="0"/>
         
     <!-- Some bug fixes cannot be turned on or off, those entries (*) are just here to get their entries into the CustomMod.log file -->
     <!-- * Fixes the bug where a city doesn't work its centre tile (v45) -->
-    <Row Class="1" Name="BUGFIX_CITY_CENTRE_WORKING" Value="1"/>
+    <Row Class="1" Name="BUGFIX_CITY_CENTRE_WORKING" Value="0"/>
 	<!-- * Fixes the bug of creating a capital from a puppet city, and leaving it that way (v73) -->
-    <Row Class="1" Name="BUGFIX_NO_PUPPET_CAPITALS" Value="1"/>
+    <Row Class="1" Name="BUGFIX_NO_PUPPET_CAPITALS" Value="0"/>
     <!-- * Adds missing policy events when adopting an ideology (v33) -->
-    <Row Class="1" Name="BUGFIX_MISSING_POLICY_EVENTS" Value="1"/>
+    <Row Class="1" Name="BUGFIX_MISSING_POLICY_EVENTS" Value="0"/>
     <!-- * Fixes trade routes sticking to coastal water when the player has the EmbarkAllWater trait (v33) -->
-    <Row Class="1" Name="BUGFIX_TRADE_ROUTES_EMBARK_ALL_WATER" Value="1"/>
+    <Row Class="1" Name="BUGFIX_TRADE_ROUTES_EMBARK_ALL_WATER" Value="0"/>
     <!-- * Fixes the bug where Venice puppets it's own capital (v42) -->
-    <Row Class="1" Name="BUGFIX_VENICE_PUPPETS_CAPITAL" Value="1"/>
+    <Row Class="1" Name="BUGFIX_VENICE_PUPPETS_CAPITAL" Value="0"/>
     <!-- Fixes the issues with using dummy policies (v77) -->
     <!-- See also: "Policy - Dummies" -->
     <Row Class="1" Name="BUGFIX_DUMMY_POLICIES" Value="0" DbUpdates="1"/>
@@ -891,37 +891,37 @@
     <Row Class="1" Name="BUGFIX_RESEARCH_OVERFLOW" Value="0"/>
     <!-- * Fixes the bug in the Lua Plot:ChangeVisibilityCount() method where iChange is treated as a boolean and not a signed int (v23) -->
     <!-- See also: "Units - Visible Trade Units" -->
-    <Row Class="1" Name="BUGFIX_LUA_CHANGE_VISIBILITY_COUNT" Value="1"/>
+    <Row Class="1" Name="BUGFIX_LUA_CHANGE_VISIBILITY_COUNT" Value="0"/>
     <!-- Fixes the bug that excludes spy pressure (Underground Sects) from the city banner tooltip display (v45) -->
-    <Row Class="1" Name="BUGFIX_RELIGIOUS_SPY_PRESSURE" Value="1"/>
+    <Row Class="1" Name="BUGFIX_RELIGIOUS_SPY_PRESSURE" Value="0"/>
     <!-- * Fixes the CanMoveAfterPurchase() bug where it is only tested for at one specific point in the code (v26) -->
     <!-- See also: "Global - Civilians Move After Purchase" -->
-    <Row Class="1" Name="BUGFIX_MOVE_AFTER_PURCHASE" Value="1"/>
+    <Row Class="1" Name="BUGFIX_MOVE_AFTER_PURCHASE" Value="0"/>
     <!-- * Fixes the issues caused by using UNIT_XYZ instead of UNITCLASS_XYZ (v26) -->
-    <Row Class="1" Name="BUGFIX_UNITCLASS_NOT_UNIT" Value="1"/>
+    <Row Class="1" Name="BUGFIX_UNITCLASS_NOT_UNIT" Value="0"/>
     <!-- * Fixes the issues caused by using BUILDING_XYZ instead of BUILDINGCLASS_XYZ (v26) -->
-    <Row Class="1" Name="BUGFIX_BUILDINGCLASS_NOT_BUILDING" Value="1"/>
+    <Row Class="1" Name="BUGFIX_BUILDINGCLASS_NOT_BUILDING" Value="0"/>
     <!-- * Fixes the NumCitiesFreeFoodBuilding (policy finisher) bug where the civilization has a UB for the Aquaduct (v19) -->
     <!-- See also: "Unique Building - Turkish Baths" -->
-    <Row Class="1" Name="BUGFIX_FREE_FOOD_BUILDING" Value="1"/>
+    <Row Class="1" Name="BUGFIX_FREE_FOOD_BUILDING" Value="0"/>
     <!-- * Fixes the bug where the naval Civilization_FreeUnits start on land (v19) -->
-    <Row Class="1" Name="BUGFIX_NAVAL_FREE_UNITS" Value="1"/>
+    <Row Class="1" Name="BUGFIX_NAVAL_FREE_UNITS" Value="0"/>
     <!-- Fixes the bug where the naval units jump to the nearest city and not the nearest available non-lake water plot (v19) -->
     <!-- See also: "Global - Naval Nearest Water" -->
     <Row Class="1" Name="BUGFIX_NAVAL_NEAREST_WATER" Value="0"/>
     <!-- Fixes the bug where naval units in hill cities attack from the top of the hill, not the harbour (v95) -->
-    <Row Class="1" Name="BUGFIX_NAVAL_TARGETING" Value="1"/>
+    <Row Class="1" Name="BUGFIX_NAVAL_TARGETING" Value="0"/>
     <!-- Fixes the bug where stacked ranged units may attack out of cities but melee units may not (v19) -->
     <!-- See also: "Global - 2 Units Per Fort" -->
     <!-- See also: "Global - 3 Units Per City" -->
     <!-- See also: "Global - No Followup From Cities" -->
     <Row Class="1" Name="BUGFIX_CITY_STACKING" Value="0"/>
     <!-- Fixes the bug where Barb Camps ignore the ValidTerrains and ValidFeatures tables (v19) -->
-    <Row Class="1" Name="BUGFIX_BARB_CAMP_TERRAINS" Value="1"/>
+    <Row Class="1" Name="BUGFIX_BARB_CAMP_TERRAINS" Value="0"/>
     <!-- Fixes the bug where Barb Camps won't spawn units if they are added via pPlot:SetImprovementType() (v21) -->
-    <Row Class="1" Name="BUGFIX_BARB_CAMP_SPAWNING" Value="1"/>
+    <Row Class="1" Name="BUGFIX_BARB_CAMP_SPAWNING" Value="0"/>
     <!-- Fixes the bug where ranged combat (archers, catapults, ships and planes) against barbarians generates Great People XP (v43) -->
-    <Row Class="1" Name="BUGFIX_BARB_GP_XP" Value="1"/>
+    <Row Class="1" Name="BUGFIX_BARB_GP_XP" Value="0"/>
     <!-- Fixes the bug where you can't remove roads in no-mans-land originally built by a now dead player (v19) -->
     <!-- See also: "Global - Remove Ghost Routes" -->
     <Row Class="1" Name="BUGFIX_REMOVE_GHOST_ROUTES" Value="0"/>
@@ -932,7 +932,7 @@
     <!-- See also: "Global - Units Awake In Danger" -->
     <Row Class="1" Name="BUGFIX_WORKERS_VISIBLE_DANGER" Value="0"/>
     <!-- Fixes the hard-coding of what builds remove which features (v45) -->
-    <Row Class="1" Name="BUGFIX_FEATURE_REMOVAL" Value="1" DbUpdates="1"/>
+    <Row Class="1" Name="BUGFIX_FEATURE_REMOVAL" Value="0" DbUpdates="1"/>
     <!-- Fixes the bug in calculating AA interception strength which takes terrain into account (v19) -->
     <!-- See also: "Promotions - AntiAir Only Defensive" -->
     <Row Class="1" Name="BUGFIX_INTERCEPTOR_STRENGTH" Value="0"/>
@@ -946,46 +946,46 @@
     <!-- See also: "Promotions - AntiAir Only Defensive" -->
     <Row Class="1" Name="BUGFIX_UNIT_POWER_NAVAL_CONSISTENCY" Value="0"/>
     <!-- * Fixes the bug where units can upgrade even without any pre-req project being available (v22) -->  
-    <Row Class="1" Name="BUGFIX_UNIT_PREREQ_PROJECT" Value="1"/>
+    <Row Class="1" Name="BUGFIX_UNIT_PREREQ_PROJECT" Value="0"/>
     <!-- * Fixes a bug where hovering units can be chosen as rebels! (v39) -->  
-    <Row Class="1" Name="BUGFIX_NO_HOVERING_REBELS" Value="1"/>
+    <Row Class="1" Name="BUGFIX_NO_HOVERING_REBELS" Value="0"/>
     <!-- * Fixes a bug in the pathfinder code for hovering units at the seaside! (v19) -->  
-    <Row Class="1" Name="BUGFIX_HOVERING_PATHFINDER" Value="1"/>
+    <Row Class="1" Name="BUGFIX_HOVERING_PATHFINDER" Value="0"/>
 
-    <Row Class="2" Name="API_BUILDING_ENABLE_PURCHASE_UNITS" Value="1"/>
+    <Row Class="2" Name="API_BUILDING_ENABLE_PURCHASE_UNITS" Value="0"/>
 
-	<Row Class="2" Name="API_VP_ADJACENT_YIELD_BOOST" Value="1"/>
+	<Row Class="2" Name="API_VP_ADJACENT_YIELD_BOOST" Value="0"/>
 
     <!-- GameEvents.TradeRouteMove.Add(function(iX, iY, iUnit, iOwner, iOriginalPlayer, iOriginalCity, iDestPlayer, iDestCity) end) -->
-	<Row Class="2" Name="EVENTS_TRADE_ROUTE_MOVE" Value="1"/>
+	<Row Class="2" Name="EVENTS_TRADE_ROUTE_MOVE" Value="0"/>
 
-	<Row Class="2" Name="API_TRADE_ROUTE_YIELD_RATE" Value="1" DbUpdates="1"/>
+	<Row Class="2" Name="API_TRADE_ROUTE_YIELD_RATE" Value="0" DbUpdates="1"/>
 
-	<Row Class="6" Name="BALANCE_CORE" Value="1" DbUpdates="1"/>
+	<Row Class="6" Name="BALANCE_CORE" Value="0" DbUpdates="1"/>
 	  
-	<Row Class="6" Name="BUILDINGS_YIELD_FROM_OTHER_YIELD" Value="1" DbUpdates="1"/>
+	<Row Class="6" Name="BUILDINGS_YIELD_FROM_OTHER_YIELD" Value="0" DbUpdates="1"/>
 
-	<Row Class="6" Name="ERA_EFFECTS_EXTENSIONS" Value="1" DbUpdates="1"/>
+	<Row Class="6" Name="ERA_EFFECTS_EXTENSIONS" Value="0" DbUpdates="1"/>
 
-	<Row Class="6" Name="BUILDINGS_GOLDEN_AGE_EXTEND" Value="1" DbUpdates="1"/>
+	<Row Class="6" Name="BUILDINGS_GOLDEN_AGE_EXTEND" Value="0" DbUpdates="1"/>
 
-	<Row Class="6" Name="TRAIT_RELIGION_FOLLOWER_EFFECTS" Value="1" DbUpdates="1"/>
+	<Row Class="6" Name="TRAIT_RELIGION_FOLLOWER_EFFECTS" Value="0" DbUpdates="1"/>
 
-    <Row Class="5" Name="API_UNIT_CANNOT_BE_RANGED_ATTACKED" Value="1"/>
+    <Row Class="5" Name="API_UNIT_CANNOT_BE_RANGED_ATTACKED" Value="0"/>
 
-    <Row Class="5" Name="API_PROMOTION_TO_PROMOTION_MODIFIERS" Value="1"/>
+    <Row Class="5" Name="API_PROMOTION_TO_PROMOTION_MODIFIERS" Value="0"/>
 
-    <Row Class="2" Name="ROG_CORE" Value="1"/>
+    <Row Class="2" Name="ROG_CORE" Value="0"/>
 
-    <Row Class="3"  Name="EVENTS_UNIT_CAN_RANGEATTACK" Value="1"/>
+    <Row Class="3"  Name="EVENTS_UNIT_CAN_RANGEATTACK" Value="0"/>
     <!--GameEvents.UnitCanRangeAttackPlot.Add(function(iPlayer, iUnit, iPlotX, iPlotY, bNeedWar) return true end)-->
-    <Row Class="3"  Name="EVENTS_UNIT_DO_TURN" Value="1"/>
+    <Row Class="3"  Name="EVENTS_UNIT_DO_TURN" Value="0"/>
     <!-- GameEvents.UnitDoTurn.Add(function(iPlayer, iUnit, iPlotX, iPlotY) end)-->
-    <Row Class="3"  Name="EVENTS_UNIT_MOVE" Value="1"/>
+    <Row Class="3"  Name="EVENTS_UNIT_MOVE" Value="0"/>
     <!--GameEvents.UnitMoveInto.Add(function(iPlayer, iUnit, iUsedMoves, iOldPlotX, iOldPlotY,iNewPlotX, iNewPlotY) end)-->
-    <Row Class="3" Name="EVENTS_GREAT_WORK_CREATED" Value="1"/>
+    <Row Class="3" Name="EVENTS_GREAT_WORK_CREATED" Value="0"/>
     <!--GameEvents.GreatWorkCreated.Add(function(iPlayer, iUnit, iGreatWork) end)--> 
-    <Row Class="3" Name="EVENTS_GREAT_PEOPLE_BOOST" Value="1"/> 
+    <Row Class="3" Name="EVENTS_GREAT_PEOPLE_BOOST" Value="0"/> 
     <!--GameEvents.ScienceDiscover.Add(function(iPlayer,iUnit,iX,iY,bIsGreatPerson) end)-->   
     <!--GameEvents.CultureDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->   
     <!--GameEvents.TourismDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->   
@@ -994,16 +994,16 @@
     <!--GameEvents.GoldenAgeDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
     <!--GameEvents.CultureBombDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
     <!--GameEvents.FaithDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
-    <Row Class="3" Name="EVENTS_CITY_PUPPETED" Value="1"/>
+    <Row Class="3" Name="EVENTS_CITY_PUPPETED" Value="0"/>
     <!--GameEvents.CityPuppeted.Add(function(playerID, cityID) end)--> 
-    <Row Class="3" Name="EVENTS_CITY_RANGE_STRIKE" Value="1"/>
+    <Row Class="3" Name="EVENTS_CITY_RANGE_STRIKE" Value="0"/>
     <!--GameEvents.CityRangedStrike.Add(function(iPlayer,iAttCity,idefPlayer,idefUnit,iX, iY) end)--> 
-    <Row Class="3" Name="EVENTS_TILE_SET_OWNER" Value="1"/>
+    <Row Class="3" Name="EVENTS_TILE_SET_OWNER" Value="0"/>
     <!--GameEvents.TileSetOwnership.Add(iPlotX, iPlotY, iOldOwner,iNewOwner) end)--> 
-    <Row Class="3" Name="EVENTS_WLKD_DAY" Value="1"/>
+    <Row Class="3" Name="EVENTS_WLKD_DAY" Value="0"/>
     <!--GameEvents.CityBeginsWLTKD.Add(iPlayer, iPlotX, iPlotY, iChange) end)--> 
     <!--GameEvents.CityEndsWLTKD.Add(iPlayer, iPlotX, iPlotY) end)--> 
-    <Row Class="3" Name="EVENTS_IMPROVEMENTS_PILLAGED" Value="1"/>  
+    <Row Class="3" Name="EVENTS_IMPROVEMENTS_PILLAGED" Value="0"/>  
     <!--GameEvents.TileImprovementPillaged.Add(iPlotX, iPlotY, iOwner,iImprovement,bPillaged) end)-->
 
   </CustomModOptions>
