@@ -878,6 +878,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 
 	Method(Units);
+	Method(GetUnitsListFromHasPromotion);
 	Method(GetNumUnits);
 	Method(GetUnitByID);
 
@@ -8047,6 +8048,30 @@ int CvLuaPlayer::lUnits(lua_State* L)
 	lua_pushcclosure(L, lUnitsAux, 1);		/* generator, */
 	lua_pushvalue(L, 1);					/* state (self)*/
 	return 2;
+}
+//------------------------------------------------------------------------------
+// Method for iterating through units have given Promotion (behaves like pairs)
+int CvLuaPlayer::lGetUnitsListFromHasPromotion(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const PromotionTypes ePromotion = (PromotionTypes)lua_tointeger(L, 2);
+	CvUnit* pkUnit = NULL;
+
+	lua_createtable(L, 0, 0);
+	const int t = lua_gettop(L);
+	int idx = 1;
+
+	std::vector<CvUnit*> unitsListFromHasPromotion;
+	pkPlayer->GetUnitsListFromHasPromotion(ePromotion, unitsListFromHasPromotion);
+
+	for(std::vector<CvUnit*>::iterator it = unitsListFromHasPromotion.begin();
+	        it!= unitsListFromHasPromotion.end(); ++it)
+	{
+		CvUnit* pkUnit = (*it);
+		CvLuaUnit::Push(L, pkUnit);
+		lua_rawseti(L, t, idx++);
+	}
+	return 1;
 }
 //------------------------------------------------------------------------------
 //CvUnit GetUnitByID();

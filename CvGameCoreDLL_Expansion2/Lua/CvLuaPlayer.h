@@ -967,6 +967,8 @@ protected:
 	static int lUnitsAux(lua_State* L);
 	static int lUnits(lua_State* L);
 
+	static int lGetUnitsListFromHasPromotion(lua_State* L);
+
 	static int lCitiesAux(lua_State* L);
 	static int lCities(lua_State* L);
 
