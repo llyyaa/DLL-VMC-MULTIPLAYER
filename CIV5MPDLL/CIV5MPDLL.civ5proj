@@ -318,11 +318,6 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/PROMOTIONS/CapitalLand.sql</FileName>
-      </Action>
-      <Action>
-        <Set>OnModActivated</Set>
-        <Type>UpdateDatabase</Type>
         <FileName>DB/RELIGION/ConversionModifiers.sql</FileName>
       </Action>
       <Action>
@@ -453,22 +448,17 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/PROMOTIONS/NumSpyMod.sql</FileName>
+        <FileName>DB/NewTableChanges.sql</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/PROMOTIONS/NumWonderMod.sql</FileName>
+        <FileName>DB/BUILDINGS/Building_EnableUnitPurchase.xml</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/PROMOTIONS/NumWorkMod.sql</FileName>
-      </Action>
-      <Action>
-        <Set>OnModActivated</Set>
-        <Type>UpdateDatabase</Type>
-        <FileName>DB/PROMOTIONS/NoResourcePunishment.sql</FileName>
+        <FileName>DB/IMPROVEMENTS/Improvement_AdjacentImprovementYieldChanges.xml</FileName>
       </Action>
     </ModActions>
     <ModReferences />
@@ -484,6 +474,7 @@
     <Folder Include="DB\GLOBAL" />
     <Folder Include="DB\BUILDINGS" />
     <Folder Include="DB\ERAS" />
+    <Folder Include="DB\IMPROVEMENTS" />
     <Folder Include="DB\YIELDS" />
     <Folder Include="DB\POLICIES" />
     <Folder Include="DB\UNITS" />
@@ -803,19 +794,15 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="DB\PROMOTIONS\NoResourcePunishment.sql">
+    <Content Include="DB\BUILDINGS\Building_EnableUnitPurchase.xml">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="DB\PROMOTIONS\NumSpyMod.sql">
+    <Content Include="DB\IMPROVEMENTS\Improvement_AdjacentImprovementYieldChanges.xml">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="DB\PROMOTIONS\NumWonderMod.sql">
-      <SubType>Lua</SubType>
-      <ImportIntoVFS>False</ImportIntoVFS>
-    </Content>
-    <Content Include="DB\PROMOTIONS\NumWorkMod.sql">
+    <Content Include="DB\NewTableChanges.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
@@ -852,10 +839,6 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\POLICIES\DDL_Policies.sql">
-      <SubType>Lua</SubType>
-      <ImportIntoVFS>False</ImportIntoVFS>
-    </Content>
-    <Content Include="DB\PROMOTIONS\CapitalLand.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
