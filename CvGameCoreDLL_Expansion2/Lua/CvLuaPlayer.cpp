@@ -822,6 +822,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(IsBuildingFree);
 	Method(GetUnitClassCount);
+	Method(GetUnitCountFromHasPromotion);
 	Method(IsUnitClassMaxedOut);
 	Method(GetUnitClassMaking);
 	Method(GetUnitClassCountPlusMaking);
@@ -7664,6 +7665,12 @@ int CvLuaPlayer::lIsBuildingFree(lua_State* L)
 int CvLuaPlayer::lGetUnitClassCount(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::getUnitClassCount);
+}
+//------------------------------------------------------------------------------
+//int getUnitCountFromHasPromotion(UnitClassTypes eIndex);
+int CvLuaPlayer::lGetUnitCountFromHasPromotion(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::getUnitCountFromHasPromotion);
 }
 //------------------------------------------------------------------------------
 //bool isUnitClassMaxedOut(UnitClassTypes  eIndex, int iExtra);

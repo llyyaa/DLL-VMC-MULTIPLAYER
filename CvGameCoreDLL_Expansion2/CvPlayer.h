@@ -1362,6 +1362,7 @@ public:
 	void changeUnitCombatFreeExperiences(UnitCombatTypes eIndex, int iChange);
 
 	int getUnitClassCount(UnitClassTypes eIndex) const;
+	int getUnitCountFromHasPromotion(PromotionTypes ePromotion) const;
 	bool isUnitClassMaxedOut(UnitClassTypes eIndex, int iExtra = 0) const;
 	void changeUnitClassCount(UnitClassTypes eIndex, int iChange);
 	int getUnitClassMaking(UnitClassTypes eIndex) const;
