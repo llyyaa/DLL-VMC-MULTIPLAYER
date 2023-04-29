@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # ModBuddy Solution File, Format Version 11.00
-Project("{F5FC21B5-7CC2-458A-ABBA-992F515BBA20}") = "CIV5MPDLL", "CIV5MPDLL\CIV5MPDLL.civ5proj", "{0B961596-36F9-4289-A247-0E889FEF1F39}"
+Project("{F5FC21B5-7CC2-458A-ABBA-992F515BBA20}") = "(1) CIV5MPDLL", "(1) CIV5MPDLL\(1) CIV5MPDLL.civ5proj", "{0B961596-36F9-4289-A247-0E889FEF1F39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
