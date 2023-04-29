@@ -524,6 +524,8 @@ int CustomMods::getOption(string sOption, int defValue) {
 		MOD_OPT_CACHE(EVENTS_UNIT_CAN_RANGEATTACK);
 		MOD_OPT_CACHE(EVENTS_UNIT_MOVE);
 		MOD_OPT_CACHE(EVENTS_UNIT_DO_TURN);
+	
+		MOD_OPT_CACHE(IMPROVEMENTS_UPGRADE);
 		m_bInit = true;
 	}
 
