@@ -465,6 +465,11 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/YIELDS/NewYields_DDL.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvement_Upgrade_Downgrade.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
   </PropertyGroup>
@@ -804,6 +809,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\IMPROVEMENTS\Improvement_AdjacentImprovementYieldChanges.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvement_Upgrade_Downgrade.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
