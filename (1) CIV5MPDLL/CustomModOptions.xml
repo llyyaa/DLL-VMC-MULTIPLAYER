@@ -1013,7 +1013,7 @@
     <!-- function plot:GetXP() return XP; -->
     <!-- function plot:SetXP(iVal, bDoUpdate) return XP; -->
     <!-- function plot:GetXPGrowth(iVal) return XP; -->
-	<Row Class="5" Name="IMPROVEMENTS_UPGRADE" Value="0"/>
+    <Row Class="5" Name="IMPROVEMENTS_UPGRADE" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>
