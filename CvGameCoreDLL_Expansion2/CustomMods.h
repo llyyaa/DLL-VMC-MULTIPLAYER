@@ -1195,6 +1195,10 @@ enum BattleTypeTypes
 #define GAMEEVENT_UnitMoveInto					"UnitMoveInto",					"iiiiiii"
 #define GAMEEVENT_UnitDoTurn					"UnitDoTurn",					"iiii"
 
+#define GAMEEVENT_OnImprovementUpgrade			"OnImprovementUpgrade",			"iiiiii"
+#define GAMEEVENT_OnImprovementDowngrade		"OnImprovementDowngrade",		"iiiiii"
+#define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		        "iiiiii"
+
 
 // Serialization wrappers
 #define MOD_SERIALIZE

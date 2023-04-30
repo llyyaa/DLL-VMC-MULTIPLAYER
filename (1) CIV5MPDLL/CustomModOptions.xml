@@ -1006,12 +1006,13 @@
     <Row Class="3" Name="EVENTS_IMPROVEMENTS_PILLAGED" Value="1"/>  
     <!--GameEvents.TileImprovementPillaged.Add(iPlotX, iPlotY, iOwner,iImprovement,bPillaged) end)-->
 
-    <!-- GameEvents.GetImprovementXP.Add(function(iX, iY, iImprovementType, iCurrentXP, iOwner, iWorkCity) return 0 end); // notice: the iOnwer or iWorkCity may be -1 -->
-    <!-- GameEvents.OnImprovementUpgrade.Add(function(iX, iY, iOldImprovementType, iNewImprovementType, iOwner, iWorkCity) return 0 end); -->
-    <!-- GameEvents.OnImprovementDowngrade.Add(function(iX, iY, iOldImprovementType, iNewImprovementType, iOwner, iWorkCity) return 0 end); -->
-    <!-- function plot:ChangeXP(iChange) return iNewXP; -->
+    <!-- GameEvents.GetImprovementXPPerTurn.Add(function(iX, iY, iImprovementType, iCurrentXP, iOwner, iWorkCity) return 0 end); // notice: the iOnwer or iWorkCity may be -1 -->
+    <!-- GameEvents.OnImprovementUpgrade.Add(function(iX, iY, iOldImprovementType, iNewImprovementType, iOwner, iWorkCity) return end); -->
+    <!-- GameEvents.OnImprovementDowngrade.Add(function(iX, iY, iOldImprovementType, iNewImprovementType, iOwner, iWorkCity) return end); -->
+    <!-- function plot:ChangeXP(iChange, bDoUpdate) return iNewXP; -->
     <!-- function plot:GetXP() return XP; -->
-    <!-- function plot:SetXP(iVal) return XP; -->
+    <!-- function plot:SetXP(iVal, bDoUpdate) return XP; -->
+    <!-- function plot:GetXPGrowth(iVal) return XP; -->
 	<Row Class="5" Name="IMPROVEMENTS_UPGRADE" Value="0"/>
   </CustomModOptions>
 
