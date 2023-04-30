@@ -1013,6 +1013,7 @@
     <!-- function plot:GetXPGrowth() return XP; -->
     <!-- function plot:ChangeXP(iChange, bDoUpdate) return iNewXP; -->
     <!-- function plot:SetXP(iVal, bDoUpdate) return XP; -->
+    <!-- Table changes: Improvement_Upgrade_Downgrade.sql -->
     <Row Class="5" Name="IMPROVEMENTS_UPGRADE" Value="0"/>
   </CustomModOptions>
 
