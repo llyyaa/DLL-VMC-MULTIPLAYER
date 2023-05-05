@@ -17631,7 +17631,7 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 											kPlayer.DoYieldsFromKill(getUnitType(), pLoopUnit->getUnitType(), iX, iY, pLoopUnit->isBarbarian(), 0);
 #endif
 #if defined(MOD_API_EXTENSIONS)
-											kPlayer.DoUnitKilledCombat(this, pLoopUnit->getOwner(), pLoopUnit->getUnitType());
+											kPlayer.DoUnitKilledCombat(this, pLoopUnit->getOwner(), pLoopUnit->getUnitType(), pLoopUnit);
 #else
 											kPlayer.DoUnitKilledCombat(pLoopUnit->getOwner(), pLoopUnit->getUnitType());
 #endif
@@ -18740,19 +18740,6 @@ int CvUnit::setDamage(int iNewValue, PlayerTypes ePlayer, float fAdditionalTextD
 
 		m_iLastGameTurnAtFullHealth = -1;
 
-		kill(true, ePlayer);
-
-		CvString szMsg;
-		CvString szUnitAIString;
-		getUnitAIString(szUnitAIString, AI_getUnitAIType());
-		szMsg.Format("Killed in combat: %s, AI was: ", getName().GetCString());
-		szMsg += szUnitAIString;
-#if defined(MOD_BUGFIX_USE_GETTERS)
-		GET_MY_PLAYER().GetTacticalAI()->LogTacticalMessage(szMsg, true /*bSkipLogDominanceZone*/);
-#else
-		GET_PLAYER(m_eOwner).GetTacticalAI()->LogTacticalMessage(szMsg, true /*bSkipLogDominanceZone*/);
-#endif
-
 		if(ePlayer != NO_PLAYER)
 		{
 #if defined(MOD_BUGFIX_USE_GETTERS)
@@ -18765,7 +18752,7 @@ int CvUnit::setDamage(int iNewValue, PlayerTypes ePlayer, float fAdditionalTextD
 			}
 
 #if defined(MOD_API_EXTENSIONS)
-			GET_PLAYER(ePlayer).DoUnitKilledCombat(NULL, getOwner(), getUnitType());
+			GET_PLAYER(ePlayer).DoUnitKilledCombat(NULL, getOwner(), getUnitType(), this);
 #else
 			GET_PLAYER(ePlayer).DoUnitKilledCombat(getOwner(), getUnitType());
 #endif
@@ -18780,6 +18767,19 @@ int CvUnit::setDamage(int iNewValue, PlayerTypes ePlayer, float fAdditionalTextD
 			}
 #endif
 		}
+
+		kill(true, ePlayer);
+
+		CvString szMsg;
+		CvString szUnitAIString;
+		getUnitAIString(szUnitAIString, AI_getUnitAIType());
+		szMsg.Format("Killed in combat: %s, AI was: ", getName().GetCString());
+		szMsg += szUnitAIString;
+#if defined(MOD_BUGFIX_USE_GETTERS)
+		GET_MY_PLAYER().GetTacticalAI()->LogTacticalMessage(szMsg, true /*bSkipLogDominanceZone*/);
+#else
+		GET_PLAYER(m_eOwner).GetTacticalAI()->LogTacticalMessage(szMsg, true /*bSkipLogDominanceZone*/);
+#endif
 	}
 
 	return iDiff;
@@ -23139,6 +23139,10 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExperiencePercent(thisPromotion.GetExperiencePercent() * iChange);
 		changeCargoSpace(thisPromotion.GetCargoChange() * iChange);
 
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+		ChangeWarCasualtiesModifier(thisPromotion.GetWarCasualtiesModifier() * iChange);
+#endif
+
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 		if (MOD_PROMOTIONS_UNIT_NAMING) {
 			if (thisPromotion.IsUnitNaming(getUnitType())) {
@@ -23569,6 +23573,10 @@ void CvUnit::read(FDataStream& kStream)
 		m_iTourismBlastStrength = 0;
 	}
 
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	kStream >> m_iWarCasualtiesModifier;
+#endif
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -23713,6 +23721,10 @@ void CvUnit::write(FDataStream& kStream) const
 	}
 
 	kStream << m_iTourismBlastStrength;
+
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	kStream << m_iWarCasualtiesModifier;
+#endif
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -27869,5 +27881,20 @@ int CvUnit::GetNumEnemyAdjacent() const
 	}
 
 	return iNumEnemiesAdjacent;
+}
+#endif
+
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+int CvUnit::GetWarCasualtiesModifier() const
+{
+	return this->m_iWarCasualtiesModifier;
+}
+void CvUnit::ChangeWarCasualtiesModifier(int iChange)
+{
+	this->m_iWarCasualtiesModifier += iChange;
+}
+void CvUnit::SetWarCasualtiesModifier(int iValue)
+{
+	this->m_iWarCasualtiesModifier = iValue;
 }
 #endif

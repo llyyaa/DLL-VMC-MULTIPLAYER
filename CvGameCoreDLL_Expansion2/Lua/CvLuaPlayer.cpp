@@ -1263,6 +1263,13 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(IsSecondReligionPantheon);
 #endif // MOD_API_RELIGION_EXTENSIONS
 
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	Method(GetWarCasualtiesCounter);
+	Method(ChangeWarCasualtiesCounter);
+	Method(SetWarCasualtiesCounter);
+	Method(CheckAndUpdateWarCasualtiesCounter);
+#endif
+
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -5331,7 +5338,7 @@ int CvLuaPlayer::lHasPolicy(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
-//void setHasPolicy(PolicyTypes  eIndex, bool bNewValue);
+//void setHasPolicy(PolicyTypes  eIndex, bool bNewValue, bool bFree);
 int CvLuaPlayer::lSetHasPolicy(lua_State* L)
 {
 #if defined(MOD_API_EXTENSIONS)
@@ -12095,6 +12102,13 @@ int CvLuaPlayer::lIsSecondReligionPantheon(lua_State* L)
 	return BasicLuaMethod(L, &CvPlayerAI::IsSecondReligionPantheon);
 }
 #endif // MOD_API_RELIGION_EXTENSIONS
+
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+LUAAPIIMPL(Player, GetWarCasualtiesCounter)
+LUAAPIIMPL(Player, ChangeWarCasualtiesCounter)
+LUAAPIIMPL(Player, SetWarCasualtiesCounter)
+LUAAPIIMPL(Player, CheckAndUpdateWarCasualtiesCounter)
+#endif
 
 #if defined(MOD_API_LUA_EXTENSIONS)
 LUAAPIIMPL(Player, HasBelief)

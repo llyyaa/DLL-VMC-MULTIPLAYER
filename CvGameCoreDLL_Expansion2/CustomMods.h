@@ -788,6 +788,8 @@
 
 #define MOD_IMPROVEMENTS_UPGRADE                    gCustomMods.isIMPROVEMENTS_UPGRADE()
 
+#define MOD_GLOBAL_WAR_CASUALTIES                   gCustomMods.isGLOBAL_WAR_CASUALTIES()
+
 #endif // ACHIEVEMENT_HACKS
 
 
@@ -1204,6 +1206,8 @@ enum BattleTypeTypes
 #define GAMEEVENT_OnImprovementDowngrade		"OnImprovementDowngrade",		"iiiiii"
 #define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		        "iiiiii"
 
+#define GAMEEVENT_DoWarPopulationLoss			"DoWarPopulationLoss",		        "iii"
+
 
 // Serialization wrappers
 #define MOD_SERIALIZE
@@ -1543,6 +1547,8 @@ public:
 	MOD_OPT_DECL(GLOBAL_UNLIMITED_ONE_TURN_GROWTH);
 	MOD_OPT_DECL(GLOBAL_UNLIMITED_ONE_TURN_PRODUCTION);
 	MOD_OPT_DECL(GLOBAL_UNLIMITED_ONE_TURN_CULTURE);
+
+	MOD_OPT_DECL(GLOBAL_WAR_CASUALTIES);
 
 	MOD_OPT_DECL(GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE);
 

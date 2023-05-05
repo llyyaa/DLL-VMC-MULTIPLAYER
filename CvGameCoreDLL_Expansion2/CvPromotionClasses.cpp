@@ -572,6 +572,10 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
 	m_iTradeMissionGoldModifier = kResults.GetInt("TradeMissionGoldModifier");
 
+ #ifdef MOD_GLOBAL_WAR_CASUALTIES
+	m_iWarCasualtiesModifier = kResults.GetInt("WarCasualtiesModifier");
+ #endif
+
 	//References
 	const char* szLayerAnimationPath = kResults.GetText("LayerAnimationPath");
 	m_iLayerAnimationPath = GC.getInfoTypeForString(szLayerAnimationPath, true);
@@ -2579,6 +2583,13 @@ int CvPromotionEntry::GetOtherPromotionDefenseModifier(PromotionTypes other) con
 	}
 
 	return iterator->second;
+}
+#endif
+
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+int CvPromotionEntry::GetWarCasualtiesModifier() const
+{
+	return this->m_iWarCasualtiesModifier;
 }
 #endif
 

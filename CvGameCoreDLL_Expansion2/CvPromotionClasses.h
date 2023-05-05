@@ -327,6 +327,10 @@ public:
 	bool IsCannotBeRangedAttacked() const;
 #endif
 
+ #ifdef MOD_GLOBAL_WAR_CASUALTIES
+	int GetWarCasualtiesModifier() const;
+ #endif
+
 protected:
 	int m_iLayerAnimationPath;
 	int m_iPrereqPromotion;
@@ -607,6 +611,10 @@ protected:
 
  #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	bool m_bCannotBeRangedAttacked;
+ #endif
+
+ #ifdef MOD_GLOBAL_WAR_CASUALTIES
+	int m_iWarCasualtiesModifier = 0;
  #endif
 };
 

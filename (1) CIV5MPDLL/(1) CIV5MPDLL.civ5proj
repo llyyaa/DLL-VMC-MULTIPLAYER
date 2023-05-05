@@ -470,6 +470,11 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/IMPROVEMENTS/Improvement_Upgrade_Downgrade.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/GLOBAL/WarCasualties.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
   </PropertyGroup>
@@ -805,6 +810,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\BUILDINGS\Building_EnableUnitPurchase.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\GLOBAL\WarCasualties.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

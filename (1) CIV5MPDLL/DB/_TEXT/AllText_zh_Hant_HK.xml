@@ -176,4 +176,13 @@
 			<Text>[NEWLINE][ICON_BULLET]杰作修正: {1_Num}%</Text>
 		</Row>
 	</Language_zh_Hant_HK>
+
+	<Language_zh_Hant_HK>
+		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE">
+			<Text>戰爭給你的文明帶來了巨大的傷亡！[COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]失去{2_loss}個單位的[ICON_CITIZEN]人口！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY">
+			<Text>慘重的戰爭傷亡！</Text>
+		</Row>
+	</Language_zh_Hant_HK>
 </GameData>

@@ -1109,6 +1109,12 @@ protected:
 	static int lGetWarmongerPreviewString(lua_State* L);
 	static int lGetLiberationPreviewString(lua_State* L);
 
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	static int lGetWarCasualtiesCounter(lua_State* L);
+	static int lChangeWarCasualtiesCounter(lua_State* L);
+	static int lSetWarCasualtiesCounter(lua_State* L);
+	static int lCheckAndUpdateWarCasualtiesCounter(lua_State* L);
+#endif
 
 #if defined(MOD_API_LUA_EXTENSIONS)
 	LUAAPIEXTN(AddMessage, void, sMessage);
