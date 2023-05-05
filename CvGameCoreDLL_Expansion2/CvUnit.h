@@ -580,6 +580,10 @@ public:
 	int experienceNeeded() const;
 	int attackXPValue() const;
 	int defenseXPValue() const;
+#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
+	int ExtraAttackXPValue() const;
+	int ExtraDefenseXPValue() const;
+#endif
 	int maxXPValue() const;
 
 	int firstStrikes() const;

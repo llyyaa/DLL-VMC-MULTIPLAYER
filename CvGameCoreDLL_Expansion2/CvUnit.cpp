@@ -15395,6 +15395,23 @@ int CvUnit::defenseXPValue() const
 	return m_pUnitInfo->GetXPValueDefense();
 }
 
+#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
+//	--------------------------------------------------------------------------------
+int CvUnit::ExtraAttackXPValue() const
+{
+	VALIDATE_OBJECT
+	return m_pUnitInfo->GetExtraXPValueAttack();
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvUnit::ExtraDefenseXPValue() const
+{
+	VALIDATE_OBJECT
+	return m_pUnitInfo->GetExtraXPValueDefense();
+}
+#endif
+
 
 //	--------------------------------------------------------------------------------
 int CvUnit::maxXPValue() const

@@ -1019,6 +1019,7 @@
     <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_GROWTH" Value="0"/>
     <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_PRODUCTION" Value="0"/>
     <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_CULTURE" Value="0"/>
+    <Row Class="6" Name="GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE" Value="1"/>
   </CustomModOptions>
 
   <CustomModPostDefines>
