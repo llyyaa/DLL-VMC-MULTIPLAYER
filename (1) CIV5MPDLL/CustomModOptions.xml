@@ -1042,6 +1042,9 @@
     <!-- ALTER TABLE Units add column ExtraXPValueDefense int not null default 0; -->
     <Row Class="6" Name="GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE" Value="1"/>
 
+    <!-- INSERT INTO Defines(Name, Value) VALUES('GOLDEN_AGE_POINT_MULTIPLE_IN_GA', 2); -->
+    <Row Class="6" Name="GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA" Value="0"/>
+
     <!-- table change: NewBattleEffects.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
   </CustomModOptions>

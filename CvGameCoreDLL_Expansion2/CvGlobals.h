@@ -5425,6 +5425,12 @@ public:
 	{
 		return m_iGOLDEN_AGE_LENGTH;
 	}
+#if defined(MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA)
+	inline int getGOLDEN_AGE_POINT_MULTIPLE_IN_GA()
+	{
+		return m_iGOLDEN_AGE_POINT_MULTIPLE_IN_GA;
+	}
+#endif
 
 #if defined(MOD_ROG_CORE)
 	inline int getORIGINAL_CAPITAL_MODMAX()
@@ -9001,6 +9007,9 @@ protected:
 	int m_iBASE_GOLDEN_AGE_UNITS;
 	int m_iGOLDEN_AGE_UNITS_MULTIPLIER;
 	int m_iGOLDEN_AGE_LENGTH;
+#if defined(MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA)
+	int m_iGOLDEN_AGE_POINT_MULTIPLE_IN_GA;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	int m_iORIGINAL_CAPITAL_MODMAX;

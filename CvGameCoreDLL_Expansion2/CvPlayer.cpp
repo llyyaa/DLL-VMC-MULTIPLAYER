@@ -13945,6 +13945,69 @@ void CvPlayer::DoProcessGoldenAge()
 	// Minors and Barbs can't get GAs
 	if(!isMinorCiv() && !isBarbarian())
 	{
+#ifdef MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA
+		bool isInGA = false;
+		int GAMeterBouns = 1;
+		// Already in a GA - don't decrement counter while in Anarchy
+		if(getGoldenAgeTurns() > 0)
+		{
+			isInGA = true;
+			GAMeterBouns = GC.getGOLDEN_AGE_POINT_MULTIPLE_IN_GA();
+			GAMeterBouns = GAMeterBouns < 1 ? 1 : GAMeterBouns;
+			if(!IsAnarchy())
+			{
+				changeGoldenAgeTurns(-1);
+			}
+		}
+
+		// Not in GA Or Can Trigger New GA in GA
+		if(!isInGA || MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA)
+		{
+			
+			// Note: This will actually REDUCE the GA meter if the player is running in the red
+			ChangeGoldenAgeProgressMeter(GetExcessHappiness()/GAMeterBouns);
+			
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+			// GA points from religion
+			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromReligion(YIELD_GOLDEN_AGE_POINTS)/GAMeterBouns);
+
+			// Trait bonus which adds GA points for trade partners? 
+			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromTraits(YIELD_GOLDEN_AGE_POINTS)/GAMeterBouns);
+
+			// Add in all the GA points from city yields
+			ChangeGoldenAgeProgressMeter(GetGoldenAgePointPerTurnFromCitys()/GAMeterBouns);
+#endif
+
+			// Enough GA Progress to trigger new GA?
+			if(GetGoldenAgeProgressMeter() >= GetGoldenAgeProgressThreshold())
+			{
+				int iOverflow = GetGoldenAgeProgressMeter() - GetGoldenAgeProgressThreshold();
+
+				SetGoldenAgeProgressMeter(iOverflow);
+				
+				int iLength = getGoldenAgeLength();
+				changeGoldenAgeTurns(iLength);
+				if(isInGA)
+				{
+					ChangeNumGoldenAges(1);
+				}
+				// If it's the active player then show the popup
+				if(GetID() == GC.getGame().getActivePlayer() && !isInGA)
+				{
+					// Don't show in MP
+#if defined(MOD_API_EXTENSIONS)
+					if(!GC.getGame().isReallyNetworkMultiPlayer())
+#else
+					if(!GC.getGame().isNetworkMultiPlayer())	// KWG: Candidate for !GC.getGame().isOption(GAMEOPTION_SIMULTANEOUS_TURNS)
+#endif
+					{
+						CvPopupInfo kPopupInfo(BUTTONPOPUP_GOLDEN_AGE_REWARD);
+						GC.GetEngineUserInterface()->AddPopup(kPopupInfo);
+					}
+				}
+			}
+		}
+#else
 		// Already in a GA - don't decrement counter while in Anarchy
 		if(getGoldenAgeTurns() > 0)
 		{
@@ -14003,6 +14066,7 @@ void CvPlayer::DoProcessGoldenAge()
 				}
 			}
 		}
+#endif
 	}
 }
 
