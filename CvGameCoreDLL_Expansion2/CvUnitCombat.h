@@ -55,6 +55,13 @@ public:
 	static CvUnit*		GetFireSupportUnit(PlayerTypes eDefender, int iDefendX, int iDefendY, int iAttackX, int iAttackY);
 	static uint			ApplyNuclearExplosionDamage(CvPlot* pkTargetPlot, int iDamageLevel, CvUnit* pkAttacker = NULL);
 
+#ifdef MOD_NEW_BATTLE_EFFECTS
+	static void DoNewBattleEffects(const CvCombatInfo& kInfo);
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	static void DoSplashDamage(const CvCombatInfo& kInfo);
+#endif
+#endif
+
 protected:
 	static void ResolveRangedUnitVsCombat(const CvCombatInfo& kInfo, uint uiParentEventID);
 	static void ResolveRangedCityVsUnitCombat(const CvCombatInfo& kCombatInfo, uint uiParentEventID);

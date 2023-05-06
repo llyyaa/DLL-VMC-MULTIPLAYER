@@ -1036,6 +1036,9 @@
     <!-- ALTER TABLE Policies add column WarCasualtiesModifier int not null default 0; -->
     <Row Class="6" Name="GLOBAL_WAR_CASUALTIES" Value="0"/>
     <Row Class="6" Name="GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE" Value="1"/>
+
+    <!-- table change: NewBattleEffects.sql -->
+    <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>

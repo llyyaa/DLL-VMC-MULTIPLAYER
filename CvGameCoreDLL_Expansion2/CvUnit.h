@@ -1692,6 +1692,18 @@ public:
 	void SetWarCasualtiesModifier(int iValue);
 #endif
 
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	std::vector<SplashInfo>& GetSplashInfoVec();
+
+	int GetSplashImmuneRC() const;
+	void ChangeSplashImmuneRC(int iChange);
+	void SetSplashImmuneRC(int iValue);
+
+	int GetSplashXP() const;
+	void ChangeSplashXP(int iChange);
+	void SetSplashXP(int iValue);
+#endif
+
 protected:
 	const MissionQueueNode* HeadMissionQueueNode() const;
 	MissionQueueNode* HeadMissionQueueNode();
@@ -2036,8 +2048,12 @@ protected:
 	int m_iRangedSupportFireMod;
 #endif
 
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	std::vector<SplashInfo> m_asSplashInfoVec = {};
 
-
+	int m_iSplashImmuneRC = 0;
+	int m_iSplashXP = 0;
+#endif
 
 	int m_iEmbarkExtraVisibility;
 	int m_iEmbarkDefensiveModifier;

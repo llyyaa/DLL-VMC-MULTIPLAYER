@@ -184,6 +184,19 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY">
 			<Text>惨重的战争伤亡！</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE">
+			<Text>在防御中，你的{2_UnitName}受到{1_EnUName}攻击时的[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]点溅射伤害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_ENEMY">
+			<Text>你的{1_UnitName}攻击时对{2_EnUName}造成了[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]点溅射伤害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_DEATH">
+			<Text>在防御中，你的{2_UnitName}被{1_EnUName}攻击时的溅射伤害消灭了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_ENEMY_DEATH">
+			<Text>你的{1_UnitName}攻击时的溅射伤害将{2_EnUName}消灭了！</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

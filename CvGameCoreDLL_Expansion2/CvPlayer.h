@@ -1841,6 +1841,11 @@ public:
 #if defined(MOD_ROG_CORE)
 	int GetNumWorldWonders();
 #endif
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+	void SetPerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType, const int iValue);
+	void ChangePerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType, const int iChange);
+	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType) const;
+#endif
 
 	// for serialization
 	virtual void Read(FDataStream& kStream);
@@ -2465,6 +2470,10 @@ protected:
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int m_iWarCasualtiesCounter = 0;
+#endif
+
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
 #endif
 };
 

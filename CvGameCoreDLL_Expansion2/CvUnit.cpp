@@ -23210,6 +23210,30 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 				GC.getMap().updateDeferredFog();
 		}
 
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+		if (thisPromotion.GetSplashDamageRadius() > 0 && thisPromotion.GetSplashDamagePlotUnitLimit() > 0)
+		{
+			if (iChange == 1)
+			{
+				m_asSplashInfoVec.push_back({thisPromotion});
+			}
+			else if (iChange == -1)
+			{
+				for (auto iter = m_asSplashInfoVec.begin(); iter != m_asSplashInfoVec.end(); iter++)
+				{
+					if (iter->ePromotion == (PromotionTypes) thisPromotion.GetID())
+					{
+						iter = m_asSplashInfoVec.erase(iter);
+						break;
+					}
+				}
+			}
+		}
+		
+		ChangeSplashImmuneRC(thisPromotion.GetSplashDamageImmune() ? iChange : 0);
+		ChangeSplashXP(thisPromotion.GetSplashXP() * iChange);
+#endif
+
 #if !defined(NO_ACHIEVEMENTS)
 		PromotionTypes eBuffaloChest =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_CHEST", true /*bHideAssert*/);
 		PromotionTypes eBuffaloLoins =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_LOINS", true /*bHideAssert*/);
@@ -23577,6 +23601,22 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iWarCasualtiesModifier;
 #endif
 
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	m_asSplashInfoVec.clear();
+	int iSplashInfoLen = 0;
+	kStream >> iSplashInfoLen;
+	m_asSplashInfoVec.reserve(iSplashInfoLen);
+	for (int i = 0; i < iSplashInfoLen; i++)
+	{
+		SplashInfo sSplashInfo;
+		sSplashInfo.read(kStream);
+		m_asSplashInfoVec.push_back(sSplashInfo);
+	}
+
+	kStream >> m_iSplashImmuneRC;
+	kStream >> m_iSplashXP;
+#endif
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -23724,6 +23764,17 @@ void CvUnit::write(FDataStream& kStream) const
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	kStream << m_iWarCasualtiesModifier;
+#endif
+
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	kStream << m_asSplashInfoVec.size();
+	for (int i = 0; i < m_asSplashInfoVec.size(); i++)
+	{
+		m_asSplashInfoVec[i].write(kStream);
+	}
+
+	kStream << m_iSplashImmuneRC;
+	kStream << m_iSplashXP;
 #endif
 
 	//  Write mission list
@@ -25849,7 +25900,7 @@ bool CvUnit::IsCanDefend(const CvPlot* pPlot) const
 	{
 		return false;
 	}
-
+	
 	if(isDelayedDeath())
 	{
 		return false;
@@ -27897,4 +27948,32 @@ void CvUnit::SetWarCasualtiesModifier(int iValue)
 {
 	this->m_iWarCasualtiesModifier = iValue;
 }
+#endif
+
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+std::vector<SplashInfo>& CvUnit::GetSplashInfoVec()
+{
+	return this->m_asSplashInfoVec;
+}
+
+int CvUnit::GetSplashImmuneRC() const {
+	return this->m_iSplashImmuneRC;
+}
+void CvUnit::ChangeSplashImmuneRC(int iChange) {
+	this->m_iSplashImmuneRC += iChange;
+}
+void CvUnit::SetSplashImmuneRC(int iValue) {
+	this->m_iSplashImmuneRC = iValue;
+}
+
+int CvUnit::GetSplashXP() const {
+	return this->m_iSplashXP;
+}
+void CvUnit::ChangeSplashXP(int iChange) {
+	this->m_iSplashXP += iChange;
+}
+void CvUnit::SetSplashXP(int iValue) {
+	this->m_iSplashXP = iValue;
+}
+
 #endif

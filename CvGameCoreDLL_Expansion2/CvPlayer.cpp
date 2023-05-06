@@ -675,7 +675,12 @@ void CvPlayer::init(PlayerTypes eID)
 		changeGoldPerUnitTimes100(GC.getINITIAL_GOLD_PER_UNIT_TIMES_100());
 
 		ChangeMaxNumBuilders(GC.getDEFAULT_MAX_NUM_BUILDERS());
-
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+		for (int i = 0; i < NUM_YIELD_TYPES; i++)
+		{
+			ChangePerMajorReligionFollowerYieldModifier(static_cast<YieldTypes>(i), GetPlayerTraits()->GetPerMajorReligionFollowerYieldModifier(static_cast<YieldTypes>(i)));
+		}
+#endif
 		changeLevelExperienceModifier(GetPlayerTraits()->GetLevelExperienceModifier());
 		changeMaxGlobalBuildingProductionModifier(GetPlayerTraits()->GetMaxGlobalBuildingProductionModifier());
 		changeMaxTeamBuildingProductionModifier(GetPlayerTraits()->GetMaxTeamBuildingProductionModifier());
@@ -1222,6 +1227,13 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_strReligionKey = "";
 	m_strScriptData = "";
 	m_strEmbarkedGraphicOverride = "";
+
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+	for (int i = 0; i < NUM_YIELD_TYPES; i++)
+	{
+		m_piPerMajorReligionFollowerYieldModifier[i] = 0;
+	}
+#endif
 
 	if(!bConstructorCall)
 	{
@@ -25834,6 +25846,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	}
 
 	kStream >> m_strEmbarkedGraphicOverride;
+	kStream >> m_piPerMajorReligionFollowerYieldModifier;
 	m_kPlayerAchievements.Read(kStream);
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
@@ -26352,6 +26365,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	}
 
 	kStream << m_strEmbarkedGraphicOverride;
+	kStream << m_piPerMajorReligionFollowerYieldModifier;
 
 	m_kPlayerAchievements.Write(kStream);
 
@@ -29247,6 +29261,23 @@ int CvPlayer::CountAllWorkedTerrain(TerrainTypes iTerrainType)
 	return iCount;
 }
 #endif // end of MOD_API_EXTENSIONS
+
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+void CvPlayer::SetPerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType, const int iValue)
+{
+	m_piPerMajorReligionFollowerYieldModifier[eYieldType] = iValue;
+}
+
+void CvPlayer::ChangePerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType, const int iChange) {
+	m_piPerMajorReligionFollowerYieldModifier[eYieldType] += iChange;
+}
+
+int CvPlayer::GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType) const 
+{
+	return m_piPerMajorReligionFollowerYieldModifier[eYieldType];
+}
+
+#endif
 
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 int CvPlayer::GetMinorsTradeRouteYieldRate(const YieldTypes eYieldType) const

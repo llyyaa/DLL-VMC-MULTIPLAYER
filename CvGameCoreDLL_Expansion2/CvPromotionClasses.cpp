@@ -572,9 +572,18 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
 	m_iTradeMissionGoldModifier = kResults.GetInt("TradeMissionGoldModifier");
 
- #ifdef MOD_GLOBAL_WAR_CASUALTIES
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
 	m_iWarCasualtiesModifier = kResults.GetInt("WarCasualtiesModifier");
- #endif
+#endif
+
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	m_iSplashDamageRadius = kResults.GetInt("SplashDamageRadius");
+	m_iSplashDamagePercent = kResults.GetInt("SplashDamagePercent");
+	m_iSplashDamageFixed = kResults.GetInt("SplashDamageFixed");
+	m_iSplashDamagePlotUnitLimit = kResults.GetInt("SplashDamagePlotUnitLimit");
+	m_iSplashDamageImmune = kResults.GetBool("SplashDamageImmune");
+	m_iSplashXP = kResults.GetInt("SplashXP");
+#endif
 
 	//References
 	const char* szLayerAnimationPath = kResults.GetText("LayerAnimationPath");
@@ -2590,6 +2599,33 @@ int CvPromotionEntry::GetOtherPromotionDefenseModifier(PromotionTypes other) con
 int CvPromotionEntry::GetWarCasualtiesModifier() const
 {
 	return this->m_iWarCasualtiesModifier;
+}
+#endif
+
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+int CvPromotionEntry::GetSplashDamageRadius() const
+{
+	return m_iSplashDamageRadius;
+}
+int CvPromotionEntry::GetSplashDamagePercent() const
+{
+	return m_iSplashDamagePercent;
+}
+int CvPromotionEntry::GetSplashDamageFixed() const
+{
+	return m_iSplashDamageFixed;
+}
+int CvPromotionEntry::GetSplashDamagePlotUnitLimit() const
+{
+	return m_iSplashDamagePlotUnitLimit;
+}
+bool CvPromotionEntry::GetSplashDamageImmune() const
+{
+	return m_iSplashDamageImmune;
+}
+int CvPromotionEntry::GetSplashXP() const
+{
+	return m_iSplashXP;
 }
 #endif
 

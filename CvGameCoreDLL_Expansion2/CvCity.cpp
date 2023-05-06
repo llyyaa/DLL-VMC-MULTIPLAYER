@@ -11014,14 +11014,25 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	if(pReligion)
 	{
 		int iReligionYieldMaxFollowers = pReligion->m_Beliefs.GetMaxYieldModifierPerFollower(eIndex);
+		int iFollowers = GetCityReligions()->GetNumFollowers(eMajority);
+		iTempMod = 0;
 		if (iReligionYieldMaxFollowers > 0)
 		{
-			int iFollowers = GetCityReligions()->GetNumFollowers(eMajority);
+			// From religion belief
 			iTempMod = min(iFollowers, iReligionYieldMaxFollowers);
-			iModifier += iTempMod;
-			if(toolTipSink)
-				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_BELIEF", iTempMod);
 		}
+
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+		if (MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS)
+		{
+			// From traits
+			iTempMod += iFollowers * GET_PLAYER(getOwner()).GetPerMajorReligionFollowerYieldModifier(eIndex);
+		}
+#endif
+
+		iModifier += iTempMod;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_BELIEF", iTempMod);
 	}
 
 	// Production Yield Rate Modifier from City States

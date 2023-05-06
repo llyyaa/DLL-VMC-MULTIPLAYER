@@ -260,6 +260,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 #if defined(MOD_API_LUA_EXTENSIONS)
 	Method(GetNumBuildingClass);
 	Method(IsHasBuildingClass);
+	Method(SetNumRealBuildingClass);
 #endif
 	Method(GetNumActiveBuilding);
 	Method(GetID);
@@ -1980,6 +1981,41 @@ int CvLuaCity::lIsHasBuildingClass(lua_State* L)
 		lua_pushboolean(L, false);
 	}
 	return 1;
+}
+
+//bool SetNumRealBuildingClass(BuildingClassTypes eBuildingClassType, int iNum);
+int CvLuaCity::lSetNumRealBuildingClass(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const BuildingClassTypes eBuildingClassType = (BuildingClassTypes)lua_tointeger(L, 2);
+	const int iNum = lua_tointeger(L, 3);
+	if (eBuildingClassType == NO_BUILDINGCLASS)
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	CvPlayerAI& pkPlayer = GET_PLAYER(pkCity->getOwner());
+	if (pkPlayer.isBarbarian())
+	{
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	BuildingTypes eBuilding = NO_BUILDING;
+	if (pkPlayer.isMinorCiv())
+	{
+		eBuilding = (BuildingTypes) GC.getBuildingClassInfo(eBuildingClassType)->getDefaultBuildingIndex();
+	}
+	else if (pkPlayer.isMajorCiv())
+	{
+		CvCivilizationInfo& playerCivilizationInfo = pkPlayer.getCivilizationInfo();
+		eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClassType);
+	}
+
+	bool bEffectBuilding = eBuilding != NO_BUILDING;
+	if (bEffectBuilding) pkCity->GetCityBuildings()->SetNumRealBuilding(eBuilding, iNum);
+	lua_pushboolean(L, bEffectBuilding);
 }
 #endif
 //------------------------------------------------------------------------------
