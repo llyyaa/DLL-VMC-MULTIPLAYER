@@ -4364,9 +4364,34 @@ void CvUnitCombat::ApplyPostCityCombatEffects(CvUnit* pkAttacker, CvCity* pkDefe
 }
 
 #ifdef MOD_NEW_BATTLE_EFFECTS
+inline static CvPlayerAI& getAttackerPlayer(const CvCombatInfo& kCombatInfo)
+{
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvCity* pAttackerCity = kCombatInfo.getCity(BATTLE_UNIT_ATTACKER);
+	return GET_PLAYER(pAttackerUnit ? pAttackerUnit->getOwner() : pAttackerCity->getOwner());
+}
+inline static CvPlayerAI& getDefenderPlayer(const CvCombatInfo& kCombatInfo)
+{
+	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	CvCity* pDefenderCity = kCombatInfo.getCity(BATTLE_UNIT_DEFENDER);
+	return GET_PLAYER(pDefenderUnit ? pDefenderUnit->getOwner() : pDefenderCity->getOwner());
+}
+
 void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 {
+	if (!ShouldDoNewBattleEffects(kCombatInfo))
+		return;
 	DoSplashDamage(kCombatInfo);
+}
+
+bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
+{
+	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
+	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
+
+	// Only do this for human players.
+	// May provide GameOption to enable for AI later.
+	return kAttackPlayer.isHuman() || kDefensePlayer.isHuman();
 }
 
 #ifdef MOD_PROMOTION_SPLASH_DAMAGE

@@ -1950,17 +1950,17 @@ int CvLuaCity::lGetNumBuildingClass(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
 	const BuildingClassTypes eBuildingClassType = (BuildingClassTypes)lua_tointeger(L, 2);
-	if(eBuildingClassType != NO_BUILDINGCLASS)
-	{
-		CvCivilizationInfo& playerCivilizationInfo = GET_PLAYER(pkCity->getOwner()).getCivilizationInfo();
-		BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClassType);
-		const int iResult = pkCity->GetCityBuildings()->GetNumBuilding(eBuilding);
-		lua_pushinteger(L, iResult);
-	}
-	else
+	if (eBuildingClassType == NO_BUILDINGCLASS)
 	{
 		lua_pushinteger(L, 0);
+		return 1;
+
 	}
+
+	CvPlayerAI& pkPlayer = GET_PLAYER(pkCity->getOwner());
+	BuildingTypes eBuilding = pkPlayer.GetCivBuilding(eBuildingClassType);
+	lua_pushinteger(L, eBuilding == NO_BUILDING? 0 : pkCity->GetCityBuildings()->GetNumBuilding(eBuilding));
+
 	return 1;
 }
 //------------------------------------------------------------------------------
@@ -1969,17 +1969,16 @@ int CvLuaCity::lIsHasBuildingClass(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
 	const BuildingClassTypes eBuildingClassType = (BuildingClassTypes)lua_tointeger(L, 2);
-	if(eBuildingClassType != NO_BUILDINGCLASS)
-	{
-		CvCivilizationInfo& playerCivilizationInfo = GET_PLAYER(pkCity->getOwner()).getCivilizationInfo();
-		BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClassType);
-		const bool bResult = pkCity->GetCityBuildings()->GetNumBuilding(eBuilding);
-		lua_pushboolean(L, bResult);
-	}
-	else
+	if (eBuildingClassType == NO_BUILDINGCLASS)
 	{
 		lua_pushboolean(L, false);
+		return 1;
 	}
+
+	CvPlayerAI& pkPlayer = GET_PLAYER(pkCity->getOwner());
+	BuildingTypes eBuilding = pkPlayer.GetCivBuilding(eBuildingClassType);
+	lua_pushboolean(L, eBuilding == NO_BUILDING ? false : pkCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0);
+
 	return 1;
 }
 
@@ -1996,26 +1995,19 @@ int CvLuaCity::lSetNumRealBuildingClass(lua_State* L)
 	}
 
 	CvPlayerAI& pkPlayer = GET_PLAYER(pkCity->getOwner());
-	if (pkPlayer.isBarbarian())
+	BuildingTypes eBuilding = pkPlayer.GetCivBuilding(eBuildingClassType);
+
+	if (eBuilding == NO_BUILDING)
 	{
 		lua_pushboolean(L, false);
-		return 1;
+	}
+	else
+	{
+		pkCity->GetCityBuildings()->SetNumRealBuilding(eBuilding, iNum);
+		lua_pushboolean(L, true);
 	}
 
-	BuildingTypes eBuilding = NO_BUILDING;
-	if (pkPlayer.isMinorCiv())
-	{
-		eBuilding = (BuildingTypes) GC.getBuildingClassInfo(eBuildingClassType)->getDefaultBuildingIndex();
-	}
-	else if (pkPlayer.isMajorCiv())
-	{
-		CvCivilizationInfo& playerCivilizationInfo = pkPlayer.getCivilizationInfo();
-		eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClassType);
-	}
-
-	bool bEffectBuilding = eBuilding != NO_BUILDING;
-	if (bEffectBuilding) pkCity->GetCityBuildings()->SetNumRealBuilding(eBuilding, iNum);
-	lua_pushboolean(L, bEffectBuilding);
+	return 1;
 }
 #endif
 //------------------------------------------------------------------------------

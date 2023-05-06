@@ -669,6 +669,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 #if defined(MOD_API_LUA_EXTENSIONS)
 	Method(IsMajorCiv);
+	Method(GetCivBuilding);
+	Method(GetCivUnit);
 #endif
 	Method(IsMinorCiv);
 	Method(GetMinorCivType);
@@ -6521,6 +6523,16 @@ int CvLuaPlayer::lIsGoldenAgeCultureBonusDisabled(lua_State* L)
 int CvLuaPlayer::lIsMajorCiv(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::isMajorCiv);
+}
+
+int CvLuaPlayer::lGetCivBuilding(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCivBuilding);
+}
+
+int CvLuaPlayer::lGetCivUnit(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCivUnit);
 }
 #endif
 //------------------------------------------------------------------------------

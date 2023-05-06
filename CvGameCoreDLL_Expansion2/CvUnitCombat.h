@@ -57,6 +57,8 @@ public:
 
 #ifdef MOD_NEW_BATTLE_EFFECTS
 	static void DoNewBattleEffects(const CvCombatInfo& kInfo);
+	static bool ShouldDoNewBattleEffects(const CvCombatInfo& kInfo);
+
 #ifdef MOD_PROMOTION_SPLASH_DAMAGE
 	static void DoSplashDamage(const CvCombatInfo& kInfo);
 #endif

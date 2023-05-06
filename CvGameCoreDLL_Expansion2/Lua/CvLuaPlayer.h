@@ -571,6 +571,8 @@ protected:
 	// Minor Civ stuff
 #if defined(MOD_API_LUA_EXTENSIONS)
 	LUAAPIEXTN(IsMajorCiv, bool);
+	LUAAPIEXTN(GetCivBuilding, int);
+	LUAAPIEXTN(GetCivUnit, int);
 #endif
 	static int lIsMinorCiv(lua_State* L);
 	static int lGetMinorCivType(lua_State* L);
