@@ -334,6 +334,12 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetJONSCultureEverGenerated);
 
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+	Method(GetGoldenAgePointPerTurnFromReligion);
+	Method(GetGoldenAgePointPerTurnFromTraits);
+	Method(GetGoldenAgePointPerTurnFromCitys);
+#endif	
+
 	Method(GetLastTurnLifetimeCulture);
 	Method(GetInfluenceOn);
 	Method(GetLastTurnInfluenceOn);
@@ -2647,6 +2653,29 @@ int CvLuaPlayer::lGetJONSCultureEverGenerated(lua_State* L)
 	return BasicLuaMethod(L, &CvPlayerAI::GetJONSCultureEverGenerated);
 }
 //------------------------------------------------------------------------------
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+int CvLuaPlayer::lGetGoldenAgePointPerTurnFromReligion(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetYieldPerTurnFromReligion(YIELD_GOLDEN_AGE_POINTS);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+int CvLuaPlayer::lGetGoldenAgePointPerTurnFromTraits(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetYieldPerTurnFromTraits(YIELD_GOLDEN_AGE_POINTS);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+int CvLuaPlayer::lGetGoldenAgePointPerTurnFromCitys(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetGoldenAgePointPerTurnFromCitys();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+#endif
 //int GetLastTurnLifetimeCulture();
 int CvLuaPlayer::lGetLastTurnLifetimeCulture(lua_State* L)
 {

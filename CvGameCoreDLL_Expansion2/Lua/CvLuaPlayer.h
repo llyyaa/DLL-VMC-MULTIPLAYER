@@ -237,6 +237,12 @@ protected:
 
 	static int lGetJONSCultureEverGenerated(lua_State* L);
 
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+	static int lGetGoldenAgePointPerTurnFromReligion(lua_State* L);
+	static int lGetGoldenAgePointPerTurnFromTraits(lua_State* L);
+	static int lGetGoldenAgePointPerTurnFromCitys(lua_State* L);
+#endif	
+
 	static int lGetLastTurnLifetimeCulture(lua_State* L);
 	static int lGetInfluenceOn(lua_State* L);
 	static int lGetLastTurnInfluenceOn(lua_State* L);

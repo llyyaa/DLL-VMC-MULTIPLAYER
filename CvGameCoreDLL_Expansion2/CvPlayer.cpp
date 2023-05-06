@@ -13921,6 +13921,19 @@ void CvPlayer::ChangeTourismBonusTurns(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+int CvPlayer::GetGoldenAgePointPerTurnFromCitys() const
+{
+	const CvCity* pLoopCity;
+	int iLoop;
+	int result = 0;
+	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	{
+		result += pLoopCity->getYieldRate(YIELD_GOLDEN_AGE_POINTS, false);
+	}
+	return result;
+}
+#endif
 /// Update all Golden-Age related stuff
 void CvPlayer::DoProcessGoldenAge()
 {

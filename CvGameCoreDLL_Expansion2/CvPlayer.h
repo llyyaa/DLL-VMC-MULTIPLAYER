@@ -670,6 +670,11 @@ public:
 	int GetTourismBonusTurns() const;
 	void ChangeTourismBonusTurns(int iChange);
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+	int GetGoldenAgePointPerTurnFromCitys() const;
+#endif	
+
 	// Golden Age Stuff
 
 	void DoProcessGoldenAge();
