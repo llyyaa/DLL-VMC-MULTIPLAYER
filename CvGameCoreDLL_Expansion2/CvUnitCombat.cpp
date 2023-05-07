@@ -620,6 +620,13 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 		}
 		else if(bDefenderDead)
 		{
+
+#if defined(MOD_ROG_CORE)
+			//if (bDefenderDead)
+			//{
+				pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
+			//}
+#endif
 			if(pkDefender->isBarbarian())
 				pkDefender->DoTestBarbarianThreatToMinorsWithThisUnitsDeath(pkAttacker->getOwner());
 		}
@@ -664,6 +671,8 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 						pkAttacker->UnitMove(pkTargetPlot, true, pkAttacker);
 
 					pkAttacker->PublishQueuedVisualizationMoves();
+
+
 				}
 				else
 				{
@@ -1089,6 +1098,14 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 						}
 
 						bTargetDied = true;
+
+
+#if defined(MOD_ROG_CORE)
+						if (bTargetDied)
+						{
+							pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
+						}
+#endif
 
 #if !defined(NO_ACHIEVEMENTS)
 						CvPlayerAI& kAttackerOwner = GET_PLAYER(pkAttacker->getOwner());
@@ -1972,6 +1989,11 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 							Localization::String strSummary = Localization::Lookup("TXT_KEY_UNIT_LOST");
 							pNotifications->Add(NOTIFICATION_UNIT_DIED, strBuffer, strSummary.toUTF8(), pkDefender->getX(), pkDefender->getY(), (int) pkDefender->getUnitType(), pkDefender->getOwner());
 						}
+
+#if defined(MOD_ROG_CORE)
+							// If a Unit is adjacent to KILL
+						pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
+#endif
 
 						bTargetDied = true;
 
@@ -4420,6 +4442,8 @@ bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 }
 
 #ifdef MOD_PROMOTION_SPLASH_DAMAGE
+
+
 // AOE damage for units with the splash damage promotion
 void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 {

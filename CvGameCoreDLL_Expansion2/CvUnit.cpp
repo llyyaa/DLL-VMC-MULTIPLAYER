@@ -406,9 +406,16 @@ CvUnit::CvUnit() :
 		, m_iMoveUsedAttackMod(0)
 		, m_iGoldenAgeMod(0)
 		, m_iRangedSupportFireMod(0)
+
+		, m_iBarbCombatBonus(0)
+		, m_iDamageAoEFortified(0)
+		, m_iWorkRateMod(0)
+		, m_iAOEDamageOnKill(0)
+
 #endif
 
-
+	, m_iCannotBeCapturedCount(0)
+	, m_iCaptureDefeatedEnemyChance(0)
 
 	, m_iEmbarkExtraVisibility(0)
 	, m_iEmbarkDefensiveModifier(0)
@@ -1106,11 +1113,19 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iStrongerDamaged = 0;
 	m_iFightWellDamaged = 0;
 
+	m_iCaptureDefeatedEnemyChance = 0;
+	m_iCannotBeCapturedCount = 0;
+
 #if defined(MOD_ROG_CORE)
 	m_iMoveLfetAttackMod = 0;
 	m_iMoveUsedAttackMod = 0;
 	m_iGoldenAgeMod = 0;
 	m_iRangedSupportFireMod = 0;
+
+	m_iBarbCombatBonus = 0;
+	m_iDamageAoEFortified = 0;
+	m_iWorkRateMod = 0;
+	m_iAOEDamageOnKill = 0;
 #endif
 
 
@@ -2280,6 +2295,32 @@ void CvUnit::doTurn()
 	}
 
 	testPromotionReady();
+
+#if defined(MOD_ROG_CORE)
+		// Only increase our Fortification level if we've actually been told to Fortify
+		if (IsFortifiedThisTurn() && GetDamageAoEFortified() > 0)
+		{
+			DoAdjacentPlotDamage(plot(), GetDamageAoEFortified());
+		}
+			// If a Unit is adjacent to KILL
+			//for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+			//{
+				//CvPlot* pAdjacentPlot = plotDirection(plot()->getX(), plot()->getY(), ((DirectionTypes)iI));
+
+				//if (pAdjacentPlot != NULL)
+				//{
+					//for (int iJ = 0; iJ < pAdjacentPlot->getNumUnits(); iJ++)
+					//{
+						//CvUnit* pEnemyUnit = pAdjacentPlot->getUnitByIndex(iJ);
+						//logically we should damage non-enemy units as well? but that is too complex to consider ... 
+						//if (pEnemyUnit != NULL && pEnemyUnit->isEnemy(getTeam()))
+						//{
+							//pEnemyUnit->changeDamage(GetDamageAoEFortified(), getOwner(), 0.0);
+						//}
+					///}
+				//}
+			//}
+#endif
 
 #if defined(MOD_API_PLOT_BASED_DAMAGE)
 	if (MOD_API_PLOT_BASED_DAMAGE) {
@@ -4920,7 +4961,7 @@ void CvUnit::ChangeCityAttackOnlyCount(int iChange)
 bool CvUnit::IsCaptureDefeatedEnemy() const
 {
 	VALIDATE_OBJECT
-	return m_iCaptureDefeatedEnemyCount > 0;
+	return m_iCaptureDefeatedEnemyCount > 0 || m_iCaptureDefeatedEnemyChance > 0;
 }
 
 //	--------------------------------------------------------------------------------
@@ -4938,13 +4979,23 @@ int CvUnit::GetCaptureChance(CvUnit *pEnemy)
 {
 	int iRtnValue = 0;
 
-	if (m_iCaptureDefeatedEnemyCount > 0 && AreUnitsOfSameType(*pEnemy))
+	if ((m_iCaptureDefeatedEnemyCount > 0 || m_iCaptureDefeatedEnemyChance > 0) && AreUnitsOfSameType(*pEnemy))
 	{
 		// Look at ratio of intrinsic combat strengths
 		CvUnitEntry *pkEnemyInfo = GC.getUnitInfo(pEnemy->getUnitType());
 		if (pkEnemyInfo)
 		{
 			int iTheirCombat = pkEnemyInfo->GetCombat();
+
+			if (pEnemy->GetCannotBeCaptured())
+			{
+				return 0;
+			}
+
+			if (m_iCaptureDefeatedEnemyChance > 0)
+			{
+				return m_iCaptureDefeatedEnemyChance;
+			}
 
 			if (iTheirCombat > 0)
 			{
@@ -5728,9 +5779,91 @@ int CvUnit::GetRangedSupportFireMod() const
 {
 	return m_iRangedSupportFireMod;
 }
+
+
+int CvUnit::getAOEDamageOnKill() const
+{
+	VALIDATE_OBJECT
+		return m_iAOEDamageOnKill;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::changeAOEDamageOnKill(int iChange)
+{
+	VALIDATE_OBJECT
+		m_iAOEDamageOnKill = (m_iAOEDamageOnKill + iChange);
+	CvAssert(getAOEDamageOnKill() >= 0);
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetBarbarianCombatBonus() const
+{
+	VALIDATE_OBJECT
+		return m_iBarbCombatBonus;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeBarbarianCombatBonus(int iValue)
+{
+	VALIDATE_OBJECT
+		if (iValue != 0)
+		{
+			m_iBarbCombatBonus += iValue;
+		}
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetDamageAoEFortified() const
+{
+	return m_iDamageAoEFortified;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeDamageAoEFortified(int iChange)
+{
+	m_iDamageAoEFortified += iChange;
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetWorkRateMod() const
+{
+	return m_iWorkRateMod;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeWorkRateMod(int iChange)
+{
+	m_iWorkRateMod += iChange;
+}
+
+
+
 #endif
 
+void CvUnit::ChangeCannotBeCapturedCount(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iCannotBeCapturedCount += iChange;
+		}
+}
 
+
+int CvUnit::GetCaptureDefeatedEnemyChance() const
+{
+	return m_iCaptureDefeatedEnemyChance;
+}
+void CvUnit::ChangeCaptureDefeatedEnemyChance(int iValue)
+{
+	m_iCaptureDefeatedEnemyChance += iValue;
+}
+
+//	--------------------------------------------------------------------------------
+bool CvUnit::GetCannotBeCaptured()
+{
+	VALIDATE_OBJECT
+		return m_iCannotBeCapturedCount > 0;
+}
 
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeCityAttackPlunderModifier(int iValue)
@@ -12384,6 +12517,18 @@ int CvUnit::workRate(bool bMax, BuildTypes /*eBuild*/) const
 
 	iRate = m_pUnitInfo->GetWorkRate();
 
+#if defined(MOD_ROG_CORE)
+	int Modifiers = 0;
+	if (GetWorkRateMod() != 0)
+	{
+		Modifiers += GetWorkRateMod();
+	}
+
+	iRate *= Modifiers + 100;
+	iRate /= 100;
+#endif
+
+
 	CvPlayerAI& kPlayer = GET_PLAYER(getOwner());
 
 	iRate *= std::max(0, (kPlayer.getWorkerSpeedModifier() + kPlayer.GetPlayerTraits()->GetWorkerSpeedModifier() + 100));
@@ -13004,6 +13149,10 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 			// Generic Barb Combat Bonus
 			iTempModifier = kPlayer.GetBarbarianCombatBonus();
 			iModifier += iTempModifier;
+
+#if defined(MOD_ROG_CORE)
+			iModifier += GetBarbarianCombatBonus();
+#endif
 
 			CvHandicapInfo& thisGameHandicap = GC.getGame().getHandicapInfo();
 
@@ -13907,6 +14056,10 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 			// Generic Barb Combat Bonus
 			iTempModifier = kPlayer.GetBarbarianCombatBonus();
 			iModifier += iTempModifier;
+
+#if defined(MOD_ROG_CORE)
+			iModifier += GetBarbarianCombatBonus();
+#endif
 
 			CvHandicapInfo& thisGameHandicap = GC.getGame().getHandicapInfo();
 
@@ -19557,6 +19710,49 @@ void CvUnit::SetFortifiedThisTurn(bool bValue)
 }
 
 
+void CvUnit::DoAdjacentPlotDamage(CvPlot* pWhere, int iValue)
+{
+	if (iValue < 1 || pWhere == NULL)
+		return ;
+
+
+	int iX = pWhere->getX();
+	int iY = pWhere->getY();
+
+	int iRadius = 2;
+	for (int i = -iRadius; i <= iRadius; ++i) {
+		for (int j = -iRadius; j <= iRadius; ++j) {
+			CvPlot* pLoopPlot = plotXYWithRangeCheck(iX, iY, i, j, 1);
+			//if (pLoopPlot != NULL && pLoopPlot != pWhere)
+			if (pLoopPlot != NULL )
+			for (int iUnitIndex = 0; iUnitIndex < pLoopPlot->getNumUnits(); iUnitIndex++)
+			{
+				CvUnit* pEnemyUnit = pLoopPlot->getUnitByIndex(iUnitIndex);
+
+				if (pEnemyUnit != NULL && pEnemyUnit->isEnemy(getTeam()))
+				{
+
+					if (iValue + pEnemyUnit->getDamage() >= pEnemyUnit->GetMaxHitPoints())
+					{
+						// Earn bonuses for kills?
+						CvPlayer& kAttackingPlayer = GET_PLAYER(getOwner());
+
+#if defined(MOD_API_UNIFIED_YIELDS)
+						kAttackingPlayer.DoYieldsFromKill(this, pEnemyUnit, pEnemyUnit->getX(), pEnemyUnit->getY(), 0);
+#else
+						kAttackingPlayer.DoYieldsFromKill(this, pEnemyUnit->getUnitType(), pEnemyUnit->getX(), pEnemyUnit->getY(), pEnemyUnit->isBarbarian(), 0);
+#endif
+					}
+
+					pEnemyUnit->changeDamage(iValue, getOwner(), 0.0);
+				}
+			}
+		}
+	}
+	
+}
+
+
 //	--------------------------------------------------------------------------------
 int CvUnit::getBlitzCount() const
 {
@@ -22956,6 +23152,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		}
 #endif
 
+		ChangeCaptureDefeatedEnemyChance((thisPromotion.GetCaptureDefeatedEnemyChance()) * iChange);
+		ChangeCannotBeCapturedCount((thisPromotion.CannotBeCaptured()) ? iChange : 0);
 
 #if defined(MOD_ROG_CORE)
 		ChangeMoveLfetAttackMod(thisPromotion.GetMoveLfetAttackMod() * iChange);
@@ -22971,6 +23169,12 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeHPHealedIfDefeatEnemyGlobal(thisPromotion.GetHPHealedIfDefeatEnemyGlobal() * iChange);
 		changeNumOriginalCapitalAttackMod(thisPromotion.GetNumOriginalCapitalAttackMod() * iChange);
 		changeNumOriginalCapitalDefenseMod(thisPromotion.GetNumOriginalCapitalDefenseMod() * iChange);
+
+		ChangeDamageAoEFortified((thisPromotion.GetDamageAoEFortified())* iChange);
+		ChangeWorkRateMod((thisPromotion.GetWorkRateMod())* iChange);
+
+		ChangeBarbarianCombatBonus((thisPromotion.GetBarbarianCombatBonus())* iChange);
+		changeAOEDamageOnKill(thisPromotion.GetAOEDamageOnKill()* iChange);
 #endif
 
 
@@ -23490,6 +23694,23 @@ void CvUnit::read(FDataStream& kStream)
 	MOD_SERIALIZE_READ(58, kStream, m_iBaseRangedCombat, ((NO_UNIT != m_eUnitType) ? m_pUnitInfo->GetRangedCombat() : 0));
 #endif
 
+	kStream >> m_iCaptureDefeatedEnemyChance;
+	kStream >> m_iCannotBeCapturedCount;
+
+#if defined(MOD_ROG_CORE)
+	kStream >> m_iMoveLfetAttackMod;
+	kStream >> m_iMoveUsedAttackMod;
+	kStream >> m_iGoldenAgeMod;
+	kStream >> m_iRangedSupportFireMod;
+
+
+	kStream >> m_iBarbCombatBonus;
+	kStream >> m_iDamageAoEFortified;
+	kStream >> m_iWorkRateMod;
+	kStream >> m_iAOEDamageOnKill;
+
+#endif
+
 	kStream >> m_iCapitalDefenseModifier;
 	kStream >> m_iCapitalDefenseFalloff;
 
@@ -23748,6 +23969,26 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iGreatGeneralCombatModifier;
 	kStream << m_iIgnoreGreatGeneralBenefit;
 	kStream << m_iIgnoreZOC;
+
+
+	kStream << m_iCaptureDefeatedEnemyChance;
+	kStream << m_iCannotBeCapturedCount;
+
+#if defined(MOD_ROG_CORE)
+	kStream << m_iMoveLfetAttackMod;
+	kStream << m_iMoveUsedAttackMod;
+	kStream << m_iGoldenAgeMod;
+	kStream << m_iRangedSupportFireMod;
+
+
+	kStream << m_iBarbCombatBonus;
+	kStream << m_iDamageAoEFortified;
+	kStream << m_iWorkRateMod;
+	kStream << m_iAOEDamageOnKill;
+
+#endif
+
+
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_WRITE(kStream, m_iNoSupply);
 #endif

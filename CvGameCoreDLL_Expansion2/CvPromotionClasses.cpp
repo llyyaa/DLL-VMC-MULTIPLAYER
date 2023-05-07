@@ -118,7 +118,15 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyUnitClassBonus(0),
 	m_iNearbyUnitClassBonusRange(0),
 	m_iCombatBonusFromNearbyUnitClass(NO_UNITCLASS),
+
+	m_iAOEDamageOnKill(0),
+	m_iDamageAoEFortified(0),
+	m_iWorkRateMod(0),
+	m_iBarbarianCombatBonus(0),
 #endif
+
+	m_iCaptureDefeatedEnemyChance(0),
+	m_bCannotBeCaptured(false),
 
 #if defined(MOD_ROG_CORE)
 	m_iHPHealedIfDefeatEnemyGlobal(0),
@@ -424,8 +432,17 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		m_iOutsideCapitalLandAttackMod = kResults.GetInt("OutsideCapitalLandAttackMod");
 		m_iOnCapitalLandDefenseMod = kResults.GetInt("OnCapitalLandDefenseMod");
 		m_iOutsideCapitalLandDefenseMod = kResults.GetInt("OutsideCapitalLandDefenseMod");
+
+
+		m_iDamageAoEFortified = kResults.GetInt("AoEWhileFortified");
+		m_iWorkRateMod = kResults.GetInt("WorkRateMod");
+		m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
+
+		m_iBarbarianCombatBonus = kResults.GetInt("BarbarianCombatBonus");
 #endif
 
+		m_iCaptureDefeatedEnemyChance = kResults.GetInt("CaptureDefeatedEnemyChance");
+		m_bCannotBeCaptured = kResults.GetBool("CannotBeCaptured");
 
 #if defined(MOD_ROG_CORE)
 			m_iNumSpyDefenseMod = kResults.GetInt("NumSpyDefenseMod");
@@ -1551,7 +1568,38 @@ int CvPromotionEntry::GetRangedSupportFireMod() const
 {
 	return m_iRangedSupportFireMod;
 }
+
+/// Accessor: Can this Promotion grant bonuses v. barbarians?
+int CvPromotionEntry::GetBarbarianCombatBonus() const
+{
+	return m_iBarbarianCombatBonus;
+}
+
+int CvPromotionEntry::GetAOEDamageOnKill() const
+{
+	return m_iAOEDamageOnKill;
+}
+
+int CvPromotionEntry::GetDamageAoEFortified() const
+{
+	return m_iDamageAoEFortified;
+}
+int CvPromotionEntry::GetWorkRateMod() const
+{
+	return m_iWorkRateMod;
+}
 #endif
+
+int CvPromotionEntry::GetCaptureDefeatedEnemyChance() const
+{
+	return m_iCaptureDefeatedEnemyChance;
+}
+
+//Cannot be captured
+bool CvPromotionEntry::CannotBeCaptured() const
+{
+	return m_bCannotBeCaptured;
+}
 
 
 
