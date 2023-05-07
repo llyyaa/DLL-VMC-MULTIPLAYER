@@ -340,6 +340,14 @@ public:
 	int GetSplashXP() const;
 #endif
 
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	int GetCollateralDamagePercent() const;
+	int GetCollateralDamageFixed() const;
+	int GetCollateralDamagePlotUnitLimit() const;
+	bool GetCollateralDamageImmune() const;
+	int GetCollateralXP() const;
+#endif
+
 protected:
 	int m_iLayerAnimationPath;
 	int m_iPrereqPromotion;
@@ -453,6 +461,14 @@ protected:
 	int m_iSplashDamagePlotUnitLimit = 0;
 	bool m_iSplashDamageImmune = 0;
 	int m_iSplashXP = 0;
+#endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	int m_iCollateralDamagePercent = 0;
+	int m_iCollateralDamageFixed = 0;
+	int m_iCollateralDamagePlotUnitLimit = 0;
+	bool m_iCollateralDamageImmune = 0;
+	int m_iCollateralXP = 0;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -768,6 +784,42 @@ struct SplashInfo {
 		int iPromotion = (int)ePromotion;
 		kStream << iPromotion;
 		kStream << iRadius;
+		kStream << iPercent;
+		kStream << iFixed;
+		kStream << iPlotUnitLimit;
+	}
+};
+#endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+struct CollateralInfo {
+	PromotionTypes ePromotion;
+
+	int iPercent;
+	int iFixed;
+	int iPlotUnitLimit;
+
+	CollateralInfo() = default;
+
+	// TODO:
+	CollateralInfo(const CvPromotionEntry& promotion) :
+		ePromotion{ (PromotionTypes)promotion.GetID() },
+		iPercent{ promotion.GetCollateralDamagePercent() },
+		iFixed{ promotion.GetCollateralDamageFixed() },
+		iPlotUnitLimit{ promotion.GetCollateralDamagePlotUnitLimit() } {}
+
+	inline void read(FDataStream& kStream) {
+		int iPromotion;
+		kStream >> iPromotion;
+		ePromotion = (PromotionTypes)iPromotion;
+		kStream >> iPercent;
+		kStream >> iFixed;
+		kStream >> iPlotUnitLimit;
+	}
+
+	inline void write(FDataStream& kStream) const {
+		int iPromotion = (int)ePromotion;
+		kStream << iPromotion;
 		kStream << iPercent;
 		kStream << iFixed;
 		kStream << iPlotUnitLimit;

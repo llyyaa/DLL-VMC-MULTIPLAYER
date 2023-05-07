@@ -1047,6 +1047,7 @@
 
     <!-- table change: NewBattleEffects.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
+    <Row Class="6" Name="PROMOTION_COLLATERAL_DAMAGE" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>

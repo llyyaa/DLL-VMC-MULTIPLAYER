@@ -23234,6 +23234,30 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeSplashXP(thisPromotion.GetSplashXP() * iChange);
 #endif
 
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+		if (thisPromotion.GetCollateralDamagePlotUnitLimit() > 0)
+		{
+			if (iChange == 1)
+			{
+				m_asCollateralInfoVec.push_back({thisPromotion});
+			}
+			else if (iChange == -1)
+			{
+				for (auto iter = m_asCollateralInfoVec.begin(); iter != m_asCollateralInfoVec.end(); iter++)
+				{
+					if (iter->ePromotion == (PromotionTypes) thisPromotion.GetID())
+					{
+						iter = m_asCollateralInfoVec.erase(iter);
+						break;
+					}
+				}
+			}
+		}
+		
+		ChangeCollateralImmuneRC(thisPromotion.GetCollateralDamageImmune() ? iChange : 0);
+		ChangeCollateralXP(thisPromotion.GetCollateralXP() * iChange);
+#endif
+
 #if !defined(NO_ACHIEVEMENTS)
 		PromotionTypes eBuffaloChest =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_CHEST", true /*bHideAssert*/);
 		PromotionTypes eBuffaloLoins =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_LOINS", true /*bHideAssert*/);
@@ -23617,6 +23641,22 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iSplashXP;
 #endif
 
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	m_asCollateralInfoVec.clear();
+	int iCollateralInfoLen = 0;
+	kStream >> iCollateralInfoLen;
+	m_asCollateralInfoVec.reserve(iCollateralInfoLen);
+	for (int i = 0; i < iCollateralInfoLen; i++)
+	{
+		CollateralInfo sCollateralInfo;
+		sCollateralInfo.read(kStream);
+		m_asCollateralInfoVec.push_back(sCollateralInfo);
+	}
+
+	kStream >> m_iCollateralImmuneRC;
+	kStream >> m_iCollateralXP;
+#endif
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -23775,6 +23815,17 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iSplashImmuneRC;
 	kStream << m_iSplashXP;
+#endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	kStream << m_asCollateralInfoVec.size();
+	for (int i = 0; i < m_asCollateralInfoVec.size(); i++)
+	{
+		m_asCollateralInfoVec[i].write(kStream);
+	}
+
+	kStream << m_iCollateralImmuneRC;
+	kStream << m_iCollateralXP;
 #endif
 
 	//  Write mission list
@@ -27975,5 +28026,31 @@ void CvUnit::ChangeSplashXP(int iChange) {
 void CvUnit::SetSplashXP(int iValue) {
 	this->m_iSplashXP = iValue;
 }
+#endif
 
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+std::vector<CollateralInfo>& CvUnit::GetCollateralInfoVec()
+{
+	return this->m_asCollateralInfoVec;
+}
+
+int CvUnit::GetCollateralImmuneRC() const {
+	return this->m_iCollateralImmuneRC;
+}
+void CvUnit::ChangeCollateralImmuneRC(int iChange) {
+	this->m_iCollateralImmuneRC += iChange;
+}
+void CvUnit::SetCollateralImmuneRC(int iValue) {
+	this->m_iCollateralImmuneRC = iValue;
+}
+
+int CvUnit::GetCollateralXP() const {
+	return this->m_iCollateralXP;
+}
+void CvUnit::ChangeCollateralXP(int iChange) {
+	this->m_iCollateralXP += iChange;
+}
+void CvUnit::SetCollateralXP(int iValue) {
+	this->m_iCollateralXP = iValue;
+}
 #endif

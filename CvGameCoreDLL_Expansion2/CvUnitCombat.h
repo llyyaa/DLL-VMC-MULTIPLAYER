@@ -61,6 +61,7 @@ public:
 
 #ifdef MOD_PROMOTION_SPLASH_DAMAGE
 	static void DoSplashDamage(const CvCombatInfo& kInfo);
+	static void DoCollateralDamage(const CvCombatInfo& kInfo);
 #endif
 #endif
 

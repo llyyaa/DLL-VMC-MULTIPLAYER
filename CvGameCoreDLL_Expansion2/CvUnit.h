@@ -1704,6 +1704,18 @@ public:
 	void SetSplashXP(int iValue);
 #endif
 
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	std::vector<CollateralInfo>& GetCollateralInfoVec();
+
+	int GetCollateralImmuneRC() const;
+	void ChangeCollateralImmuneRC(int iChange);
+	void SetCollateralImmuneRC(int iValue);
+
+	int GetCollateralXP() const;
+	void ChangeCollateralXP(int iChange);
+	void SetCollateralXP(int iValue);
+#endif
+
 protected:
 	const MissionQueueNode* HeadMissionQueueNode() const;
 	MissionQueueNode* HeadMissionQueueNode();
@@ -2053,6 +2065,13 @@ protected:
 
 	int m_iSplashImmuneRC = 0;
 	int m_iSplashXP = 0;
+#endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	std::vector<CollateralInfo> m_asCollateralInfoVec = {};
+
+	int m_iCollateralImmuneRC = 0;
+	int m_iCollateralXP = 0;
 #endif
 
 	int m_iEmbarkExtraVisibility;

@@ -4377,11 +4377,36 @@ inline static CvPlayerAI& getDefenderPlayer(const CvCombatInfo& kCombatInfo)
 	return GET_PLAYER(pDefenderUnit ? pDefenderUnit->getOwner() : pDefenderCity->getOwner());
 }
 
+static int calcOrCacheDamage(CvUnit* pAttacker, CvPlot* pFromPlot, CvUnit* pDefender, CvPlot* pTargetPlot, bool bRangedAttack, std::tr1::unordered_map<CvUnit*, int>& mUnitDamageBaseMap)
+{
+	int result = 0;
+	auto iterCachedDamageBase = mUnitDamageBaseMap.find(pDefender);
+	if (iterCachedDamageBase != mUnitDamageBaseMap.end()) // hit cache
+	{
+		result = iterCachedDamageBase->second;
+	}
+	else
+	{
+		if (bRangedAttack) {
+			result = pAttacker->GetRangeCombatDamage(pDefender, nullptr, false); ;
+		}
+		else {
+			int iAttackStrength = pAttacker->GetMaxAttackStrength(pFromPlot, pDefender->plot(), pDefender);
+			int iDefenseStrength = pDefender->GetMaxDefenseStrength(pDefender->plot(), pAttacker, false);
+			result = pAttacker->getCombatDamage(iAttackStrength, iDefenseStrength, pAttacker->getDamage(), false, false, false);
+		}
+		mUnitDamageBaseMap[pDefender] = result;
+	}
+
+	return result;
+}
+
 void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 {
 	if (!ShouldDoNewBattleEffects(kCombatInfo))
 		return;
 	DoSplashDamage(kCombatInfo);
+	DoCollateralDamage(kCombatInfo);
 }
 
 bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
@@ -4414,8 +4439,8 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 	auto& vSplashInfoVec = pAttackerUnit->GetSplashInfoVec();
 	if (vSplashInfoVec.empty()) return;
 
-	CvPlayerAI& kAttackPlayer = GET_PLAYER(pAttackerUnit->getOwner());
-	CvPlayerAI& kDefensePlayer = GET_PLAYER(pDefenderUnit ? pDefenderUnit->getOwner() : pDefenderCity->getOwner());
+	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
+	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
 	CvPlot* pFromPlot = pAttackerUnit ? pAttackerUnit->plot() : pAttackerCity->plot();
 	CvPlot* pTargetPlot = kCombatInfo.getPlot();
 
@@ -4450,26 +4475,8 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 					if (dedupSet.count(pAOEUnit) > 0) continue;
 					dedupSet.insert(pAOEUnit);
 
-					int iAOEDamageBase = 0;
-					auto iterCachedDamageBase = mUnitDamageBaseMap.find(pAOEUnit);
-					if (iterCachedDamageBase != mUnitDamageBaseMap.end()) // hit cache
-					{
-						iAOEDamageBase = iterCachedDamageBase->second;
-					}
-					else
-					{
-						if (bRangedAttack) {
-							iAOEDamageBase = pAttackerUnit->GetRangeCombatDamage(pAOEUnit, nullptr, false); ;
-						}
-						else {
-							int iAttackStrength = pAttackerUnit->GetMaxAttackStrength(pFromPlot, pAOEUnit->plot(), pAOEUnit);
-							int iDefenseStrength = pAOEUnit->GetMaxDefenseStrength(pAOEUnit->plot(), pAttackerUnit, false);
-							iAOEDamageBase = pAttackerUnit->getCombatDamage(iAttackStrength, iDefenseStrength, pAttackerUnit->getDamage(), false, false, false);
-						}
-						mUnitDamageBaseMap[pAOEUnit] = iAOEDamageBase;
-					}
-
-					int iAOEDamage = iAOEDamageBase * iDamageRateTimes100 / 100;
+					int iAOEDamageBase = calcOrCacheDamage(pAttackerUnit, pFromPlot, pAOEUnit, pLoopPlot, bRangedAttack, mUnitDamageBaseMap);
+					int iAOEDamage = (int64)iAOEDamageBase * (int64) iDamageRateTimes100 / 100;
 					mUnitDamageSumMap[pAOEUnit] += iAOEDamage + iFixed;
 
 					iAffectedCounter++;
@@ -4530,4 +4537,110 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 	}
 }
 #endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
+{
+	if (!MOD_PROMOTION_COLLATERAL_DAMAGE) return;
+
+	bool bRangedAttack = kCombatInfo.getAttackIsRanged();
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvCity* pAttackerCity = kCombatInfo.getCity(BATTLE_UNIT_ATTACKER);
+	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	CvCity* pDefenderCity = kCombatInfo.getCity(BATTLE_UNIT_DEFENDER);
+
+	// Only work when unit vs unit
+	if (pAttackerCity != nullptr) return;
+	if (pDefenderCity != nullptr) return; // TODO: will support later
+
+	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
+	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
+	CvPlot* pFromPlot = pAttackerUnit ? pAttackerUnit->plot() : pAttackerCity->plot();
+	CvPlot* pTargetPlot = kCombatInfo.getPlot();
+	if (pTargetPlot == nullptr) return;
+
+	std::tr1::unordered_map<CvUnit*, int> mUnitDamageSumMap;
+	std::tr1::unordered_map<CvUnit*, int> mUnitDamageBaseMap;
+
+	std::vector<CollateralInfo>& vCollateralInfo = pAttackerUnit->GetCollateralInfoVec();
+	for (const auto& sCollateralInfo : vCollateralInfo)
+	{
+		int iDamageRateTimes100 = sCollateralInfo.iPercent;
+		int iUnitLimitPerTile = sCollateralInfo.iPlotUnitLimit;
+		int iFixed = sCollateralInfo.iFixed;
+		std::tr1::unordered_set<CvUnit*> dedupSet;
+
+		int iAffectedCounter = 0;
+		for (int iUnitIndex = 0; iUnitIndex < pTargetPlot->getNumUnits(); iUnitIndex++)
+		{
+			CvUnit* pAffectedUnit = pTargetPlot->getUnitByIndex(iUnitIndex);
+			bool bImmune = pAffectedUnit->GetCollateralImmuneRC() > 0;
+			if (pAffectedUnit == pDefenderUnit) continue;
+			if (bImmune) continue;
+			if (pAffectedUnit->getDomainType() != DOMAIN_LAND && pAffectedUnit->getDomainType() != DOMAIN_SEA) continue;
+			if (!kAttackPlayer.IsAtWarWith(pAffectedUnit->getOwner())) continue;
+			if (dedupSet.count(pAffectedUnit) > 0) continue;
+			dedupSet.insert(pAffectedUnit);
+
+			int iDamageBase = calcOrCacheDamage(pAttackerUnit, pFromPlot, pAffectedUnit, pTargetPlot, bRangedAttack, mUnitDamageBaseMap);
+			int iDamage = (int64)iDamageBase * (int64)iDamageRateTimes100 / 100;
+			mUnitDamageSumMap[pAffectedUnit] += iDamage + iFixed;
+
+			iAffectedCounter++;
+			if (iAffectedCounter >= iUnitLimitPerTile)
+			{
+				break;
+			}
+		}
+	}
+
+	ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+	for (auto iter = mUnitDamageSumMap.begin(); iter != mUnitDamageSumMap.end(); iter++)
+	{
+		CvUnit* pAffectedUnit = iter->first;
+		int iDamage = iter->second;
+		if (iDamage == 0)
+		{
+			continue;
+		}
+
+		bool bKill = iDamage >= pAffectedUnit->GetCurrHitPoints();
+		pAffectedUnit->changeDamage(iDamage, kAttackPlayer.GetID(), pAttackerUnit->GetID());
+		pAffectedUnit->ShowDamageDeltaText(iDamage, pAffectedUnit->plot());
+
+		if (pAttackerUnit->GetCollateralXP() != 0)
+		{
+			pAttackerUnit->changeExperienceTimes100(pAttackerUnit->GetCollateralXP() * 100);
+		}
+
+		if (kAttackPlayer.isHuman())
+		{
+			if (bKill)
+			{
+				CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY_DEATH", pAttackerUnit->getNameKey(), pAffectedUnit->getNameKey());
+				pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+			}
+			else
+			{
+				CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY", pAttackerUnit->getNameKey(), pAffectedUnit->getNameKey(), iDamage);
+				pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+			}
+		}
+		if (kDefensePlayer.isHuman())
+		{
+			if (bKill)
+			{
+				CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_COLL_DAMAGE_DEATH", pAttackerUnit->getNameKey(), pAffectedUnit->getNameKey());
+				pkDLLInterface->AddMessage(0, kDefensePlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+			}
+			else
+			{
+				CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_COLL_DAMAGE", pAttackerUnit->getNameKey(), pAffectedUnit->getNameKey(), iDamage);
+				pkDLLInterface->AddMessage(0, kDefensePlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+			}
+		}
+	}
+}
+#endif
+
 #endif

@@ -197,5 +197,18 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_ENEMY_DEATH">
 			<Text>你的{1_UnitName}攻擊時的濺射傷害將{2_EnUName}消滅了！</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE">
+			<Text>在防禦中，你的{2_UnitName}受到敵方{1_EnUName}攻擊時的[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點穿透傷害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY">
+			<Text>你的{1_UnitName}攻擊時對敵方{2_EnUName}造成了[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點穿透傷害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_DEATH">
+			<Text>在防禦中，你的{2_UnitName}被敵方{1_EnUName}攻擊時的穿透傷害消滅了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY_DEATH">
+			<Text>你的{1_UnitName}攻擊時的穿透傷害將敵方{2_EnUName}消滅了！</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

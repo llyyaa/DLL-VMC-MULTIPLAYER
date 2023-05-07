@@ -585,6 +585,14 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iSplashXP = kResults.GetInt("SplashXP");
 #endif
 
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	m_iCollateralDamagePercent = kResults.GetInt("CollateralDamagePercent");
+	m_iCollateralDamageFixed = kResults.GetInt("CollateralDamageFixed");
+	m_iCollateralDamagePlotUnitLimit = kResults.GetInt("CollateralDamagePlotUnitLimit");
+	m_iCollateralDamageImmune = kResults.GetBool("CollateralDamageImmune");
+	m_iCollateralXP = kResults.GetInt("CollateralXP");
+#endif
+
 	//References
 	const char* szLayerAnimationPath = kResults.GetText("LayerAnimationPath");
 	m_iLayerAnimationPath = GC.getInfoTypeForString(szLayerAnimationPath, true);
@@ -2626,6 +2634,29 @@ bool CvPromotionEntry::GetSplashDamageImmune() const
 int CvPromotionEntry::GetSplashXP() const
 {
 	return m_iSplashXP;
+}
+#endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+int CvPromotionEntry::GetCollateralDamagePercent() const
+{
+	return m_iCollateralDamagePercent;
+}
+int CvPromotionEntry::GetCollateralDamageFixed() const
+{
+	return m_iCollateralDamageFixed;
+}
+int CvPromotionEntry::GetCollateralDamagePlotUnitLimit() const
+{
+	return m_iCollateralDamagePlotUnitLimit;
+}
+bool CvPromotionEntry::GetCollateralDamageImmune() const
+{
+	return m_iCollateralDamageImmune;
+}
+int CvPromotionEntry::GetCollateralXP() const
+{
+	return m_iCollateralXP;
 }
 #endif
 
