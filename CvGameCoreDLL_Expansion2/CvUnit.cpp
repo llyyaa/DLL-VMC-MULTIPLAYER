@@ -12958,6 +12958,18 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 		iModifier += iNearbyImprovementModifier;
 	}
 
+
+
+#if defined(MOD_ROG_CORE)
+	// UnitClass with combat bonus  nearby
+	int iNearbyUnitClassModifier = GetNearbyUnitClassModifierFromUnitClass();
+	if (iNearbyUnitClassModifier != 0)
+	{
+		iModifier += iNearbyUnitClassModifier;
+	}
+
+#endif
+
 	// Adjacent Friendly military Unit?
 	if(IsFriendlyUnitAdjacent(/*bCombatUnit*/ true))
 		iModifier += GetAdjacentModifier();
@@ -13976,6 +13988,16 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 	{
 		iModifier += iNearbyImprovementModifier;
 	}
+
+#if defined(MOD_ROG_CORE)
+	// UnitClass with combat bonus  nearby
+	int iNearbyUnitClassModifier = GetNearbyUnitClassModifierFromUnitClass();
+	if (iNearbyUnitClassModifier != 0)
+	{
+		iModifier += iNearbyUnitClassModifier;
+	}
+	
+#endif
 
 	// Our empire fights well in Golden Ages?
 	if(kPlayer.isGoldenAge())
