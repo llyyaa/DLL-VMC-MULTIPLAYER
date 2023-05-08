@@ -24221,6 +24221,16 @@ bool CvUnit::canRangeStrikeAt(int iX, int iY, bool bNeedWar, bool bNoncombatAllo
 				return false;
 			}
 
+
+#if defined(MOD_EVENTS_UNIT_CAN_RANGEATTACK)
+			if (MOD_EVENTS_UNIT_CAN_RANGEATTACK) {
+				if (GAMEEVENTINVOKE_TESTANY(GAMEEVENT_UnitCanRangeAttackPlot, getOwner(), GetID(), iX, iY, bNeedWar) == GAMEEVENTRETURN_FALSE) {
+					return false;
+				}
+			}
+#endif
+
+
 #if defined(MOD_GLOBAL_SUBS_UNDER_ICE_IMMUNITY)
 				// if the defender is a sub
 				if (pDefender->getInvisibleType() == 0) {
@@ -24295,15 +24305,6 @@ bool CvUnit::canRangeStrikeAt(int iX, int iY, bool bNeedWar, bool bNoncombatAllo
 					}
 				}
 #endif
-
-#if defined(MOD_EVENTS_UNIT_CAN_RANGEATTACK)
-				if (MOD_EVENTS_UNIT_CAN_RANGEATTACK) {
-					if (GAMEEVENTINVOKE_TESTANY(GAMEEVENT_UnitCanRangeAttackPlot, getOwner(), GetID(), iX, iY, bNeedWar) == GAMEEVENTRETURN_FALSE) {
-						return false;
-					}
-				}
-#endif
-
 				return false;
 			}
 		}
