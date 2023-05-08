@@ -910,8 +910,6 @@ public:
 	int attackAbove50HealthModifier() const;
 	int attackBelow50HealthModifier() const;
 
-	//int DoAdjacentPlotDamage(CvPlot* pWhere, int iValue, const char* chTextKey = NULL);
-
 	int getForcedDamageValue();
 	void ChangeForcedDamageValue(int iChange);
 
