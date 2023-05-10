@@ -328,6 +328,9 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(IsEnemyInMovementRange);
 
 	Method(IsTrade);
+
+	Method(IsCannotBeCapturedUnit);
+
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_TRADEROUTES)
 	Method(GetTradeRouteIndex);
 	Method(IsRecalledTrader);
@@ -405,6 +408,8 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetOutsideCapitalLandAttackMod);
 	Method(GetOnCapitalLandDefenseMod);
 	Method(GetOutsideCapitalLandDefenseMod);
+
+	Method(GetBarbarianCombatBonus);
 #endif
 
 
@@ -2593,6 +2598,27 @@ int CvLuaUnit::lIsCombatUnit(lua_State* L)
 	lua_pushboolean(L, bResult);
 	return 1;
 }
+
+int CvLuaUnit::lIsCannotBeCapturedUnit(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const bool bResult = pkUnit->GetCannotBeCaptured();
+
+	lua_pushboolean(L, bResult);
+	return 1;
+}
+
+#if defined(MOD_ROG_CORE)
+//------------------------------------------------------------------------------
+int CvLuaUnit::lGetBarbarianCombatBonus(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int bResult = pkUnit->GetBarbarianCombatBonus();
+	lua_pushinteger(L, bResult);
+	return 1;
+}
+#endif
+
 //------------------------------------------------------------------------------
 //bool CanDefend(CyPlot* pPlot);
 int CvLuaUnit::lIsCanDefend(lua_State* L)

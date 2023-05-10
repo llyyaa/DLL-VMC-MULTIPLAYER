@@ -620,6 +620,10 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 		}
 		else if(bDefenderDead)
 		{
+
+#if defined(MOD_ROG_CORE)
+			pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
+#endif
 			if(pkDefender->isBarbarian())
 				pkDefender->DoTestBarbarianThreatToMinorsWithThisUnitsDeath(pkAttacker->getOwner());
 		}
@@ -664,6 +668,8 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 						pkAttacker->UnitMove(pkTargetPlot, true, pkAttacker);
 
 					pkAttacker->PublishQueuedVisualizationMoves();
+
+
 				}
 				else
 				{
@@ -1089,6 +1095,14 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 						}
 
 						bTargetDied = true;
+
+
+#if defined(MOD_ROG_CORE)
+						if (bTargetDied)
+						{
+							pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
+						}
+#endif
 
 #if !defined(NO_ACHIEVEMENTS)
 						CvPlayerAI& kAttackerOwner = GET_PLAYER(pkAttacker->getOwner());
@@ -1972,6 +1986,11 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 							Localization::String strSummary = Localization::Lookup("TXT_KEY_UNIT_LOST");
 							pNotifications->Add(NOTIFICATION_UNIT_DIED, strBuffer, strSummary.toUTF8(), pkDefender->getX(), pkDefender->getY(), (int) pkDefender->getUnitType(), pkDefender->getOwner());
 						}
+
+#if defined(MOD_ROG_CORE)
+						// If a Unit is adjacent to KILL
+						pkDefender->DoAdjacentPlotDamage(pkTargetPlot, pkDefender->getAOEDamageOnKill());
+#endif
 
 						bTargetDied = true;
 
@@ -4420,6 +4439,8 @@ bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 }
 
 #ifdef MOD_PROMOTION_SPLASH_DAMAGE
+
+
 // AOE damage for units with the splash damage promotion
 void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 {
@@ -4427,7 +4448,6 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 		return;
 	}
 
-	bool bRangedAttack = kCombatInfo.getAttackIsRanged();
 	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
 	CvCity* pAttackerCity = kCombatInfo.getCity(BATTLE_UNIT_ATTACKER);
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
@@ -4443,6 +4463,7 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
 	CvPlot* pFromPlot = pAttackerUnit ? pAttackerUnit->plot() : pAttackerCity->plot();
 	CvPlot* pTargetPlot = kCombatInfo.getPlot();
+	bool bRangedAttack = kCombatInfo.getAttackIsRanged() || kCombatInfo.getAttackIsBombingMission();
 
 	int iX = pTargetPlot->getX();
 	int iY = pTargetPlot->getY();
@@ -4543,7 +4564,6 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 {
 	if (!MOD_PROMOTION_COLLATERAL_DAMAGE) return;
 
-	bool bRangedAttack = kCombatInfo.getAttackIsRanged();
 	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
 	CvCity* pAttackerCity = kCombatInfo.getCity(BATTLE_UNIT_ATTACKER);
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
@@ -4558,6 +4578,8 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 	CvPlot* pFromPlot = pAttackerUnit ? pAttackerUnit->plot() : pAttackerCity->plot();
 	CvPlot* pTargetPlot = kCombatInfo.getPlot();
 	if (pTargetPlot == nullptr) return;
+
+	bool bRangedAttack = kCombatInfo.getAttackIsRanged() || kCombatInfo.getAttackIsBombingMission();
 
 	std::tr1::unordered_map<CvUnit*, int> mUnitDamageSumMap;
 	std::tr1::unordered_map<CvUnit*, int> mUnitDamageBaseMap;

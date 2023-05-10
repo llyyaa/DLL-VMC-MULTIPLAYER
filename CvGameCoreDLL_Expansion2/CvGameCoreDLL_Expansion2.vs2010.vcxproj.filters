@@ -551,6 +551,9 @@
     <ClCompile Include="StackWalker.cpp">
       <Filter>NetworkSync\LogTool</Filter>
     </ClCompile>
+    <ClCompile Include="CvCityScaleClasses.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="banned.h">
@@ -1344,6 +1347,9 @@
     </ClInclude>
     <ClInclude Include="..\FirePlace\include\FireWorks\Win32\FKBInputDevice.h">
       <Filter>FireWorks Headers\Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="CvCityScaleClasses.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

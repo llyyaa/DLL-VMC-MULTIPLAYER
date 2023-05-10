@@ -1596,6 +1596,12 @@ enum ActivityTypes
 	NUM_ACTIVITY_TYPES
 };
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+enum CityScaleTypes {
+	NO_CITY_SCALE = -1
+};
+#endif
+
 enum AutomateTypes
 {
 	NO_AUTOMATE = -1,

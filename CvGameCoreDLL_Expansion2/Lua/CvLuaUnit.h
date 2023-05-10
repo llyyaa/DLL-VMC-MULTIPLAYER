@@ -262,6 +262,9 @@ protected:
 	static int lIsEnemyInMovementRange(lua_State* L);
 
 	static int lIsTrade(lua_State* L);
+
+	static int lIsCannotBeCapturedUnit(lua_State* L);
+
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_TRADEROUTES)
 	LUAAPIEXTN(GetTradeRouteIndex, int);
 	LUAAPIEXTN(IsRecalledTrader, bool);
@@ -416,8 +419,10 @@ protected:
 	static int lGetHPHealedIfDefeatEnemyGlobal(lua_State* L);
 	static int lGetNumOriginalCapitalDefenseMod(lua_State* L);
 	static int lGetNumOriginalCapitalAttackMod(lua_State* L);
+	static int lGetBarbarianCombatBonus(lua_State* L);
 #endif
 
+	
 
 #if defined(MOD_ROG_CORE)
 	static int lGetNumSpyDefenseMod(lua_State* L);

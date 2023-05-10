@@ -480,6 +480,11 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/PROMOTIONS/NewBattleEffects.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/CITY_SCALES/CityScales.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
   </PropertyGroup>
@@ -495,6 +500,7 @@
     <Folder Include="DB\BUILDINGS" />
     <Folder Include="DB\ERAS" />
     <Folder Include="DB\IMPROVEMENTS" />
+    <Folder Include="DB\CITY_SCALES" />
     <Folder Include="DB\YIELDS" />
     <Folder Include="DB\POLICIES" />
     <Folder Include="DB\UNITS" />
@@ -815,6 +821,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\BUILDINGS\Building_EnableUnitPurchase.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\CITY_SCALES\CityScales.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

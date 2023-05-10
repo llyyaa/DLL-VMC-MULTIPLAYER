@@ -884,6 +884,9 @@
 #define MOD_NEW_BATTLE_EFFECTS (MOD_PROMOTION_SPLASH_DAMAGE)
 #endif
 
+#define MOD_GLOBAL_CITY_SCALES gCustomMods.isGLOBAL_CITY_SCALES()
+#define MOD_EVENTS_CITY_SCALES gCustomMods.isEVENTS_CITY_SCALES()
+
 //
 // NOTHING BELOW HERE SHOULD NEED CHANGING
 //
@@ -1217,6 +1220,8 @@ enum BattleTypeTypes
 #define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		        "iiiiii"
 
 #define GAMEEVENT_DoWarPopulationLoss			"DoWarPopulationLoss",		        "iii"
+
+#define GAMEEVENT_OnCityScaleChange			"OnCityScaleChange",		        "iiii"
 
 
 // Serialization wrappers
@@ -1566,6 +1571,10 @@ public:
 	MOD_OPT_DECL(PROMOTION_SPLASH_DAMAGE);
 	MOD_OPT_DECL(PROMOTION_COLLATERAL_DAMAGE);
 	MOD_OPT_DECL(TRAIT_RELIGION_FOLLOWER_EFFECTS);
+
+	MOD_OPT_DECL(GLOBAL_CITY_SCALES);
+	MOD_OPT_DECL(EVENTS_CITY_SCALES);
+	
 
 protected:
 	bool m_bInit;

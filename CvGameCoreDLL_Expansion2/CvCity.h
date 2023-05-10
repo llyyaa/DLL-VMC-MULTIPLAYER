@@ -1037,6 +1037,12 @@ public:
 	//void ChangeYieldFromOtherYield(const YieldTypes eInType, const YieldTypes eOutType, const YieldFromYield eConvertType, const int iChange);
 #endif
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes GetScale() const { return m_eCityScale; }
+	CvCityScaleEntry* GetScaleInfo() const { return GC.getCityScaleInfo(m_eCityScale); }
+	void SetScale(CvCityScaleEntry* eNewScale);
+#endif
+
 	int iScratch; // know the scope of your validity
 
 protected:
@@ -1231,6 +1237,10 @@ protected:
 	int** m_ppaaiImprovementYieldChange;
 	int** m_ppiSpecialistYieldChange;
 
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes m_eCityScale = NO_CITY_SCALE;
 #endif
 
 	CvCityBuildings* m_pCityBuildings;

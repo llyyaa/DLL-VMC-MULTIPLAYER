@@ -900,6 +900,7 @@ public:
 	bool isBlitz() const;
 	void changeBlitzCount(int iChange);
 
+	void DoAdjacentPlotDamage(CvPlot* pWhere, int iValue);
 
 #if defined(MOD_ROG_CORE)
 	int getMeleeDefenseModifier() const;
@@ -908,8 +909,6 @@ public:
 	int attackFullyHealedModifier() const;
 	int attackAbove50HealthModifier() const;
 	int attackBelow50HealthModifier() const;
-
-	//int DoAdjacentPlotDamage(CvPlot* pWhere, int iValue, const char* chTextKey = NULL);
 
 	int getForcedDamageValue();
 	void ChangeForcedDamageValue(int iChange);
@@ -1577,8 +1576,25 @@ public:
 
 	void ChangeRangedSupportFireMod(int iValue);
 	int GetRangedSupportFireMod() const;
+
+
+	int GetDamageAoEFortified() const;
+	void ChangeDamageAoEFortified(int iChange);
+
+	int GetWorkRateMod() const;
+	void ChangeWorkRateMod(int iChange);
+
+	int getAOEDamageOnKill() const;
+	void changeAOEDamageOnKill(int iChange);
+
+	int GetBarbarianCombatBonus() const;
+	void ChangeBarbarianCombatBonus(int iValue);
 #endif
 
+	int GetCaptureDefeatedEnemyChance() const;
+	void ChangeCaptureDefeatedEnemyChance(int iValue);
+	void ChangeCannotBeCapturedCount(int iChange);
+	bool GetCannotBeCaptured();
 
 
 #if defined(MOD_ROG_CORE)
@@ -2058,7 +2074,16 @@ protected:
 	int m_iMoveUsedAttackMod;
 	int m_iGoldenAgeMod;
 	int m_iRangedSupportFireMod;
+
+	int m_iBarbCombatBonus;
+	int m_iDamageAoEFortified;
+	int m_iWorkRateMod;
+	int m_iAOEDamageOnKill;
 #endif
+
+	int m_iCannotBeCapturedCount;
+	int m_iCaptureDefeatedEnemyChance;
+
 
 #ifdef MOD_PROMOTION_SPLASH_DAMAGE
 	std::vector<SplashInfo> m_asSplashInfoVec = {};
