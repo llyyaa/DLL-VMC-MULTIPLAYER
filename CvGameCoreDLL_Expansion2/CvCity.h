@@ -1040,7 +1040,8 @@ public:
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes GetScale() const { return m_eCityScale; }
 	CvCityScaleEntry* GetScaleInfo() const { return GC.getCityScaleInfo(m_eCityScale); }
-	void SetScale(CvCityScaleEntry* eNewScale);
+	void SetScale(CityScaleTypes eScale);
+	void UpdateScaleBuildings();
 #endif
 
 	int iScratch; // know the scope of your validity

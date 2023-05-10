@@ -7,5 +7,8 @@ create table CityScales (
 create table CityScale_FreeBuildingClass (
     CityScaleType text not null references CityScales(Type),
     BuildingClassType text not null references BuildingClasses(Type),
-    NumBuildings integer not null default 1
+    NumBuildings integer not null default 1,
+
+    RequiredTraitType text null,
+    RequiredPolicyType text null
 );

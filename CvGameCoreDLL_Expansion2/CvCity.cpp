@@ -818,6 +818,11 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 	}
 #endif
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+	if (MOD_GLOBAL_CITY_SCALES)
+		UpdateScaleBuildings();
+#endif
+
 	AI_init();
 
 	if (GC.getGame().getGameTurn() == 0)
@@ -1363,6 +1368,10 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		//	}
 		//}
 	}
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+	m_eCityScale = NO_CITY_SCALE;
 #endif
 }
 
@@ -8375,7 +8384,7 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 		if (MOD_GLOBAL_CITY_SCALES)
 		{
 			CvCityScaleEntry* pNewScaleInfo = GC.getCityScaleInfoByPopulation(getPopulation());
-			SetScale(pNewScaleInfo);
+			SetScale(pNewScaleInfo? (CityScaleTypes)pNewScaleInfo->GetID() : NO_CITY_SCALE);
 		}
 #endif
 
@@ -19204,56 +19213,83 @@ bool CvCity::HasYieldFromOtherYield() const
 #endif
 
 #ifdef MOD_GLOBAL_CITY_SCALES
-void CvCity::SetScale(CvCityScaleEntry* pNewScale)
+void CvCity::SetScale(CityScaleTypes eNewScale)
 {
 	if (!MOD_GLOBAL_CITY_SCALES) return;
-
 	CityScaleTypes eOldScale = GetScale();
-	CityScaleTypes eNewScale = pNewScale ? static_cast<CityScaleTypes>(pNewScale->GetID()) : NO_CITY_SCALE;
 
 	if (eOldScale == eNewScale)
 	{
 		return;
 	}
 
-	CvCityScaleEntry* pOldScale = GC.getCityScaleInfo(eOldScale);
-	CvPlayerAI& pkOwner = GET_PLAYER(getOwner());
-	std::tr1::unordered_map<BuildingClassTypes, int> buildingClassNumChange;
-	if (pOldScale != nullptr)
-	{
-		// recycle free buildings
-		auto& vFreeBuildingInfoVec = pOldScale->GetFreeBuildingClassInfo();
-		for (auto& sFreeBuildingInfo : vFreeBuildingInfoVec)
-		{
-			BuildingClassTypes eBuildingClass = sFreeBuildingInfo.m_eBuildingClass;
-			buildingClassNumChange[eBuildingClass] -= sFreeBuildingInfo.m_iNum;
-		}
-	}
-	if (pNewScale != nullptr)
-	{
-		// add free buildings
-		auto& vFreeBuildingInfoVec = pNewScale->GetFreeBuildingClassInfo();
-		for (auto& sFreeBuildingInfo : vFreeBuildingInfoVec)
-		{
-			BuildingClassTypes eBuildingClass = sFreeBuildingInfo.m_eBuildingClass;
-			buildingClassNumChange[eBuildingClass] += sFreeBuildingInfo.m_iNum;
-		}
-	}
-
-	for (auto iter = buildingClassNumChange.begin(); iter != buildingClassNumChange.end(); iter++)
-	{
-		if (iter->second == 0) continue;
-
-		BuildingTypes eBuilding = pkOwner.GetCivBuilding(iter->first);
-		int iCurrentBuildingNum = GetCityBuildings()->GetNumRealBuilding(eBuilding);
-		GetCityBuildings()->SetNumRealBuilding(eBuilding, iCurrentBuildingNum + iter->second);
-	}
-
 	m_eCityScale = eNewScale;
+	UpdateScaleBuildings();
 
 #ifdef MOD_EVENTS_CITY_SCALES
 	if (MOD_EVENTS_CITY_SCALES)
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_OnCityScaleChange, getOwner(), GetID(), eOldScale, eNewScale);
 #endif
 }
+
+void CvCity::UpdateScaleBuildings()
+{
+	CityScaleTypes eScale = GetScale();
+	CvCityScaleEntry *pNewScale = GC.getCityScaleInfo(eScale);
+	auto &pAllScales = GC.getCityScaleInfo();
+	CvPlayerAI &pkOwner = GET_PLAYER(getOwner());
+	std::tr1::unordered_map<BuildingClassTypes, int> buildingClassNum;
+
+	// clear all scale buildings
+	for (auto *pScale : pAllScales)
+	{
+		if (pScale == nullptr)
+			continue;
+
+		for (auto& vFreeBuildings : pScale->GetFreeBuildingClassInfo())
+		{
+			buildingClassNum[vFreeBuildings.m_eBuildingClass] = 0;
+		}
+
+		for (auto& vFreeBuildings : pScale->GetFreeBuildingClassInfoFromPolicies())
+		{
+			buildingClassNum[vFreeBuildings.m_eBuildingClass] = 0;
+		}
+
+		for (auto& vFreeBuildings : pScale->GetFreeBuildingClassInfoFromTraits())
+		{
+			buildingClassNum[vFreeBuildings.m_eBuildingClass] = 0;
+		}
+	}
+
+	// add new scale buildings
+	if (pNewScale)
+	{
+		for (auto& vFreeBuildings : pNewScale->GetFreeBuildingClassInfo())
+		{
+			buildingClassNum[vFreeBuildings.m_eBuildingClass] += vFreeBuildings.m_iNum;
+		}
+		for (auto& vFreeBuildings : pNewScale->GetFreeBuildingClassInfoFromPolicies())
+		{
+			if (pkOwner.HasPolicy(vFreeBuildings.m_eRequiredPolicy) && !pkOwner.GetPlayerPolicies()->IsPolicyBlocked(vFreeBuildings.m_eRequiredPolicy))
+			{
+				buildingClassNum[vFreeBuildings.m_eBuildingClass] += vFreeBuildings.m_iNum;
+			}
+		}
+		for (auto& vFreeBuildings : pNewScale->GetFreeBuildingClassInfoFromTraits())
+		{
+			if (pkOwner.isMajorCiv() && pkOwner.GetPlayerTraits()->HasTrait(vFreeBuildings.m_eRequiredTrait))
+			{
+				buildingClassNum[vFreeBuildings.m_eBuildingClass] += vFreeBuildings.m_iNum;
+			}
+		}
+	}
+
+	for (auto iter = buildingClassNum.begin(); iter != buildingClassNum.end(); iter++)
+	{
+		BuildingTypes eBuilding = pkOwner.GetCivBuilding(iter->first);
+		GetCityBuildings()->SetNumRealBuilding(eBuilding, iter->second);
+	}
+}
+
 #endif
