@@ -2238,6 +2238,14 @@ void CvGlobals::init()
 	m_pCityScales = FNEW(CvCityScaleXMLEntries, c_eCiv5GameplayDLL, 0);
 #endif
 
+#ifdef MOD_PROMOTION_COLLECTIONS
+	m_pPromotionCollections = FNEW(CvPromotionCollectionEntries, c_eCiv5GameplayDLL, 0);
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	m_pBuildingClassCollections = FNEW(CvBuildingClassCollectionsXMLEntries, c_eCiv5GameplayDLL, 0);
+#endif
+
 	auto_ptr<ICvDLLDatabaseUtility1> pkLoader(getDatabaseLoadUtility());
 
 	Database::Connection* pDB = GetGameDatabase();
@@ -2332,6 +2340,14 @@ void CvGlobals::uninit()
 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	SAFE_DELETE(m_pCityScales);
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+	SAFE_DELETE(m_pPromotionCollections);
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	SAFE_DELETE(m_pBuildingClassCollections);
 #endif
 
 	// already deleted outside of the dll, set to null for safety
@@ -3288,6 +3304,34 @@ CvCityScaleEntry* CvGlobals::getCityScaleInfoByPopulation(int iPopulation) const
 
 	return nullptr;
 }
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+std::vector<CvPromotionCollectionEntry*>& CvGlobals::GetPromotionCollections() { return m_pPromotionCollections->GetEntries();}
+CvPromotionCollectionEntry* CvGlobals::GetPromotionCollection(PromotionCollectionsTypes ePromotionCollection) { return m_pPromotionCollections->GetEntry(ePromotionCollection); }
+int CvGlobals::GetNumPromotionCollections() { return m_pPromotionCollections->GetNumEntries(); }
+std::tr1::unordered_map<PromotionTypes, std::tr1::unordered_set<PromotionCollectionsTypes> >& CvGlobals::GetPromotion2CollectionsMapping() { return m_mPromotion2CollectionsMapping; }
+
+void CvGlobals::InitPromotion2CollectionMapping()
+{
+	auto& vPromotionCollections = GetPromotionCollections();
+	for (auto* pPromotionCollection : vPromotionCollections)
+	{
+		if (pPromotionCollection == nullptr) continue;
+
+		auto& vPromotions = pPromotionCollection->GetPromotions();
+		for (auto& sPromotion : vPromotions)
+		{
+			m_mPromotion2CollectionsMapping[sPromotion.m_ePromotionType].insert((PromotionCollectionsTypes)pPromotionCollection->GetID());
+		}
+	}
+}
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+std::vector<CvBuildingClassCollectionsEntry*>& CvGlobals::GetBuildingClassCollections() { return m_pBuildingClassCollections->GetEntries(); }
+CvBuildingClassCollectionsEntry* CvGlobals::GetBuildingClassCollection(BuildingClassCollectionsTypes eBuildingClassCollection) { return m_pBuildingClassCollections->GetEntry((int)eBuildingClassCollection); }
+int CvGlobals::GetNumBuildingClassCollections() {return m_pBuildingClassCollections->GetNumEntries(); }
 #endif
 
 int CvGlobals::getNumBuildInfos()

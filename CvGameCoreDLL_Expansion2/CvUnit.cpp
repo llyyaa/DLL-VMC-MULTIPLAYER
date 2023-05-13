@@ -2325,6 +2325,47 @@ void CvUnit::doTurn()
 	}
 #endif
 
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	if (MOD_GLOBAL_PROMOTIONS_REMOVAL)
+	{
+		std::vector<PromotionTypes> vPromotionsToRemove;
+		for (auto iter = m_mapAutoRemovePromotions.begin(); iter != m_mapAutoRemovePromotions.end(); iter++)
+		{
+			bool bDoRemove = false;
+
+			if (iter->second.m_iTurnToRemove >= 0 && GC.getGame().getGameTurn() >= iter->second.m_iTurnToRemove)
+			{
+				bDoRemove = true;
+				goto CHECK_AND_REMOVE;
+			}
+			if (iter->second.m_bRemoveAfterFullyHeal && getDamage() <= 0)
+			{
+				bDoRemove = true;
+				goto CHECK_AND_REMOVE;
+			}
+			if (iter->second.m_bRemoveLuaCheck)
+			{
+				if (GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CanRemovePromotion, (int)iter->first, getOwner(), GetID()) == GAMEEVENTRETURN_TRUE)
+				{
+					bDoRemove = true;
+					goto CHECK_AND_REMOVE;
+				}
+			}
+
+		CHECK_AND_REMOVE:
+			if (!bDoRemove) continue;
+
+			vPromotionsToRemove.push_back(iter->first);
+		}
+
+		for (auto promotion : vPromotionsToRemove)
+		{
+			setHasPromotion(promotion, false);
+		}
+	}
+
+#endif
+
 	// Only increase our Fortification level if we've actually been told to Fortify
 	if(IsFortifiedThisTurn())
 	{
@@ -23466,6 +23507,71 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCollateralXP(thisPromotion.GetCollateralXP() * iChange);
 #endif
 
+#ifdef MOD_PROMOTION_COLLECTIONS
+		auto promotionCollectionIter = GC.GetPromotion2CollectionsMapping().find((PromotionTypes)thisPromotion.GetID());
+		if (promotionCollectionIter != GC.GetPromotion2CollectionsMapping().end())
+		{
+			auto& newSet = promotionCollectionIter->second;
+			for (auto elem : newSet)
+			{
+				m_sPromotionCollections[elem] += iChange;
+				if (m_sPromotionCollections[elem] == 0)
+				{
+					m_sPromotionCollections.erase(elem);
+				}
+			}
+		}
+#endif
+
+#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
+		ChangeAddEnermyPromotionImmuneRC(thisPromotion.GetAddEnermyPromotionImmune() ? iChange : 0);
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+		if (thisPromotion.CanAutoRemove())
+		{
+			if (iChange == 1)
+			{
+				int iTurnToRemove = thisPromotion.GetRemoveAfterXTurns() > 0 ? GC.getGame().getGameTurn() + thisPromotion.GetRemoveAfterXTurns() : -1;
+				AutoRemoveInfo info(thisPromotion, iTurnToRemove);
+				m_mapAutoRemovePromotions[info.m_ePromotion] = info;
+			}
+			else if (iChange == -1)
+			{
+				m_mapAutoRemovePromotions.erase((PromotionTypes)thisPromotion.GetID());
+			}
+		}
+
+		if (thisPromotion.GetCanActionClear())
+		{
+			if (iChange == 1)
+			{
+				m_sPromotionsThatCanBeActionCleared.insert((PromotionTypes)thisPromotion.GetID());
+			}
+			else if (iChange == -1)
+			{
+				m_sPromotionsThatCanBeActionCleared.erase((PromotionTypes)thisPromotion.GetID());
+			}
+		}
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+		if (thisPromotion.CanDestroyBuildings())
+		{
+			if (iChange == 1)
+			{
+				m_mapDestroyBuildings[PromotionTypes(thisPromotion.GetID())] = {thisPromotion};
+			}
+			else if (iChange == -1)
+			{
+				m_mapDestroyBuildings.erase(PromotionTypes(thisPromotion.GetID()));
+			}
+		}
+
+		ChangeSiegeKillCitizensFixed(thisPromotion.GetSiegeKillCitizensFixed() * iChange);
+		ChangeSiegeKillCitizensPercent(thisPromotion.GetSiegeKillCitizensPercent() * iChange);
+#endif
+
 #if !defined(NO_ACHIEVEMENTS)
 		PromotionTypes eBuffaloChest =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_CHEST", true /*bHideAssert*/);
 		PromotionTypes eBuffaloLoins =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_LOINS", true /*bHideAssert*/);
@@ -23882,6 +23988,65 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCollateralXP;
 #endif
 
+#ifdef MOD_PROMOTION_COLLECTIONS
+	int iPromotionCollectionsLen = 0;
+	kStream >> iPromotionCollectionsLen;
+	m_sPromotionCollections.clear();
+	for (int i = 0; i < iPromotionCollectionsLen; i++)
+	{
+		int iPromotionCollection = 0;
+		int iRC = 0;
+		kStream >> iPromotionCollection;
+		kStream >> iRC;
+		m_sPromotionCollections[(PromotionCollectionsTypes)iPromotionCollection] = iRC;
+	}
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int iCityDestroyerLen = 0;
+	kStream >> iCityDestroyerLen;
+	m_mapDestroyBuildings.clear();
+	for (int i = 0; i < iCityDestroyerLen; i++)
+	{
+		int iPromotion = 0;
+		DestroyBuildingsInfo info;
+		kStream >> iPromotion;
+		kStream >> info;
+		m_mapDestroyBuildings[(PromotionTypes)iPromotion] = info;
+	}
+
+	kStream >> m_iSiegeKillCitizensPercent;
+	kStream >> m_iSiegeKillCitizensFixed;
+#endif
+
+#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
+	kStream >> m_iAddEnermyPromotionImmuneRC;
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	int iAutoRemovePromotionsLen = 0;
+	kStream >> iAutoRemovePromotionsLen;
+	m_mapAutoRemovePromotions.clear();
+	for (int i = 0; i < iAutoRemovePromotionsLen; i++)
+	{
+		int iAutoRemovePromotion = 0;
+		AutoRemoveInfo info;
+		kStream >> iAutoRemovePromotion;
+		kStream >> info;
+		m_mapAutoRemovePromotions[(PromotionTypes)iAutoRemovePromotion] = info;
+	}
+
+	int iActionClearPromotionLen = 0;
+	kStream >> iActionClearPromotionLen;
+	m_sPromotionsThatCanBeActionCleared.clear();
+	for (int i = 0; i < iActionClearPromotionLen; i++)
+	{
+		int iActionClearPromotion = 0;
+		kStream >> iActionClearPromotion;
+		m_sPromotionsThatCanBeActionCleared.insert((PromotionTypes)iActionClearPromotion);
+	}
+#endif
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -24071,6 +24236,46 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iCollateralImmuneRC;
 	kStream << m_iCollateralXP;
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+	kStream << m_sPromotionCollections.size();
+	for (auto iter = m_sPromotionCollections.begin(); iter != m_sPromotionCollections.end(); iter++)
+	{
+		kStream << (int) iter->first;
+		kStream << (int) iter->second;
+	}
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	kStream << m_mapDestroyBuildings.size();
+	for (auto iter = m_mapDestroyBuildings.begin(); iter != m_mapDestroyBuildings.end(); iter++)
+	{
+		kStream << (int) iter->first;
+		kStream << iter->second;
+	}
+
+	kStream << m_iSiegeKillCitizensPercent;
+	kStream << m_iSiegeKillCitizensFixed;
+#endif
+
+#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
+	kStream << m_iAddEnermyPromotionImmuneRC;
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	kStream << m_mapAutoRemovePromotions.size();
+	for (auto iter = m_mapAutoRemovePromotions.begin(); iter != m_mapAutoRemovePromotions.end(); iter++)
+	{
+		kStream << (int) iter->first;
+		kStream << iter->second;
+	}
+
+	kStream << m_sPromotionsThatCanBeActionCleared.size();
+	for (auto iter = m_sPromotionsThatCanBeActionCleared.begin(); iter != m_sPromotionsThatCanBeActionCleared.end(); iter++)
+	{
+		kStream << (int) *iter;
+	}
 #endif
 
 	//  Write mission list
@@ -28299,4 +28504,65 @@ void CvUnit::ChangeCollateralXP(int iChange) {
 void CvUnit::SetCollateralXP(int iValue) {
 	this->m_iCollateralXP = iValue;
 }
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+std::tr1::unordered_map<PromotionCollectionsTypes, int>& CvUnit::GetPromotionCollections()
+{
+	return m_sPromotionCollections;
+}
+#endif
+
+#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
+int CvUnit::GetAddEnermyPromotionImmuneRC() const
+{
+	return m_iAddEnermyPromotionImmuneRC;
+}
+void CvUnit::ChangeAddEnermyPromotionImmuneRC(int iChange)
+{
+	m_iAddEnermyPromotionImmuneRC += iChange;
+}
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+void CvUnit::ClearSamePlotPromotions()
+{
+	if (plot())
+		plot()->ClearUnitPromotions();
+}
+
+std::tr1::unordered_set<PromotionTypes>& CvUnit::GetPromotionsThatCanBeActionCleared()
+{
+	return m_sPromotionsThatCanBeActionCleared;
+}
+
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+std::tr1::unordered_map<PromotionTypes, DestroyBuildingsInfo>& CvUnit::GetDestroyBuildings()
+{
+	return m_mapDestroyBuildings;
+}
+
+int CvUnit::GetSiegeKillCitizensPercent() const
+{
+	return m_iSiegeKillCitizensPercent;
+}
+int CvUnit::GetSiegeKillCitizensFixed() const
+{
+	return m_iSiegeKillCitizensFixed;
+}
+void CvUnit::ChangeSiegeKillCitizensPercent(int iChange)
+{
+	m_iSiegeKillCitizensPercent += iChange;
+}
+void CvUnit::ChangeSiegeKillCitizensFixed(int iChange)
+{
+	m_iSiegeKillCitizensFixed += iChange;
+}
+bool CvUnit::CanSiegeKillCitizens() const
+{
+	return (m_iSiegeKillCitizensPercent > 0 || m_iSiegeKillCitizensFixed > 0);
+}
+
 #endif

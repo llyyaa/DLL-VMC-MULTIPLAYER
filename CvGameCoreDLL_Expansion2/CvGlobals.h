@@ -155,6 +155,12 @@ class ICvUnit1;
 #include "CvCityScaleClasses.h"
 #endif
 
+#ifdef MOD_PROMOTION_COLLECTIONS
+#include "CvPromotionCollectionClasses.h"
+#endif
+
+#include "CvBuildingClassCollectionsClasses.h"
+
 class CvGlobals
 {
 public:
@@ -414,6 +420,20 @@ public:
 
 	void sortAndUpdateOrderedCityScale(const std::vector<CvCityScaleEntry*>&);
 	CvCityScaleEntry* getCityScaleInfoByPopulation(int iPopulation) const;
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+	std::vector<CvPromotionCollectionEntry*>& GetPromotionCollections();
+	CvPromotionCollectionEntry* GetPromotionCollection(PromotionCollectionsTypes ePromotionCollection);
+	int GetNumPromotionCollections();
+	void InitPromotion2CollectionMapping();
+	std::tr1::unordered_map<PromotionTypes, std::tr1::unordered_set<PromotionCollectionsTypes> >& GetPromotion2CollectionsMapping();
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	std::vector<CvBuildingClassCollectionsEntry*>& GetBuildingClassCollections();
+	CvBuildingClassCollectionsEntry* GetBuildingClassCollection(BuildingClassCollectionsTypes eBuildingClassCollection);
+	int GetNumBuildingClassCollections();
 #endif
 
 	int getNumBuildInfos();
@@ -7801,6 +7821,15 @@ protected:
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CvCityScaleXMLEntries* m_pCityScales;
 	std::vector<CvCityScaleEntry*> m_vOrderedCityScales; // order by min population
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+	CvPromotionCollectionEntries* m_pPromotionCollections;
+	std::tr1::unordered_map<PromotionTypes, std::tr1::unordered_set<PromotionCollectionsTypes> > m_mPromotion2CollectionsMapping;
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	CvBuildingClassCollectionsXMLEntries* m_pBuildingClassCollections;
 #endif
 
 	//////////////////////////////////////////////////////////////////////////

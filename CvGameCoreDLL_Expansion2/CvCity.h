@@ -1044,6 +1044,11 @@ public:
 	void UpdateScaleBuildings();
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int GetSiegeKillCitizensModifier() const;
+	void ChangeSiegeKillCitizensModifier(int iChange);
+#endif
+
 	int iScratch; // know the scope of your validity
 
 protected:
@@ -1242,6 +1247,10 @@ protected:
 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eCityScale = NO_CITY_SCALE;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int m_iSiegeKillCitizensModifier = 0;
 #endif
 
 	CvCityBuildings* m_pCityBuildings;
