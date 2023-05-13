@@ -6812,6 +6812,13 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			changeFreePromotionCount(((PromotionTypes)(pBuildingInfo->GetTrainedFreePromotion())), iChange);
 		}
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0))
+		{
+			GET_PLAYER(getOwner());
+		}
+#endif
+
 		changeGreatPeopleRateModifier(pBuildingInfo->GetGreatPeopleRateModifier() * iChange);
 		changeFreeExperience(pBuildingInfo->GetFreeExperience() * iChange);
 		ChangeMaxAirUnits(pBuildingInfo->GetAirModifier() * iChange);

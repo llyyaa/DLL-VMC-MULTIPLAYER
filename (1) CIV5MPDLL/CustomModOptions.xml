@@ -1051,6 +1051,10 @@
     <!-- INSERT INTO Defines(Name, Value) VALUES('GOLDEN_AGE_POINT_MULTIPLE_IN_GA', 2); -->
     <Row Class="6" Name="GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA" Value="0"/>
 
+    <!-- table changes: -->
+    <!-- see Building_InstantYield.xml -->
+    <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
+
     <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
     <Row Class="6" Name="PROMOTION_COLLATERAL_DAMAGE" Value="0"/>
