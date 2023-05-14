@@ -1064,13 +1064,16 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 			CvAssert(iOtherPromotionType > -1 && iOtherPromotionType < GC.getNumPromotionInfos());
 
 			const int iModifier = pResults->GetInt("Modifier");
-			m_pPromotionModifiers[iOtherPromotionType] += iModifier;
+			if (iModifier != 0)
+				m_pPromotionModifiers[iOtherPromotionType] += iModifier;
 
 			const int iAttack = pResults->GetInt("Attack");
-			m_pPromotionAttackModifiers[iOtherPromotionType] += iAttack;
+			if (iAttack != 0)
+				m_pPromotionAttackModifiers[iOtherPromotionType] += iAttack;
 
 			const int iDefense = pResults->GetInt("Defense");
-			m_pPromotionDefenseModifiers[iOtherPromotionType] += iDefense;
+			if (iDefense != 0)
+				m_pPromotionDefenseModifiers[iOtherPromotionType] += iDefense;
 		}
 
 		pResults->Reset();
@@ -2690,6 +2693,22 @@ int CvPromotionEntry::GetOtherPromotionDefenseModifier(PromotionTypes other) con
 
 	return iterator->second;
 }
+bool CvPromotionEntry::HasOtherPromotionModifier() const
+{
+	return !m_pPromotionModifiers.empty() || !m_pPromotionAttackModifiers.empty() || !m_pPromotionDefenseModifiers.empty();
+}
+std::tr1::unordered_map<PromotionTypes, int>& CvPromotionEntry::GetOtherPromotionModifierMap()
+{
+	return m_pPromotionModifiers;
+}
+std::tr1::unordered_map<PromotionTypes, int>& CvPromotionEntry::GetOtherPromotionAttackModifierMap()
+{
+	return m_pPromotionAttackModifiers;
+}
+std::tr1::unordered_map<PromotionTypes, int>& CvPromotionEntry::GetOtherPromotionDefenseModifierMap()
+{
+	return m_pPromotionDefenseModifiers;
+}
 #endif
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
@@ -2894,6 +2913,33 @@ void CvUnitPromotions::Reset()
 	m_kHasPromotion.SetSize(0);
 }
 
+#ifdef MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS
+inline FDataStream& operator<<(FDataStream& os, const std::tr1::unordered_map<PromotionTypes, int>& promotionIntMap)
+{
+	os << promotionIntMap.size();
+	for (auto iter = promotionIntMap.begin(); iter != promotionIntMap.end(); ++iter)
+	{
+		os << (int)iter->first;
+		os << iter->second;
+	}
+	return os;
+}
+inline FDataStream& operator>>(FDataStream& is, std::tr1::unordered_map<PromotionTypes, int>& promotionIntMap)
+{
+	int iSize;
+	is >> iSize;
+	for (int i = 0; i < iSize; i++)
+	{
+		PromotionTypes ePromotion;
+		int iValue;
+		is >> (int&)ePromotion;
+		is >> iValue;
+		promotionIntMap[ePromotion] = iValue;
+	}
+	return is;
+}
+#endif
+
 /// Serialization read
 void CvUnitPromotions::Read(FDataStream& kStream)
 {
@@ -2908,6 +2954,12 @@ void CvUnitPromotions::Read(FDataStream& kStream)
 	int iNumPromotions;
 	kStream >> iNumPromotions;
 	CvAssertMsg(m_pPromotions != NULL && m_pPromotions->GetNumPromotions() > 0, "Number of promotions to serialize is expected to greater than 0");
+
+#ifdef MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS
+	kStream >> m_pPromotionModifiers;
+	kStream >> m_pPromotionAttackModifiers;
+	kStream >> m_pPromotionDefenseModifiers;
+#endif
 
 	PromotionArrayHelpers::Read(kStream, m_kHasPromotion);
 }
@@ -2924,6 +2976,12 @@ void CvUnitPromotions::Write(FDataStream& kStream) const
 	int iNumPromotions = m_pPromotions->GetNumPromotions();
 	kStream << iNumPromotions;
 	CvAssertMsg(iNumPromotions > 0, "Number of promotions to serialize is expected to greater than 0");
+
+#ifdef MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS
+	kStream << m_pPromotionModifiers;
+	kStream << m_pPromotionAttackModifiers;
+	kStream << m_pPromotionDefenseModifiers;
+#endif
 
 	PromotionArrayHelpers::Write(kStream, m_kHasPromotion, iNumPromotions);
 }
@@ -2948,6 +3006,20 @@ bool CvUnitPromotions::HasPromotion(PromotionTypes eIndex) const
 	return false;
 }
 
+static void UpdatePromotionToPromotionModifierMap(std::tr1::unordered_map<PromotionTypes, int>& dest, std::tr1::unordered_map<PromotionTypes, int>& src, int iChange)
+{
+	for (auto iter = src.begin(); iter != src.end(); iter++)
+	{
+		PromotionTypes eOtherPromotion = (PromotionTypes)iter->first;
+		int iModifier = iter->second;
+		dest[eOtherPromotion] += iModifier * iChange;
+		if (dest[eOtherPromotion] == 0)
+		{
+			dest.erase(eOtherPromotion);
+		}
+	}
+}
+
 /// Sets the promotion to a certain value
 void CvUnitPromotions::SetPromotion(PromotionTypes eIndex, bool bValue)
 {
@@ -2957,6 +3029,19 @@ void CvUnitPromotions::SetPromotion(PromotionTypes eIndex, bool bValue)
 	if(eIndex >= 0 && eIndex < GC.getNumPromotionInfos())
 	{
 		m_kHasPromotion.SetBit(eIndex, bValue);
+
+#ifdef MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS
+		CvPromotionEntry* thisPromotion = GC.getPromotionInfo(eIndex);
+		if (MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS && thisPromotion->HasOtherPromotionModifier())
+		{
+			if (!thisPromotion->GetOtherPromotionModifierMap().empty())
+				UpdatePromotionToPromotionModifierMap(m_pPromotionModifiers, thisPromotion->GetOtherPromotionModifierMap(), bValue ? 1 : -1);
+			if (!thisPromotion->GetOtherPromotionAttackModifierMap().empty())
+				UpdatePromotionToPromotionModifierMap(m_pPromotionAttackModifiers, thisPromotion->GetOtherPromotionAttackModifierMap(), bValue ? 1 : -1);
+			if (!thisPromotion->GetOtherPromotionDefenseModifierMap().empty())
+				UpdatePromotionToPromotionModifierMap(m_pPromotionDefenseModifiers, thisPromotion->GetOtherPromotionDefenseModifierMap(), bValue ? 1 : -1);
+		}
+#endif
 	}
 }
 
@@ -3120,53 +3205,29 @@ PromotionTypes CvUnitPromotions::ChangePromotionAfterCombat(PromotionTypes eInde
 }
 
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-int CvUnitPromotions::GetOtherPromotionModifier(PromotionTypes other) const
+int CvUnitPromotions::GetOtherPromotionModifier(PromotionTypes other)
 {
-	int iSum = 0;
-	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
-	{
-		PromotionTypes thisPromotionType = (PromotionTypes)iLoop;
-		CvPromotionEntry* thisPromotion = GC.getPromotionInfo(thisPromotionType);
-		if (thisPromotion == nullptr || !HasPromotion(thisPromotionType))
-		{
-			continue;
-		}
-
-		iSum += thisPromotion->GetOtherPromotionModifier(other);
-	}
-	return iSum;
+	return m_pPromotionModifiers[other];
 }
-int CvUnitPromotions::GetOtherPromotionAttackModifier(PromotionTypes other) const
+int CvUnitPromotions::GetOtherPromotionAttackModifier(PromotionTypes other)
 {
-	int iSum = 0;
-	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
-	{
-		PromotionTypes thisPromotionType = (PromotionTypes)iLoop;
-		CvPromotionEntry* thisPromotion = GC.getPromotionInfo(thisPromotionType);
-		if (thisPromotion == nullptr || !HasPromotion(thisPromotionType))
-		{
-			continue;
-		}
-
-		iSum += thisPromotion->GetOtherPromotionAttackModifier(other);
-	}
-	return iSum;
+	return m_pPromotionAttackModifiers[other];
 }
-int CvUnitPromotions::GetOtherPromotionDefenseModifier(PromotionTypes other) const
+int CvUnitPromotions::GetOtherPromotionDefenseModifier(PromotionTypes other)
 {
-	int iSum = 0;
-	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
-	{
-		PromotionTypes thisPromotionType = (PromotionTypes)iLoop;
-		CvPromotionEntry* thisPromotion = GC.getPromotionInfo(thisPromotionType);
-		if (thisPromotion == nullptr || !HasPromotion(thisPromotionType))
-		{
-			continue;
-		}
-
-		iSum += thisPromotion->GetOtherPromotionDefenseModifier(other);
-	}
-	return iSum;
+	return m_pPromotionDefenseModifiers[other];
+}
+std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionModifierMap()
+{
+	return m_pPromotionModifiers;
+}
+std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionAttackModifierMap()
+{
+	return m_pPromotionAttackModifiers;
+}
+std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionDefenseModifierMap()
+{
+	return m_pPromotionDefenseModifiers;
 }
 #endif
 
