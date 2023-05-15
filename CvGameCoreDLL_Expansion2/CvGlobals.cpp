@@ -2242,6 +2242,10 @@ void CvGlobals::init()
 	m_pPromotionCollections = FNEW(CvPromotionCollectionEntries, c_eCiv5GameplayDLL, 0);
 #endif
 
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	m_pBuildingClassCollections = FNEW(CvBuildingClassCollectionsXMLEntries, c_eCiv5GameplayDLL, 0);
+#endif
+
 	auto_ptr<ICvDLLDatabaseUtility1> pkLoader(getDatabaseLoadUtility());
 
 	Database::Connection* pDB = GetGameDatabase();
@@ -2340,6 +2344,10 @@ void CvGlobals::uninit()
 
 #ifdef MOD_PROMOTION_COLLECTIONS
 	SAFE_DELETE(m_pPromotionCollections);
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	SAFE_DELETE(m_pBuildingClassCollections);
 #endif
 
 	// already deleted outside of the dll, set to null for safety
@@ -3318,7 +3326,12 @@ void CvGlobals::InitPromotion2CollectionMapping()
 		}
 	}
 }
+#endif
 
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+std::vector<CvBuildingClassCollectionsEntry*>& CvGlobals::GetBuildingClassCollections() { return m_pBuildingClassCollections->GetEntries(); }
+CvBuildingClassCollectionsEntry* CvGlobals::GetBuildingClassCollection(BuildingClassCollectionsTypes eBuildingClassCollection) { return m_pBuildingClassCollections->GetEntry((int)eBuildingClassCollection); }
+int CvGlobals::GetNumBuildingClassCollections() {return m_pBuildingClassCollections->GetNumEntries(); }
 #endif
 
 int CvGlobals::getNumBuildInfos()

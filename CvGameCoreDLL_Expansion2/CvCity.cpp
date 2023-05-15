@@ -6923,6 +6923,10 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		}
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+		ChangeSiegeKillCitizensModifier(pBuildingInfo->GetSiegeKillCitizensModifier() * iChange);
+#endif
+
 		if (pBuildingInfo->AffectSpiesNow() && iChange > 0)
 		{
 			for (uint ui = 0; ui < MAX_MAJOR_CIVS; ui++)
@@ -16579,6 +16583,10 @@ void CvCity::read(FDataStream& kStream)
 	m_eCityScale = (CityScaleTypes)iCityScale;
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	kStream >> m_iSiegeKillCitizensModifier;
+#endif
+
 	if (uiVersion >= 3)
 	{
 		kStream >> m_iExtraHitPoints;
@@ -16882,6 +16890,10 @@ void CvCity::write(FDataStream& kStream) const
 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	kStream << (int) m_eCityScale;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	kStream << m_iSiegeKillCitizensModifier;
 #endif
 
 	kStream << m_iExtraHitPoints;
@@ -19395,4 +19407,15 @@ void CvCity::UpdateScaleBuildings()
 	}
 }
 
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+int CvCity::GetSiegeKillCitizensModifier() const
+{
+	return m_iSiegeKillCitizensModifier;
+}
+void CvCity::ChangeSiegeKillCitizensModifier(int iChange)
+{
+	m_iSiegeKillCitizensModifier += iChange;
+}
 #endif

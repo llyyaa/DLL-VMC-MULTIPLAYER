@@ -17328,7 +17328,7 @@ int CvUnit::otherPromotionModifier(PromotionTypes other) const
 	VALIDATE_OBJECT
 	CvAssertMsg(other < GC.getNumPromotionInfos(), "otherPromotionModifier: upper bound");
 	CvAssertMsg(other > -1, "otherPromotionModifier: lower bound");
-	return m_Promotions.GetOtherPromotionModifier(other);
+	return ((CvUnitPromotions&)m_Promotions).GetOtherPromotionModifier(other);
 }
 
 int CvUnit::otherPromotionAttackModifier(PromotionTypes other) const
@@ -17336,7 +17336,7 @@ int CvUnit::otherPromotionAttackModifier(PromotionTypes other) const
 	VALIDATE_OBJECT
 	CvAssertMsg(other < GC.getNumPromotionInfos(), "otherPromotionAttackModifier: upper bound");
 	CvAssertMsg(other > -1, "otherPromotionAttackModifier: lower bound");
-	return m_Promotions.GetOtherPromotionAttackModifier(other);
+	return ((CvUnitPromotions&)m_Promotions).GetOtherPromotionAttackModifier(other);
 }
 
 int CvUnit::otherPromotionDefenseModifier(PromotionTypes other) const
@@ -17344,7 +17344,7 @@ int CvUnit::otherPromotionDefenseModifier(PromotionTypes other) const
 	VALIDATE_OBJECT
 	CvAssertMsg(other < GC.getNumPromotionInfos(), "otherPromotionDefenseModifier: upper bound");
 	CvAssertMsg(other > -1, "otherPromotionDefenseModifier: lower bound");
-	return m_Promotions.GetOtherPromotionDefenseModifier(other);
+	return ((CvUnitPromotions&)m_Promotions).GetOtherPromotionDefenseModifier(other);
 }
 
 int CvUnit::otherPromotionModifierByUnit(const CvUnit* otherUnit) const
@@ -17355,16 +17355,14 @@ int CvUnit::otherPromotionModifierByUnit(const CvUnit* otherUnit) const
 	}
 
 	int iSum = 0;
-	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
+	auto& map = ((CvUnitPromotions&)m_Promotions).GetOtherPromotionModifierMap();
+	for (auto iter = map.begin(); iter != map.end(); iter++)
 	{
-		PromotionTypes otherPromotionType = (PromotionTypes)iLoop;
-		CvPromotionEntry* otherPromotion = GC.getPromotionInfo(otherPromotionType);
-		if (otherPromotion == nullptr || !otherUnit->isHasPromotion(otherPromotionType))
+		PromotionTypes otherPromotionType = (PromotionTypes)iter->first;
+		if (otherUnit->isHasPromotion(otherPromotionType))
 		{
-			continue;
+			iSum += iter->second;
 		}
-
-		iSum += this->otherPromotionModifier(otherPromotionType);
 	}
 	return iSum;
 }
@@ -17377,16 +17375,14 @@ int CvUnit::otherPromotionAttackModifierByUnit(const CvUnit* otherUnit) const
 	}
 
 	int iSum = 0;
-	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
+	auto& map = ((CvUnitPromotions&)m_Promotions).GetOtherPromotionAttackModifierMap();
+	for (auto iter = map.begin(); iter != map.end(); iter++)
 	{
-		PromotionTypes otherPromotionType = (PromotionTypes)iLoop;
-		CvPromotionEntry* otherPromotion = GC.getPromotionInfo(otherPromotionType);
-		if (otherPromotion == nullptr || !otherUnit->isHasPromotion(otherPromotionType))
+		PromotionTypes otherPromotionType = (PromotionTypes)iter->first;
+		if (otherUnit->isHasPromotion(otherPromotionType))
 		{
-			continue;
+			iSum += iter->second;
 		}
-
-		iSum += this->otherPromotionAttackModifier(otherPromotionType);
 	}
 	return iSum;
 }
@@ -17399,16 +17395,14 @@ int CvUnit::otherPromotionDefenseModifierByUnit(const CvUnit* otherUnit) const
 	}
 
 	int iSum = 0;
-	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
+	auto& map = ((CvUnitPromotions&)m_Promotions).GetOtherPromotionDefenseModifierMap();
+	for (auto iter = map.begin(); iter != map.end(); iter++)
 	{
-		PromotionTypes otherPromotionType = (PromotionTypes)iLoop;
-		CvPromotionEntry* otherPromotion = GC.getPromotionInfo(otherPromotionType);
-		if (otherPromotion == nullptr || !otherUnit->isHasPromotion(otherPromotionType))
+		PromotionTypes otherPromotionType = (PromotionTypes)iter->first;
+		if (otherUnit->isHasPromotion(otherPromotionType))
 		{
-			continue;
+			iSum += iter->second;
 		}
-
-		iSum += this->otherPromotionDefenseModifier(otherPromotionType);
 	}
 	return iSum;
 }
@@ -23555,6 +23549,23 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		}
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+		if (thisPromotion.CanDestroyBuildings())
+		{
+			if (iChange == 1)
+			{
+				m_mapDestroyBuildings[PromotionTypes(thisPromotion.GetID())] = {thisPromotion};
+			}
+			else if (iChange == -1)
+			{
+				m_mapDestroyBuildings.erase(PromotionTypes(thisPromotion.GetID()));
+			}
+		}
+
+		ChangeSiegeKillCitizensFixed(thisPromotion.GetSiegeKillCitizensFixed() * iChange);
+		ChangeSiegeKillCitizensPercent(thisPromotion.GetSiegeKillCitizensPercent() * iChange);
+#endif
+
 #if !defined(NO_ACHIEVEMENTS)
 		PromotionTypes eBuffaloChest =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_CHEST", true /*bHideAssert*/);
 		PromotionTypes eBuffaloLoins =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_LOINS", true /*bHideAssert*/);
@@ -23985,6 +23996,23 @@ void CvUnit::read(FDataStream& kStream)
 	}
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int iCityDestroyerLen = 0;
+	kStream >> iCityDestroyerLen;
+	m_mapDestroyBuildings.clear();
+	for (int i = 0; i < iCityDestroyerLen; i++)
+	{
+		int iPromotion = 0;
+		DestroyBuildingsInfo info;
+		kStream >> iPromotion;
+		kStream >> info;
+		m_mapDestroyBuildings[(PromotionTypes)iPromotion] = info;
+	}
+
+	kStream >> m_iSiegeKillCitizensPercent;
+	kStream >> m_iSiegeKillCitizensFixed;
+#endif
+
 #ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
 	kStream >> m_iAddEnermyPromotionImmuneRC;
 #endif
@@ -24211,6 +24239,18 @@ void CvUnit::write(FDataStream& kStream) const
 		kStream << (int) iter->first;
 		kStream << (int) iter->second;
 	}
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	kStream << m_mapDestroyBuildings.size();
+	for (auto iter = m_mapDestroyBuildings.begin(); iter != m_mapDestroyBuildings.end(); iter++)
+	{
+		kStream << (int) iter->first;
+		kStream << iter->second;
+	}
+
+	kStream << m_iSiegeKillCitizensPercent;
+	kStream << m_iSiegeKillCitizensFixed;
 #endif
 
 #ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
@@ -28488,6 +28528,35 @@ void CvUnit::ClearSamePlotPromotions()
 std::tr1::unordered_set<PromotionTypes>& CvUnit::GetPromotionsThatCanBeActionCleared()
 {
 	return m_sPromotionsThatCanBeActionCleared;
+}
+
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+std::tr1::unordered_map<PromotionTypes, DestroyBuildingsInfo>& CvUnit::GetDestroyBuildings()
+{
+	return m_mapDestroyBuildings;
+}
+
+int CvUnit::GetSiegeKillCitizensPercent() const
+{
+	return m_iSiegeKillCitizensPercent;
+}
+int CvUnit::GetSiegeKillCitizensFixed() const
+{
+	return m_iSiegeKillCitizensFixed;
+}
+void CvUnit::ChangeSiegeKillCitizensPercent(int iChange)
+{
+	m_iSiegeKillCitizensPercent += iChange;
+}
+void CvUnit::ChangeSiegeKillCitizensFixed(int iChange)
+{
+	m_iSiegeKillCitizensFixed += iChange;
+}
+bool CvUnit::CanSiegeKillCitizens() const
+{
+	return (m_iSiegeKillCitizensPercent > 0 || m_iSiegeKillCitizensFixed > 0);
 }
 
 #endif

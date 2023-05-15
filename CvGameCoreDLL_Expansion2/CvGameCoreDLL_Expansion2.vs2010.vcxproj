@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="CustomMods.cpp" />
     <ClCompile Include="CvAchievementInfo.cpp" />
+    <ClCompile Include="CvBuildingClassCollectionsClasses.cpp" />
     <ClCompile Include="CvCityManager.cpp" />
     <ClCompile Include="CvCityScaleClasses.cpp" />
     <ClCompile Include="CvEventLog.cpp" />
@@ -443,6 +444,7 @@
     <ClInclude Include="CvBeliefClasses.h" />
     <ClInclude Include="CvBitfield.h" />
     <ClInclude Include="CvBuilderTaskingAI.h" />
+    <ClInclude Include="CvBuildingClassCollectionsClasses.h" />
     <ClInclude Include="CvBuildingClasses.h" />
     <ClInclude Include="CvBuildingProductionAI.h" />
     <ClInclude Include="CvCity.h" />

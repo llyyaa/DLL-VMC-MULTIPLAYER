@@ -1604,7 +1604,13 @@ enum CityScaleTypes {
 
 #ifdef MOD_PROMOTION_COLLECTIONS
 enum PromotionCollectionsTypes {
-	NO_COLLECTION = -1
+	NO_PROMOTION_COLLECTION = -1
+};
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+enum BuildingClassCollectionsTypes {
+	NO_BUILDINGCLASS_COLLECTION = -1
 };
 #endif
 

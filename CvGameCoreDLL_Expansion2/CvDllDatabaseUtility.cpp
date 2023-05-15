@@ -417,6 +417,10 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	GC.InitPromotion2CollectionMapping();
 #endif
 
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	PrefetchCollection(GC.GetBuildingClassCollections(), "BuildingClassCollections");
+#endif
+
 	//Copy flavors into string array
 	{
 		CvDatabaseUtility kUtility;

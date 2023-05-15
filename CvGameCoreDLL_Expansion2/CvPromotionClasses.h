@@ -330,6 +330,10 @@ public:
 	int GetOtherPromotionModifier(PromotionTypes other) const;
 	int GetOtherPromotionAttackModifier(PromotionTypes other) const;
 	int GetOtherPromotionDefenseModifier(PromotionTypes other) const;
+	bool HasOtherPromotionModifier() const;
+	std::tr1::unordered_map<PromotionTypes, int>& GetOtherPromotionModifierMap();
+	std::tr1::unordered_map<PromotionTypes, int>& GetOtherPromotionAttackModifierMap();
+	std::tr1::unordered_map<PromotionTypes, int>& GetOtherPromotionDefenseModifierMap();
 #endif
 
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
@@ -350,6 +354,16 @@ public:
 	bool GetRemoveAfterFullyHeal() const;
 	bool GetRemoveWithLuaCheck() const;
 	bool GetCanActionClear() const;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	BuildingClassCollectionsTypes GetDestroyBuildingCollection() const;
+	int GetDestroyBuildingProbability() const;
+	int GetDestroyBuildingNumLimit() const;
+	bool CanDestroyBuildings() const;
+
+	int GetSiegeKillCitizensPercent() const;
+	int GetSiegeKillCitizensFixed() const;
 #endif
 
  #ifdef MOD_PROMOTION_SPLASH_DAMAGE
@@ -691,6 +705,14 @@ protected:
 	bool m_bCanActionClear = 0;
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	BuildingClassCollectionsTypes m_iDestroyBuildingCollection = NO_BUILDINGCLASS_COLLECTION;
+	int m_iDestroyBuildingProbability = 0;
+	int m_iDestroyBuildingNumLimit = 0;
+
+	int m_iSiegeKillCitizensPercent = 0;
+	int m_iSiegeKillCitizensFixed = 0;
+#endif
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -755,17 +777,16 @@ public:
 
 	PromotionTypes ChangePromotionAfterCombat(PromotionTypes eIndex);
 
-
-
-
 	int GetDomainAttackPercentMod(DomainTypes eDomain) const;
 	int GetDomainDefensePercentMod(DomainTypes eDomain) const;
 
-
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-	int GetOtherPromotionModifier(PromotionTypes other) const;
-	int GetOtherPromotionAttackModifier(PromotionTypes other) const;
-	int GetOtherPromotionDefenseModifier(PromotionTypes other) const;
+	int GetOtherPromotionModifier(PromotionTypes other);
+	int GetOtherPromotionAttackModifier(PromotionTypes other);
+	int GetOtherPromotionDefenseModifier(PromotionTypes other);
+	std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionModifierMap();
+	std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionAttackModifierMap();
+	std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionDefenseModifierMap();
 #endif
 
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
@@ -773,6 +794,12 @@ public:
 #endif
 
 private:
+
+#if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
+	std::tr1::unordered_map<PromotionTypes, int> m_pPromotionModifiers; // key: other promotion type, value: modifier * 100
+	std::tr1::unordered_map<PromotionTypes, int> m_pPromotionAttackModifiers; // key: other promotion type, value: attack modifier * 100
+	std::tr1::unordered_map<PromotionTypes, int> m_pPromotionDefenseModifiers; // key: other promotion type, value: defense modifier * 100
+#endif
 
 	bool IsInUseByPlayer(PromotionTypes eIndex, PlayerTypes ePlayer); 
 
@@ -904,4 +931,44 @@ inline FDataStream& operator>>(FDataStream& is, AutoRemoveInfo& info) {
 
 	return is;
 }
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+struct DestroyBuildingsInfo {
+	PromotionTypes ePromotion;
+
+	BuildingClassCollectionsTypes m_iDestroyBuildingCollection = NO_BUILDINGCLASS_COLLECTION;
+	int m_iDestroyBuildingProbability = 0;
+	int m_iDestroyBuildingNumLimit = 0;
+
+	DestroyBuildingsInfo() = default;
+	DestroyBuildingsInfo(const CvPromotionEntry& entry):
+		ePromotion{ (PromotionTypes)entry.GetID() },
+		m_iDestroyBuildingCollection{ entry.GetDestroyBuildingCollection() },
+		m_iDestroyBuildingProbability{ entry.GetDestroyBuildingProbability() },
+		m_iDestroyBuildingNumLimit{ entry.GetDestroyBuildingNumLimit() } {}
+};
+
+inline FDataStream& operator<<(FDataStream& os, const DestroyBuildingsInfo& info) {
+	os << (int)info.ePromotion;
+	os << (int)info.m_iDestroyBuildingCollection;
+	os << info.m_iDestroyBuildingProbability;
+	os << info.m_iDestroyBuildingNumLimit;
+
+	return os;
+}
+
+inline FDataStream& operator>>(FDataStream& is, DestroyBuildingsInfo& info) {
+	int iPromotion = -1;
+	int iBuildingClassType = -1;
+	is >> iPromotion;
+	info.ePromotion = (PromotionTypes)iPromotion;
+	is >> iBuildingClassType;
+	info.m_iDestroyBuildingCollection = (BuildingClassCollectionsTypes)iBuildingClassType;
+	is >> info.m_iDestroyBuildingProbability;
+	is >> info.m_iDestroyBuildingNumLimit;
+
+	return is;
+}
+
 #endif

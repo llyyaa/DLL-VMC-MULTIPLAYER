@@ -1734,6 +1734,16 @@ public:
 	std::tr1::unordered_set<PromotionTypes>& GetPromotionsThatCanBeActionCleared();
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	std::tr1::unordered_map<PromotionTypes, DestroyBuildingsInfo>& GetDestroyBuildings();
+
+	int GetSiegeKillCitizensPercent() const;
+	int GetSiegeKillCitizensFixed() const;
+	void ChangeSiegeKillCitizensPercent(int iChange);
+	void ChangeSiegeKillCitizensFixed(int iChange);
+	bool CanSiegeKillCitizens() const;
+#endif
+
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
 	std::vector<CollateralInfo>& GetCollateralInfoVec();
 
@@ -2124,6 +2134,13 @@ protected:
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
 	std::tr1::unordered_map<PromotionTypes, AutoRemoveInfo> m_mapAutoRemovePromotions;
 	std::tr1::unordered_set<PromotionTypes> m_sPromotionsThatCanBeActionCleared;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	std::tr1::unordered_map<PromotionTypes, DestroyBuildingsInfo> m_mapDestroyBuildings;
+
+	int m_iSiegeKillCitizensPercent = 0;
+	int m_iSiegeKillCitizensFixed = 0;
 #endif
 
 	int m_iEmbarkExtraVisibility;

@@ -4427,6 +4427,8 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 	DoSplashDamage(kCombatInfo);
 	DoCollateralDamage(kCombatInfo);
 	DoAddEnermyPromotions(kCombatInfo);
+	DoDestroyBuildings(kCombatInfo);
+	DoKillCitizens(kCombatInfo);
 }
 
 bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
@@ -4756,6 +4758,101 @@ void CvUnitCombat::DoAddEnermyPromotions(const CvCombatInfo& kCombatInfo)
 	DoAddEnermyPromotionsInner(pAttackerUnit, pDefenderUnit, BATTLE_UNIT_ATTACKER, kCombatInfo);
 	DoAddEnermyPromotionsInner(pDefenderUnit, pAttackerUnit, BATTLE_UNIT_DEFENDER, kCombatInfo);
 }
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+void CvUnitCombat::DoDestroyBuildings(const CvCombatInfo& kInfo)
+{
+	if (!MOD_PROMOTION_CITY_DESTROYER) return;
+
+	CvUnit* pAttackerUnit = kInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvCity* pAttackerCity = kInfo.getCity(BATTLE_UNIT_ATTACKER);
+	CvUnit* pDefenderUnit = kInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	CvCity* pDefenderCity = kInfo.getCity(BATTLE_UNIT_DEFENDER);
+
+	if (pAttackerUnit == nullptr || pDefenderCity == nullptr) return; // only work for unit attacking a city
+
+	auto& destroyInfo = pAttackerUnit->GetDestroyBuildings();
+	if (destroyInfo.empty()) return;
+
+	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kInfo);
+	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kInfo);
+	int iCount = 0;
+	for (auto iter = destroyInfo.begin(); iter != destroyInfo.end(); iter++)
+	{
+		for (int i = 0; i < iter->second.m_iDestroyBuildingNumLimit; i++)
+		{
+			int iRand = GC.getGame().getJonRandNum(100, "destroy chance");
+			if (iRand >= iter->second.m_iDestroyBuildingProbability) continue;
+
+			auto* collection = GC.GetBuildingClassCollection(iter->second.m_iDestroyBuildingCollection);
+			for (auto& entry : collection->GetBuildingClasses())
+			{
+				BuildingTypes eBuilding = kDefensePlayer.GetCivBuilding(entry.eBuildingClass);
+				if (pDefenderCity->HasBuilding(eBuilding))
+				{
+					pDefenderCity->GetCityBuildings()->SetNumRealBuilding(eBuilding, 0);
+					iCount++;
+					break;
+				}
+			}
+		}
+	}
+
+	if (iCount > 0)
+	{
+		ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+		if (kAttackPlayer.isHuman())
+		{
+			CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKING", iCount);
+			pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+		}
+		if (kDefensePlayer.isHuman())
+		{
+			CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKED", iCount, pDefenderCity->getNameKey());
+			pkDLLInterface->AddMessage(0, kDefensePlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+		}
+	}
+}
+
+void CvUnitCombat::DoKillCitizens(const CvCombatInfo& kInfo)
+{
+	if (!MOD_PROMOTION_CITY_DESTROYER) return;
+
+	CvUnit* pAttackerUnit = kInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvCity* pAttackerCity = kInfo.getCity(BATTLE_UNIT_ATTACKER);
+	CvUnit* pDefenderUnit = kInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	CvCity* pDefenderCity = kInfo.getCity(BATTLE_UNIT_DEFENDER);
+
+	if (pAttackerUnit == nullptr || pDefenderCity == nullptr) return; // only work for unit attacking a city
+	if (!pAttackerUnit->CanSiegeKillCitizens()) return;
+
+	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kInfo);
+	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kInfo);
+
+	int iKillNum = pDefenderCity->getPopulation() * pAttackerUnit->GetSiegeKillCitizensPercent() / 100 + pAttackerUnit->GetSiegeKillCitizensFixed();
+	iKillNum = (pDefenderCity->GetSiegeKillCitizensModifier() + 100) * iKillNum / 100;
+	if (iKillNum >= pDefenderCity->getPopulation())
+	{
+		iKillNum = pDefenderCity->getPopulation() - 1;
+	}
+	if (iKillNum <= 0) return;
+
+	pDefenderCity->changePopulation(-iKillNum, true);
+
+	ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+	if (kAttackPlayer.isHuman())
+	{
+		CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_BOMBER_CITY_KILL_POPULATION_ATTACKING", iKillNum);
+		pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+	}
+	if (kDefensePlayer.isHuman())
+	{
+		CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_BOMBER_CITY_KILL_POPULATION_ATTACKED", iKillNum, pDefenderCity->getNameKey());
+		pkDLLInterface->AddMessage(0, kDefensePlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+	}
+}
+
 #endif
 
 #endif

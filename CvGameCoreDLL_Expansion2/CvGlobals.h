@@ -159,6 +159,8 @@ class ICvUnit1;
 #include "CvPromotionCollectionClasses.h"
 #endif
 
+#include "CvBuildingClassCollectionsClasses.h"
+
 class CvGlobals
 {
 public:
@@ -426,6 +428,12 @@ public:
 	int GetNumPromotionCollections();
 	void InitPromotion2CollectionMapping();
 	std::tr1::unordered_map<PromotionTypes, std::tr1::unordered_set<PromotionCollectionsTypes> >& GetPromotion2CollectionsMapping();
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	std::vector<CvBuildingClassCollectionsEntry*>& GetBuildingClassCollections();
+	CvBuildingClassCollectionsEntry* GetBuildingClassCollection(BuildingClassCollectionsTypes eBuildingClassCollection);
+	int GetNumBuildingClassCollections();
 #endif
 
 	int getNumBuildInfos();
@@ -7818,6 +7826,10 @@ protected:
 #ifdef MOD_PROMOTION_COLLECTIONS
 	CvPromotionCollectionEntries* m_pPromotionCollections;
 	std::tr1::unordered_map<PromotionTypes, std::tr1::unordered_set<PromotionCollectionsTypes> > m_mPromotion2CollectionsMapping;
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	CvBuildingClassCollectionsXMLEntries* m_pBuildingClassCollections;
 #endif
 
 	//////////////////////////////////////////////////////////////////////////

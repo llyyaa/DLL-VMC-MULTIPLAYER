@@ -508,6 +508,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_bArtInfoEraVariation = kResults.GetBool("ArtInfoEraVariation");
 	m_bArtInfoRandomVariation = kResults.GetBool("ArtInfoRandomVariation");
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	m_iSiegeKillCitizensModifier = kResults.GetInt("SiegeKillCitizensModifier");
+#endif
+
 	//References
 	const char* szTextVal;
 	szTextVal = kResults.GetText("BuildingClass");
@@ -1582,6 +1586,13 @@ int CvBuildingEntry::GetReduceDamageValue() const
 	return m_iReduceDamageValue;
 }
 
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+int CvBuildingEntry::GetSiegeKillCitizensModifier() const
+{
+	return m_iSiegeKillCitizensModifier;
+}
 #endif
 
 

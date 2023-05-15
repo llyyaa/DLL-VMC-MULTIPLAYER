@@ -400,6 +400,10 @@ public:
 	int GetGoldenAgeMeterMod() const;
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int GetSiegeKillCitizensModifier() const;
+#endif
+
 private:
 	int m_iBuildingClassType;
 	const CvBuildingClassInfo* m_pkBuildingClassInfo;
@@ -562,6 +566,10 @@ private:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int m_iConversionModifier;
 	int m_iGlobalConversionModifier;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int m_iSiegeKillCitizensModifier = 0;
 #endif
 
 	int m_iLandmarksTourismPercent;
@@ -829,7 +837,6 @@ public:
 #if defined(MOD_ROG_CORE)
 	const std::vector<BuildingTypes>& GetAllBuildingsHere() const { return m_buildingsThatExistAtLeastOnce; }
 #endif
-
 
 private:
 	void NotifyNewBuildingStarted(BuildingTypes eIndex);

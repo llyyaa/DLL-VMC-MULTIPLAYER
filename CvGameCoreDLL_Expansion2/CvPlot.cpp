@@ -10452,20 +10452,19 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 		if(getBuildProgress(eBuild) >= getBuildTime(eBuild, ePlayer))
 		{
 			m_paiBuildProgress[eBuild] = 0;
-#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
-			CvImprovementEntry& tImprovementEntry = *GC.getImprovementInfo(eImprovement);
-			ResourceTypes cResource = (ResourceTypes)tImprovementEntry.GetResourceCreated();
-			int cResourceQuantity = tImprovementEntry.GetResourceQuantityCreated();
-			if(MOD_IMPROVEMENTS_CREATE_ITEMS && cResource != NO_RESOURCE && cResourceQuantity !=0)
-			{
-				cResourceQuantity = cResourceQuantity > 0 ? cResourceQuantity : GC.getGame().getJonRandNum(-cResourceQuantity, "Get random source quantity when constructed ") + 1;
-				setResourceType(cResource, cResourceQuantity);
-			}
-#endif
+
 			// Constructed Improvement
 			if (eImprovement != NO_IMPROVEMENT)
 			{
 #if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+				CvImprovementEntry& tImprovementEntry = *GC.getImprovementInfo(eImprovement);
+				ResourceTypes cResource = (ResourceTypes)tImprovementEntry.GetResourceCreated();
+				int cResourceQuantity = tImprovementEntry.GetResourceQuantityCreated();
+				if (MOD_IMPROVEMENTS_CREATE_ITEMS && cResource != NO_RESOURCE && cResourceQuantity != 0)
+				{
+					cResourceQuantity = cResourceQuantity > 0 ? cResourceQuantity : GC.getGame().getJonRandNum(-cResourceQuantity, "Get random source quantity when constructed ") + 1;
+					setResourceType(cResource, cResourceQuantity);
+				}
 				if(MOD_IMPROVEMENTS_CREATE_ITEMS && (ImprovementTypes)tImprovementEntry.GetNewImprovement() != NO_IMPROVEMENT)
 				{
 					eImprovement = (ImprovementTypes)tImprovementEntry.GetNewImprovement();
