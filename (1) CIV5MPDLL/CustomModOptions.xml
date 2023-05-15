@@ -1053,7 +1053,7 @@
 
     <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
-    <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
+    <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="0"/>
 
     <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
