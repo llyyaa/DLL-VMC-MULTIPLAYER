@@ -20942,6 +20942,13 @@ void CvPlayer::ChangeFreePromotionCount(PromotionTypes ePromotion, int iChange)
 				{
 					pLoopUnit->setHasPromotion(ePromotion, true);
 				}
+
+
+				else if (::IsPromotionValidForUnitType(ePromotion, pLoopUnit->getUnitType()))
+				{
+					pLoopUnit->setHasPromotion(ePromotion, true);
+				}
+
 			}
 		}
 	}
