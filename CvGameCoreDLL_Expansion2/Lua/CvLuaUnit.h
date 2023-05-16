@@ -349,6 +349,9 @@ protected:
 #endif
 	static int lIsNeverInvisible(lua_State* L);
 	static int lIsInvisible(lua_State* L);
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	static int lIsInvisibleInvalid(lua_State* L);
+#endif
 
 	static int lIsNukeImmune(lua_State* L);
 

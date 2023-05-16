@@ -664,6 +664,13 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	const char* szSeeInvisible = kResults.GetText("SeeInvisible");
 	m_iSeeInvisibleType = GC.getInfoTypeForString(szSeeInvisible, true);
 
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	const char* szFeatureInvisible = kResults.GetText("FeatureInvisible");
+	m_iFeatureInvisible = GC.getInfoTypeForString(szFeatureInvisible, true);
+	const char* szFeatureInvisible2 = kResults.GetText("FeatureInvisible2");
+	m_iFeatureInvisible2 = GC.getInfoTypeForString(szFeatureInvisible2, true);
+#endif
+
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
 
@@ -1233,6 +1240,17 @@ int CvPromotionEntry::GetSeeInvisibleType() const
 {
 	return m_iSeeInvisibleType;
 }
+
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+int CvPromotionEntry::GetFeatureInvisible() const
+{
+	return m_iFeatureInvisible;
+}
+int CvPromotionEntry::GetFeatureInvisible2() const
+{
+	return m_iFeatureInvisible2;
+}
+#endif
 
 /// Accessor: How many additional tiles this promotion allows a unit to see (can be negative)
 int CvPromotionEntry::GetVisibilityChange() const

@@ -81,6 +81,9 @@ ALTER TABLE UnitPromotions ADD 'NearNumEnemyDefenseMod' INTEGER DEFAULT 0;
 ALTER TABLE Units ADD 'ExtraXPValueAttack' INTEGER DEFAULT 0;
 ALTER TABLE Units ADD 'ExtraXPValueDefense' INTEGER DEFAULT 0;
 
+ALTER TABLE UnitPromotions ADD 'FeatureInvisible' TEXT DEFAULT NULL;
+ALTER TABLE UnitPromotions ADD 'FeatureInvisible2' TEXT DEFAULT NULL;
+
 ALTER TABLE UnitPromotions ADD 'WorkRateMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'AoEWhileFortified' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'AOEDamageOnKill' INTEGER DEFAULT 0;

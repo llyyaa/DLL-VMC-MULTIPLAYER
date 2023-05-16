@@ -455,6 +455,10 @@ CvUnit::CvUnit() :
 	, m_eLeaderUnitType("CvUnit::m_eLeaderUnitType", m_syncArchive)
 	, m_eInvisibleType("CvUnit::m_eInvisibleType", m_syncArchive)
 	, m_eSeeInvisibleType("CvUnit::m_eSeeInvisibleType", m_syncArchive)
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	, m_eFeatureInvisible("CvUnit::m_eFeatureInvisible", m_syncArchive)
+	, m_eFeatureInvisible2("CvUnit::m_eFeatureInvisible2", m_syncArchive)
+#endif
 	, m_eGreatPeopleDirectiveType("CvUnit::m_eGreatPeopleDirectiveType", m_syncArchive)
 	, m_combatUnit()
 	, m_transportUnit()
@@ -1272,6 +1276,10 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	m_eLeaderUnitType = NO_UNIT;
 	m_eInvisibleType = NO_INVISIBLE;
 	m_eSeeInvisibleType = NO_INVISIBLE;
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	m_eFeatureInvisible = (int)NO_FEATURE;
+	m_eFeatureInvisible2 = (int)NO_FEATURE;
+#endif
 	m_eGreatPeopleDirectiveType = NO_GREAT_PEOPLE_DIRECTIVE_TYPE;
 	m_iCargoCapacity = 0;
 
@@ -16512,6 +16520,14 @@ bool CvUnit::isInvisible(TeamTypes eTeam, bool bDebug, bool bCheckCargo) const
 		}
 	}
 
+	
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	if(IsInvisibleInvalid())
+	{
+		return false;
+	}
+#endif
+
 	if(m_eInvisibleType == NO_INVISIBLE)
 	{
 		return false;
@@ -16521,6 +16537,21 @@ bool CvUnit::isInvisible(TeamTypes eTeam, bool bDebug, bool bCheckCargo) const
 }
 
 //	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+bool CvUnit::IsInvisibleInvalid() const
+{
+	if(GetFeatureInvisible() != -1 || GetFeatureInvisible2() != -1)
+	{
+		int thisFeature = (int)plot()->getFeatureType();
+		if(thisFeature == -1 || (GetFeatureInvisible() != thisFeature && GetFeatureInvisible2() != thisFeature))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+//	--------------------------------------------------------------------------------
+#endif
 bool CvUnit::isNukeImmune() const
 {
 	VALIDATE_OBJECT
@@ -22071,6 +22102,28 @@ void CvUnit::setSeeInvisibleType(InvisibleTypes InvisibleType)
 	}
 }
 
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+//	--------------------------------------------------------------------------------
+const int CvUnit::GetFeatureInvisible() const
+{
+	VALIDATE_OBJECT
+	return m_eFeatureInvisible;
+}
+//	--------------------------------------------------------------------------------
+const int CvUnit::GetFeatureInvisible2() const
+{
+	VALIDATE_OBJECT
+	return m_eFeatureInvisible2;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::setFeatureInvisible(int FeatureInvisible, int FeatureInvisible2)
+{
+	VALIDATE_OBJECT
+	m_eFeatureInvisible = FeatureInvisible == -1 ? m_eFeatureInvisible : FeatureInvisible;
+	m_eFeatureInvisible2 = FeatureInvisible2 == -1 ? m_eFeatureInvisible2 : FeatureInvisible2;
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 const CvUnit* CvUnit::getCombatUnit() const
 {
@@ -23139,6 +23192,13 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		{
 			setSeeInvisibleType((InvisibleTypes) thisPromotion.GetSeeInvisibleType());
 		}
+
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+		if(thisPromotion.GetFeatureInvisible() != -1 || thisPromotion.GetFeatureInvisible2() != -1)
+		{
+			setFeatureInvisible(thisPromotion.GetFeatureInvisible(), thisPromotion.GetFeatureInvisible2());
+		}
+#endif
 
 		changeBlitzCount((thisPromotion.IsBlitz()) ? iChange : 0);
 		changeAmphibCount((thisPromotion.IsAmphib()) ? iChange : 0);
