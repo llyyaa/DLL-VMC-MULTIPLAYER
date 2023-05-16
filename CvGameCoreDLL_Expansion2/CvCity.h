@@ -548,6 +548,11 @@ public:
 	int getFreeExperience() const;
 	void changeFreeExperience(int iChange);
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	void doInstantYieldArray(int* iInstantYieldArray);
+	void doInstantYield(YieldTypes iYield, int iValue);
+#endif
+
 	bool CanAirlift() const;
 
 	int GetMaxAirUnits() const;

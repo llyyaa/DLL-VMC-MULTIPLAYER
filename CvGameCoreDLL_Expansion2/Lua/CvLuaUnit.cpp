@@ -472,6 +472,9 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #endif
 	Method(IsNeverInvisible);
 	Method(IsInvisible);
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	Method(IsInvisibleInvalid);
+#endif
 	Method(IsNukeImmune);
 	Method(IsRangeAttackOnlyInDomain);
 	Method(IsCityAttackOnly);
@@ -3392,6 +3395,17 @@ int CvLuaUnit::lIsInvisible(lua_State* L)
 	lua_pushboolean(L, bResult);
 	return 1;
 }
+
+//------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+int CvLuaUnit::lIsInvisibleInvalid(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const bool bResult = pkUnit->IsInvisibleInvalid();
+	lua_pushboolean(L, bResult);
+	return 1;
+}
+#endif
 
 //------------------------------------------------------------------------------
 int CvLuaUnit::lIsEnemyCityAdjacent(lua_State* L)

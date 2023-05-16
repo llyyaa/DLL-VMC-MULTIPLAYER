@@ -178,6 +178,11 @@ public:
 	int GetCityAutomatonWorkersChange() const;
 #endif
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	int GetInstantYield(int i) const;
+	int* GetInstantYieldArray() const;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	int GetGreatWorkYieldChange(int i) const;
 	int* GetGreatWorkYieldChangeArray() const;
@@ -473,6 +478,10 @@ private:
 #if defined(MOD_BUILDINGS_CITY_AUTOMATON_WORKERS)
 	int m_iGlobalCityAutomatonWorkersChange;
 	int m_iCityAutomatonWorkersChange;
+#endif
+
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	int* m_piInstantYield;
 #endif
 
 #if defined(MOD_ROG_CORE)

@@ -1291,6 +1291,12 @@ public:
 
 	const InvisibleTypes getSeeInvisibleType() const;
 	void setSeeInvisibleType(InvisibleTypes InvisibleType);
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	const int GetFeatureInvisible() const;
+	const int GetFeatureInvisible2() const;
+	void setFeatureInvisible(int FeatureInvisible, int FeatureInvisible2);
+	bool IsInvisibleInvalid() const;
+#endif
 
 	const CvUnit* getCombatUnit() const;
 	CvUnit* getCombatUnit();
@@ -2037,6 +2043,10 @@ protected:
 	FAutoVariable<UnitTypes, CvUnit> m_eLeaderUnitType;
 	FAutoVariable<InvisibleTypes, CvUnit> m_eInvisibleType;
 	FAutoVariable<InvisibleTypes, CvUnit> m_eSeeInvisibleType;
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	FAutoVariable<int, CvUnit> m_eFeatureInvisible;
+	FAutoVariable<int, CvUnit> m_eFeatureInvisible2;
+#endif
 	FAutoVariable<GreatPeopleDirectiveTypes, CvUnit> m_eGreatPeopleDirectiveType;
 	CvUnitEntry* m_pUnitInfo;
 

@@ -6812,6 +6812,13 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			changeFreePromotionCount(((PromotionTypes)(pBuildingInfo->GetTrainedFreePromotion())), iChange);
 		}
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0))
+		{
+			doInstantYieldArray(pBuildingInfo->GetInstantYieldArray());
+		}
+#endif
+
 		changeGreatPeopleRateModifier(pBuildingInfo->GetGreatPeopleRateModifier() * iChange);
 		changeFreeExperience(pBuildingInfo->GetFreeExperience() * iChange);
 		ChangeMaxAirUnits(pBuildingInfo->GetAirModifier() * iChange);
@@ -9891,6 +9898,102 @@ void CvCity::changeFreeExperience(int iChange)
 	CvAssert(getFreeExperience() >= 0);
 }
 
+//	--------------------------------------------------------------------------------
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+void CvCity::doInstantYieldArray(int* iInstantYield)
+{
+	VALIDATE_OBJECT
+	if(!iInstantYield) return;
+	for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
+	{
+		if(iInstantYield[iYieldLoop] > 0)
+		{
+			int iValue = iInstantYield[iYieldLoop];
+			iValue *= GC.getGame().getGameSpeedInfo().getConstructPercent();
+			iValue /= 100;
+			doInstantYield((YieldTypes)iYieldLoop, iValue);
+		}
+	}
+}
+//	--------------------------------------------------------------------------------
+void CvCity::doInstantYield(YieldTypes iYield, int iValue)
+{
+	VALIDATE_OBJECT
+	if (iValue > 0)
+	{
+		CvPlayerAI& thisPlayer = GET_PLAYER(getOwner());
+		//Apply yields.
+		switch(iYield)
+		{
+			case NO_YIELD:
+			break;
+			case YIELD_FOOD:
+			{
+				changeFood(iValue);
+			}
+			break;
+			case YIELD_PRODUCTION:
+			{
+				if (getProduction() < getProductionNeeded() && isProduction())
+				{
+					changeProduction(iValue);
+				}
+				else
+				{
+					changeOverflowProduction(iValue);
+				}
+			}
+			break;
+			case YIELD_GOLD:
+			{
+				thisPlayer.GetTreasury()->ChangeGold(iValue);
+			}
+			break;
+			case YIELD_SCIENCE:
+			{
+				TechTypes eCurrentTech = thisPlayer.GetPlayerTechs()->GetCurrentResearch();
+				if(eCurrentTech == NO_TECH)
+				{
+					thisPlayer.changeOverflowResearch(iValue);
+				}
+				else
+				{
+					GET_TEAM(thisPlayer.getTeam()).GetTeamTechs()->ChangeResearchProgress(eCurrentTech, iValue, thisPlayer.GetID());
+				}
+			}
+			break;
+			case YIELD_CULTURE:
+			{
+				thisPlayer.changeJONSCulture(iValue);
+				ChangeJONSCultureStored(iValue);
+			}
+			break;
+			case YIELD_FAITH:
+			{
+				thisPlayer.ChangeFaith(iValue);
+			}
+			break;
+			case YIELD_TOURISM:
+			{
+				thisPlayer.GetCulture()->AddTourismAllKnownCivs(iValue);
+			}
+			break;
+			case YIELD_GOLDEN_AGE_POINTS:
+			{
+				thisPlayer.ChangeGoldenAgeProgressMeter(iValue);
+			}
+			break;
+		}
+#if defined(SHOW_PLOT_POPUP)
+		//And now notifications.
+		CvYieldInfo* pYieldInfo = GC.getYieldInfo(iYield);
+		char text[256] = {0};
+		sprintf_s(text, "%s+%d[ENDCOLOR] %s", pYieldInfo->getColorString(), iValue, pYieldInfo->getIconString());
+		SHOW_PLOT_POPUP(plot(), thisPlayer.GetID(), text);
+#endif
+	}
+}
+#endif
 //	--------------------------------------------------------------------------------
 bool CvCity::CanAirlift() const
 {

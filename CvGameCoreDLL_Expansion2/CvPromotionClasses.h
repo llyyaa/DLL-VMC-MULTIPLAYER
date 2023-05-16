@@ -56,6 +56,10 @@ public:
 	int  GetInvisibleType() const;
 	int  GetSeeInvisibleType() const;
 	int  GetVisibilityChange() const;
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	int GetFeatureInvisible() const;
+	int GetFeatureInvisible2() const;
+#endif
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
 	int  GetReconChange() const;
 #endif
@@ -399,6 +403,10 @@ protected:
 	int m_iTechPrereq;
 	int m_iInvisibleType;
 	int m_iSeeInvisibleType;
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	int m_iFeatureInvisible;
+	int m_iFeatureInvisible2;
+#endif
 	int m_iVisibilityChange;
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
 	int m_iReconChange;

@@ -160,6 +160,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iNukeInterceptionChance(0),
 	m_iExtraAttacks(0),
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	m_piInstantYield(NULL),
+#endif
+
 #if defined(MOD_ROG_CORE)
 	m_piResourceQuantityFromPOP(NULL),
 
@@ -296,6 +300,10 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piNumFreeUnits);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassHappiness);
 	SAFE_DELETE_ARRAY(m_paThemingBonusInfo);
+
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	SAFE_DELETE_ARRAY(m_piInstantYield);
+#endif
 
 #if defined(MOD_ROG_CORE)
 	SAFE_DELETE_ARRAY(m_piResourceQuantityFromPOP);
@@ -627,6 +635,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.PopulateArrayByExistence(m_piPrereqAndTechs, "Technologies", "Building_TechAndPrereqs", "TechType", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByExistence(m_piLocalResourceAnds, "Resources", "Building_LocalResourceAnds", "ResourceType", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByExistence(m_piLocalResourceOrs, "Resources", "Building_LocalResourceOrs", "ResourceType", "BuildingType", szBuildingType);
+
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	kUtility.SetYields(m_piInstantYield, "Building_InstantYield", "BuildingType", szBuildingType);
+#endif
 
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piGreatWorkYieldChange, "Building_GreatWorkYieldChanges", "BuildingType", szBuildingType);
@@ -2457,6 +2469,21 @@ int CvBuildingEntry::GetHurryModifier(int i) const
 	return m_paiHurryModifier ? m_paiHurryModifier[i] : -1;
 }
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+/// Instant yield
+int CvBuildingEntry::GetInstantYield(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piInstantYield ? m_piInstantYield[i] : 0;
+}
+
+/// Array of instant yields
+int* CvBuildingEntry::GetInstantYieldArray() const
+{
+	return m_piInstantYield;
+}
+#endif
 
 #if defined(MOD_ROG_CORE)
 // Resource provided by Population
