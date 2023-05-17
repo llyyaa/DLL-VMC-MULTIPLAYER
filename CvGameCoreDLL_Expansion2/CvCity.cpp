@@ -158,6 +158,14 @@ CvCity::CvCity() :
 
 	, m_iResetDamageValue("CvCity::m_iResetDamageValue", m_syncArchive)
 	, m_iReduceDamageValue("CvCity::m_iReduceDamageValue", m_syncArchive)
+
+
+	, m_iWaterTileDamage("CvCity::m_iWaterTileDamage", m_syncArchive)
+	, m_iWaterTileMovementReduce("CvCity::m_iWaterTileMovementReduce", m_syncArchive)
+	, m_iWaterTileTurnDamage("CvCity::m_iWaterTileTurnDamage", m_syncArchive)
+	, m_iLandTileDamage("CvCity::m_iLandTileDamage", m_syncArchive)
+	, m_iLandTileMovementReduce("CvCity::m_iLandTileMovementReduce", m_syncArchive)
+	, m_iLandTileTurnDamage("CvCity::m_iLandTileTurnDamage", m_syncArchive)
 #endif
 
 	, m_iNumAttacks("CvCity::m_iNumAttacks", m_syncArchive)
@@ -951,6 +959,14 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 
 	m_iResetDamageValue = 0;
 	m_iReduceDamageValue = 0;
+
+
+	m_iWaterTileDamage = 0;
+	m_iWaterTileMovementReduce = 0;
+	m_iWaterTileTurnDamage = 0;
+	m_iLandTileDamage = 0;
+	m_iLandTileMovementReduce = 0;
+	m_iLandTileTurnDamage = 0;
 #endif
 
 	m_iNumAttacks = 1;
@@ -6834,6 +6850,13 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 		changeResetDamageValue(pBuildingInfo->GetResetDamageValue()* iChange);
 		changeReduceDamageValue(pBuildingInfo->GetReduceDamageValue()* iChange);
+
+		changeWaterTileDamage(pBuildingInfo->GetWaterTileDamage()* iChange);
+		changeWaterTileMovementReduce(pBuildingInfo->GetWaterTileMovementReduce()* iChange);
+		changeWaterTileTurnDamage(pBuildingInfo->GetWaterTileTurnDamage()* iChange);
+		changeLandTileDamage(pBuildingInfo->GetLandTileDamage()* iChange);
+		changeLandTileMovementReduce(pBuildingInfo->GetLandTileMovementReduce()* iChange);
+		changeLandTileTurnDamage(pBuildingInfo->GetLandTileTurnDamage()* iChange);
 #endif
 
 		changeExtraAttacks(pBuildingInfo->GetExtraAttacks()* iChange);
@@ -16268,6 +16291,14 @@ void CvCity::read(FDataStream& kStream)
 	
 	kStream >> m_iResetDamageValue;
 	kStream >> m_iReduceDamageValue;
+
+
+	kStream >> m_iWaterTileDamage;
+	kStream >> m_iWaterTileMovementReduce;
+	kStream >> m_iWaterTileTurnDamage;
+	kStream >> m_iLandTileDamage;
+	kStream >> m_iLandTileMovementReduce;
+	kStream >> m_iLandTileTurnDamage;
 #endif
 
 
@@ -16682,6 +16713,15 @@ void CvCity::write(FDataStream& kStream) const
 
 	kStream << m_iResetDamageValue;
 	kStream << m_iReduceDamageValue;
+
+
+
+	kStream << m_iWaterTileDamage;
+	kStream << m_iWaterTileMovementReduce;
+	kStream << m_iWaterTileTurnDamage;
+	kStream << m_iLandTileDamage;
+	kStream << m_iLandTileMovementReduce;
+	kStream << m_iLandTileTurnDamage;
 #endif
 
 
@@ -17194,6 +17234,114 @@ void CvCity::changeReduceDamageValue(int iChange)
 		if (iChange != 0)
 		{
 			m_iReduceDamageValue += iChange;
+		}
+}
+
+
+
+
+//	--------------------------------------------------------------------------------
+int CvCity::getWaterTileDamage() const
+{
+	VALIDATE_OBJECT
+		return m_iWaterTileDamage;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeWaterTileDamage(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iWaterTileDamage += iChange;
+		}
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::getWaterTileMovementReduce() const
+{
+	VALIDATE_OBJECT
+		return m_iWaterTileMovementReduce;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeWaterTileMovementReduce(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iWaterTileMovementReduce += iChange;
+		}
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvCity::getWaterTileTurnDamage() const
+{
+	VALIDATE_OBJECT
+		return m_iWaterTileTurnDamage;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeWaterTileTurnDamage(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iWaterTileTurnDamage += iChange;
+		}
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvCity::getLandTileDamage() const
+{
+	VALIDATE_OBJECT
+		return m_iLandTileDamage;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeLandTileDamage(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iLandTileDamage += iChange;
+		}
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvCity::getLandTileMovementReduce() const
+{
+	VALIDATE_OBJECT
+		return m_iLandTileMovementReduce;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeLandTileMovementReduce(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iLandTileMovementReduce += iChange;
+		}
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::getLandTileTurnDamage() const
+{
+	VALIDATE_OBJECT
+		return m_iLandTileTurnDamage;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeLandTileTurnDamage(int iChange)
+{
+	VALIDATE_OBJECT
+		if (iChange != 0)
+		{
+			m_iLandTileTurnDamage += iChange;
 		}
 }
 #endif
