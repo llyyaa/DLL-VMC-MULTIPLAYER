@@ -27,6 +27,11 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iPrereqOrPromotion7(NO_PROMOTION),
 	m_iPrereqOrPromotion8(NO_PROMOTION),
 	m_iPrereqOrPromotion9(NO_PROMOTION),
+	m_iPrereqOrPromotion10(NO_PROMOTION),
+	m_iPrereqOrPromotion11(NO_PROMOTION),
+	m_iPrereqOrPromotion12(NO_PROMOTION),
+	m_iPrereqOrPromotion13(NO_PROMOTION),
+
 	m_iTechPrereq(NO_TECH),
 	m_iInvisibleType(NO_INVISIBLE),
 	m_iSeeInvisibleType(NO_INVISIBLE),
@@ -278,6 +283,12 @@ CvPromotionEntry::CvPromotionEntry():
 	m_pbFeatureImpassable(NULL),
 	m_pbUnitCombat(NULL),
 	m_pbCivilianUnitType(NULL),
+
+
+	m_pbUnitType(NULL),
+
+
+
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	m_pbUnitName(NULL),
 #endif
@@ -318,6 +329,10 @@ CvPromotionEntry::~CvPromotionEntry(void)
 	SAFE_DELETE_ARRAY(m_pbFeatureImpassable);
 	SAFE_DELETE_ARRAY(m_pbUnitCombat);
 	SAFE_DELETE_ARRAY(m_pbCivilianUnitType);
+
+	SAFE_DELETE_ARRAY(m_pbUnitType);
+
+
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	SAFE_DELETE_ARRAY(m_pbUnitName);
 #endif
@@ -701,6 +716,18 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	const char* szPromotionPrereqOr9 = kResults.GetText("PromotionPrereqOr9");
 	m_iPrereqOrPromotion9 = GC.getInfoTypeForString(szPromotionPrereqOr9, true);
 
+	const char* szPromotionPrereqOr10 = kResults.GetText("PromotionPrereqOr10");
+	m_iPrereqOrPromotion10 = GC.getInfoTypeForString(szPromotionPrereqOr10, true);
+
+	const char* szPromotionPrereqOr11 = kResults.GetText("PromotionPrereqOr11");
+	m_iPrereqOrPromotion11 = GC.getInfoTypeForString(szPromotionPrereqOr11, true);
+
+	const char* szPromotionPrereqOr12 = kResults.GetText("PromotionPrereqOr12");
+	m_iPrereqOrPromotion12 = GC.getInfoTypeForString(szPromotionPrereqOr12, true);
+
+	const char* szPromotionPrereqOr13 = kResults.GetText("PromotionPrereqOr13");
+	m_iPrereqOrPromotion13 = GC.getInfoTypeForString(szPromotionPrereqOr13, true);
+
 	//Arrays
 	const int iNumUnitClasses = kUtility.MaxRows("UnitClasses");
 	const int iNumTerrains = GC.getNumTerrainInfos();
@@ -1032,6 +1059,37 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		pResults->Reset();
 	}
 
+
+	//UnitPromotions_UnitType
+	{
+		kUtility.InitializeArray(m_pbUnitType, iNumUnitTypes, false);
+
+		std::string sqlKey = "m_pbUnitType";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if (pResults == NULL)
+		{
+			const char* szSQL = "select Units.ID from UnitPromotions_UnitType inner join Units On Units.Type = UnitType where PromotionType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		CvAssert(pResults);
+		if (!pResults) return false;
+
+		pResults->Bind(1, szPromotionType);
+
+		while (pResults->Step())
+		{
+			const int iUnit = (UnitTypes)pResults->GetInt(0);
+			CvAssert(iUnit < iNumUnitTypes);
+
+			m_pbUnitType[iUnit] = true;
+		}
+
+		pResults->Reset();
+	}
+
+
+
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	if (MOD_PROMOTIONS_UNIT_NAMING)
 	{
@@ -1222,6 +1280,58 @@ void CvPromotionEntry::SetPrereqOrPromotion9(int i)
 {
 	m_iPrereqOrPromotion9 = i;
 }
+
+/// Accessor: Gets promotion 10 of an either/or promotion prerequisite.
+int CvPromotionEntry::GetPrereqOrPromotion10() const
+{
+	return m_iPrereqOrPromotion10;
+}
+
+/// Accessor: Sets promotion 10 of an either/or promotion prerequisite.
+void CvPromotionEntry::SetPrereqOrPromotion10(int i)
+{
+	m_iPrereqOrPromotion10 = i;
+}
+
+/// Accessor: Gets promotion 10 of an either/or promotion prerequisite.
+int CvPromotionEntry::GetPrereqOrPromotion11() const
+{
+	return m_iPrereqOrPromotion11;
+}
+
+/// Accessor: Sets promotion 11 of an either/or promotion prerequisite.
+void CvPromotionEntry::SetPrereqOrPromotion11(int i)
+{
+	m_iPrereqOrPromotion11 = i;
+}
+
+
+/// Accessor: Gets promotion 11 of an either/or promotion prerequisite.
+int CvPromotionEntry::GetPrereqOrPromotion12() const
+{
+	return m_iPrereqOrPromotion12;
+}
+
+/// Accessor: Sets promotion 10 of an either/or promotion prerequisite.
+void CvPromotionEntry::SetPrereqOrPromotion12(int i)
+{
+	m_iPrereqOrPromotion12 = i;
+}
+
+
+/// Accessor: Gets promotion 11 of an either/or promotion prerequisite.
+int CvPromotionEntry::GetPrereqOrPromotion13() const
+{
+	return m_iPrereqOrPromotion13;
+}
+
+/// Accessor: Sets promotion 10 of an either/or promotion prerequisite.
+void CvPromotionEntry::SetPrereqOrPromotion13(int i)
+{
+	m_iPrereqOrPromotion13 = i;
+}
+
+
 
 /// Accessor: Gets the tech prerequisite for this promotion
 int CvPromotionEntry::GetTechPrereq() const
@@ -2596,6 +2706,11 @@ bool CvPromotionEntry::GetFeatureImpassable(int i) const
 	return false;
 }
 
+
+
+
+
+
 /// Returns the combat classes that this promotion is available for
 bool CvPromotionEntry::GetUnitCombatClass(int i) const
 {
@@ -2609,6 +2724,23 @@ bool CvPromotionEntry::GetUnitCombatClass(int i) const
 
 	return false;
 }
+
+
+
+/// Returns the  unit type that this promotion is available for
+bool CvPromotionEntry::GetUnitType(int i) const
+{
+	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+
+	if (i > -1 && i < GC.getNumUnitInfos() && m_pbUnitType)
+	{
+		return m_pbUnitType[i];
+	}
+
+	return false;
+}
+
 
 /// Returns the civilian unit type that this promotion is available for
 bool CvPromotionEntry::GetCivilianUnitType(int i) const

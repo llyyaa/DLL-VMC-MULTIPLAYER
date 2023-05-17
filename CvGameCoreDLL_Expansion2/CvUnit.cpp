@@ -725,6 +725,11 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 				setHasPromotion(ePromotion, true);
 			}
 
+			else if (::IsPromotionValidForUnitType(ePromotion, getUnitType()))
+			{
+				setHasPromotion(ePromotion, true);
+			}
+
 		}
 	}
 
@@ -1556,8 +1561,10 @@ void CvUnit::convert(CvUnit* pUnit, bool bIsUpgrade)
 				}
 
 				// if we get this due to a policy or wonder
+
+
 				else if (GET_PLAYER(getOwner()).IsFreePromotion(ePromotion) && (
-					::IsPromotionValidForUnitCombatType(ePromotion, getUnitType()) || ::IsPromotionValidForCivilianUnitType(ePromotion, getUnitType())))
+					::IsPromotionValidForUnitCombatType(ePromotion, getUnitType()) || ::IsPromotionValidForCivilianUnitType(ePromotion, getUnitType()) || ::IsPromotionValidForUnitType(ePromotion, getUnitType())))
 				{
 					bGivePromotion = true;
 				}
@@ -22996,6 +23003,54 @@ bool CvUnit::canAcquirePromotion(PromotionTypes ePromotion) const
 				bLacksOrPrereq = false;
 		}
 	}
+
+
+	// OR Promotion 10
+	if (bLacksOrPrereq)
+	{
+		PromotionTypes ePromotion10 = (PromotionTypes)pkPromotionInfo->GetPrereqOrPromotion10();
+		if (ePromotion10 != NO_PROMOTION)
+		{
+			if (isHasPromotion(ePromotion10))
+				bLacksOrPrereq = false;
+		}
+	}
+
+	// OR Promotion 11
+	if (bLacksOrPrereq)
+	{
+		PromotionTypes ePromotion11 = (PromotionTypes)pkPromotionInfo->GetPrereqOrPromotion11();
+		if (ePromotion11 != NO_PROMOTION)
+		{
+			if (isHasPromotion(ePromotion11))
+				bLacksOrPrereq = false;
+		}
+	}
+
+	// OR Promotion 12
+	if (bLacksOrPrereq)
+	{
+		PromotionTypes ePromotion12 = (PromotionTypes)pkPromotionInfo->GetPrereqOrPromotion12();
+		if (ePromotion12 != NO_PROMOTION)
+		{
+			if (isHasPromotion(ePromotion12))
+				bLacksOrPrereq = false;
+		}
+	}
+
+
+
+	// OR Promotion 13
+	if (bLacksOrPrereq)
+	{
+		PromotionTypes ePromotion13 = (PromotionTypes)pkPromotionInfo->GetPrereqOrPromotion13();
+		if (ePromotion13 != NO_PROMOTION)
+		{
+			if (isHasPromotion(ePromotion13))
+				bLacksOrPrereq = false;
+		}
+	}
+
 
 	if(bLacksOrPrereq)
 	{

@@ -52,6 +52,16 @@ public:
 	int	GetPrereqOrPromotion9() const;
 	void	SetPrereqOrPromotion9(int i);
 
+
+	int	GetPrereqOrPromotion10() const;
+	void	SetPrereqOrPromotion10(int i);
+	int	GetPrereqOrPromotion11() const;
+	void	SetPrereqOrPromotion11(int i);
+	int	GetPrereqOrPromotion12() const;
+	void	SetPrereqOrPromotion12(int i);
+	int	GetPrereqOrPromotion13() const;
+	void	SetPrereqOrPromotion13(int i);
+
 	int  GetTechPrereq() const;
 	int  GetInvisibleType() const;
 	int  GetSeeInvisibleType() const;
@@ -324,6 +334,11 @@ public:
 	bool GetFeatureImpassable(int i) const;
 	bool GetUnitCombatClass(int i) const;
 	bool GetCivilianUnitType(int i) const;
+
+#if defined(MOD_ROG_CORE)
+	bool GetUnitType(int i) const;
+#endif
+
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	bool IsUnitNaming(int i) const;
 	void GetUnitName(UnitTypes eUnit, CvString& sUnitName) const;
@@ -399,6 +414,10 @@ protected:
 	int m_iPrereqOrPromotion7;
 	int m_iPrereqOrPromotion8;
 	int m_iPrereqOrPromotion9;
+	int m_iPrereqOrPromotion10;
+	int m_iPrereqOrPromotion11;
+	int m_iPrereqOrPromotion12;
+	int m_iPrereqOrPromotion13;
 
 	int m_iTechPrereq;
 	int m_iInvisibleType;
@@ -683,6 +702,11 @@ protected:
 	bool* m_pbFeatureImpassable;
 	bool* m_pbUnitCombat;
 	bool* m_pbCivilianUnitType;
+
+
+	bool* m_pbUnitType;
+
+
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	bool* m_pbUnitName;
 #endif
