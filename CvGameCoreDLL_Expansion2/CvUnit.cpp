@@ -17952,6 +17952,18 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 
 	if(pNewPlot != NULL)
 	{
+
+#if defined(MOD_ROG_CORE)
+		if (getAoEDamageOnMove() != 0)
+		{
+			DoAdjacentPlotDamage(pNewPlot, getAoEDamageOnMove());
+		}
+
+		MoveToEnemyPlotDamage(pNewPlot);
+
+#endif
+
+
 		//update facing direction
 		if(pOldPlot != NULL)
 		{
@@ -18171,30 +18183,7 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 
 			if(pAdjacentPlot != NULL)
 			{
-#if defined(MOD_ROG_CORE)
-				if (getAoEDamageOnMove() != 0)
-				{
-					//bool bIsCity = pAdjacentPlot->isCity();
-					if (!pAdjacentPlot->isCity())
-					{
-						for (int iJ = 0; iJ < pAdjacentPlot->getNumUnits(); iJ++)
-						{
-							CvUnit* pEnemyUnit = pAdjacentPlot->getUnitByIndex(iJ);
 
-							if (pEnemyUnit != NULL && pEnemyUnit->isEnemy(getTeam()))
-							{
-								if (getAoEDamageOnMove() + pEnemyUnit->getDamage() >= pEnemyUnit->GetMaxHitPoints())
-								{
-									// Earn bonuses for kills?
-									CvPlayer& kAttackingPlayer = GET_PLAYER(getOwner());
-									kAttackingPlayer.DoYieldsFromKill(this, pEnemyUnit, pNewPlot->getX(), pNewPlot->getY(), 0.5f);
-								}
-								pEnemyUnit->changeDamage(getAoEDamageOnMove(), getOwner());
-							}
-						}
-					}
-				}
-#endif
 				// Owned by someone
 				if(pAdjacentPlot->getTeam() != NO_TEAM)
 				{
@@ -19787,6 +19776,32 @@ void CvUnit::SetFortifiedThisTurn(bool bValue)
 }
 
 
+
+void CvUnit::MoveToEnemyPlotDamage(CvPlot* pWhere)
+{
+	if (pWhere == NULL)
+		return;
+
+	CvCity* pOwner = pWhere->getWorkingCity();
+	CvPlayer& kPlayer = GET_PLAYER(getOwner());
+
+	if (pOwner != NULL && GET_TEAM(pOwner->getTeam()).isAtWar(kPlayer.getTeam()))
+	{
+		if (pWhere->isWater())
+		{
+			int iTempdamage = pWhere->getWorkingCity()->getWaterTileDamage();
+			changeDamage(iTempdamage, pOwner->getOwner(), 0.0f);
+		}
+
+		else
+		{
+			int iTempdamage = pWhere->getWorkingCity()->getLandTileDamage();
+			changeDamage(iTempdamage, pOwner->getOwner(), 0.0f);
+		}
+	}
+}
+
+
 void CvUnit::DoAdjacentPlotDamage(CvPlot* pWhere, int iValue)
 {
 	if (iValue < 1 || pWhere == NULL)
@@ -19795,6 +19810,7 @@ void CvUnit::DoAdjacentPlotDamage(CvPlot* pWhere, int iValue)
 
 	int iX = pWhere->getX();
 	int iY = pWhere->getY();
+
 
 	int iRadius = 2;
 	for (int i = -iRadius; i <= iRadius; ++i) {
@@ -19821,7 +19837,7 @@ void CvUnit::DoAdjacentPlotDamage(CvPlot* pWhere, int iValue)
 #endif
 					}
 
-					pEnemyUnit->changeDamage(iValue, getOwner(), 0.0);
+					pEnemyUnit->changeDamage(iValue, getOwner(), 0.0f);
 				}
 			}
 		}
