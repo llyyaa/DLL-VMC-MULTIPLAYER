@@ -5225,6 +5225,33 @@ void CvPlayer::DoUnitReset()
 			pLoopUnit->changeDamage(-iCitadelHeal, NO_PLAYER, /*fAdditionalTextDelay*/ 0.5f);
 #endif
 		}
+
+
+		CvPlot* pUnitPlot = pLoopUnit->plot();
+		CvCity* pOwner = pUnitPlot->getWorkingCity();
+
+		if (pOwner != NULL && GET_TEAM(pOwner->getTeam()).isAtWar(getTeam()))
+		{
+			if (pUnitPlot->isWater())
+			{
+
+				int iTempDamage = pUnitPlot->getWorkingCity()->getWaterTileTurnDamage();
+				if (iTempDamage > 0)
+				{
+					pLoopUnit->changeDamage(iTempDamage, pUnitPlot->getOwner(), 0.0f);
+				}
+			}
+
+			else
+			{
+				int iTempDamage = pUnitPlot->getWorkingCity()->getLandTileTurnDamage();
+				if (iTempDamage > 0)
+				{
+					pLoopUnit->changeDamage(iTempDamage, pUnitPlot->getOwner(), 0.0f);
+				}
+
+			}
+		}
 #endif
 
 
