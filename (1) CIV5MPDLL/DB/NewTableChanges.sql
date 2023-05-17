@@ -43,6 +43,17 @@ ALTER TABLE Buildings ADD COLUMN 'NukeInterceptionChance' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD COLUMN 'ExtraDamageHeal' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD COLUMN 'ExtraAttacks' INTEGER DEFAULT 0;
 
+
+ALTER TABLE Buildings ADD COLUMN 'WaterTileDamage' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD COLUMN 'WaterTileMovementReduce' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD COLUMN 'WaterTileTurnDamage' INTEGER DEFAULT 0;
+
+ALTER TABLE Buildings ADD COLUMN 'LandTileDamage' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD COLUMN 'LandTileMovementReduce' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD COLUMN 'LandTileTurnDamage' INTEGER DEFAULT 0;
+
+
+
 ALTER TABLE Improvements ADD COLUMN 'NearbyFriendHeal' INTEGER DEFAULT 0;
 ALTER TABLE Improvements ADD COLUMN 'ImprovementResource' TEXT DEFAULT NULL;
 ALTER TABLE Improvements ADD COLUMN 'ImprovementResourceQuantity' INTEGER DEFAULT 0;
