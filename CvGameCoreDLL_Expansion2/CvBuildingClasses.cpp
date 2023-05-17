@@ -155,6 +155,13 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 	m_iGlobalCityStrengthMod(0),
 	m_iGlobalRangedStrikeModifier(0),
+
+	m_iWaterTileDamage(0),
+	m_iWaterTileMovementReduce(0),
+	m_iWaterTileTurnDamage(0),
+	m_iLandTileDamage(0),
+	m_iLandTileMovementReduce(0),
+	m_iLandTileTurnDamage(0),
 #endif
 
 	m_iNukeInterceptionChance(0),
@@ -373,6 +380,14 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 	m_iGlobalCityStrengthMod = kResults.GetInt("GlobalCityStrengthMod");
 	m_iGlobalRangedStrikeModifier = kResults.GetInt("GlobalRangedStrikeModifier");
+
+
+	m_iWaterTileDamage = kResults.GetInt("WaterTileDamage");
+	m_iWaterTileMovementReduce = kResults.GetInt("WaterTileMovementReduce");
+	m_iWaterTileTurnDamage = kResults.GetInt("WaterTileTurnDamage");
+	m_iLandTileDamage = kResults.GetInt("LandTileDamage");
+	m_iLandTileMovementReduce = kResults.GetInt("LandTileMovementReduce");
+	m_iLandTileTurnDamage = kResults.GetInt("LandTileTurnDamage");
 #endif
 
 	m_iNukeInterceptionChance = kResults.GetInt("NukeInterceptionChance");
@@ -1586,6 +1601,39 @@ int CvBuildingEntry::GetReduceDamageValue() const
 	return m_iReduceDamageValue;
 }
 
+
+
+int CvBuildingEntry::GetWaterTileDamage() const
+{
+	return m_iWaterTileDamage;
+}
+
+int CvBuildingEntry::GetWaterTileMovementReduce() const
+{
+	return m_iWaterTileMovementReduce;
+}
+
+
+
+int CvBuildingEntry::GetWaterTileTurnDamage() const
+{
+	return m_iWaterTileTurnDamage;
+}
+
+int CvBuildingEntry::GetLandTileDamage() const
+{
+	return m_iLandTileDamage;
+}
+
+int CvBuildingEntry::GetLandTileMovementReduce() const
+{
+	return m_iLandTileMovementReduce;
+}
+
+int CvBuildingEntry::GetLandTileTurnDamage() const
+{
+	return m_iLandTileTurnDamage;
+}
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
