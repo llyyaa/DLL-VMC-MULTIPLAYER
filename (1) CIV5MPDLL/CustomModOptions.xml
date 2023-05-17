@@ -1017,9 +1017,11 @@
     <Row Class="5" Name="IMPROVEMENTS_UPGRADE" Value="0"/>
 
     <!-- table changes: -->
-    <!-- ALTER TABLE Improvements ADD COLUMN 'CreateResource' TEXT DEFAULT NULL; -->
+    <!-- see Improvements_Create_Item.sql -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'CreatedItemMod' INTEGER DEFAULT 0; -->
     <!-- ALTER TABLE Improvements ADD COLUMN 'CreatedResourceQuantity' INTEGER DEFAULT 0; -->
     <!-- ALTER TABLE Improvements ADD COLUMN 'SetNewImprovement' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'SetNewFeature' TEXT DEFAULT NULL; -->
     <Row Class="5" Name="IMPROVEMENTS_CREATE_ITEMS" Value="1"/>
 
     <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_GROWTH" Value="0"/>
