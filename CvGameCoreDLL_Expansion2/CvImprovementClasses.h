@@ -100,7 +100,7 @@ public:
 	int GetNewFeature() const;
 
 	int GetCreateResource(CvPlot* pPlot) const;
-	bool* GetCreateResourceList() const;
+	int* GetCreateResourceList() const;
 	int* GetCreateTerrainList() const;
 	bool* GetCreateTerrainOnlyList() const;
 	int* GetCreateFeatureList() const;
@@ -289,7 +289,7 @@ protected:
 	int m_iSetNewImprovement;
 	int m_iSetNewFeature;
 
-	bool* m_iCreateResourceList;
+	int* m_iCreateResourceList;
 	int* m_iCreateTerrainList;
 	bool* m_iCreateTerrainOnlyList;
 	int* m_iCreateFeatureList;

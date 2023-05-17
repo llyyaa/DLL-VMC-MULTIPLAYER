@@ -606,7 +606,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 		}
 
 		pResults->Bind(1, szImprovementType, false);
-
+		int iResultLoop = 0;
 		while(pResults->Step())
 		{
 			const int ResourceID = pResults->GetInt(0);
@@ -620,11 +620,13 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 			CvAssert(FeatureID > -1);
 			const bool FeatureOnly = pResults->GetBool(4);
 			
-			m_iCreateResourceList[ResourceID] = true;
-			m_iCreateTerrainList[ResourceID] = TerrainID;
-			m_iCreateTerrainOnlyList[ResourceID] = TerrainOnly;
-			m_iCreateFeatureList[ResourceID] = FeatureID;
-			m_iCreateFeatureOnlyList[ResourceID] = FeatureOnly;
+			//ResourceID + 1 to distinguish between default value and RESOURCE_IRON(0)
+			m_iCreateResourceList[iResultLoop] = ResourceID + 1;
+			m_iCreateTerrainList[iResultLoop] = TerrainID;
+			m_iCreateTerrainOnlyList[iResultLoop] = TerrainOnly;
+			m_iCreateFeatureList[iResultLoop] = FeatureID;
+			m_iCreateFeatureOnlyList[iResultLoop] = FeatureOnly;
+			iResultLoop = iResultLoop + 1;
 		}
 		pResults->Reset();
 #endif
@@ -1037,9 +1039,9 @@ int CvImprovementEntry::GetCreateResource(CvPlot* pPlot) const
 		int iNumResources = GC.getNumResourceInfos();
 		for(int iResourceLoop = 0; iResourceLoop < iNumResources; iResourceLoop++)
 		{
-			if(!m_iCreateResourceList[iResourceLoop])
+			if(m_iCreateResourceList[iResourceLoop] == 0)
 			{
-				continue;
+				break;
 			}
 			TerrainTypes thisTerrain = (TerrainTypes)m_iCreateTerrainList[iResourceLoop];
 			if(m_iCreateTerrainOnlyList[iResourceLoop] && pPlot->getTerrainType() != thisTerrain)
@@ -1052,7 +1054,7 @@ int CvImprovementEntry::GetCreateResource(CvPlot* pPlot) const
 				continue;
 			}
 
-			CanCreateResourceList.push_back(iResourceLoop);
+			CanCreateResourceList.push_back(m_iCreateResourceList[iResourceLoop] - 1);
 		}
 		if(!CanCreateResourceList.empty())
 		{
@@ -1062,7 +1064,7 @@ int CvImprovementEntry::GetCreateResource(CvPlot* pPlot) const
 	}
 	return -1;
 }
-bool* CvImprovementEntry::GetCreateResourceList() const
+int* CvImprovementEntry::GetCreateResourceList() const
 {
 	return m_iCreateResourceList;
 }
