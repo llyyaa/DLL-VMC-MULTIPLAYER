@@ -219,6 +219,13 @@ public:
 	int GetYieldChangeWorldWonderGlobal(int i) const;
 #endif
 
+	int GetYieldFromProcessModifier(int i) const;
+	int* GetYieldFromProcessModifierArray() const;
+
+	int GetYieldFromProcessModifierGlobal(int i) const;
+	int* GetYieldFromProcessModifierArrayGlobal() const;
+
+
 #if defined(MOD_ROG_CORE)
 	int GetResourceYieldChangeGlobal(int iResource, int iYieldType) const;
 	int GetImprovementYieldChange(int i, int j) const;
@@ -231,6 +238,7 @@ public:
 
 	int GetBuildingClassYieldModifier(int i, int j) const;
 #endif
+
 
 	int GetMinAreaSize() const;
 	int GetConquestProbability() const;
@@ -527,6 +535,8 @@ private:
 	int** m_ppaiSpecialistYieldChangeLocal;
 #endif
 
+	int* m_piYieldFromProcessModifier;
+	int* m_piYieldFromProcessModifierGlobal;
 
 #if defined(MOD_ROG_CORE)
 	int* m_piYieldChangeWorldWonder;

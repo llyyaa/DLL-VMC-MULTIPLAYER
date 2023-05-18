@@ -725,6 +725,11 @@ public:
 	void ChangeYieldPerPopInEmpireTimes100(YieldTypes eIndex, int iChange);
 #endif
 
+	int GetYieldFromProcessModifier(YieldTypes eIndex1) const;
+	void ChangeYieldFromProcessModifier(YieldTypes eIndex, int iChange);
+
+
+
 #if defined(MOD_ROG_CORE)
 	int getLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2)	const;
 	void changeLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2, int iChange);
@@ -1219,6 +1224,8 @@ protected:
 
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
 #endif
+
+	FAutoVariable<std::vector<int>, CvCity> m_aiYieldFromProcessModifier;
 
 
 	std::vector<int> m_aiYieldPerReligion;

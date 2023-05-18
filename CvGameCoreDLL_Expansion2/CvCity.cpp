@@ -309,12 +309,15 @@ CvCity::CvCity() :
 	, m_ppaiFeatureYieldChange(0)
 	, m_ppaiTerrainYieldChange(0)
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
-	, m_ppaiPlotYieldChange(0)
+	, m_ppaiPlotYieldChange(0)	
 #endif
 
+	, m_aiYieldFromProcessModifier("CvCity::m_aiYieldFromProcessModifier", m_syncArchive)
+
+
 #if defined(MOD_ROG_CORE)
-		, m_ppaaiImprovementYieldChange(0)
-		, m_ppiSpecialistYieldChange(0)
+	, m_ppaaiImprovementYieldChange(0)
+	, m_ppiSpecialistYieldChange(0)
 #endif
 
 
@@ -1077,6 +1080,10 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiBaseYieldRateFromReligion.resize(NUM_YIELD_TYPES);
 	m_aiYieldPerPop.resize(NUM_YIELD_TYPES);
 
+
+	m_aiYieldFromProcessModifier.resize(NUM_YIELD_TYPES);
+
+
 #if defined(MOD_ROG_CORE)
 	m_aiYieldPerPopInEmpire.clear();
 #endif
@@ -1161,6 +1168,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiResourceQuantityFromPOP.clear();
 		m_aiResourceQuantityFromPOP.resize(iNumResources);
 #endif
+
+		m_aiYieldFromProcessModifier.setAt(iI, 0);
 
 
 		for(iI = 0; iI < iNumResources; iI++)
@@ -7089,6 +7098,11 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 #if defined(MOD_ROG_CORE)
 			ChangeYieldPerPopInEmpireTimes100(eYield, pBuildingInfo->GetYieldChangePerPopInEmpire(eYield)* iChange);
+
+			if ((pBuildingInfo->GetYieldFromProcessModifier(eYield) > 0))
+			{
+				ChangeYieldFromProcessModifier(eYield, (pBuildingInfo->GetYieldFromProcessModifier(eYield) * iChange));
+			}
 #endif
 #if defined(MOD_ROG_CORE)
 			int iYieldMod = pBuildingInfo->GetBuildingClassYieldModifier(eBuildingClass, eYield);
@@ -7357,7 +7371,8 @@ void CvCity::processProcess(ProcessTypes eProcess, int iChange)
 		// Convert to another yield
 		for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 		{
-			changeProductionToYieldModifier(((YieldTypes)iI), (pkProcessInfo->getProductionToYieldModifier(iI) * iChange));
+			changeProductionToYieldModifier((YieldTypes)iI, (pkProcessInfo->getProductionToYieldModifier(iI)) * iChange);
+
 		}
 	}
 }
@@ -8940,7 +8955,11 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 	// Process production into culture
-	iCulturePerTurn += (getBasicYieldRateTimes100(YIELD_PRODUCTION, false, true) / 100) * getProductionToYieldModifier(YIELD_CULTURE) / 100;
+	if (getProductionToYieldModifier(YIELD_CULTURE) != 0)
+	{
+	iCulturePerTurn += (getBasicYieldRateTimes100(YIELD_PRODUCTION, false, true) / 100) * (getProductionToYieldModifier(YIELD_CULTURE) + GetYieldFromProcessModifier(YIELD_CULTURE) + GET_PLAYER(getOwner()).GetYieldFromProcessModifierGlobal(YIELD_CULTURE)) / 100;
+	}
+	//iCulturePerTurn += (getBasicYieldRateTimes100(YIELD_PRODUCTION, false, true) / 100) * (getProductionToYieldModifier(YIELD_CULTURE)) / 100;
 
 	// Culture from having trade routes
 	iCulturePerTurn += GET_PLAYER(m_eOwner).GetTrade()->GetTradeValuesAtCityTimes100(this, YIELD_CULTURE) / 100;
@@ -9094,7 +9113,10 @@ int CvCity::GetFaithPerTurn() const
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 	// Process production into faith
-	iFaith += (getBasicYieldRateTimes100(YIELD_PRODUCTION, false, false) / 100) * getProductionToYieldModifier(YIELD_FAITH) / 100;
+	if (getProductionToYieldModifier(YIELD_FAITH) != 0)
+	{
+		iFaith += (getBasicYieldRateTimes100(YIELD_PRODUCTION, false, false) / 100) * (getProductionToYieldModifier(YIELD_FAITH) + GetYieldFromProcessModifier(YIELD_FAITH) + GET_PLAYER(getOwner()).GetYieldFromProcessModifierGlobal(YIELD_FAITH)) / 100;
+	}
 
 	// Faith from having trade routes
 	iFaith += GET_PLAYER(m_eOwner).GetTrade()->GetTradeValuesAtCityTimes100(this, YIELD_FAITH) / 100;
@@ -11308,11 +11330,11 @@ int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const
 	{
 #if defined(MOD_PROCESS_STOCKPILE)
 		// We want to process production to production and call it stockpiling!
-		iProcessYield = getBasicYieldRateTimes100(YIELD_PRODUCTION, false, false) * getProductionToYieldModifier(eIndex) / 100;
+		iProcessYield = getBasicYieldRateTimes100(YIELD_PRODUCTION, false, false) * (getProductionToYieldModifier(eIndex) + GetYieldFromProcessModifier(eIndex) + GET_PLAYER(getOwner()).GetYieldFromProcessModifierGlobal(eIndex)) / 100;
 #else
 		CvAssertMsg(eIndex != YIELD_PRODUCTION, "GAMEPLAY: should not be trying to convert Production into Production via process.");
 
-		iProcessYield = getYieldRateTimes100(YIELD_PRODUCTION, false) * getProductionToYieldModifier(eIndex) / 100;
+		iProcessYield = getYieldRateTimes100(YIELD_PRODUCTION, false) * (getProductionToYieldModifier(eIndex) + GetYieldFromProcessModifier(eIndex) + GET_PLAYER(getOwner()).GetYieldFromProcessModifierGlobal(eIndex)) / 100;
 #endif
 	}
 
@@ -11562,6 +11584,36 @@ void CvCity::ChangeBaseYieldRateFromMisc(YieldTypes eIndex, int iChange)
 		}
 	}
 }
+
+
+
+
+//	--------------------------------------------------------------------------------
+/// process Extra yield from building
+int CvCity::GetYieldFromProcessModifier(YieldTypes eIndex1) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex1 >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex1 < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	return m_aiYieldFromProcessModifier[eIndex1];
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield from building
+void CvCity::ChangeYieldFromProcessModifier(YieldTypes eIndex1, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex1 >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex1 < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	if (iChange != 0)
+	{
+		m_aiYieldFromProcessModifier.setAt(eIndex1, m_aiYieldFromProcessModifier[eIndex1] + iChange);
+		CvAssert(GetYieldFromProcessModifier(eIndex) >= 0);
+	}
+}
+
+
 
 //	--------------------------------------------------------------------------------
 /// Base yield rate from Religion
@@ -16392,6 +16444,9 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiBaseYieldRateFromMisc;
 	kStream >> m_aiBaseYieldRateFromReligion;
 	kStream >> m_aiYieldPerPop;
+
+	kStream >> m_aiYieldFromProcessModifier;
+
 	if (uiVersion >= 4)
 	{
 		kStream >> m_aiYieldPerReligion;
@@ -16809,6 +16864,8 @@ void CvCity::write(FDataStream& kStream) const
 
 	kStream << m_strName;
 	kStream << m_strScriptData;
+
+	kStream << m_aiYieldFromProcessModifier;
 
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiNoResource);
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiFreeResource);
