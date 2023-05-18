@@ -2619,13 +2619,13 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 		{
 			return false;
 		}
-
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
 		// Can not create resource in a plot where already has one
-		if(getResourceType() != NO_RESOURCE && (ResourceTypes)GC.getImprovementInfo(eImprovement)->GetResourceCreated() != NO_RESOURCE)
+		if(getResourceType() != NO_RESOURCE && GC.getImprovementInfo(eImprovement)->GetCreateItemMod() > 2)
 		{
 			return false;
 		}
-
+#endif
 		// Already an improvement here
 		if(getImprovementType() != NO_IMPROVEMENT)
 		{
@@ -10425,6 +10425,10 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 	if(pkBuildInfo == NULL)
 		return false;
 
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+	bool eClearImprovement = false;
+#endif
+
 	if(iChange != 0)
 	{
 		if(NULL == m_paiBuildProgress)
@@ -10458,19 +10462,48 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 			{
 #if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
 				CvImprovementEntry& tImprovementEntry = *GC.getImprovementInfo(eImprovement);
-				ResourceTypes cResource = (ResourceTypes)tImprovementEntry.GetResourceCreated();
-				int cResourceQuantity = tImprovementEntry.GetResourceQuantityCreated();
-				if (MOD_IMPROVEMENTS_CREATE_ITEMS && cResource != NO_RESOURCE && cResourceQuantity != 0)
+				int eCreateItemMod = tImprovementEntry.GetCreateItemMod();
+				if(MOD_IMPROVEMENTS_CREATE_ITEMS)
 				{
-					cResourceQuantity = cResourceQuantity > 0 ? cResourceQuantity : GC.getGame().getJonRandNum(-cResourceQuantity, "Get random source quantity when constructed ") + 1;
-					setResourceType(cResource, cResourceQuantity);
+					//enable create resource mod
+					if(eCreateItemMod > 2)
+					{
+						ResourceTypes cResource = (ResourceTypes)tImprovementEntry.GetCreateResource(this);
+						int cResourceQuantity = tImprovementEntry.GetCreatedResourceQuantity();
+						if (cResource != NO_RESOURCE && cResourceQuantity != 0)
+						{
+							cResourceQuantity = cResourceQuantity > 0 ? cResourceQuantity : GC.getGame().getJonRandNum(-cResourceQuantity, "Get random source quantity when constructed ") + 1;
+							setResourceType(cResource, cResourceQuantity);
+						}
+					}
+					if(eCreateItemMod >1)
+					{
+						FeatureTypes cFeature = (FeatureTypes)tImprovementEntry.GetNewFeature();
+						if(cFeature != NO_FEATURE)
+						{
+							setFeatureType(cFeature);
+						}
+					}
+					if(eCreateItemMod >0)
+					{
+						ImprovementTypes cImprovement = (ImprovementTypes)tImprovementEntry.GetNewImprovement();
+						if(cImprovement != NO_IMPROVEMENT)
+						{
+							eImprovement = cImprovement;
+						}
+						else 
+						{
+							eClearImprovement = true;
+						}
+					}
 				}
-				if(MOD_IMPROVEMENTS_CREATE_ITEMS && (ImprovementTypes)tImprovementEntry.GetNewImprovement() != NO_IMPROVEMENT)
+				if(!eClearImprovement)
 				{
-					eImprovement = (ImprovementTypes)tImprovementEntry.GetNewImprovement();
+					setImprovementType(eImprovement, ePlayer);
 				}
-#endif
+#else
 				setImprovementType(eImprovement, ePlayer);
+#endif		
 				
 #if defined(MOD_BUGFIX_MINOR)
 				// Building a GP improvement on a resource needs to clear any previous pillaged state

@@ -488,6 +488,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvements_Create_Item.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/GLOBAL/WarCasualties.sql</FileName>
       </Action>
       <Action>
@@ -865,6 +870,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\IMPROVEMENTS\Improvement_Upgrade_Downgrade.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvements_Create_Item.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
