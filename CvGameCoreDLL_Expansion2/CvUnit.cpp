@@ -459,6 +459,9 @@ CvUnit::CvUnit() :
 	, m_eFeatureInvisible("CvUnit::m_eFeatureInvisible", m_syncArchive)
 	, m_eFeatureInvisible2("CvUnit::m_eFeatureInvisible2", m_syncArchive)
 #endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	, m_eMultipleInitExperence("CvUnit::m_eMultipleInitExperence", m_syncArchive)
+#endif
 	, m_eGreatPeopleDirectiveType("CvUnit::m_eGreatPeopleDirectiveType", m_syncArchive)
 	, m_combatUnit()
 	, m_transportUnit()
@@ -1284,6 +1287,9 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 #if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
 	m_eFeatureInvisible = (int)NO_FEATURE;
 	m_eFeatureInvisible2 = (int)NO_FEATURE;
+#endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	m_eMultipleInitExperence = 0;
 #endif
 	m_eGreatPeopleDirectiveType = NO_GREAT_PEOPLE_DIRECTIVE_TYPE;
 	m_iCargoCapacity = 0;
@@ -16559,7 +16565,7 @@ bool CvUnit::isInvisible(TeamTypes eTeam, bool bDebug, bool bCheckCargo) const
 #if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
 bool CvUnit::IsInvisibleInvalid() const
 {
-	if(GetFeatureInvisible() != -1 || GetFeatureInvisible2() != -1)
+	if(MOD_PROMOTION_FEATURE_INVISIBLE && (GetFeatureInvisible() != -1 || GetFeatureInvisible2() != -1))
 	{
 		int thisFeature = (int)plot()->getFeatureType();
 		if(thisFeature == -1 || (GetFeatureInvisible() != thisFeature && GetFeatureInvisible2() != thisFeature))
@@ -16569,8 +16575,21 @@ bool CvUnit::IsInvisibleInvalid() const
 	}
 	return false;
 }
-//	--------------------------------------------------------------------------------
 #endif
+//	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+void CvUnit::ChangeMultipleInitExperence(int iValue)
+{
+	VALIDATE_OBJECT
+	m_eMultipleInitExperence += iValue;
+}
+const int CvUnit::GetMultipleInitExperence() const
+{
+	VALIDATE_OBJECT
+	return m_eMultipleInitExperence;
+}
+#endif
+//	--------------------------------------------------------------------------------
 bool CvUnit::isNukeImmune() const
 {
 	VALIDATE_OBJECT
@@ -23277,9 +23296,15 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		}
 
 #if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-		if(thisPromotion.GetFeatureInvisible() != -1 || thisPromotion.GetFeatureInvisible2() != -1)
+		if(MOD_PROMOTION_FEATURE_INVISIBLE && thisPromotion.GetFeatureInvisible() != -1 || thisPromotion.GetFeatureInvisible2() != -1)
 		{
 			setFeatureInvisible(thisPromotion.GetFeatureInvisible(), thisPromotion.GetFeatureInvisible2());
+		}
+#endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+		if(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE && thisPromotion.GetMultipleInitExperence() > 0)
+		{
+			ChangeMultipleInitExperence(thisPromotion.GetMultipleInitExperence());
 		}
 #endif
 

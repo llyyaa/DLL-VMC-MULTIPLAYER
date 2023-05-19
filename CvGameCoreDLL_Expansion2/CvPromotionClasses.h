@@ -70,6 +70,9 @@ public:
 	int GetFeatureInvisible() const;
 	int GetFeatureInvisible2() const;
 #endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	int GetMultipleInitExperence() const;
+#endif
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
 	int  GetReconChange() const;
 #endif
@@ -425,6 +428,9 @@ protected:
 #if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
 	int m_iFeatureInvisible;
 	int m_iFeatureInvisible2;
+#endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	int m_iMultipleInitExperence;
 #endif
 	int m_iVisibilityChange;
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)

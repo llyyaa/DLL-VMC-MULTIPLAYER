@@ -1062,6 +1062,10 @@
     <Row Class="6" Name="GLOBAL_UNIT_MOVES_AFTER_DISEMBARK" Value="0"/>
 
     <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="PROMOTION_MULTIPLE_INIT_EXPERENCE" Value="1"/>
+
+    <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
     <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="0"/>
 

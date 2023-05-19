@@ -1299,6 +1299,10 @@ public:
 	void setFeatureInvisible(int FeatureInvisible, int FeatureInvisible2);
 	bool IsInvisibleInvalid() const;
 #endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	const int GetMultipleInitExperence() const;
+	void ChangeMultipleInitExperence(int iValue);
+#endif
 
 	const CvUnit* getCombatUnit() const;
 	CvUnit* getCombatUnit();
@@ -2049,6 +2053,10 @@ protected:
 	FAutoVariable<int, CvUnit> m_eFeatureInvisible;
 	FAutoVariable<int, CvUnit> m_eFeatureInvisible2;
 #endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	FAutoVariable<int, CvUnit> m_eMultipleInitExperence;
+#endif
+
 	FAutoVariable<GreatPeopleDirectiveTypes, CvUnit> m_eGreatPeopleDirectiveType;
 	CvUnitEntry* m_pUnitInfo;
 

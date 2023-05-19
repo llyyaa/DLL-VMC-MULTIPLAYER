@@ -685,6 +685,9 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	const char* szFeatureInvisible2 = kResults.GetText("FeatureInvisible2");
 	m_iFeatureInvisible2 = GC.getInfoTypeForString(szFeatureInvisible2, true);
 #endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
+#endif
 
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
@@ -1359,6 +1362,13 @@ int CvPromotionEntry::GetFeatureInvisible() const
 int CvPromotionEntry::GetFeatureInvisible2() const
 {
 	return m_iFeatureInvisible2;
+}
+#endif
+
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+int CvPromotionEntry::GetMultipleInitExperence() const
+{
+	return m_iMultipleInitExperence;
 }
 #endif
 

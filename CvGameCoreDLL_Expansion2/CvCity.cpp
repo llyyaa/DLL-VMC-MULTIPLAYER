@@ -4326,6 +4326,13 @@ void CvCity::addProductionExperience(CvUnit* pUnit, bool bConscript)
 	}
 
 	pUnit->testPromotionReady();
+
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	if(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE && pUnit->GetMultipleInitExperence() > 0)
+	{
+		pUnit->changeExperienceTimes100(pUnit->getExperienceTimes100() * (pUnit->GetMultipleInitExperence()) / 100);
+	}
+#endif	
 }
 
 
