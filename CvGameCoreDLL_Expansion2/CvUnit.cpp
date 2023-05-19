@@ -3810,6 +3810,9 @@ void CvUnit::move(CvPlot& targetPlot, bool bShow)
 
 	bool bShouldDeductCost = true;
 	int iMoveCost = targetPlot.movementCost(this, plot());
+#if defined(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK)
+	bool bIsDisembark = false;
+#endif
 
 	// we need to get our dis/embarking on
 #if defined(MOD_PATHFINDER_TERRAFIRMA)
@@ -3872,6 +3875,9 @@ void CvUnit::move(CvPlot& targetPlot, bool bShow)
 					PublishQueuedVisualizationMoves();
 
 				disembark(pOldPlot);
+#if defined(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK)
+				bIsDisembark = true;
+#endif	
 			}
 		}
 		else
@@ -3896,6 +3902,12 @@ void CvUnit::move(CvPlot& targetPlot, bool bShow)
 
 	if(bShouldDeductCost)
 		changeMoves(-iMoveCost);
+#if defined(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK)
+		if(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK && !canMove() && bIsDisembark)
+		{
+			setMoves(GC.getUNIT_MOVES_AFTER_DISEMBARK());
+		}
+#endif
 	setXY(targetPlot.getX(), targetPlot.getY(), true, true, bShow && targetPlot.isVisibleToWatchingHuman(), bShow);
 }
 
