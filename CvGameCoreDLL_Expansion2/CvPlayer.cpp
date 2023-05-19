@@ -14025,15 +14025,15 @@ void CvPlayer::DoProcessGoldenAge()
 	// Minors and Barbs can't get GAs
 	if(!isMinorCiv() && !isBarbarian())
 	{
-#ifdef MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA
+#if defined(MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA)
 		bool isInGA = false;
-		int GAMeterBouns = 1;
+		int GAMeterBouns = 100;
 		// Already in a GA - don't decrement counter while in Anarchy
 		if(getGoldenAgeTurns() > 0)
 		{
 			isInGA = true;
 			GAMeterBouns = GC.getGOLDEN_AGE_POINT_MULTIPLE_IN_GA();
-			GAMeterBouns = GAMeterBouns < 1 ? 1 : GAMeterBouns;
+			GAMeterBouns = GAMeterBouns < 0 ? 0 : GAMeterBouns;
 			if(!IsAnarchy())
 			{
 				changeGoldenAgeTurns(-1);
@@ -14045,17 +14045,17 @@ void CvPlayer::DoProcessGoldenAge()
 		{
 			
 			// Note: This will actually REDUCE the GA meter if the player is running in the red
-			ChangeGoldenAgeProgressMeter(GetExcessHappiness()/GAMeterBouns);
+			ChangeGoldenAgeProgressMeter(GetExcessHappiness()*GAMeterBouns/100);
 			
 #if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			// GA points from religion
-			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromReligion(YIELD_GOLDEN_AGE_POINTS)/GAMeterBouns);
+			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromReligion(YIELD_GOLDEN_AGE_POINTS)*GAMeterBouns/100);
 
 			// Trait bonus which adds GA points for trade partners? 
-			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromTraits(YIELD_GOLDEN_AGE_POINTS)/GAMeterBouns);
+			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromTraits(YIELD_GOLDEN_AGE_POINTS)*GAMeterBouns/100);
 
 			// Add in all the GA points from city yields
-			ChangeGoldenAgeProgressMeter(GetGoldenAgePointPerTurnFromCitys()/GAMeterBouns);
+			ChangeGoldenAgeProgressMeter(GetGoldenAgePointPerTurnFromCitys()*GAMeterBouns/100);
 #endif
 
 			// Enough GA Progress to trigger new GA?
