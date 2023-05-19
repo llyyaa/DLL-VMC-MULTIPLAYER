@@ -23928,46 +23928,21 @@ void CvUnit::read(FDataStream& kStream)
 #if defined(MOD_API_EXTENSIONS)
 	MOD_SERIALIZE_READ(58, kStream, m_iBaseRangedCombat, ((NO_UNIT != m_eUnitType) ? m_pUnitInfo->GetRangedCombat() : 0));
 #endif
-
-	kStream >> m_iCaptureDefeatedEnemyChance;
-	kStream >> m_iCannotBeCapturedCount;
-
-#if defined(MOD_ROG_CORE)
-	kStream >> m_iMoveLfetAttackMod;
-	kStream >> m_iMoveUsedAttackMod;
-	kStream >> m_iGoldenAgeMod;
-	kStream >> m_iRangedSupportFireMod;
-
-
-	kStream >> m_iBarbCombatBonus;
-	kStream >> m_iDamageAoEFortified;
-	kStream >> m_iWorkRateMod;
-	kStream >> m_iAOEDamageOnKill;
-
-#endif
-
 	kStream >> m_iCapitalDefenseModifier;
 	kStream >> m_iCapitalDefenseFalloff;
-
 	kStream >> m_iCityAttackPlunderModifier;
-
 	kStream >> m_iReligiousStrengthLossRivalTerritory;
-
 	kStream >> m_iTradeMissionInfluenceModifier;
 	kStream >> m_iTradeMissionGoldModifier;
-
 	kStream >> m_iEnemyDamageChance;
 	kStream >> m_iNeutralDamageChance;
-
 	kStream >> m_iEnemyDamage;
 	kStream >> m_iNeutralDamage;
-
 	kStream >> m_iNearbyEnemyCombatMod;
 	kStream >> m_iNearbyEnemyCombatRange;
 
 	kStream >> m_iHealOnPillageCount;
 	kStream >> m_iFlankAttackModifier;
-
 	if (uiVersion >= 3)
 	{
 		kStream >> m_iGoldenAgeValueFromKills;
@@ -23980,7 +23955,6 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iGreatGeneralReceivesMovementCount;
 	kStream >> m_iGreatGeneralCombatModifier;
 	kStream >> m_iIgnoreGreatGeneralBenefit;
-
 	if (uiVersion >= 8)
 	{
 		kStream >> m_iIgnoreZOC;
@@ -23989,6 +23963,20 @@ void CvUnit::read(FDataStream& kStream)
 	{
 		m_iIgnoreZOC = 0;
 	}
+
+	kStream >> m_iCaptureDefeatedEnemyChance;
+	kStream >> m_iCannotBeCapturedCount;
+
+#if defined(MOD_ROG_CORE)
+	kStream >> m_iMoveLfetAttackMod;
+	kStream >> m_iMoveUsedAttackMod;
+	kStream >> m_iGoldenAgeMod;
+	kStream >> m_iRangedSupportFireMod;
+	kStream >> m_iBarbCombatBonus;
+	kStream >> m_iDamageAoEFortified;
+	kStream >> m_iWorkRateMod;
+	kStream >> m_iAOEDamageOnKill;
+#endif
 
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_READ(77, kStream, m_iNoSupply, 0);
@@ -24264,7 +24252,6 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iIgnoreGreatGeneralBenefit;
 	kStream << m_iIgnoreZOC;
 
-
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;
 
@@ -24273,15 +24260,11 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iMoveUsedAttackMod;
 	kStream << m_iGoldenAgeMod;
 	kStream << m_iRangedSupportFireMod;
-
-
 	kStream << m_iBarbCombatBonus;
 	kStream << m_iDamageAoEFortified;
 	kStream << m_iWorkRateMod;
 	kStream << m_iAOEDamageOnKill;
-
 #endif
-
 
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_WRITE(kStream, m_iNoSupply);
