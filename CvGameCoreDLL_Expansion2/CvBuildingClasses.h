@@ -203,6 +203,13 @@ public:
 
 	int GetResetDamageValue() const;
 	int GetReduceDamageValue() const;
+
+	int GetWaterTileDamage() const;
+	int GetWaterTileMovementReduce() const;
+	int GetWaterTileTurnDamage() const;
+	int GetLandTileDamage() const;
+	int GetLandTileMovementReduce() const;
+	int GetLandTileTurnDamage() const;
 #endif
 
 
@@ -211,6 +218,13 @@ public:
 	int GetYieldChangeWorldWonder(int i) const;
 	int GetYieldChangeWorldWonderGlobal(int i) const;
 #endif
+
+	int GetYieldFromProcessModifier(int i) const;
+	int* GetYieldFromProcessModifierArray() const;
+
+	int GetYieldFromProcessModifierGlobal(int i) const;
+	int* GetYieldFromProcessModifierArrayGlobal() const;
+
 
 #if defined(MOD_ROG_CORE)
 	int GetResourceYieldChangeGlobal(int iResource, int iYieldType) const;
@@ -224,6 +238,7 @@ public:
 
 	int GetBuildingClassYieldModifier(int i, int j) const;
 #endif
+
 
 	int GetMinAreaSize() const;
 	int GetConquestProbability() const;
@@ -496,6 +511,15 @@ private:
 
 	int m_iGlobalCityStrengthMod;
 	int m_iGlobalRangedStrikeModifier;
+
+
+
+	int m_iWaterTileDamage;
+	int m_iWaterTileMovementReduce;
+	int m_iWaterTileTurnDamage;
+	int m_iLandTileDamage;
+	int m_iLandTileMovementReduce;
+	int m_iLandTileTurnDamage;
 #endif
 
 	int m_iNukeInterceptionChance;
@@ -511,6 +535,8 @@ private:
 	int** m_ppaiSpecialistYieldChangeLocal;
 #endif
 
+	int* m_piYieldFromProcessModifier;
+	int* m_piYieldFromProcessModifierGlobal;
 
 #if defined(MOD_ROG_CORE)
 	int* m_piYieldChangeWorldWonder;

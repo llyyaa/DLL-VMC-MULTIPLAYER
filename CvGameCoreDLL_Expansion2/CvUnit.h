@@ -902,6 +902,8 @@ public:
 
 	void DoAdjacentPlotDamage(CvPlot* pWhere, int iValue);
 
+	void MoveToEnemyPlotDamage(CvPlot* pWhere);
+
 #if defined(MOD_ROG_CORE)
 	int getMeleeDefenseModifier() const;
 	void changeMeleeDefenseModifier(int iValue);

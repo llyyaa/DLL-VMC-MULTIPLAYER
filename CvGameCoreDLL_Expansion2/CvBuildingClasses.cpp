@@ -155,6 +155,13 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 	m_iGlobalCityStrengthMod(0),
 	m_iGlobalRangedStrikeModifier(0),
+
+	m_iWaterTileDamage(0),
+	m_iWaterTileMovementReduce(0),
+	m_iWaterTileTurnDamage(0),
+	m_iLandTileDamage(0),
+	m_iLandTileMovementReduce(0),
+	m_iLandTileTurnDamage(0),
 #endif
 
 	m_iNukeInterceptionChance(0),
@@ -163,6 +170,9 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	m_piInstantYield(NULL),
 #endif
+
+	m_piYieldFromProcessModifier(NULL),
+	m_piYieldFromProcessModifierGlobal(NULL),
 
 #if defined(MOD_ROG_CORE)
 	m_piResourceQuantityFromPOP(NULL),
@@ -177,7 +187,6 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piYieldChangeWorldWonderGlobal(NULL),
 
 	m_ppiBuildingClassYieldModifiers(NULL),
-
 	m_piYieldChangePerPopInEmpire(),
 #endif
 
@@ -305,6 +314,9 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piInstantYield);
 #endif
 
+	SAFE_DELETE_ARRAY(m_piYieldFromProcessModifier);
+	SAFE_DELETE_ARRAY(m_piYieldFromProcessModifierGlobal);
+
 #if defined(MOD_ROG_CORE)
 	SAFE_DELETE_ARRAY(m_piResourceQuantityFromPOP);
 	SAFE_DELETE_ARRAY(m_piGreatWorkYieldChange);
@@ -373,6 +385,14 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 	m_iGlobalCityStrengthMod = kResults.GetInt("GlobalCityStrengthMod");
 	m_iGlobalRangedStrikeModifier = kResults.GetInt("GlobalRangedStrikeModifier");
+
+
+	m_iWaterTileDamage = kResults.GetInt("WaterTileDamage");
+	m_iWaterTileMovementReduce = kResults.GetInt("WaterTileMovementReduce");
+	m_iWaterTileTurnDamage = kResults.GetInt("WaterTileTurnDamage");
+	m_iLandTileDamage = kResults.GetInt("LandTileDamage");
+	m_iLandTileMovementReduce = kResults.GetInt("LandTileMovementReduce");
+	m_iLandTileTurnDamage = kResults.GetInt("LandTileTurnDamage");
 #endif
 
 	m_iNukeInterceptionChance = kResults.GetInt("NukeInterceptionChance");
@@ -640,11 +660,15 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piInstantYield, "Building_InstantYield", "BuildingType", szBuildingType);
 #endif
 
+	kUtility.SetYields(m_piYieldFromProcessModifier, "Building_YieldFromProcessModifier", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromProcessModifierGlobal, "Building_YieldFromProcessModifierGlobal", "BuildingType", szBuildingType);
+
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piGreatWorkYieldChange, "Building_GreatWorkYieldChanges", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangeWorldWonder, "Building_YieldChangeWorldWonder", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangeWorldWonderGlobal, "Building_YieldChangeWorldWonderGlobal", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByValue(m_piResourceQuantityFromPOP, "Resources", "Building_ResourceQuantityFromPOP", "ResourceType", "BuildingType", szBuildingType, "Modifier");
+
 #endif
 
 	//ResourceYieldChanges
@@ -1586,6 +1610,39 @@ int CvBuildingEntry::GetReduceDamageValue() const
 	return m_iReduceDamageValue;
 }
 
+
+
+int CvBuildingEntry::GetWaterTileDamage() const
+{
+	return m_iWaterTileDamage;
+}
+
+int CvBuildingEntry::GetWaterTileMovementReduce() const
+{
+	return m_iWaterTileMovementReduce;
+}
+
+
+
+int CvBuildingEntry::GetWaterTileTurnDamage() const
+{
+	return m_iWaterTileTurnDamage;
+}
+
+int CvBuildingEntry::GetLandTileDamage() const
+{
+	return m_iLandTileDamage;
+}
+
+int CvBuildingEntry::GetLandTileMovementReduce() const
+{
+	return m_iLandTileMovementReduce;
+}
+
+int CvBuildingEntry::GetLandTileTurnDamage() const
+{
+	return m_iLandTileTurnDamage;
+}
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
@@ -2190,7 +2247,35 @@ int* CvBuildingEntry::GetYieldChangePerPopArray() const
 }
 
 
+
+/// Does this Policy grant yields from constructing buildings?
+int CvBuildingEntry::GetYieldFromProcessModifier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromProcessModifier[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromProcessModifierArray() const
+{
+	return m_piYieldFromProcessModifier;
+}
+
+int CvBuildingEntry::GetYieldFromProcessModifierGlobal(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromProcessModifierGlobal[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromProcessModifierArrayGlobal() const
+{
+	return m_piYieldFromProcessModifierGlobal;
+}
+
+
 #if defined(MOD_ROG_CORE)
+
 /// Change to yield by type
 int CvBuildingEntry::GetYieldChangePerPopInEmpire(int i) const
 {

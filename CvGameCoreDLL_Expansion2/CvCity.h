@@ -725,6 +725,11 @@ public:
 	void ChangeYieldPerPopInEmpireTimes100(YieldTypes eIndex, int iChange);
 #endif
 
+	int GetYieldFromProcessModifier(YieldTypes eIndex1) const;
+	void ChangeYieldFromProcessModifier(YieldTypes eIndex, int iChange);
+
+
+
 #if defined(MOD_ROG_CORE)
 	int getLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2)	const;
 	void changeLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2, int iChange);
@@ -849,6 +854,26 @@ public:
 
 	int getReduceDamageValue()const;
 	void changeReduceDamageValue(int iChange);
+
+
+
+	int getWaterTileDamage()const;
+	void changeWaterTileDamage(int iChange);
+
+	int getWaterTileMovementReduce()const;
+	void changeWaterTileMovementReduce(int iChange);
+
+	int getWaterTileTurnDamage()const;
+	void changeWaterTileTurnDamage(int iChange);
+
+	int getLandTileDamage()const;
+	void changeLandTileDamage(int iChange);
+
+	int getLandTileMovementReduce()const;
+	void changeLandTileMovementReduce(int iChange);
+
+	int getLandTileTurnDamage()const;
+	void changeLandTileTurnDamage(int iChange);
 
 #endif
 
@@ -1147,6 +1172,15 @@ protected:
 
 	FAutoVariable<int, CvCity> m_iResetDamageValue;
 	FAutoVariable<int, CvCity> m_iReduceDamageValue;
+
+
+	FAutoVariable<int, CvCity> m_iWaterTileDamage;
+	FAutoVariable<int, CvCity> m_iWaterTileMovementReduce;
+
+	FAutoVariable<int, CvCity> m_iWaterTileTurnDamage;
+	FAutoVariable<int, CvCity> m_iLandTileDamage;
+	FAutoVariable<int, CvCity> m_iLandTileMovementReduce;
+	FAutoVariable<int, CvCity> m_iLandTileTurnDamage;
 #endif
 
 	int m_iNukeInterceptionChance;
@@ -1190,6 +1224,8 @@ protected:
 
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
 #endif
+
+	FAutoVariable<std::vector<int>, CvCity> m_aiYieldFromProcessModifier;
 
 
 	std::vector<int> m_aiYieldPerReligion;

@@ -4692,9 +4692,11 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 		auto* collection = GC.GetPromotionCollection(collectionType);
 		if (!collection->CanAddEnermyPromotions()) continue;
 
-		for (auto promotionIter = collection->GetPromotions().rbegin(); promotionIter != collection->GetPromotions().rend(); promotionIter++)
+		bool breakPromotionLoop = false;
+		for (auto promotionIter = collection->GetPromotions().rbegin(); !breakPromotionLoop && promotionIter != collection->GetPromotions().rend(); promotionIter++)
 		{
 			if (!thisUnit->HasPromotion(promotionIter->m_ePromotionType)) continue;
+			breakPromotionLoop = true;
 
 			auto& triggerInfo = promotionIter->m_kTriggerAddPromotionInfo;
 			bool combatTypeOK = ((rangedAttack && triggerInfo.m_bRangedAttack)
@@ -4703,22 +4705,21 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 				|| (meleeDefense && triggerInfo.m_bMeleeDefense));
 			if (!combatTypeOK) continue;
 
-			bool triggerFlag = false;
+			bool isTrigger = false;
 			if (triggerInfo.m_bLuaCheck)
 			{
-				triggerFlag = GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CanAddEnermyPromotion, promotionIter->m_ePromotionType, collectionType, 
+				isTrigger = GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CanAddEnermyPromotion, promotionIter->m_ePromotionType, collectionType, 
 					thisBattleType, thisUnit->getOwner(), thisUnit->GetID(), thatUnit->getOwner(), thatUnit->GetID()) == GAMEEVENTRETURN_TRUE;
 			}
-			if (!triggerFlag)
+			if (!isTrigger)
 			{
 				int thatHP = thatUnit->GetCurrHitPoints();
 				if (thatHP < triggerInfo.m_iHPFixed + triggerInfo.m_iHPPercent * thatUnit->GetMaxHitPoints() / 100)
 				{
-					triggerFlag = true;
+					isTrigger = true;
 				}
 			}
-
-			if (!triggerFlag) continue;
+			if (!isTrigger) continue;
 
 			for (auto collectionToAdd : collection->GetAddEnermyPromotionPools())
 			{
@@ -4729,6 +4730,7 @@ static void DoAddEnermyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battl
 					if (thatUnit->HasPromotion(promotionToAdd.m_ePromotionType)) continue;
 
 					thatUnit->setHasPromotion(promotionToAdd.m_ePromotionType, true);
+					thatPromotion = promotionToAdd.m_ePromotionType;
 					break;
 				}
 				if (triggerInfo.m_bLuaHook)
