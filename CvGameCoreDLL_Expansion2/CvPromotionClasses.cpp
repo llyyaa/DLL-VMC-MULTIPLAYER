@@ -204,6 +204,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyImprovementBonusRange(0),
 	m_eCombatBonusImprovement(NO_IMPROVEMENT),
 #endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	m_iAllyCityStateCombatModifier(0),
+	m_iAllyCityStateCombatModifierMax(0),
+#endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	m_bCanCrossMountains(false),
 #endif
@@ -362,6 +366,13 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		if (szTextVal) {
 			m_eCombatBonusImprovement = (ImprovementTypes)GC.getInfoTypeForString(szTextVal, true);
 		}
+	}
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	if (MOD_PROMOTIONS_ALLYCITYSTATE_BONUS) {
+		m_iAllyCityStateCombatModifier = kResults.GetInt("AllyCityStateCombatModifier");
+		m_iAllyCityStateCombatModifierMax = kResults.GetInt("AllyCityStateCombatModifierMax");
 	}
 #endif
 
@@ -2040,6 +2051,18 @@ int CvPromotionEntry::GetNearbyImprovementBonusRange() const
 ImprovementTypes CvPromotionEntry::GetCombatBonusImprovement() const
 {
 	return m_eCombatBonusImprovement;
+}
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+/// Accessor: Permits units to receive a combat bonus from Ally City States
+int CvPromotionEntry::GetAllyCityStateCombatModifier() const
+{
+	return m_iAllyCityStateCombatModifier;
+}
+int CvPromotionEntry::GetAllyCityStateCombatModifierMax() const
+{
+	return m_iAllyCityStateCombatModifierMax;
 }
 #endif
 

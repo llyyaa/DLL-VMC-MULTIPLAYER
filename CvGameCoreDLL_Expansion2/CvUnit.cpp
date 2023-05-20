@@ -285,6 +285,11 @@ CvUnit::CvUnit() :
 	, m_eCombatBonusImprovement("CvUnit::m_eCombatBonusImprovement", m_syncArchive)
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	, m_iAllyCityStateCombatModifier("CvUnit::m_iAllyCityStateCombatModifier", m_syncArchive)
+	, m_iAllyCityStateCombatModifierMax("CvUnit::m_iAllyCityStateCombatModifierMax", m_syncArchive)
+#endif
+
 #if defined(MOD_ROG_CORE)
 		, m_iCombatBonusFromNearbyUnitClass("CvUnit::m_iCombatBonusFromNearbyUnitClass", m_syncArchive)
 		, m_iNearbyUnitClassBonusRange("CvUnit::m_iNearbyUnitClassBonusRange", m_syncArchive)
@@ -1091,6 +1096,11 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iNearbyImprovementCombatBonus = 0;
 	m_iNearbyImprovementBonusRange = 0;
 	m_eCombatBonusImprovement = NO_IMPROVEMENT;
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	m_iAllyCityStateCombatModifier = 0;
+	m_iAllyCityStateCombatModifierMax = 0;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -13213,6 +13223,11 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 
 	CvPlayerAI& onwer = GET_PLAYER(getOwner());
 	iModifier += onwer.GetStrengthModifierFromAlly();
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	iModifier += GetStrengthModifierFromAlly();
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	if (MOD_BUILDINGS_GOLDEN_AGE_EXTEND && onwer.isGoldenAge())
 	{
@@ -14657,7 +14672,6 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 	//this may be always zero when defending (on defense -> fewer targets, harder to hit)
 	iModifier += GetDamageCombatModifier(!bAttacking);
 
-
 #if defined(MOD_ROG_CORE)
 	// GoldenAge modifier always applies for attack
 	//CvPlayerAI& kPlayer = GET_PLAYER(getOwner());
@@ -14673,6 +14687,11 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 	CvPlayerAI& onwer = GET_PLAYER(getOwner());
 	iModifier += onwer.GetStrengthModifierFromAlly();
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	iModifier += GetStrengthModifierFromAlly();
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	if (MOD_BUILDINGS_GOLDEN_AGE_EXTEND && onwer.isGoldenAge())
 	{
@@ -16002,7 +16021,44 @@ void CvUnit::SetCombatBonusImprovement(ImprovementTypes eImprovement)
 }
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+int CvUnit::GetAllyCityStateCombatModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iAllyCityStateCombatModifier;
+}
+void CvUnit::SetAllyCityStateCombatModifier(int iCombatBonus)
+{
+	VALIDATE_OBJECT
+	m_iAllyCityStateCombatModifier = iCombatBonus;
+}
+int CvUnit::GetAllyCityStateCombatModifierMax() const
+{
+	VALIDATE_OBJECT
+	return m_iAllyCityStateCombatModifierMax;
+}
+void CvUnit::SetAllyCityStateCombatModifierMax(int iCombatBonusMax)
+{
+	VALIDATE_OBJECT
+	m_iAllyCityStateCombatModifierMax = iCombatBonusMax;
+}
+int CvUnit::GetStrengthModifierFromAlly() const
+{
+	VALIDATE_OBJECT
+	if (GetAllyCityStateCombatModifier() == 0)
+	{
+		return 0;
+	}
 
+	int mod = GET_PLAYER(getOwner()).GetMinorAllyCount(true) * GetAllyCityStateCombatModifier();
+	if (GetAllyCityStateCombatModifierMax() > -1 && mod > GetAllyCityStateCombatModifierMax())
+	{
+		mod = GetAllyCityStateCombatModifierMax();
+	}
+
+	return mod;
+}
+#endif
 
 #if defined(MOD_ROG_CORE)
 int CvUnit::getNearbyUnitClassBonus() const
@@ -23169,6 +23225,17 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 				SetNearbyImprovementCombatBonus(thisPromotion.GetNearbyImprovementCombatBonus());
 				SetNearbyImprovementBonusRange(thisPromotion.GetNearbyImprovementBonusRange());
 				SetCombatBonusImprovement(thisPromotion.GetCombatBonusImprovement());
+			}
+		}
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+		if (MOD_PROMOTIONS_ALLYCITYSTATE_BONUS) {
+			if (thisPromotion.GetAllyCityStateCombatModifier() > 0) {
+				SetAllyCityStateCombatModifier(thisPromotion.GetAllyCityStateCombatModifier());
+			}
+			if (thisPromotion.GetAllyCityStateCombatModifierMax() > 0) {
+				SetAllyCityStateCombatModifierMax(thisPromotion.GetAllyCityStateCombatModifierMax());
 			}
 		}
 #endif
