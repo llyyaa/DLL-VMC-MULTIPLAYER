@@ -269,6 +269,10 @@ public:
 	int GetNearbyImprovementBonusRange() const;
 	ImprovementTypes GetCombatBonusImprovement() const;
 #endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int GetAllyCityStateCombatModifier() const;
+	int GetAllyCityStateCombatModifierMax() const;
+#endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool CanCrossMountains() const;
 #endif
@@ -411,6 +415,15 @@ public:
 	bool GetCollateralDamageImmune() const;
 	int GetCollateralXP() const;
 #endif
+
+	int GetAttackInflictDamageChange() const;
+	int GetAttackInflictDamageChangeMaxHPPercent() const;
+
+	int GetDefenseInflictDamageChange() const;
+	int GetDefenseInflictDamageChangeMaxHPPercent() const;
+
+	int GetSiegeInflictDamageChange() const;
+	int GetSiegeInflictDamageChangeMaxHPPercent() const;
 
 protected:
 	int m_iLayerAnimationPath;
@@ -646,6 +659,10 @@ protected:
 	int m_iNearbyImprovementBonusRange;
 	ImprovementTypes m_eCombatBonusImprovement;
 #endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int m_iAllyCityStateCombatModifier;
+	int m_iAllyCityStateCombatModifierMax;
+#endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool m_bCanCrossMountains;
 #endif
@@ -765,6 +782,15 @@ protected:
 	int m_iSiegeKillCitizensPercent = 0;
 	int m_iSiegeKillCitizensFixed = 0;
 #endif
+
+	int m_iAttackInflictDamageChange = 0;
+	int m_iAttackInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iDefenseInflictDamageChange = 0;
+	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iSiegeInflictDamageChange = 0;
+	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

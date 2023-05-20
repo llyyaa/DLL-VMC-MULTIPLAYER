@@ -285,6 +285,11 @@ CvUnit::CvUnit() :
 	, m_eCombatBonusImprovement("CvUnit::m_eCombatBonusImprovement", m_syncArchive)
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	, m_iAllyCityStateCombatModifier("CvUnit::m_iAllyCityStateCombatModifier", m_syncArchive)
+	, m_iAllyCityStateCombatModifierMax("CvUnit::m_iAllyCityStateCombatModifierMax", m_syncArchive)
+#endif
+
 #if defined(MOD_ROG_CORE)
 		, m_iCombatBonusFromNearbyUnitClass("CvUnit::m_iCombatBonusFromNearbyUnitClass", m_syncArchive)
 		, m_iNearbyUnitClassBonusRange("CvUnit::m_iNearbyUnitClassBonusRange", m_syncArchive)
@@ -1110,6 +1115,11 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iNearbyImprovementCombatBonus = 0;
 	m_iNearbyImprovementBonusRange = 0;
 	m_eCombatBonusImprovement = NO_IMPROVEMENT;
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	m_iAllyCityStateCombatModifier = 0;
+	m_iAllyCityStateCombatModifierMax = 0;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -13311,6 +13321,11 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 
 	CvPlayerAI& onwer = GET_PLAYER(getOwner());
 	iModifier += onwer.GetStrengthModifierFromAlly();
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	iModifier += GetStrengthModifierFromAlly();
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	if (MOD_BUILDINGS_GOLDEN_AGE_EXTEND && onwer.isGoldenAge())
 	{
@@ -14755,7 +14770,6 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 	//this may be always zero when defending (on defense -> fewer targets, harder to hit)
 	iModifier += GetDamageCombatModifier(!bAttacking);
 
-
 #if defined(MOD_ROG_CORE)
 	// GoldenAge modifier always applies for attack
 	//CvPlayerAI& kPlayer = GET_PLAYER(getOwner());
@@ -14771,6 +14785,11 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 	CvPlayerAI& onwer = GET_PLAYER(getOwner());
 	iModifier += onwer.GetStrengthModifierFromAlly();
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	iModifier += GetStrengthModifierFromAlly();
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	if (MOD_BUILDINGS_GOLDEN_AGE_EXTEND && onwer.isGoldenAge())
 	{
@@ -16100,7 +16119,44 @@ void CvUnit::SetCombatBonusImprovement(ImprovementTypes eImprovement)
 }
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+int CvUnit::GetAllyCityStateCombatModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iAllyCityStateCombatModifier;
+}
+void CvUnit::SetAllyCityStateCombatModifier(int iCombatBonus)
+{
+	VALIDATE_OBJECT
+	m_iAllyCityStateCombatModifier = iCombatBonus;
+}
+int CvUnit::GetAllyCityStateCombatModifierMax() const
+{
+	VALIDATE_OBJECT
+	return m_iAllyCityStateCombatModifierMax;
+}
+void CvUnit::SetAllyCityStateCombatModifierMax(int iCombatBonusMax)
+{
+	VALIDATE_OBJECT
+	m_iAllyCityStateCombatModifierMax = iCombatBonusMax;
+}
+int CvUnit::GetStrengthModifierFromAlly() const
+{
+	VALIDATE_OBJECT
+	if (GetAllyCityStateCombatModifier() == 0)
+	{
+		return 0;
+	}
 
+	int mod = GET_PLAYER(getOwner()).GetMinorAllyCount(true) * GetAllyCityStateCombatModifier();
+	if (GetAllyCityStateCombatModifierMax() > -1 && mod > GetAllyCityStateCombatModifierMax())
+	{
+		mod = GetAllyCityStateCombatModifierMax();
+	}
+
+	return mod;
+}
+#endif
 
 #if defined(MOD_ROG_CORE)
 int CvUnit::getNearbyUnitClassBonus() const
@@ -23400,6 +23456,17 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		}
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+		if (MOD_PROMOTIONS_ALLYCITYSTATE_BONUS) {
+			if (thisPromotion.GetAllyCityStateCombatModifier() > 0) {
+				SetAllyCityStateCombatModifier(thisPromotion.GetAllyCityStateCombatModifier());
+			}
+			if (thisPromotion.GetAllyCityStateCombatModifierMax() > 0) {
+				SetAllyCityStateCombatModifierMax(thisPromotion.GetAllyCityStateCombatModifierMax());
+			}
+		}
+#endif
+
 #if defined(MOD_ROG_CORE)
 		if (MOD_ROG_CORE) {	
 			changeAoEDamageOnMove(thisPromotion.GetAoEDamageOnMove() * iChange);
@@ -23808,20 +23875,27 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 
 #if !defined(NO_ACHIEVEMENTS)
 		PromotionTypes eBuffaloChest =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_CHEST", true /*bHideAssert*/);
-		PromotionTypes eBuffaloLoins =(PromotionTypes) GC.getInfoTypeForString("PROMOTION_BUFFALO_LOINS", true /*bHideAssert*/);
+		PromotionTypes eBuffaloLoins = (PromotionTypes)GC.getInfoTypeForString("PROMOTION_BUFFALO_LOINS", true /*bHideAssert*/);
 
 		const PlayerTypes eActivePlayer = GC.getGame().getActivePlayer();
-		if(getOwner() == eActivePlayer && ((eIndex == eBuffaloChest && isHasPromotion(eBuffaloLoins)) || (eIndex == eBuffaloLoins && isHasPromotion(eBuffaloChest))))
+		if (getOwner() == eActivePlayer && ((eIndex == eBuffaloChest && isHasPromotion(eBuffaloLoins)) || (eIndex == eBuffaloLoins && isHasPromotion(eBuffaloChest))))
 		{
 			gDLL->UnlockAchievement(ACHIEVEMENT_XP2_27);
 		}
 #endif
 
+		ChangeAttackInflictDamageChange(iChange * thisPromotion.GetAttackInflictDamageChange());
+		ChangeAttackInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetAttackInflictDamageChangeMaxHPPercent());
+		ChangeDefenseInflictDamageChange(iChange * thisPromotion.GetDefenseInflictDamageChange());
+		ChangeDefenseInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetDefenseInflictDamageChangeMaxHPPercent());
+		ChangeSiegeInflictDamageChange(iChange * thisPromotion.GetSiegeInflictDamageChange());
+		ChangeSiegeInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetSiegeInflictDamageChangeMaxHPPercent());
+
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
-	if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
-	{
-		SetCannotBeRangedAttacked(m_Promotions.IsCannotBeRangedAttacked());
-	}
+		if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
+		{
+			SetCannotBeRangedAttacked(m_Promotions.IsCannotBeRangedAttacked());
+		}
 #endif
 	}
 }
@@ -24276,6 +24350,20 @@ void CvUnit::read(FDataStream& kStream)
 	}
 #endif
 
+#ifdef MOD_PROMOTIONS_ALLYCITYSTATE_BONUS
+	kStream >> m_iAllyCityStateCombatModifier;
+	kStream >> m_iAllyCityStateCombatModifierMax;
+#endif
+
+	kStream >> m_iAttackInflictDamageChange;
+	kStream >> m_iAttackInflictDamageChangeMaxHPPercent;
+
+	kStream >> m_iDefenseInflictDamageChange;
+	kStream >> m_iDefenseInflictDamageChangeMaxHPPercent;
+
+	kStream >> m_iSiegeInflictDamageChange;
+	kStream >> m_iSiegeInflictDamageChangeMaxHPPercent;
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -24508,6 +24596,20 @@ void CvUnit::write(FDataStream& kStream) const
 		kStream << (int) *iter;
 	}
 #endif
+
+#ifdef MOD_PROMOTIONS_ALLYCITYSTATE_BONUS
+	kStream << m_iAllyCityStateCombatModifier;
+	kStream << m_iAllyCityStateCombatModifierMax;
+#endif
+
+	kStream << m_iAttackInflictDamageChange;
+	kStream << m_iAttackInflictDamageChangeMaxHPPercent;
+
+	kStream << m_iDefenseInflictDamageChange;
+	kStream << m_iDefenseInflictDamageChangeMaxHPPercent;
+
+	kStream << m_iSiegeInflictDamageChange;
+	kStream << m_iSiegeInflictDamageChangeMaxHPPercent;
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -28801,3 +28903,56 @@ bool CvUnit::CanSiegeKillCitizens() const
 }
 
 #endif
+
+int CvUnit::GetAttackInflictDamageChange() const
+{
+	return m_iAttackInflictDamageChange;
+}
+int CvUnit::GetAttackInflictDamageChangeMaxHPPercent() const
+{
+	return m_iAttackInflictDamageChangeMaxHPPercent;
+}
+
+int CvUnit::GetDefenseInflictDamageChange() const
+{
+	return m_iDefenseInflictDamageChange;
+}
+int CvUnit::GetDefenseInflictDamageChangeMaxHPPercent() const
+{
+	return m_iDefenseInflictDamageChangeMaxHPPercent;
+}
+
+void CvUnit::ChangeAttackInflictDamageChange(int iChange)
+{
+	m_iAttackInflictDamageChange += iChange;
+}
+void CvUnit::ChangeAttackInflictDamageChangeMaxHPPercent(int iChange)
+{
+	m_iAttackInflictDamageChangeMaxHPPercent += iChange;
+}
+
+void CvUnit::ChangeDefenseInflictDamageChange(int iChange)
+{
+	m_iDefenseInflictDamageChange += iChange;
+}
+void CvUnit::ChangeDefenseInflictDamageChangeMaxHPPercent(int iChange)
+{
+	m_iDefenseInflictDamageChangeMaxHPPercent += iChange;
+}
+
+int CvUnit::GetSiegeInflictDamageChange() const
+{
+	return m_iSiegeInflictDamageChange;
+}
+int CvUnit::GetSiegeInflictDamageChangeMaxHPPercent() const
+{
+	return m_iSiegeInflictDamageChangeMaxHPPercent;
+}
+void CvUnit::ChangeSiegeInflictDamageChange(int iChange)
+{
+	m_iSiegeInflictDamageChange += iChange;
+}
+void CvUnit::ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange)
+{
+	m_iSiegeInflictDamageChangeMaxHPPercent += iChange;
+}

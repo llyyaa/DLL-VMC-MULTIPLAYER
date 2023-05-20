@@ -213,6 +213,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyImprovementBonusRange(0),
 	m_eCombatBonusImprovement(NO_IMPROVEMENT),
 #endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	m_iAllyCityStateCombatModifier(0),
+	m_iAllyCityStateCombatModifierMax(0),
+#endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	m_bCanCrossMountains(false),
 #endif
@@ -381,6 +385,13 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		if (szTextVal) {
 			m_eCombatBonusImprovement = (ImprovementTypes)GC.getInfoTypeForString(szTextVal, true);
 		}
+	}
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	if (MOD_PROMOTIONS_ALLYCITYSTATE_BONUS) {
+		m_iAllyCityStateCombatModifier = kResults.GetInt("AllyCityStateCombatModifier");
+		m_iAllyCityStateCombatModifierMax = kResults.GetInt("AllyCityStateCombatModifierMax");
 	}
 #endif
 
@@ -700,6 +711,15 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 #if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
 	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
 #endif
+
+	m_iAttackInflictDamageChange = kResults.GetInt("AttackInflictDamageChange");
+	m_iAttackInflictDamageChangeMaxHPPercent = kResults.GetInt("AttackInflictDamageChangeMaxHPPercent");
+
+	m_iDefenseInflictDamageChange = kResults.GetInt("DefenseInflictDamageChange");
+	m_iDefenseInflictDamageChangeMaxHPPercent = kResults.GetInt("DefenseInflictDamageChangeMaxHPPercent");
+
+	m_iSiegeInflictDamageChange = kResults.GetInt("SiegeInflictDamageChange");
+	m_iSiegeInflictDamageChangeMaxHPPercent = kResults.GetInt("SiegeInflictDamageChangeMaxHPPercent");
 
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
@@ -2216,6 +2236,18 @@ ImprovementTypes CvPromotionEntry::GetCombatBonusImprovement() const
 }
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+/// Accessor: Permits units to receive a combat bonus from Ally City States
+int CvPromotionEntry::GetAllyCityStateCombatModifier() const
+{
+	return m_iAllyCityStateCombatModifier;
+}
+int CvPromotionEntry::GetAllyCityStateCombatModifierMax() const
+{
+	return m_iAllyCityStateCombatModifierMax;
+}
+#endif
+
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 /// Accessor: Can cross mountains (but we'd rather they left them nice and straight!)
 bool CvPromotionEntry::CanCrossMountains() const
@@ -2959,6 +2991,33 @@ int CvPromotionEntry::GetCollateralXP() const
 	return m_iCollateralXP;
 }
 #endif
+
+int CvPromotionEntry::GetAttackInflictDamageChange() const
+{
+	return m_iAttackInflictDamageChange;
+}
+int CvPromotionEntry::GetAttackInflictDamageChangeMaxHPPercent() const
+{
+	return m_iAttackInflictDamageChangeMaxHPPercent;
+}
+
+int CvPromotionEntry::GetDefenseInflictDamageChange() const
+{
+	return m_iDefenseInflictDamageChange;
+}
+int CvPromotionEntry::GetDefenseInflictDamageChangeMaxHPPercent() const
+{
+	return m_iDefenseInflictDamageChangeMaxHPPercent;
+}
+
+int CvPromotionEntry::GetSiegeInflictDamageChange() const
+{
+	return m_iSiegeInflictDamageChange;
+}
+int CvPromotionEntry::GetSiegeInflictDamageChangeMaxHPPercent() const
+{
+	return m_iSiegeInflictDamageChangeMaxHPPercent;
+}
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 bool CvPromotionEntry::GetAddEnemyPromotionImmune() const

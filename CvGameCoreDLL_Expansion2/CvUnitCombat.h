@@ -13,6 +13,23 @@
 #include "CvUnit.h"
 #include "CvPlot.h"
 
+struct InflictDamageContext
+{
+	CvUnit* pAttackerUnit = nullptr;
+	CvCity* pAttackerCity = nullptr;
+	CvUnit* pDefenderUnit = nullptr;
+	CvCity *pDefenderCity = nullptr;
+
+	// battle type
+	bool bRanged = false;
+	bool bMelee = false;
+	bool bAirCombat = false;
+
+	// output
+	int *piAttackInflictDamage = nullptr;
+	int *piDefenseInflictDamage = nullptr;
+};
+
 // Combat controller for CvUnits
 class CvUnitCombat
 {
@@ -70,6 +87,10 @@ public:
 #endif
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 	static void DoInstantYieldFromCombat(const CvCombatInfo& kInfo);
+#endif
+
+#ifdef MOD_ROG_CORE
+	static void InterveneInflictDamage(InflictDamageContext* ctx);
 #endif
 
 protected:

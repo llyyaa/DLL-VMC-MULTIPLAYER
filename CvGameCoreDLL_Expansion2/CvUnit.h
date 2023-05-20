@@ -625,6 +625,14 @@ public:
 	void SetCombatBonusImprovement(ImprovementTypes eImprovement);
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int GetAllyCityStateCombatModifier() const;
+	void SetAllyCityStateCombatModifier(int iCombatBonus);
+	int GetAllyCityStateCombatModifierMax() const;
+	void SetAllyCityStateCombatModifierMax(int iCombatBonusMax);
+	int GetStrengthModifierFromAlly() const;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	int getNearbyUnitClassBonus() const;
 	void SetNearbyUnitClassBonus(int iCombatBonus);
@@ -964,7 +972,20 @@ public:
 	void changeOutsideCapitalLandDefenseMod(int iValue);
 #endif
 
+	int GetAttackInflictDamageChange() const;
+	int GetAttackInflictDamageChangeMaxHPPercent() const;
+	void ChangeAttackInflictDamageChange(int iChange);
+	void ChangeAttackInflictDamageChangeMaxHPPercent(int iChange);
 
+	int GetDefenseInflictDamageChange() const;
+	int GetDefenseInflictDamageChangeMaxHPPercent() const;
+	void ChangeDefenseInflictDamageChange(int iChange);
+	void ChangeDefenseInflictDamageChangeMaxHPPercent(int iChange);
+
+	int GetSiegeInflictDamageChange() const;
+	int GetSiegeInflictDamageChangeMaxHPPercent() const;
+	void ChangeSiegeInflictDamageChange(int iChange);
+	void ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange);
 
 	int getAmphibCount() const;
 	bool isAmphib() const;
@@ -1923,6 +1944,10 @@ protected:
 	FAutoVariable<ImprovementTypes, CvUnit> m_eCombatBonusImprovement;
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifier;
+	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifierMax;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvUnit> m_iAoEDamageOnMove;
@@ -2193,6 +2218,15 @@ protected:
 	int m_iMapLayer;		// Which layer does the unit reside on for pathing/stacking/etc.
 	int m_iNumGoodyHutsPopped;
 	int m_iLastGameTurnAtFullHealth;
+
+	int m_iAttackInflictDamageChange = 0;
+	int m_iAttackInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iDefenseInflictDamageChange = 0;
+	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iSiegeInflictDamageChange = 0;
+	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
 	
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	CvString m_strUnitName;

@@ -510,6 +510,11 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/PROMOTIONS/AutoRemove.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/InflictDamageChange.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
   </PropertyGroup>
@@ -882,6 +887,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\PROMOTIONS\AutoRemove.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\InflictDamageChange.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
