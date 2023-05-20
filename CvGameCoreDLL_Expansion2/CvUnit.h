@@ -625,6 +625,14 @@ public:
 	void SetCombatBonusImprovement(ImprovementTypes eImprovement);
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int GetAllyCityStateCombatModifier() const;
+	void SetAllyCityStateCombatModifier(int iCombatBonus);
+	int GetAllyCityStateCombatModifierMax() const;
+	void SetAllyCityStateCombatModifierMax(int iCombatBonusMax);
+	int GetStrengthModifierFromAlly() const;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	int getNearbyUnitClassBonus() const;
 	void SetNearbyUnitClassBonus(int iCombatBonus);
@@ -1912,6 +1920,10 @@ protected:
 	FAutoVariable<ImprovementTypes, CvUnit> m_eCombatBonusImprovement;
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifier;
+	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifierMax;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvUnit> m_iAoEDamageOnMove;

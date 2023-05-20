@@ -262,6 +262,10 @@ public:
 	int GetNearbyImprovementBonusRange() const;
 	ImprovementTypes GetCombatBonusImprovement() const;
 #endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int GetAllyCityStateCombatModifier() const;
+	int GetAllyCityStateCombatModifierMax() const;
+#endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool CanCrossMountains() const;
 #endif
@@ -631,6 +635,10 @@ protected:
 	int m_iNearbyImprovementCombatBonus;
 	int m_iNearbyImprovementBonusRange;
 	ImprovementTypes m_eCombatBonusImprovement;
+#endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int m_iAllyCityStateCombatModifier;
+	int m_iAllyCityStateCombatModifierMax;
 #endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool m_bCanCrossMountains;
