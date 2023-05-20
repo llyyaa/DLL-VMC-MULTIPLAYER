@@ -1071,6 +1071,10 @@
     <Row Class="6" Name="PROMOTION_GET_INSTANCE_FROM_ATTACK" Value="1"/>
 
     <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'RemovePromotionUpgrade' TEXT DEFAULT NULL; -->
+    <Row Class="6" Name="PROMOTION_REMOVE_PROMOTION_UPGRADE" Value="1"/>
+
+    <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
     <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="0"/>
 

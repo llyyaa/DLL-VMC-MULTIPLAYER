@@ -608,6 +608,10 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iUnitAttackFaithBonus = kResults.GetInt("UnitAttackFaithBonus");
 	m_iCityAttackFaithBonus = kResults.GetInt("CityAttackFaithBonus");
 #endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	const char* szRemovePromotionUpgrade = kResults.GetText("RemovePromotionUpgrade");
+	m_iRemovePromotionUpgrade = GC.getInfoTypeForString(szRemovePromotionUpgrade, true);
+#endif
 	m_iReligiousStrengthLossRivalTerritory = kResults.GetInt("ReligiousStrengthLossRivalTerritory");
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
 	m_iTradeMissionGoldModifier = kResults.GetInt("TradeMissionGoldModifier");
@@ -2046,6 +2050,13 @@ int CvPromotionEntry::GetUnitAttackFaithBonus() const
 int CvPromotionEntry::GetCityAttackFaithBonus() const
 {
 	return m_iCityAttackFaithBonus;
+}
+#endif
+
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+int CvPromotionEntry::GetRemovePromotionUpgrade() const
+{
+	return m_iRemovePromotionUpgrade;
 }
 #endif
 

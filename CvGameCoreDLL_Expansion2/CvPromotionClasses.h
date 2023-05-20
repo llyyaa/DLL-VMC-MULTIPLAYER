@@ -233,6 +233,9 @@ public:
 	int GetUnitAttackFaithBonus() const;
 	int GetCityAttackFaithBonus() const;
 #endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int GetRemovePromotionUpgrade() const;
+#endif
 	int GetReligiousStrengthLossRivalTerritory() const;
 	
 	int GetTradeMissionInfluenceModifier() const;
@@ -516,6 +519,9 @@ protected:
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 	int m_iUnitAttackFaithBonus;
 	int m_iCityAttackFaithBonus;
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int m_iRemovePromotionUpgrade;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
