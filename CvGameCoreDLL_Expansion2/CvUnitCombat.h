@@ -68,6 +68,9 @@ public:
 	static void DoStackingFightBack(const CvCombatInfo& kInfo);
 #endif
 #endif
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	static void DoInstantYieldFromCombat(const CvCombatInfo& kInfo);
+#endif
 
 protected:
 	static void ResolveRangedUnitVsCombat(const CvCombatInfo& kInfo, uint uiParentEventID);

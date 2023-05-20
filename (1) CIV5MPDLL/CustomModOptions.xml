@@ -1066,6 +1066,11 @@
     <Row Class="6" Name="PROMOTION_MULTIPLE_INIT_EXPERENCE" Value="1"/>
 
     <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="PROMOTION_GET_INSTANCE_FROM_ATTACK" Value="1"/>
+
+    <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
     <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="0"/>
 

@@ -99,6 +99,8 @@ ALTER TABLE UnitPromotions ADD 'FeatureInvisible' TEXT DEFAULT NULL;
 ALTER TABLE UnitPromotions ADD 'FeatureInvisible2' TEXT DEFAULT NULL;
 
 ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0;
 
 ALTER TABLE UnitPromotions ADD 'WorkRateMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'AoEWhileFortified' INTEGER DEFAULT 0;
