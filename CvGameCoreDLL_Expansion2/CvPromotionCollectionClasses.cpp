@@ -42,29 +42,32 @@ bool CvPromotionCollectionEntry::CacheResults(Database::Results& kResults, CvDat
             entry.m_kTriggerAddPromotionInfo.m_bLuaCheck = pResults->GetBool("TriggerLuaCheck");
             entry.m_kTriggerAddPromotionInfo.m_bLuaHook = pResults->GetBool("TriggerLuaHook");
 
+			entry.m_kStackingFightBackInfo.m_bOnlyMelee = pResults->GetBool("StackingFightBackOnlyMelee");
+
             m_vPromotions.push_back(entry);
 		}
 		pResults->Reset();
 	}
 
     {
-		std::string strKey = "PromotionCollections - AddEnermyPromotionPools";
+		std::string strKey = "PromotionCollections - AddEnemyPromotionPools";
 		Database::Results* pResults = kUtility.GetResults(strKey);
 		if (pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select PromotionCollections.ID as OtherID from PromotionCollections_AddEnermyPromotions "
-                "left join PromotionCollections on PromotionCollections_AddEnermyPromotions.OtherCollectionType = PromotionCollections.Type where CollectionType = ?;");
+			pResults = kUtility.PrepareResults(strKey, "select PromotionCollections.ID as OtherID from PromotionCollections_AddEnemyPromotions "
+                "left join PromotionCollections on PromotionCollections_AddEnemyPromotions.OtherCollectionType = PromotionCollections.Type where CollectionType = ?;");
 		}
 
 		pResults->Bind(1, szThisType, lenThisType, false);
 
 		while (pResults->Step())
 		{
-			m_vAddEnermyPromotionPools.push_back((PromotionCollectionsTypes)pResults->GetInt("OtherID"));
+			m_vAddEnemyPromotionPools.push_back((PromotionCollectionsTypes)pResults->GetInt("OtherID"));
 		}
 		pResults->Reset();
 	}
 
+	m_bStackingFightBack = kResults.GetBool("StackingFightBack");
 // ------------------------------------------------------------------------
 
 #ifdef DEBUG_CvPromotionCollectionEntry

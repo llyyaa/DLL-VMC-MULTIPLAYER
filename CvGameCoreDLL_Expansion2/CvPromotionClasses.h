@@ -366,8 +366,8 @@ public:
 	int GetWarCasualtiesModifier() const;
  #endif
 
- #ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	bool GetAddEnermyPromotionImmune() const;
+ #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	bool GetAddEnemyPromotionImmune() const;
  #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -732,8 +732,8 @@ protected:
 	int m_iWarCasualtiesModifier = 0;
  #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	bool m_bAddEnermyPromotionImmune = 0;
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	bool m_bAddEnemyPromotionImmune = 0;
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL

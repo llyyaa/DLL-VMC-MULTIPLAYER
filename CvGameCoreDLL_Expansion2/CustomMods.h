@@ -886,12 +886,12 @@
 
 #define MOD_PROMOTION_SPLASH_DAMAGE             		gCustomMods.isPROMOTION_SPLASH_DAMAGE()
 #define MOD_PROMOTION_COLLATERAL_DAMAGE             		gCustomMods.isPROMOTION_COLLATERAL_DAMAGE()
-#define MOD_PROMOTION_ADD_ENERMY_PROMOTIONS             		gCustomMods.isPROMOTION_ADD_ENERMY_PROMOTIONS()
+#define MOD_PROMOTION_ADD_ENEMY_PROMOTIONS             		gCustomMods.isPROMOTION_ADD_ENEMY_PROMOTIONS()
 #define MOD_PROMOTION_CITY_DESTROYER             		gCustomMods.isPROMOTION_CITY_DESTROYER()
 #define MOD_GLOBAL_PROMOTIONS_REMOVAL 		   		                gCustomMods.isGLOBAL_PROMOTIONS_REMOVAL()
 
 #ifdef MOD_PROMOTION_SPLASH_DAMAGE
-#define MOD_NEW_BATTLE_EFFECTS (MOD_PROMOTION_SPLASH_DAMAGE || MOD_PROMOTION_COLLATERAL_DAMAGE || MOD_PROMOTION_ADD_ENERMY_PROMOTIONS || MOD_PROMOTION_CITY_DESTROYER)
+#define MOD_NEW_BATTLE_EFFECTS (MOD_PROMOTION_SPLASH_DAMAGE || MOD_PROMOTION_COLLATERAL_DAMAGE || MOD_PROMOTION_ADD_ENEMY_PROMOTIONS || MOD_PROMOTION_CITY_DESTROYER)
 #endif
 
 #define MOD_GLOBAL_CITY_SCALES gCustomMods.isGLOBAL_CITY_SCALES()
@@ -1236,8 +1236,8 @@ enum BattleTypeTypes
 
 #define GAMEEVENT_OnCityScaleChange			"OnCityScaleChange",		        "iiii"
 
-#define GAMEEVENT_CanAddEnermyPromotion			"CanAddEnermyPromotion",		        "iiiiiii"
-#define GAMEEVENT_OnTriggerAddEnermyPromotion			"OnTriggerAddEnermyPromotion",		        "iiiiiiiiiii"
+#define GAMEEVENT_CanAddEnemyPromotion			"CanAddEnemyPromotion",		        "iiiiiii"
+#define GAMEEVENT_OnTriggerAddEnemyPromotion			"OnTriggerAddEnemyPromotion",		        "iiiiiiiiiii"
 #define GAMEEVENT_CanRemovePromotion "CanRemovePromotion", "iii"
 
 // Serialization wrappers
@@ -1591,7 +1591,7 @@ public:
 
 	MOD_OPT_DECL(PROMOTION_SPLASH_DAMAGE);
 	MOD_OPT_DECL(PROMOTION_COLLATERAL_DAMAGE);
-	MOD_OPT_DECL(PROMOTION_ADD_ENERMY_PROMOTIONS);
+	MOD_OPT_DECL(PROMOTION_ADD_ENEMY_PROMOTIONS);
 	MOD_OPT_DECL(PROMOTION_CITY_DESTROYER);
 
 	MOD_OPT_DECL(GLOBAL_PROMOTIONS_REMOVAL);

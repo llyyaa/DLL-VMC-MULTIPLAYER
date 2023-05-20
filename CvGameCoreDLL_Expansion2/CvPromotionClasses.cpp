@@ -625,8 +625,8 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCollateralXP = kResults.GetInt("CollateralXP");
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	m_bAddEnermyPromotionImmune = kResults.GetBool("AddEnermyPromotionImmune");
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	m_bAddEnemyPromotionImmune = kResults.GetBool("AddEnemyPromotionImmune");
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -2928,10 +2928,10 @@ int CvPromotionEntry::GetCollateralXP() const
 }
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-bool CvPromotionEntry::GetAddEnermyPromotionImmune() const
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+bool CvPromotionEntry::GetAddEnemyPromotionImmune() const
 {
-	return m_bAddEnermyPromotionImmune;
+	return m_bAddEnemyPromotionImmune;
 }
 #endif
 
