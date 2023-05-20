@@ -24264,6 +24264,11 @@ void CvUnit::read(FDataStream& kStream)
 	}
 #endif
 
+#ifdef MOD_PROMOTIONS_ALLYCITYSTATE_BONUS
+	kStream >> m_iAllyCityStateCombatModifier;
+	kStream >> m_iAllyCityStateCombatModifierMax;
+#endif
+
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -24488,6 +24493,11 @@ void CvUnit::write(FDataStream& kStream) const
 	{
 		kStream << (int) *iter;
 	}
+#endif
+
+#ifdef MOD_PROMOTIONS_ALLYCITYSTATE_BONUS
+	kStream << m_iAllyCityStateCombatModifier;
+	kStream << m_iAllyCityStateCombatModifierMax;
 #endif
 
 	//  Write mission list
