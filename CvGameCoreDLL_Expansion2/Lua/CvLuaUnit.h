@@ -709,6 +709,10 @@ protected:
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
 	LUAAPIEXTN(ClearSamePlotPromotions, void);
 #endif
+
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	LUAAPIEXTN(IsImmuneNegtivePromotions, bool);
+#endif
 };
 
 

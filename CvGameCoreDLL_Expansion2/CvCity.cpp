@@ -4326,6 +4326,13 @@ void CvCity::addProductionExperience(CvUnit* pUnit, bool bConscript)
 	}
 
 	pUnit->testPromotionReady();
+
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	if(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE && pUnit->GetMultipleInitExperence() > 0)
+	{
+		pUnit->changeExperienceTimes100(pUnit->getExperienceTimes100() * (pUnit->GetMultipleInitExperence()) / 100);
+	}
+#endif	
 }
 
 
@@ -9804,6 +9811,10 @@ void CvCity::changeFoodKept(int iChange)
 int CvCity::getMaxFoodKeptPercent() const
 {
 	VALIDATE_OBJECT
+#ifdef MOD_GLOBAL_CITY_SCALES
+	if (MOD_GLOBAL_CITY_SCALES && !CanGrowNormally())
+		return 0;
+#endif
 	return m_iMaxFoodKeptPercent;
 }
 
@@ -19547,6 +19558,12 @@ void CvCity::SetScale(CityScaleTypes eNewScale)
 	m_eCityScale = eNewScale;
 	UpdateScaleBuildings();
 
+	if (!CanGrowNormally())
+	{
+		setFood(0);
+		setFoodKept(0);
+	}
+
 #ifdef MOD_EVENTS_CITY_SCALES
 	if (MOD_EVENTS_CITY_SCALES)
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_OnCityScaleChange, getOwner(), GetID(), eOldScale, eNewScale);
@@ -19611,6 +19628,25 @@ void CvCity::UpdateScaleBuildings()
 		BuildingTypes eBuilding = pkOwner.GetCivBuilding(iter->first);
 		GetCityBuildings()->SetNumRealBuilding(eBuilding, iter->second);
 	}
+}
+
+bool CvCity::CanGrowNormally() const
+{
+	auto* info = GetScaleInfo();
+	if (info == nullptr || !info->NeedGrowthBuilding())
+	{
+		return true;
+	}
+
+	for (auto& it = info->GetBuildingsSupportGrowth().begin(); it != info->GetBuildingsSupportGrowth().end(); it++)
+	{
+		auto eBuilding = *it;
+		if (HasBuilding(eBuilding))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 #endif

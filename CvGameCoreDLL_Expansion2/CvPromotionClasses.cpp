@@ -179,6 +179,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseModifier(0),
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	m_iUnitAttackFaithBonus(0),
+	m_iCityAttackFaithBonus(0),
+#endif
 	m_iReligiousStrengthLossRivalTerritory(0),
 	m_iTradeMissionInfluenceModifier(0),
 	m_iTradeMissionGoldModifier(0),
@@ -208,6 +212,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyImprovementCombatBonus(0),
 	m_iNearbyImprovementBonusRange(0),
 	m_eCombatBonusImprovement(NO_IMPROVEMENT),
+#endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	m_iAllyCityStateCombatModifier(0),
+	m_iAllyCityStateCombatModifierMax(0),
 #endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	m_bCanCrossMountains(false),
@@ -377,6 +385,13 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		if (szTextVal) {
 			m_eCombatBonusImprovement = (ImprovementTypes)GC.getInfoTypeForString(szTextVal, true);
 		}
+	}
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	if (MOD_PROMOTIONS_ALLYCITYSTATE_BONUS) {
+		m_iAllyCityStateCombatModifier = kResults.GetInt("AllyCityStateCombatModifier");
+		m_iAllyCityStateCombatModifierMax = kResults.GetInt("AllyCityStateCombatModifierMax");
 	}
 #endif
 
@@ -600,6 +615,14 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseModifier = kResults.GetInt("CapitalDefenseModifier");
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	m_iUnitAttackFaithBonus = kResults.GetInt("UnitAttackFaithBonus");
+	m_iCityAttackFaithBonus = kResults.GetInt("CityAttackFaithBonus");
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	const char* szRemovePromotionUpgrade = kResults.GetText("RemovePromotionUpgrade");
+	m_iRemovePromotionUpgrade = GC.getInfoTypeForString(szRemovePromotionUpgrade, true);
+#endif
 	m_iReligiousStrengthLossRivalTerritory = kResults.GetInt("ReligiousStrengthLossRivalTerritory");
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
 	m_iTradeMissionGoldModifier = kResults.GetInt("TradeMissionGoldModifier");
@@ -623,10 +646,12 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCollateralDamagePlotUnitLimit = kResults.GetInt("CollateralDamagePlotUnitLimit");
 	m_iCollateralDamageImmune = kResults.GetBool("CollateralDamageImmune");
 	m_iCollateralXP = kResults.GetInt("CollateralXP");
+	m_bCollateralOnlyCity = kResults.GetBool("CollateralOnlyCity");
+	m_bCollateralOnlyUnit = kResults.GetBool("CollateralOnlyUnit");
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	m_bAddEnermyPromotionImmune = kResults.GetBool("AddEnermyPromotionImmune");
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	m_bAddEnemyPromotionImmune = kResults.GetBool("AddEnemyPromotionImmune");
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -685,6 +710,23 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	const char* szFeatureInvisible2 = kResults.GetText("FeatureInvisible2");
 	m_iFeatureInvisible2 = GC.getInfoTypeForString(szFeatureInvisible2, true);
 #endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
+#endif
+
+	m_iAttackInflictDamageChange = kResults.GetInt("AttackInflictDamageChange");
+	m_iAttackInflictDamageChangeMaxHPPercent = kResults.GetInt("AttackInflictDamageChangeMaxHPPercent");
+
+	m_iDefenseInflictDamageChange = kResults.GetInt("DefenseInflictDamageChange");
+	m_iDefenseInflictDamageChangeMaxHPPercent = kResults.GetInt("DefenseInflictDamageChangeMaxHPPercent");
+
+	m_iSiegeInflictDamageChange = kResults.GetInt("SiegeInflictDamageChange");
+	m_iSiegeInflictDamageChangeMaxHPPercent = kResults.GetInt("SiegeInflictDamageChangeMaxHPPercent");
+
+	m_iHeavyChargeAddMoves = kResults.GetInt("HeavyChargeAddMoves");
+	m_iHeavyChargeExtraDamage = kResults.GetInt("HeavyChargeExtraDamage");
+	m_iHeavyChargeCollateralFixed = kResults.GetInt("HeavyChargeCollateralFixed");
+	m_iHeavyChargeCollateralPercent = kResults.GetInt("HeavyChargeCollateralPercent");
 
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
@@ -1362,6 +1404,13 @@ int CvPromotionEntry::GetFeatureInvisible2() const
 }
 #endif
 
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+int CvPromotionEntry::GetMultipleInitExperence() const
+{
+	return m_iMultipleInitExperence;
+}
+#endif
+
 /// Accessor: How many additional tiles this promotion allows a unit to see (can be negative)
 int CvPromotionEntry::GetVisibilityChange() const
 {
@@ -2018,6 +2067,26 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 	return m_iCityAttackPlunderModifier;
 }
 
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+/// Accessor: faith earned from damage on an attacked unit
+int CvPromotionEntry::GetUnitAttackFaithBonus() const
+{
+	return m_iUnitAttackFaithBonus;
+}
+/// Accessor: faith earned from damage on an attacked city
+int CvPromotionEntry::GetCityAttackFaithBonus() const
+{
+	return m_iCityAttackFaithBonus;
+}
+#endif
+
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+int CvPromotionEntry::GetRemovePromotionUpgrade() const
+{
+	return m_iRemovePromotionUpgrade;
+}
+#endif
+
 /// Accessor: loss of strength at end of each turn in rival territory without open borders
 int CvPromotionEntry::GetReligiousStrengthLossRivalTerritory() const
 {
@@ -2171,6 +2240,18 @@ int CvPromotionEntry::GetNearbyImprovementBonusRange() const
 ImprovementTypes CvPromotionEntry::GetCombatBonusImprovement() const
 {
 	return m_eCombatBonusImprovement;
+}
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+/// Accessor: Permits units to receive a combat bonus from Ally City States
+int CvPromotionEntry::GetAllyCityStateCombatModifier() const
+{
+	return m_iAllyCityStateCombatModifier;
+}
+int CvPromotionEntry::GetAllyCityStateCombatModifierMax() const
+{
+	return m_iAllyCityStateCombatModifierMax;
 }
 #endif
 
@@ -2916,12 +2997,64 @@ int CvPromotionEntry::GetCollateralXP() const
 {
 	return m_iCollateralXP;
 }
+bool CvPromotionEntry::GetCollateralOnlyCity() const
+{
+	return m_bCollateralOnlyCity;
+}
+bool CvPromotionEntry::GetCollateralOnlyUnit() const
+{
+	return m_bCollateralOnlyUnit;
+}
 #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-bool CvPromotionEntry::GetAddEnermyPromotionImmune() const
+int CvPromotionEntry::GetAttackInflictDamageChange() const
 {
-	return m_bAddEnermyPromotionImmune;
+	return m_iAttackInflictDamageChange;
+}
+int CvPromotionEntry::GetAttackInflictDamageChangeMaxHPPercent() const
+{
+	return m_iAttackInflictDamageChangeMaxHPPercent;
+}
+
+int CvPromotionEntry::GetDefenseInflictDamageChange() const
+{
+	return m_iDefenseInflictDamageChange;
+}
+int CvPromotionEntry::GetDefenseInflictDamageChangeMaxHPPercent() const
+{
+	return m_iDefenseInflictDamageChangeMaxHPPercent;
+}
+
+int CvPromotionEntry::GetSiegeInflictDamageChange() const
+{
+	return m_iSiegeInflictDamageChange;
+}
+int CvPromotionEntry::GetSiegeInflictDamageChangeMaxHPPercent() const
+{
+	return m_iSiegeInflictDamageChangeMaxHPPercent;
+}
+
+int CvPromotionEntry::GetHeavyChargeAddMoves() const
+{
+	return m_iHeavyChargeAddMoves;
+}
+int CvPromotionEntry::GetHeavyChargeExtraDamage() const
+{
+	return m_iHeavyChargeExtraDamage;
+}
+int CvPromotionEntry::GetHeavyChargeCollateralFixed() const
+{
+	return m_iHeavyChargeCollateralFixed;
+}
+int CvPromotionEntry::GetHeavyChargeCollateralPercent() const
+{
+	return m_iHeavyChargeCollateralPercent;
+}
+
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+bool CvPromotionEntry::GetAddEnemyPromotionImmune() const
+{
+	return m_bAddEnemyPromotionImmune;
 }
 #endif
 

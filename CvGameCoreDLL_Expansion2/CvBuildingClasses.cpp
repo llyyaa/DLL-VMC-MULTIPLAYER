@@ -1133,6 +1133,30 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	}
 #endif
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+	m_bEnableAllCityScaleGrowth = kResults.GetBool("EnableAllCityScaleGrowth");
+	auto* strCityScale = kResults.GetText("EnableCityScaleGrowth");
+	if (strCityScale != nullptr)
+	{
+		int len = strlen(strCityScale);
+		if (len > 0)
+		{
+			std::string strKey("Building_EnableCityScaleGrowth");
+			Database::Results* pResults = kUtility.GetResults(strKey);
+			if (pResults == NULL)
+			{
+				pResults = kUtility.PrepareResults(strKey, "select ID from CityScales where Type = ?");
+			}
+
+			pResults->Bind(1, strCityScale);
+			if (pResults->Step())
+			{
+				m_eEnableCityScaleGrowth = (CityScaleTypes)pResults->GetInt(0);
+			}
+		}
+	}
+#endif
+
 	return true;
 }
 
@@ -2876,6 +2900,17 @@ bool CvBuildingEntry::HasYieldFromOtherYield() const
 	return m_bHasYieldFromOtherYield;
 }
 
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+CityScaleTypes CvBuildingEntry::GetEnableCityScaleGrowth() const
+{
+	return m_eEnableCityScaleGrowth;
+}
+bool CvBuildingEntry::GetEnableAllCityScaleGrowth() const
+{
+	return m_bEnableAllCityScaleGrowth;
+}
 #endif
 
 std::pair<UnitClassTypes, int>* CvBuildingEntry::GetAllowPurchaseUnitsByYieldType(YieldTypes iType) {

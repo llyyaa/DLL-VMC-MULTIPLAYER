@@ -70,6 +70,9 @@ public:
 	int GetFeatureInvisible() const;
 	int GetFeatureInvisible2() const;
 #endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	int GetMultipleInitExperence() const;
+#endif
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
 	int  GetReconChange() const;
 #endif
@@ -226,6 +229,13 @@ public:
 	int GetCapitalDefenseModifier() const;
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	int GetUnitAttackFaithBonus() const;
+	int GetCityAttackFaithBonus() const;
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int GetRemovePromotionUpgrade() const;
+#endif
 	int GetReligiousStrengthLossRivalTerritory() const;
 	
 	int GetTradeMissionInfluenceModifier() const;
@@ -258,6 +268,10 @@ public:
 	int GetNearbyImprovementCombatBonus() const;
 	int GetNearbyImprovementBonusRange() const;
 	ImprovementTypes GetCombatBonusImprovement() const;
+#endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int GetAllyCityStateCombatModifier() const;
+	int GetAllyCityStateCombatModifierMax() const;
 #endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool CanCrossMountains() const;
@@ -363,8 +377,8 @@ public:
 	int GetWarCasualtiesModifier() const;
  #endif
 
- #ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	bool GetAddEnermyPromotionImmune() const;
+ #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	bool GetAddEnemyPromotionImmune() const;
  #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -400,7 +414,23 @@ public:
 	int GetCollateralDamagePlotUnitLimit() const;
 	bool GetCollateralDamageImmune() const;
 	int GetCollateralXP() const;
+	bool GetCollateralOnlyCity() const;
+	bool GetCollateralOnlyUnit() const;
 #endif
+
+	int GetAttackInflictDamageChange() const;
+	int GetAttackInflictDamageChangeMaxHPPercent() const;
+
+	int GetDefenseInflictDamageChange() const;
+	int GetDefenseInflictDamageChangeMaxHPPercent() const;
+
+	int GetSiegeInflictDamageChange() const;
+	int GetSiegeInflictDamageChangeMaxHPPercent() const;
+
+	int GetHeavyChargeAddMoves() const;
+	int GetHeavyChargeExtraDamage() const;
+	int GetHeavyChargeCollateralFixed() const;
+	int GetHeavyChargeCollateralPercent() const;
 
 protected:
 	int m_iLayerAnimationPath;
@@ -425,6 +455,9 @@ protected:
 #if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
 	int m_iFeatureInvisible;
 	int m_iFeatureInvisible2;
+#endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	int m_iMultipleInitExperence;
 #endif
 	int m_iVisibilityChange;
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
@@ -503,6 +536,13 @@ protected:
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	int m_iUnitAttackFaithBonus;
+	int m_iCityAttackFaithBonus;
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int m_iRemovePromotionUpgrade;
+#endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
 	int m_iTradeMissionGoldModifier;
@@ -531,6 +571,8 @@ protected:
 	int m_iCollateralDamagePlotUnitLimit = 0;
 	bool m_iCollateralDamageImmune = 0;
 	int m_iCollateralXP = 0;
+	bool m_bCollateralOnlyCity = false;
+	bool m_bCollateralOnlyUnit = true;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -625,6 +667,10 @@ protected:
 	int m_iNearbyImprovementCombatBonus;
 	int m_iNearbyImprovementBonusRange;
 	ImprovementTypes m_eCombatBonusImprovement;
+#endif
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int m_iAllyCityStateCombatModifier;
+	int m_iAllyCityStateCombatModifierMax;
 #endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool m_bCanCrossMountains;
@@ -726,8 +772,8 @@ protected:
 	int m_iWarCasualtiesModifier = 0;
  #endif
 
-#ifdef MOD_PROMOTION_ADD_ENERMY_PROMOTIONS
-	bool m_bAddEnermyPromotionImmune = 0;
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	bool m_bAddEnemyPromotionImmune = 0;
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -745,6 +791,20 @@ protected:
 	int m_iSiegeKillCitizensPercent = 0;
 	int m_iSiegeKillCitizensFixed = 0;
 #endif
+
+	int m_iAttackInflictDamageChange = 0;
+	int m_iAttackInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iDefenseInflictDamageChange = 0;
+	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iSiegeInflictDamageChange = 0;
+	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iHeavyChargeAddMoves = 0;
+	int m_iHeavyChargeExtraDamage = 0;
+	int m_iHeavyChargeCollateralFixed = 0;
+	int m_iHeavyChargeCollateralPercent = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -895,18 +955,21 @@ struct SplashInfo {
 struct CollateralInfo {
 	PromotionTypes ePromotion;
 
-	int iPercent;
-	int iFixed;
-	int iPlotUnitLimit;
+	int iPercent = 0;
+	int iFixed = 0;
+	int iPlotUnitLimit = 0;
+	bool bOnlyUnit = true;
+	bool bOnlyCity = false;
 
 	CollateralInfo() = default;
 
-	// TODO:
 	CollateralInfo(const CvPromotionEntry& promotion) :
 		ePromotion{ (PromotionTypes)promotion.GetID() },
 		iPercent{ promotion.GetCollateralDamagePercent() },
 		iFixed{ promotion.GetCollateralDamageFixed() },
-		iPlotUnitLimit{ promotion.GetCollateralDamagePlotUnitLimit() } {}
+		iPlotUnitLimit{ promotion.GetCollateralDamagePlotUnitLimit() },
+		bOnlyCity {promotion.GetCollateralOnlyCity()},
+		bOnlyUnit {promotion.GetCollateralOnlyUnit()} {}
 
 	inline void read(FDataStream& kStream) {
 		int iPromotion;
@@ -915,6 +978,8 @@ struct CollateralInfo {
 		kStream >> iPercent;
 		kStream >> iFixed;
 		kStream >> iPlotUnitLimit;
+		kStream >> bOnlyUnit;
+		kStream >> bOnlyCity;
 	}
 
 	inline void write(FDataStream& kStream) const {
@@ -923,6 +988,8 @@ struct CollateralInfo {
 		kStream << iPercent;
 		kStream << iFixed;
 		kStream << iPlotUnitLimit;
+		kStream << bOnlyUnit;
+		kStream << bOnlyCity;
 	}
 };
 #endif

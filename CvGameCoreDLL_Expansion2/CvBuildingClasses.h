@@ -410,6 +410,11 @@ public:
 	bool HasYieldFromOtherYield() const;
 #endif
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes GetEnableCityScaleGrowth() const;
+	bool GetEnableAllCityScaleGrowth() const;
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	int GetGoldenAgeUnitCombatModifier() const;
 	int GetGoldenAgeMeterMod() const;
@@ -712,6 +717,11 @@ private:
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	int m_ppiYieldFromOtherYield[NUM_YIELD_TYPES][NUM_YIELD_TYPES][YieldFromYield::LENGTH];
 	bool m_bHasYieldFromOtherYield = false;
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes m_eEnableCityScaleGrowth = NO_CITY_SCALE;
+	bool m_bEnableAllCityScaleGrowth = false;
 #endif
 };
 

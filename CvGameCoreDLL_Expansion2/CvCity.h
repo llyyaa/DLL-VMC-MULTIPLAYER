@@ -1072,6 +1072,7 @@ public:
 	CvCityScaleEntry* GetScaleInfo() const { return GC.getCityScaleInfo(m_eCityScale); }
 	void SetScale(CityScaleTypes eScale);
 	void UpdateScaleBuildings();
+	bool CanGrowNormally() const;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
