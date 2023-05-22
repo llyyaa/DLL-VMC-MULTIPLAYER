@@ -313,6 +313,7 @@ public:
 	bool IsCaptureDefeatedEnemy() const;
 	bool IsIgnoreGreatGeneralBenefit() const;
 	bool IsIgnoreZOC() const;
+	bool IsImmueMeleeAttack() const;
 	bool IsSapper() const;
 	bool IsCanHeavyCharge() const;
 	bool HasPostCombatPromotions() const;
@@ -712,6 +713,7 @@ protected:
 	bool m_bCaptureDefeatedEnemy;
 	bool m_bIgnoreGreatGeneralBenefit;
 	bool m_bIgnoreZOC;
+	bool m_bImmueMeleeAttack;
 	bool m_bHasPostCombatPromotions;
 	bool m_bPostCombatPromotionsExclusive;
 	bool m_bSapper;

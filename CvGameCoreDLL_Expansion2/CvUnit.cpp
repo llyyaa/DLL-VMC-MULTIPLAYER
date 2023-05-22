@@ -1156,7 +1156,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iWorkRateMod = 0;
 	m_iAOEDamageOnKill = 0;
 #endif
-
+	m_iImmueMeleeAttack = 0;
 
 #if defined(MOD_ROG_CORE)
 	m_iNumOriginalCapitalAttackMod = 0;
@@ -3353,6 +3353,26 @@ bool CvUnit::canMoveInto(const CvPlot& plot, byte bMoveFlags) const
 {
 	VALIDATE_OBJECT
 	TeamTypes ePlotTeam;
+
+	// cannot melee attack 
+	if ((bMoveFlags & MOVEFLAG_ATTACK) || (bMoveFlags & MOVEFLAG_DECLARE_WAR))
+	{
+
+		for (int iUnitLoop = 0; iUnitLoop < plot.getNumUnits(); iUnitLoop++)
+		{
+			CvUnit* loopUnit = plot.getUnitByIndex(iUnitLoop);
+
+			if (loopUnit && GET_TEAM(getTeam()).isAtWar(plot.getUnitByIndex(iUnitLoop)->getTeam()))
+			{
+				if (loopUnit->IsImmueMeleeAttack() && !plot.isEnemyCity(*this))
+				{
+					return false;
+				}
+
+			}
+		}
+
+	}
 
 	if(atPlot(plot))
 	{
@@ -21582,6 +21602,19 @@ void CvUnit::changeMaxHitPointsModifier(int iChange)
 }
 #endif
 
+
+//	--------------------------------------------------------------------------------
+bool CvUnit::IsImmueMeleeAttack() const
+{
+	return m_iImmueMeleeAttack > 0;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeImmueMeleeAttackCount(int iChange)
+{
+	m_iImmueMeleeAttack += iChange;
+}
+
 //	--------------------------------------------------------------------------------
 bool CvUnit::IsIgnoreZOC() const
 {
@@ -23670,7 +23703,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 
 		ChangeIgnoreGreatGeneralBenefitCount(thisPromotion.IsIgnoreGreatGeneralBenefit() ? iChange: 0);
 		ChangeIgnoreZOCCount(thisPromotion.IsIgnoreZOC() ? iChange: 0);
-
+		ChangeImmueMeleeAttackCount(thisPromotion.IsImmueMeleeAttack() ? iChange : 0);
 #if defined(MOD_UNITS_NO_SUPPLY)
 		changeNoSupply(thisPromotion.IsNoSupply() ? iChange : 0);
 #endif
@@ -24171,7 +24204,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iWorkRateMod;
 	kStream >> m_iAOEDamageOnKill;
 #endif
-
+	kStream >> m_iImmueMeleeAttack;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_READ(77, kStream, m_iNoSupply, 0);
 #endif
@@ -24485,6 +24518,8 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iWorkRateMod;
 	kStream << m_iAOEDamageOnKill;
 #endif
+
+	kStream << m_iImmueMeleeAttack;
 
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_WRITE(kStream, m_iNoSupply);
