@@ -1157,6 +1157,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iAOEDamageOnKill = 0;
 #endif
 
+	m_iImmueMeleeAttack = 0;
 
 #if defined(MOD_ROG_CORE)
 	m_iNumOriginalCapitalAttackMod = 0;
@@ -1243,7 +1244,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iGreatGeneralCombatModifier = 0;
 	m_iIgnoreGreatGeneralBenefit = 0;
 	m_iIgnoreZOC = 0;
-	m_iImmueMeleeAttack = 0;
+
 #if defined(MOD_UNITS_NO_SUPPLY)
 	m_iNoSupply = 0;
 #endif
@@ -24171,7 +24172,7 @@ void CvUnit::read(FDataStream& kStream)
 
 	kStream >> m_iHealOnPillageCount;
 	kStream >> m_iFlankAttackModifier;
-	kStream >> m_iImmueMeleeAttack;
+
 	if (uiVersion >= 3)
 	{
 		kStream >> m_iGoldenAgeValueFromKills;
@@ -24193,6 +24194,7 @@ void CvUnit::read(FDataStream& kStream)
 		m_iIgnoreZOC = 0;
 	}
 
+
 	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCannotBeCapturedCount;
 
@@ -24206,6 +24208,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iWorkRateMod;
 	kStream >> m_iAOEDamageOnKill;
 #endif
+
+	kStream >> m_iImmueMeleeAttack;
 
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_READ(77, kStream, m_iNoSupply, 0);
@@ -24506,7 +24510,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iGreatGeneralCombatModifier;
 	kStream << m_iIgnoreGreatGeneralBenefit;
 	kStream << m_iIgnoreZOC;
-	kStream << m_iImmueMeleeAttack;
+
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;
 
@@ -24520,6 +24524,8 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iWorkRateMod;
 	kStream << m_iAOEDamageOnKill;
 #endif
+
+	kStream << m_iImmueMeleeAttack;
 
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_WRITE(kStream, m_iNoSupply);
