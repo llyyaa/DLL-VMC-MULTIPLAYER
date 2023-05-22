@@ -226,6 +226,11 @@ public:
 	int GetRouteYieldChanges(int i, int j) const;
 	int* GetRouteYieldChangesArray(int i);				// For Moose - CvWidgetData XXX
 
+#if defined(MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
+	int GetTradeRouteYieldChanges(int i, int j) const;
+	int* GetTradeRouteYieldChangesArray(int i);				// For Moose - CvWidgetData XXX
+#endif
+
 	int  GetImprovementResourceYield(int i, int j) const;
 	bool IsImprovementResourceMakesValid(int i) const;
 	bool IsImprovementResourceTrade(int i) const;
@@ -389,6 +394,10 @@ protected:
 	int** m_ppiTechNoFreshWaterYieldChanges;
 	int** m_ppiTechFreshWaterYieldChanges;
 	int** m_ppiRouteYieldChanges;
+
+#if defined(MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
+	int** m_ppiTradeRouteYieldChanges;
+#endif
 
 #ifdef MOD_IMPROVEMENTS_UPGRADE
 	bool m_bEnableXP = false;

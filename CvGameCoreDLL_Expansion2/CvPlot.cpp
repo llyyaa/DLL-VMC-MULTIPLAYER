@@ -8749,6 +8749,18 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 		}
 
 		iYield += iBestYield;
+
+#if defined(MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
+		iBestYield = 0;
+
+		for(iI = 0; iI < GC.getNumUnitDomainInfos(); ++iI)
+		{
+			iBestYield = std::max(iBestYield, pImprovement->GetTradeRouteYieldChanges(iI, eYield));
+		}
+
+		iYield += iBestYield;
+#endif
+
 	}
 	else
 	{
@@ -8766,6 +8778,24 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 		{
 			iYield += pImprovement->GetRouteYieldChanges(eRouteType, eYield);
 		}
+
+#if defined(MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
+		if (IsTradeRoute())
+		{
+			// Simple code to reduce time
+			DomainTypes eTradeRouteDomain = DOMAIN_LAND;
+			if (isWater()) 
+			{
+				eTradeRouteDomain = DOMAIN_SEA;
+			}
+
+			if(eTradeRouteDomain != NO_DOMAIN)
+			{
+				iYield += pImprovement->GetTradeRouteYieldChanges(eTradeRouteDomain, eYield);
+			}
+		}
+#endif
+
 	}
 
 	bool bIsFreshWater = isFreshWater();
