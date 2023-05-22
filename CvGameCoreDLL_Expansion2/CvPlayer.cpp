@@ -20954,6 +20954,10 @@ void CvPlayer::changeFreeBuildingCount(BuildingTypes eIndex, int iChange)
 			for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 			{
 				pLoopCity->GetCityBuildings()->SetNumFreeBuilding(eIndex, 1);
+#ifdef MOD_BUGFIX_BUILDING_FREEBUILDING
+				if (MOD_BUGFIX_BUILDING_FREEBUILDING)
+					pLoopCity->GetCityBuildings()->SetNumRealBuilding(eIndex, 0);
+#endif
 			}
 		}
 		else if(getFreeBuildingCount(eIndex) == 0)
@@ -20963,6 +20967,10 @@ void CvPlayer::changeFreeBuildingCount(BuildingTypes eIndex, int iChange)
 			for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 			{
 				pLoopCity->GetCityBuildings()->SetNumFreeBuilding(eIndex, 0);
+#ifdef MOD_BUGFIX_BUILDING_FREEBUILDING
+				if (MOD_BUGFIX_BUILDING_FREEBUILDING)
+					pLoopCity->GetCityBuildings()->SetNumRealBuilding(eIndex, 1);
+#endif
 			}
 		}
 	}

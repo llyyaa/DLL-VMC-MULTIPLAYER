@@ -952,6 +952,8 @@
     <!-- * Fixes a bug in the pathfinder code for hovering units at the seaside! (v19) -->  
     <Row Class="1" Name="BUGFIX_HOVERING_PATHFINDER" Value="1"/>
 
+    <Row Class="1" Name="BUGFIX_BUILDING_FREEBUILDING" Value="1"/>
+
     <Row Class="2" Name="API_BUILDING_ENABLE_PURCHASE_UNITS" Value="1"/>
 
 	<Row Class="2" Name="API_VP_ADJACENT_YIELD_BOOST" Value="1"/>

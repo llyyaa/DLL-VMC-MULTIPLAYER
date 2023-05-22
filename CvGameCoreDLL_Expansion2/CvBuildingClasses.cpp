@@ -3460,6 +3460,10 @@ void CvCityBuildings::SetNumRealBuildingTimed(BuildingTypes eIndex, int iNewValu
 	CvAssertMsg(eIndex < m_pBuildings->GetNumBuildings(), "eIndex expected to be < m_pBuildings->GetNumBuildings()");
 
 	int iChangeNumRealBuilding = iNewValue - GetNumRealBuilding(eIndex);
+	if (iChangeNumRealBuilding == 0)
+	{
+		return;
+	}
 
 	CvBuildingEntry* buildingEntry = GC.getBuildingInfo(eIndex);
 	if (buildingEntry == nullptr)
@@ -3470,65 +3474,54 @@ void CvCityBuildings::SetNumRealBuildingTimed(BuildingTypes eIndex, int iNewValu
 	const BuildingClassTypes buildingClassType = (BuildingClassTypes) buildingEntry->GetBuildingClassType();
 	const CvBuildingClassInfo& kBuildingClassInfo = buildingEntry->GetBuildingClassInfo();
 
-	if(iChangeNumRealBuilding != 0)
+	int iOldNumBuilding = GetNumRealBuilding(eIndex);
+	m_paiNumRealBuilding[eIndex] = iNewValue;
+
+	if (GetNumRealBuilding(eIndex) > 0)
 	{
-		int iOldNumBuilding = GetNumBuilding(eIndex);
+		SetBuildingOriginalOwner(eIndex, eOriginalOwner);
+		SetBuildingOriginalTime(eIndex, iOriginalTime);
+	}
+	else
+	{
+		SetBuildingOriginalOwner(eIndex, NO_PLAYER);
+		SetBuildingOriginalTime(eIndex, MIN_INT);
+	}
 
-		m_paiNumRealBuilding[eIndex] = iNewValue;
+	// Process building effects
+	m_pCity->processBuilding(eIndex, iChangeNumRealBuilding, bFirst);
 
-		if(GetNumRealBuilding(eIndex) > 0)
-		{
-			SetBuildingOriginalOwner(eIndex, eOriginalOwner);
-			SetBuildingOriginalTime(eIndex, iOriginalTime);
-		}
-		else
-		{
-			SetBuildingOriginalOwner(eIndex, NO_PLAYER);
-			SetBuildingOriginalTime(eIndex, MIN_INT);
-		}
-
-		// Process building effects
-		if(iOldNumBuilding != GetNumBuilding(eIndex))
-		{
-			m_pCity->processBuilding(eIndex, iChangeNumRealBuilding, bFirst);
-		}
-
-		// Maintenance cost
-		if(buildingEntry->GetGoldMaintenance() != 0)
-		{
-			pPlayer->GetTreasury()->ChangeBaseBuildingGoldMaintenance(buildingEntry->GetGoldMaintenance() * iChangeNumRealBuilding);
-		}
+	// Maintenance cost
+	if (buildingEntry->GetGoldMaintenance() != 0)
+	{
+		pPlayer->GetTreasury()->ChangeBaseBuildingGoldMaintenance(buildingEntry->GetGoldMaintenance() * iChangeNumRealBuilding);
+	}
 
 #if !defined(NO_ACHIEVEMENTS)
-		//Achievement for Temples
-		const char* szBuildingTypeC = buildingEntry->GetType();
-		CvString szBuildingType = szBuildingTypeC;
-		if(szBuildingType == "BUILDING_TEMPLE")
+	// Achievement for Temples
+	const char *szBuildingTypeC = buildingEntry->GetType();
+	CvString szBuildingType = szBuildingTypeC;
+	if (szBuildingType == "BUILDING_TEMPLE")
+	{
+		if (m_pCity->getOwner() == GC.getGame().getActivePlayer())
 		{
-			if(m_pCity->getOwner() == GC.getGame().getActivePlayer())
-			{
-				gDLL->IncrementSteamStatAndUnlock(ESTEAMSTAT_TEMPLES, 1000, ACHIEVEMENT_1000TEMPLES);
-			}
+			gDLL->IncrementSteamStatAndUnlock(ESTEAMSTAT_TEMPLES, 1000, ACHIEVEMENT_1000TEMPLES);
 		}
+	}
 #endif
 
-		if(buildingEntry->GetPreferredDisplayPosition() > 0)
-		{
-			auto_ptr<ICvCity1> pDllCity(new CvDllCity(m_pCity));
+	if (buildingEntry->GetPreferredDisplayPosition() > 0)
+	{
+		auto_ptr<ICvCity1> pDllCity(new CvDllCity(m_pCity));
 
-			if(iNewValue > 0)
+		if (iNewValue > 0)
+		{
+			// if this is a WW that (likely has a half-built state)
+			if (isWorldWonderClass(kBuildingClassInfo))
 			{
-				// if this is a WW that (likely has a half-built state)
-				if(isWorldWonderClass(kBuildingClassInfo))
+				if (GetBuildingProduction(eIndex))
 				{
-					if(GetBuildingProduction(eIndex))
-					{
-						GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_EDITED, pDllCity.get(), eIndex, 1);
-					}
-					else
-					{
-						GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_CREATED, pDllCity.get(), eIndex, 1);
-					}
+					GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_EDITED, pDllCity.get(), eIndex, 1);
 				}
 				else
 				{
@@ -3537,162 +3530,165 @@ void CvCityBuildings::SetNumRealBuildingTimed(BuildingTypes eIndex, int iNewValu
 			}
 			else
 			{
-				GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_REMOVED, pDllCity.get(), eIndex, 0);
+				GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_CREATED, pDllCity.get(), eIndex, 1);
 			}
 		}
-
-		if(!(kBuildingClassInfo.isNoLimit()))
+		else
 		{
-			if(isWorldWonderClass(kBuildingClassInfo))
+			GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_REMOVED, pDllCity.get(), eIndex, 0);
+		}
+	}
+
+	if (!(kBuildingClassInfo.isNoLimit()))
+	{
+		if (isWorldWonderClass(kBuildingClassInfo))
+		{
+			m_pCity->changeNumWorldWonders(iChangeNumRealBuilding);
+			pPlayer->ChangeNumWonders(iChangeNumRealBuilding);
+		}
+		else if (isTeamWonderClass(kBuildingClassInfo))
+		{
+			m_pCity->changeNumTeamWonders(iChangeNumRealBuilding);
+		}
+		else if (isNationalWonderClass(kBuildingClassInfo))
+		{
+			m_pCity->changeNumNationalWonders(iChangeNumRealBuilding);
+			if (m_pCity->isHuman() && !GC.getGame().isGameMultiPlayer())
 			{
-				m_pCity->changeNumWorldWonders(iChangeNumRealBuilding);
-				pPlayer->ChangeNumWonders(iChangeNumRealBuilding);
+				IncrementWonderStats(buildingClassType);
 			}
-			else if(isTeamWonderClass(kBuildingClassInfo))
+		}
+		else
+		{
+			ChangeNumBuildings(iChangeNumRealBuilding);
+		}
+	}
+
+	if (buildingEntry->IsCityWall())
+	{
+		auto_ptr<ICvPlot1> pDllPlot(new CvDllPlot(m_pCity->plot()));
+		gDLL->GameplayWallCreated(pDllPlot.get());
+	}
+
+	// Update the amount of a Resource used up by this Building
+	int iNumResources = GC.getNumResourceInfos();
+	for (int iResourceLoop = 0; iResourceLoop < iNumResources; iResourceLoop++)
+	{
+		if (buildingEntry->GetResourceQuantityRequirement(iResourceLoop) > 0)
+		{
+			pPlayer->changeNumResourceUsed((ResourceTypes)iResourceLoop, iChangeNumRealBuilding * buildingEntry->GetResourceQuantityRequirement(iResourceLoop));
+		}
+	}
+
+	if (iChangeNumRealBuilding > 0)
+	{
+		if (bFirst)
+		{
+			if (GC.getGame().isFinalInitialized() /* && !(gDLL->GetWorldBuilderMode() )*/)
 			{
-				m_pCity->changeNumTeamWonders(iChangeNumRealBuilding);
-			}
-			else if(isNationalWonderClass(kBuildingClassInfo))
-			{
-				m_pCity->changeNumNationalWonders(iChangeNumRealBuilding);
-				if(m_pCity->isHuman() && !GC.getGame().isGameMultiPlayer())
+				// World Wonder Notification
+				if (isWorldWonderClass(kBuildingClassInfo))
 				{
-					IncrementWonderStats(buildingClassType);
-				}
-			}
-			else
-			{
-				ChangeNumBuildings(iChangeNumRealBuilding);
-			}
-		}
+					Localization::String localizedText = Localization::Lookup("TXT_KEY_MISC_COMPLETES_WONDER");
+					localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
+					GC.getGame().addReplayMessage(REPLAY_MESSAGE_MAJOR_EVENT, m_pCity->getOwner(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY());
 
-		if(buildingEntry->IsCityWall())
-		{
-			auto_ptr<ICvPlot1> pDllPlot(new CvDllPlot(m_pCity->plot()));
-			gDLL->GameplayWallCreated(pDllPlot.get());
-		}
+					bool bDontShowRewardPopup = GC.GetEngineUserInterface()->IsOptionNoRewardPopups();
 
-		// Update the amount of a Resource used up by this Building
-		int iNumResources = GC.getNumResourceInfos();
-		for(int iResourceLoop = 0; iResourceLoop < iNumResources; iResourceLoop++)
-		{
-			if(buildingEntry->GetResourceQuantityRequirement(iResourceLoop) > 0)
-			{
-				pPlayer->changeNumResourceUsed((ResourceTypes) iResourceLoop, iChangeNumRealBuilding * buildingEntry->GetResourceQuantityRequirement(iResourceLoop));
-			}
-		}
-
-		if(iChangeNumRealBuilding > 0)
-		{
-			if(bFirst)
-			{
-				if(GC.getGame().isFinalInitialized()/* && !(gDLL->GetWorldBuilderMode() )*/)
-				{
-					// World Wonder Notification
-					if(isWorldWonderClass(kBuildingClassInfo))
-					{
-						Localization::String localizedText = Localization::Lookup("TXT_KEY_MISC_COMPLETES_WONDER");
-						localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
-						GC.getGame().addReplayMessage(REPLAY_MESSAGE_MAJOR_EVENT, m_pCity->getOwner(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY());
-
-						bool bDontShowRewardPopup = GC.GetEngineUserInterface()->IsOptionNoRewardPopups();
-
-						// Notification in MP games
+					// Notification in MP games
 #if defined(MOD_API_EXTENSIONS)
-						if(bDontShowRewardPopup || GC.getGame().isReallyNetworkMultiPlayer())
+					if (bDontShowRewardPopup || GC.getGame().isReallyNetworkMultiPlayer())
 #else
-						if(bDontShowRewardPopup || GC.getGame().isNetworkMultiPlayer())	// KWG: Candidate for !GC.getGame().IsOption(GAMEOPTION_SIMULTANEOUS_TURNS)
+					if (bDontShowRewardPopup || GC.getGame().isNetworkMultiPlayer()) // KWG: Candidate for !GC.getGame().IsOption(GAMEOPTION_SIMULTANEOUS_TURNS)
 #endif
+					{
+						CvNotifications *pNotifications = GET_PLAYER(m_pCity->getOwner()).GetNotifications();
+						if (pNotifications)
 						{
-							CvNotifications* pNotifications = GET_PLAYER(m_pCity->getOwner()).GetNotifications();
-							if(pNotifications)
-							{
-								localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED");
-								localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
-								pNotifications->Add(NOTIFICATION_WONDER_COMPLETED_ACTIVE_PLAYER, localizedText.toUTF8(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY(), eIndex, pPlayer->GetID());
-							}
+							localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED");
+							localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
+							pNotifications->Add(NOTIFICATION_WONDER_COMPLETED_ACTIVE_PLAYER, localizedText.toUTF8(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY(), eIndex, pPlayer->GetID());
 						}
-						// Popup in SP games
-						else
+					}
+					// Popup in SP games
+					else
+					{
+						if (m_pCity->getOwner() == GC.getGame().getActivePlayer())
 						{
-							if(m_pCity->getOwner() == GC.getGame().getActivePlayer())
-							{
-								CvPopupInfo kPopup(BUTTONPOPUP_WONDER_COMPLETED_ACTIVE_PLAYER, eIndex);
-								GC.GetEngineUserInterface()->AddPopup(kPopup);
+							CvPopupInfo kPopup(BUTTONPOPUP_WONDER_COMPLETED_ACTIVE_PLAYER, eIndex);
+							GC.GetEngineUserInterface()->AddPopup(kPopup);
 
 #if !defined(NO_ACHIEVEMENTS)
-								if(GET_PLAYER(GC.getGame().getActivePlayer()).isHuman())
-								{
-									gDLL->UnlockAchievement(ACHIEVEMENT_BUILD_WONDER);
-
-									//look to see if all wonders have been built to unlock the other one
-									IncrementWonderStats(buildingClassType);
-
-								}
-#endif
-							}
-						}
-
-						// Wonder notification for all other players
-						for(int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
-						{
-							CvPlayerAI& thisPlayer = GET_PLAYER((PlayerTypes)iI);
-							if(thisPlayer.isAlive())
+							if (GET_PLAYER(GC.getGame().getActivePlayer()).isHuman())
 							{
-								// Owner already got his messaging
-								if(iI != m_pCity->getOwner())
-								{
-									// If the builder is met, and the city is revealed
-									// Special case for DLC_06 Scenario: Always show the more informative notification
-									if((m_pCity->plot()->isRevealed(thisPlayer.getTeam()) && GET_TEAM(thisPlayer.getTeam()).isHasMet(m_pCity->getTeam())) || gDLL->IsModActivated(CIV5_DLC_06_SCENARIO_MODID))
-									{
-										CvNotifications* pNotifications = thisPlayer.GetNotifications();
-										if(pNotifications)
-										{
-											localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED");
-											localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
-											pNotifications->Add(NOTIFICATION_WONDER_COMPLETED, localizedText.toUTF8(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY(), eIndex, pPlayer->GetID());
-										}
-									}
-									else
-									{
-										CvNotifications* pNotifications = thisPlayer.GetNotifications();
-										if(pNotifications)
-										{
-											localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED_UNKNOWN");
-											localizedText <<  buildingEntry->GetTextKey();
-											pNotifications->Add(NOTIFICATION_WONDER_COMPLETED, localizedText.toUTF8(), localizedText.toUTF8(), -1, -1, eIndex, -1);
-										}
-									}
-								}
-							}
+								gDLL->UnlockAchievement(ACHIEVEMENT_BUILD_WONDER);
 
-#if !defined(NO_ACHIEVEMENTS)
-							//Achievements!
-							if(pPlayer->GetID() == GC.getGame().getActivePlayer() && strcmp(buildingEntry->GetType(), "BUILDING_GREAT_FIREWALL") == 0)
-							{
-								gDLL->UnlockAchievement(ACHIEVEMENT_XP1_16);
+								// look to see if all wonders have been built to unlock the other one
+								IncrementWonderStats(buildingClassType);
 							}
 #endif
 						}
 					}
-				}
 
-				GC.getGame().incrementBuildingClassCreatedCount(buildingClassType);
-			}
-		}
-
-		m_pCity->updateStrengthValue();
-
-		// Building might affect City Banner stats
-		auto_ptr<ICvCity1> pCity = GC.WrapCityPointer(m_pCity);
-		GC.GetEngineUserInterface()->SetSpecificCityInfoDirty(pCity.get(), CITY_UPDATE_TYPE_BANNER);
+					// Wonder notification for all other players
+					for (int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
+					{
+						CvPlayerAI &thisPlayer = GET_PLAYER((PlayerTypes)iI);
+						if (thisPlayer.isAlive())
+						{
+							// Owner already got his messaging
+							if (iI != m_pCity->getOwner())
+							{
+								// If the builder is met, and the city is revealed
+								// Special case for DLC_06 Scenario: Always show the more informative notification
+								if ((m_pCity->plot()->isRevealed(thisPlayer.getTeam()) && GET_TEAM(thisPlayer.getTeam()).isHasMet(m_pCity->getTeam())) || gDLL->IsModActivated(CIV5_DLC_06_SCENARIO_MODID))
+								{
+									CvNotifications *pNotifications = thisPlayer.GetNotifications();
+									if (pNotifications)
+									{
+										localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED");
+										localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
+										pNotifications->Add(NOTIFICATION_WONDER_COMPLETED, localizedText.toUTF8(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY(), eIndex, pPlayer->GetID());
+									}
+								}
+								else
+								{
+									CvNotifications *pNotifications = thisPlayer.GetNotifications();
+									if (pNotifications)
+									{
+										localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED_UNKNOWN");
+										localizedText << buildingEntry->GetTextKey();
+										pNotifications->Add(NOTIFICATION_WONDER_COMPLETED, localizedText.toUTF8(), localizedText.toUTF8(), -1, -1, eIndex, -1);
+									}
+								}
+							}
+						}
 
 #if !defined(NO_ACHIEVEMENTS)
-		//Test for any achievements being unlocked.
-		pPlayer->GetPlayerAchievements().FinishedBuilding(m_pCity, eIndex);
+						// Achievements!
+						if (pPlayer->GetID() == GC.getGame().getActivePlayer() && strcmp(buildingEntry->GetType(), "BUILDING_GREAT_FIREWALL") == 0)
+						{
+							gDLL->UnlockAchievement(ACHIEVEMENT_XP1_16);
+						}
 #endif
+					}
+				}
+			}
+
+			GC.getGame().incrementBuildingClassCreatedCount(buildingClassType);
+		}
 	}
+
+	m_pCity->updateStrengthValue();
+
+	// Building might affect City Banner stats
+	auto_ptr<ICvCity1> pCity = GC.WrapCityPointer(m_pCity);
+	GC.GetEngineUserInterface()->SetSpecificCityInfoDirty(pCity.get(), CITY_UPDATE_TYPE_BANNER);
+
+#if !defined(NO_ACHIEVEMENTS)
+	// Test for any achievements being unlocked.
+	pPlayer->GetPlayerAchievements().FinishedBuilding(m_pCity, eIndex);
+#endif
 }
 
 /// Accessor: Get number of free buildings of this type in city
