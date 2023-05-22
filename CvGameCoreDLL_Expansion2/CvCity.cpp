@@ -16893,6 +16893,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_strName;
 	kStream << m_strScriptData;
 
+	kStream << m_aiYieldFromProcessModifier;
+
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiNoResource);
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiFreeResource);
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiNumResourcesLocal);
