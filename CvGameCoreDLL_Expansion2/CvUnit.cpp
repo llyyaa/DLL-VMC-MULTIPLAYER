@@ -24204,7 +24204,9 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iWorkRateMod;
 	kStream >> m_iAOEDamageOnKill;
 #endif
+
 	kStream >> m_iImmueMeleeAttack;
+
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_READ(77, kStream, m_iNoSupply, 0);
 #endif
@@ -24519,7 +24521,9 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iAOEDamageOnKill;
 #endif
 
+
 	kStream << m_iImmueMeleeAttack;
+
 
 #if defined(MOD_UNITS_NO_SUPPLY)
 	MOD_SERIALIZE_WRITE(kStream, m_iNoSupply);
