@@ -7121,7 +7121,23 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 
 #if defined(MOD_API_UNIFIED_YIELDS)
-			ChangeBaseYieldRateFromBuildings(eYield, GET_PLAYER(getOwner()).GetPlayerTraits()->GetBuildingClassYieldChange(eBuildingClass, eYield) * iChange);
+			// ChangeBaseYieldRateFromBuildings(eYield, GET_PLAYER(getOwner()).GetPlayerTraits()->GetBuildingClassYieldChange(eBuildingClass, eYield) * iChange);
+			int iTraitBuildingClassBonus = owningPlayer.GetPlayerTraits()->GetBuildingClassYieldChange(eBuildingClass, eYield);
+			if(iTraitBuildingClassBonus > 0)
+			{
+				if(eYield == YIELD_CULTURE)
+				{
+					ChangeJONSCulturePerTurnFromBuildings(iTraitBuildingClassBonus * iChange);
+				}
+				else if(eYield == YIELD_FAITH)
+				{
+					ChangeFaithPerTurnFromBuildings(iTraitBuildingClassBonus * iChange);
+				}
+				else
+				{
+					ChangeBaseYieldRateFromBuildings(eYield, iTraitBuildingClassBonus * iChange);
+				}
+			}
 #endif
 
 
