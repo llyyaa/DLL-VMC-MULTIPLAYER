@@ -455,6 +455,30 @@ void CvPlot::doTurn()
 	// Clear world anchor
 	SetWorldAnchor(NO_WORLD_ANCHOR);
 
+#ifdef MOD_IMPROVEMENTS_UPGRADE
+	if (MOD_IMPROVEMENTS_UPGRADE)
+	{
+		bool bChangeXP = false;
+		if (getImprovementType() == NO_IMPROVEMENT)
+		{
+			bChangeXP = false;
+		}
+		else {
+			CvImprovementEntry* pInfo = GC.getImprovementInfo(getImprovementType());
+			bChangeXP = pInfo && (pInfo->GetEnableUpgrade() || pInfo->GetEnableDowngrade());
+		}
+
+		if (bChangeXP)
+		{
+			int iXPChange = GetXPGrowth();
+			if (iXPChange != 0)
+			{
+				ChangeXP(iXPChange, true);
+			}
+		}
+	}
+#endif
+
 	// XXX
 #ifdef _DEBUG
 	{
@@ -645,7 +669,11 @@ void CvPlot::updateVisibility()
 				{
 					// This unit has visibility rules, send a message that it needs to update itself.
 					auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(pLoopUnit));
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+					gDLL->GameplayUnitVisibility(pDllUnit.get(), (pLoopUnit->getTeam() == eActiveTeam)?true:(isInvisibleVisible(eActiveTeam, eInvisibleType) || pLoopUnit->IsInvisibleInvalid()), true, 0.01f);
+#else
 					gDLL->GameplayUnitVisibility(pDllUnit.get(), (pLoopUnit->getTeam() == eActiveTeam)?true:isInvisibleVisible(eActiveTeam, eInvisibleType), true, 0.01f);
+#endif
 				}
 			}
 		}
@@ -666,7 +694,11 @@ void CvPlot::updateVisibility()
 					{
 						// This unit has visibility rules, send a message that it needs to update itself.
 						auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(pLoopUnit));
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+						gDLL->GameplayUnitVisibility(pDllUnit.get(), (pLoopUnit->getTeam() == eActiveTeam)?true:(isInvisibleVisible(eActiveTeam, eInvisibleType) || pLoopUnit->IsInvisibleInvalid()), true, 0.01f);
+#else
 						gDLL->GameplayUnitVisibility(pDllUnit.get(), (pLoopUnit->getTeam() == eActiveTeam)?true:isInvisibleVisible(eActiveTeam, eInvisibleType), true, 0.01f);
+#endif
 					}
 				}
 			}
@@ -2595,7 +2627,13 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 		{
 			return false;
 		}
-
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+		// Can not create resource in a plot where already has one
+		if(MOD_IMPROVEMENTS_CREATE_ITEMS && getResourceType() != NO_RESOURCE && GC.getImprovementInfo(eImprovement)->GetCreateItemMod() > 2)
+		{
+			return false;
+		}
+#endif
 		// Already an improvement here
 		if(getImprovementType() != NO_IMPROVEMENT)
 		{
@@ -7124,6 +7162,26 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue, PlayerTypes eBuilder
 			}
 #endif
 
+#ifdef MOD_IMPROVEMENTS_UPGRADE
+			if (MOD_IMPROVEMENTS_UPGRADE)
+			{
+				bool bResetXP = false;
+				if (eNewValue == NO_IMPROVEMENT)
+				{
+					bResetXP = true;
+				}
+				else if (!GC.getImprovementInfo(eNewValue) || !GC.getImprovementInfo(eNewValue)->GetEnableXP())
+				{
+					bResetXP = true;
+				}
+
+				if (bResetXP)
+				{
+					this->SetXP(0, false);
+				}
+			}
+#endif // MOD_IMPROVEMENTS_UPGRADE
+
 
 			// Someone owns this plot
 			if(owningPlayerID != NO_PLAYER)
@@ -10375,6 +10433,10 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 	if(pkBuildInfo == NULL)
 		return false;
 
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+	bool eClearImprovement = false;
+#endif
+
 	if(iChange != 0)
 	{
 		if(NULL == m_paiBuildProgress)
@@ -10406,7 +10468,50 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 			// Constructed Improvement
 			if (eImprovement != NO_IMPROVEMENT)
 			{
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+				CvImprovementEntry& tImprovementEntry = *GC.getImprovementInfo(eImprovement);
+				int eCreateItemMod = tImprovementEntry.GetCreateItemMod();
+				if(MOD_IMPROVEMENTS_CREATE_ITEMS)
+				{
+					//enable create resource mod
+					if(eCreateItemMod > 2)
+					{
+						ResourceTypes cResource = (ResourceTypes)tImprovementEntry.GetCreateResource(this);
+						int cResourceQuantity = tImprovementEntry.GetCreatedResourceQuantity();
+						if (cResource != NO_RESOURCE && cResourceQuantity != 0)
+						{
+							cResourceQuantity = cResourceQuantity > 0 ? cResourceQuantity : GC.getGame().getJonRandNum(-cResourceQuantity, "Get random source quantity when constructed ") + 1;
+							setResourceType(cResource, cResourceQuantity);
+						}
+					}
+					if(eCreateItemMod >1)
+					{
+						FeatureTypes cFeature = (FeatureTypes)tImprovementEntry.GetNewFeature();
+						if(cFeature != NO_FEATURE)
+						{
+							setFeatureType(cFeature);
+						}
+					}
+					if(eCreateItemMod >0)
+					{
+						ImprovementTypes cImprovement = (ImprovementTypes)tImprovementEntry.GetNewImprovement();
+						if(cImprovement != NO_IMPROVEMENT)
+						{
+							eImprovement = cImprovement;
+						}
+						else 
+						{
+							eClearImprovement = true;
+						}
+					}
+				}
+				if(!eClearImprovement)
+				{
+					setImprovementType(eImprovement, ePlayer);
+				}
+#else
 				setImprovementType(eImprovement, ePlayer);
+#endif		
 				
 #if defined(MOD_BUGFIX_MINOR)
 				// Building a GP improvement on a resource needs to clear any previous pillaged state
@@ -11332,6 +11437,10 @@ void CvPlot::read(FDataStream& kStream)
 	kStream >> m_cContinentType;
 	kStream >> m_kArchaeologyData;
 
+#ifdef MOD_IMPROVEMENTS_UPGRADE
+	kStream >> m_iXP;
+#endif
+
 	updateImpassable();
 }
 
@@ -11487,6 +11596,10 @@ void CvPlot::write(FDataStream& kStream) const
 
 	kStream << m_cContinentType;
 	kStream << m_kArchaeologyData;
+
+#ifdef MOD_IMPROVEMENTS_UPGRADE
+	kStream << m_iXP;
+#endif
 }
 
 //	--------------------------------------------------------------------------------
@@ -12807,5 +12920,122 @@ int CvPlot::ComputeYieldFromAdjacentFeature(CvImprovementEntry& kImprovement, Yi
 
 	return iRtnValue;
 }
+#endif
 
+#ifdef MOD_IMPROVEMENTS_UPGRADE
+int CvPlot::GetXP() const
+{
+	return this->m_iXP;
+}
+int CvPlot::GetXPGrowth() const
+{
+	int iXPChange = 0;
+	int iValue = 0;
+	CvCity* pCity = getWorkingCity();
+	if (GAMEEVENTINVOKE_VALUE(iValue, GAMEEVENT_GetImprovementXPPerTurn, getX(), getY(), getImprovementType(), GetXP(), getOwner(), pCity ? pCity->GetID() : -1) == GAMEEVENTRETURN_VALUE) {
+		iXPChange += iValue;
+	}
+
+	return iXPChange;
+}
+
+int CvPlot::SetXP(int iNewValue, bool bDoUpdate)
+{
+	if (!MOD_IMPROVEMENTS_UPGRADE)
+	{
+		this->m_iXP = 0;
+		return this->m_iXP;
+	}
+	
+	ImprovementTypes  eCurImpr = this->getImprovementType();
+	if (eCurImpr == NO_IMPROVEMENT)
+	{
+		return this->m_iXP;
+	}
+	CvImprovementEntry* pImprInfo = GC.getImprovementInfo(eCurImpr);
+	if (pImprInfo == nullptr)
+	{
+		return this->m_iXP;
+	}
+	int upgradeXP = pImprInfo->GetUpgradeXP();
+	
+	this->m_iXP = iNewValue;
+	while (this->m_iXP >= upgradeXP && pImprInfo->GetEnableUpgrade())
+	{
+		ImprovementTypes eOldImpr = eCurImpr;
+		this->m_iXP -= upgradeXP;
+		this->setImprovementType(pImprInfo->GetUpgradeImprovementType());
+		eCurImpr = this->getImprovementType();
+		CvCity* pCity = getWorkingCity();
+		GAMEEVENTINVOKE_HOOK(GAMEEVENT_OnImprovementUpgrade, getX(), getY(), eOldImpr, eCurImpr, getOwner(), pCity ? pCity->GetID() : -1);
+		if (eCurImpr == NO_IMPROVEMENT)
+		{
+			this->m_iXP = 0;
+			break;
+		}
+		pImprInfo = GC.getImprovementInfo(eCurImpr);
+		if (pImprInfo == nullptr)
+		{
+			this->m_iXP = 0;
+			break;
+		}
+		upgradeXP = pImprInfo->GetUpgradeXP();
+	}
+	while (this->m_iXP < 0 && pImprInfo->GetEnableDowngrade())
+	{
+		ImprovementTypes eOldImpr = eCurImpr;
+		this->setImprovementType(pImprInfo->GetDowngradeImprovementType());
+		eCurImpr = this->getImprovementType();
+		CvCity* pCity = getWorkingCity();
+		GAMEEVENTINVOKE_HOOK(GAMEEVENT_OnImprovementDowngrade, getX(), getY(), eOldImpr, eCurImpr, getOwner(), pCity ? pCity->GetID() : -1);
+		if (eCurImpr == NO_IMPROVEMENT)
+		{
+			this->m_iXP = 0;
+			break;
+		}
+		pImprInfo = GC.getImprovementInfo(eCurImpr);
+		if (pImprInfo == nullptr)
+		{
+			this->m_iXP = 0;
+			break;
+		}
+
+		if (pImprInfo->GetEnableUpgrade())
+		{
+			upgradeXP = pImprInfo->GetUpgradeXP();
+			this->m_iXP += upgradeXP;
+		}
+		else
+		{
+			this->m_iXP = 0;
+			break;
+		}
+	}
+
+	return this->m_iXP;
+}
+int CvPlot::ChangeXP(int iChange, bool bDoUpdate)
+{
+	return this->SetXP(GetXP() + iChange, bDoUpdate);
+}
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+void CvPlot::ClearUnitPromotions()
+{
+	if (!MOD_GLOBAL_PROMOTIONS_REMOVAL) return;
+
+	int iUnitCount = getNumUnits();
+	for (int i = 0; i < iUnitCount; i++)
+	{
+		CvUnit* pLoopUnit = getUnitByIndex(i);
+		if (!pLoopUnit) continue;
+
+		auto& candidatePromotionToClear = pLoopUnit->GetPromotionsThatCanBeActionCleared();
+		for (auto it = candidatePromotionToClear.begin(); it != candidatePromotionToClear.end(); ++it)
+		{
+			pLoopUnit->setHasPromotion(*it, false);
+		}
+	}
+}
 #endif

@@ -580,6 +580,10 @@ public:
 	int experienceNeeded() const;
 	int attackXPValue() const;
 	int defenseXPValue() const;
+#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
+	int ExtraAttackXPValue() const;
+	int ExtraDefenseXPValue() const;
+#endif
 	int maxXPValue() const;
 
 	int firstStrikes() const;
@@ -619,6 +623,14 @@ public:
 	void SetNearbyImprovementBonusRange(int iBonusRange);
 	ImprovementTypes GetCombatBonusImprovement() const;
 	void SetCombatBonusImprovement(ImprovementTypes eImprovement);
+#endif
+
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	int GetAllyCityStateCombatModifier() const;
+	void SetAllyCityStateCombatModifier(int iCombatBonus);
+	int GetAllyCityStateCombatModifierMax() const;
+	void SetAllyCityStateCombatModifierMax(int iCombatBonusMax);
+	int GetStrengthModifierFromAlly() const;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -896,6 +908,9 @@ public:
 	bool isBlitz() const;
 	void changeBlitzCount(int iChange);
 
+	void DoAdjacentPlotDamage(CvPlot* pWhere, int iValue);
+
+	void MoveToEnemyPlotDamage(CvPlot* pWhere);
 
 #if defined(MOD_ROG_CORE)
 	int getMeleeDefenseModifier() const;
@@ -904,8 +919,6 @@ public:
 	int attackFullyHealedModifier() const;
 	int attackAbove50HealthModifier() const;
 	int attackBelow50HealthModifier() const;
-
-	//int DoAdjacentPlotDamage(CvPlot* pWhere, int iValue, const char* chTextKey = NULL);
 
 	int getForcedDamageValue();
 	void ChangeForcedDamageValue(int iChange);
@@ -959,7 +972,29 @@ public:
 	void changeOutsideCapitalLandDefenseMod(int iValue);
 #endif
 
+	int GetAttackInflictDamageChange() const;
+	int GetAttackInflictDamageChangeMaxHPPercent() const;
+	void ChangeAttackInflictDamageChange(int iChange);
+	void ChangeAttackInflictDamageChangeMaxHPPercent(int iChange);
 
+	int GetDefenseInflictDamageChange() const;
+	int GetDefenseInflictDamageChangeMaxHPPercent() const;
+	void ChangeDefenseInflictDamageChange(int iChange);
+	void ChangeDefenseInflictDamageChangeMaxHPPercent(int iChange);
+
+	int GetSiegeInflictDamageChange() const;
+	int GetSiegeInflictDamageChangeMaxHPPercent() const;
+	void ChangeSiegeInflictDamageChange(int iChange);
+	void ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange);
+
+	int GetHeavyChargeAddMoves() const;
+	int GetHeavyChargeExtraDamage() const;
+	int GetHeavyChargeCollateralFixed() const;
+	int GetHeavyChargeCollateralPercent() const;
+	void ChangeHeavyChargeAddMoves(int iChange);
+	void ChangeHeavyChargeExtraDamage(int iChange);
+	void ChangeHeavyChargeCollateralFixed(int iChange);
+	void ChangeHeavyChargeCollateralPercent(int iChange);
 
 	int getAmphibCount() const;
 	bool isAmphib() const;
@@ -1288,6 +1323,16 @@ public:
 
 	const InvisibleTypes getSeeInvisibleType() const;
 	void setSeeInvisibleType(InvisibleTypes InvisibleType);
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	const int GetFeatureInvisible() const;
+	const int GetFeatureInvisible2() const;
+	void setFeatureInvisible(int FeatureInvisible, int FeatureInvisible2);
+	bool IsInvisibleInvalid() const;
+#endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	const int GetMultipleInitExperence() const;
+	void ChangeMultipleInitExperence(int iValue);
+#endif
 
 	const CvUnit* getCombatUnit() const;
 	CvUnit* getCombatUnit();
@@ -1593,6 +1638,7 @@ public:
 	void ChangeCannotBeCapturedCount(int iChange);
 	bool GetCannotBeCaptured();
 
+
 #if defined(MOD_ROG_CORE)
 	void ChangeNumSpyAttackMod(int iValue);
 	int GetNumSpyAttackMod() const;
@@ -1638,6 +1684,17 @@ public:
 
 	void ChangeCityAttackPlunderModifier(int iValue);
 	int GetCityAttackPlunderModifier() const;
+
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	void ChangeUnitAttackFaithBonus(int iValue);
+	void ChangeCityAttackFaithBonus(int iValue);
+	int GetUnitAttackFaithBonus() const;
+	int GetCityAttackFaithBonus() const;
+#endif
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	void setRemovePromotionUpgrade(int iValue);
+	int GetRemovePromotionUpgrade() const;
+#endif
 
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
 	int GetReligiousStrengthLossRivalTerritory() const;
@@ -1696,6 +1753,61 @@ public:
 	bool IsOnTerrain(TerrainTypes iTerrainType) const;
 	bool IsAdjacentToTerrain(TerrainTypes iTerrainType) const;
 	bool IsWithinDistanceOfTerrain(TerrainTypes iTerrainType, int iDistance) const;
+#endif
+
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	int GetWarCasualtiesModifier() const;
+	void ChangeWarCasualtiesModifier(int iChange);
+	void SetWarCasualtiesModifier(int iValue);
+#endif
+
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	std::vector<SplashInfo>& GetSplashInfoVec();
+
+	int GetSplashImmuneRC() const;
+	void ChangeSplashImmuneRC(int iChange);
+	void SetSplashImmuneRC(int iValue);
+
+	int GetSplashXP() const;
+	void ChangeSplashXP(int iChange);
+	void SetSplashXP(int iValue);
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+	std::tr1::unordered_map<PromotionCollectionsTypes, int>& GetPromotionCollections();
+#endif
+
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	int GetAddEnemyPromotionImmuneRC() const;
+	bool IsImmuneNegtivePromotions() const;
+	void ChangeAddEnemyPromotionImmuneRC(int iChange);
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	void ClearSamePlotPromotions();
+	std::tr1::unordered_set<PromotionTypes>& GetPromotionsThatCanBeActionCleared();
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	std::tr1::unordered_map<PromotionTypes, DestroyBuildingsInfo>& GetDestroyBuildings();
+
+	int GetSiegeKillCitizensPercent() const;
+	int GetSiegeKillCitizensFixed() const;
+	void ChangeSiegeKillCitizensPercent(int iChange);
+	void ChangeSiegeKillCitizensFixed(int iChange);
+	bool CanSiegeKillCitizens() const;
+#endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	std::vector<CollateralInfo>& GetCollateralInfoVec();
+
+	int GetCollateralImmuneRC() const;
+	void ChangeCollateralImmuneRC(int iChange);
+	void SetCollateralImmuneRC(int iValue);
+
+	int GetCollateralXP() const;
+	void ChangeCollateralXP(int iChange);
+	void SetCollateralXP(int iValue);
 #endif
 
 protected:
@@ -1841,6 +1953,10 @@ protected:
 	FAutoVariable<ImprovementTypes, CvUnit> m_eCombatBonusImprovement;
 #endif
 
+#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
+	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifier;
+	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifierMax;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvUnit> m_iAoEDamageOnMove;
@@ -1979,6 +2095,14 @@ protected:
 	FAutoVariable<UnitTypes, CvUnit> m_eLeaderUnitType;
 	FAutoVariable<InvisibleTypes, CvUnit> m_eInvisibleType;
 	FAutoVariable<InvisibleTypes, CvUnit> m_eSeeInvisibleType;
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	FAutoVariable<int, CvUnit> m_eFeatureInvisible;
+	FAutoVariable<int, CvUnit> m_eFeatureInvisible2;
+#endif
+#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
+	FAutoVariable<int, CvUnit> m_eMultipleInitExperence;
+#endif
+
 	FAutoVariable<GreatPeopleDirectiveTypes, CvUnit> m_eGreatPeopleDirectiveType;
 	CvUnitEntry* m_pUnitInfo;
 
@@ -2045,24 +2169,78 @@ protected:
 	int m_iDamageAoEFortified;
 	int m_iWorkRateMod;
 	int m_iAOEDamageOnKill;
-
 #endif
 
 	int m_iCannotBeCapturedCount;
 	int m_iCaptureDefeatedEnemyChance;
 
 
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+	std::vector<SplashInfo> m_asSplashInfoVec = {};
+
+	int m_iSplashImmuneRC = 0;
+	int m_iSplashXP = 0;
+#endif
+
+#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
+	std::vector<CollateralInfo> m_asCollateralInfoVec = {};
+
+	int m_iCollateralImmuneRC = 0;
+	int m_iCollateralXP = 0;
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+	std::tr1::unordered_map<PromotionCollectionsTypes, int> m_sPromotionCollections;
+#endif
+
+ #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	int m_iAddEnemyPromotionImmuneRC = 0;
+ #endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	std::tr1::unordered_map<PromotionTypes, AutoRemoveInfo> m_mapAutoRemovePromotions;
+	std::tr1::unordered_set<PromotionTypes> m_sPromotionsThatCanBeActionCleared;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	std::tr1::unordered_map<PromotionTypes, DestroyBuildingsInfo> m_mapDestroyBuildings;
+
+	int m_iSiegeKillCitizensPercent = 0;
+	int m_iSiegeKillCitizensFixed = 0;
+#endif
+
 	int m_iEmbarkExtraVisibility;
 	int m_iEmbarkDefensiveModifier;
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	int m_iUnitAttackFaithBonus;
+	int m_iCityAttackFaithBonus;
+#endif	
+#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int m_iRemovePromotionUpgrade;
+#endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
 	int m_iTradeMissionGoldModifier;
 	int m_iMapLayer;		// Which layer does the unit reside on for pathing/stacking/etc.
 	int m_iNumGoodyHutsPopped;
 	int m_iLastGameTurnAtFullHealth;
+
+	int m_iAttackInflictDamageChange = 0;
+	int m_iAttackInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iDefenseInflictDamageChange = 0;
+	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iSiegeInflictDamageChange = 0;
+	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iHeavyChargeAddMoves = 0;
+	int m_iHeavyChargeExtraDamage = 0;
+	int m_iHeavyChargeCollateralFixed = 0;
+	int m_iHeavyChargeCollateralPercent = 0;
 	
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	CvString m_strUnitName;
@@ -2087,6 +2265,10 @@ protected:
 	// these are do to a unit using Heavy Charge against you
 	bool CanFallBackFromMelee(CvUnit& pAttacker);
 	bool DoFallBackFromMelee(CvUnit& pAttacker);
+
+ #ifdef MOD_GLOBAL_WAR_CASUALTIES
+	int m_iWarCasualtiesModifier = 0;
+ #endif
 
 private:
 

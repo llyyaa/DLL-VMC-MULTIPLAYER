@@ -5,15 +5,15 @@
     <ProjectGuid>{0b961596-36f9-4289-a247-0e889fef1f39}</ProjectGuid>
     <Name>(1) CIV5MPDLL</Name>
     <Guid>a2969a0a-e4da-41cc-9e0b-19b29aa971d8</Guid>
-    <ModVersion>1</ModVersion>
-    <Stability>Experimental</Stability>
+    <ModVersion>4</ModVersion>
+    <Stability>Alpha</Stability>
     <Teaser>This mod is based on whoward69's DLL-VMC v97. It fixes multiplayer gaming bugs and provides more useful modding interface.</Teaser>
     <Description>This mod is based on whoward69's DLL-VMC v97. It fixes out-of-sync problem of
       playing with mods in multiplayer game by creating lua interface allows to broadcast arbitrary
       lua-CPP interface operations or CPP functions (in progress) on all the clients in a
       multiplayer game by providing their names and arguments.In addition, it provides more useful
       functionalities for modding.</Description>
-    <Authors>Whoward69,Apeiria,rogcore,Qinyin,catgrep</Authors>
+    <Authors>Whoward69,Apeiria,rogcore,Qingyin,catgrep</Authors>
     <SpecialThanks>
     </SpecialThanks>
     <AffectsSavedGames>true</AffectsSavedGames>
@@ -149,6 +149,11 @@
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
         <FileName>DB/BUGFIX/UnitclassNotUnit.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/BUILDINGS/BuildingClassCollections.sql</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
@@ -318,6 +323,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/PromotionCollections.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/RELIGION/ConversionModifiers.sql</FileName>
       </Action>
       <Action>
@@ -458,6 +468,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/BUILDINGS/Building_InstantYield.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/IMPROVEMENTS/Improvement_AdjacentImprovementYieldChanges.xml</FileName>
       </Action>
       <Action>
@@ -465,8 +480,52 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/YIELDS/NewYields_DDL.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvement_Upgrade_Downgrade.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvements_Create_Item.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/GLOBAL/WarCasualties.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/NewBattleEffects.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/CITY_SCALES/CityScales.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/AutoRemove.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/InflictDamageChange.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
+    <ModBlockers>
+      <Association xmlns="">
+        <Type>Mod</Type>
+        <Name>VMC</Name>
+        <Id>d1b6328c-ff44-4b0d-aad7-c657f83610cd</Id>
+        <MinVersion>0</MinVersion>
+        <MaxVersion>999</MaxVersion>
+      </Association>
+    </ModBlockers>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="ART\" />
@@ -480,6 +539,7 @@
     <Folder Include="DB\BUILDINGS" />
     <Folder Include="DB\ERAS" />
     <Folder Include="DB\IMPROVEMENTS" />
+    <Folder Include="DB\CITY_SCALES" />
     <Folder Include="DB\YIELDS" />
     <Folder Include="DB\POLICIES" />
     <Folder Include="DB\UNITS" />
@@ -799,7 +859,23 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="DB\BUILDINGS\BuildingClassCollections.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="DB\BUILDINGS\Building_EnableUnitPurchase.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\BUILDINGS\Building_InstantYield.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\CITY_SCALES\CityScales.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\GLOBAL\WarCasualties.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
@@ -807,7 +883,31 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvement_Upgrade_Downgrade.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvements_Create_Item.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="DB\NewTableChanges.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\AutoRemove.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\InflictDamageChange.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\NewBattleEffects.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\PromotionCollections.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

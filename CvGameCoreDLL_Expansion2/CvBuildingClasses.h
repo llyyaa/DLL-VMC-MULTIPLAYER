@@ -178,6 +178,11 @@ public:
 	int GetCityAutomatonWorkersChange() const;
 #endif
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	int GetInstantYield(int i) const;
+	int* GetInstantYieldArray() const;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	int GetGreatWorkYieldChange(int i) const;
 	int* GetGreatWorkYieldChangeArray() const;
@@ -198,6 +203,13 @@ public:
 
 	int GetResetDamageValue() const;
 	int GetReduceDamageValue() const;
+
+	int GetWaterTileDamage() const;
+	int GetWaterTileMovementReduce() const;
+	int GetWaterTileTurnDamage() const;
+	int GetLandTileDamage() const;
+	int GetLandTileMovementReduce() const;
+	int GetLandTileTurnDamage() const;
 #endif
 
 
@@ -206,6 +218,13 @@ public:
 	int GetYieldChangeWorldWonder(int i) const;
 	int GetYieldChangeWorldWonderGlobal(int i) const;
 #endif
+
+	int GetYieldFromProcessModifier(int i) const;
+	int* GetYieldFromProcessModifierArray() const;
+
+	int GetYieldFromProcessModifierGlobal(int i) const;
+	int* GetYieldFromProcessModifierArrayGlobal() const;
+
 
 #if defined(MOD_ROG_CORE)
 	int GetResourceYieldChangeGlobal(int iResource, int iYieldType) const;
@@ -219,6 +238,7 @@ public:
 
 	int GetBuildingClassYieldModifier(int i, int j) const;
 #endif
+
 
 	int GetMinAreaSize() const;
 	int GetConquestProbability() const;
@@ -396,9 +416,18 @@ public:
 	bool HasYieldFromOtherYield() const;
 #endif
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes GetEnableCityScaleGrowth() const;
+	bool GetEnableAllCityScaleGrowth() const;
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	int GetGoldenAgeUnitCombatModifier() const;
 	int GetGoldenAgeMeterMod() const;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int GetSiegeKillCitizensModifier() const;
 #endif
 
 private:
@@ -477,6 +506,10 @@ private:
 	int m_iCityAutomatonWorkersChange;
 #endif
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	int* m_piInstantYield;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	int* m_piGreatWorkYieldChange;
 
@@ -489,6 +522,15 @@ private:
 
 	int m_iGlobalCityStrengthMod;
 	int m_iGlobalRangedStrikeModifier;
+
+
+
+	int m_iWaterTileDamage;
+	int m_iWaterTileMovementReduce;
+	int m_iWaterTileTurnDamage;
+	int m_iLandTileDamage;
+	int m_iLandTileMovementReduce;
+	int m_iLandTileTurnDamage;
 #endif
 
 	int m_iNukeInterceptionChance;
@@ -504,6 +546,8 @@ private:
 	int** m_ppaiSpecialistYieldChangeLocal;
 #endif
 
+	int* m_piYieldFromProcessModifier;
+	int* m_piYieldFromProcessModifierGlobal;
 
 #if defined(MOD_ROG_CORE)
 	int* m_piYieldChangeWorldWonder;
@@ -559,6 +603,10 @@ private:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int m_iConversionModifier;
 	int m_iGlobalConversionModifier;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int m_iSiegeKillCitizensModifier = 0;
 #endif
 
 	int m_iLandmarksTourismPercent;
@@ -682,6 +730,11 @@ private:
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	int m_ppiYieldFromOtherYield[NUM_YIELD_TYPES][NUM_YIELD_TYPES][YieldFromYield::LENGTH];
 	bool m_bHasYieldFromOtherYield = false;
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes m_eEnableCityScaleGrowth = NO_CITY_SCALE;
+	bool m_bEnableAllCityScaleGrowth = false;
 #endif
 };
 
@@ -833,7 +886,6 @@ public:
 #if defined(MOD_ROG_CORE)
 	const std::vector<BuildingTypes>& GetAllBuildingsHere() const { return m_buildingsThatExistAtLeastOnce; }
 #endif
-
 
 private:
 	void NotifyNewBuildingStarted(BuildingTypes eIndex);

@@ -1006,6 +1006,92 @@
     <Row Class="3" Name="EVENTS_IMPROVEMENTS_PILLAGED" Value="1"/>  
     <!--GameEvents.TileImprovementPillaged.Add(iPlotX, iPlotY, iOwner,iImprovement,bPillaged) end)-->
 
+    <!-- GameEvents.GetImprovementXPPerTurn.Add(function(iX, iY, iImprovementType, iCurrentXP, iOwner, iWorkCity) return 0 end); // notice: the iOnwer or iWorkCity may be -1 -->
+    <!-- GameEvents.OnImprovementUpgrade.Add(function(iX, iY, iOldImprovementType, iNewImprovementType, iOwner, iWorkCity) return end); -->
+    <!-- GameEvents.OnImprovementDowngrade.Add(function(iX, iY, iOldImprovementType, iNewImprovementType, iOwner, iWorkCity) return end); -->
+    <!-- function plot:GetXP() return XP; -->
+    <!-- function plot:GetXPGrowth() return XP; -->
+    <!-- function plot:ChangeXP(iChange, bDoUpdate) return iNewXP; -->
+    <!-- function plot:SetXP(iVal, bDoUpdate) return XP; -->
+    <!-- Table changes: Improvement_Upgrade_Downgrade.sql -->
+    <Row Class="5" Name="IMPROVEMENTS_UPGRADE" Value="0"/>
+
+    <!-- table changes: -->
+    <!-- see Improvements_Create_Item.sql -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'CreatedItemMod' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'CreatedResourceQuantity' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'SetNewImprovement' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'SetNewFeature' TEXT DEFAULT NULL; -->
+    <Row Class="5" Name="IMPROVEMENTS_CREATE_ITEMS" Value="1"/>
+
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_GROWTH" Value="0"/>
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_PRODUCTION" Value="0"/>
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_CULTURE" Value="0"/>
+
+    <!-- lua interfaces: -->
+    <!-- int pPlayer:GetWarCasualtiesCounter() const; -->
+	<!-- void pPlayer:ChangeWarCasualtiesCounter(const int iChange); -->
+	<!-- void pPlayer:SetWarCasualtiesCounter(const int iValue); -->
+	<!-- bool pPlayer:CheckAndUpdateWarCasualtiesCounter(); -->
+    <!-- lua events: -->
+    <!-- DoWarPopulationLoss(int iPlayer, int iCity, int iChange)-->
+    <!-- table changes: -->
+    <!-- see WarCasualties.sql -->
+    <!-- INSERT INTO Defines(Name, Value) VALUES('WAR_CASUALTIES_THRESHOLD', 200); -->
+    <!-- INSERT INTO Defines(Name, Value) VALUES('WAR_CASUALTIES_DELTA_BASE', 100); -->
+    <!-- INSERT INTO Defines(Name, Value) VALUES('WAR_CASUALTIES_POPULATION_LOSS', 1); -->
+    <!-- ALTER TABLE UnitPromotions add column WarCasualtiesModifier int not null default 0; -->
+    <!-- ALTER TABLE Policies add column WarCasualtiesModifier int not null default 0; -->
+    <Row Class="6" Name="GLOBAL_WAR_CASUALTIES" Value="0"/>
+
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
+    <!-- ALTER TABLE Units add column ExtraXPValueAttack int not null default 0; -->
+    <!-- ALTER TABLE Units add column ExtraXPValueDefense int not null default 0; -->
+    <Row Class="6" Name="GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
+    <!-- ALTER TABLE UnitPromotions ADD 'FeatureInvisible' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'FeatureInvisible2' TEXT DEFAULT NULL; -->
+    <Row Class="6" Name="PROMOTION_FEATURE_INVISIBLE" Value="0"/>
+
+    <!-- INSERT INTO Defines(Name, Value) VALUES('GOLDEN_AGE_POINT_MULTIPLE_IN_GA', 2); -->
+    <Row Class="6" Name="GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA" Value="0"/>
+    <!-- INSERT INTO Defines(Name, Value) VALUES('UNIT_MOVES_AFTER_DISEMBARK', 60); --> 
+    <Row Class="6" Name="GLOBAL_UNIT_MOVES_AFTER_DISEMBARK" Value="0"/>
+
+    <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="PROMOTION_MULTIPLE_INIT_EXPERENCE" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="PROMOTION_GET_INSTANCE_FROM_ATTACK" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'RemovePromotionUpgrade' TEXT DEFAULT NULL; -->
+    <Row Class="6" Name="PROMOTION_REMOVE_PROMOTION_UPGRADE" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see Building_InstantYield.xml -->
+    <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="0"/>
+
+    <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
+    <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
+    <Row Class="6" Name="PROMOTION_COLLATERAL_DAMAGE" Value="0"/>
+    <Row Class="6" Name="PROMOTION_ADD_ENEMY_PROMOTIONS" Value="0"/>
+    <Row Class="6" Name="PROMOTION_CITY_DESTROYER" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_PROMOTIONS_REMOVAL" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_CITY_SCALES" Value="0"/>
+    <Row Class="6" Name="EVENTS_CITY_SCALES" Value="0"/>
+
+    <!-- Permits units to receive a combat bonus from Ally City States-->
+    <!-- table change: NewTableChanges.sql -->
+    <Row Class="4" Name="PROMOTIONS_ALLYCITYSTATE_BONUS" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>
