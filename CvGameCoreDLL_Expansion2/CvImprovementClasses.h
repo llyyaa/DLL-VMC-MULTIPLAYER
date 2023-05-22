@@ -93,6 +93,20 @@ public:
 	int GetResourceQuantityFromImprovement() const;
 #endif
 
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+	int GetCreateItemMod() const;
+	int GetCreatedResourceQuantity() const;
+	int GetNewImprovement() const;
+	int GetNewFeature() const;
+
+	int GetCreateResource(CvPlot* pPlot) const;
+	int* GetCreateResourceList() const;
+	int* GetCreateTerrainList() const;
+	bool* GetCreateTerrainOnlyList() const;
+	int* GetCreateFeatureList() const;
+	bool* GetCreateFeatureOnlyList() const;
+#endif
+
 #if defined(MOD_GLOBAL_RELOCATION)
 	bool IsAllowsRebaseTo() const;
 	bool IsAllowsAirliftFrom() const;
@@ -267,6 +281,19 @@ protected:
 
 	int m_iImprovementResource;
 	int m_iImprovementResourceQuantity;
+#endif
+
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+	int m_iCreateItemMod;
+	int m_iCreatedResourceQuantity;
+	int m_iSetNewImprovement;
+	int m_iSetNewFeature;
+
+	int* m_iCreateResourceList;
+	int* m_iCreateTerrainList;
+	bool* m_iCreateTerrainOnlyList;
+	int* m_iCreateFeatureList;
+	bool* m_iCreateFeatureOnlyList;
 #endif
 
 #if defined(MOD_GLOBAL_RELOCATION)

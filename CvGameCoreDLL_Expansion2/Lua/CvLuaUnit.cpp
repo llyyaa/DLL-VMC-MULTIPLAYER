@@ -472,6 +472,9 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #endif
 	Method(IsNeverInvisible);
 	Method(IsInvisible);
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	Method(IsInvisibleInvalid);
+#endif
 	Method(IsNukeImmune);
 	Method(IsRangeAttackOnlyInDomain);
 	Method(IsCityAttackOnly);
@@ -777,6 +780,13 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(IsOnTerrain);
 	Method(IsAdjacentToTerrain);
 	Method(IsWithinDistanceOfTerrain);
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	Method(ClearSamePlotPromotions);
+#endif
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	Method(IsImmuneNegtivePromotions);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -3399,6 +3409,17 @@ int CvLuaUnit::lIsInvisible(lua_State* L)
 }
 
 //------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+int CvLuaUnit::lIsInvisibleInvalid(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const bool bResult = pkUnit->IsInvisibleInvalid();
+	lua_pushboolean(L, bResult);
+	return 1;
+}
+#endif
+
+//------------------------------------------------------------------------------
 int CvLuaUnit::lIsEnemyCityAdjacent(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
@@ -6017,4 +6038,12 @@ LUAAPIIMPL(Unit, IsWithinDistanceOfResource)
 LUAAPIIMPL(Unit, IsOnTerrain)
 LUAAPIIMPL(Unit, IsAdjacentToTerrain)
 LUAAPIIMPL(Unit, IsWithinDistanceOfTerrain)
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+LUAAPIIMPL(Unit, ClearSamePlotPromotions)
+#endif
+
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+LUAAPIIMPL(Unit, IsImmuneNegtivePromotions)
 #endif

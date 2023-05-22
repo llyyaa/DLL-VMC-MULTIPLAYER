@@ -669,7 +669,11 @@ void CvPlot::updateVisibility()
 				{
 					// This unit has visibility rules, send a message that it needs to update itself.
 					auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(pLoopUnit));
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+					gDLL->GameplayUnitVisibility(pDllUnit.get(), (pLoopUnit->getTeam() == eActiveTeam)?true:(isInvisibleVisible(eActiveTeam, eInvisibleType) || pLoopUnit->IsInvisibleInvalid()), true, 0.01f);
+#else
 					gDLL->GameplayUnitVisibility(pDllUnit.get(), (pLoopUnit->getTeam() == eActiveTeam)?true:isInvisibleVisible(eActiveTeam, eInvisibleType), true, 0.01f);
+#endif
 				}
 			}
 		}
@@ -690,7 +694,11 @@ void CvPlot::updateVisibility()
 					{
 						// This unit has visibility rules, send a message that it needs to update itself.
 						auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(pLoopUnit));
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+						gDLL->GameplayUnitVisibility(pDllUnit.get(), (pLoopUnit->getTeam() == eActiveTeam)?true:(isInvisibleVisible(eActiveTeam, eInvisibleType) || pLoopUnit->IsInvisibleInvalid()), true, 0.01f);
+#else
 						gDLL->GameplayUnitVisibility(pDllUnit.get(), (pLoopUnit->getTeam() == eActiveTeam)?true:isInvisibleVisible(eActiveTeam, eInvisibleType), true, 0.01f);
+#endif
 					}
 				}
 			}
@@ -2619,7 +2627,13 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 		{
 			return false;
 		}
-
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+		// Can not create resource in a plot where already has one
+		if(MOD_IMPROVEMENTS_CREATE_ITEMS && getResourceType() != NO_RESOURCE && GC.getImprovementInfo(eImprovement)->GetCreateItemMod() > 2)
+		{
+			return false;
+		}
+#endif
 		// Already an improvement here
 		if(getImprovementType() != NO_IMPROVEMENT)
 		{
@@ -10419,6 +10433,10 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 	if(pkBuildInfo == NULL)
 		return false;
 
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+	bool eClearImprovement = false;
+#endif
+
 	if(iChange != 0)
 	{
 		if(NULL == m_paiBuildProgress)
@@ -10450,7 +10468,50 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 			// Constructed Improvement
 			if (eImprovement != NO_IMPROVEMENT)
 			{
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+				CvImprovementEntry& tImprovementEntry = *GC.getImprovementInfo(eImprovement);
+				int eCreateItemMod = tImprovementEntry.GetCreateItemMod();
+				if(MOD_IMPROVEMENTS_CREATE_ITEMS)
+				{
+					//enable create resource mod
+					if(eCreateItemMod > 2)
+					{
+						ResourceTypes cResource = (ResourceTypes)tImprovementEntry.GetCreateResource(this);
+						int cResourceQuantity = tImprovementEntry.GetCreatedResourceQuantity();
+						if (cResource != NO_RESOURCE && cResourceQuantity != 0)
+						{
+							cResourceQuantity = cResourceQuantity > 0 ? cResourceQuantity : GC.getGame().getJonRandNum(-cResourceQuantity, "Get random source quantity when constructed ") + 1;
+							setResourceType(cResource, cResourceQuantity);
+						}
+					}
+					if(eCreateItemMod >1)
+					{
+						FeatureTypes cFeature = (FeatureTypes)tImprovementEntry.GetNewFeature();
+						if(cFeature != NO_FEATURE)
+						{
+							setFeatureType(cFeature);
+						}
+					}
+					if(eCreateItemMod >0)
+					{
+						ImprovementTypes cImprovement = (ImprovementTypes)tImprovementEntry.GetNewImprovement();
+						if(cImprovement != NO_IMPROVEMENT)
+						{
+							eImprovement = cImprovement;
+						}
+						else 
+						{
+							eClearImprovement = true;
+						}
+					}
+				}
+				if(!eClearImprovement)
+				{
+					setImprovementType(eImprovement, ePlayer);
+				}
+#else
 				setImprovementType(eImprovement, ePlayer);
+#endif		
 				
 #if defined(MOD_BUGFIX_MINOR)
 				// Building a GP improvement on a resource needs to clear any previous pillaged state
@@ -12956,5 +13017,25 @@ int CvPlot::SetXP(int iNewValue, bool bDoUpdate)
 int CvPlot::ChangeXP(int iChange, bool bDoUpdate)
 {
 	return this->SetXP(GetXP() + iChange, bDoUpdate);
+}
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+void CvPlot::ClearUnitPromotions()
+{
+	if (!MOD_GLOBAL_PROMOTIONS_REMOVAL) return;
+
+	int iUnitCount = getNumUnits();
+	for (int i = 0; i < iUnitCount; i++)
+	{
+		CvUnit* pLoopUnit = getUnitByIndex(i);
+		if (!pLoopUnit) continue;
+
+		auto& candidatePromotionToClear = pLoopUnit->GetPromotionsThatCanBeActionCleared();
+		for (auto it = candidatePromotionToClear.begin(); it != candidatePromotionToClear.end(); ++it)
+		{
+			pLoopUnit->setHasPromotion(*it, false);
+		}
+	}
 }
 #endif

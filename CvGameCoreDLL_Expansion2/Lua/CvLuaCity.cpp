@@ -702,6 +702,11 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(IsHasSecondaryBelief);
 	Method(IsSecondaryReligionActive);
 #endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+	Method(GetScale);
+	Method(CanGrowNormally);
+#endif
 }
 //------------------------------------------------------------------------------
 void CvLuaCity::HandleMissingInstance(lua_State* L)
@@ -4662,4 +4667,9 @@ int CvLuaCity::lIsSecondaryReligionActive(lua_State* L)
 	lua_pushboolean(L, pCity->GetCityReligions()->IsSecondaryReligionActive());
 	return 1;
 }
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+LUAAPIIMPL(City, GetScale)
+LUAAPIIMPL(City, CanGrowNormally)
 #endif

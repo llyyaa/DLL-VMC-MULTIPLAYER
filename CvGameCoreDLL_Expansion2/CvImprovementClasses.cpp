@@ -93,6 +93,18 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_iImprovementResourceQuantity(0),
 #endif
 
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+	m_iCreateItemMod(0),
+	m_iCreatedResourceQuantity(0),
+	m_iSetNewImprovement(NO_IMPROVEMENT),
+	m_iSetNewFeature(NO_FEATURE),
+
+	m_iCreateResourceList(NULL),
+	m_iCreateTerrainList(NULL),
+	m_iCreateTerrainOnlyList(NULL),
+	m_iCreateFeatureList(NULL),
+	m_iCreateFeatureOnlyList(NULL),
+#endif
 
 	m_iPillageGold(0),
 	m_iResourceExtractionMod(0),
@@ -205,6 +217,14 @@ CvImprovementEntry::~CvImprovementEntry(void)
 	SAFE_DELETE_ARRAY(m_pbImprovementMakesValid);
 #if defined(MOD_API_UNIFIED_YIELDS)
 	SAFE_DELETE_ARRAY(m_piAdjacentSameTypeYield);
+#endif
+
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+	SAFE_DELETE_ARRAY(m_iCreateResourceList);
+	SAFE_DELETE_ARRAY(m_iCreateTerrainList);
+	SAFE_DELETE_ARRAY(m_iCreateTerrainOnlyList);
+	SAFE_DELETE_ARRAY(m_iCreateFeatureList);
+	SAFE_DELETE_ARRAY(m_iCreateFeatureOnlyList);
 #endif
 
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
@@ -393,6 +413,14 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	m_iImprovementResourceQuantity = kResults.GetInt("ImprovementResourceQuantity");
 #endif
 
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+	m_iCreateItemMod = kResults.GetInt("CreatedItemMod");
+	m_iCreatedResourceQuantity = kResults.GetInt("CreatedResourceQuantity");
+	const char* szSetNewImprovement = kResults.GetText("SetNewImprovement");
+	m_iSetNewImprovement = GC.getInfoTypeForString(szSetNewImprovement, true);
+	const char* szSetNewFeature = kResults.GetText("SetNewFeature");
+	m_iSetNewFeature = GC.getInfoTypeForString(szSetNewFeature, true);
+#endif
 
 	m_iPillageGold = kResults.GetInt("PillageGold");
 	m_bOutsideBorders = kResults.GetBool("OutsideBorders");
@@ -562,6 +590,47 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 #endif
 	}
 
+	{
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+		kUtility.InitializeArray(m_iCreateResourceList, kUtility.MaxRows("Resources"));
+		kUtility.InitializeArray(m_iCreateTerrainList, kUtility.MaxRows("Resources"));
+		kUtility.InitializeArray(m_iCreateTerrainOnlyList, kUtility.MaxRows("Resources"));
+		kUtility.InitializeArray(m_iCreateFeatureList, kUtility.MaxRows("Resources"));
+		kUtility.InitializeArray(m_iCreateFeatureOnlyList, kUtility.MaxRows("Resources"));
+
+		std::string strImprovementCreateKey("Improvements - Improvements_Create_Collection");
+		Database::Results* pResults = kUtility.GetResults(strImprovementCreateKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strImprovementCreateKey, "select Resources.ID as ResourceID, Terrains.ID as TerrainID, TerrainOnly, Features.ID as FeatureID, FeatureOnly from Improvements_Create_Collection inner join Resources on Resources.Type = ResourceType left join Terrains on Terrains.Type = TerrainType left join Features on Features.Type = FeatureType where ImprovementType = ?");
+		}
+
+		pResults->Bind(1, szImprovementType, false);
+		int iResultLoop = 0;
+		while(pResults->Step())
+		{
+			const int ResourceID = pResults->GetInt(0);
+			CvAssert(ResourceID > -1);
+
+			const int TerrainID = pResults->GetInt(1);
+			CvAssert(TerrainID > -1);
+			const bool TerrainOnly = pResults->GetBool(2);
+
+			const int FeatureID = pResults->GetInt(3);
+			CvAssert(FeatureID > -1);
+			const bool FeatureOnly = pResults->GetBool(4);
+			
+			//ResourceID + 1 to distinguish between default value and RESOURCE_IRON(0)
+			m_iCreateResourceList[iResultLoop] = ResourceID + 1;
+			m_iCreateTerrainList[iResultLoop] = TerrainID;
+			m_iCreateTerrainOnlyList[iResultLoop] = TerrainOnly;
+			m_iCreateFeatureList[iResultLoop] = FeatureID;
+			m_iCreateFeatureOnlyList[iResultLoop] = FeatureOnly;
+			iResultLoop = iResultLoop + 1;
+		}
+		pResults->Reset();
+#endif
+	}
 
 
 #if defined(MOD_ROG_CORE)
@@ -938,6 +1007,82 @@ int CvImprovementEntry::GetResourceFromImprovement() const
 int CvImprovementEntry::GetResourceQuantityFromImprovement() const
 {
 	return m_iImprovementResourceQuantity;
+}
+#endif
+
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+// get the items generate mod 0 = disable, 1 = only improvement, 2 = only feature, 3 = enable all
+int CvImprovementEntry::GetCreateItemMod() const
+{
+	return m_iCreateItemMod;
+}
+int CvImprovementEntry::GetCreatedResourceQuantity() const
+{
+	return m_iCreatedResourceQuantity;
+}
+int CvImprovementEntry::GetNewImprovement() const
+{
+	return m_iSetNewImprovement;
+}
+int CvImprovementEntry::GetNewFeature() const
+{
+	return m_iSetNewFeature;
+}
+
+
+int CvImprovementEntry::GetCreateResource(CvPlot* pPlot) const
+{
+	std::vector<int> CanCreateResourceList;
+	CanCreateResourceList.clear();
+	if(pPlot)
+	{
+		int iNumResources = GC.getNumResourceInfos();
+		for(int iResourceLoop = 0; iResourceLoop < iNumResources; iResourceLoop++)
+		{
+			if(m_iCreateResourceList[iResourceLoop] == 0)
+			{
+				break;
+			}
+			TerrainTypes thisTerrain = (TerrainTypes)m_iCreateTerrainList[iResourceLoop];
+			if(m_iCreateTerrainOnlyList[iResourceLoop] && pPlot->getTerrainType() != thisTerrain)
+			{
+				continue;
+			}
+			FeatureTypes thisFeature = (FeatureTypes)m_iCreateFeatureList[iResourceLoop];
+			if(m_iCreateFeatureOnlyList[iResourceLoop] && pPlot->getFeatureType() != thisFeature)
+			{
+				continue;
+			}
+
+			CanCreateResourceList.push_back(m_iCreateResourceList[iResourceLoop] - 1);
+		}
+		if(!CanCreateResourceList.empty())
+		{
+			int randSelect = CanCreateResourceList.size() > 1 ? GC.getGame().getJonRandNum(CanCreateResourceList.size(), "Get random create source when constructed") : 0; 
+			return CanCreateResourceList[randSelect];
+		}
+	}
+	return -1;
+}
+int* CvImprovementEntry::GetCreateResourceList() const
+{
+	return m_iCreateResourceList;
+}
+int* CvImprovementEntry::GetCreateTerrainList() const
+{
+	return m_iCreateTerrainList;
+}
+bool* CvImprovementEntry::GetCreateTerrainOnlyList() const
+{
+	return m_iCreateTerrainOnlyList;
+}
+int* CvImprovementEntry::GetCreateFeatureList() const
+{
+	return m_iCreateFeatureList;
+}
+bool* CvImprovementEntry::GetCreateFeatureOnlyList() const
+{
+	return m_iCreateFeatureOnlyList;
 }
 #endif
 
