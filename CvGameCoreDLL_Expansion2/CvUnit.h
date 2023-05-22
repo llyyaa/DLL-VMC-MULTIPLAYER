@@ -945,6 +945,8 @@ public:
 	void ChangeIsFightWellDamaged(int iChange);
 #endif
 
+	bool IsImmueMeleeAttack() const;
+	void ChangeImmueMeleeAttackCount(int iChange);
 
 #if defined(MOD_ROG_CORE)
 	int getHPHealedIfDefeatEnemyGlobal() const;
@@ -2057,6 +2059,8 @@ protected:
 	int m_iGreatGeneralCombatModifier;
 	int m_iIgnoreGreatGeneralBenefit;
 	int m_iIgnoreZOC;
+
+	int m_iImmueMeleeAttack;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	int m_iNoSupply;
 #endif

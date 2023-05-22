@@ -257,6 +257,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_bCaptureDefeatedEnemy(false),
 	m_bIgnoreGreatGeneralBenefit(false),
 	m_bIgnoreZOC(false),
+	m_bImmueMeleeAttack(false),
 	m_bHasPostCombatPromotions(false),
 	m_bPostCombatPromotionsExclusive(false),
 	m_bSapper(false),
@@ -521,6 +522,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_bCaptureDefeatedEnemy = kResults.GetBool("CaptureDefeatedEnemy");
 	m_bIgnoreGreatGeneralBenefit = kResults.GetBool("IgnoreGreatGeneralBenefit");
 	m_bIgnoreZOC = kResults.GetBool("IgnoreZOC");
+	m_bImmueMeleeAttack = kResults.GetBool("ImmueMeleeAttack");
 	m_bHasPostCombatPromotions = kResults.GetBool("HasPostCombatPromotions");
 	m_bPostCombatPromotionsExclusive = kResults.GetBool("PostCombatPromotionsExclusive");
 	m_bSapper = kResults.GetBool("Sapper");
@@ -2437,6 +2439,12 @@ bool CvPromotionEntry::IsCaptureDefeatedEnemy() const
 bool CvPromotionEntry::IsIgnoreGreatGeneralBenefit() const
 {
 	return m_bIgnoreGreatGeneralBenefit;
+}
+
+
+bool CvPromotionEntry::IsImmueMeleeAttack() const
+{
+	return m_bImmueMeleeAttack;
 }
 
 /// Accessor: Can this unit ignore ZOC when moving?
