@@ -428,7 +428,10 @@ protected:
 	static int lGetBarbarianCombatBonus(lua_State* L);
 #endif
 
-	
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+	static int lGetMoveLeftDefenseMod(lua_State* L);
+	static int lGetMoveUsedDefenseMod(lua_State* L);
+#endif	
 
 #if defined(MOD_ROG_CORE)
 	static int lGetNumSpyDefenseMod(lua_State* L);

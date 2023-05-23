@@ -1125,8 +1125,10 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iAllyCityStateCombatModifierMax = 0;
 #endif
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 	m_iMoveLeftDefenseMod = 0;
 	m_iMoveUsedDefenseMod = 0;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	m_iNearbyUnitClassBonus = 0;
@@ -5817,6 +5819,7 @@ int CvUnit::GetNearNumEnemyDefenseMod() const
 #endif
 
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeMoveLeftDefenseMod(int iValue)
 {
@@ -5850,7 +5853,7 @@ int CvUnit::GetMoveUsedDefenseMod() const
 	VALIDATE_OBJECT
 	return m_iMoveUsedDefenseMod;
 }
-
+#endif
 
 #if defined(MOD_ROG_CORE)
 //	--------------------------------------------------------------------------------
@@ -13759,6 +13762,7 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 	if(bFromRangedAttack)
 		iModifier += rangedDefenseModifier();
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 	// Generic Moves Left/Used Defense Bonus
 	// Generic Move Left modifier
 	int imovesLeft;
@@ -13781,7 +13785,7 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 		iTempModifier = (imovesUsed * iMoveUsedDefenseModValue);
 		iModifier += iTempModifier;
 	}
-
+#endif
 
 #if defined(MOD_ROG_CORE)
 	//  modifier always applies for own OriginalCapital
@@ -14827,6 +14831,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 		iModifier += getDefenseModifier();
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 		// Ranged Move Left modifier
 		int imovesLeft;
 		int iMoveLeftDefenseModValue;
@@ -14848,6 +14853,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 			iTempModifier = (imovesUsed * iMoveUsedDefenseModValue);
 			iModifier += iTempModifier;
 		}
+#endif
 
 	}
 
@@ -23773,8 +23779,10 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExperiencePercent(thisPromotion.GetExperiencePercent() * iChange);
 		changeCargoSpace(thisPromotion.GetCargoChange() * iChange);
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 		ChangeMoveLeftDefenseMod(thisPromotion.GetMoveLeftDefenseMod() * iChange);
 		ChangeMoveUsedDefenseMod(thisPromotion.GetMoveUsedDefenseMod() * iChange);
+#endif
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 		ChangeWarCasualtiesModifier(thisPromotion.GetWarCasualtiesModifier() * iChange);
@@ -24248,8 +24256,10 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCannotBeCapturedCount;
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 	kStream >> m_iMoveLeftDefenseMod;
 	kStream >> m_iMoveUsedDefenseMod;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	kStream >> m_iMoveLfetAttackMod;
@@ -24565,8 +24575,10 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 	kStream << m_iMoveLeftDefenseMod;
 	kStream << m_iMoveUsedDefenseMod;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	kStream << m_iMoveLfetAttackMod;
@@ -27765,11 +27777,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 			iValue = GetPromotionValue(pkPromotionInfo->GetDefenseMod(), getDefenseModifier(), iFlavorDefense, lowPriority);
 		}
 
-		if (iValue == 0)
-		{
-			iValue = GetPromotionValue(pkPromotionInfo->GetMoveLeftDefenseMod(), GetMoveLeftDefenseMod(), iFlavorDefense, lowPriority);
-		}
-
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 		if (iValue == 0)
 		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetMoveLeftDefenseMod(), GetMoveLeftDefenseMod(), iFlavorDefense, lowPriority);
@@ -27779,6 +27787,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetMoveUsedDefenseMod(), GetMoveUsedDefenseMod(), iFlavorDefense, lowPriority);
 		}
+#endif
 
 #if defined(MOD_ROG_CORE)
 		if (iValue == 0)
@@ -28265,6 +28274,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iValue += iTemp + iFlavorDefense * 2;
 	}
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 	iTemp = pkPromotionInfo->GetMoveLeftDefenseMod();
 	if(iTemp != 0)
 	{
@@ -28282,6 +28292,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iTemp /= 100;
 		iValue += iTemp + iFlavorDefense * 2;
 	}
+#endif
 
 #if defined(MOD_ROG_CORE)
 	iTemp = pkPromotionInfo->GetMeleeDefenseMod();

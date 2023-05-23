@@ -138,8 +138,10 @@ public:
 	int  GetMaxHitPointsModifier() const;
 #endif
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 	int GetMoveLeftDefenseMod() const;
 	int GetMoveUsedDefenseMod() const;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	int GetMoveLfetAttackMod() const;
@@ -550,8 +552,10 @@ protected:
 	int m_iTradeMissionInfluenceModifier;
 	int m_iTradeMissionGoldModifier;
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 	int m_iMoveLeftDefenseMod;
 	int m_iMoveUsedDefenseMod;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	int m_iMoveLfetAttackMod;

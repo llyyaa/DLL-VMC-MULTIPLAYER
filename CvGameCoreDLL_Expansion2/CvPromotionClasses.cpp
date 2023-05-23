@@ -98,8 +98,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iMaxHitPointsModifier(0),
 #endif
 
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 	m_iMoveLeftDefenseMod(0),
 	m_iMoveUsedDefenseMod(0),
+#endif
 
 #if defined(MOD_ROG_CORE)
 	m_iMoveLfetAttackMod(0),
@@ -398,8 +400,12 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	}
 #endif
 
-	m_iMoveLeftDefenseMod = kResults.GetInt("MoveLeftDefenseMod");
-	m_iMoveUsedDefenseMod = kResults.GetInt("MoveUsedDefenseMod");
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+	if (MOD_PROMOTIONS_MOVES_DEFENSE) {
+		m_iMoveLeftDefenseMod = kResults.GetInt("MoveLeftDefenseMod");
+		m_iMoveUsedDefenseMod = kResults.GetInt("MoveUsedDefenseMod");
+	}
+#endif
 
 #if defined(MOD_ROG_CORE)
 	if (MOD_ROG_CORE) {
@@ -1670,6 +1676,8 @@ bool CvPromotionEntry::IsGreatAdmiral() const
 	return m_bGreatAdmiral;
 }
 
+
+#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
 int CvPromotionEntry::GetMoveLeftDefenseMod() const
 {
 	return m_iMoveLeftDefenseMod;
@@ -1679,6 +1687,7 @@ int CvPromotionEntry::GetMoveUsedDefenseMod() const
 {
 	return m_iMoveUsedDefenseMod;
 }
+#endif
 
 #if defined(MOD_PROMOTIONS_AURA_CHANGE)
 /// Accessor: Does this Promotion change the range of the aura of a Great General or Great Admiral?
