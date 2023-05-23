@@ -3,7 +3,9 @@ ALTER TABLE UnitPromotions ADD COLUMN 'PromotionPrereqOr11' TEXT DEFAULT NULL;
 ALTER TABLE UnitPromotions ADD COLUMN 'PromotionPrereqOr12' TEXT DEFAULT NULL;
 ALTER TABLE UnitPromotions ADD COLUMN 'PromotionPrereqOr13' TEXT DEFAULT NULL;
 
+ALTER TABLE UnitPromotions ADD 'ImmueMeleeAttack' BOOLEAN DEFAULT 0;
 
+ALTER TABLE Improvements ADD WonderProductionModifier INTEGER DEFAULT 0;
 
 ALTER TABLE Processes ADD COLUMN 'DefenseValue' INTEGER DEFAULT 0;
 
