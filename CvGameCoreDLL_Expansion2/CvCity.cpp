@@ -6037,6 +6037,31 @@ int CvCity::getProductionModifier(BuildingTypes eBuilding, CvString* toolTipSink
 				}
 			}
 		}
+#if defined(MOD_ROG_CORE)
+		int iNumberOfImprovements = 0;
+		CvPlot* pLoopPlot = NULL;
+		for (int iJ = 0; iJ < GetNumWorkablePlots(); iJ++)
+		{
+			pLoopPlot = iterateRingPlots(getX(), getY(), iJ);
+			if (pLoopPlot != NULL && pLoopPlot->getOwner() == getOwner())
+			{
+				if (pLoopPlot->getImprovementType() != NO_IMPROVEMENT && !pLoopPlot->IsImprovementPillaged())
+				{
+					CvImprovementEntry* pImprovementInfo = GC.getImprovementInfo(pLoopPlot->getImprovementType());
+					if (pImprovementInfo->GetWonderProductionModifier() > 0)
+					{
+						iTempMod = pImprovementInfo->GetWonderProductionModifier();
+						iMultiplier += iTempMod;
+						iNumberOfImprovements++;
+					}
+				}
+			}
+		}
+		if (toolTipSink && iTempMod && iNumberOfImprovements)
+		{
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_WONDER_IMPROVEMENT", iTempMod * iNumberOfImprovements);
+		}
+#endif
 	}
 	// Not-wonder bonus
 	else
@@ -12130,14 +12155,8 @@ int CvCity::getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) cons
 	int iXP = 0;
 	int iLoop = 0;
 	int iGreatWorks = 0;
-	for (const CvCity* pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
-	{
-		if (pLoopCity != NULL)
-		{
-			iGreatWorks += pLoopCity->GetCityCulture()->GetNumGreatWorks();
-			//iGreatWorks += pLoopCity->GetCityBuildings()->GetNumGreatWorks(CvTypes::getGREAT_WORK_SLOT_LITERATURE());
-		}
-	}
+	iGreatWorks = GET_PLAYER(getOwner()).GetCulture()->GetNumGreatWorks();
+
 	iXP += (iGreatWorks * iMod);
 
 	if (iXP > 150)
