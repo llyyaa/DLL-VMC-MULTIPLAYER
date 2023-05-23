@@ -8749,6 +8749,21 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 		}
 
 		iYield += iBestYield;
+
+#if defined(MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
+		if (MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
+		{
+			iBestYield = 0;
+
+			for(iI = 0; iI < GC.getNumUnitDomainInfos(); ++iI)
+			{
+				iBestYield = std::max(iBestYield, pImprovement->GetTradeRouteYieldChanges(iI, eYield));
+			}
+
+			iYield += iBestYield;
+		}
+#endif
+
 	}
 	else
 	{
@@ -8766,6 +8781,38 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 		{
 			iYield += pImprovement->GetRouteYieldChanges(eRouteType, eYield);
 		}
+
+#if defined(MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
+		// IsTradeRoute() Does Nothing!
+		if (MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
+		{
+			bool plotIsTradeRoute = false;
+			DomainTypes eTradeRouteDomain = NO_DOMAIN;
+			CvGameTrade* pTrade = GC.getGame().GetGameTrade();
+			int iPlotX = getX();
+			int iPlotY = getY();
+	
+			// Take bonus from any trade routes that pass through the plot
+			for (uint uiConnection = 0; uiConnection < pTrade->m_aTradeConnections.size(); uiConnection++) {
+				if (!pTrade->IsTradeRouteIndexEmpty(uiConnection)) {
+					TradeConnection* pConnection = &(pTrade->m_aTradeConnections[uiConnection]);
+					TradeConnectionPlotList aPlotList = pConnection->m_aPlotList;
+					for (uint uiPlotIndex = 0; uiPlotIndex < pConnection->m_aPlotList.size(); uiPlotIndex++) {
+						if (aPlotList[uiPlotIndex].m_iX == iPlotX && aPlotList[uiPlotIndex].m_iY == iPlotY) {
+							plotIsTradeRoute = true;
+							eTradeRouteDomain = pConnection->m_eDomain;
+							if(eTradeRouteDomain != NO_DOMAIN)
+							{
+								iYield += pImprovement->GetTradeRouteYieldChanges(eTradeRouteDomain, eYield);
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+#endif
+
 	}
 
 	bool bIsFreshWater = isFreshWater();

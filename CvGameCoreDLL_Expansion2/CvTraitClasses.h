@@ -133,6 +133,7 @@ public:
 	int GetWorkerSpeedModifier() const;
 	int GetAfraidMinorPerTurnInfluence() const;
 	int GetLandTradeRouteRangeBonus() const;
+	int GetGoldenAgeMinorPerTurnInfluence() const;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int GetSeaTradeRouteRangeBonus() const;
 #endif
@@ -336,6 +337,7 @@ protected:
 	int m_iWorkerSpeedModifier;
 	int m_iAfraidMinorPerTurnInfluence;
 	int m_iLandTradeRouteRangeBonus;
+	int m_iGoldenAgeMinorPerTurnInfluence;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int m_iSeaTradeRouteRangeBonus;
 #endif
@@ -783,6 +785,10 @@ public:
 	{
 		return m_iLandTradeRouteRangeBonus;
 	}
+	int GetGoldenAgeMinorPerTurnInfluence() const
+	{
+		return m_iGoldenAgeMinorPerTurnInfluence;
+	}
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int GetSeaTradeRouteRangeBonus() const
 	{
@@ -1133,6 +1139,7 @@ private:
 	int m_iWorkerSpeedModifier;
 	int m_iAfraidMinorPerTurnInfluence; 
 	int m_iLandTradeRouteRangeBonus;
+	int m_iGoldenAgeMinorPerTurnInfluence;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int m_iSeaTradeRouteRangeBonus;
 #endif

@@ -108,6 +108,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iAfraidMinorPerTurnInfluence(0),
 	m_iLandTradeRouteRangeBonus(0),
 #endif
+	m_iGoldenAgeMinorPerTurnInfluence(0),
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	m_iSeaTradeRouteRangeBonus(0),
 #endif
@@ -636,6 +637,11 @@ int CvTraitEntry::GetAfraidMinorPerTurnInfluence() const
 int CvTraitEntry::GetLandTradeRouteRangeBonus() const
 {
 	return m_iLandTradeRouteRangeBonus;
+}
+
+int CvTraitEntry::GetGoldenAgeMinorPerTurnInfluence() const
+{
+	return m_iGoldenAgeMinorPerTurnInfluence;
 }
 
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
@@ -1338,6 +1344,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iWorkerSpeedModifier					= kResults.GetInt("WorkerSpeedModifier");
 	m_iAfraidMinorPerTurnInfluence			= kResults.GetInt("AfraidMinorPerTurnInfluence");
 	m_iLandTradeRouteRangeBonus				= kResults.GetInt("LandTradeRouteRangeBonus");
+	m_iGoldenAgeMinorPerTurnInfluence		= kResults.GetInt("GoldenAgeMinorPerTurnInfluence");
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	if (MOD_TRAITS_TRADE_ROUTE_BONUSES) {
 		m_iSeaTradeRouteRangeBonus			= kResults.GetInt("SeaTradeRouteRangeBonus");
@@ -2105,6 +2112,8 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iWorkerSpeedModifier += trait->GetWorkerSpeedModifier();
 			m_iAfraidMinorPerTurnInfluence += trait->GetAfraidMinorPerTurnInfluence();
 			m_iLandTradeRouteRangeBonus += trait->GetLandTradeRouteRangeBonus();
+			m_iGoldenAgeMinorPerTurnInfluence += trait->GetGoldenAgeMinorPerTurnInfluence();
+
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 			m_iSeaTradeRouteRangeBonus += trait->GetSeaTradeRouteRangeBonus();
 #endif
@@ -2543,6 +2552,7 @@ void CvPlayerTraits::Reset()
 	m_iWorkerSpeedModifier = 0;
 	m_iAfraidMinorPerTurnInfluence = 0;
 	m_iLandTradeRouteRangeBonus = 0;
+	m_iGoldenAgeMinorPerTurnInfluence = 0;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	m_iSeaTradeRouteRangeBonus = 0;
 #endif
@@ -3914,10 +3924,12 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	if (uiVersion >= 14)
 	{
 		kStream >> m_iAfraidMinorPerTurnInfluence;
+		kStream >> m_iGoldenAgeMinorPerTurnInfluence;
 	}
 	else
 	{
 		m_iAfraidMinorPerTurnInfluence = 0;
+		m_iGoldenAgeMinorPerTurnInfluence = 0;
 	}
 	
 	if (uiVersion >= 15)
@@ -4271,6 +4283,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iUniqueLuxuryCitiesPlaced;
 	kStream << m_iWorkerSpeedModifier;
 	kStream << m_iAfraidMinorPerTurnInfluence;
+	kStream << m_iGoldenAgeMinorPerTurnInfluence;
 	kStream << m_iLandTradeRouteRangeBonus;
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
