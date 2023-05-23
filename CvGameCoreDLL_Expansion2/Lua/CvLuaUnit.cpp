@@ -388,6 +388,9 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(ExtraFeatureDamage);
 #endif
 
+	Method(GetMoveLeftDefenseMod);
+	Method(GetMoveUsedDefenseMod);
+
 #if defined(MOD_ROG_CORE)
 	Method(GetZOCStatus);
 #endif
@@ -3910,6 +3913,24 @@ int CvLuaUnit::lDomainDefense(lua_State* L)
 
 	const int iResult = pkUnit->domainDefense(eDomain);
 	lua_pushinteger(L, iResult);
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+int CvLuaUnit::lMoveLeftDefenseMod(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int bResult = pkUnit->GetMoveLeftDefenseMod();
+	lua_pushinteger(L, bResult);
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+int CvLuaUnit::lMoveUsedDefenseMod(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int bResult = pkUnit->GetMoveUsedDefenseMod();
+	lua_pushinteger(L, bResult);
 	return 1;
 }
 

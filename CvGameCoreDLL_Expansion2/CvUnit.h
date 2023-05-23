@@ -1605,6 +1605,11 @@ public:
 	void ChangeCapitalDefenseFalloff(int iValue);
 	int GetCapitalDefenseFalloff() const;
 
+	void ChangeMoveLeftDefenseMod(int iValue);
+	int GetMoveLeftDefenseMod() const;
+
+	void ChangeMoveUsedDefenseMod(int iValue);
+	int GetMoveUsedDefenseMod() const;
 
 #if defined(MOD_ROG_CORE)
 	void ChangeMoveLfetAttackMod(int iValue);
@@ -2158,6 +2163,9 @@ protected:
 #if defined(MOD_PROMOTIONS_DEEP_WATER_EMBARKATION)
 	int m_iEmbarkedDeepWaterCount;
 #endif
+
+	int m_iMoveLeftDefenseMod;
+	int m_iMoveUsedDefenseMod;
 
 #if defined(MOD_ROG_CORE)
 	int m_iMoveLfetAttackMod;

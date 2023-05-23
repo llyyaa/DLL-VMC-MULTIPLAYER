@@ -406,6 +406,9 @@ CvUnit::CvUnit() :
 	, m_iEmbarkedDeepWaterCount(0)
 #endif
 
+	, m_iMoveLeftDefenseMod(0)
+	, m_iMoveUsedDefenseMod(0)
+
 #if defined(MOD_ROG_CORE)
 		, m_iMoveLfetAttackMod(0)
 		, m_iMoveUsedAttackMod(0)
@@ -1121,6 +1124,9 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iAllyCityStateCombatModifier = 0;
 	m_iAllyCityStateCombatModifierMax = 0;
 #endif
+
+	m_iMoveLeftDefenseMod = 0;
+	m_iMoveUsedDefenseMod = 0;
 
 #if defined(MOD_ROG_CORE)
 	m_iNearbyUnitClassBonus = 0;
@@ -5810,6 +5816,40 @@ int CvUnit::GetNearNumEnemyDefenseMod() const
 }
 #endif
 
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeMoveLeftDefenseMod(int iValue)
+{
+	VALIDATE_OBJECT
+	if(iValue != 0)
+	{
+		m_iMoveLeftDefenseMod += iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetMoveLeftDefenseMod() const
+{
+	VALIDATE_OBJECT
+	return m_iMoveLeftDefenseMod;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeMoveUsedDefenseMod(int iValue)
+{
+	VALIDATE_OBJECT
+	if(iValue != 0)
+	{
+		m_iMoveUsedDefenseMod += iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetMoveUsedDefenseMod() const
+{	
+	VALIDATE_OBJECT
+	return m_iMoveUsedDefenseMod;
+}
 
 
 #if defined(MOD_ROG_CORE)
@@ -13719,6 +13759,29 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 	if(bFromRangedAttack)
 		iModifier += rangedDefenseModifier();
 
+	// Generic Moves Left/Used Defense Bonus
+	// Generic Move Left modifier
+	int imovesLeft;
+	int iMoveLeftDefenseModValue;
+	if (movesLeft() > 0)
+	{
+		imovesLeft = movesLeft() / GC.getMOVE_DENOMINATOR();
+		iMoveLeftDefenseModValue = GetMoveLeftDefenseMod();
+		iTempModifier = (imovesLeft * iMoveLeftDefenseModValue);
+		iModifier += iTempModifier;
+	}
+
+	// Generic Move Used modifier
+	int imovesUsed;
+	int iMoveUsedDefenseModValue;
+	if (maxMoves() > movesLeft())
+	{
+		imovesUsed = (maxMoves() - movesLeft()) / GC.getMOVE_DENOMINATOR();
+		iMoveUsedDefenseModValue = GetMoveUsedDefenseMod();
+		iTempModifier = (imovesUsed * iMoveUsedDefenseModValue);
+		iModifier += iTempModifier;
+	}
+
 
 #if defined(MOD_ROG_CORE)
 	//  modifier always applies for own OriginalCapital
@@ -14763,9 +14826,30 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 #endif
 
 		iModifier += getDefenseModifier();
+
+		// Ranged Move Left modifier
+		int imovesLeft;
+		int iMoveLeftDefenseModValue;
+		if (movesLeft() > 0)
+		{
+			imovesLeft = movesLeft() / GC.getMOVE_DENOMINATOR();
+			iMoveLeftDefenseModValue = GetMoveLeftDefenseMod();
+			iTempModifier = (imovesLeft * iMoveLeftDefenseModValue);
+			iModifier += iTempModifier;
+		}
+	
+		// Ranged Move Used modifier
+		int imovesUsed;
+		int iMoveUsedDefenseModValue;
+		if (maxMoves() > movesLeft())
+		{
+			imovesUsed = (maxMoves() - movesLeft()) / GC.getMOVE_DENOMINATOR();
+			iMoveUsedDefenseModValue = GetMoveUsedDefenseMod();
+			iTempModifier = (imovesUsed * iMoveUsedDefenseModValue);
+			iModifier += iTempModifier;
+		}
+
 	}
-
-
 
 	//this may be always zero when defending (on defense -> fewer targets, harder to hit)
 	iModifier += GetDamageCombatModifier(!bAttacking);
@@ -23689,6 +23773,9 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExperiencePercent(thisPromotion.GetExperiencePercent() * iChange);
 		changeCargoSpace(thisPromotion.GetCargoChange() * iChange);
 
+		ChangeMoveLeftDefenseMod(thisPromotion.GetMoveLeftDefenseMod() * iChange);
+		ChangeMoveUsedDefenseMod(thisPromotion.GetMoveUsedDefenseMod() * iChange);
+
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 		ChangeWarCasualtiesModifier(thisPromotion.GetWarCasualtiesModifier() * iChange);
 #endif
@@ -24161,6 +24248,9 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCannotBeCapturedCount;
 
+	kStream >> m_iMoveLeftDefenseMod;
+	kStream >> m_iMoveUsedDefenseMod;
+
 #if defined(MOD_ROG_CORE)
 	kStream >> m_iMoveLfetAttackMod;
 	kStream >> m_iMoveUsedAttackMod;
@@ -24474,6 +24564,9 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;
+
+	kStream << m_iMoveLeftDefenseMod;
+	kStream << m_iMoveUsedDefenseMod;
 
 #if defined(MOD_ROG_CORE)
 	kStream << m_iMoveLfetAttackMod;
@@ -27672,6 +27765,21 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 			iValue = GetPromotionValue(pkPromotionInfo->GetDefenseMod(), getDefenseModifier(), iFlavorDefense, lowPriority);
 		}
 
+		if (iValue == 0)
+		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetMoveLeftDefenseMod(), GetMoveLeftDefenseMod(), iFlavorDefense, lowPriority);
+		}
+
+		if (iValue == 0)
+		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetMoveLeftDefenseMod(), GetMoveLeftDefenseMod(), iFlavorDefense, lowPriority);
+		}
+
+		if (iValue == 0)
+		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetMoveUsedDefenseMod(), GetMoveUsedDefenseMod(), iFlavorDefense, lowPriority);
+		}
+
 #if defined(MOD_ROG_CORE)
 		if (iValue == 0)
 		{
@@ -28152,6 +28260,24 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 	if(iTemp != 0)
 	{
 		iExtra = getDefenseModifier() * 2;
+		iTemp *= (100 + iExtra);
+		iTemp /= 100;
+		iValue += iTemp + iFlavorDefense * 2;
+	}
+
+	iTemp = pkPromotionInfo->GetMoveLeftDefenseMod();
+	if(iTemp != 0)
+	{
+		iExtra = GetMoveLeftDefenseMod() * 2;
+		iTemp *= (100 + iExtra);
+		iTemp /= 100;
+		iValue += iTemp + iFlavorDefense * 2;
+	}
+
+	iTemp = pkPromotionInfo->GetMoveUsedDefenseMod();
+	if(iTemp != 0)
+	{
+		iExtra = GetMoveUsedDefenseMod() * 2;
 		iTemp *= (100 + iExtra);
 		iTemp /= 100;
 		iValue += iTemp + iFlavorDefense * 2;

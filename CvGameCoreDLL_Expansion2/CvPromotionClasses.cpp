@@ -98,6 +98,9 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iMaxHitPointsModifier(0),
 #endif
 
+	m_iMoveLeftDefenseMod(0),
+	m_iMoveUsedDefenseMod(0),
+
 #if defined(MOD_ROG_CORE)
 	m_iMoveLfetAttackMod(0),
 	m_iMoveUsedAttackMod(0),
@@ -395,6 +398,9 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	}
 #endif
 
+	m_iMoveLeftDefenseMod = kResults.GetInt("MoveLeftDefenseMod");
+	m_iMoveUsedDefenseMod = kResults.GetInt("MoveUsedDefenseMod");
+
 #if defined(MOD_ROG_CORE)
 	if (MOD_ROG_CORE) {
 		m_iNearbyUnitClassBonus = kResults.GetInt("NearbyUnitClassBonus");
@@ -439,7 +445,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 	m_iMeleeDefenseMod = kResults.GetInt("MeleeDefenseMod");
 #endif
-
 
 #if defined(MOD_ROG_CORE)
 	if (MOD_ROG_CORE) {
@@ -1663,6 +1668,16 @@ bool CvPromotionEntry::IsGreatGeneral() const
 bool CvPromotionEntry::IsGreatAdmiral() const
 {
 	return m_bGreatAdmiral;
+}
+
+int CvPromotionEntry::GetMoveLeftDefenseMod() const
+{
+	return m_iMoveLeftDefenseMod;
+}
+
+int CvPromotionEntry::GetMoveUsedDefenseMod() const
+{
+	return m_iMoveUsedDefenseMod;
 }
 
 #if defined(MOD_PROMOTIONS_AURA_CHANGE)
