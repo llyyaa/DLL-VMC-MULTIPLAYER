@@ -1094,6 +1094,7 @@
     <Row Class="4" Name="PROMOTIONS_ALLYCITYSTATE_BONUS" Value="0"/>
 
     <!-- Improvement_TradeRouteYieldChanges -->
+    <!-- table change: Improvement_TradeRouteYieldChanges.sql -->
     <Row Class="4" Name="IMPROVEMENT_TRADE_ROUTE_BONUSES" Value="0"/>
   </CustomModOptions>
 

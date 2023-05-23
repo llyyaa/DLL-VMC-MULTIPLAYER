@@ -108,7 +108,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iAfraidMinorPerTurnInfluence(0),
 	m_iLandTradeRouteRangeBonus(0),
 #endif
-	m_iGoldenAgeMinorPerTurnInfluence(0);
+	m_iGoldenAgeMinorPerTurnInfluence(0),
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	m_iSeaTradeRouteRangeBonus(0),
 #endif
