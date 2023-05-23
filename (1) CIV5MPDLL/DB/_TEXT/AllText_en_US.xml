@@ -5,6 +5,14 @@
 		<Row Tag="TXT_KEY_SPY_STATE_TERMINATED">
 			<Text>Eliminated!</Text>
 		</Row>
+
+
+	<Row Tag="TXT_KEY_PRODMOD_WONDER_IMPROVEMENT">
+			<Text>
+				[NEWLINE][ICON_BULLET]Improved facilities provide spectacle construction bonus: {1_Num}%。
+			</Text>
+		</Row>
+
 	</Language_en_US>
 
 	<!-- GoodyHutMessages.xml -->
