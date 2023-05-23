@@ -87,6 +87,8 @@ public:
 #endif
 
 #if defined(MOD_ROG_CORE)
+	int GetWonderProductionModifier() const;
+
 	int GetNearbyFriendHeal() const;
 
 	int GetResourceFromImprovement() const;
@@ -282,6 +284,7 @@ protected:
 #endif
 
 #if defined(MOD_ROG_CORE)
+	int m_iWonderProductionModifier;
 	int m_iNearbyFriendHeal;
 
 	int m_iImprovementResource;
