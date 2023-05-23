@@ -98,7 +98,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iMaxHitPointsModifier(0),
 #endif
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	m_iMoveLeftDefenseMod(0),
 	m_iMoveUsedDefenseMod(0),
 #endif
@@ -400,8 +400,8 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	}
 #endif
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
-	if (MOD_PROMOTIONS_MOVES_DEFENSE) {
+#if defined(MOD_DEFENSE_MOVES_BONUS)
+	if (MOD_DEFENSE_MOVES_BONUS) {
 		m_iMoveLeftDefenseMod = kResults.GetInt("MoveLeftDefenseMod");
 		m_iMoveUsedDefenseMod = kResults.GetInt("MoveUsedDefenseMod");
 	}
@@ -1677,7 +1677,7 @@ bool CvPromotionEntry::IsGreatAdmiral() const
 }
 
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 int CvPromotionEntry::GetMoveLeftDefenseMod() const
 {
 	return m_iMoveLeftDefenseMod;

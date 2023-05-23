@@ -1605,7 +1605,7 @@ public:
 	void ChangeCapitalDefenseFalloff(int iValue);
 	int GetCapitalDefenseFalloff() const;
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	void ChangeMoveLeftDefenseMod(int iValue);
 	int GetMoveLeftDefenseMod() const;
 
@@ -2166,7 +2166,7 @@ protected:
 	int m_iEmbarkedDeepWaterCount;
 #endif
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	int m_iMoveLeftDefenseMod;
 	int m_iMoveUsedDefenseMod;
 #endif

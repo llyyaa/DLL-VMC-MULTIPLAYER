@@ -138,7 +138,7 @@ public:
 	int  GetMaxHitPointsModifier() const;
 #endif
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	int GetMoveLeftDefenseMod() const;
 	int GetMoveUsedDefenseMod() const;
 #endif
@@ -552,7 +552,7 @@ protected:
 	int m_iTradeMissionInfluenceModifier;
 	int m_iTradeMissionGoldModifier;
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	int m_iMoveLeftDefenseMod;
 	int m_iMoveUsedDefenseMod;
 #endif

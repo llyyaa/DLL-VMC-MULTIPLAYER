@@ -406,8 +406,10 @@ CvUnit::CvUnit() :
 	, m_iEmbarkedDeepWaterCount(0)
 #endif
 
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	, m_iMoveLeftDefenseMod(0)
 	, m_iMoveUsedDefenseMod(0)
+#endif
 
 #if defined(MOD_ROG_CORE)
 		, m_iMoveLfetAttackMod(0)
@@ -1125,7 +1127,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iAllyCityStateCombatModifierMax = 0;
 #endif
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	m_iMoveLeftDefenseMod = 0;
 	m_iMoveUsedDefenseMod = 0;
 #endif
@@ -5819,7 +5821,7 @@ int CvUnit::GetNearNumEnemyDefenseMod() const
 #endif
 
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeMoveLeftDefenseMod(int iValue)
 {
@@ -13762,7 +13764,7 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 	if(bFromRangedAttack)
 		iModifier += rangedDefenseModifier();
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	// Generic Moves Left/Used Defense Bonus
 	// Generic Move Left modifier
 	int imovesLeft;
@@ -14831,7 +14833,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 		iModifier += getDefenseModifier();
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 		// Ranged Move Left modifier
 		int imovesLeft;
 		int iMoveLeftDefenseModValue;
@@ -23779,7 +23781,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExperiencePercent(thisPromotion.GetExperiencePercent() * iChange);
 		changeCargoSpace(thisPromotion.GetCargoChange() * iChange);
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 		ChangeMoveLeftDefenseMod(thisPromotion.GetMoveLeftDefenseMod() * iChange);
 		ChangeMoveUsedDefenseMod(thisPromotion.GetMoveUsedDefenseMod() * iChange);
 #endif
@@ -24256,7 +24258,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCannotBeCapturedCount;
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	kStream >> m_iMoveLeftDefenseMod;
 	kStream >> m_iMoveUsedDefenseMod;
 #endif
@@ -24575,7 +24577,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	kStream << m_iMoveLeftDefenseMod;
 	kStream << m_iMoveUsedDefenseMod;
 #endif
@@ -27777,7 +27779,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 			iValue = GetPromotionValue(pkPromotionInfo->GetDefenseMod(), getDefenseModifier(), iFlavorDefense, lowPriority);
 		}
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 		if (iValue == 0)
 		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetMoveLeftDefenseMod(), GetMoveLeftDefenseMod(), iFlavorDefense, lowPriority);
@@ -28274,7 +28276,7 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		iValue += iTemp + iFlavorDefense * 2;
 	}
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	iTemp = pkPromotionInfo->GetMoveLeftDefenseMod();
 	if(iTemp != 0)
 	{

@@ -1095,7 +1095,7 @@
 
     <!-- Permits units to receive defense bonus from Left/Used Moves-->
     <!-- table change: NewTableChanges.sql -->
-    <Row Class="4" Name="PROMOTIONS_MOVES_DEFENSE" Value="0"/>
+    <Row Class="4" Name="DEFENSE_MOVES_BONUS" Value="0"/>
 
     <!-- Improvement_TradeRouteYieldChanges -->
     <!-- table change: Improvement_TradeRouteYieldChanges.sql -->

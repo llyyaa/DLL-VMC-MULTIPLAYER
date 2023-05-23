@@ -388,7 +388,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(ExtraFeatureDamage);
 #endif
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 	Method(GetMoveLeftDefenseMod);
 	Method(GetMoveUsedDefenseMod);
 #endif
@@ -3918,7 +3918,7 @@ int CvLuaUnit::lDomainDefense(lua_State* L)
 	return 1;
 }
 
-#if defined(MOD_PROMOTIONS_MOVES_DEFENSE)
+#if defined(MOD_DEFENSE_MOVES_BONUS)
 //------------------------------------------------------------------------------
 int CvLuaUnit::lGetMoveLeftDefenseMod(lua_State* L)
 {
