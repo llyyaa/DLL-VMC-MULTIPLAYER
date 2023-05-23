@@ -87,6 +87,7 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_iNearbyEnemyDamage(0),
 
 #if defined(MOD_ROG_CORE)
+	m_iWonderProductionModifier(0),
 	m_iNearbyFriendHeal(0),
 
 	m_iImprovementResource(NO_RESOURCE),
@@ -419,6 +420,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 #endif
 
 #if defined(MOD_ROG_CORE)
+	m_iWonderProductionModifier = kResults.GetInt("WonderProductionModifier");
 	m_iNearbyFriendHeal = kResults.GetInt("NearbyFriendHeal");
 
 	const char* szImprovementResource = kResults.GetText("ImprovementResource");
@@ -1037,12 +1039,17 @@ int CvImprovementEntry::GetDefenseModifier() const
 }
 
 #if defined(MOD_ROG_CORE)
+
+int CvImprovementEntry::GetWonderProductionModifier() const
+{
+	return m_iWonderProductionModifier;
+}
+
 /// heal done to nearby our units
 int CvImprovementEntry::GetNearbyFriendHeal() const
 {
 	return m_iNearbyFriendHeal;
 }
-
 
 // Does this improvement create a resource when construced?
 int CvImprovementEntry::GetResourceFromImprovement() const
