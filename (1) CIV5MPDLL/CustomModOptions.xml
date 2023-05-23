@@ -1095,6 +1095,10 @@
     <!-- table change: NewTableChanges.sql -->
     <Row Class="4" Name="PROMOTIONS_ALLYCITYSTATE_BONUS" Value="0"/>
 
+    <!-- Permits units to receive defense bonus from Left/Used Moves-->
+    <!-- table change: NewTableChanges.sql -->
+    <Row Class="4" Name="DEFENSE_MOVES_BONUS" Value="0"/>
+
     <!-- Improvement_TradeRouteYieldChanges -->
     <!-- table change: Improvement_TradeRouteYieldChanges.sql -->
     <Row Class="4" Name="IMPROVEMENT_TRADE_ROUTE_BONUSES" Value="0"/>
