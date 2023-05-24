@@ -1990,26 +1990,25 @@ void CvTeamTechs::SetHasTech(TechTypes eIndex, bool bNewValue)
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < GC.getNumTechInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
 
-	if(m_pabHasTech[eIndex] != bNewValue)
+	if (m_pabHasTech[eIndex] == bNewValue) return;
+
+	m_pabHasTech[eIndex] = bNewValue;
+
+	if(bNewValue)
+		SetLastTechAcquired(eIndex);
+
+	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
+	if(pkScriptSystem)
 	{
-		m_pabHasTech[eIndex] = bNewValue;
+		CvLuaArgsHandle args;
+		args->Push(m_pTeam->GetID());
+		args->Push(eIndex);
+		args->Push(bNewValue);
 
-		if(bNewValue)
-			SetLastTechAcquired(eIndex);
-
-		ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
-		if(pkScriptSystem)
-		{
-			CvLuaArgsHandle args;
-			args->Push(m_pTeam->GetID());
-			args->Push(eIndex);
-			args->Push(bNewValue);
-
-			// Attempt to execute the game events.
-			// Will return false if there are no registered listeners.
-			bool bResult = false;
-			LuaSupport::CallHook(pkScriptSystem, "TeamSetHasTech", args.get(), bResult);
-		}
+		// Attempt to execute the game events.
+		// Will return false if there are no registered listeners.
+		bool bResult = false;
+		LuaSupport::CallHook(pkScriptSystem, "TeamSetHasTech", args.get(), bResult);
 	}
 }
 

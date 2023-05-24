@@ -1198,6 +1198,10 @@ protected:
 	LUAAPIEXTN(ActivateMilitaryStrategy, void, iStrategy);
 	LUAAPIEXTN(DeactivateMilitaryStrategy, void, iStrategy);
 #endif
+
+#if defined(MOD_SPECIALIST_RESOURCES)
+	LUAAPIEXTN(GetSpecialistResources, table, eSpecialist);
+#endif
 };
 
 #endif //CVLUAPLAYER_H

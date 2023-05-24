@@ -184,6 +184,18 @@ protected:
 class CvSpecialistInfo : public CvHotKeyInfo
 {
 public:
+#ifdef MOD_SPECIALIST_RESOURCES
+	struct ResourceInfo {
+		ResourceTypes m_eResource = NO_RESOURCE;
+		int m_iQuantity = 0;
+
+		// optional:
+		PolicyTypes m_eRequiredPolicy = NO_POLICY;
+		TechTypes m_eRequiredTech = NO_TECH;
+	};
+#endif
+
+public:
 
 	CvSpecialistInfo();
 	virtual ~CvSpecialistInfo();
@@ -226,6 +238,15 @@ protected:
 
 	int* m_piYieldChange;
 	int* m_piFlavorValue;
+
+#ifdef MOD_SPECIALIST_RESOURCES
+	std::vector<ResourceInfo> m_vResourceInfo;
+#endif
+
+public:
+#ifdef MOD_SPECIALIST_RESOURCES
+	std::vector<ResourceInfo>& GetResourceInfo() { return m_vResourceInfo; }
+#endif
 
 private:
 	CvSpecialistInfo(const CvSpecialistInfo&);

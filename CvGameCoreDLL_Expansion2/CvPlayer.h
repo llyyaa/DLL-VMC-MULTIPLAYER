@@ -1360,6 +1360,13 @@ public:
 	int getResourceSiphoned(ResourceTypes eIndex) const;
 	void changeResourceSiphoned(ResourceTypes eIndex, int iChange);
 
+#ifdef MOD_SPECIALIST_RESOURCES
+	int getResourceFromSpecialists(ResourceTypes eIndex) const;
+	void changeResourceFromSpecialists(ResourceTypes eIndex, int iChange);
+	void UpdateResourceFromSpecialists();
+	bool MeetSpecialistResourceRequirement(const CvSpecialistInfo::ResourceInfo& info) const;
+#endif
+
 	int getResourceInOwnedPlots(ResourceTypes eIndex);
 
 	int getTotalImprovementsBuilt() const;
@@ -2310,6 +2317,9 @@ protected:
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourceImport;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourceFromMinors;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourcesSiphoned;
+#ifdef MOD_SPECIALIST_RESOURCES
+	std::vector<int> m_paiResourcesFromSpecialists;
+#endif
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiImprovementCount;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiFreeBuildingCount;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiFreePromotionCount;

@@ -399,7 +399,7 @@ protected:
 	static int lAirSweepCombatMod(lua_State* L);
 	static int lCapitalDefenseModifier(lua_State* L);
 	static int lCapitalDefenseFalloff(lua_State* L);
-
+	
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
 	static int lOtherPromotionModifier(lua_State* L);
 	static int lOtherPromotionAttackModifier(lua_State* L);
@@ -425,7 +425,10 @@ protected:
 	static int lGetBarbarianCombatBonus(lua_State* L);
 #endif
 
-	
+#if defined(MOD_DEFENSE_MOVES_BONUS)
+	static int lGetMoveLeftDefenseMod(lua_State* L);
+	static int lGetMoveUsedDefenseMod(lua_State* L);
+#endif	
 
 #if defined(MOD_ROG_CORE)
 	static int lGetNumSpyDefenseMod(lua_State* L);

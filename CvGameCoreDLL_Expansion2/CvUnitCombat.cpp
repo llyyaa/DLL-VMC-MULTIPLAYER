@@ -4520,6 +4520,8 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 
 bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 {
+	if (kCombatInfo.getAttackIsNuclear()) return false;
+
 	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
 	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
 

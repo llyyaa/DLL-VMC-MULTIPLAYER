@@ -296,6 +296,8 @@
 #define MOD_PROMOTIONS_IMPROVEMENT_BONUS            gCustomMods.isPROMOTIONS_IMPROVEMENT_BONUS()
 // Permits units to receive a combat bonus from Ally City States
 #define MOD_PROMOTIONS_ALLYCITYSTATE_BONUS			gCustomMods.isPROMOTIONS_ALLYCITYSTATE_BONUS()
+// Permits units to receive defense bonus from Left/Used Moves
+#define MOD_DEFENSE_MOVES_BONUS						gCustomMods.isDEFENSE_MOVES_BONUS()
 
 // Permit the focus (gold/production/culture) of puppet cities to be set (but not what is being built or how specialists are allocated)
 #define MOD_UI_CITY_PRODUCTION                      gCustomMods.isUI_CITY_PRODUCTION()
@@ -909,6 +911,8 @@
 #define MOD_PROMOTION_COLLECTIONS
 #define MOD_BUILDINGCLASS_COLLECTIONS
 
+#define MOD_SPECIALIST_RESOURCES gCustomMods.isSPECIALIST_RESOURCES()
+
 //
 // NOTHING BELOW HERE SHOULD NEED CHANGING
 //
@@ -1419,6 +1423,7 @@ public:
 	MOD_OPT_DECL(PROMOTIONS_UNIT_NAMING);
 	MOD_OPT_DECL(PROMOTIONS_IMPROVEMENT_BONUS);
 	MOD_OPT_DECL(PROMOTIONS_ALLYCITYSTATE_BONUS);
+	MOD_OPT_DECL(DEFENSE_MOVES_BONUS);
 
 	MOD_OPT_DECL(UI_CITY_PRODUCTION);
 	MOD_OPT_DECL(UI_CITY_EXPANSION);
@@ -1614,7 +1619,8 @@ public:
 
 	MOD_OPT_DECL(GLOBAL_CITY_SCALES);
 	MOD_OPT_DECL(EVENTS_CITY_SCALES);
-	
+
+	MOD_OPT_DECL(SPECIALIST_RESOURCES);
 
 protected:
 	bool m_bInit;

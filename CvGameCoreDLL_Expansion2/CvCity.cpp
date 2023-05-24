@@ -7440,6 +7440,20 @@ void CvCity::processProcess(ProcessTypes eProcess, int iChange)
 	}
 }
 
+#ifdef MOD_SPECIALIST_RESOURCES
+static inline void ChangeResourceFromSpecialist(CvCity* city, CvSpecialistInfo* pkSpecialist, int iChange)
+{
+	if (!MOD_SPECIALIST_RESOURCES) return;
+
+	CvPlayerAI& owner = GET_PLAYER(city->getOwner());
+	for (auto& resourceInfo : pkSpecialist->GetResourceInfo())
+	{
+		if (!owner.MeetSpecialistResourceRequirement(resourceInfo)) continue;
+
+		owner.changeResourceFromSpecialists(resourceInfo.m_eResource, resourceInfo.m_iQuantity * iChange);
+	}
+}
+#endif
 
 //	--------------------------------------------------------------------------------
 void CvCity::processSpecialist(SpecialistTypes eSpecialist, int iChange)
@@ -7468,6 +7482,10 @@ void CvCity::processSpecialist(SpecialistTypes eSpecialist, int iChange)
 	// Culture
 	int iCulturePerSpecialist = GetCultureFromSpecialist(eSpecialist);
 	ChangeJONSCulturePerTurnFromSpecialists(iCulturePerSpecialist * iChange);
+
+#ifdef MOD_SPECIALIST_RESOURCES
+	ChangeResourceFromSpecialist(this, pkSpecialist, iChange);
+#endif
 }
 
 //	--------------------------------------------------------------------------------

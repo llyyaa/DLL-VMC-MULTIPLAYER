@@ -782,6 +782,9 @@ void CvPlayer::uninit()
 	m_paiProjectMaking.clear();
 	m_paiHurryCount.clear();
 	m_paiHurryModifier.clear();
+#ifdef MOD_SPECIALIST_RESOURCES
+	m_paiResourcesFromSpecialists.clear();
+#endif
 
 	m_pabLoyalMember.clear();
 	m_pabGetsScienceFromPlayer.clear();
@@ -1287,6 +1290,11 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 		m_paiResourcesSiphoned.clear();
 		m_paiResourcesSiphoned.resize(GC.getNumResourceInfos(), 0);
+
+#ifdef MOD_SPECIALIST_RESOURCES
+		m_paiResourcesFromSpecialists.clear();
+		m_paiResourcesFromSpecialists.resize(GC.getNumResourceInfos(), 0);
+#endif
 
 		CvAssertMsg(0 < GC.getNumImprovementInfos(), "GC.getNumImprovementInfos() is not greater than zero but it is used to allocate memory in CvPlayer::reset");
 		m_paiImprovementCount.clear();
@@ -20575,9 +20583,6 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 		iTotalNumResource += iCityPOPResource / 100;
 #endif
 
-
-
-
 		if(GetStrategicResourceMod() != 0)
 		{
 			iTotalNumResource *= GetStrategicResourceMod();
@@ -20593,6 +20598,11 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 	}
 
 	iTotalNumResource -= getResourceExport(eIndex);
+
+	if (MOD_SPECIALIST_RESOURCES)
+	{
+		iTotalNumResource += getResourceFromSpecialists(eIndex);
+	}
 
 	return iTotalNumResource;
 }
@@ -20926,6 +20936,70 @@ void CvPlayer::changeResourceSiphoned(ResourceTypes eIndex, int iChange)
 		DoUpdateHappiness();
 	}
 }
+
+#ifdef MOD_SPECIALIST_RESOURCES
+int CvPlayer::getResourceFromSpecialists(ResourceTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumResourceInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	return m_paiResourcesFromSpecialists[eIndex];
+}
+
+void CvPlayer::changeResourceFromSpecialists(ResourceTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumResourceInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_paiResourcesFromSpecialists[eIndex] += iChange;
+		CvAssert(getResourceFromSpecialists(eIndex) >= 0);
+
+		DoUpdateHappiness();
+	}
+}
+
+void CvPlayer::UpdateResourceFromSpecialists()
+{
+	if (!MOD_SPECIALIST_RESOURCES)
+		return;
+
+	for (auto &v : m_paiResourcesFromSpecialists)
+	{
+		v = 0;
+	}
+
+	for (int i = 0; i < GC.getNumSpecialistInfos(); i++)
+	{
+		int cityLoop = 0;
+		for (CvCity *city = firstCity(&cityLoop); city != NULL; city = nextCity(&cityLoop))
+		{
+			SpecialistTypes specialistType = (SpecialistTypes)i;
+			CvSpecialistInfo *sinfo = GC.getSpecialistInfo(specialistType);
+			int num = city->GetCityCitizens()->GetSpecialistCount(specialistType);
+			if (num == 0)
+				continue;
+
+			for (auto &rinfo : sinfo->GetResourceInfo())
+			{
+				if (MeetSpecialistResourceRequirement(rinfo))
+				{
+					m_paiResourcesFromSpecialists[rinfo.m_eResource] += rinfo.m_iQuantity * num;
+				}
+			}
+		}
+	}
+}
+
+bool CvPlayer::MeetSpecialistResourceRequirement(const CvSpecialistInfo::ResourceInfo& resourceInfo) const
+{
+	bool hasTech = resourceInfo.m_eRequiredTech == NO_TECH || HasTech(resourceInfo.m_eRequiredTech);
+	bool hasPolicy = resourceInfo.m_eRequiredPolicy == NO_POLICY || (HasPolicy(resourceInfo.m_eRequiredPolicy) && !GetPlayerPolicies()->IsPolicyBlocked(resourceInfo.m_eRequiredPolicy));
+	return hasTech && hasPolicy;
+}
+
+#endif
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::getResourceInOwnedPlots(ResourceTypes eIndex)
@@ -25232,6 +25306,13 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		}
 	}
 
+#ifdef MOD_SPECIALIST_RESOURCES
+	if (MOD_SPECIALIST_RESOURCES && GC.getSpecialistResourcesPolicies().count(ePolicy) > 0)
+	{
+		UpdateResourceFromSpecialists();
+	}
+#endif
+
 	DoUpdateHappiness();
 	GetTrade()->UpdateTradeConnectionValues();
 	recomputeGreatPeopleModifiers();
@@ -26159,6 +26240,10 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iWarCasualtiesModifier;
 #endif
 
+#ifdef MOD_SPECIALIST_RESOURCES
+	kStream >> m_paiResourcesFromSpecialists;
+#endif
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -26684,6 +26769,10 @@ void CvPlayer::Write(FDataStream& kStream) const
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	kStream << m_iWarCasualtiesCounter;
 	kStream << m_iWarCasualtiesModifier;
+#endif
+
+#ifdef MOD_SPECIALIST_RESOURCES
+	kStream << m_paiResourcesFromSpecialists;
 #endif
 }
 
