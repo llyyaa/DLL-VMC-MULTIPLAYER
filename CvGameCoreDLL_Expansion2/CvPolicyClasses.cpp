@@ -62,6 +62,9 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iCapitalUnhappinessMod(0),
 	m_iFreeExperience(0),
 	m_iWorkerSpeedModifier(0),
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	m_iWaterBuildSpeedModifier(0),
+#endif
 	m_iAllFeatureProduction(0),
 	m_iImprovementCostModifier(0),
 	m_iImprovementUpgradeRateModifier(0),
@@ -324,6 +327,9 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iCapitalUnhappinessMod = kResults.GetInt("CapitalUnhappinessMod");
 	m_iFreeExperience = kResults.GetInt("FreeExperience");
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	m_iWaterBuildSpeedModifier = kResults.GetInt("WaterBuildSpeedModifier");
+#endif
 	m_iAllFeatureProduction = kResults.GetInt("AllFeatureProduction");
 	m_iImprovementCostModifier = kResults.GetInt("ImprovementCostModifier");
 	m_iImprovementUpgradeRateModifier = kResults.GetInt("ImprovementUpgradeRateModifier");
@@ -1274,7 +1280,13 @@ int CvPolicyEntry::GetWorkerSpeedModifier() const
 {
 	return m_iWorkerSpeedModifier;
 }
-
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+/// build on water
+int CvPolicyEntry::GetWaterBuildSpeedModifier() const
+{
+	return m_iWaterBuildSpeedModifier;
+}
+#endif
 /// How much Production does removing ALL Features now give us?
 int CvPolicyEntry::GetAllFeatureProduction() const
 {

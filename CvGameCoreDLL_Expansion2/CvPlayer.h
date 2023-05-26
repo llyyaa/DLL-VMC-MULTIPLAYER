@@ -875,6 +875,11 @@ public:
 	int getWorkerSpeedModifier() const;
 	void changeWorkerSpeedModifier(int iChange);
 
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	int getWaterBuildSpeedModifier() const;
+	void changeWaterBuildSpeedModifier(int iChange);
+#endif
+
 	int getImprovementCostModifier() const;
 	void changeImprovementCostModifier(int iChange);
 
@@ -2124,6 +2129,9 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iFreeExperienceFromMinors;
 	FAutoVariable<int, CvPlayer> m_iFeatureProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	FAutoVariable<int, CvPlayer> m_iWaterBuildSpeedModifier;
+#endif
 	FAutoVariable<int, CvPlayer> m_iImprovementCostModifier;
 	FAutoVariable<int, CvPlayer> m_iImprovementUpgradeRateModifier;
 	FAutoVariable<int, CvPlayer> m_iSpecialistProductionModifier;

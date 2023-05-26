@@ -1062,6 +1062,10 @@
     <Row Class="6" Name="GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA" Value="0"/>
     <!-- INSERT INTO Defines(Name, Value) VALUES('UNIT_MOVES_AFTER_DISEMBARK', 60); --> 
     <Row Class="6" Name="GLOBAL_UNIT_MOVES_AFTER_DISEMBARK" Value="0"/>
+    
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
+    <Row Class="6" Name="POLICY_WATER_BUILD_SPEED_MODIFIER" Value="0"/>
 
     <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0; -->
