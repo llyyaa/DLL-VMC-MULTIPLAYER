@@ -278,6 +278,15 @@ public:
 	int GetAllyCityStateCombatModifier() const;
 	int GetAllyCityStateCombatModifierMax() const;
 #endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	ResourceTypes GetExtraResourceType() const;
+	int GetExtraResourceCombatModifier() const;
+	int GetExtraResourceCombatModifierMax() const;
+	int GetExtraHappinessCombatModifier() const;
+	int GetExtraHappinessCombatModifierMax() const;
+#endif
+
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool CanCrossMountains() const;
 #endif
@@ -682,6 +691,13 @@ protected:
 #if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
 	int m_iAllyCityStateCombatModifier;
 	int m_iAllyCityStateCombatModifierMax;
+#endif
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	ResourceTypes m_eExtraResourceType;
+	int m_iExtraResourceCombatModifier;
+	int m_iExtraResourceCombatModifierMax;
+	int m_iExtraHappinessCombatModifier;
+	int m_iExtraHappinessCombatModifierMax;
 #endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool m_bCanCrossMountains;
