@@ -6885,7 +6885,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		}
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0))
+		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0) && pBuildingInfo->IsAllowInstantYield())
 		{
 			doInstantYieldArray(pBuildingInfo->GetInstantYieldArray());
 		}
@@ -10039,7 +10039,7 @@ void CvCity::doInstantYieldArray(int* iInstantYield)
 		if(iInstantYield[iYieldLoop] > 0)
 		{
 			int iValue = iInstantYield[iYieldLoop];
-			iValue *= GC.getGame().getGameSpeedInfo().getConstructPercent();
+			iValue *= GC.getGame().getGameSpeedInfo().getGoldPercent();
 			iValue /= 100;
 			doInstantYield((YieldTypes)iYieldLoop, iValue);
 		}
