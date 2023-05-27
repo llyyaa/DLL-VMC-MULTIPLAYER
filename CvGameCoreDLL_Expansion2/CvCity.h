@@ -549,7 +549,11 @@ public:
 	void changeFreeExperience(int iChange);
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-	void doInstantYieldArray(int* iInstantYieldArray);
+#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+	void doRelogionInstantYield(ReligionTypes eReligion);
+	void doBeliefInstantYield(BeliefTypes eBelief);
+#endif	
+	void doBuildingInstantYield(int* iInstantYieldArray);
 	void doInstantYield(YieldTypes iYield, int iValue);
 #endif
 

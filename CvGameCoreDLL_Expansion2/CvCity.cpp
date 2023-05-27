@@ -6887,7 +6887,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0) && pBuildingInfo->IsAllowInstantYield())
 		{
-			doInstantYieldArray(pBuildingInfo->GetInstantYieldArray());
+			doBuildingInstantYield(pBuildingInfo->GetInstantYieldArray());
 		}
 #endif
 
@@ -8486,6 +8486,16 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 					GetCityCitizens()->DoAddBestCitizenFromUnassigned();
 				}
 			}
+#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+			if (MOD_BELIEF_BIRTH_INSTANT_YIELD && !IsResistance())
+			{
+				doRelogionInstantYield(GetCityReligions()->GetReligiousMajority());
+				if(GetCityReligions()->IsSecondaryReligionActive())
+				{
+					doBeliefInstantYield(GetCityReligions()->GetSecondaryReligionPantheonBelief());
+				}
+			}
+#endif
 		}
 
 		setLayoutDirty(true);
@@ -10030,15 +10040,53 @@ void CvCity::changeFreeExperience(int iChange)
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-void CvCity::doInstantYieldArray(int* iInstantYield)
+#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+void CvCity::doRelogionInstantYield(ReligionTypes eReligion)
+{
+	VALIDATE_OBJECT
+	if(eReligion == NO_RELIGION) return;
+	const CvReligion* pkReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion,getOwner());
+	if(!pkReligion->m_Beliefs.AllowYieldPerBirth()) return;
+	for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
+	{
+		YieldTypes iYieldType = (YieldTypes)iYieldLoop;
+		int iValue = pkReligion->m_Beliefs.GetYieldPerBirth(iYieldType);
+		if(iValue > 0)
+		{
+			iValue *= GC.getGame().getGameSpeedInfo().getFaithPercent();
+			iValue /= 100;
+			doInstantYield((YieldTypes)iYieldLoop, iValue);
+		}
+	}
+}
+void CvCity::doBeliefInstantYield(BeliefTypes eBelief)
+{
+	VALIDATE_OBJECT
+	if(eBelief == NO_BELIEF) return;
+	const CvBeliefEntry* pkBelief = GC.GetGameBeliefs()->GetEntry(eBelief);
+	if(!pkBelief->AllowYieldPerBirth()) return;
+	for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
+	{
+		YieldTypes iYieldType = (YieldTypes)iYieldLoop;
+		int iValue = pkBelief->GetYieldPerBirth(iYieldType);
+		if(iValue > 0)
+		{
+			iValue *= GC.getGame().getGameSpeedInfo().getFaithPercent();
+			iValue /= 100;
+			doInstantYield((YieldTypes)iYieldLoop, iValue);
+		}
+	}
+}
+#endif
+void CvCity::doBuildingInstantYield(int* iInstantYield)
 {
 	VALIDATE_OBJECT
 	if(!iInstantYield) return;
 	for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
 	{
-		if(iInstantYield[iYieldLoop] > 0)
+		int iValue = iInstantYield[iYieldLoop];
+		if(iValue > 0)
 		{
-			int iValue = iInstantYield[iYieldLoop];
 			iValue *= GC.getGame().getGameSpeedInfo().getGoldPercent();
 			iValue /= 100;
 			doInstantYield((YieldTypes)iYieldLoop, iValue);
