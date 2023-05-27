@@ -290,6 +290,14 @@ CvUnit::CvUnit() :
 	, m_iAllyCityStateCombatModifierMax("CvUnit::m_iAllyCityStateCombatModifierMax", m_syncArchive)
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	, m_eExtraResourceType("CvUnit::m_eExtraResourceType", m_syncArchive)
+	, m_iExtraResourceCombatModifier("CvUnit::m_iExtraResourceCombatModifier", m_syncArchive)
+	, m_iExtraResourceCombatModifierMax("CvUnit::m_iExtraResourceCombatModifierMax", m_syncArchive)
+	, m_iExtraHappinessCombatModifier("CvUnit::m_iExtraHappinessCombatModifier", m_syncArchive)
+	, m_iExtraHappinessCombatModifierMax("CvUnit::m_iExtraHappinessCombatModifierMax", m_syncArchive)
+#endif
+
 #if defined(MOD_ROG_CORE)
 		, m_iCombatBonusFromNearbyUnitClass("CvUnit::m_iCombatBonusFromNearbyUnitClass", m_syncArchive)
 		, m_iNearbyUnitClassBonusRange("CvUnit::m_iNearbyUnitClassBonusRange", m_syncArchive)
@@ -1125,6 +1133,14 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 #if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
 	m_iAllyCityStateCombatModifier = 0;
 	m_iAllyCityStateCombatModifierMax = 0;
+#endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	m_eExtraResourceType = NO_RESOURCE;
+	m_iExtraResourceCombatModifier = 0;
+	m_iExtraResourceCombatModifierMax = 0;
+	m_iExtraHappinessCombatModifier = 0;
+	m_iExtraHappinessCombatModifierMax = 0;
 #endif
 
 #if defined(MOD_DEFENSE_MOVES_BONUS)
@@ -13466,6 +13482,11 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 	iModifier += GetStrengthModifierFromAlly();
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	iModifier += GetStrengthModifierFromExtraResource();
+	iModifier += GetStrengthModifierFromExtraHappiness();
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	if (MOD_BUILDINGS_GOLDEN_AGE_EXTEND && onwer.isGoldenAge())
 	{
@@ -14977,6 +14998,11 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 	iModifier += GetStrengthModifierFromAlly();
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	iModifier += GetStrengthModifierFromExtraResource();
+	iModifier += GetStrengthModifierFromExtraHappiness();
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	if (MOD_BUILDINGS_GOLDEN_AGE_EXTEND && onwer.isGoldenAge())
 	{
@@ -16339,6 +16365,92 @@ int CvUnit::GetStrengthModifierFromAlly() const
 	if (GetAllyCityStateCombatModifierMax() > -1 && mod > GetAllyCityStateCombatModifierMax())
 	{
 		mod = GetAllyCityStateCombatModifierMax();
+	}
+
+	return mod;
+}
+#endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+ResourceTypes CvUnit::GetExtraResourceType() const
+{
+	VALIDATE_OBJECT
+	return m_eExtraResourceType;
+}
+void CvUnit::SetExtraResourceType(ResourceTypes m_eResourceType)
+{
+	VALIDATE_OBJECT
+	m_eExtraResourceType = m_eResourceType;
+}
+int CvUnit::GetExtraResourceCombatModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraResourceCombatModifier;
+}
+void CvUnit::SetExtraResourceCombatModifier(int iCombatBonus)
+{
+	VALIDATE_OBJECT
+	m_iExtraResourceCombatModifier = iCombatBonus;
+}
+int CvUnit::GetExtraResourceCombatModifierMax() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraResourceCombatModifierMax;
+}
+void CvUnit::SetExtraResourceCombatModifierMax(int iCombatBonusMax)
+{
+	VALIDATE_OBJECT
+	m_iExtraResourceCombatModifierMax = iCombatBonusMax;
+}
+int CvUnit::GetStrengthModifierFromExtraResource() const
+{
+	VALIDATE_OBJECT
+	if (GetExtraResourceCombatModifier() == 0)
+	{
+		return 0;
+	}
+
+	int iUsed = GET_PLAYER(getOwner()).getNumResourceUsed(m_eExtraResourceType);
+	int iTotal = GET_PLAYER(getOwner()).getNumResourceTotal(m_eExtraResourceType, /*bIncludeImport*/ true);
+	int mod = (iTotal - iUsed) * GetExtraResourceCombatModifier();
+	if (mod > 0 && GetExtraResourceCombatModifierMax() > -1 && mod > GetExtraResourceCombatModifierMax())
+	{
+		mod = GetExtraResourceCombatModifierMax();
+	}
+
+	return mod;
+}
+int CvUnit::GetExtraHappinessCombatModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraHappinessCombatModifier;
+}
+void CvUnit::SetExtraHappinessCombatModifier(int iCombatBonus)
+{
+	VALIDATE_OBJECT
+	m_iExtraHappinessCombatModifier = iCombatBonus;
+}
+int CvUnit::GetExtraHappinessCombatModifierMax() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraHappinessCombatModifierMax;
+}
+void CvUnit::SetExtraHappinessCombatModifierMax(int iCombatBonusMax)
+{
+	VALIDATE_OBJECT
+	m_iExtraHappinessCombatModifierMax = iCombatBonusMax;
+}
+int CvUnit::GetStrengthModifierFromExtraHappiness() const
+{
+	VALIDATE_OBJECT
+	if (GetExtraHappinessCombatModifier() == 0)
+	{
+		return 0;
+	}
+	int mod = GET_PLAYER(getOwner()).GetExcessHappiness() * GetExtraHappinessCombatModifier();
+	if (GetExtraHappinessCombatModifierMax() > -1 && mod > GetExtraHappinessCombatModifierMax())
+	{
+		mod = GetExtraHappinessCombatModifierMax();
 	}
 
 	return mod;
@@ -23678,6 +23790,24 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		}
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+		if (MOD_PROMOTIONS_EXTRARES_BONUS) {
+			if (thisPromotion.GetExtraResourceType() != NO_RESOURCE && thisPromotion.GetExtraResourceCombatModifier() > 0) {
+				SetExtraResourceCombatModifier(thisPromotion.GetExtraResourceCombatModifier());
+				SetExtraResourceType(thisPromotion.GetExtraResourceType());
+			}
+			if (thisPromotion.GetExtraResourceCombatModifierMax() > 0) {
+				SetExtraResourceCombatModifierMax(thisPromotion.GetExtraResourceCombatModifierMax());
+			}
+			if (thisPromotion.GetExtraHappinessCombatModifier() > 0) {
+				SetExtraHappinessCombatModifier(thisPromotion.GetExtraHappinessCombatModifier());
+			}
+			if (thisPromotion.GetExtraHappinessCombatModifierMax() > 0) {
+				SetExtraHappinessCombatModifierMax(thisPromotion.GetExtraHappinessCombatModifierMax());
+			}
+		}
+#endif
+
 #if defined(MOD_ROG_CORE)
 		if (MOD_ROG_CORE) {	
 			changeAoEDamageOnMove(thisPromotion.GetAoEDamageOnMove() * iChange);
@@ -24582,6 +24712,15 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iAllyCityStateCombatModifierMax;
 #endif
 
+#ifdef MOD_PROMOTIONS_EXTRARES_BONUS
+
+	kStream >> m_eExtraResourceType;
+	kStream >> m_iExtraResourceCombatModifier;
+	kStream >> m_iExtraResourceCombatModifierMax;
+	kStream >> m_iExtraHappinessCombatModifier;
+	kStream >> m_iExtraHappinessCombatModifierMax;
+#endif
+
 	kStream >> m_iAttackInflictDamageChange;
 	kStream >> m_iAttackInflictDamageChangeMaxHPPercent;
 
@@ -24844,6 +24983,14 @@ void CvUnit::write(FDataStream& kStream) const
 #ifdef MOD_PROMOTIONS_ALLYCITYSTATE_BONUS
 	kStream << m_iAllyCityStateCombatModifier;
 	kStream << m_iAllyCityStateCombatModifierMax;
+#endif
+
+#ifdef MOD_PROMOTIONS_EXTRARES_BONUS
+	kStream << m_eExtraResourceType;
+	kStream << m_iExtraResourceCombatModifier;
+	kStream << m_iExtraResourceCombatModifierMax;
+	kStream << m_iExtraHappinessCombatModifier;
+	kStream << m_iExtraHappinessCombatModifierMax;
 #endif
 
 	kStream << m_iAttackInflictDamageChange;

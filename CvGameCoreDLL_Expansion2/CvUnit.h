@@ -633,6 +633,21 @@ public:
 	int GetStrengthModifierFromAlly() const;
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	ResourceTypes GetExtraResourceType() const;
+	void SetExtraResourceType(ResourceTypes m_eResourceType);
+	int GetExtraResourceCombatModifier() const;
+	void SetExtraResourceCombatModifier(int iCombatBonus);
+	int GetExtraResourceCombatModifierMax() const;
+	void SetExtraResourceCombatModifierMax(int iCombatBonusMax);
+	int GetStrengthModifierFromExtraResource() const;
+	int GetExtraHappinessCombatModifier() const;
+	void SetExtraHappinessCombatModifier(int iCombatBonus);
+	int GetExtraHappinessCombatModifierMax() const;
+	void SetExtraHappinessCombatModifierMax(int iCombatBonusMax);
+	int GetStrengthModifierFromExtraHappiness() const;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	int getNearbyUnitClassBonus() const;
 	void SetNearbyUnitClassBonus(int iCombatBonus);
@@ -1972,6 +1987,14 @@ protected:
 #if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
 	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifier;
 	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifierMax;
+#endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	FAutoVariable<ResourceTypes, CvUnit> m_eExtraResourceType;
+	FAutoVariable<int, CvUnit> m_iExtraResourceCombatModifier;
+	FAutoVariable<int, CvUnit> m_iExtraResourceCombatModifierMax;
+	FAutoVariable<int, CvUnit> m_iExtraHappinessCombatModifier;
+	FAutoVariable<int, CvUnit> m_iExtraHappinessCombatModifierMax;
 #endif
 
 #if defined(MOD_ROG_CORE)

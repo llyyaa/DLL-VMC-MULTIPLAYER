@@ -1119,6 +1119,9 @@
     <Row Class="6" Name="POLICIY_PUBLIC_OPTION" Value="0"/>
 
     <Row Class="6" Name="BATTLE_CAPTURE_NEW_RULE" Value="0"/>
+    <!-- Permits units to receive a combat bonus from Extra Resourses/Hapiness-->
+    <!-- table change: NewTableChanges.sql -->
+    <Row Class="4" Name="PROMOTIONS_EXTRARES_BONUS" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>
