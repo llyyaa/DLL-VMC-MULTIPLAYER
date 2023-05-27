@@ -10299,7 +10299,7 @@ bool CvCity::DoRazingTurn()
 	{
 		CvPlayer& kPlayer = GET_PLAYER(getOwner());
 		int iPopulationDrop = 1;
-		iPopulationDrop *= (100 + kPlayer.GetPlayerTraits()->GetRazeSpeedModifier());
+		iPopulationDrop *= (100 + kPlayer.GetRazeSpeedModifier());
 		iPopulationDrop /= 100;
 
 		ChangeRazingTurns(-1);
@@ -11233,14 +11233,20 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 
 	// Golden Age Yield Modifier
-	if(GET_PLAYER(getOwner()).isGoldenAge())
+	if (GET_PLAYER(getOwner()).isGoldenAge())
 	{
-		CvYieldInfo* pYield = GC.getYieldInfo(eIndex);
-		if(pYield)
+		CvYieldInfo *pYield = GC.getYieldInfo(eIndex);
+		if (pYield)
 		{
 			iTempMod = pYield->getGoldenAgeYieldMod();
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+			if (MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER)
+			{
+				iTempMod += GET_PLAYER(getOwner()).getGoldenAgeYieldRateModifier(eIndex);
+			}
+#endif
 			iModifier += iTempMod;
-			if(toolTipSink)
+			if (toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_GOLDEN_AGE", iTempMod);
 		}
 	}
@@ -11261,6 +11267,23 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		}
 	}
 #endif
+
+	if (getNumWorldWonders() > 0)
+	{
+		auto& onwer = GET_PLAYER(getOwner());
+		if (!onwer.GetCityWithWorldWonderYieldModifier().empty())
+		{
+			iTempMod = 0;
+			for (const auto& info : onwer.GetCityWithWorldWonderYieldModifier())
+			{
+				if (info.eYield != eIndex) continue;
+				iTempMod += info.iYield;
+			}
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER", iTempMod);
+		}
+	}
 
 	// Religion Yield Rate Modifier
 	ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
@@ -11440,8 +11463,17 @@ int CvCity::getBasicYieldRateTimes100(const YieldTypes eIndex, const bool bIgnor
 	iBaseYield += (GetYieldPerPopInEmpireTimes100(eIndex) * GET_PLAYER(m_eOwner).getTotalPopulation());
 #endif
 
+#ifdef MOD_BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED
+	int iModifiedYield = iBaseYield;
+	if (!MOD_BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED || iBaseYield > 0)
+	{
+		iModifiedYield *= getBaseYieldRateModifier(eIndex);
+		iModifiedYield /= 100;
+	}
+#else
 	int iModifiedYield = iBaseYield * getBaseYieldRateModifier(eIndex);
 	iModifiedYield /= 100;
+#endif
 
 #if !defined(MOD_PROCESS_STOCKPILE)
 	iModifiedYield += iProcessYield;

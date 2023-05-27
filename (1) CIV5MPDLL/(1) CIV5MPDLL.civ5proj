@@ -519,7 +519,21 @@
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
         <FileName>DB/SPECIALISTS/Specialist_Resources.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/IMPROVEMENTS/Improvement_TradeRouteYieldChanges.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/TRAITS/TraitsGoldenAgeEffects.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/TECHS/TechQuickRazing.sql</FileName>
       </Action>
     </ModActions>
     <ModReferences />
@@ -546,6 +560,7 @@
     <Folder Include="DB\ERAS" />
     <Folder Include="DB\IMPROVEMENTS" />
     <Folder Include="DB\CITY_SCALES" />
+    <Folder Include="DB\TECHS" />
     <Folder Include="DB\SPECIALISTS" />
     <Folder Include="DB\YIELDS" />
     <Folder Include="DB\POLICIES" />
@@ -923,6 +938,14 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\SPECIALISTS\Specialist_Resources.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\TECHS\TechQuickRazing.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\TRAITS\TraitsGoldenAgeEffects.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

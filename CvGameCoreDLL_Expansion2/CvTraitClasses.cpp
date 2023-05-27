@@ -161,6 +161,9 @@ CvTraitEntry::CvTraitEntry() :
 	m_paiYieldChangePerTradePartner(NULL),
 	m_paiYieldChangeIncomingTradeRoute(NULL),
 	m_paiYieldModifier(NULL),
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	m_paiGoldenAgeYieldModifier(NULL),
+#endif
 	m_piStrategicResourceQuantityModifier(NULL),
 	m_piResourceQuantityModifiers(NULL),
 	m_ppiImprovementYieldChanges(NULL),
@@ -877,6 +880,13 @@ int CvTraitEntry::GetYieldModifier(int i) const
 	return m_paiYieldModifier ? m_paiYieldModifier[i] : -1;
 }
 
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+int CvTraitEntry::GetGoldenAgeYieldModifier(int i) const
+{
+	return m_paiGoldenAgeYieldModifier ? m_paiGoldenAgeYieldModifier[i] : -1;
+}
+#endif
+
 /// Accessor:: Additional quantity of strategic resources
 int CvTraitEntry::GetStrategicResourceQuantityModifier(int i) const
 {
@@ -1480,6 +1490,9 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	kUtility.SetYields(m_paiYieldChangePerTradePartner, "Trait_YieldChangesPerTradePartner", "TraitType", szTraitType);
 	kUtility.SetYields(m_paiYieldChangeIncomingTradeRoute, "Trait_YieldChangesIncomingTradeRoute", "TraitType", szTraitType);
 	kUtility.SetYields(m_paiYieldModifier, "Trait_YieldModifiers", "TraitType", szTraitType);
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	kUtility.SetYields(m_paiGoldenAgeYieldModifier, "Trait_GoldenAgeYieldModifiers", "TraitType", szTraitType);
+#endif
 
 	const int iNumTerrains = GC.getNumTerrainInfos();
 
@@ -2252,6 +2265,9 @@ void CvPlayerTraits::InitPlayerTraits()
 				m_iYieldChangePerTradePartner[iYield] = trait->GetYieldChangePerTradePartner(iYield);
 				m_iYieldChangeIncomingTradeRoute[iYield] = trait->GetYieldChangeIncomingTradeRoute(iYield);
 				m_iYieldRateModifier[iYield] = trait->GetYieldModifier(iYield);
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+				m_iGoldenAgeYieldRateModifier[iYield] = trait->GetGoldenAgeYieldModifier(iYield);
+#endif
 
 				for(int iFeatureLoop = 0; iFeatureLoop < GC.getNumFeatureInfos(); iFeatureLoop++)
 				{
@@ -2642,6 +2658,9 @@ void CvPlayerTraits::Reset()
 		m_iYieldChangePerTradePartner[iYield] = 0;
 		m_iYieldChangeIncomingTradeRoute[iYield] = 0;
 		m_iYieldRateModifier[iYield] = 0;
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+		m_iGoldenAgeYieldRateModifier[0] = 0;
+#endif
 
 		for(int iImprovement = 0; iImprovement < GC.getNumImprovementInfos(); iImprovement++)
 		{
@@ -4061,6 +4080,11 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	ArrayWrapper<int> kYieldRateModifierWrapper(NUM_YIELD_TYPES, m_iYieldRateModifier);
 	kStream >> kYieldRateModifierWrapper;
 
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	ArrayWrapper<int> kGoldenAgeYieldRateModifierWrapper(NUM_YIELD_TYPES, m_iGoldenAgeYieldRateModifier);
+	kStream >> kGoldenAgeYieldRateModifierWrapper;
+#endif
+
 	ArrayWrapper<int> kYieldChangeNaturalWonderWrapper(NUM_YIELD_TYPES, m_iYieldChangeNaturalWonder);
 	kStream >> kYieldChangeNaturalWonderWrapper;
 
@@ -4345,6 +4369,9 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iFreeCityYield);
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldChangeStrategicResources);
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldRateModifier);
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iGoldenAgeYieldRateModifier);
+#endif
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldChangeNaturalWonder);
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldChangePerTradePartner);
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldChangeIncomingTradeRoute);

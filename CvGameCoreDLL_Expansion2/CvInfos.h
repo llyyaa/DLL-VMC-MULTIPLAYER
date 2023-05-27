@@ -2410,6 +2410,29 @@ private:
 	CvVoteSourceInfo& operator=(const CvVoteSourceInfo&);
 };
 
+struct PolicyYieldInfo
+{
+	PolicyTypes ePolicy;
+	YieldTypes eYield;
+	int iYield;
+};
+
+inline FDataStream& operator<<(FDataStream& os, const PolicyYieldInfo& kYield)
+{
+	os << (int)kYield.ePolicy;
+	os << (int)kYield.eYield;
+	os << kYield.iYield;
+	return os;
+}
+
+inline FDataStream& operator>>(FDataStream& is, PolicyYieldInfo& kYield)
+{
+	is >> (int&)kYield.ePolicy;
+	is >> (int&)kYield.eYield;
+	is >> kYield.iYield;
+	return is;
+}
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  class : CvDomainInfo
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

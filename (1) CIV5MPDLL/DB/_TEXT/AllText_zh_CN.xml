@@ -231,6 +231,12 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_KILL_POPULATION_ATTACKED">
 			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] [ICON_CITIZEN] 市民在你的城市中被杀害：{2_CityName}</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER">
+			<Text>
+				[NEWLINE][ICON_BULLET]城市级修正(世界奇观): {1_Num}%
+			</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

@@ -2918,6 +2918,14 @@ int CvPlot::getBuildTurnsLeft(BuildTypes eBuild, PlayerTypes ePlayer, int iNowEx
 		}
 	}
 
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	if(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER && GC.getBuildInfo(eBuild)->IsWater())
+	{
+		iThenBuildRate *= (100 + GET_PLAYER(ePlayer).getWaterBuildSpeedModifier());
+		iThenBuildRate /= 100;
+	}
+#endif
+
 	if(iThenBuildRate == 0)
 	{
 		//this means it will take forever under current circumstances
@@ -10504,6 +10512,14 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 				m_eImprovementTypeUnderConstruction = eImprovement;
 			}
 		}
+
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+		if(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER && pkBuildInfo->IsWater())
+		{
+			iChange *= (100 + kPlayer.getWaterBuildSpeedModifier());
+			iChange /= 100;
+		}
+#endif
 
 		m_paiBuildProgress[eBuild] += iChange;
 		CvAssert(getBuildProgress(eBuild) >= 0);

@@ -1795,6 +1795,8 @@ public:
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
 	void ClearSamePlotPromotions();
 	std::tr1::unordered_set<PromotionTypes>& GetPromotionsThatCanBeActionCleared();
+	void RemoveDebuffWhenDoTurn();
+	bool CanRemoveDebuff(const AutoRemoveInfo& kAutoRemoveInfo) const;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER

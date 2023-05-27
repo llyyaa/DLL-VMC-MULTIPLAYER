@@ -131,6 +131,7 @@ bool CvTechEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_bResearchAgreementTradingAllowed = kResults.GetBool("ResearchAgreementTradingAllowed");
 	m_bTradeAgreementTradingAllowed = kResults.GetBool("TradeAgreementTradingAllowed");
 	m_bPermanentAllianceTrading = kResults.GetBool("PermanentAllianceTradingAllowed");
+	m_iRazeSpeedModifier = kResults.GetInt("RazeSpeedModifier");
 #if defined(MOD_TECHS_CITY_WORKING)
 	m_iCityWorkingChange = kResults.GetInt("CityWorkingChange");
 #endif
@@ -587,6 +588,11 @@ int CvTechEntry::GetPrereqOrTechs(int i) const
 int CvTechEntry::GetPrereqAndTechs(int i) const
 {
 	return m_piPrereqAndTechs ? m_piPrereqAndTechs[i] : -1;
+}
+
+int CvTechEntry::GetRazeSpeedModifier() const
+{
+	return m_iRazeSpeedModifier;
 }
 
 #if defined(MOD_ROG_CORE)

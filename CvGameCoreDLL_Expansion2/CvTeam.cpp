@@ -3190,6 +3190,15 @@ void CvTeam::changePermanentAllianceTradingCount(int iChange)
 	CvAssert(getPermanentAllianceTradingCount() >= 0);
 }
 
+int CvTeam::GetRazeSpeedModifier() const
+{
+	return m_iRazeSpeedModifier;
+}
+void CvTeam::ChangeRazeSpeedModifier(int iChange)
+{
+	m_iRazeSpeedModifier += iChange;
+}
+
 #if defined(MOD_TECHS_CITY_WORKING)
 //	--------------------------------------------------------------------------------
 int CvTeam::GetCityWorkingChange() const
@@ -6530,6 +6539,11 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 		}
 	}
 
+	if (pTech->GetRazeSpeedModifier() != 0)
+	{
+		ChangeRazeSpeedModifier(pTech->GetRazeSpeedModifier() * iChange);
+	}
+
 	if(pTech->IsMapTrading())
 	{
 		changeMapTradingCount(iChange);
@@ -6822,7 +6836,7 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 			kPlayer.UpdateResourceFromSpecialists();
 		}
 	}
-#endif	
+#endif
 
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
 	if(pkScriptSystem)
@@ -7446,6 +7460,9 @@ void CvTeam::Read(FDataStream& kStream)
 	kStream >> m_iResearchAgreementTradingAllowedCount;
 	kStream >> m_iTradeAgreementTradingAllowedCount;
 	kStream >> m_iPermanentAllianceTradingCount;
+
+	kStream >> m_iRazeSpeedModifier;
+
 #if defined(MOD_TECHS_CITY_WORKING)
 	MOD_SERIALIZE_READ(23, kStream, m_iCityWorkingChange, 0);
 #endif
@@ -7638,6 +7655,9 @@ void CvTeam::Write(FDataStream& kStream) const
 	kStream << m_iResearchAgreementTradingAllowedCount;
 	kStream << m_iTradeAgreementTradingAllowedCount;
 	kStream << m_iPermanentAllianceTradingCount;
+
+	kStream << m_iRazeSpeedModifier;
+
 #if defined(MOD_TECHS_CITY_WORKING)
 	MOD_SERIALIZE_WRITE(kStream, m_iCityWorkingChange);
 #endif

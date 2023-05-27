@@ -875,6 +875,11 @@ public:
 	int getWorkerSpeedModifier() const;
 	void changeWorkerSpeedModifier(int iChange);
 
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	int getWaterBuildSpeedModifier() const;
+	void changeWaterBuildSpeedModifier(int iChange);
+#endif
+
 	int getImprovementCostModifier() const;
 	void changeImprovementCostModifier(int iChange);
 
@@ -1263,6 +1268,11 @@ public:
 
 	int getYieldRateModifier(YieldTypes eIndex) const;
 	void changeYieldRateModifier(YieldTypes eIndex, int iChange);
+
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	int getGoldenAgeYieldRateModifier(YieldTypes eIndex) const;
+	void changeGoldenAgeYieldRateModifier(YieldTypes eIndex, int iChange);
+#endif
 
 	int getCapitalYieldRateModifier(YieldTypes eIndex) const;
 	void changeCapitalYieldRateModifier(YieldTypes eIndex, int iChange);
@@ -1946,7 +1956,18 @@ public:
 	void ChangeWarCasualtiesModifier(const int iChange);
 #endif
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int GetIdeologyPressureModifier() const;
+	int GetIdeologyUnhappinessModifier() const;
+	void ChangeIdeologyPressureModifier(int iChange);
+	void ChangeIdeologyUnhappinessModifier(int iChange);
+#endif
+
+	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
+
 	CvCity* CvPlayer::GetRandomCity();
+
+	int GetRazeSpeedModifier() const;
 
 protected:
 	class ConqueredByBoolField
@@ -2119,6 +2140,9 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iFreeExperienceFromMinors;
 	FAutoVariable<int, CvPlayer> m_iFeatureProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	FAutoVariable<int, CvPlayer> m_iWaterBuildSpeedModifier;
+#endif
 	FAutoVariable<int, CvPlayer> m_iImprovementCostModifier;
 	FAutoVariable<int, CvPlayer> m_iImprovementUpgradeRateModifier;
 	FAutoVariable<int, CvPlayer> m_iSpecialistProductionModifier;
@@ -2295,6 +2319,10 @@ protected:
 	std::vector<int> m_aiSiphonLuxuryCount;
 	std::vector<int> m_aiGreatWorkYieldChange;
 
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	std::vector<int> m_aiGoldenAgeYieldRateModifier;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainFreeExperiencePerGreatWorkGlobal;
 
@@ -2373,6 +2401,13 @@ protected:
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int m_iWarCasualtiesModifier = 0;
 #endif
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int m_iIdeologyPressureModifier = 0;
+	int m_iIdeologyUnhappinessModifier = 0;
+#endif
+
+	std::vector<PolicyYieldInfo> m_vCityWithWorldWonderYieldModifier;
 
 	// Obsolete: only used to read old saves
 	FAutoVariable< std::vector< Firaxis::Array< int, NUM_YIELD_TYPES > >, CvPlayer> m_ppaaiBuildingClassYieldMod;

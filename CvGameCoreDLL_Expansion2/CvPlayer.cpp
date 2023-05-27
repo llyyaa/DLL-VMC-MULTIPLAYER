@@ -272,6 +272,9 @@ CvPlayer::CvPlayer() :
 	, m_iFreeExperienceFromMinors("CvPlayer::m_iFreeExperienceFromMinors", m_syncArchive)
 	, m_iFeatureProductionModifier("CvPlayer::m_iFeatureProductionModifier", m_syncArchive)
 	, m_iWorkerSpeedModifier("CvPlayer::m_iWorkerSpeedModifier", m_syncArchive)
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	, m_iWaterBuildSpeedModifier("CvPlayer::m_iWaterBuildSpeedModifier", m_syncArchive)
+#endif
 	, m_iImprovementCostModifier("CvPlayer::m_iImprovementCostModifier", m_syncArchive)
 	, m_iImprovementUpgradeRateModifier("CvPlayer::m_iImprovementUpgradeRateModifier", m_syncArchive)
 	, m_iSpecialistProductionModifier("CvPlayer::m_iSpecialistProductionModifier", m_syncArchive)
@@ -716,6 +719,9 @@ void CvPlayer::init(PlayerTypes eID)
 			ChangeCityYieldChange((YieldTypes)iJ, 100 * GetPlayerTraits()->GetFreeCityYield((YieldTypes)iJ));
 #endif
 			changeYieldRateModifier((YieldTypes)iJ, GetPlayerTraits()->GetYieldRateModifier((YieldTypes)iJ));
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+			changeGoldenAgeYieldRateModifier((YieldTypes)iJ, GetPlayerTraits()->GetGoldenAgeYieldRateModifier((YieldTypes)iJ));
+#endif
 		}
 
 		recomputeGreatPeopleModifiers();
@@ -1012,6 +1018,9 @@ void CvPlayer::uninit()
 	m_iFreeExperienceFromMinors = 0;
 	m_iFeatureProductionModifier = 0;
 	m_iWorkerSpeedModifier = 0;
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	m_iWaterBuildSpeedModifier = 0;
+#endif
 	m_iImprovementCostModifier = 0;
 	m_iImprovementUpgradeRateModifier = 0;
 	m_iSpecialistProductionModifier = 0;
@@ -1223,6 +1232,11 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	m_aiYieldRateModifier.clear();
 	m_aiYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
+
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	m_aiGoldenAgeYieldRateModifier.clear();
+	m_aiGoldenAgeYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
+#endif
 
 	m_aiCapitalYieldRateModifier.clear();
 	m_aiCapitalYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
@@ -6410,7 +6424,7 @@ void CvPlayer::raze(CvCity* pCity)
 	DoUpdateHappiness();
 
 	int iPopulationDrop = 1;
-	iPopulationDrop *= (100 + GetPlayerTraits()->GetRazeSpeedModifier());
+	iPopulationDrop *= (100 + GetRazeSpeedModifier());
 	iPopulationDrop /= 100;
 	int iTurnsToRaze = pCity->getPopulation();
 	if(iPopulationDrop > 0)
@@ -15752,6 +15766,21 @@ void CvPlayer::changeWorkerSpeedModifier(int iChange)
 
 
 //	--------------------------------------------------------------------------------
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+int CvPlayer::getWaterBuildSpeedModifier() const
+{
+	return m_iWaterBuildSpeedModifier;
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeWaterBuildSpeedModifier(int iChange)
+{
+	m_iWaterBuildSpeedModifier += iChange;
+}
+
+#endif
+//	--------------------------------------------------------------------------------
 int CvPlayer::getImprovementCostModifier() const
 {
 	return m_iImprovementCostModifier;
@@ -19420,6 +19449,32 @@ void CvPlayer::changeYieldRateModifier(YieldTypes eIndex, int iChange)
 		}
 	}
 }
+
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+int CvPlayer::getGoldenAgeYieldRateModifier(YieldTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiGoldenAgeYieldRateModifier[eIndex];
+}
+void CvPlayer::changeGoldenAgeYieldRateModifier(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if(iChange != 0)
+	{
+		m_aiGoldenAgeYieldRateModifier[eIndex] += iChange;
+
+		invalidateYieldRankCache(eIndex);
+
+		if(getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
+#endif
 
 
 //	--------------------------------------------------------------------------------
@@ -24496,6 +24551,9 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeGoldenAgeMeterMod(pPolicy->GetGoldenAgeMeterMod() * iChange);
 	changeGoldenAgeModifier(pPolicy->GetGoldenAgeDurationMod() * iChange);
 	changeWorkerSpeedModifier(pPolicy->GetWorkerSpeedModifier() * iChange);
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	changeWaterBuildSpeedModifier(pPolicy->GetWaterBuildSpeedModifier() * iChange);
+#endif
 	changeImprovementCostModifier(pPolicy->GetImprovementCostModifier() * iChange);
 	changeImprovementUpgradeRateModifier(pPolicy->GetImprovementUpgradeRateModifier() * iChange);
 	changeSpecialistProductionModifier(pPolicy->GetSpecialistProductionModifier() * iChange);
@@ -24566,6 +24624,15 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	ChangeWarCasualtiesModifier(pPolicy->GetWarCasualtiesModifier() * iChange);
+#endif
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	if (pPolicy->GetIdeologyPressureModifier() != 0 || pPolicy->GetIdeologyUnhappinessModifier() != 0)
+	{
+		ChangeIdeologyPressureModifier(pPolicy->GetIdeologyPressureModifier() * iChange);
+		ChangeIdeologyUnhappinessModifier(pPolicy->GetIdeologyUnhappinessModifier() * iChange);
+		GetCulture()->DoPublicOpinion();
+	}
 #endif
 
 	if(pPolicy->IsOneShot())
@@ -25002,6 +25069,28 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	if (MOD_GLOBAL_CITY_SCALES)
 		pLoopCity->UpdateScaleBuildings();
 #endif
+	}
+
+	if (iChange < 0)
+	{
+		for (auto it = m_vCityWithWorldWonderYieldModifier.begin(); it != m_vCityWithWorldWonderYieldModifier.end();)
+		{
+			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
+			{
+					it = m_vCityWithWorldWonderYieldModifier.erase(it);
+			}
+			else
+			{
+					it++;
+			}
+		}
+	}
+	else
+	{
+		for (const auto& info : pPolicy->GetCityWithWorldWonderYieldModifier())
+		{
+			m_vCityWithWorldWonderYieldModifier.push_back(info);
+		}
 	}
 
 	// Store off number of newly built cities that will get a free building
@@ -25757,6 +25846,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iFreeExperienceFromMinors;
 	kStream >> m_iFeatureProductionModifier;
 	kStream >> m_iWorkerSpeedModifier;
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	kStream >> m_iWaterBuildSpeedModifier;
+#endif
 	kStream >> m_iImprovementCostModifier;
 	kStream >> m_iImprovementUpgradeRateModifier;
 	kStream >> m_iSpecialistProductionModifier;
@@ -25965,6 +26057,10 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiSeaPlotYield;
 	kStream >> m_aiYieldRateModifier;
 	kStream >> m_aiCapitalYieldRateModifier;
+
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	kStream >> m_aiGoldenAgeYieldRateModifier;
+#endif
 
 
 	if (uiVersion >= 4)
@@ -26240,6 +26336,13 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iWarCasualtiesModifier;
 #endif
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	kStream >> m_iIdeologyPressureModifier;
+	kStream >> m_iIdeologyUnhappinessModifier;
+#endif
+
+	kStream >> m_vCityWithWorldWonderYieldModifier;
+
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream >> m_paiResourcesFromSpecialists;
 #endif
@@ -26387,6 +26490,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iFreeExperienceFromMinors;
 	kStream << m_iFeatureProductionModifier;
 	kStream << m_iWorkerSpeedModifier;
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	kStream << m_iWaterBuildSpeedModifier;
+#endif
 	kStream << m_iImprovementCostModifier;
 	kStream << m_iImprovementUpgradeRateModifier;
 	kStream << m_iSpecialistProductionModifier;
@@ -26549,6 +26655,10 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiSeaPlotYield;
 	kStream << m_aiYieldRateModifier;
 	kStream << m_aiCapitalYieldRateModifier;
+
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	kStream << m_aiGoldenAgeYieldRateModifier;
+#endif
 
 	kStream << m_aiGreatWorkYieldChange;
 	kStream << m_aiExtraYieldThreshold;
@@ -26770,6 +26880,13 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iWarCasualtiesCounter;
 	kStream << m_iWarCasualtiesModifier;
 #endif
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	kStream << m_iIdeologyPressureModifier;
+	kStream << m_iIdeologyUnhappinessModifier;
+#endif
+
+	kStream << m_vCityWithWorldWonderYieldModifier;
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream << m_paiResourcesFromSpecialists;
@@ -29853,6 +29970,31 @@ void CvPlayer::ChangeWarCasualtiesModifier(const int iChange)
 
 #endif
 
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+int CvPlayer::GetIdeologyPressureModifier() const
+{
+	return m_iIdeologyPressureModifier;
+}
+int CvPlayer::GetIdeologyUnhappinessModifier() const
+{
+	return m_iIdeologyUnhappinessModifier;
+}
+void CvPlayer::ChangeIdeologyPressureModifier(int iChange)
+{
+	m_iIdeologyPressureModifier += iChange;
+}
+void CvPlayer::ChangeIdeologyUnhappinessModifier(int iChange)
+{
+	m_iIdeologyUnhappinessModifier += iChange;
+}
+#endif
+
+std::vector<PolicyYieldInfo>& CvPlayer::GetCityWithWorldWonderYieldModifier()
+{
+	return m_vCityWithWorldWonderYieldModifier;
+}
+
 CvCity* CvPlayer::GetRandomCity()
 {
 	CvCity *pCity;
@@ -29874,4 +30016,9 @@ CvCity* CvPlayer::GetRandomCity()
 	}
 
 	return pCity;
+}
+
+int CvPlayer::GetRazeSpeedModifier() const
+{
+	return GetPlayerTraits()->GetRazeSpeedModifier() + GET_TEAM(getTeam()).GetRazeSpeedModifier();
 }

@@ -73,6 +73,9 @@ public:
 	int GetCapitalUnhappinessMod() const;
 	int GetFreeExperience() const;
 	int GetWorkerSpeedModifier() const;
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	int GetWaterBuildSpeedModifier() const;
+#endif
 	int GetAllFeatureProduction() const;
 	int GetImprovementCostModifier() const;
 	int GetImprovementUpgradeRateModifier() const;
@@ -271,6 +274,13 @@ public:
 	int GetWarCasualtiesModifier() const;
 #endif
 
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int GetIdeologyPressureModifier() const;
+	int GetIdeologyUnhappinessModifier() const;
+#endif
+
+	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
+
 private:
 	int m_iTechPrereq;
 	int m_iCultureCost;
@@ -315,6 +325,9 @@ private:
 	int m_iCapitalUnhappinessMod;
 	int m_iFreeExperience;
 	int m_iWorkerSpeedModifier;
+#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+	int m_iWaterBuildSpeedModifier;
+#endif
 	int m_iAllFeatureProduction;
 	int m_iImprovementCostModifier;
 	int m_iImprovementUpgradeRateModifier;
@@ -492,10 +505,18 @@ private:
 	int m_iWarCasualtiesModifier;
 #endif
 
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int m_iIdeologyPressureModifier = 0;
+	int m_iIdeologyUnhappinessModifier = 0;
+#endif
+
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piMinorsTradeRouteYieldRate;
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piInternalTradeRouteDestYieldRate;
 #endif
+
+	std::vector<PolicyYieldInfo> m_vCityWithWorldWonderYieldModifier;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
