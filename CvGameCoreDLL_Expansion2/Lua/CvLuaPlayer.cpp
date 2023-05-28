@@ -1283,6 +1283,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetSpecialistResources);
 #endif
 
+	Method(GetHappinessFromFaith);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12407,3 +12408,5 @@ int CvLuaPlayer::lGetSpecialistResources(lua_State* L)
 	return 1;
 }
 #endif
+
+LUAAPIIMPL(Player, GetHappinessFromFaith)

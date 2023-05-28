@@ -10629,6 +10629,12 @@ int CvCity::GetLocalHappiness() const
 	}
 
 	iLocalHappiness += iSpecialPolicyBuildingHappiness;
+
+	if (GetWeLoveTheKingDayCounter() > 0)
+	{
+		iLocalHappiness += kPlayer.GetHappinessInWLTKDCities();
+	}
+
 	int iLocalHappinessCap = getPopulation();
 
 	// India has unique way to compute local happiness cap

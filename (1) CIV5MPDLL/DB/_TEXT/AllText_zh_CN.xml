@@ -243,6 +243,12 @@
 				[NEWLINE][ICON_BULLET]商路数量修正(政策): {1_Num}%
 			</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_TP_HAPPINESS_FAITH">
+			<Text>
+				{1_Happiness} 来自[ICON_PEACE]信仰。
+			</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

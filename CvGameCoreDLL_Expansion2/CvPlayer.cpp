@@ -11956,6 +11956,8 @@ void CvPlayer::DoUpdateHappiness()
 	}
 #endif
 
+	m_iHappiness += GetHappinessFromFaith();
+
 	GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
 }
 
@@ -25111,6 +25113,10 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		}
 	}
 
+	ChangeGlobalHappinessFromFaithPercent(pPolicy->GetGlobalHappinessFromFaithPercent() * iChange);
+
+	ChangeHappinessInWLTKDCities(pPolicy->GetHappinessInWLTKDCities() * iChange);
+
 	// Store off number of newly built cities that will get a free building
 	ChangeNumCitiesFreeCultureBuilding(iNumCitiesFreeCultureBuilding);
 	ChangeNumCitiesFreeFoodBuilding(iNumCitiesFreeFoodBuilding);
@@ -26366,6 +26372,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_paiResourcesFromSpecialists;
 #endif
 
+	kStream >> m_iGlobalHappinessFromFaithPercent;
+	kStream >> m_iHappinessInWLTKDCities;
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -26911,6 +26920,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream << m_paiResourcesFromSpecialists;
 #endif
+
+	kStream << m_iGlobalHappinessFromFaithPercent;
+	kStream << m_iHappinessInWLTKDCities;
 }
 
 //	--------------------------------------------------------------------------------
@@ -30018,6 +30030,33 @@ std::vector<PolicyYieldInfo>& CvPlayer::GetCityWithWorldWonderYieldModifier()
 std::vector<PolicyYieldInfo>& CvPlayer::GetTradeRouteCityYieldModifier()
 {
 	return m_vTradeRouteCityYieldModifier;
+}
+
+int CvPlayer::GetGlobalHappinessFromFaithPercent() const
+{
+	return m_iGlobalHappinessFromFaithPercent;
+}
+void CvPlayer::ChangeGlobalHappinessFromFaithPercent(int iChange)
+{
+	m_iGlobalHappinessFromFaithPercent += iChange;
+}
+int CvPlayer::GetHappinessFromFaith() const
+{
+	if (m_iGlobalHappinessFromFaithPercent == 0)
+	{
+		return 0;
+	}
+
+	return m_iGlobalHappinessFromFaithPercent * GetTotalFaithPerTurn() / 100;
+}
+
+int CvPlayer::GetHappinessInWLTKDCities() const
+{
+	return m_iHappinessInWLTKDCities;
+}
+void CvPlayer::ChangeHappinessInWLTKDCities(int iChange)
+{
+	m_iHappinessInWLTKDCities += iChange;
 }
 
 CvCity* CvPlayer::GetRandomCity()

@@ -244,6 +244,13 @@
 				[NEWLINE][ICON_BULLET]City Modifier for the Trade Routes(Policy): {1_Num}%
 			</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_TP_HAPPINESS_FAITH">
+			<Text>
+				{1_Happiness} from Faith.
+			</Text>
+		</Row>
+
 	</Language_en_US>
 
 </GameData>
