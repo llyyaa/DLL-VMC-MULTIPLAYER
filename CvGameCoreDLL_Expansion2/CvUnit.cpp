@@ -16417,7 +16417,7 @@ int CvUnit::GetStrengthModifierFromExtraResource() const
 	{
 		mod = GetExtraResourceCombatModifierMax();
 	}
-
+	mod = mod < 0 ? 0 : mod;
 	return mod;
 }
 int CvUnit::GetExtraHappinessCombatModifier() const
@@ -16452,7 +16452,7 @@ int CvUnit::GetStrengthModifierFromExtraHappiness() const
 	{
 		mod = GetExtraHappinessCombatModifierMax();
 	}
-
+	mod = mod < 0 ? 0 : mod;
 	return mod;
 }
 #endif
