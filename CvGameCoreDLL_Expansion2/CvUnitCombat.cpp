@@ -5144,7 +5144,7 @@ void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)
 	int iFaithBonus = iAttackDamage * iUnitAttackFaithBonus /100;
 	
 	kAttackPlayer.ChangeFaith(iFaithBonus);
-	if (kAttackPlayer.isHuman())
+	if (kAttackPlayer.GetID() == GC.getGame().getActivePlayer())
 	{
 		char text[256] = {0};
 		colorString = "[COLOR_YELLOW]+%d[ENDCOLOR][ICON_PEACE]";

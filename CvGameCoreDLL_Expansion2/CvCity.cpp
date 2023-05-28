@@ -10163,11 +10163,14 @@ void CvCity::doInstantYield(YieldTypes iYield, int iValue)
 			break;
 		}
 #if defined(SHOW_PLOT_POPUP)
-		//And now notifications.
-		CvYieldInfo* pYieldInfo = GC.getYieldInfo(iYield);
-		char text[256] = {0};
-		sprintf_s(text, "%s+%d[ENDCOLOR] %s", pYieldInfo->getColorString(), iValue, pYieldInfo->getIconString());
-		SHOW_PLOT_POPUP(plot(), thisPlayer.GetID(), text);
+		if(getOwner() == GC.getGame().getActivePlayer())
+		{
+			//And now notifications.
+			CvYieldInfo* pYieldInfo = GC.getYieldInfo(iYield);
+			char text[256] = {0};
+			sprintf_s(text, "%s+%d[ENDCOLOR] %s", pYieldInfo->getColorString(), iValue, pYieldInfo->getIconString());
+			SHOW_PLOT_POPUP(plot(), thisPlayer.GetID(), text);
+		}
 #endif
 	}
 }
