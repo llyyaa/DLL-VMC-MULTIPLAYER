@@ -6885,9 +6885,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		}
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0))
+		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0) && pBuildingInfo->IsAllowInstantYield())
 		{
-			doInstantYieldArray(pBuildingInfo->GetInstantYieldArray());
+			doBuildingInstantYield(pBuildingInfo->GetInstantYieldArray());
 		}
 #endif
 
@@ -8486,6 +8486,16 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 					GetCityCitizens()->DoAddBestCitizenFromUnassigned();
 				}
 			}
+#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+			if (MOD_BELIEF_BIRTH_INSTANT_YIELD && !IsResistance())
+			{
+				doRelogionInstantYield(GetCityReligions()->GetReligiousMajority());
+				if(GetCityReligions()->IsSecondaryReligionActive())
+				{
+					doBeliefInstantYield(GetCityReligions()->GetSecondaryReligionPantheonBelief());
+				}
+			}
+#endif
 		}
 
 		setLayoutDirty(true);
@@ -10030,16 +10040,54 @@ void CvCity::changeFreeExperience(int iChange)
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-void CvCity::doInstantYieldArray(int* iInstantYield)
+#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+void CvCity::doRelogionInstantYield(ReligionTypes eReligion)
+{
+	VALIDATE_OBJECT
+	if(eReligion == NO_RELIGION) return;
+	const CvReligion* pkReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion,getOwner());
+	if(!pkReligion->m_Beliefs.AllowYieldPerBirth()) return;
+	for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
+	{
+		YieldTypes iYieldType = (YieldTypes)iYieldLoop;
+		int iValue = pkReligion->m_Beliefs.GetYieldPerBirth(iYieldType);
+		if(iValue > 0)
+		{
+			iValue *= GC.getGame().getGameSpeedInfo().getFaithPercent();
+			iValue /= 100;
+			doInstantYield((YieldTypes)iYieldLoop, iValue);
+		}
+	}
+}
+void CvCity::doBeliefInstantYield(BeliefTypes eBelief)
+{
+	VALIDATE_OBJECT
+	if(eBelief == NO_BELIEF) return;
+	const CvBeliefEntry* pkBelief = GC.GetGameBeliefs()->GetEntry(eBelief);
+	if(!pkBelief->AllowYieldPerBirth()) return;
+	for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
+	{
+		YieldTypes iYieldType = (YieldTypes)iYieldLoop;
+		int iValue = pkBelief->GetYieldPerBirth(iYieldType);
+		if(iValue > 0)
+		{
+			iValue *= GC.getGame().getGameSpeedInfo().getFaithPercent();
+			iValue /= 100;
+			doInstantYield((YieldTypes)iYieldLoop, iValue);
+		}
+	}
+}
+#endif
+void CvCity::doBuildingInstantYield(int* iInstantYield)
 {
 	VALIDATE_OBJECT
 	if(!iInstantYield) return;
 	for (int iYieldLoop = 0; iYieldLoop < NUM_YIELD_TYPES; iYieldLoop++)
 	{
-		if(iInstantYield[iYieldLoop] > 0)
+		int iValue = iInstantYield[iYieldLoop];
+		if(iValue > 0)
 		{
-			int iValue = iInstantYield[iYieldLoop];
-			iValue *= GC.getGame().getGameSpeedInfo().getConstructPercent();
+			iValue *= GC.getGame().getGameSpeedInfo().getGoldPercent();
 			iValue /= 100;
 			doInstantYield((YieldTypes)iYieldLoop, iValue);
 		}
@@ -10115,11 +10163,14 @@ void CvCity::doInstantYield(YieldTypes iYield, int iValue)
 			break;
 		}
 #if defined(SHOW_PLOT_POPUP)
-		//And now notifications.
-		CvYieldInfo* pYieldInfo = GC.getYieldInfo(iYield);
-		char text[256] = {0};
-		sprintf_s(text, "%s+%d[ENDCOLOR] %s", pYieldInfo->getColorString(), iValue, pYieldInfo->getIconString());
-		SHOW_PLOT_POPUP(plot(), thisPlayer.GetID(), text);
+		if(getOwner() == GC.getGame().getActivePlayer())
+		{
+			//And now notifications.
+			CvYieldInfo* pYieldInfo = GC.getYieldInfo(iYield);
+			char text[256] = {0};
+			sprintf_s(text, "%s+%d[ENDCOLOR] %s", pYieldInfo->getColorString(), iValue, pYieldInfo->getIconString());
+			SHOW_PLOT_POPUP(plot(), thisPlayer.GetID(), text);
+		}
 #endif
 	}
 }
@@ -10581,6 +10632,12 @@ int CvCity::GetLocalHappiness() const
 	}
 
 	iLocalHappiness += iSpecialPolicyBuildingHappiness;
+
+	if (GetWeLoveTheKingDayCounter() > 0)
+	{
+		iLocalHappiness += kPlayer.GetHappinessInWLTKDCities();
+	}
+
 	int iLocalHappinessCap = getPopulation();
 
 	// India has unique way to compute local happiness cap
@@ -11268,13 +11325,13 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 #endif
 
+	auto& owner = GET_PLAYER(getOwner());
 	if (getNumWorldWonders() > 0)
 	{
-		auto& onwer = GET_PLAYER(getOwner());
-		if (!onwer.GetCityWithWorldWonderYieldModifier().empty())
+		if (!owner.GetCityWithWorldWonderYieldModifier().empty())
 		{
 			iTempMod = 0;
-			for (const auto& info : onwer.GetCityWithWorldWonderYieldModifier())
+			for (const auto& info : owner.GetCityWithWorldWonderYieldModifier())
 			{
 				if (info.eYield != eIndex) continue;
 				iTempMod += info.iYield;
@@ -11283,6 +11340,20 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			if (iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER", iTempMod);
 		}
+	}
+	
+	int iNumTradeRoutes = owner.GetTrade()->GetNumTradeRoutesUsed(true);
+	if (!owner.GetTradeRouteCityYieldModifier().empty() && iNumTradeRoutes > 0)
+	{
+		iTempMod = 0;
+		for (const auto& info : owner.GetTradeRouteCityYieldModifier())
+		{
+			if (info.eYield != eIndex) continue;
+			iTempMod += info.iYield * iNumTradeRoutes;
+		}
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_POLICY_TRADE_ROUTE_NUM", iTempMod);
 	}
 
 	// Religion Yield Rate Modifier

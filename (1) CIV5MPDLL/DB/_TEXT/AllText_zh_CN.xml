@@ -237,6 +237,18 @@
 				[NEWLINE][ICON_BULLET]城市级修正(世界奇观): {1_Num}%
 			</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_TRADE_ROUTE_NUM">
+			<Text>
+				[NEWLINE][ICON_BULLET]商路数量修正(政策): {1_Num}%
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_TP_HAPPINESS_FAITH">
+			<Text>
+				{1_Happiness} 来自[ICON_PEACE]信仰。
+			</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

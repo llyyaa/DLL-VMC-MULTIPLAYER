@@ -955,6 +955,8 @@
 
     <Row Class="1" Name="BUGFIX_BUILDING_FREEBUILDING" Value="1"/>
 
+    <Row Class="1" Name="BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY" Value="1"/>
+
     <Row Class="2" Name="API_BUILDING_ENABLE_PURCHASE_UNITS" Value="1"/>
 
 	<Row Class="2" Name="API_VP_ADJACENT_YIELD_BOOST" Value="1"/>
@@ -1083,7 +1085,12 @@
 
     <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
-    <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="0"/>
+    <!-- ALTER TABLE Buildings ADD COLUMN 'AllowInstantYield' BOOLEAN DEFAULT 0;-->
+    <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see Belief_YieldPerBirth.sql -->
+    <Row Class="6" Name="BELIEF_BIRTH_INSTANT_YIELD" Value="0"/>
 
     <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
@@ -1112,6 +1119,11 @@
     <Row Class="6" Name="TRAITS_GOLDEN_AGE_YIELD_MODIFIER" Value="0"/>
 
     <Row Class="6" Name="POLICIY_PUBLIC_OPTION" Value="0"/>
+
+    <Row Class="6" Name="BATTLE_CAPTURE_NEW_RULE" Value="0"/>
+    <!-- Permits units to receive a combat bonus from Extra Resourses/Hapiness-->
+    <!-- table change: NewTableChanges.sql -->
+    <Row Class="4" Name="PROMOTIONS_EXTRARES_BONUS" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>

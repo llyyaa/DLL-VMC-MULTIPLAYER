@@ -181,6 +181,7 @@ public:
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	int GetInstantYield(int i) const;
 	int* GetInstantYieldArray() const;
+	bool IsAllowInstantYield() const;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -508,6 +509,7 @@ private:
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	int* m_piInstantYield;
+	bool m_bAllowInstantYield;
 #endif
 
 #if defined(MOD_ROG_CORE)

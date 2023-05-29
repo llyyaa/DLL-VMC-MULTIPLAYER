@@ -65,6 +65,10 @@ struct CvUnitCaptureDefinition
 	int iReligiousStrength;
 	int iSpreadsLeft;
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	CvUnit* pCapturingUnit = nullptr;
+#endif
+
 	CvUnitCaptureDefinition()
 		: eOriginalOwner(NO_PLAYER)
 		, eOldPlayer(NO_PLAYER)
@@ -86,7 +90,11 @@ struct CvUnitCaptureDefinition
 #endif
 		, eReligion(NO_RELIGION)
 		, iReligiousStrength(0)
-		, iSpreadsLeft(0) { }
+		, iSpreadsLeft(0)
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+		, pCapturingUnit(nullptr)
+#endif
+		{ }
 
 	inline bool IsValid() const
 	{
@@ -631,6 +639,21 @@ public:
 	int GetAllyCityStateCombatModifierMax() const;
 	void SetAllyCityStateCombatModifierMax(int iCombatBonusMax);
 	int GetStrengthModifierFromAlly() const;
+#endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	ResourceTypes GetExtraResourceType() const;
+	void SetExtraResourceType(ResourceTypes m_eResourceType);
+	int GetExtraResourceCombatModifier() const;
+	void SetExtraResourceCombatModifier(int iCombatBonus);
+	int GetExtraResourceCombatModifierMax() const;
+	void SetExtraResourceCombatModifierMax(int iCombatBonusMax);
+	int GetStrengthModifierFromExtraResource() const;
+	int GetExtraHappinessCombatModifier() const;
+	void SetExtraHappinessCombatModifier(int iCombatBonus);
+	int GetExtraHappinessCombatModifierMax() const;
+	void SetExtraHappinessCombatModifierMax(int iCombatBonusMax);
+	int GetStrengthModifierFromExtraHappiness() const;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -1313,6 +1336,11 @@ public:
 	bool IsCapturedAsIs() const;
 	void SetCapturedAsIs(bool bSetValue);
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	CvUnit* getCapturingUnit() const;
+	void setCapturingUnit(CvUnit* unit);
+#endif
+
 	const UnitTypes getUnitType() const;
 	CvUnitEntry& getUnitInfo() const;
 	UnitClassTypes getUnitClassType() const;
@@ -1369,6 +1397,11 @@ public:
 #endif
 	int GetTourismBlastStrength() const;
 	void SetTourismBlastStrength(int iValue);
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	bool GetIsNewCapture() const;
+	void SetIsNewCapture(bool value);
+#endif
 
 	// Arbitrary Script Data
 	std::string getScriptData() const;
@@ -1825,7 +1858,7 @@ protected:
 	const MissionQueueNode* HeadMissionQueueNode() const;
 	MissionQueueNode* HeadMissionQueueNode();
 
-	bool	getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer = NO_PLAYER);
+	bool getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer = NO_PLAYER, CvUnit* pCapturingUnit = nullptr);
 	static CvUnit* createCaptureUnit(const CvUnitCaptureDefinition& kCaptureDef);
 
 	void	ClearPathCache();
@@ -1969,6 +2002,14 @@ protected:
 	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifierMax;
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	FAutoVariable<ResourceTypes, CvUnit> m_eExtraResourceType;
+	FAutoVariable<int, CvUnit> m_iExtraResourceCombatModifier;
+	FAutoVariable<int, CvUnit> m_iExtraResourceCombatModifierMax;
+	FAutoVariable<int, CvUnit> m_iExtraHappinessCombatModifier;
+	FAutoVariable<int, CvUnit> m_iExtraHappinessCombatModifierMax;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvUnit> m_iAoEDamageOnMove;
 	FAutoVariable<int, CvUnit> m_iForcedDamage;
@@ -2104,6 +2145,10 @@ protected:
 
 	FAutoVariable<TacticalAIMoveTypes, CvUnit> m_eTacticalMove;
 	FAutoVariable<PlayerTypes, CvUnit> m_eCapturingPlayer;
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	CvUnit* m_pCapturingUnit;
+#endif
+
 	bool m_bCapturedAsIs;
 	FAutoVariable<UnitTypes, CvUnit> m_eLeaderUnitType;
 	FAutoVariable<InvisibleTypes, CvUnit> m_eInvisibleType;
@@ -2269,6 +2314,10 @@ protected:
 #endif
 	GreatWorkType m_eGreatWork;
 	int m_iTourismBlastStrength;
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	bool m_bIsNewCapture = false;
+#endif
 
 	mutable CvPathNodeArray m_kLastPath;
 	mutable uint m_uiLastPathCacheDest;

@@ -918,6 +918,34 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 		pResults->Reset();
 	}
 
+	
+	{
+		m_vTradeRouteCityYieldModifier.clear();
+		std::string sqlKey = "m_vTradeRouteCityYieldModifier";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if(pResults == NULL)
+		{
+			const char* szSQL = "select t2.ID, t1.Yield from Policy_TradeRouteCityYieldModifier t1 left join Yields t2 on t1.YieldType = t2.Type where t1.PolicyType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, szPolicyType, false);
+
+		while(pResults->Step())
+		{
+			PolicyYieldInfo p;
+			p.eYield = (YieldTypes)pResults->GetInt(0);
+			p.iYield = pResults->GetInt(1);
+			p.ePolicy = (PolicyTypes)GetID();
+			m_vTradeRouteCityYieldModifier.push_back(p);
+		}
+
+		pResults->Reset();
+	}
+
+	m_iGlobalHappinessFromFaithPercent = kResults.GetInt("GlobalHappinessFromFaithPercent");
+	m_iHappinessInWLTKDCities = kResults.GetInt("HappinessInWLTKDCities");
+
 #if defined(MOD_RELIGION_POLICY_BRANCH_FAITH_GP)
 	//FaithPurchaseUnitClasses
 	if (MOD_RELIGION_POLICY_BRANCH_FAITH_GP)
@@ -2469,6 +2497,21 @@ int CvPolicyEntry::GetIdeologyUnhappinessModifier() const
 std::vector<PolicyYieldInfo>& CvPolicyEntry::GetCityWithWorldWonderYieldModifier()
 {
 	return m_vCityWithWorldWonderYieldModifier;
+}
+
+std::vector<PolicyYieldInfo>& CvPolicyEntry::GetTradeRouteCityYieldModifier()
+{
+	return m_vTradeRouteCityYieldModifier;
+}
+
+int CvPolicyEntry::GetGlobalHappinessFromFaithPercent() const
+{
+	return m_iGlobalHappinessFromFaithPercent;
+}
+
+int CvPolicyEntry::GetHappinessInWLTKDCities() const
+{
+	return m_iHappinessInWLTKDCities;
 }
 
 //=====================================

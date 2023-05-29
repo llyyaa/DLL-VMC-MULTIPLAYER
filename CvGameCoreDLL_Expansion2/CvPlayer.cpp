@@ -5308,6 +5308,9 @@ void CvPlayer::DoUnitReset()
 
 		// Finally (now that healing is done), restore movement points
 		pLoopUnit->setMoves(pLoopUnit->maxMoves());
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+		pLoopUnit->SetIsNewCapture(false);
+#endif
 #if defined(MOD_PROMOTIONS_FLAGSHIP)
 		if(pLoopUnit->IsGreatGeneral() || (MOD_PROMOTIONS_FLAGSHIP && pLoopUnit->IsGreatAdmiral()))
 #else
@@ -11952,6 +11955,8 @@ void CvPlayer::DoUpdateHappiness()
 		gDLL->UnlockAchievement(ACHIEVEMENT_XP2_45);
 	}
 #endif
+
+	m_iHappiness += GetHappinessFromFaith();
 
 	GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
 }
@@ -25084,6 +25089,17 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 					it++;
 			}
 		}
+		for (auto it = m_vTradeRouteCityYieldModifier.begin(); it != m_vTradeRouteCityYieldModifier.end();)
+		{
+			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
+			{
+					it = m_vTradeRouteCityYieldModifier.erase(it);
+			}
+			else
+			{
+					it++;
+			}
+		}
 	}
 	else
 	{
@@ -25091,7 +25107,15 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		{
 			m_vCityWithWorldWonderYieldModifier.push_back(info);
 		}
+		for (const auto& info : pPolicy->GetTradeRouteCityYieldModifier())
+		{
+			m_vTradeRouteCityYieldModifier.push_back(info);
+		}
 	}
+
+	ChangeGlobalHappinessFromFaithPercent(pPolicy->GetGlobalHappinessFromFaithPercent() * iChange);
+
+	ChangeHappinessInWLTKDCities(pPolicy->GetHappinessInWLTKDCities() * iChange);
 
 	// Store off number of newly built cities that will get a free building
 	ChangeNumCitiesFreeCultureBuilding(iNumCitiesFreeCultureBuilding);
@@ -26342,10 +26366,14 @@ void CvPlayer::Read(FDataStream& kStream)
 #endif
 
 	kStream >> m_vCityWithWorldWonderYieldModifier;
+	kStream >> m_vTradeRouteCityYieldModifier;
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream >> m_paiResourcesFromSpecialists;
 #endif
+
+	kStream >> m_iGlobalHappinessFromFaithPercent;
+	kStream >> m_iHappinessInWLTKDCities;
 
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
@@ -26887,10 +26915,14 @@ void CvPlayer::Write(FDataStream& kStream) const
 #endif
 
 	kStream << m_vCityWithWorldWonderYieldModifier;
+	kStream << m_vTradeRouteCityYieldModifier;
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream << m_paiResourcesFromSpecialists;
 #endif
+
+	kStream << m_iGlobalHappinessFromFaithPercent;
+	kStream << m_iHappinessInWLTKDCities;
 }
 
 //	--------------------------------------------------------------------------------
@@ -29993,6 +30025,38 @@ void CvPlayer::ChangeIdeologyUnhappinessModifier(int iChange)
 std::vector<PolicyYieldInfo>& CvPlayer::GetCityWithWorldWonderYieldModifier()
 {
 	return m_vCityWithWorldWonderYieldModifier;
+}
+
+std::vector<PolicyYieldInfo>& CvPlayer::GetTradeRouteCityYieldModifier()
+{
+	return m_vTradeRouteCityYieldModifier;
+}
+
+int CvPlayer::GetGlobalHappinessFromFaithPercent() const
+{
+	return m_iGlobalHappinessFromFaithPercent;
+}
+void CvPlayer::ChangeGlobalHappinessFromFaithPercent(int iChange)
+{
+	m_iGlobalHappinessFromFaithPercent += iChange;
+}
+int CvPlayer::GetHappinessFromFaith() const
+{
+	if (m_iGlobalHappinessFromFaithPercent == 0)
+	{
+		return 0;
+	}
+
+	return m_iGlobalHappinessFromFaithPercent * GetTotalFaithPerTurn() / 100;
+}
+
+int CvPlayer::GetHappinessInWLTKDCities() const
+{
+	return m_iHappinessInWLTKDCities;
+}
+void CvPlayer::ChangeHappinessInWLTKDCities(int iChange)
+{
+	m_iHappinessInWLTKDCities += iChange;
 }
 
 CvCity* CvPlayer::GetRandomCity()

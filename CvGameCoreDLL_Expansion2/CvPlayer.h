@@ -1964,6 +1964,14 @@ public:
 #endif
 
 	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
+	std::vector<PolicyYieldInfo>& GetTradeRouteCityYieldModifier();
+	int GetGlobalHappinessFromFaithPercent() const;
+	void ChangeGlobalHappinessFromFaithPercent(int iChange);
+
+	int GetHappinessInWLTKDCities() const;
+	void ChangeHappinessInWLTKDCities(int iChange);
+
+	int GetHappinessFromFaith() const;
 
 	CvCity* CvPlayer::GetRandomCity();
 
@@ -2408,6 +2416,9 @@ protected:
 #endif
 
 	std::vector<PolicyYieldInfo> m_vCityWithWorldWonderYieldModifier;
+	std::vector<PolicyYieldInfo> m_vTradeRouteCityYieldModifier;
+	int m_iGlobalHappinessFromFaithPercent = 0;
+	int m_iHappinessInWLTKDCities = 0;
 
 	// Obsolete: only used to read old saves
 	FAutoVariable< std::vector< Firaxis::Array< int, NUM_YIELD_TYPES > >, CvPlayer> m_ppaaiBuildingClassYieldMod;

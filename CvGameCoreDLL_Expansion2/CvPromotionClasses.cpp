@@ -222,6 +222,13 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iAllyCityStateCombatModifier(0),
 	m_iAllyCityStateCombatModifierMax(0),
 #endif
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	m_eExtraResourceType(NO_RESOURCE),
+	m_iExtraResourceCombatModifier(0),
+	m_iExtraResourceCombatModifierMax(0),
+	m_iExtraHappinessCombatModifier(0),
+	m_iExtraHappinessCombatModifierMax(0),
+#endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	m_bCanCrossMountains(false),
 #endif
@@ -398,6 +405,19 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	if (MOD_PROMOTIONS_ALLYCITYSTATE_BONUS) {
 		m_iAllyCityStateCombatModifier = kResults.GetInt("AllyCityStateCombatModifier");
 		m_iAllyCityStateCombatModifierMax = kResults.GetInt("AllyCityStateCombatModifierMax");
+	}
+#endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	if (MOD_PROMOTIONS_EXTRARES_BONUS) {
+		const char* szTextVal = kResults.GetText("ExtraResourceType");
+		if (szTextVal) {
+			m_eExtraResourceType = (ResourceTypes)GC.getInfoTypeForString(szTextVal, true);
+		}
+		m_iExtraResourceCombatModifier = kResults.GetInt("ExtraResourceCombatModifier");
+		m_iExtraResourceCombatModifierMax = kResults.GetInt("ExtraResourceCombatModifierMax");
+		m_iExtraHappinessCombatModifier = kResults.GetInt("ExtraHappinessCombatModifier");
+		m_iExtraHappinessCombatModifierMax = kResults.GetInt("ExtraHappinessCombatModifierMax");
 	}
 #endif
 
@@ -2278,6 +2298,30 @@ int CvPromotionEntry::GetAllyCityStateCombatModifier() const
 int CvPromotionEntry::GetAllyCityStateCombatModifierMax() const
 {
 	return m_iAllyCityStateCombatModifierMax;
+}
+#endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+// Permits units to receive a combat bonus from Extra Resourses/Hapiness
+ResourceTypes CvPromotionEntry::GetExtraResourceType() const
+{
+	return m_eExtraResourceType;
+}
+int CvPromotionEntry::GetExtraResourceCombatModifier() const
+{
+	return m_iExtraResourceCombatModifier;
+}
+int CvPromotionEntry::GetExtraResourceCombatModifierMax() const
+{
+	return m_iExtraResourceCombatModifierMax;
+}
+int CvPromotionEntry::GetExtraHappinessCombatModifier() const
+{
+	return m_iExtraHappinessCombatModifier;
+}
+int CvPromotionEntry::GetExtraHappinessCombatModifierMax() const
+{
+	return m_iExtraHappinessCombatModifierMax;
 }
 #endif
 

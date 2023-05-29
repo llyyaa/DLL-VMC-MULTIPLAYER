@@ -290,6 +290,14 @@ CvUnit::CvUnit() :
 	, m_iAllyCityStateCombatModifierMax("CvUnit::m_iAllyCityStateCombatModifierMax", m_syncArchive)
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	, m_eExtraResourceType("CvUnit::m_eExtraResourceType", m_syncArchive)
+	, m_iExtraResourceCombatModifier("CvUnit::m_iExtraResourceCombatModifier", m_syncArchive)
+	, m_iExtraResourceCombatModifierMax("CvUnit::m_iExtraResourceCombatModifierMax", m_syncArchive)
+	, m_iExtraHappinessCombatModifier("CvUnit::m_iExtraHappinessCombatModifier", m_syncArchive)
+	, m_iExtraHappinessCombatModifierMax("CvUnit::m_iExtraHappinessCombatModifierMax", m_syncArchive)
+#endif
+
 #if defined(MOD_ROG_CORE)
 		, m_iCombatBonusFromNearbyUnitClass("CvUnit::m_iCombatBonusFromNearbyUnitClass", m_syncArchive)
 		, m_iNearbyUnitClassBonusRange("CvUnit::m_iNearbyUnitClassBonusRange", m_syncArchive)
@@ -1127,6 +1135,14 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iAllyCityStateCombatModifierMax = 0;
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	m_eExtraResourceType = NO_RESOURCE;
+	m_iExtraResourceCombatModifier = 0;
+	m_iExtraResourceCombatModifierMax = 0;
+	m_iExtraHappinessCombatModifier = 0;
+	m_iExtraHappinessCombatModifierMax = 0;
+#endif
+
 #if defined(MOD_DEFENSE_MOVES_BONUS)
 	m_iMoveLeftDefenseMod = 0;
 	m_iMoveUsedDefenseMod = 0;
@@ -1414,6 +1430,10 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	m_iHeavyChargeExtraDamage = 0;
 	m_iHeavyChargeCollateralFixed = 0;
 	m_iHeavyChargeCollateralPercent = 0;
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	m_bIsNewCapture = false;
+#endif
 
 	if(!bConstructorCall)
 	{
@@ -1882,6 +1902,9 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 						if(pPlot->isValidDomainForLocation(*pLoopUnit))
 						{
 							pLoopUnit->setCapturingPlayer(getCapturingPlayer());	// KWG: Creating a new captured cargo, but how does its transport (this) then get attached to the new cargo?
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+							pLoopUnit->setCapturingUnit(getCapturingUnit());
+#endif
 						}
 
 						pLoopUnit->kill(false, ePlayer);
@@ -2123,7 +2146,7 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 
 //	---------------------------------------------------------------------------
 //	Get a definition that can be used to create a captured version of the unit.
-bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer /* = NO_PLAYER */)
+bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer /* = NO_PLAYER */, CvUnit* pCapturingUnit /*=nullptr*/)
 {
 	CvUnitCaptureDefinition kCaptureDef;
 	kCaptureDef.eOldPlayer = getOwner();
@@ -2188,6 +2211,13 @@ bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerT
 		kCaptureDef.iY = INVALID_PLOT_COORD;
 	}
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	if (MOD_BATTLE_CAPTURE_NEW_RULE)
+	{
+		kCaptureDef.pCapturingUnit = pCapturingUnit ? pCapturingUnit : getCapturingUnit();
+	}
+#endif
+
 	if(pkCaptureDef)
 		*pkCaptureDef = kCaptureDef;
 
@@ -2217,6 +2247,24 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 	CvUnit *pkCapturedUnit = kCapturingPlayer.initUnit(kCaptureDef.eCaptureUnitType, kCaptureDef.iX, kCaptureDef.iY);
 	if (pkCapturedUnit == nullptr)
 		return nullptr;
+	
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	if (MOD_BATTLE_CAPTURE_NEW_RULE)
+	{
+		pkCapturedUnit->SetIsNewCapture(true);
+		try // kCaptureDef.pCapturingUnit may not a valid pointer. For safety, try catch.
+		{
+			if (pkCapturedUnit && pkCapturedUnit->IsCombatUnit() && kCaptureDef.pCapturingUnit != nullptr)
+			{
+				pkCapturedUnit->setExperienceTimes100(kCaptureDef.pCapturingUnit->getExperienceTimes100() / 4);
+				pkCapturedUnit->setLevel(1);
+			}
+		}
+		catch (...)
+		{
+		}
+	}
+#endif
 
 	pkCapturedUnit->GetReligionData()->SetReligion(kCaptureDef.eReligion);
 	pkCapturedUnit->GetReligionData()->SetReligiousStrength(kCaptureDef.iReligiousStrength);
@@ -2227,10 +2275,12 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 #if defined(MOD_API_EXTENSIONS)
 	pkCapturedUnit->setScenarioData(kCaptureDef.iScenarioData);
 
+	// always keep name
+	pkCapturedUnit->setName(kCaptureDef.sName);
+
 	// If we have a great person, use their details
 	if (pkCapturedUnit->IsGreatPerson())
 	{
-		pkCapturedUnit->setName(kCaptureDef.sName);
 #if defined(MOD_GLOBAL_NO_LOST_GREATWORKS)
 		if (MOD_GLOBAL_NO_LOST_GREATWORKS && pkCapturedUnit->HasUnusedGreatWork())
 		{
@@ -2267,8 +2317,22 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 	bool bDisbanded = false;
 	if (pkCapturedUnit != NULL)
 	{
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+		if (MOD_BATTLE_CAPTURE_NEW_RULE)
+		{
+			int iMoveRandPercent = GC.getGame().getJonRandNum(25, "Capture Move Rand") + 1 + 25; // 26 - 50%
+			pkCapturedUnit->setMoves(pkCapturedUnit->maxMoves() * iMoveRandPercent / 100);
+			int iDamagePecent = 100 - (GC.getGame().getJonRandNum(25, "Capture Damage Rand") + 1 + 25); // 51 - 75%
+			pkCapturedUnit->setDamage(pkCapturedUnit->GetMaxHitPoints() * iDamagePecent / 100);
+		}
+		else
+		{
+			pkCapturedUnit->finishMoves();
+		}
+#else
 		pkCapturedUnit->finishMoves();
-
+#endif
+		
 		// Minor civs can't capture settlers, ever!
 		if (!bDisbanded && GET_PLAYER(pkCapturedUnit->getOwner()).isMinorCiv() && (pkCapturedUnit->isFound() || pkCapturedUnit->IsFoundAbroad()))
 		{
@@ -13441,6 +13505,11 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 	iModifier += GetStrengthModifierFromAlly();
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	iModifier += GetStrengthModifierFromExtraResource();
+	iModifier += GetStrengthModifierFromExtraHappiness();
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	if (MOD_BUILDINGS_GOLDEN_AGE_EXTEND && onwer.isGoldenAge())
 	{
@@ -14952,6 +15021,11 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 	iModifier += GetStrengthModifierFromAlly();
 #endif
 
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+	iModifier += GetStrengthModifierFromExtraResource();
+	iModifier += GetStrengthModifierFromExtraHappiness();
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	if (MOD_BUILDINGS_GOLDEN_AGE_EXTEND && onwer.isGoldenAge())
 	{
@@ -16316,6 +16390,92 @@ int CvUnit::GetStrengthModifierFromAlly() const
 		mod = GetAllyCityStateCombatModifierMax();
 	}
 
+	return mod;
+}
+#endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+ResourceTypes CvUnit::GetExtraResourceType() const
+{
+	VALIDATE_OBJECT
+	return m_eExtraResourceType;
+}
+void CvUnit::SetExtraResourceType(ResourceTypes m_eResourceType)
+{
+	VALIDATE_OBJECT
+	m_eExtraResourceType = m_eResourceType;
+}
+int CvUnit::GetExtraResourceCombatModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraResourceCombatModifier;
+}
+void CvUnit::SetExtraResourceCombatModifier(int iCombatBonus)
+{
+	VALIDATE_OBJECT
+	m_iExtraResourceCombatModifier = iCombatBonus;
+}
+int CvUnit::GetExtraResourceCombatModifierMax() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraResourceCombatModifierMax;
+}
+void CvUnit::SetExtraResourceCombatModifierMax(int iCombatBonusMax)
+{
+	VALIDATE_OBJECT
+	m_iExtraResourceCombatModifierMax = iCombatBonusMax;
+}
+int CvUnit::GetStrengthModifierFromExtraResource() const
+{
+	VALIDATE_OBJECT
+	if (GetExtraResourceCombatModifier() == 0)
+	{
+		return 0;
+	}
+
+	int iUsed = GET_PLAYER(getOwner()).getNumResourceUsed(m_eExtraResourceType);
+	int iTotal = GET_PLAYER(getOwner()).getNumResourceTotal(m_eExtraResourceType, /*bIncludeImport*/ true);
+	int mod = (iTotal - iUsed) * GetExtraResourceCombatModifier();
+	if (mod > 0 && GetExtraResourceCombatModifierMax() > -1 && mod > GetExtraResourceCombatModifierMax())
+	{
+		mod = GetExtraResourceCombatModifierMax();
+	}
+	mod = mod < 0 ? 0 : mod;
+	return mod;
+}
+int CvUnit::GetExtraHappinessCombatModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraHappinessCombatModifier;
+}
+void CvUnit::SetExtraHappinessCombatModifier(int iCombatBonus)
+{
+	VALIDATE_OBJECT
+	m_iExtraHappinessCombatModifier = iCombatBonus;
+}
+int CvUnit::GetExtraHappinessCombatModifierMax() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraHappinessCombatModifierMax;
+}
+void CvUnit::SetExtraHappinessCombatModifierMax(int iCombatBonusMax)
+{
+	VALIDATE_OBJECT
+	m_iExtraHappinessCombatModifierMax = iCombatBonusMax;
+}
+int CvUnit::GetStrengthModifierFromExtraHappiness() const
+{
+	VALIDATE_OBJECT
+	if (GetExtraHappinessCombatModifier() == 0)
+	{
+		return 0;
+	}
+	int mod = GET_PLAYER(getOwner()).GetExcessHappiness() * GetExtraHappinessCombatModifier();
+	if (GetExtraHappinessCombatModifierMax() > -1 && mod > GetExtraHappinessCombatModifierMax())
+	{
+		mod = GetExtraHappinessCombatModifierMax();
+	}
+	mod = mod < 0 ? 0 : mod;
 	return mod;
 }
 #endif
@@ -18193,9 +18353,12 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 										CvUnitCaptureDefinition kCaptureDef;
 										if(bDoCapture)
 										{
-											if(pLoopUnit->getCaptureDefinition(&kCaptureDef, getOwner()))
+											if(pLoopUnit->getCaptureDefinition(&kCaptureDef, getOwner()), this)
 												kCaptureUnitList.push_back(kCaptureDef);
 											pLoopUnit->setCapturingPlayer(NO_PLAYER);	// Make absolutely sure this is not valid so the kill does not do the capture.
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+											pLoopUnit->setCapturingUnit(nullptr);
+#endif
 										}
 
 										pLoopUnit->kill(false, getOwner());
@@ -18341,7 +18504,11 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 		{
 			pNewCity->updateStrengthValue();
 
+#ifdef MOD_BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY
+			if(isEnemy(pNewCity->getTeam()) && (MOD_BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY || !canCoexistWithEnemyUnit(pNewCity->getTeam())))
+#else
 			if(isEnemy(pNewCity->getTeam()) && !canCoexistWithEnemyUnit(pNewCity->getTeam()))
+#endif
 			{
 				PlayerTypes eNewOwner = GET_PLAYER(getOwner()).pickConqueredCityOwner(*pNewCity);
 
@@ -18425,9 +18592,6 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 						}
 					}
 #endif
-					
-
-					
 
 					GET_PLAYER(eNewOwner).acquireCity(pNewCity, true, false); // will delete the pointer
 					pNewCity = NULL;
@@ -22348,6 +22512,17 @@ void CvUnit::setCapturingPlayer(PlayerTypes eNewValue)
 	m_eCapturingPlayer = eNewValue;
 }
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+CvUnit* CvUnit::getCapturingUnit() const
+{
+	return m_pCapturingUnit;
+}
+void CvUnit::setCapturingUnit(CvUnit* unit)
+{
+	m_pCapturingUnit = unit;
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 bool CvUnit::IsCapturedAsIs() const
 {
@@ -22812,6 +22987,17 @@ void CvUnit::SetTourismBlastStrength(int iValue)
 {
 	m_iTourismBlastStrength = iValue;
 }
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+bool CvUnit::GetIsNewCapture() const
+{
+	return m_bIsNewCapture;
+}
+void CvUnit::SetIsNewCapture(bool value)
+{
+	m_bIsNewCapture = value;
+}
+#endif
 
 //	--------------------------------------------------------------------------------
 std::string CvUnit::getScriptData() const
@@ -23638,6 +23824,24 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 			}
 			if (thisPromotion.GetAllyCityStateCombatModifierMax() > 0) {
 				SetAllyCityStateCombatModifierMax(thisPromotion.GetAllyCityStateCombatModifierMax());
+			}
+		}
+#endif
+
+#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
+		if (MOD_PROMOTIONS_EXTRARES_BONUS) {
+			if (thisPromotion.GetExtraResourceType() != NO_RESOURCE && thisPromotion.GetExtraResourceCombatModifier() > 0) {
+				SetExtraResourceCombatModifier(thisPromotion.GetExtraResourceCombatModifier());
+				SetExtraResourceType(thisPromotion.GetExtraResourceType());
+			}
+			if (thisPromotion.GetExtraResourceCombatModifierMax() > 0) {
+				SetExtraResourceCombatModifierMax(thisPromotion.GetExtraResourceCombatModifierMax());
+			}
+			if (thisPromotion.GetExtraHappinessCombatModifier() > 0) {
+				SetExtraHappinessCombatModifier(thisPromotion.GetExtraHappinessCombatModifier());
+			}
+			if (thisPromotion.GetExtraHappinessCombatModifierMax() > 0) {
+				SetExtraHappinessCombatModifierMax(thisPromotion.GetExtraHappinessCombatModifierMax());
 			}
 		}
 #endif
@@ -24546,6 +24750,15 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iAllyCityStateCombatModifierMax;
 #endif
 
+#ifdef MOD_PROMOTIONS_EXTRARES_BONUS
+
+	kStream >> m_eExtraResourceType;
+	kStream >> m_iExtraResourceCombatModifier;
+	kStream >> m_iExtraResourceCombatModifierMax;
+	kStream >> m_iExtraHappinessCombatModifier;
+	kStream >> m_iExtraHappinessCombatModifierMax;
+#endif
+
 	kStream >> m_iAttackInflictDamageChange;
 	kStream >> m_iAttackInflictDamageChangeMaxHPPercent;
 
@@ -24560,6 +24773,9 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iHeavyChargeCollateralFixed;
 	kStream >> m_iHeavyChargeCollateralPercent;
 
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	kStream >> m_bIsNewCapture;
+#endif
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -24807,6 +25023,14 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iAllyCityStateCombatModifierMax;
 #endif
 
+#ifdef MOD_PROMOTIONS_EXTRARES_BONUS
+	kStream << m_eExtraResourceType;
+	kStream << m_iExtraResourceCombatModifier;
+	kStream << m_iExtraResourceCombatModifierMax;
+	kStream << m_iExtraHappinessCombatModifier;
+	kStream << m_iExtraHappinessCombatModifierMax;
+#endif
+
 	kStream << m_iAttackInflictDamageChange;
 	kStream << m_iAttackInflictDamageChangeMaxHPPercent;
 
@@ -24820,6 +25044,10 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iHeavyChargeExtraDamage;
 	kStream << m_iHeavyChargeCollateralFixed;
 	kStream << m_iHeavyChargeCollateralPercent;
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	kStream << m_bIsNewCapture;
+#endif
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -26884,6 +27112,11 @@ bool CvUnit::IsCanAttackRanged() const
 bool CvUnit::IsCanAttack() const
 {
 	VALIDATE_OBJECT
+
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+	if (MOD_BATTLE_CAPTURE_NEW_RULE && GetIsNewCapture()) return false;
+#endif
+
 	return IsCanAttackWithMove() || IsCanAttackRanged();
 }
 

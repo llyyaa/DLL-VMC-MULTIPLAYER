@@ -559,6 +559,9 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 			if (kCombatInfo.getDefenderCaptured())
 			{
 				pkDefender->setCapturingPlayer(pkAttacker->getOwner());
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+				pkDefender->setCapturingUnit(pkAttacker);
+#endif
 				pkDefender->SetCapturedAsIs(true);
 			}
 		}
@@ -3508,6 +3511,9 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::Attack(CvUnit& kAttacker, CvPlot& targ
 		if(!kAttacker.isNoCapture() && (!pDefender->isEmbarked() || pDefender->getUnitInfo().IsCaptureWhileEmbarked()) && pDefender->getCaptureUnitType(GET_PLAYER(pDefender->getOwner()).getCivilizationType()) != NO_UNIT)
 		{
 			pDefender->setCapturingPlayer(kAttacker.getOwner());
+#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
+			pDefender->setCapturingUnit(&kAttacker);
+#endif
 
 			if(kAttacker.isBarbarian())
 			{
@@ -5144,7 +5150,7 @@ void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)
 	int iFaithBonus = iAttackDamage * iUnitAttackFaithBonus /100;
 	
 	kAttackPlayer.ChangeFaith(iFaithBonus);
-	if (kAttackPlayer.isHuman())
+	if (kAttackPlayer.GetID() == GC.getGame().getActivePlayer())
 	{
 		char text[256] = {0};
 		colorString = "[COLOR_YELLOW]+%d[ENDCOLOR][ICON_PEACE]";

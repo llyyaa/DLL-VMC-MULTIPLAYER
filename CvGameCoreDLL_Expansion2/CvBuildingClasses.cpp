@@ -169,6 +169,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	m_piInstantYield(NULL),
+	m_bAllowInstantYield(false),
 #endif
 
 	m_piYieldFromProcessModifier(NULL),
@@ -411,7 +412,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iNukeInterceptionChance = kResults.GetInt("NukeInterceptionChance");
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
-
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	m_bAllowInstantYield = kResults.GetBool("AllowInstantYield");
+#endif
 	m_bMountain = kResults.GetBool("Mountain");
 	m_bHill = kResults.GetBool("Hill");
 	m_bFlat = kResults.GetBool("Flat");
@@ -2660,6 +2663,11 @@ int CvBuildingEntry::GetInstantYield(int i) const
 int* CvBuildingEntry::GetInstantYieldArray() const
 {
 	return m_piInstantYield;
+}
+/// Array of instant yields
+bool CvBuildingEntry::IsAllowInstantYield() const
+{
+	return m_bAllowInstantYield;
 }
 #endif
 

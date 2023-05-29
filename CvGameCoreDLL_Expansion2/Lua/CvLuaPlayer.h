@@ -1202,6 +1202,8 @@ protected:
 #if defined(MOD_SPECIALIST_RESOURCES)
 	LUAAPIEXTN(GetSpecialistResources, table, eSpecialist);
 #endif
+
+	LUAAPIEXTN(GetHappinessFromFaith, int);
 };
 
 #endif //CVLUAPLAYER_H
