@@ -13095,6 +13095,7 @@ void CvPlot::ClearUnitPromotions()
 		if (!pLoopUnit) continue;
 
 		auto& candidatePromotionToClear = pLoopUnit->GetPromotionsThatCanBeActionCleared();
+		if (candidatePromotionToClear.empty()) continue;
 		for (auto it = candidatePromotionToClear.begin(); it != candidatePromotionToClear.end(); ++it)
 		{
 			pLoopUnit->setHasPromotion(*it, false);

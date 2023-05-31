@@ -4682,6 +4682,8 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 	std::tr1::unordered_map<CvUnit*, int> mUnitDamageBaseMap;
 
 	std::vector<CollateralInfo>& vCollateralInfo = pAttackerUnit->GetCollateralInfoVec();
+	if (vCollateralInfo.empty()) return;
+
 	for (const auto& sCollateralInfo : vCollateralInfo)
 	{
 		int iDamageRateTimes100 = sCollateralInfo.iPercent;
@@ -4789,6 +4791,7 @@ static void DoAddEnemyPromotionsInner(CvUnit* thisUnit, CvUnit* thatUnit, Battle
 	bool meleeDefense = melee && defense;
 
 	auto& collections = thisUnit->GetPromotionCollections();
+
 	for (auto collectionIter = collections.begin(); collectionIter != collections.end(); collectionIter++)
 	{
 		if (collectionIter->second <= 0) continue;
@@ -4986,6 +4989,8 @@ void CvUnitCombat::DoStackingFightBack(const CvCombatInfo & kCombatInfo)
 			continue;
 
 		auto &collections = pFoundUnit->GetPromotionCollections();
+		if (collections.empty()) continue;
+
 		for (auto it = collections.begin(); it != collections.end(); it++)
 		{
 			if (it->second <= 0)
@@ -5045,6 +5050,8 @@ void CvUnitCombat::DoStopAttacker(const CvCombatInfo& kCombatInfo)
 	bool melee = !ranged;
 
 	auto &collections = pDefenderUnit->GetPromotionCollections();
+	if (collections.empty()) return;
+
 	for (auto it = collections.begin(); it != collections.end(); it++)
 	{
 		if (it->second <= 0)
