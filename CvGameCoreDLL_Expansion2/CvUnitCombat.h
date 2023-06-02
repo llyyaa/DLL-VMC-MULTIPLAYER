@@ -89,6 +89,9 @@ public:
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 	static void DoInstantYieldFromCombat(const CvCombatInfo& kInfo);
 #endif
+#if defined(MOD_GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY)
+	static void DoKillHeavilyDamagedCityPopulation(const CvCombatInfo & kCombatInfo);
+#endif
 
 #ifdef MOD_ROG_CORE
 	static void InterveneInflictDamage(InflictDamageContext* ctx);

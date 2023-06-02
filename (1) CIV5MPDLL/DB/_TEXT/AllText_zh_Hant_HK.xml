@@ -249,5 +249,12 @@
 				{1_Happiness} 來自[ICON_PEACE]信仰。
 			</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE">
+			<Text>{2_CityName:textkey}的防禦工事已經被摧毀殆盡，你的市民失去了庇護！一個單位的人口被敵方{1_UnitName}的遠程火力殺死。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE_SHORT">
+			<Text>城市遭到轟炸！</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

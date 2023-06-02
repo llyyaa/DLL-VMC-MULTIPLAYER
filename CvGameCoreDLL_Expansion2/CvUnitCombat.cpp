@@ -1161,6 +1161,9 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 						MILITARYLOG(pCity->getOwner(), strBuffer.c_str(), pCity->plot(), pkAttacker->getOwner());
 					}
 				}
+#if defined(MOD_GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY)
+					DoKillHeavilyDamagedCityPopulation(kCombatInfo);
+#endif	
 
 				pCity->clearCombat();
 			}
@@ -2010,6 +2013,10 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 					pkAttacker->changeDamage(iDefenderDamageInflicted, pCity->getOwner(), -1);
 #else
 					pkAttacker->changeDamage(iDefenderDamageInflicted, pCity->getOwner());
+#endif
+
+#if defined(MOD_GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY)
+					DoKillHeavilyDamagedCityPopulation(kCombatInfo);
 #endif
 
 					//		iUnitDamage = std::max(pCity->getDamage(), pCity->getDamage() + iDamage);
@@ -5167,6 +5174,37 @@ void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)
 #else
 		GC.GetEngineUserInterface()->AddPopupText(pAttackerUnit->getX(), pAttackerUnit->getY(), text, fDelay);
 #endif
+	}
+}
+#endif
+
+#if defined(MOD_GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY)
+void CvUnitCombat::DoKillHeavilyDamagedCityPopulation(const CvCombatInfo & kCombatInfo)
+{
+	if(!MOD_GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY) return;
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvCity* pDefenderCity = kCombatInfo.getCity(BATTLE_UNIT_DEFENDER);
+	if (pAttackerUnit == nullptr || pDefenderCity == nullptr) return; // only work for unit attacking a city
+	
+	if(pDefenderCity->getPopulation() > 1 && pDefenderCity->getDamage() >= pDefenderCity->GetMaxHitPoints()-1)
+	{
+		pDefenderCity->changePopulation(-1, true);
+		CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
+		if(kDefensePlayer.isHuman())
+		{
+			CvNotifications* pNotifications = kDefensePlayer.GetNotifications();
+			NotificationTypes eNotification;
+			Localization::String strSummary;
+			Localization::String strNotification;
+			
+			eNotification = NOTIFICATION_STARVING;
+			strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE_SHORT");
+			strNotification = Localization::Lookup("TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE");
+			strNotification << pAttackerUnit->getNameKey();
+			strNotification << pDefenderCity->getNameKey();
+			
+			pNotifications->Add(eNotification, strNotification.toUTF8(), strSummary.toUTF8(), pDefenderCity->getX(), pDefenderCity->getY(), -1);
+		}
 	}
 }
 #endif

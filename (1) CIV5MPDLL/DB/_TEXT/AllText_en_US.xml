@@ -251,6 +251,12 @@
 			</Text>
 		</Row>
 
+		<Row Tag="TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE">
+			<Text> A [ICON_CITIZEN] Citizen has been killed in {2_CityName:textkey} by the Ranged Attack of the enemy's {1_UnitName}! (this city's hitpoint is 0 and it cannot protect citizens from enemy's Ranged Attack.)</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE_SHORT">
+			<Text>City heavily damaged! Citizen killed! </Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>
