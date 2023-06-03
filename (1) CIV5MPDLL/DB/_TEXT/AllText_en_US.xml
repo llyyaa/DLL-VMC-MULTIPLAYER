@@ -239,7 +239,7 @@
 			</Text>
 		</Row>
 
-		<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER">
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_TRADE_ROUTE_NUM">
 			<Text>
 				[NEWLINE][ICON_BULLET]City Modifier for the Trade Routes(Policy): {1_Num}%
 			</Text>
