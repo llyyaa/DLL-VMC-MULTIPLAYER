@@ -1077,6 +1077,10 @@
     <Row Class="6" Name="PROMOTION_MULTIPLE_INIT_EXPERENCE" Value="1"/>
 
     <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'CarrierEXPGivenModifier' INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="PROMOTION_GIVE_EXP_TO_CARRIER" Value="1"/>
+
+    <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0; -->
     <!-- ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0; -->
     <Row Class="6" Name="PROMOTION_GET_INSTANCE_FROM_ATTACK" Value="1"/>

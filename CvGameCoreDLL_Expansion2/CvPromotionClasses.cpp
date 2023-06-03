@@ -188,6 +188,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iUnitAttackFaithBonus(0),
 	m_iCityAttackFaithBonus(0),
 #endif
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+	m_iCarrierEXPGivenModifier(0),
+#endif
+
 	m_iReligiousStrengthLossRivalTerritory(0),
 	m_iTradeMissionInfluenceModifier(0),
 	m_iTradeMissionGoldModifier(0),
@@ -651,6 +655,9 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 	m_iUnitAttackFaithBonus = kResults.GetInt("UnitAttackFaithBonus");
 	m_iCityAttackFaithBonus = kResults.GetInt("CityAttackFaithBonus");
+#endif
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+	m_iCarrierEXPGivenModifier = kResults.GetInt("CarrierEXPGivenModifier");
 #endif
 #if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	const char* szRemovePromotionUpgrade = kResults.GetText("RemovePromotionUpgrade");
@@ -2123,6 +2130,12 @@ int CvPromotionEntry::GetUnitAttackFaithBonus() const
 int CvPromotionEntry::GetCityAttackFaithBonus() const
 {
 	return m_iCityAttackFaithBonus;
+}
+#endif
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+int CvPromotionEntry::GetCarrierEXPGivenModifier() const
+{
+	return m_iCarrierEXPGivenModifier;
 }
 #endif
 

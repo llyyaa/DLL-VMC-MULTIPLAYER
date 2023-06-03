@@ -444,6 +444,9 @@ CvUnit::CvUnit() :
 	, m_iUnitAttackFaithBonus(0)
 	, m_iCityAttackFaithBonus(0)
 #endif
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+	, m_iCarrierEXPGivenModifier(0)
+#endif
 #if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	, m_iRemovePromotionUpgrade(NO_PROMOTION)
 #endif
@@ -1290,6 +1293,9 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 	m_iUnitAttackFaithBonus = 0;
 	m_iCityAttackFaithBonus = 0;
+#endif
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+	m_iCarrierEXPGivenModifier = 0;
 #endif
 #if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	m_iRemovePromotionUpgrade = NO_PROMOTION;
@@ -6158,6 +6164,18 @@ void CvUnit::ChangeCityAttackFaithBonus(int iValue)
 int CvUnit::GetCityAttackFaithBonus() const
 {
 	return m_iCityAttackFaithBonus;
+}
+#endif
+//	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+int CvUnit::GetCarrierEXPGivenModifier() const
+{
+	return m_iCarrierEXPGivenModifier;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeCarrierEXPGivenModifier(int iValue)
+{
+	m_iCarrierEXPGivenModifier += iValue;
 }
 #endif
 //	--------------------------------------------------------------------------------
@@ -23981,6 +23999,9 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeUnitAttackFaithBonus((thisPromotion.GetUnitAttackFaithBonus()) *  iChange);
 		ChangeCityAttackFaithBonus((thisPromotion.GetCityAttackFaithBonus()) *  iChange);
 #endif
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+		ChangeCarrierEXPGivenModifier((thisPromotion.GetCarrierEXPGivenModifier()) *  iChange);
+#endif
 #if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 		setRemovePromotionUpgrade(thisPromotion.GetRemovePromotionUpgrade() ? thisPromotion.GetRemovePromotionUpgrade() : -1);
 #endif
@@ -24506,6 +24527,9 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iUnitAttackFaithBonus;
 	kStream >> m_iCityAttackFaithBonus;
 #endif
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+	kStream >> m_iCarrierEXPGivenModifier;
+#endif
 #if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	kStream >> m_iRemovePromotionUpgrade;
 #endif
@@ -24852,6 +24876,9 @@ void CvUnit::write(FDataStream& kStream) const
 #if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
 	kStream << m_iUnitAttackFaithBonus;
 	kStream << m_iCityAttackFaithBonus;
+#endif
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+	kStream << m_iCarrierEXPGivenModifier;
 #endif
 #if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	kStream << m_iRemovePromotionUpgrade;

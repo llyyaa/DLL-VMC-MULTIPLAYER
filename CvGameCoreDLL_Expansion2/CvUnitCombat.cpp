@@ -2095,6 +2095,9 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 	
 	BATTLE_FINISHED();
 	DoNewBattleEffects(kCombatInfo);
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	DoGiveEXPToCarrier(kCombatInfo);
+#endif
 }
 
 //	---------------------------------------------------------------------------
@@ -2488,6 +2491,9 @@ void CvUnitCombat::ResolveAirSweep(const CvCombatInfo& kCombatInfo, uint uiParen
 	
 	BATTLE_FINISHED();
 	DoNewBattleEffects(kCombatInfo);
+#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	DoGiveEXPToCarrier(kCombatInfo);
+#endif
 }
 
 //	GenerateNuclearCombatInfo
@@ -5205,6 +5211,28 @@ void CvUnitCombat::DoKillHeavilyDamagedCityPopulation(const CvCombatInfo & kComb
 			
 			pNotifications->Add(eNotification, strNotification.toUTF8(), strSummary.toUTF8(), pDefenderCity->getX(), pDefenderCity->getY(), -1);
 		}
+	}
+}
+#endif
+
+#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
+void CvUnitCombat::DoGiveEXPToCarrier(const CvCombatInfo& kCombatInfo)
+{
+	if(!MOD_PROMOTION_GIVE_EXP_TO_CARRIER) return;
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	if (pAttackerUnit == nullptr || pAttackerUnit->IsDead() || pAttackerUnit->GetCarrierEXPGivenModifier() <=0) return;
+	if(pAttackerUnit->getTransportUnit())
+	{
+		pAttackerUnit->getTransportUnit()->changeExperienceTimes100(pAttackerUnit->getExperienceTimes100() * pAttackerUnit->GetCarrierEXPGivenModifier() /100);
+		pAttackerUnit->setExperienceTimes100(0);
+	}
+
+	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	if (pDefenderUnit == nullptr || pDefenderUnit->IsDead() || pDefenderUnit->GetCarrierEXPGivenModifier() <=0) return;
+	if(pDefenderUnit->getTransportUnit())
+	{
+		pDefenderUnit->getTransportUnit()->changeExperienceTimes100(pDefenderUnit->getExperienceTimes100() * pDefenderUnit->GetCarrierEXPGivenModifier() /100);
+		pDefenderUnit->setExperienceTimes100(0);
 	}
 }
 #endif
