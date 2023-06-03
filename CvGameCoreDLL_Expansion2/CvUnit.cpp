@@ -440,14 +440,11 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseModifier(0)
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	, m_eMultipleInitExperence(0)
 	, m_iUnitAttackFaithBonus(0)
 	, m_iCityAttackFaithBonus(0)
-#endif
-#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
 	, m_iCarrierEXPGivenModifier(0)
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	, m_iRemovePromotionUpgrade(NO_PROMOTION)
 #endif
 	, m_iReligiousStrengthLossRivalTerritory(0)
@@ -486,9 +483,6 @@ CvUnit::CvUnit() :
 #if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
 	, m_eFeatureInvisible("CvUnit::m_eFeatureInvisible", m_syncArchive)
 	, m_eFeatureInvisible2("CvUnit::m_eFeatureInvisible2", m_syncArchive)
-#endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	, m_eMultipleInitExperence("CvUnit::m_eMultipleInitExperence", m_syncArchive)
 #endif
 	, m_eGreatPeopleDirectiveType("CvUnit::m_eGreatPeopleDirectiveType", m_syncArchive)
 	, m_combatUnit()
@@ -1290,14 +1284,11 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseModifier = 0;
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_eMultipleInitExperence = 0;
 	m_iUnitAttackFaithBonus = 0;
 	m_iCityAttackFaithBonus = 0;
-#endif
-#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
 	m_iCarrierEXPGivenModifier = 0;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	m_iRemovePromotionUpgrade = NO_PROMOTION;
 #endif
 	m_iReligiousStrengthLossRivalTerritory = 0;
@@ -1343,9 +1334,6 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 #if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
 	m_eFeatureInvisible = (int)NO_FEATURE;
 	m_eFeatureInvisible2 = (int)NO_FEATURE;
-#endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	m_eMultipleInitExperence = 0;
 #endif
 	m_eGreatPeopleDirectiveType = NO_GREAT_PEOPLE_DIRECTIVE_TYPE;
 	m_iCargoCapacity = 0;
@@ -6143,13 +6131,21 @@ int CvUnit::GetCityAttackPlunderModifier() const
 }
 
 //	--------------------------------------------------------------------------------
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeMultipleInitExperence(int iValue)
+{
+	m_eMultipleInitExperence += iValue;
+}
+const int CvUnit::GetMultipleInitExperence() const
+{
+	return m_eMultipleInitExperence;
+}
+//	--------------------------------------------------------------------------------
 void CvUnit::ChangeUnitAttackFaithBonus(int iValue)
 {
 	m_iUnitAttackFaithBonus += iValue;
 }
-
-//	--------------------------------------------------------------------------------
 int CvUnit::GetUnitAttackFaithBonus() const
 {
 	return m_iUnitAttackFaithBonus;
@@ -6159,27 +6155,20 @@ void CvUnit::ChangeCityAttackFaithBonus(int iValue)
 {
 	m_iCityAttackFaithBonus += iValue;
 }
-
-//	--------------------------------------------------------------------------------
 int CvUnit::GetCityAttackFaithBonus() const
 {
 	return m_iCityAttackFaithBonus;
 }
-#endif
 //	--------------------------------------------------------------------------------
-#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
 int CvUnit::GetCarrierEXPGivenModifier() const
 {
 	return m_iCarrierEXPGivenModifier;
 }
-//	--------------------------------------------------------------------------------
 void CvUnit::ChangeCarrierEXPGivenModifier(int iValue)
 {
 	m_iCarrierEXPGivenModifier += iValue;
 }
-#endif
 //	--------------------------------------------------------------------------------
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 void CvUnit::setRemovePromotionUpgrade(int iValue)
 {
 	if(m_iRemovePromotionUpgrade < 0 && iValue >= 0)
@@ -12348,8 +12337,8 @@ CvUnit* CvUnit::DoUpgradeTo(UnitTypes eUnitType, bool bFree)
 		pNewUnit->convert(this, true);
 		pNewUnit->setupGraphical();
 	
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
-		if(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE && pNewUnit->GetRemovePromotionUpgrade() > NO_PROMOTION)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && pNewUnit->GetRemovePromotionUpgrade() > NO_PROMOTION)
 		{
 			if(pNewUnit->HasPromotion((PromotionTypes)pNewUnit->GetRemovePromotionUpgrade()))
 			{
@@ -17035,19 +17024,6 @@ bool CvUnit::IsInvisibleInvalid() const
 		}
 	}
 	return false;
-}
-#endif
-//	--------------------------------------------------------------------------------
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-void CvUnit::ChangeMultipleInitExperence(int iValue)
-{
-	VALIDATE_OBJECT
-	m_eMultipleInitExperence += iValue;
-}
-const int CvUnit::GetMultipleInitExperence() const
-{
-	VALIDATE_OBJECT
-	return m_eMultipleInitExperence;
 }
 #endif
 //	--------------------------------------------------------------------------------
@@ -23801,12 +23777,6 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 			setFeatureInvisible(thisPromotion.GetFeatureInvisible(), thisPromotion.GetFeatureInvisible2());
 		}
 #endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-		if(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE && thisPromotion.GetMultipleInitExperence() > 0)
-		{
-			ChangeMultipleInitExperence(thisPromotion.GetMultipleInitExperence());
-		}
-#endif
 
 		changeBlitzCount((thisPromotion.IsBlitz()) ? iChange : 0);
 		changeAmphibCount((thisPromotion.IsAmphib()) ? iChange : 0);
@@ -23995,14 +23965,11 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseModifier((thisPromotion.GetCapitalDefenseModifier()) * iChange);
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
-		ChangeUnitAttackFaithBonus((thisPromotion.GetUnitAttackFaithBonus()) *  iChange);
-		ChangeCityAttackFaithBonus((thisPromotion.GetCityAttackFaithBonus()) *  iChange);
-#endif
-#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
-		ChangeCarrierEXPGivenModifier((thisPromotion.GetCarrierEXPGivenModifier()) *  iChange);
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		ChangeMultipleInitExperence((thisPromotion.GetMultipleInitExperence()) * iChange);
+		ChangeUnitAttackFaithBonus((thisPromotion.GetUnitAttackFaithBonus()) * iChange);
+		ChangeCityAttackFaithBonus((thisPromotion.GetCityAttackFaithBonus()) * iChange);
+		ChangeCarrierEXPGivenModifier((thisPromotion.GetCarrierEXPGivenModifier()) * iChange);
 		setRemovePromotionUpgrade(thisPromotion.GetRemovePromotionUpgrade() ? thisPromotion.GetRemovePromotionUpgrade() : -1);
 #endif
 		ChangeReligiousStrengthLossRivalTerritory((thisPromotion.GetReligiousStrengthLossRivalTerritory()) *  iChange);
@@ -24523,14 +24490,11 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseModifier;
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream >> m_eMultipleInitExperence;
 	kStream >> m_iUnitAttackFaithBonus;
 	kStream >> m_iCityAttackFaithBonus;
-#endif
-#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
 	kStream >> m_iCarrierEXPGivenModifier;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	kStream >> m_iRemovePromotionUpgrade;
 #endif
 	kStream >> m_iReligiousStrengthLossRivalTerritory;
@@ -24873,14 +24837,11 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseModifier;
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_eMultipleInitExperence;
 	kStream << m_iUnitAttackFaithBonus;
 	kStream << m_iCityAttackFaithBonus;
-#endif
-#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
 	kStream << m_iCarrierEXPGivenModifier;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
 	kStream << m_iRemovePromotionUpgrade;
 #endif
 	kStream << m_iReligiousStrengthLossRivalTerritory;

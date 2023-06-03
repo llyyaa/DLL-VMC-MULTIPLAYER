@@ -86,14 +86,12 @@ public:
 	static void DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPlot* battlePlot);
 
 #endif
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	static void DoInstantYieldFromCombat(const CvCombatInfo& kCombatInfo);
+	static void DoGiveEXPToCarrier(const CvCombatInfo& kCombatInfo);
 #endif
 #if defined(MOD_GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY)
 	static void DoKillHeavilyDamagedCityPopulation(const CvCombatInfo & kCombatInfo);
-#endif
-#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
-	static void DoGiveEXPToCarrier(const CvCombatInfo& kCombatInfo);
 #endif
 
 #ifdef MOD_ROG_CORE

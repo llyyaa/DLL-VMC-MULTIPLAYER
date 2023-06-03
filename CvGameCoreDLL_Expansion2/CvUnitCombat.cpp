@@ -438,7 +438,7 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 			gDLL->UnlockAchievement(ACHIEVEMENT_ONEHITKILL);
 		}
 #endif
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		DoInstantYieldFromCombat(kCombatInfo);
 #endif		
 #if defined(MOD_API_UNIT_STATS)
@@ -1111,7 +1111,7 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 					//white icon over defending unit
 					//pkDLLInterface->AddMessage(uiParentEventID, pkDefender->getOwner(), false, 0, ""/*, "AS2D_COMBAT", MESSAGE_TYPE_DISPLAY_ONLY, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_WHITE"), pkDefender->getX(), pkDefender->getY(), true, true*/);
 
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 					DoInstantYieldFromCombat(kCombatInfo);
 #endif	
 					//set damage but don't update entity damage visibility
@@ -1281,7 +1281,7 @@ void CvUnitCombat::ResolveRangedCityVsUnitCombat(const CvCombatInfo& kCombatInfo
 #endif
 					}
 
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 					DoInstantYieldFromCombat(kCombatInfo);
 #endif	
 					//set damage but don't update entity damage visibility
@@ -1352,7 +1352,7 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 
 	if(pkAttacker && pkDefender)
 	{
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		DoInstantYieldFromCombat(kCombatInfo);
 #endif	
 #if defined(MOD_API_UNIT_STATS)
@@ -1857,7 +1857,7 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 					}
 #endif
 
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 					DoInstantYieldFromCombat(kCombatInfo);
 #endif	
 #if defined(MOD_API_UNIT_STATS)
@@ -2095,7 +2095,7 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 	
 	BATTLE_FINISHED();
 	DoNewBattleEffects(kCombatInfo);
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	DoGiveEXPToCarrier(kCombatInfo);
 #endif
 }
@@ -2296,7 +2296,7 @@ void CvUnitCombat::ResolveAirSweep(const CvCombatInfo& kCombatInfo, uint uiParen
 				gDLL->UnlockAchievement(ACHIEVEMENT_ONEHITKILL);
 			}
 #endif
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 			DoInstantYieldFromCombat(kCombatInfo);
 #endif	
 
@@ -2491,7 +2491,7 @@ void CvUnitCombat::ResolveAirSweep(const CvCombatInfo& kCombatInfo, uint uiParen
 	
 	BATTLE_FINISHED();
 	DoNewBattleEffects(kCombatInfo);
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	DoGiveEXPToCarrier(kCombatInfo);
 #endif
 }
@@ -4352,13 +4352,13 @@ void CvUnitCombat::ApplyPostCityCombatEffects(CvUnit* pkAttacker, CvCity* pkDefe
 			}
 		}
 	}
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int iCityAttackFaithBonus;
 #if !defined(SHOW_PLOT_POPUP)
 	float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 3;
 #endif
 	iCityAttackFaithBonus = pkAttacker->GetCityAttackFaithBonus();
-	if(iCityAttackFaithBonus > 0 && MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+	if(iCityAttackFaithBonus > 0 && MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	{
 		int iFaithBonus = iAttackerDamageInflicted * iCityAttackFaithBonus;
 		iFaithBonus /= 100;
@@ -5149,10 +5149,10 @@ void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPl
 
 #endif
 
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)
 {
-	if (!MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK) return;
+	if (!MOD_PROMOTION_NEW_EFFECT_FOR_SP) return;
 #if !defined(SHOW_PLOT_POPUP)
 	float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 3;
 #endif
@@ -5180,6 +5180,26 @@ void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)
 #else
 		GC.GetEngineUserInterface()->AddPopupText(pAttackerUnit->getX(), pAttackerUnit->getY(), text, fDelay);
 #endif
+	}
+}
+
+void CvUnitCombat::DoGiveEXPToCarrier(const CvCombatInfo& kCombatInfo)
+{
+	if(!MOD_PROMOTION_NEW_EFFECT_FOR_SP) return;
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	if (pAttackerUnit == nullptr || pAttackerUnit->IsDead() || pAttackerUnit->GetCarrierEXPGivenModifier() <=0) return;
+	if(pAttackerUnit->getTransportUnit())
+	{
+		pAttackerUnit->getTransportUnit()->changeExperienceTimes100(pAttackerUnit->getExperienceTimes100() * pAttackerUnit->GetCarrierEXPGivenModifier() /100);
+		pAttackerUnit->setExperienceTimes100(0);
+	}
+
+	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	if (pDefenderUnit == nullptr || pDefenderUnit->IsDead() || pDefenderUnit->GetCarrierEXPGivenModifier() <=0) return;
+	if(pDefenderUnit->getTransportUnit())
+	{
+		pDefenderUnit->getTransportUnit()->changeExperienceTimes100(pDefenderUnit->getExperienceTimes100() * pDefenderUnit->GetCarrierEXPGivenModifier() /100);
+		pDefenderUnit->setExperienceTimes100(0);
 	}
 }
 #endif
@@ -5211,28 +5231,6 @@ void CvUnitCombat::DoKillHeavilyDamagedCityPopulation(const CvCombatInfo & kComb
 			
 			pNotifications->Add(eNotification, strNotification.toUTF8(), strSummary.toUTF8(), pDefenderCity->getX(), pDefenderCity->getY(), -1);
 		}
-	}
-}
-#endif
-
-#if defined(MOD_PROMOTION_GIVE_EXP_TO_CARRIER)
-void CvUnitCombat::DoGiveEXPToCarrier(const CvCombatInfo& kCombatInfo)
-{
-	if(!MOD_PROMOTION_GIVE_EXP_TO_CARRIER) return;
-	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
-	if (pAttackerUnit == nullptr || pAttackerUnit->IsDead() || pAttackerUnit->GetCarrierEXPGivenModifier() <=0) return;
-	if(pAttackerUnit->getTransportUnit())
-	{
-		pAttackerUnit->getTransportUnit()->changeExperienceTimes100(pAttackerUnit->getExperienceTimes100() * pAttackerUnit->GetCarrierEXPGivenModifier() /100);
-		pAttackerUnit->setExperienceTimes100(0);
-	}
-
-	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
-	if (pDefenderUnit == nullptr || pDefenderUnit->IsDead() || pDefenderUnit->GetCarrierEXPGivenModifier() <=0) return;
-	if(pDefenderUnit->getTransportUnit())
-	{
-		pDefenderUnit->getTransportUnit()->changeExperienceTimes100(pDefenderUnit->getExperienceTimes100() * pDefenderUnit->GetCarrierEXPGivenModifier() /100);
-		pDefenderUnit->setExperienceTimes100(0);
 	}
 }
 #endif

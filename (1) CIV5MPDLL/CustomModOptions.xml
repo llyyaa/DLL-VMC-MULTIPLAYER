@@ -1074,20 +1074,11 @@
 
     <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0; -->
-    <Row Class="6" Name="PROMOTION_MULTIPLE_INIT_EXPERENCE" Value="1"/>
-
-    <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'CarrierEXPGivenModifier' INTEGER DEFAULT 0; -->
-    <Row Class="6" Name="PROMOTION_GIVE_EXP_TO_CARRIER" Value="1"/>
-
-    <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0; -->
     <!-- ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0; -->
-    <Row Class="6" Name="PROMOTION_GET_INSTANCE_FROM_ATTACK" Value="1"/>
-
-    <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'RemovePromotionUpgrade' TEXT DEFAULT NULL; -->
-    <Row Class="6" Name="PROMOTION_REMOVE_PROMOTION_UPGRADE" Value="1"/>
+    <Row Class="6" Name="PROMOTION_NEW_EFFECT_FOR_SP" Value="1"/>
 
     <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
