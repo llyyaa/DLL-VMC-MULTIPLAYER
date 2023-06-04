@@ -263,6 +263,9 @@
 				[NEWLINE][ICON_BULLET]City Modifier for the Number of Cities(Policy): {1_Num}%
 			</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_ATTACKING_CITY_LOST_MOVEMENT">
+			<Text>Your {@1_name} consumed all its [ICON_MOVES] Movements after attacking the enemy city!</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

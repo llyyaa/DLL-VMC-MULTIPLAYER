@@ -1354,6 +1354,16 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		DoInstantYieldFromCombat(kCombatInfo);
+		if(pkAttacker->GetLostAllMovesAttackCity() > 0)
+		{
+			pkAttacker->setMoves(0);
+			if (pkAttacker->getOwner() == GC.getGame().getActivePlayer())
+			{
+				CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_ATTACKING_CITY_LOST_MOVEMENT", pkAttacker->getName());
+				ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+				pkDLLInterface->AddMessage(0, pkAttacker->getOwner(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer);
+			}
+		}
 #endif	
 #if defined(MOD_API_UNIT_STATS)
 		pkAttacker->changeDamage(iDefenderDamageInflicted, pkDefender->getOwner(), pkDefender->GetID());

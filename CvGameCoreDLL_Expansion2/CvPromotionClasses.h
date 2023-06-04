@@ -233,6 +233,7 @@ public:
 	int GetCityAttackPlunderModifier() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int GetMultipleInitExperence() const;
+	int GetLostAllMovesAttackCity() const;
 	int GetUnitAttackFaithBonus() const;
 	int GetCityAttackFaithBonus() const;
 	int GetCarrierEXPGivenModifier() const;
@@ -547,6 +548,7 @@ protected:
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int m_iMultipleInitExperence;
+	int m_iLostAllMovesAttackCity;
 	int m_iUnitAttackFaithBonus;
 	int m_iCityAttackFaithBonus;
 	int m_iCarrierEXPGivenModifier;

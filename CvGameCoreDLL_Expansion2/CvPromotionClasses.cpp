@@ -186,6 +186,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCityAttackPlunderModifier(0),
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMultipleInitExperence(0),
+	m_iLostAllMovesAttackCity(0),
 	m_iUnitAttackFaithBonus(0),
 	m_iCityAttackFaithBonus(0),
 	m_iCarrierEXPGivenModifier(0),
@@ -654,6 +655,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
+	m_iLostAllMovesAttackCity = kResults.GetInt("LostAllMovesAttackCity");
 	m_iUnitAttackFaithBonus = kResults.GetInt("UnitAttackFaithBonus");
 	m_iCityAttackFaithBonus = kResults.GetInt("CityAttackFaithBonus");
 	m_iCarrierEXPGivenModifier = kResults.GetInt("CarrierEXPGivenModifier");
@@ -2111,6 +2113,11 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 int CvPromotionEntry::GetMultipleInitExperence() const
 {
 	return m_iMultipleInitExperence;
+}
+
+int CvPromotionEntry::GetLostAllMovesAttackCity() const
+{
+	return m_iLostAllMovesAttackCity;
 }
 
 /// Accessor: faith earned from damage on an attacked unit

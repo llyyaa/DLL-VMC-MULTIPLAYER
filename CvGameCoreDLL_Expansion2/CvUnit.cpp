@@ -441,7 +441,8 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	, m_eMultipleInitExperence(0)
+	, m_iMultipleInitExperence(0)
+	, m_iLostAllMovesAttackCity(0)
 	, m_iUnitAttackFaithBonus(0)
 	, m_iCityAttackFaithBonus(0)
 	, m_iCarrierEXPGivenModifier(0)
@@ -1285,7 +1286,8 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	m_eMultipleInitExperence = 0;
+	m_iMultipleInitExperence = 0;
+	m_iLostAllMovesAttackCity = 0;
 	m_iUnitAttackFaithBonus = 0;
 	m_iCityAttackFaithBonus = 0;
 	m_iCarrierEXPGivenModifier = 0;
@@ -6135,18 +6137,27 @@ int CvUnit::GetCityAttackPlunderModifier() const
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeMultipleInitExperence(int iValue)
 {
-	m_eMultipleInitExperence += iValue;
+	m_iMultipleInitExperence += iValue;
 }
 const int CvUnit::GetMultipleInitExperence() const
 {
-	return m_eMultipleInitExperence;
+	return m_iMultipleInitExperence;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeLostAllMovesAttackCity(int iValue)
+{
+	m_iLostAllMovesAttackCity += iValue;
+}
+const int CvUnit::GetLostAllMovesAttackCity() const
+{
+	return m_iLostAllMovesAttackCity;
 }
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeUnitAttackFaithBonus(int iValue)
 {
 	m_iUnitAttackFaithBonus += iValue;
 }
-int CvUnit::GetUnitAttackFaithBonus() const
+const int CvUnit::GetUnitAttackFaithBonus() const
 {
 	return m_iUnitAttackFaithBonus;
 }
@@ -6155,12 +6166,12 @@ void CvUnit::ChangeCityAttackFaithBonus(int iValue)
 {
 	m_iCityAttackFaithBonus += iValue;
 }
-int CvUnit::GetCityAttackFaithBonus() const
+const int CvUnit::GetCityAttackFaithBonus() const
 {
 	return m_iCityAttackFaithBonus;
 }
 //	--------------------------------------------------------------------------------
-int CvUnit::GetCarrierEXPGivenModifier() const
+const int CvUnit::GetCarrierEXPGivenModifier() const
 {
 	return m_iCarrierEXPGivenModifier;
 }
@@ -6178,7 +6189,7 @@ void CvUnit::setRemovePromotionUpgrade(int iValue)
 }
 
 //	--------------------------------------------------------------------------------
-int CvUnit::GetRemovePromotionUpgrade() const
+const int CvUnit::GetRemovePromotionUpgrade() const
 {
 	return m_iRemovePromotionUpgrade;
 }
@@ -23967,6 +23978,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		ChangeMultipleInitExperence((thisPromotion.GetMultipleInitExperence()) * iChange);
+		ChangeLostAllMovesAttackCity((thisPromotion.GetLostAllMovesAttackCity()) * iChange);
 		ChangeUnitAttackFaithBonus((thisPromotion.GetUnitAttackFaithBonus()) * iChange);
 		ChangeCityAttackFaithBonus((thisPromotion.GetCityAttackFaithBonus()) * iChange);
 		ChangeCarrierEXPGivenModifier((thisPromotion.GetCarrierEXPGivenModifier()) * iChange);
@@ -24491,7 +24503,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	kStream >> m_eMultipleInitExperence;
+	kStream >> m_iMultipleInitExperence;
+	kStream >> m_iLostAllMovesAttackCity;
 	kStream >> m_iUnitAttackFaithBonus;
 	kStream >> m_iCityAttackFaithBonus;
 	kStream >> m_iCarrierEXPGivenModifier;
@@ -24838,7 +24851,8 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	kStream << m_eMultipleInitExperence;
+	kStream << m_iMultipleInitExperence;
+	kStream << m_iLostAllMovesAttackCity;
 	kStream << m_iUnitAttackFaithBonus;
 	kStream << m_iCityAttackFaithBonus;
 	kStream << m_iCarrierEXPGivenModifier;

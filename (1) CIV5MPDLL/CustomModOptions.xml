@@ -1078,6 +1078,7 @@
     <!-- ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0; -->
     <!-- ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0; -->
     <!-- ALTER TABLE UnitPromotions ADD 'RemovePromotionUpgrade' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'LostAllMovesAttackCity'  INTEGER DEFAULT 0; -->
     <Row Class="6" Name="PROMOTION_NEW_EFFECT_FOR_SP" Value="1"/>
 
     <!-- table changes: -->

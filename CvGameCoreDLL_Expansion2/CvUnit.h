@@ -1727,16 +1727,19 @@ public:
 	const int GetMultipleInitExperence() const;
 	void ChangeMultipleInitExperence(int iValue);
 
+	const int GetLostAllMovesAttackCity() const;
+	void ChangeLostAllMovesAttackCity(int iValue);
+
 	void ChangeUnitAttackFaithBonus(int iValue);
 	void ChangeCityAttackFaithBonus(int iValue);
-	int GetUnitAttackFaithBonus() const;
-	int GetCityAttackFaithBonus() const;
+	const int GetUnitAttackFaithBonus() const;
+	const int GetCityAttackFaithBonus() const;
 
-	int GetCarrierEXPGivenModifier() const;
+	const int GetCarrierEXPGivenModifier() const;
 	void ChangeCarrierEXPGivenModifier(int iValue);
 
 	void setRemovePromotionUpgrade(int iValue);
-	int GetRemovePromotionUpgrade() const;
+	const int GetRemovePromotionUpgrade() const;
 #endif
 
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
@@ -2276,7 +2279,8 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	int m_eMultipleInitExperence;
+	int m_iMultipleInitExperence;
+	int m_iLostAllMovesAttackCity;
 	int m_iUnitAttackFaithBonus;
 	int m_iCityAttackFaithBonus;
 	int m_iCarrierEXPGivenModifier;

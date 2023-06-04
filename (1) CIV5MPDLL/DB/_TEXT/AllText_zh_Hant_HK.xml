@@ -262,5 +262,8 @@
 				[NEWLINE][ICON_BULLET]城市數量修正(政策): {1_Num}%
 			</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_ATTACKING_CITY_LOST_MOVEMENT">
+			<Text>你的{@1_name}攻擊城市后失去所有[ICON_MOVES]移動力！</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>
