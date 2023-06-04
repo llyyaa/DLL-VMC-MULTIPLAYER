@@ -57,6 +57,11 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iSpyPressure(0),
 	m_iInquisitorPressureRetention(0),
 	m_iFaithBuildingTourism(0),
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iCityExtraMissionarySpreads(0),
+	m_bAllowYieldPerBirth(false),
+	m_piYieldPerBirth(NULL),
+#endif
 
 	m_bPantheon(false),
 	m_bFounder(false),
@@ -66,9 +71,6 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_bRequiresPeace(false),
 	m_bConvertsBarbarians(false),
 	m_bFaithPurchaseAllGreatPeople(false),
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
-	m_bAllowYieldPerBirth(false),
-#endif
 
 	m_eObsoleteEra(NO_ERA),
 	m_eResourceRevealed(NO_RESOURCE),
@@ -109,9 +111,7 @@ CvBeliefEntry::CvBeliefEntry() :
 #if defined(MOD_RELIGION_PLOT_YIELDS)
 	m_ppiPlotYieldChange(NULL),
 #endif
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
-	m_piYieldPerBirth(NULL),
-#endif
+
 	m_piResourceHappiness(NULL),
 	m_piYieldChangeAnySpecialist(NULL),
 	m_piYieldChangeTradeRoute(NULL),
@@ -671,7 +671,13 @@ int CvBeliefEntry::GetPlotYieldChange(int i, int j) const
 	}
 }
 #endif
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+//Extra Missionary Spreads
+int CvBeliefEntry::GetCityExtraMissionarySpreads() const
+{
+	return m_iCityExtraMissionarySpreads;
+}
+//Instant Yield when birth
 bool CvBeliefEntry::AllowYieldPerBirth() const
 {
 	return m_bAllowYieldPerBirth;
@@ -803,6 +809,9 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iSpyPressure					  = kResults.GetInt("SpyPressure");
 	m_iInquisitorPressureRetention    = kResults.GetInt("InquisitorPressureRetention");
 	m_iFaithBuildingTourism           = kResults.GetInt("FaithBuildingTourism");
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iCityExtraMissionarySpreads	  = kResults.GetInt("CityExtraMissionarySpreads");
+#endif
 
 	m_bPantheon						  = kResults.GetBool("Pantheon");
 	m_bFounder						  = kResults.GetBool("Founder");
@@ -812,7 +821,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_bRequiresPeace				  = kResults.GetBool("RequiresPeace");
 	m_bConvertsBarbarians			  = kResults.GetBool("ConvertsBarbarians");
 	m_bFaithPurchaseAllGreatPeople	  = kResults.GetBool("FaithPurchaseAllGreatPeople");
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	m_bAllowYieldPerBirth	  		  = kResults.GetBool("AllowYieldPerBirth");
 #endif
 	//References
@@ -826,7 +835,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 
 	//Arrays
 	const char* szBeliefType = GetType();
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	kUtility.SetYields(m_piYieldPerBirth, "Belief_YieldPerBirth", "BeliefType", szBeliefType);
 #endif
 	kUtility.SetYields(m_paiCityYieldChange, "Belief_CityYieldChanges", "BeliefType", szBeliefType);
@@ -2050,7 +2059,23 @@ int CvReligionBeliefs::GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType
 }
 #endif
 
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+//Is has Extra Missionary Spreads ?
+int CvReligionBeliefs::GetCityExtraMissionarySpreads() const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
+	{
+		if(HasBelief((BeliefTypes)i))
+		{
+			rtnValue += pBeliefs->GetEntry(i)->GetCityExtraMissionarySpreads();
+		}
+	}
+
+	return rtnValue;
+}
 /// Is has beliefs allow birth yeild ?
 bool CvReligionBeliefs::AllowYieldPerBirth() const
 {

@@ -1087,8 +1087,9 @@
     <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
 
     <!-- table changes: -->
-    <!-- see Belief_YieldPerBirth.sql -->
-    <Row Class="6" Name="BELIEF_BIRTH_INSTANT_YIELD" Value="0"/>
+    <!-- see Belief_Table_Changes.sql -->
+    <!-- ALTER TABLE Beliefs ADD COLUMN 'CityExtraMissionarySpreads' INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="BELIEF_NEW_EFFECT_FOR_SP" Value="1"/>
 
     <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>

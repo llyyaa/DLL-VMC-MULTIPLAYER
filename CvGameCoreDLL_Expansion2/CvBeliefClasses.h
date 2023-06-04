@@ -122,7 +122,8 @@ public:
 #if defined(MOD_RELIGION_PLOT_YIELDS)
 	int GetPlotYieldChange(int i, int j) const;
 #endif
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetCityExtraMissionarySpreads() const;
 	bool AllowYieldPerBirth() const;
 	int GetYieldPerBirth(int i) const;
 #endif
@@ -179,6 +180,11 @@ protected:
 	int m_iSpyPressure;
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int m_iCityExtraMissionarySpreads;
+	bool m_bAllowYieldPerBirth;
+	int* m_piYieldPerBirth;
+#endif
 
 	bool m_bPantheon;
 	bool m_bFounder;
@@ -188,9 +194,6 @@ protected:
 	bool m_bRequiresPeace;
 	bool m_bConvertsBarbarians;
 	bool m_bFaithPurchaseAllGreatPeople;
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
-	bool m_bAllowYieldPerBirth;
-#endif
 
 	EraTypes m_eObsoleteEra;
 	ResourceTypes m_eResourceRevealed;
@@ -234,9 +237,7 @@ protected:
 #if defined(MOD_RELIGION_PLOT_YIELDS)
 	int** m_ppiPlotYieldChange;
 #endif
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
-	int* m_piYieldPerBirth;
-#endif
+
 	int* m_piResourceHappiness;
 	int* m_piYieldChangeAnySpecialist;
 	int* m_piYieldChangeTradeRoute;
@@ -458,7 +459,8 @@ public:
 #if defined(MOD_RELIGION_PLOT_YIELDS)
 	int GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType) const;
 #endif
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetCityExtraMissionarySpreads() const;
 	bool AllowYieldPerBirth() const;
 	int GetYieldPerBirth(YieldTypes eYieldType) const;
 #endif

@@ -5,3 +5,4 @@ CREATE TABLE Belief_YieldPerBirth (
 );
 
 ALTER TABLE Beliefs ADD COLUMN 'AllowYieldPerBirth' BOOLEAN DEFAULT 0;
+ALTER TABLE Beliefs ADD COLUMN 'CityExtraMissionarySpreads' INTEGER DEFAULT 0;

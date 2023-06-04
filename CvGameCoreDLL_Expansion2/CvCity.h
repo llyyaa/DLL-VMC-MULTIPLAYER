@@ -548,8 +548,12 @@ public:
 	int getFreeExperience() const;
 	void changeFreeExperience(int iChange);
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetReligionExtraMissionarySpreads(ReligionTypes eReligion);
+	int GetBeliefExtraMissionarySpreads(BeliefTypes eBelief);
+#endif	
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	void doRelogionInstantYield(ReligionTypes eReligion);
 	void doBeliefInstantYield(BeliefTypes eBelief);
 #endif	

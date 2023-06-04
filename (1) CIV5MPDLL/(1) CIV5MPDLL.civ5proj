@@ -343,7 +343,7 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/RELIGION/Belief_YieldPerBirth.sql</FileName>
+        <FileName>DB/RELIGION/Belief_Table_Changes.sql</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
@@ -829,7 +829,7 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="DB/RELIGION/Belief_YieldPerBirth.sql">
+    <Content Include="DB/RELIGION/Belief_Table_Changes.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
