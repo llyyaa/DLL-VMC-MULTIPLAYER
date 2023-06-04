@@ -178,6 +178,7 @@
     <ClCompile Include="CvCityScaleClasses.cpp" />
     <ClCompile Include="CvEventLog.cpp" />
     <ClCompile Include="CvGreatPersonInfo.cpp" />
+    <ClCompile Include="CvLuaFormula.cpp" />
     <ClCompile Include="CvPlotInfo.cpp" />
     <ClCompile Include="CvPromotionCollectionClasses.cpp" />
     <ClCompile Include="CvQuestInfo.cpp" />
@@ -488,6 +489,7 @@
     <ClInclude Include="CvInfos.h" />
     <ClInclude Include="CvInfosSerializationHelper.h" />
     <ClInclude Include="CvInternalGameCoreUtils.h" />
+    <ClInclude Include="CvLuaFormula.h" />
     <ClInclude Include="CvMap.h" />
     <ClInclude Include="CvMapGenerator.h" />
     <ClInclude Include="CvMilitaryAI.h" />
