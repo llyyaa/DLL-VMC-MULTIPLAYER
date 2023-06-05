@@ -1158,7 +1158,25 @@ bool CvTraitEntry::IsFreePromotionUnitCombat(const int promotionID, const int un
 
 	return false;
 }
-
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+/// Accessor:: Does the civ get free promotions?
+bool CvTraitEntry::IsFreePromotionUnitClass(const int promotionID, const int unitClassID) const
+{
+	std::multimap<int, int>::const_iterator it = m_FreePromotionUnitClasses.find(promotionID);
+	if(it != m_FreePromotionUnitClasses.end())
+	{
+		std::multimap<int, int>::const_iterator lastElement = m_FreePromotionUnitClasses.upper_bound(promotionID);
+		for(; it != lastElement; ++it)
+		{
+			if(it->second == unitClassID)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+#endif
 /// Has this trait become obsolete?
 bool CvTraitEntry::IsObsoleteByTech(TeamTypes eTeam)
 {
@@ -1564,6 +1582,32 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 
 		kUtility.PopulateArrayByValue(m_piResourceQuantityModifiers, "Resources", "Trait_ResourceQuantityModifiers", "ResourceType", "TraitType", szTraitType, "ResourceQuantityModifier");
 	}
+
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	//Populate m_FreePromotionUnitClasses
+	{
+		std::string sqlKey = "FreePromotionUnitClasses";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if(pResults == NULL)
+		{
+			const char* szSQL = "select UnitPromotions.ID, UnitClasses.ID from Trait_FreePromotionUnitClasses, UnitPromotions, UnitClasses where TraitType = ? and PromotionType = UnitPromotions.Type and UnitClassType = UnitClasses.Type";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, szTraitType);
+
+		while(pResults->Step())
+		{
+			const int unitPromotionID = pResults->GetInt(0);
+			const int unitClassID = pResults->GetInt(1);
+
+			m_FreePromotionUnitClasses.insert(std::pair<int, int>(unitPromotionID, unitClassID));
+		}
+		pResults->Reset();
+		//Trim extra memory off container since this is mostly read-only.
+		std::multimap<int,int>(m_FreePromotionUnitClasses).swap(m_FreePromotionUnitClasses);
+	}
+#endif
 
 	//Populate m_MovesChangeUnitCombats
 	{
@@ -3087,6 +3131,30 @@ bool CvPlayerTraits::HasFreePromotionUnitCombat(const int promotionID, const int
 
 	return false;
 }
+
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+/// Do all new units get a specific promotion?
+bool CvPlayerTraits::HasFreePromotionUnitClass(const int promotionID, const int unitClassID) const
+{
+	CvAssertMsg((promotionID >= 0), "promotionID is less than zero");
+	for(int iI = 0; iI < GC.getNumTraitInfos(); iI++)
+	{
+		const TraitTypes eTrait = static_cast<TraitTypes>(iI);
+		CvTraitEntry* pkTraitInfo = GC.getTraitInfo(eTrait);
+		if(pkTraitInfo)
+		{
+			if(HasTrait(eTrait))
+			{
+				if(pkTraitInfo->IsFreePromotionUnitClass(promotionID, unitClassID))
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+#endif
 
 /// Does each city get a free building?
 BuildingTypes CvPlayerTraits::GetFreeBuilding() const

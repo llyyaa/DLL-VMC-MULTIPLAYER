@@ -14,3 +14,9 @@ create table Trait_PerMajorReligionFollowerYieldModifier (
 );
 
 ALTER TABLE Traits ADD COLUMN 'CiviliansFreePromotion' TEXT DEFAULT NULL;
+CREATE TABLE Trait_FreePromotionUnitClasses(
+    'TraitType' text , 'UnitClassType' text , 'PromotionType' text, 
+    foreign key (TraitType) references Traits(Type), 
+    foreign key (UnitClassType) references UnitClasses(Type), 
+    foreign key (PromotionType) references UnitPromotions(Type)
+);

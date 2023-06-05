@@ -232,6 +232,9 @@ public:
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool IsFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	bool IsFreePromotionUnitClass(const int promotionID, const int unitClassID) const;
+#endif
 	bool IsObsoleteByTech(TeamTypes eTeam);
 	bool IsEnabledByTech(TeamTypes eTeam);
 #if defined(MOD_TRAITS_OTHER_PREREQS)
@@ -438,6 +441,9 @@ protected:
 	int** m_ppiUnimprovedFeatureYieldChanges;
 
 	std::multimap<int, int> m_FreePromotionUnitCombats;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	std::multimap<int, int> m_FreePromotionUnitClasses;
+#endif
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
 	std::vector<bool> m_abNoTrainUnitClass;
 
@@ -1008,6 +1014,9 @@ public:
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool HasFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	bool HasFreePromotionUnitClass(const int promotionID, const int unitClassID) const;
+#endif
 
 	// Public functions to make trait-based game state changes
 	void AddUniqueLuxuries(CvCity *pCity);
