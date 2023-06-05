@@ -1088,8 +1088,11 @@
 
     <!-- table changes: -->
     <!-- see Belief_Table_Changes.sql -->
-    <!-- ALTER TABLE Beliefs ADD COLUMN 'CityExtraMissionarySpreads' INTEGER DEFAULT 0; -->
     <Row Class="6" Name="BELIEF_NEW_EFFECT_FOR_SP" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see DDL_Traits.sql -->
+    <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
 
     <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>

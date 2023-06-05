@@ -139,6 +139,9 @@ public:
 #endif
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetCiviliansFreePromotion() const;
+#endif
 
 	TechTypes GetFreeUnitPrereqTech() const;
 	ImprovementTypes GetCombatBonusImprovement() const;
@@ -346,6 +349,9 @@ protected:
 #endif
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iCiviliansFreePromotion;
+#endif
 
 	TechTypes m_eFreeUnitPrereqTech;
 	ImprovementTypes m_eCombatBonusImprovement;
@@ -810,6 +816,12 @@ public:
 		return m_iTradeBuildingModifier;
 	}
 
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetCiviliansFreePromotion() const
+	{
+		return m_iCiviliansFreePromotion;
+	}
+#endif
 	bool IsFightWellDamaged() const
 	{
 		return m_bFightWellDamaged;
@@ -1157,6 +1169,9 @@ private:
 #endif
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iCiviliansFreePromotion;
+#endif
 	// Saved
 
 	bool m_bFightWellDamaged;

@@ -718,7 +718,12 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 				setHasPromotion(ePromotion, true);
 		}
 	}
-
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	if(!IsCombatUnit() && kPlayer.GetPlayerTraits()->GetCiviliansFreePromotion() != NO_PROMOTION)
+	{
+		setHasPromotion((PromotionTypes)kPlayer.GetPlayerTraits()->GetCiviliansFreePromotion(), true);
+	}
+#endif
 	const UnitCombatTypes unitCombatType = getUnitCombatType();
 	if(unitCombatType != NO_UNITCOMBAT)
 	{

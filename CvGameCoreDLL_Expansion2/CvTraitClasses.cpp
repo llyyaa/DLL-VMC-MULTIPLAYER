@@ -116,6 +116,9 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeReligionModifier(0),
 	m_iTradeBuildingModifier(0),
 #endif
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iCiviliansFreePromotion(NO_PROMOTION),
+#endif
 
 	m_eFreeUnitPrereqTech(NO_TECH),
 	m_eFreeBuilding(NO_BUILDING),
@@ -663,6 +666,13 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 {
 	return m_iTradeBuildingModifier;
 }
+
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetCiviliansFreePromotion() const
+{
+	return m_iCiviliansFreePromotion;
+}
+#endif
 
 /// Accessor: tech that triggers this free unit
 TechTypes CvTraitEntry::GetFreeUnitPrereqTech() const
@@ -1393,6 +1403,13 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	{
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	szTextVal = kResults.GetText("CiviliansFreePromotion");
+	if(szTextVal)
+	{
+		m_iCiviliansFreePromotion = GC.getInfoTypeForString(szTextVal, true);
+	}
+#endif
 
 #if defined(MOD_TRAITS_OTHER_PREREQS)
 	if (MOD_TRAITS_OTHER_PREREQS) {
@@ -2132,6 +2149,12 @@ void CvPlayerTraits::InitPlayerTraits()
 #endif
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			if(trait->GetCiviliansFreePromotion() != NO_PROMOTION)
+			{
+				m_iCiviliansFreePromotion = trait->GetCiviliansFreePromotion();
+			}
+#endif
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 			if (MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS)
@@ -2574,6 +2597,9 @@ void CvPlayerTraits::Reset()
 #endif
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iCiviliansFreePromotion = NO_PROMOTION;
+#endif
 
 	m_bFightWellDamaged = false;
 	m_bMoveFriendlyWoodsAsRoad = false;
@@ -3970,6 +3996,9 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	{
 		m_iTradeBuildingModifier = 0;
 	}
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iCiviliansFreePromotion;
+#endif
 
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	MOD_SERIALIZE_READ(52, kStream, m_iSeaTradeRouteRangeBonus, 0);
@@ -4311,6 +4340,9 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iLandTradeRouteRangeBonus;
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iCiviliansFreePromotion;
+#endif
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	MOD_SERIALIZE_WRITE(kStream, m_iSeaTradeRouteRangeBonus);
 #endif

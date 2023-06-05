@@ -12,3 +12,5 @@ create table Trait_PerMajorReligionFollowerYieldModifier (
     YieldType text not null references Yields(Type),
     Yield int default 0
 );
+
+ALTER TABLE Traits ADD COLUMN 'CiviliansFreePromotion' TEXT DEFAULT NULL;
