@@ -184,10 +184,15 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseModifier(0),
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iMultipleInitExperence(0),
+	m_iLostAllMovesAttackCity(0),
 	m_iUnitAttackFaithBonus(0),
 	m_iCityAttackFaithBonus(0),
+	m_iCarrierEXPGivenModifier(0),
+	m_iRemovePromotionUpgrade(NO_PROMOTION),
 #endif
+
 	m_iReligiousStrengthLossRivalTerritory(0),
 	m_iTradeMissionInfluenceModifier(0),
 	m_iTradeMissionGoldModifier(0),
@@ -648,11 +653,12 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseModifier = kResults.GetInt("CapitalDefenseModifier");
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
+	m_iLostAllMovesAttackCity = kResults.GetInt("LostAllMovesAttackCity");
 	m_iUnitAttackFaithBonus = kResults.GetInt("UnitAttackFaithBonus");
 	m_iCityAttackFaithBonus = kResults.GetInt("CityAttackFaithBonus");
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	m_iCarrierEXPGivenModifier = kResults.GetInt("CarrierEXPGivenModifier");
 	const char* szRemovePromotionUpgrade = kResults.GetText("RemovePromotionUpgrade");
 	m_iRemovePromotionUpgrade = GC.getInfoTypeForString(szRemovePromotionUpgrade, true);
 #endif
@@ -742,9 +748,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iFeatureInvisible = GC.getInfoTypeForString(szFeatureInvisible, true);
 	const char* szFeatureInvisible2 = kResults.GetText("FeatureInvisible2");
 	m_iFeatureInvisible2 = GC.getInfoTypeForString(szFeatureInvisible2, true);
-#endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
 #endif
 
 	m_iAttackInflictDamageChange = kResults.GetInt("AttackInflictDamageChange");
@@ -1437,13 +1440,6 @@ int CvPromotionEntry::GetFeatureInvisible2() const
 }
 #endif
 
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-int CvPromotionEntry::GetMultipleInitExperence() const
-{
-	return m_iMultipleInitExperence;
-}
-#endif
-
 /// Accessor: How many additional tiles this promotion allows a unit to see (can be negative)
 int CvPromotionEntry::GetVisibilityChange() const
 {
@@ -2113,7 +2109,17 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 	return m_iCityAttackPlunderModifier;
 }
 
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvPromotionEntry::GetMultipleInitExperence() const
+{
+	return m_iMultipleInitExperence;
+}
+
+int CvPromotionEntry::GetLostAllMovesAttackCity() const
+{
+	return m_iLostAllMovesAttackCity;
+}
+
 /// Accessor: faith earned from damage on an attacked unit
 int CvPromotionEntry::GetUnitAttackFaithBonus() const
 {
@@ -2124,9 +2130,12 @@ int CvPromotionEntry::GetCityAttackFaithBonus() const
 {
 	return m_iCityAttackFaithBonus;
 }
-#endif
 
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+int CvPromotionEntry::GetCarrierEXPGivenModifier() const
+{
+	return m_iCarrierEXPGivenModifier;
+}
+
 int CvPromotionEntry::GetRemovePromotionUpgrade() const
 {
 	return m_iRemovePromotionUpgrade;

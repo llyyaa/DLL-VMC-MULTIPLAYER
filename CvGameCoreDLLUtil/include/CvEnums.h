@@ -1602,6 +1602,10 @@ enum CityScaleTypes {
 };
 #endif
 
+enum LuaFormulaTypes {
+	NO_LUA_FORMULA = -1
+};
+
 #ifdef MOD_PROMOTION_COLLECTIONS
 enum PromotionCollectionsTypes {
 	NO_PROMOTION_COLLECTION = -1

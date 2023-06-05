@@ -4342,8 +4342,8 @@ void CvCity::addProductionExperience(CvUnit* pUnit, bool bConscript)
 
 	pUnit->testPromotionReady();
 
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	if(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE && pUnit->GetMultipleInitExperence() > 0)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && pUnit->GetMultipleInitExperence() > 0)
 	{
 		pUnit->changeExperienceTimes100(pUnit->getExperienceTimes100() * (pUnit->GetMultipleInitExperence()) / 100);
 	}
@@ -8486,8 +8486,8 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 					GetCityCitizens()->DoAddBestCitizenFromUnassigned();
 				}
 			}
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
-			if (MOD_BELIEF_BIRTH_INSTANT_YIELD && !IsResistance())
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+			if (MOD_BELIEF_NEW_EFFECT_FOR_SP && !IsResistance())
 			{
 				doRelogionInstantYield(GetCityReligions()->GetReligiousMajority());
 				if(GetCityReligions()->IsSecondaryReligionActive())
@@ -10039,8 +10039,24 @@ void CvCity::changeFreeExperience(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+int CvCity::GetReligionExtraMissionarySpreads(ReligionTypes eReligion)
+{
+	VALIDATE_OBJECT
+	if(eReligion == NO_RELIGION) return 0;
+	return GC.getGame().GetGameReligions()->GetReligion(eReligion,getOwner())->m_Beliefs.GetCityExtraMissionarySpreads();
+}
+//	--------------------------------------------------------------------------------
+int CvCity::GetBeliefExtraMissionarySpreads(BeliefTypes eBelief)
+{
+	VALIDATE_OBJECT
+	if(eBelief == NO_BELIEF) return 0;
+	return GC.GetGameBeliefs()->GetEntry(eBelief)->GetCityExtraMissionarySpreads();
+}
+#endif	
+//	--------------------------------------------------------------------------------
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 void CvCity::doRelogionInstantYield(ReligionTypes eReligion)
 {
 	VALIDATE_OBJECT
@@ -11354,6 +11370,20 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		iModifier += iTempMod;
 		if (iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_POLICY_TRADE_ROUTE_NUM", iTempMod);
+	}
+
+	int iCityCount = owner.getNumCities();
+	if (!owner.GetCityNumberCityYieldModifier().empty() && iCityCount != 0)
+	{
+		iTempMod = 0;
+		for (const auto& info : owner.GetCityNumberCityYieldModifier())
+		{
+			if (info.eYield != eIndex) continue;
+			iTempMod += info.iYield * iCityCount;
+		}
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_POLICY_CITY_NUMBER", iTempMod);
 	}
 
 	// Religion Yield Rate Modifier
@@ -15566,6 +15596,16 @@ void CvCity::Purchase(UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectT
 			if(iReligionSpreads > 0 && eReligion > RELIGION_PANTHEON)
 			{
 				pUnit->GetReligionData()->SetSpreadsLeft(iReligionSpreads + GetCityBuildings()->GetMissionaryExtraSpreads());
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+				if (MOD_BELIEF_NEW_EFFECT_FOR_SP)
+				{
+					pUnit->GetReligionData()->SetSpreadsLeft(pUnit->GetReligionData()->GetSpreadsLeft()+GetReligionExtraMissionarySpreads(GetCityReligions()->GetReligiousMajority()));
+					if(GetCityReligions()->IsSecondaryReligionActive())
+					{
+						pUnit->GetReligionData()->SetSpreadsLeft(pUnit->GetReligionData()->GetSpreadsLeft()+GetBeliefExtraMissionarySpreads(GetCityReligions()->GetSecondaryReligionPantheonBelief()));
+					}
+				}
+#endif
 				pUnit->GetReligionData()->SetReligiousStrength(iReligiousStrength);
 			}
 

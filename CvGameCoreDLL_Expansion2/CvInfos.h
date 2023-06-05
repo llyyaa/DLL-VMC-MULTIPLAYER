@@ -2433,6 +2433,37 @@ inline FDataStream& operator>>(FDataStream& is, PolicyYieldInfo& kYield)
 	return is;
 }
 
+struct PolicyResourceInfo
+{
+	PolicyTypes ePolicy = NO_POLICY;
+	ResourceTypes eResource = NO_RESOURCE;
+	int iQuantity = 0;
+
+	// optional conditions
+	bool bMustCoastal = false;
+	CityScaleTypes eCityScale = NO_CITY_SCALE;
+};
+
+inline FDataStream& operator<<(FDataStream& os, const PolicyResourceInfo& kResourceInfo)
+{
+	os << (int)kResourceInfo.ePolicy;
+	os << (int)kResourceInfo.eResource;
+	os << kResourceInfo.iQuantity;
+	os << kResourceInfo.bMustCoastal;
+	os << (int)kResourceInfo.eCityScale;
+	return os;
+}
+
+inline FDataStream& operator>>(FDataStream& is, PolicyResourceInfo& kResourceInfo)
+{
+	is >> (int&)kResourceInfo.ePolicy;
+	is >> (int&)kResourceInfo.eResource;
+	is >> kResourceInfo.iQuantity;
+	is >> kResourceInfo.bMustCoastal;
+	is >> (int&)kResourceInfo.eCityScale;
+	return is;
+}
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  class : CvDomainInfo
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -343,7 +343,7 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/RELIGION/Belief_YieldPerBirth.sql</FileName>
+        <FileName>DB/RELIGION/Belief_Table_Changes.sql</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
@@ -540,6 +540,16 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/TECHS/TechQuickRazing.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/POLICIES/Policy_CityResources.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/LUA_FORMULA/LuaFormula.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
     <ModBlockers>
@@ -565,6 +575,7 @@
     <Folder Include="DB\ERAS" />
     <Folder Include="DB\IMPROVEMENTS" />
     <Folder Include="DB\CITY_SCALES" />
+    <Folder Include="DB\LUA_FORMULA" />
     <Folder Include="DB\TECHS" />
     <Folder Include="DB\SPECIALISTS" />
     <Folder Include="DB\YIELDS" />
@@ -818,7 +829,7 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="DB/RELIGION/Belief_YieldPerBirth.sql">
+    <Content Include="DB/RELIGION/Belief_Table_Changes.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
@@ -926,7 +937,15 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="DB\LUA_FORMULA\LuaFormula.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="DB\NewTableChanges.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\POLICIES\Policy_CityResources.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

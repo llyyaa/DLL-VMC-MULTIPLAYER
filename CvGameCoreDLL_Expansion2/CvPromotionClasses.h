@@ -70,9 +70,6 @@ public:
 	int GetFeatureInvisible() const;
 	int GetFeatureInvisible2() const;
 #endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	int GetMultipleInitExperence() const;
-#endif
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
 	int  GetReconChange() const;
 #endif
@@ -234,11 +231,12 @@ public:
 	int GetCapitalDefenseModifier() const;
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int GetMultipleInitExperence() const;
+	int GetLostAllMovesAttackCity() const;
 	int GetUnitAttackFaithBonus() const;
 	int GetCityAttackFaithBonus() const;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int GetCarrierEXPGivenModifier() const;
 	int GetRemovePromotionUpgrade() const;
 #endif
 	int GetReligiousStrengthLossRivalTerritory() const;
@@ -471,9 +469,6 @@ protected:
 	int m_iFeatureInvisible;
 	int m_iFeatureInvisible2;
 #endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	int m_iMultipleInitExperence;
-#endif
 	int m_iVisibilityChange;
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
 	int m_iReconChange;
@@ -551,11 +546,12 @@ protected:
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iMultipleInitExperence;
+	int m_iLostAllMovesAttackCity;
 	int m_iUnitAttackFaithBonus;
 	int m_iCityAttackFaithBonus;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int m_iCarrierEXPGivenModifier;
 	int m_iRemovePromotionUpgrade;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;

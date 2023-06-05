@@ -6486,8 +6486,8 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 		}
 		iRtnValue += iTempValue;
 
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
-		if(MOD_BELIEF_BIRTH_INSTANT_YIELD && pEntry->AllowYieldPerBirth())
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+		if(MOD_BELIEF_NEW_EFFECT_FOR_SP && pEntry->AllowYieldPerBirth())
 		{
 			iTempValue = pEntry->GetYieldPerBirth(iI);
 			if(pCity->getPopulation() < 15)  // Like it more with small cities
@@ -6567,6 +6567,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	int iFlavorScience = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_SCIENCE"));
 	int iFlavorDiplomacy = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_DIPLOMACY"));
 	int iFlavorExpansion = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_EXPANSION"));
+	int iFlavorReligon = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_RELIGION"));
 
 	int iNumEnhancedReligions = pGameReligions->GetNumReligionsEnhanced();
 	int iReligionsEnhancedPercent = (100 * iNumEnhancedReligions) / GC.getMap().getWorldInfo().getMaxActiveReligions();
@@ -6632,6 +6633,11 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 			iRtnValue += iTemp;
 		}
 	}
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	//Is has Extra Missionary Spreads ?
+	iRtnValue += pEntry->GetCityExtraMissionarySpreads() * iFlavorReligon;
+#endif
 
 	//----------------
 	// FOUNDER BELIEFS

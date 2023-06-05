@@ -1359,10 +1359,6 @@ public:
 	void setFeatureInvisible(int FeatureInvisible, int FeatureInvisible2);
 	bool IsInvisibleInvalid() const;
 #endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	const int GetMultipleInitExperence() const;
-	void ChangeMultipleInitExperence(int iValue);
-#endif
 
 	const CvUnit* getCombatUnit() const;
 	CvUnit* getCombatUnit();
@@ -1727,15 +1723,23 @@ public:
 	void ChangeCityAttackPlunderModifier(int iValue);
 	int GetCityAttackPlunderModifier() const;
 
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	const int GetMultipleInitExperence() const;
+	void ChangeMultipleInitExperence(int iValue);
+
+	const int GetLostAllMovesAttackCity() const;
+	void ChangeLostAllMovesAttackCity(int iValue);
+
 	void ChangeUnitAttackFaithBonus(int iValue);
 	void ChangeCityAttackFaithBonus(int iValue);
-	int GetUnitAttackFaithBonus() const;
-	int GetCityAttackFaithBonus() const;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	const int GetUnitAttackFaithBonus() const;
+	const int GetCityAttackFaithBonus() const;
+
+	const int GetCarrierEXPGivenModifier() const;
+	void ChangeCarrierEXPGivenModifier(int iValue);
+
 	void setRemovePromotionUpgrade(int iValue);
-	int GetRemovePromotionUpgrade() const;
+	const int GetRemovePromotionUpgrade() const;
 #endif
 
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
@@ -2157,9 +2161,6 @@ protected:
 	FAutoVariable<int, CvUnit> m_eFeatureInvisible;
 	FAutoVariable<int, CvUnit> m_eFeatureInvisible2;
 #endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	FAutoVariable<int, CvUnit> m_eMultipleInitExperence;
-#endif
 
 	FAutoVariable<GreatPeopleDirectiveTypes, CvUnit> m_eGreatPeopleDirectiveType;
 	CvUnitEntry* m_pUnitInfo;
@@ -2277,11 +2278,12 @@ protected:
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iMultipleInitExperence;
+	int m_iLostAllMovesAttackCity;
 	int m_iUnitAttackFaithBonus;
 	int m_iCityAttackFaithBonus;
-#endif	
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
+	int m_iCarrierEXPGivenModifier;
 	int m_iRemovePromotionUpgrade;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;

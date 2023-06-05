@@ -1065,6 +1065,8 @@
     <Row Class="6" Name="GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA" Value="0"/>
     <!-- INSERT INTO Defines(Name, Value) VALUES('UNIT_MOVES_AFTER_DISEMBARK', 60); --> 
     <Row Class="6" Name="GLOBAL_UNIT_MOVES_AFTER_DISEMBARK" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY" Value="0"/>
     
     <!-- table changes: -->
     <!-- see NewTableChanges.sql -->
@@ -1072,16 +1074,12 @@
 
     <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0; -->
-    <Row Class="6" Name="PROMOTION_MULTIPLE_INIT_EXPERENCE" Value="1"/>
-
-    <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'CarrierEXPGivenModifier' INTEGER DEFAULT 0; -->
     <!-- ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0; -->
     <!-- ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0; -->
-    <Row Class="6" Name="PROMOTION_GET_INSTANCE_FROM_ATTACK" Value="1"/>
-
-    <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'RemovePromotionUpgrade' TEXT DEFAULT NULL; -->
-    <Row Class="6" Name="PROMOTION_REMOVE_PROMOTION_UPGRADE" Value="1"/>
+    <!-- ALTER TABLE UnitPromotions ADD 'LostAllMovesAttackCity'  INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="PROMOTION_NEW_EFFECT_FOR_SP" Value="1"/>
 
     <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
@@ -1089,8 +1087,9 @@
     <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
 
     <!-- table changes: -->
-    <!-- see Belief_YieldPerBirth.sql -->
-    <Row Class="6" Name="BELIEF_BIRTH_INSTANT_YIELD" Value="0"/>
+    <!-- see Belief_Table_Changes.sql -->
+    <!-- ALTER TABLE Beliefs ADD COLUMN 'CityExtraMissionarySpreads' INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="BELIEF_NEW_EFFECT_FOR_SP" Value="1"/>
 
     <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>

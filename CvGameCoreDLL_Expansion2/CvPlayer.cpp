@@ -20607,6 +20607,14 @@ void CvPlayer::changeNumResourceUsed(ResourceTypes eIndex, int iChange)
 	CvAssert(m_paiNumResourceUsed[eIndex] >= 0);
 }
 
+inline static bool MeetCityResourceRequirement(const PolicyResourceInfo& info,  const CvCity* city, const CvPlayer* player)
+{
+	bool okPolicy = (player->HasPolicy(info.ePolicy) && !player->GetPlayerPolicies()->IsPolicyBlocked(info.ePolicy));
+	bool okCoastal = (!info.bMustCoastal || city->isCoastal());
+	bool okCityScale = (info.eCityScale == NO_CITY_SCALE || city->GetScale() == info.eCityScale);
+	return okPolicy && okCoastal && okCityScale;
+}
+
 //	--------------------------------------------------------------------------------
 int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) const
 {
@@ -20624,11 +20632,11 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 
 	if(pkResource->getResourceUsage() == RESOURCEUSAGE_STRATEGIC)
 	{
-
 #if defined(MOD_ROG_CORE)
 		const CvCity* pLoopCity = NULL;
 		int iLoop = 0;
 		int iCityPOPResource = 0;
+		int iCityResourceFromPolicy = 0;
 		for (pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 		{
 			if (pLoopCity != NULL)
@@ -20637,13 +20645,21 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 				{
 					iCityPOPResource += (pLoopCity->getPopulation() * pLoopCity->GetResourceQuantityFromPOP(eIndex));
 				}
+				for (const auto& info : GetCityResourcesFromPolicy())
+				{
+					if (info.eResource == eIndex && MeetCityResourceRequirement(info, pLoopCity, this))
+					{
+						iCityResourceFromPolicy += info.iQuantity;
+					}
+				}
 			}
 		}
 
 		iTotalNumResource += iCityPOPResource / 100;
+		iTotalNumResource += iCityResourceFromPolicy;
 #endif
 
-		if(GetStrategicResourceMod() != 0)
+	if(GetStrategicResourceMod() != 0)
 		{
 			iTotalNumResource *= GetStrategicResourceMod();
 			iTotalNumResource /= 100;
@@ -25100,6 +25116,28 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 					it++;
 			}
 		}
+		for (auto it = m_vCityNumberCityYieldModifier.begin(); it != m_vCityNumberCityYieldModifier.end();)
+		{
+			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
+			{
+					it = m_vCityNumberCityYieldModifier.erase(it);
+			}
+			else
+			{
+					it++;
+			}
+		}
+		for (auto it = m_vCityResourcesFromPolicy.begin(); it != m_vCityResourcesFromPolicy.end();)
+		{
+			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
+			{
+				it = m_vCityResourcesFromPolicy.erase(it);
+			}
+			else
+			{
+				it++;
+			}
+		}
 	}
 	else
 	{
@@ -25110,6 +25148,14 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		for (const auto& info : pPolicy->GetTradeRouteCityYieldModifier())
 		{
 			m_vTradeRouteCityYieldModifier.push_back(info);
+		}
+		for (const auto& info : pPolicy->GetCityNumberCityYieldModifier())
+		{
+			m_vCityNumberCityYieldModifier.push_back(info);
+		}
+		for (const auto& info : pPolicy->GetCityResources())
+		{
+			m_vCityResourcesFromPolicy.push_back(info);
 		}
 	}
 
@@ -26367,6 +26413,9 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_vCityWithWorldWonderYieldModifier;
 	kStream >> m_vTradeRouteCityYieldModifier;
+	kStream >> m_vCityNumberCityYieldModifier;
+
+	kStream >> m_vCityResourcesFromPolicy;
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream >> m_paiResourcesFromSpecialists;
@@ -26916,6 +26965,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	kStream << m_vCityWithWorldWonderYieldModifier;
 	kStream << m_vTradeRouteCityYieldModifier;
+	kStream << m_vCityNumberCityYieldModifier;
+
+	kStream << m_vCityResourcesFromPolicy;
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream << m_paiResourcesFromSpecialists;
@@ -30030,6 +30082,21 @@ std::vector<PolicyYieldInfo>& CvPlayer::GetCityWithWorldWonderYieldModifier()
 std::vector<PolicyYieldInfo>& CvPlayer::GetTradeRouteCityYieldModifier()
 {
 	return m_vTradeRouteCityYieldModifier;
+}
+
+std::vector<PolicyYieldInfo>& CvPlayer::GetCityNumberCityYieldModifier()
+{
+	return m_vCityNumberCityYieldModifier;
+}
+
+std::vector<PolicyResourceInfo>& CvPlayer::GetCityResourcesFromPolicy()
+{
+	return m_vCityResourcesFromPolicy;
+}
+
+const std::vector<PolicyResourceInfo>& CvPlayer::GetCityResourcesFromPolicy() const
+{
+	return m_vCityResourcesFromPolicy;
 }
 
 int CvPlayer::GetGlobalHappinessFromFaithPercent() const

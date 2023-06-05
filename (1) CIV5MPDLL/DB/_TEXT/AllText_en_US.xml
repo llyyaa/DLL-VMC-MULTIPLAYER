@@ -239,7 +239,7 @@
 			</Text>
 		</Row>
 
-		<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER">
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_TRADE_ROUTE_NUM">
 			<Text>
 				[NEWLINE][ICON_BULLET]City Modifier for the Trade Routes(Policy): {1_Num}%
 			</Text>
@@ -251,6 +251,21 @@
 			</Text>
 		</Row>
 
+		<Row Tag="TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE">
+			<Text> A [ICON_CITIZEN] Citizen has been killed in {2_CityName:textkey} by the Ranged Attack of the enemy's {1_UnitName}! (this city's hitpoint is 0 and it cannot protect citizens from enemy's Ranged Attack.)</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE_SHORT">
+			<Text>City heavily damaged! Citizen killed! </Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_NUMBER">
+			<Text>
+				[NEWLINE][ICON_BULLET]City Modifier for the Number of Cities(Policy): {1_Num}%
+			</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_ATTACKING_CITY_LOST_MOVEMENT">
+			<Text>Your {@1_name} consumed all its [ICON_MOVES] Movements after attacking the enemy city!</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

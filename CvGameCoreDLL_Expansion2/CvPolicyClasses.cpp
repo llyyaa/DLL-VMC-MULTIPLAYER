@@ -943,6 +943,56 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 		pResults->Reset();
 	}
 
+	{
+		m_vCityNumberCityYieldModifier.clear();
+		std::string sqlKey = "m_vCityNumberCityYieldModifier";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if(pResults == NULL)
+		{
+			const char* szSQL = "select t2.ID, t1.Yield from Policy_CityNumberCityYieldModifier t1 left join Yields t2 on t1.YieldType = t2.Type where t1.PolicyType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, szPolicyType, false);
+
+		while(pResults->Step())
+		{
+			PolicyYieldInfo p;
+			p.eYield = (YieldTypes)pResults->GetInt(0);
+			p.iYield = pResults->GetInt(1);
+			p.ePolicy = (PolicyTypes)GetID();
+			m_vCityNumberCityYieldModifier.push_back(p);
+		}
+
+		pResults->Reset();
+	}
+
+	{
+		m_vCityResources.clear();
+		std::string sqlKey = "m_vCityResources";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if (pResults == NULL)
+		{
+			const char* szSQL = "select t2.ID, t1.Quantity, t1.CityScaleType, t1.MustCoastal from Policy_CityResources t1 left join Resources t2 on t1.ResourceType = t2.Type where t1.PolicyType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, szPolicyType, false);
+
+		while (pResults->Step())
+		{
+			PolicyResourceInfo info;
+			info.ePolicy = (PolicyTypes)GetID();
+			info.eResource = (ResourceTypes)pResults->GetInt(0);
+			info.iQuantity = pResults->GetInt(1);
+			info.eCityScale = (CityScaleTypes)GC.getInfoTypeForString(pResults->GetText(2));
+			info.bMustCoastal = pResults->GetBool(3);
+			m_vCityResources.push_back(info);
+		}
+
+		pResults->Reset();
+	}
+
 	m_iGlobalHappinessFromFaithPercent = kResults.GetInt("GlobalHappinessFromFaithPercent");
 	m_iHappinessInWLTKDCities = kResults.GetInt("HappinessInWLTKDCities");
 
@@ -2502,6 +2552,16 @@ std::vector<PolicyYieldInfo>& CvPolicyEntry::GetCityWithWorldWonderYieldModifier
 std::vector<PolicyYieldInfo>& CvPolicyEntry::GetTradeRouteCityYieldModifier()
 {
 	return m_vTradeRouteCityYieldModifier;
+}
+
+std::vector<PolicyYieldInfo>& CvPolicyEntry::GetCityNumberCityYieldModifier()
+{
+	return m_vCityNumberCityYieldModifier;
+}
+
+std::vector<PolicyResourceInfo>& CvPolicyEntry::GetCityResources()
+{
+	return m_vCityResources;
 }
 
 int CvPolicyEntry::GetGlobalHappinessFromFaithPercent() const
