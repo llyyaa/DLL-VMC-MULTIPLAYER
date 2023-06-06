@@ -83,7 +83,7 @@ namespace lua {
 			{
 				continue;
 			}
-			m_data[static_cast<LuaFormulaTypes>(formula->GetID())].Swap(&evaluator);
+			m_data[static_cast<LuaFormulaTypes>(formula->GetID())] = static_cast<Evaluator&&>(evaluator);
 		}
 
 		return true;

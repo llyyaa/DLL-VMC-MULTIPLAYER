@@ -909,7 +909,7 @@
     <Row Class="1" Name="BUGFIX_NAVAL_FREE_UNITS" Value="1"/>
     <!-- Fixes the bug where the naval units jump to the nearest city and not the nearest available non-lake water plot (v19) -->
     <!-- See also: "Global - Naval Nearest Water" -->
-    <Row Class="1" Name="BUGFIX_NAVAL_NEAREST_WATER" Value="0"/>
+    <Row Class="1" Name="BUGFIX_NAVAL_NEAREST_WATER" Value="1"/>
     <!-- Fixes the bug where naval units in hill cities attack from the top of the hill, not the harbour (v95) -->
     <Row Class="1" Name="BUGFIX_NAVAL_TARGETING" Value="1"/>
     <!-- Fixes the bug where stacked ranged units may attack out of cities but melee units may not (v19) -->
@@ -1088,8 +1088,11 @@
 
     <!-- table changes: -->
     <!-- see Belief_Table_Changes.sql -->
-    <!-- ALTER TABLE Beliefs ADD COLUMN 'CityExtraMissionarySpreads' INTEGER DEFAULT 0; -->
     <Row Class="6" Name="BELIEF_NEW_EFFECT_FOR_SP" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see DDL_Traits.sql -->
+    <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
 
     <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
@@ -1123,6 +1126,8 @@
     <!-- Permits units to receive a combat bonus from Extra Resourses/Hapiness-->
     <!-- table change: NewTableChanges.sql -->
     <Row Class="4" Name="PROMOTIONS_EXTRARES_BONUS" Value="0"/>
+
+    <Row Class="6" Name="RESOURCE_EXTRA_BUFF" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>

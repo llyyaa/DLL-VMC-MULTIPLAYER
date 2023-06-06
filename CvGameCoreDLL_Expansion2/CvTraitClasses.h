@@ -139,6 +139,9 @@ public:
 #endif
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetCiviliansFreePromotion() const;
+#endif
 
 	TechTypes GetFreeUnitPrereqTech() const;
 	ImprovementTypes GetCombatBonusImprovement() const;
@@ -229,6 +232,9 @@ public:
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool IsFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	bool IsFreePromotionUnitClass(const int promotionID, const int unitClassID) const;
+#endif
 	bool IsObsoleteByTech(TeamTypes eTeam);
 	bool IsEnabledByTech(TeamTypes eTeam);
 #if defined(MOD_TRAITS_OTHER_PREREQS)
@@ -346,6 +352,9 @@ protected:
 #endif
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iCiviliansFreePromotion;
+#endif
 
 	TechTypes m_eFreeUnitPrereqTech;
 	ImprovementTypes m_eCombatBonusImprovement;
@@ -432,6 +441,9 @@ protected:
 	int** m_ppiUnimprovedFeatureYieldChanges;
 
 	std::multimap<int, int> m_FreePromotionUnitCombats;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	std::multimap<int, int> m_FreePromotionUnitClasses;
+#endif
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
 	std::vector<bool> m_abNoTrainUnitClass;
 
@@ -810,6 +822,12 @@ public:
 		return m_iTradeBuildingModifier;
 	}
 
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetCiviliansFreePromotion() const
+	{
+		return m_iCiviliansFreePromotion;
+	}
+#endif
 	bool IsFightWellDamaged() const
 	{
 		return m_bFightWellDamaged;
@@ -996,6 +1014,9 @@ public:
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool HasFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	bool HasFreePromotionUnitClass(const int promotionID, const int unitClassID) const;
+#endif
 
 	// Public functions to make trait-based game state changes
 	void AddUniqueLuxuries(CvCity *pCity);
@@ -1157,6 +1178,9 @@ private:
 #endif
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iCiviliansFreePromotion;
+#endif
 	// Saved
 
 	bool m_bFightWellDamaged;

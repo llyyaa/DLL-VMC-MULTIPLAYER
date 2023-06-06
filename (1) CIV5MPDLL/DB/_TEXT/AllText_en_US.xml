@@ -266,6 +266,24 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_ATTACKING_CITY_LOST_MOVEMENT">
 			<Text>Your {@1_name} consumed all its [ICON_MOVES] Movements after attacking the enemy city!</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_RESOURCE_BUFF">
+			<Text>
+				[NEWLINE][ICON_BULLET] Global Modifier for Resources: {1_Num}%
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_HAPPINESS_GLOBAL">
+			<Text>
+				[NEWLINE][ICON_BULLET] Global Modifier for Happiness: {1_Num}%
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_HAPPINESS_POLICY">
+			<Text>
+				[NEWLINE][ICON_BULLET] Global Modifier for Happiness (Policy): {1_Num}%
+			</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

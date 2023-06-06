@@ -42,3 +42,12 @@ CREATE TABLE Policy_CityNumberCityYieldModifier (
 	foreign key (PolicyType) references Policies(Type),
 	foreign key (YieldType) references Yields(Type)
 );
+
+create table Policy_HappinessYieldModifier (
+    PolicyType text references Policies(Type),
+    YieldType text references Yields(Type),
+    YieldFormula text references LuaFormula(Type)
+);
+
+alter table Policies add column InstantFoodThresholdPercent integer not null default 0;
+alter table Policies add column CaptureCityResistanceTurnsChangeFormula text references LuaFormula(Type);

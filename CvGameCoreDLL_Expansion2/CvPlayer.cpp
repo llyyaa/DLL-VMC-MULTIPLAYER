@@ -760,6 +760,7 @@ void CvPlayer::init(PlayerTypes eID)
 	}
 
 	m_aiPlots.clear();
+
 	m_bfEverConqueredBy.ClearAll();
 
 	AI_init();
@@ -770,6 +771,7 @@ void CvPlayer::init(PlayerTypes eID)
 void CvPlayer::uninit()
 {
 	m_paiNumResourceUsed.clear();
+	m_paiNumResourceAvailableCache.clear();
 	m_paiNumResourceTotal.clear();
 	m_paiResourceGiftedToMinors.clear();
 	m_paiResourceExport.clear();
@@ -1286,6 +1288,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 		CvAssertMsg(0 < GC.getNumResourceInfos(), "GC.getNumResourceInfos() is not greater than zero but it is used to allocate memory in CvPlayer::reset");
 		m_paiNumResourceUsed.clear();
 		m_paiNumResourceUsed.resize(GC.getNumResourceInfos(), 0);
+
+		m_paiNumResourceAvailableCache.clear();
+		m_paiNumResourceAvailableCache.resize(GC.getNumResourceInfos(), 0);
 
 		m_paiNumResourceTotal.clear();
 		m_paiNumResourceTotal.resize(GC.getNumResourceInfos(), 0);
@@ -3115,11 +3120,12 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 			pNewCity->SetOccupied(true);
 
 			int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
-			int iResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
+			int iOriginalResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
+			int iTurnChange = GetCaptureCityResistanceTurnsChange(pNewCity, iOriginalResistanceTurns, GET_PLAYER(eOldOwner).IsHasLostCapital());
 
-			if (iResistanceTurns > 0)
+			if (iTurnChange + iOriginalResistanceTurns > 0)
 			{
-				pNewCity->ChangeResistanceTurns(iResistanceTurns);
+				pNewCity->ChangeResistanceTurns(iTurnChange + iOriginalResistanceTurns);
 			}
 		}
 
@@ -13411,7 +13417,14 @@ void CvPlayer::ChangeUnhappinessFromUnitsMod(int iChange)
 /// Unhappiness Mod (-50 = 50% of normal)
 int CvPlayer::GetUnhappinessMod() const
 {
-	return m_iUnhappinessMod;
+	int iTemp = 0;
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	if (MOD_RESOURCE_EXTRA_BUFF)
+	{
+		iTemp += GetUnhappinessModFromResource();
+	}
+#endif
+	return m_iUnhappinessMod + iTemp;
 }
 
 //	--------------------------------------------------------------------------------
@@ -20882,9 +20895,18 @@ int CvPlayer::getNumResourceAvailable(ResourceTypes eIndex, bool bIncludeImport)
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < GC.getNumResourceInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
-	return getNumResourceTotal(eIndex, bIncludeImport) - getNumResourceUsed(eIndex);
+	int result = getNumResourceTotal(eIndex, bIncludeImport) - getNumResourceUsed(eIndex);
+	if (bIncludeImport)
+	{
+		int oldValue = m_paiNumResourceAvailableCache[eIndex];
+		if (oldValue != result)
+		{
+			std::vector<int>& tmp = const_cast<std::vector<int>&>(m_paiNumResourceAvailableCache);
+			tmp[eIndex] = result;
+		}
+	}
+	return result;
 }
-
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::getResourceGiftedToMinors(ResourceTypes eIndex) const
@@ -21766,7 +21788,14 @@ int CvPlayer::getHurryModifier(HurryTypes eIndex) const
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < GC.getNumHurryInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
-	return m_paiHurryModifier[eIndex];
+	int tmp = 0;
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	if (MOD_RESOURCE_EXTRA_BUFF)
+	{
+		tmp += GetHurryModifierFromResource(eIndex);
+	}
+#endif
+	return m_paiHurryModifier[eIndex] + tmp;
 }
 
 //	--------------------------------------------------------------------------------
@@ -24909,6 +24938,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	int iNumCitiesFreeCultureBuilding = pPolicy->GetNumCitiesFreeCultureBuilding();
 	int iNumCitiesFreeFoodBuilding = pPolicy->GetNumCitiesFreeFoodBuilding();
 
+	int iInstanceFoodThresholdPercent = pPolicy->GetInstantFoodThresholdPercent();
+
 	// Loop through Cities
 	int iLoop;
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
@@ -25087,9 +25118,16 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 #endif
 
 #ifdef MOD_GLOBAL_CITY_SCALES
-	if (MOD_GLOBAL_CITY_SCALES)
-		pLoopCity->UpdateScaleBuildings();
+		if (MOD_GLOBAL_CITY_SCALES)
+		{
+			pLoopCity->UpdateScaleBuildings();
+		}
 #endif
+
+		if (iInstanceFoodThresholdPercent > 0 && iChange > 0)
+		{
+			pLoopCity->changeFoodTimes100(iInstanceFoodThresholdPercent * pLoopCity->growthThreshold());
+		}
 	}
 
 	if (iChange < 0)
@@ -25098,33 +25136,44 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		{
 			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
 			{
-					it = m_vCityWithWorldWonderYieldModifier.erase(it);
+				it = m_vCityWithWorldWonderYieldModifier.erase(it);
 			}
 			else
 			{
-					it++;
+				it++;
 			}
 		}
 		for (auto it = m_vTradeRouteCityYieldModifier.begin(); it != m_vTradeRouteCityYieldModifier.end();)
 		{
 			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
 			{
-					it = m_vTradeRouteCityYieldModifier.erase(it);
+				it = m_vTradeRouteCityYieldModifier.erase(it);
 			}
 			else
 			{
-					it++;
+				it++;
 			}
 		}
 		for (auto it = m_vCityNumberCityYieldModifier.begin(); it != m_vCityNumberCityYieldModifier.end();)
 		{
 			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
 			{
-					it = m_vCityNumberCityYieldModifier.erase(it);
+				it = m_vCityNumberCityYieldModifier.erase(it);
 			}
 			else
 			{
-					it++;
+				it++;
+			}
+		}
+		for (auto it = m_vHappinessYieldModifier.begin(); it != m_vHappinessYieldModifier.end();)
+		{
+			if (it->ePolicy == (PolicyTypes)pPolicy->GetID())
+			{
+				it = m_vHappinessYieldModifier.erase(it);
+			}
+			else
+			{
+				it++;
 			}
 		}
 		for (auto it = m_vCityResourcesFromPolicy.begin(); it != m_vCityResourcesFromPolicy.end();)
@@ -25153,6 +25202,10 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		{
 			m_vCityNumberCityYieldModifier.push_back(info);
 		}
+		for (const auto& info : pPolicy->GetHappinessYieldModifier())
+		{
+			m_vHappinessYieldModifier.push_back(info);
+		}
 		for (const auto& info : pPolicy->GetCityResources())
 		{
 			m_vCityResourcesFromPolicy.push_back(info);
@@ -25166,6 +25219,17 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	// Store off number of newly built cities that will get a free building
 	ChangeNumCitiesFreeCultureBuilding(iNumCitiesFreeCultureBuilding);
 	ChangeNumCitiesFreeFoodBuilding(iNumCitiesFreeFoodBuilding);
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	if (pPolicy->GetResourceCityConnectionTradeRouteGoldModifier() != 0)
+	{
+		ChangeResourceCityConnectionTradeRouteGoldModifier(pPolicy->GetResourceCityConnectionTradeRouteGoldModifier() * iChange);
+	}
+	if (pPolicy->GetResourceUnhappinessModifier() != 0)
+	{
+		ChangeResourceUnhappinessModifier(pPolicy->GetResourceUnhappinessModifier() * iChange);
+	}
+#endif
 
 	// Not really techs but this is what we use (for now)
 	for(iI = 0; iI < GC.getNUM_AND_TECH_PREREQS(); iI++)
@@ -25422,6 +25486,18 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	if(pPolicy->IsMinorGreatPeopleAllies())
 	{
 		DoAdoptedGreatPersonCityStatePolicy();
+	}
+
+	if (pPolicy->GetCaptureCityResistanceTurnsChangeFormula() != NO_LUA_FORMULA)
+	{
+		if (iChange > 0)
+		{
+			SetCaptureCityResistanceTurnsChangeFormula(pPolicy->GetCaptureCityResistanceTurnsChangeFormula());
+		}
+		else
+		{
+			SetCaptureCityResistanceTurnsChangeFormula(NO_LUA_FORMULA);
+		}
 	}
 
 	// Add a Reformation belief if eligible
@@ -26179,6 +26255,7 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	CvAssertMsg((0 < GC.getNumResourceInfos()), "GC.getNumResourceInfos() is not greater than zero but it is expected to be in CvPlayer::read");
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiNumResourceUsed.dirtyGet());
+	kStream >> m_paiNumResourceAvailableCache;
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiNumResourceTotal.dirtyGet());
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiResourceGiftedToMinors.dirtyGet());
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiResourceExport.dirtyGet());
@@ -26399,6 +26476,14 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_strEmbarkedGraphicOverride;
 	kStream >> m_piPerMajorReligionFollowerYieldModifier;
+
+	#ifdef MOD_RESOURCE_EXTRA_BUFF
+	kStream >> m_iResourceUnhappinessModifier;
+	kStream >> m_iResourceCityConnectionTradeRouteGoldModifier;
+#endif
+
+	kStream >> (int&)m_iCaptureCityResistanceTurnsChangeFormula;
+
 	m_kPlayerAchievements.Read(kStream);
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
@@ -26414,6 +26499,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_vCityWithWorldWonderYieldModifier;
 	kStream >> m_vTradeRouteCityYieldModifier;
 	kStream >> m_vCityNumberCityYieldModifier;
+	kStream >> m_vHappinessYieldModifier;
 
 	kStream >> m_vCityResourcesFromPolicy;
 
@@ -26754,6 +26840,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	CvAssertMsg((0 < GC.getNumResourceInfos()), "GC.getNumResourceInfos() is not greater than zero but an array is being allocated in CvPlayer::write");
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiNumResourceUsed);
+	kStream << m_paiNumResourceAvailableCache;
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiNumResourceTotal);
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiResourceGiftedToMinors);
 	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes, int>(kStream, m_paiResourceExport);
@@ -26951,6 +27038,13 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_strEmbarkedGraphicOverride;
 	kStream << m_piPerMajorReligionFollowerYieldModifier;
 
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	kStream << m_iResourceUnhappinessModifier;
+	kStream << m_iResourceCityConnectionTradeRouteGoldModifier;
+#endif
+
+	kStream << (int)m_iCaptureCityResistanceTurnsChangeFormula;
+
 	m_kPlayerAchievements.Write(kStream);
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
@@ -26966,6 +27060,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_vCityWithWorldWonderYieldModifier;
 	kStream << m_vTradeRouteCityYieldModifier;
 	kStream << m_vCityNumberCityYieldModifier;
+	kStream << m_vHappinessYieldModifier;
 
 	kStream << m_vCityResourcesFromPolicy;
 
@@ -30089,6 +30184,11 @@ std::vector<PolicyYieldInfo>& CvPlayer::GetCityNumberCityYieldModifier()
 	return m_vCityNumberCityYieldModifier;
 }
 
+std::vector<PolicyYieldInfo>& CvPlayer::GetHappinessYieldModifier()
+{
+	return m_vHappinessYieldModifier;
+}
+
 std::vector<PolicyResourceInfo>& CvPlayer::GetCityResourcesFromPolicy()
 {
 	return m_vCityResourcesFromPolicy;
@@ -30115,6 +30215,33 @@ int CvPlayer::GetHappinessFromFaith() const
 	}
 
 	return m_iGlobalHappinessFromFaithPercent * GetTotalFaithPerTurn() / 100;
+}
+
+LuaFormulaTypes CvPlayer::GetCaptureCityResistanceTurnsChangeFormula() const
+{
+	return m_iCaptureCityResistanceTurnsChangeFormula;
+}
+
+void CvPlayer::SetCaptureCityResistanceTurnsChangeFormula(LuaFormulaTypes value)
+{
+	m_iCaptureCityResistanceTurnsChangeFormula = value;
+}
+
+int CvPlayer::GetCaptureCityResistanceTurnsChange(CvCity* city, int originalResistanceTurn, bool originalOwnerLostCaptal) const
+{
+	auto* eval = GC.GetLuaEvaluatorManager()->GetEvaluator(GetCaptureCityResistanceTurnsChangeFormula());
+	if (eval == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = eval->Evaluate<int>(city->getPopulation(), originalResistanceTurn, originalOwnerLostCaptal);
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	return result.value;
 }
 
 int CvPlayer::GetHappinessInWLTKDCities() const
@@ -30152,4 +30279,223 @@ CvCity* CvPlayer::GetRandomCity()
 int CvPlayer::GetRazeSpeedModifier() const
 {
 	return GetPlayerTraits()->GetRazeSpeedModifier() + GET_TEAM(getTeam()).GetRazeSpeedModifier();
+}
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+int CvPlayer::GetUnhappinessModFromResource() const
+{
+	int ret = 0;
+	for (auto* info : GC.getResourceInfo())
+	{
+		ret += CalculateUnhappinessModFromResource(info, m_paiNumResourceAvailableCache[info->GetID()]);
+	}
+	return 0;
+}
+
+int CvPlayer::CalculateUnhappinessModFromResource(CvResourceInfo* info, int num) const
+{
+	auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(info->GetUnHappinessModifierFormula());
+	if (evaluator == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = evaluator->Evaluate<int>(num, getNumCities());
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	if (result.value < 0)
+	{
+		return result.value * (100 + GetResourceUnhappinessModifier()) / 100;
+	}
+
+	return result.value;
+}
+
+int CvPlayer::GetCityConnectionTradeRouteGoldModifierFromResource() const
+{
+	int ret = 0;
+	for (auto* info : GC.getResourceInfo())
+	{
+		ret += CalculateCityConnectionTradeRouteGoldModifierFromResource(info, m_paiNumResourceAvailableCache[info->GetID()]);
+	}
+	return ret;
+}
+
+int CvPlayer::CalculateCityConnectionTradeRouteGoldModifierFromResource(CvResourceInfo* info, int num) const
+{
+	auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(info->GetCityConnectionTradeRouteGoldModifierFormula());
+	if (evaluator == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = evaluator->Evaluate<int>(num, getNumCities());
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	return result.value * (100 + GetResourceCityConnectionTradeRouteGoldModifier()) / 100;
+}
+
+int CvPlayer::GetHurryModifierFromResource(HurryTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumHurryInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	static HurryTypes eHurryGold = static_cast<HurryTypes>(GC.getInfoTypeForString("HURRY_GOLD"));
+	if (eIndex != eHurryGold)
+	{
+		return 0;
+	}
+
+	int ret = 0;
+	for (auto* info : GC.getResourceInfo())
+	{
+		ret += CalculateGoldHurryModFromResource(info, m_paiNumResourceAvailableCache[info->GetID()]);
+	}
+	return ret;
+}
+
+int CvPlayer::CalculateGoldHurryModFromResource(CvResourceInfo* pInfo, int num) const
+{
+	if (pInfo == nullptr || pInfo->GetGoldHurryCostModifierFormula() == NO_LUA_FORMULA)
+	{
+		return 0;
+	}
+
+	auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(pInfo->GetGoldHurryCostModifierFormula());
+	if (evaluator == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = evaluator->Evaluate<int>(num, getNumCities());
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	return result.value;
+}
+
+int CvPlayer::GetGlobalYieldModifierFromResource(YieldTypes eYield) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	int ret = 0;
+	for (auto* info : GC.getResourceInfo())
+	{
+		ret += CalculateGlobalYieldModifierFromResource(info, m_paiNumResourceAvailableCache[info->GetID()], eYield);
+	}
+	return ret;
+}
+
+int CvPlayer::CalculateGlobalYieldModifierFromResource(CvResourceInfo* pInfo, int num, YieldTypes eYield) const
+{
+	if (pInfo == nullptr || pInfo->GetGlobalYieldModifiers().empty())
+	{
+		return 0;
+	}
+
+	int ret = 0;
+	for (auto& yieldInfo : pInfo->GetGlobalYieldModifiers())
+	{
+		if (yieldInfo.eYield != eYield)
+		{
+			continue;
+		}
+
+		bool okEra = (yieldInfo.eStartEra == NO_ERA || GetCurrentEra() >= yieldInfo.eStartEra)
+			&& (yieldInfo.eEndEra == NO_ERA || GetCurrentEra() < yieldInfo.eEndEra);
+		if (!okEra)
+		{
+			continue;
+		}
+
+		auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(yieldInfo.eFormula);
+		if (evaluator == nullptr)
+		{
+			continue;
+		}
+
+		auto result = evaluator->Evaluate<int>(num, getNumCities(), GET_TEAM( getTeam()).GetTeamTechs()->GetNumTechsKnown());
+		if (!result.ok)
+		{
+			continue;
+		}
+
+		ret += result.value;
+	}
+
+	return ret;
+}
+
+// modifiers from policies ...
+int CvPlayer::GetResourceUnhappinessModifier() const
+{
+	return m_iResourceUnhappinessModifier;
+}
+void CvPlayer::ChangeResourceUnhappinessModifier(int value)
+{
+	m_iResourceUnhappinessModifier += value;
+}
+int CvPlayer::GetResourceCityConnectionTradeRouteGoldModifier() const
+{
+	return m_iResourceCityConnectionTradeRouteGoldModifier;
+}
+void CvPlayer::ChangeResourceCityConnectionTradeRouteGoldModifier(int value)
+{
+	m_iResourceCityConnectionTradeRouteGoldModifier += value;
+}
+
+#endif
+
+int CvPlayer::GetYieldModifierFromHappiness(CvYieldInfo* info) const
+{
+	auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(info->GetExcessHappinessModifierFormula());
+	if (evaluator == nullptr)
+	{
+		return 0;
+	}
+
+	auto result = evaluator->Evaluate<int>(GetExcessHappiness(), getNumCities());
+	if (!result.ok)
+	{
+		return 0;
+	}
+
+	return result.value;
+}
+
+int CvPlayer::GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const
+{
+	int ret = 0;
+	for (auto yieldEntry : m_vHappinessYieldModifier)
+	{
+		if (yieldEntry.eYield != info->GetID())
+		{
+			continue;
+		}
+		auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator(yieldEntry.eLuaFormula);
+		if (evaluator == nullptr)
+		{
+			continue;
+		}
+		auto result = evaluator->Evaluate<int>(GetExcessHappiness());
+		if (result.ok)
+		{
+			ret += result.value;
+		}
+	}
+	return ret;
+}
+
+int CvPlayer::GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const
+{
+	int iNum = GetCulture()->GetNumGreatWorks();
+	const int iYieldModFromGws = info->getGreakWorkYieldMod();
+	return iNum * iYieldModFromGws;
 }

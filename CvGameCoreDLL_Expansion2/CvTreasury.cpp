@@ -295,7 +295,14 @@ void CvTreasury::DoUpdateCityConnectionGold()
 /// How much of a percent bonus do we get for Trade Routes
 int CvTreasury::GetCityConnectionTradeRouteGoldModifier() const
 {
-	return m_iCityConnectionTradeRouteGoldModifier;
+	int tmp = 0;
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	if (MOD_RESOURCE_EXTRA_BUFF)
+	{
+		tmp += m_pPlayer->GetCityConnectionTradeRouteGoldModifierFromResource();
+	}
+#endif
+	return m_iCityConnectionTradeRouteGoldModifier + tmp;
 }
 
 /// Changes how much of a percent bonus do we get for Trade Routes

@@ -58,6 +58,11 @@ public:
 	// City Connection Route Modifiers
 	int GetCityConnectionTradeRouteGoldModifier() const;
 	void ChangeCityConnectionTradeRouteGoldModifier(int iChange);
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int GetCityConnectionTradeRouteGoldModifierFromResource() const;
+	void SetCityConnectionTradeRouteGoldModifierFromResource(int value);
+	void ChangeCityConnectionTradeRouteGoldModifierFromResource(int iChange);
+#endif
 	int GetCityConnectionTradeRouteGoldChange() const;
 	void ChangeCityConnectionTradeRouteGoldChange(int iChange);
 #if defined(MOD_EVENTS_CITY_CONNECTIONS)
@@ -117,6 +122,9 @@ protected:
 	int m_iExpensePerTurnUnitSupply;
 	int m_iCityConnectionGoldTimes100;
 	int m_iCityConnectionTradeRouteGoldModifier;
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int m_iCityConnectionTradeRouteGoldModifierFromResource = 0;
+#endif
 	int m_iCityConnectionTradeRouteGoldChange;
 
 	int m_iBaseBuildingGoldMaintenance;

@@ -1966,6 +1966,7 @@ public:
 	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
 	std::vector<PolicyYieldInfo>& GetTradeRouteCityYieldModifier();
 	std::vector<PolicyYieldInfo>& GetCityNumberCityYieldModifier();
+	std::vector<PolicyYieldInfo>& GetHappinessYieldModifier();
 
 	std::vector<PolicyResourceInfo>& GetCityResourcesFromPolicy();
 	const std::vector<PolicyResourceInfo>& GetCityResourcesFromPolicy() const;
@@ -1977,9 +1978,39 @@ public:
 
 	int GetHappinessFromFaith() const;
 
+	LuaFormulaTypes GetCaptureCityResistanceTurnsChangeFormula() const;
+	void SetCaptureCityResistanceTurnsChangeFormula(LuaFormulaTypes value);
+
+	int GetCaptureCityResistanceTurnsChange(CvCity* city, int originalResistanceTurn, bool originalOwnerLostCaptal) const;
+
 	CvCity* CvPlayer::GetRandomCity();
 
 	int GetRazeSpeedModifier() const;
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int GetUnhappinessModFromResource() const;
+	int CalculateUnhappinessModFromResource(CvResourceInfo* pInfo, int num) const;
+
+	int GetCityConnectionTradeRouteGoldModifierFromResource() const;
+	int CalculateCityConnectionTradeRouteGoldModifierFromResource(CvResourceInfo* pInfo, int num) const;
+
+	int GetHurryModifierFromResource(HurryTypes eIndex) const;
+	int CalculateGoldHurryModFromResource(CvResourceInfo* pInfo, int num) const;
+
+	int GetGlobalYieldModifierFromResource(YieldTypes eYield) const;
+	int CalculateGlobalYieldModifierFromResource(CvResourceInfo* pInfo, int num, YieldTypes eYield) const;
+
+	// modifiers from policies ...
+	int GetResourceUnhappinessModifier() const;
+	void ChangeResourceUnhappinessModifier(int value);
+	int GetResourceCityConnectionTradeRouteGoldModifier() const;
+	void ChangeResourceCityConnectionTradeRouteGoldModifier(int value);
+#endif
+
+	int GetYieldModifierFromHappiness(CvYieldInfo* info) const;
+	int GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const;
+
+	int GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const;
 
 protected:
 	class ConqueredByBoolField
@@ -2352,6 +2383,7 @@ protected:
 
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiNumResourceUsed;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiNumResourceTotal;
+	std::vector<int> m_paiNumResourceAvailableCache;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourceGiftedToMinors;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourceExport;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiResourceImport;
@@ -2422,6 +2454,8 @@ protected:
 	std::vector<PolicyYieldInfo> m_vCityWithWorldWonderYieldModifier;
 	std::vector<PolicyYieldInfo> m_vTradeRouteCityYieldModifier;
 	std::vector<PolicyYieldInfo> m_vCityNumberCityYieldModifier;
+	std::vector<PolicyYieldInfo> m_vHappinessYieldModifier;
+
 	std::vector<PolicyResourceInfo> m_vCityResourcesFromPolicy;
 	int m_iGlobalHappinessFromFaithPercent = 0;
 	int m_iHappinessInWLTKDCities = 0;
@@ -2568,6 +2602,14 @@ protected:
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
 #endif
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int m_iResourceUnhappinessModifier = 0;
+	int m_iResourceCityConnectionTradeRouteGoldModifier = 0;
+#endif
+
+	LuaFormulaTypes m_iCaptureCityResistanceTurnsChangeFormula = NO_LUA_FORMULA;
+
 };
 
 extern bool CancelActivePlayerEndTurn();

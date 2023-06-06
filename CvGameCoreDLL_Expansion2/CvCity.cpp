@@ -4278,6 +4278,18 @@ int CvCity::getProductionExperience(UnitTypes eUnit)
 			}
 
 			iExperience += getSpecialistFreeExperience();
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+			//Experence from Religion
+			ReligionTypes eCityReligion = GetCityReligions()->GetReligiousMajority();
+			if(MOD_BELIEF_NEW_EFFECT_FOR_SP && eCityReligion != NO_RELIGION)
+			{
+				int iExBouns = GC.getGame().GetGameReligions()->GetReligion(eCityReligion,getOwner())->m_Beliefs.GetHolyCityUnitExperence();
+				if(iExBouns != 0 && GetCityReligions()->IsHolyCityForReligion(eCityReligion) && GET_PLAYER(getOwner()).HasReligion(eCityReligion))
+				{
+					iExperience += iExBouns;
+				}
+			}
+#endif
 		}
 	}
 
@@ -11262,6 +11274,8 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	VALIDATE_OBJECT
 	int iModifier = 0;
 	int iTempMod;
+	auto& owner = GET_PLAYER(getOwner());
+	CvYieldInfo* pYield = GC.getYieldInfo(eIndex);
 
 	// Yield Rate Modifier
 	iTempMod = getYieldRateModifier(eIndex);
@@ -11308,7 +11322,6 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	// Golden Age Yield Modifier
 	if (GET_PLAYER(getOwner()).isGoldenAge())
 	{
-		CvYieldInfo *pYield = GC.getYieldInfo(eIndex);
 		if (pYield)
 		{
 			iTempMod = pYield->getGoldenAgeYieldMod();
@@ -11328,20 +11341,32 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 #ifdef MOD_BALANCE_CORE
 	if (MOD_BALANCE_CORE)
 	{
-		const int iNumGWs = GET_PLAYER(getOwner()).GetCulture()->GetNumGreatWorks();
-		const int iYieldModFromGws = GC.getYieldInfo(eIndex)->getGreakWorkYieldMod();
-		if (iYieldModFromGws != 0 && iNumGWs != 0)
+		iTempMod = owner.GetYieldModifierFromNumGreakWork(pYield);
+		if (iTempMod != 0)
 		{
-			iTempMod = iYieldModFromGws * iNumGWs;
-			iModifier += iTempMod;
-
 			if (toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_NUM_GREAT_WORK", iTempMod);
 		}
+		iModifier += iTempMod;
 	}
 #endif
 
-	auto& owner = GET_PLAYER(getOwner());
+	const int iModFromHappiness = owner.GetYieldModifierFromHappiness(pYield);
+	if (iModFromHappiness != 0)
+	{
+		iModifier += iModFromHappiness;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HAPPINESS_GLOBAL", iModFromHappiness);
+	}
+
+	const int iModFromHappinessPolicy = owner.GetYieldModifierFromHappinessPolicy(pYield);
+	if (iModFromHappinessPolicy != 0)
+	{
+		iModifier += iModFromHappinessPolicy;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HAPPINESS_POLICY", iModFromHappinessPolicy);
+	}
+
 	if (getNumWorldWonders() > 0)
 	{
 		if (!owner.GetCityWithWorldWonderYieldModifier().empty())
@@ -11357,6 +11382,19 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER", iTempMod);
 		}
 	}
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	if (MOD_RESOURCE_EXTRA_BUFF)
+	{
+		iTempMod = owner.GetGlobalYieldModifierFromResource(eIndex);
+		if (iTempMod != 0)
+		{
+			iModifier += iTempMod;
+			if (toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_RESOURCE_BUFF", iTempMod);
+		}
+	}
+#endif
 	
 	int iNumTradeRoutes = owner.GetTrade()->GetNumTradeRoutesUsed(true);
 	if (!owner.GetTradeRouteCityYieldModifier().empty() && iNumTradeRoutes > 0)

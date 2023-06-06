@@ -1424,8 +1424,22 @@ public:
 
 	int getFlavorValue(int i) const;
 
-	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	struct YieldInfo {
+		YieldTypes eYield = NO_YIELD;
+		LuaFormulaTypes eFormula = NO_LUA_FORMULA;
+		EraTypes eStartEra = NO_ERA;
+		EraTypes eEndEra = NO_ERA;
+	};
 
+	LuaFormulaTypes GetUnHappinessModifierFormula() const;
+	LuaFormulaTypes GetCityConnectionTradeRouteGoldModifierFormula() const;
+	LuaFormulaTypes GetGoldHurryCostModifierFormula() const;
+
+	const std::vector<YieldInfo>& GetGlobalYieldModifiers() const;
+#endif
+
+	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 protected:
 	int m_iResourceClassType;
 	int m_iChar;
@@ -1482,6 +1496,14 @@ protected:
 	bool* m_pbTerrain;
 	bool* m_pbFeature;
 	bool* m_pbFeatureTerrain;
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	LuaFormulaTypes m_eUnHappinessModifierFormula = NO_LUA_FORMULA;
+	LuaFormulaTypes m_eCityConnectionTradeRouteGoldModifierFormula = NO_LUA_FORMULA;
+	LuaFormulaTypes m_eGoldHurryCostModifierFormula = NO_LUA_FORMULA;
+
+	std::vector<YieldInfo> m_vGlobalYieldModifiers;
+#endif
 
 private:
 	CvResourceInfo(const CvResourceInfo&);
@@ -1658,6 +1680,8 @@ public:
 	int getAIWeightPercent() const;
 	int getGreakWorkYieldMod() const;
 
+	LuaFormulaTypes GetExcessHappinessModifierFormula() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -1680,6 +1704,8 @@ protected:
 #ifdef MOD_BALANCE_CORE
 	int m_iGreakWorkYieldMod;
 #endif
+
+	LuaFormulaTypes m_eExcessHappinessModifierFormula = NO_LUA_FORMULA;
 };
 
 
@@ -2415,6 +2441,7 @@ struct PolicyYieldInfo
 	PolicyTypes ePolicy;
 	YieldTypes eYield;
 	int iYield;
+	LuaFormulaTypes eLuaFormula = NO_LUA_FORMULA;
 };
 
 inline FDataStream& operator<<(FDataStream& os, const PolicyYieldInfo& kYield)

@@ -178,10 +178,10 @@ namespace lua {
                 return Result<T>::Error();
             }
 
-            lua_getglobal(m_pL, m_pLuaFormula->GetType());
+            lua_getglobal(m_pL, m_strGlobalName.c_str());
             if (!lua_isfunction(m_pL, -1))
             {
-                LogMsg("%s: cannot find global function", m_pLuaFormula->GetType());
+                LogMsg("%s: cannot find global function", m_strGlobalName.c_str());
                 lua_pop(m_pL, 1);
                 return Result<T>::Error();
             }
@@ -217,20 +217,22 @@ namespace lua {
             }
         }
 
-        void Swap(Evaluator* other)
+        Evaluator& operator=(Evaluator&& other)
         {
-            if (this == other)
+            if (&other == this)
             {
-                return;
+                return *this;
             }
 
-            lua_State* tmp_l = this->m_pL;
-            CvLuaFormula* tmp_pLuaFormula = this->m_pLuaFormula;
+            this->m_pL = other.m_pL;
+            this->m_pLuaFormula = other.m_pLuaFormula;
+            this->m_strGlobalName = other.m_strGlobalName;
 
-            this->m_pL = other->m_pL;
-            this->m_pLuaFormula = other->m_pLuaFormula;
-            other->m_pL = tmp_l;
-            other->m_pLuaFormula = tmp_pLuaFormula;
+            other.m_pL = nullptr;
+            other.m_pLuaFormula = nullptr;
+            other.m_strGlobalName = "";
+
+            return *this;
         }
 
         Evaluator& operator=(const Evaluator& other) = delete;
@@ -238,6 +240,7 @@ namespace lua {
     private:
         CvLuaFormula* m_pLuaFormula = nullptr; // weak pointer;
         lua_State* m_pL = nullptr;
+        std::string m_strGlobalName = "";
     };
 
     class EvaluatorFactory
@@ -269,10 +272,12 @@ namespace lua {
                 lua_close(l);
                 return false;
             }
-            lua_setglobal(l, pFormula->GetType());
-
+            outEvaluator->m_strGlobalName = "func";
             outEvaluator->m_pLuaFormula = pFormula;
             outEvaluator->m_pL = l;
+            lua_setglobal(l, outEvaluator->m_strGlobalName.c_str());
+            outEvaluator->LogMsg("%s: init successfully. formula=%s", pFormula->GetType(), pFormula->GetFormula().c_str());
+            return true;
         }
     };
 

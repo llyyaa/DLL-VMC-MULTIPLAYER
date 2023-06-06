@@ -2449,6 +2449,16 @@ int CvGameReligions::GetAdjacentCityReligiousPressure (ReligionTypes eReligion, 
 			iPressure *= (100 + iModifier);
 			iPressure /= 100;
 		}
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+		// Belief that boosts pressure from originating city?
+		int iHolyCityModifier = GC.getGame().GetGameReligions()->GetReligion(eReligion,pFromCity->getOwner())->m_Beliefs.GetHolyCityPressureModifier();
+		if(MOD_BELIEF_NEW_EFFECT_FOR_SP && iHolyCityModifier !=0 && pFromCity->GetCityReligions()->IsHolyCityForReligion(eReligion))
+		{
+			iPressure *= (100 + iHolyCityModifier);
+			iPressure /=100;
+		}
+#endif		
 	}
 
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -6635,8 +6645,9 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	}
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	//Is has Extra Missionary Spreads ?
 	iRtnValue += pEntry->GetCityExtraMissionarySpreads() * iFlavorReligon;
+	iRtnValue += pEntry->GetHolyCityPressureModifier() / 10 * iFlavorReligon;
+	iRtnValue += pEntry->GetHolyCityUnitExperence() * (iFlavorDefense + iFlavorOffense) / 2;
 #endif
 
 	//----------------

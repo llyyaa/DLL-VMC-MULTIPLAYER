@@ -464,6 +464,10 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iIdeologyUnhappinessModifier = kResults.GetInt("IdeologyUnhappinessModifier");
 #endif
 
+	m_iInstantFoodThresholdPercent = kResults.GetInt("InstantFoodThresholdPercent");
+
+	m_eCaptureCityResistanceTurnsChangeFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("CaptureCityResistanceTurnsChangeFormula")));
+
 	const char* szFreeBuilding = kResults.GetText("FreeBuildingOnConquest");
 	if(szFreeBuilding)
 	{
@@ -968,6 +972,31 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	}
 
 	{
+		m_vHappinessYieldModifier.clear();
+		std::string sqlKey = "Policy - m_vHappinessYieldModifier";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if(pResults == NULL)
+		{
+			const char* szSQL = "select * from Policy_HappinessYieldModifier where PolicyType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, szPolicyType, false);
+
+		while(pResults->Step())
+		{
+			PolicyYieldInfo p;
+			p.eYield = (YieldTypes)GC.getInfoTypeForString(pResults->GetText("YieldType"));
+			p.iYield = 0;
+			p.ePolicy = (PolicyTypes)GetID();
+			p.eLuaFormula = (LuaFormulaTypes)GC.getInfoTypeForString(pResults->GetText("YieldFormula"));
+			m_vHappinessYieldModifier.push_back(p);
+		}
+
+		pResults->Reset();
+	}
+
+	{
 		m_vCityResources.clear();
 		std::string sqlKey = "m_vCityResources";
 		Database::Results* pResults = kUtility.GetResults(sqlKey);
@@ -995,6 +1024,11 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 
 	m_iGlobalHappinessFromFaithPercent = kResults.GetInt("GlobalHappinessFromFaithPercent");
 	m_iHappinessInWLTKDCities = kResults.GetInt("HappinessInWLTKDCities");
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	m_iResourceUnhappinessModifier = kResults.GetInt("ResourceUnhappinessModifier");
+	m_iResourceCityConnectionTradeRouteGoldModifier = kResults.GetInt("ResourceCityConnectionTradeRouteGoldModifier");
+#endif
 
 #if defined(MOD_RELIGION_POLICY_BRANCH_FAITH_GP)
 	//FaithPurchaseUnitClasses
@@ -2544,6 +2578,16 @@ int CvPolicyEntry::GetIdeologyUnhappinessModifier() const
 }
 #endif
 
+int CvPolicyEntry::GetInstantFoodThresholdPercent() const
+{
+	return m_iInstantFoodThresholdPercent;
+}
+
+LuaFormulaTypes CvPolicyEntry::GetCaptureCityResistanceTurnsChangeFormula() const
+{
+	return m_eCaptureCityResistanceTurnsChangeFormula;
+}
+
 std::vector<PolicyYieldInfo>& CvPolicyEntry::GetCityWithWorldWonderYieldModifier()
 {
 	return m_vCityWithWorldWonderYieldModifier;
@@ -2559,6 +2603,12 @@ std::vector<PolicyYieldInfo>& CvPolicyEntry::GetCityNumberCityYieldModifier()
 	return m_vCityNumberCityYieldModifier;
 }
 
+std::vector<PolicyYieldInfo>& CvPolicyEntry::GetHappinessYieldModifier()
+{
+	return m_vHappinessYieldModifier;
+}
+
+
 std::vector<PolicyResourceInfo>& CvPolicyEntry::GetCityResources()
 {
 	return m_vCityResources;
@@ -2573,6 +2623,17 @@ int CvPolicyEntry::GetHappinessInWLTKDCities() const
 {
 	return m_iHappinessInWLTKDCities;
 }
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+int CvPolicyEntry::GetResourceUnhappinessModifier() const
+{
+	return m_iResourceUnhappinessModifier;
+}
+int CvPolicyEntry::GetResourceCityConnectionTradeRouteGoldModifier() const
+{
+	return m_iResourceCityConnectionTradeRouteGoldModifier;
+}
+#endif
 
 //=====================================
 // CvPolicyBranchEntry

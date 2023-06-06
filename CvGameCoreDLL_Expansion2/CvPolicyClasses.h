@@ -279,14 +279,23 @@ public:
 	int GetIdeologyUnhappinessModifier() const;
 #endif
 
+	int GetInstantFoodThresholdPercent() const;
+	LuaFormulaTypes GetCaptureCityResistanceTurnsChangeFormula() const;
+
 	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
 	std::vector<PolicyYieldInfo>& GetTradeRouteCityYieldModifier();
 	std::vector<PolicyYieldInfo>& GetCityNumberCityYieldModifier();
+	std::vector<PolicyYieldInfo>& GetHappinessYieldModifier();
 
 	std::vector<PolicyResourceInfo>& GetCityResources();
 
 	int GetGlobalHappinessFromFaithPercent() const;
 	int GetHappinessInWLTKDCities() const;
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int GetResourceUnhappinessModifier() const;
+	int GetResourceCityConnectionTradeRouteGoldModifier() const;
+#endif
 
 private:
 	int m_iTechPrereq;
@@ -518,6 +527,10 @@ private:
 	int m_iIdeologyUnhappinessModifier = 0;
 #endif
 
+	int m_iInstantFoodThresholdPercent = 0;
+
+	LuaFormulaTypes m_eCaptureCityResistanceTurnsChangeFormula = NO_LUA_FORMULA;
+
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piMinorsTradeRouteYieldRate;
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piInternalTradeRouteDestYieldRate;
@@ -526,8 +539,14 @@ private:
 	std::vector<PolicyYieldInfo> m_vCityWithWorldWonderYieldModifier;
 	std::vector<PolicyYieldInfo> m_vTradeRouteCityYieldModifier;
 	std::vector<PolicyYieldInfo> m_vCityNumberCityYieldModifier;
+	std::vector<PolicyYieldInfo> m_vHappinessYieldModifier;
 	int m_iGlobalHappinessFromFaithPercent = 0;
 	int m_iHappinessInWLTKDCities = 0;
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int m_iResourceUnhappinessModifier = 0;
+	int m_iResourceCityConnectionTradeRouteGoldModifier = 0;
+#endif
 
 	std::vector<PolicyResourceInfo> m_vCityResources;
 };

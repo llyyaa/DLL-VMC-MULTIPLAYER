@@ -1284,6 +1284,16 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 #endif
 
 	Method(GetHappinessFromFaith);
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	Method(GetUnHappinessModFromResourceByIndex);
+	Method(GetCityConnectionTradeRouteGoldModifierFromResourceByIndex);
+	Method(GetGoldHurryCostModifierFromResourceByIndex);
+#endif
+
+	Method(GetYieldModifierFromHappiness);
+	Method(GetYieldModifierFromNumGreakWork);
+	Method(GetYieldModifierFromHappinessPolicy);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12410,3 +12420,62 @@ int CvLuaPlayer::lGetSpecialistResources(lua_State* L)
 #endif
 
 LUAAPIIMPL(Player, GetHappinessFromFaith)
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+// player:GetUnHappinessModFromResourceByIndex(eResource)
+int CvLuaPlayer::lGetUnHappinessModFromResourceByIndex(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	ResourceTypes eResource = static_cast<ResourceTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->CalculateUnhappinessModFromResource(GC.getResourceInfo(eResource), pkPlayer->getNumResourceAvailable(eResource));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+// player:GetCityConnectionTradeRouteGoldModifierFromResourceByIndex(eResource)
+int CvLuaPlayer::lGetCityConnectionTradeRouteGoldModifierFromResourceByIndex(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	ResourceTypes eResource = static_cast<ResourceTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->CalculateCityConnectionTradeRouteGoldModifierFromResource(GC.getResourceInfo(eResource), pkPlayer->getNumResourceAvailable(eResource));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetGoldHurryCostModifierFromResourceByIndex(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	ResourceTypes eResource = static_cast<ResourceTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->CalculateGoldHurryModFromResource(GC.getResourceInfo(eResource), pkPlayer->getNumResourceAvailable(eResource));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+#endif
+
+int CvLuaPlayer::lGetYieldModifierFromHappiness(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromHappiness(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetYieldModifierFromNumGreakWork(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromNumGreakWork(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetYieldModifierFromHappinessPolicy(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromHappinessPolicy(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}

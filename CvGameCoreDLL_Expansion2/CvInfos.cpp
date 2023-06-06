@@ -4897,8 +4897,55 @@ bool CvResourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	}
 
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	m_eUnHappinessModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("UnHappinessModifierFormula"), true));
+	m_eCityConnectionTradeRouteGoldModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("CityConnectionTradeRouteGoldModifierFormula"), true));
+	m_eGoldHurryCostModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("GoldHurryCostModifierFormula"), true));
+
+	{
+		std::string sqlKey = "Resoureces - m_vGlobalYieldModifiers";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if (pResults == NULL)
+		{
+			const char* szSQL = "select * from Resource_GlobalYieldModifiers where ResourceType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, GetType(), false);
+
+		while (pResults->Step())
+		{
+			YieldInfo info;
+			info.eFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(pResults->GetText("YieldFormula")));
+			info.eYield = static_cast<YieldTypes>(GC.getInfoTypeForString(pResults->GetText("YieldType")));
+			info.eStartEra = static_cast<EraTypes>(GC.getInfoTypeForString(pResults->GetText("StartEra")));
+			info.eEndEra = static_cast<EraTypes>(GC.getInfoTypeForString(pResults->GetText("EndEra")));
+			m_vGlobalYieldModifiers.push_back(info);
+		}
+
+		pResults->Reset();
+	}
+#endif
 
 	return true;
+}
+
+LuaFormulaTypes CvResourceInfo::GetUnHappinessModifierFormula() const
+{
+	return m_eUnHappinessModifierFormula;
+}
+LuaFormulaTypes CvResourceInfo::GetCityConnectionTradeRouteGoldModifierFormula() const
+{
+	return m_eCityConnectionTradeRouteGoldModifierFormula;
+}
+LuaFormulaTypes CvResourceInfo::GetGoldHurryCostModifierFormula() const
+{
+	return m_eGoldHurryCostModifierFormula;
+}
+
+const std::vector<CvResourceInfo::YieldInfo>& CvResourceInfo::GetGlobalYieldModifiers() const
+{
+	return m_vGlobalYieldModifiers;
 }
 
 //======================================================================================================
@@ -5455,6 +5502,11 @@ int CvYieldInfo::getGreakWorkYieldMod() const
 }
 #endif
 
+LuaFormulaTypes CvYieldInfo::GetExcessHappinessModifierFormula() const
+{
+	return m_eExcessHappinessModifierFormula;
+}
+
 //------------------------------------------------------------------------------
 bool CvYieldInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -5483,6 +5535,8 @@ bool CvYieldInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 		kResults.GetValue("GreakWorkYieldMod", m_iGreakWorkYieldMod);
 	}
 #endif
+
+	m_eExcessHappinessModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("ExcessHappinessModifierFormula")));
 
 	return true;
 }

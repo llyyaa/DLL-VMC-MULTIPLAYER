@@ -718,9 +718,19 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 				setHasPromotion(ePromotion, true);
 		}
 	}
-
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	if(!IsCombatUnit() && kPlayer.GetPlayerTraits()->GetCiviliansFreePromotion() != NO_PROMOTION)
+	{
+		setHasPromotion((PromotionTypes)kPlayer.GetPlayerTraits()->GetCiviliansFreePromotion(), true);
+	}
+#endif
 	const UnitCombatTypes unitCombatType = getUnitCombatType();
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	const UnitClassTypes unitClassType = getUnitClassType();
+	if(unitCombatType != NO_UNITCOMBAT && unitClassType != NO_UNITCLASS)
+#else
 	if(unitCombatType != NO_UNITCOMBAT)
+#endif
 	{
 		// Any free Promotions to apply?
 		for(int iJ = 0; iJ < GC.getNumPromotionInfos(); iJ++)
@@ -730,6 +740,12 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 			{
 				setHasPromotion(promotionID, true);
 			}
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			else if(kPlayer.GetPlayerTraits()->HasFreePromotionUnitClass(promotionID, unitClassType))
+			{
+				setHasPromotion(promotionID, true);
+			}
+#endif
 		}
 	}
 

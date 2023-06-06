@@ -4555,8 +4555,7 @@ int CvCityCulture::GetBaseTourismBeforeModifiers()
 int CvCityCulture::GetBaseTourism()
 {
 	int iBase = GetBaseTourismBeforeModifiers();
-
-	int iModifier = 0;
+	int iModifier = m_pCity->getBaseYieldRateModifier(YIELD_TOURISM) - 100;
 
 	CvPlayer &kPlayer = GET_PLAYER(m_pCity->getOwner());
 	int iTechSpreadModifier = kPlayer.GetInfluenceSpreadModifier();
@@ -4580,7 +4579,6 @@ int CvCityCulture::GetBaseTourism()
 	{
 		iModifier += kPlayer.GetPlayerTraits()->GetGoldenAgeTourismModifier();
 	}
-	
 
 	int iBuildingMod = 0;
 	for(int iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
