@@ -995,6 +995,20 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 
 	if(bSetupGraphical)
 		setupGraphical();
+
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	if(MOD_UNIT_BOUND_IMPROVEMENT)
+	{
+		if(plot()->isWater() && GetBoundWaterImprovement() != NO_IMPROVEMENT)
+		{
+			plot()->setImprovementType((ImprovementTypes)GetBoundWaterImprovement(),getOwner());
+		}
+		else if(!plot()->isWater() && GetBoundLandImprovement() != NO_IMPROVEMENT)
+		{
+			plot()->setImprovementType((ImprovementTypes)GetBoundLandImprovement(),getOwner());
+		}
+	}
+#endif
 		
 #if defined(MOD_EVENTS_UNIT_CREATED)
 	if (MOD_EVENTS_UNIT_CREATED) {
@@ -2119,6 +2133,13 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 #if defined(MOD_EVENTS_UNIT_CAPTURE)
 	if (MOD_EVENTS_UNIT_CAPTURE && (kCaptureDef.eCapturingPlayer != NO_PLAYER && kCaptureDef.eCaptureUnitType != NO_UNIT)) {
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_UnitCaptured, kCaptureDef.eCapturingPlayer, kCaptureDef.eCaptureUnitType, getOwner(), GetID(), false, 1);
+	}
+#endif
+
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	if(MOD_UNIT_BOUND_IMPROVEMENT && (GetBoundLandImprovement() != NO_IMPROVEMENT || GetBoundWaterImprovement() != NO_IMPROVEMENT))
+	{
+		pPlot->setImprovementType(NO_IMPROVEMENT);
 	}
 #endif
 
@@ -15994,6 +16015,22 @@ int CvUnit::ExtraDefenseXPValue() const
 {
 	VALIDATE_OBJECT
 	return m_pUnitInfo->GetExtraXPValueDefense();
+}
+#endif
+
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+int CvUnit::GetBoundLandImprovement() const
+{
+	VALIDATE_OBJECT
+	return m_pUnitInfo->GetBoundLandImprovement();
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetBoundWaterImprovement() const
+{
+	VALIDATE_OBJECT
+	return m_pUnitInfo->GetBoundWaterImprovement();
 }
 #endif
 

@@ -592,6 +592,10 @@ public:
 	int ExtraAttackXPValue() const;
 	int ExtraDefenseXPValue() const;
 #endif
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	int GetBoundLandImprovement() const;
+	int GetBoundWaterImprovement() const;
+#endif
 	int maxXPValue() const;
 
 	int firstStrikes() const;

@@ -90,6 +90,10 @@ public:
 	int GetExtraXPValueAttack() const;
 	int GetExtraXPValueDefense() const;
 #endif
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	int GetBoundLandImprovement() const;
+	int GetBoundWaterImprovement() const;
+#endif
 	int GetSpecialCargo() const;
 	int GetDomainCargo() const;
 
@@ -258,6 +262,11 @@ private:
 	int m_iExtraXPValueAttack;
 	int m_iExtraXPValueDefense;
 #endif
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	int m_iBoundLandImprovement;
+	int m_iBoundWaterImprovement;
+#endif
+
 	int m_iSpecialCargo;
 
 	int m_iDomainCargo;

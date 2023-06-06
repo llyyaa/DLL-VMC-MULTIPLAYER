@@ -1057,6 +1057,12 @@
 
     <!-- table changes: -->
     <!-- see NewTableChanges.sql -->
+    <!-- ALTER TABLE Units ADD COLUMN 'BoundLandImprovement' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE Units ADD COLUMN 'BoundWaterImprovement' TEXT DEFAULT NULL; -->
+    <Row Class="6" Name="UNIT_BOUND_IMPROVEMENT" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
     <!-- ALTER TABLE UnitPromotions ADD 'FeatureInvisible' TEXT DEFAULT NULL; -->
     <!-- ALTER TABLE UnitPromotions ADD 'FeatureInvisible2' TEXT DEFAULT NULL; -->
     <Row Class="6" Name="PROMOTION_FEATURE_INVISIBLE" Value="0"/>
