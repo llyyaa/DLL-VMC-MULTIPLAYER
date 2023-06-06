@@ -909,7 +909,7 @@
     <Row Class="1" Name="BUGFIX_NAVAL_FREE_UNITS" Value="1"/>
     <!-- Fixes the bug where the naval units jump to the nearest city and not the nearest available non-lake water plot (v19) -->
     <!-- See also: "Global - Naval Nearest Water" -->
-    <Row Class="1" Name="BUGFIX_NAVAL_NEAREST_WATER" Value="0"/>
+    <Row Class="1" Name="BUGFIX_NAVAL_NEAREST_WATER" Value="1"/>
     <!-- Fixes the bug where naval units in hill cities attack from the top of the hill, not the harbour (v95) -->
     <Row Class="1" Name="BUGFIX_NAVAL_TARGETING" Value="1"/>
     <!-- Fixes the bug where stacked ranged units may attack out of cities but melee units may not (v19) -->
