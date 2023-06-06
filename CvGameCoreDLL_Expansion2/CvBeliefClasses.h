@@ -123,6 +123,7 @@ public:
 	int GetPlotYieldChange(int i, int j) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
 	int GetCityExtraMissionarySpreads() const;
 	bool AllowYieldPerBirth() const;
@@ -182,6 +183,7 @@ protected:
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
 	int m_iCityExtraMissionarySpreads;
 	bool m_bAllowYieldPerBirth;
@@ -462,6 +464,7 @@ public:
 	int GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
 	int GetCityExtraMissionarySpreads() const;
 	bool AllowYieldPerBirth() const;

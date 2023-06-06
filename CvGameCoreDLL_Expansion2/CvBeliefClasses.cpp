@@ -58,6 +58,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iInquisitorPressureRetention(0),
 	m_iFaithBuildingTourism(0),
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iHolyCityUnitExperence(0),
 	m_iHolyCityPressureModifier(0),
 	m_iCityExtraMissionarySpreads(0),
 	m_bAllowYieldPerBirth(false),
@@ -673,6 +674,11 @@ int CvBeliefEntry::GetPlotYieldChange(int i, int j) const
 }
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+//Extra Experence for Holy City Unit
+int CvBeliefEntry::GetHolyCityUnitExperence() const
+{
+	return m_iHolyCityUnitExperence;
+}
 //Extra HolyCity Religious Pressure
 int CvBeliefEntry::GetHolyCityPressureModifier() const
 {
@@ -816,6 +822,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iInquisitorPressureRetention    = kResults.GetInt("InquisitorPressureRetention");
 	m_iFaithBuildingTourism           = kResults.GetInt("FaithBuildingTourism");
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iHolyCityUnitExperence	  	  = kResults.GetInt("HolyCityUnitExperence");
 	m_iCityExtraMissionarySpreads	  = kResults.GetInt("CityExtraMissionarySpreads");
 	m_iHolyCityPressureModifier	  	  = kResults.GetInt("HolyCityPressureModifier");
 #endif
@@ -2067,6 +2074,22 @@ int CvReligionBeliefs::GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType
 #endif
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+//Is has Extra Experence for Holy City Unit ?
+int CvReligionBeliefs::GetHolyCityUnitExperence() const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
+	{
+		if(HasBelief((BeliefTypes)i))
+		{
+			rtnValue += pBeliefs->GetEntry(i)->GetHolyCityUnitExperence();
+		}
+	}
+
+	return rtnValue;
+}
 //Is has Extra HolyCity Religious Pressure ?
 int CvReligionBeliefs::GetHolyCityPressureModifier() const
 {

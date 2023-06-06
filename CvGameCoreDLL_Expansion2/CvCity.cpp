@@ -4278,6 +4278,18 @@ int CvCity::getProductionExperience(UnitTypes eUnit)
 			}
 
 			iExperience += getSpecialistFreeExperience();
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+			//Experence from Religion
+			ReligionTypes eCityReligion = GetCityReligions()->GetReligiousMajority();
+			if(MOD_BELIEF_NEW_EFFECT_FOR_SP && eCityReligion != NO_RELIGION)
+			{
+				int iExBouns = GC.getGame().GetGameReligions()->GetReligion(eCityReligion,getOwner())->m_Beliefs.GetHolyCityUnitExperence();
+				if(iExBouns != 0 && GetCityReligions()->IsHolyCityForReligion(eCityReligion) && GET_PLAYER(getOwner()).HasReligion(eCityReligion))
+				{
+					iExperience += iExBouns;
+				}
+			}
+#endif
 		}
 	}
 

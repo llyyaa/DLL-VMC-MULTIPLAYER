@@ -6645,9 +6645,9 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	}
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	//Is has Extra Missionary Spreads ?
 	iRtnValue += pEntry->GetCityExtraMissionarySpreads() * iFlavorReligon;
-	iRtnValue += pEntry->GetHolyCityPressureModifier() /10 * iFlavorReligon;
+	iRtnValue += pEntry->GetHolyCityPressureModifier() / 10 * iFlavorReligon;
+	iRtnValue += pEntry->GetHolyCityUnitExperence() * (iFlavorDefense + iFlavorOffense) / 2;
 #endif
 
 	//----------------
