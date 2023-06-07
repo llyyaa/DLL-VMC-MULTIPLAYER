@@ -3,6 +3,14 @@
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
 
+
+<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
+				<Text>
+					[NEWLINE][ICON_BULLET]全局城市修正(世界奇觀): {1_Num}%
+				</Text>
+			</Row>
+
+
 	<Row Tag="TXT_KEY_PRODMOD_WONDER_IMPROVEMENT">
 			<Text>
 				[NEWLINE][ICON_BULLET]改良設施提供奇觀建造加成: {1_Num}%。
