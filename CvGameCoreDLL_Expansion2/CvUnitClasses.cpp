@@ -74,6 +74,10 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_iExtraXPValueAttack(0),
 	m_iExtraXPValueDefense(0),
 #endif
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	m_iBoundLandImprovement(NO_IMPROVEMENT),
+	m_iBoundWaterImprovement(NO_IMPROVEMENT),
+#endif
 	m_iSpecialCargo(0),
 	m_iDomainCargo(0),
 	m_iConscriptionValue(0),
@@ -308,6 +312,13 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 
 	szTextVal = kResults.GetText("CombatClass");
 	m_iUnitCombatType = GC.getInfoTypeForString(szTextVal, true);
+
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	szTextVal = kResults.GetText("BoundLandImprovement");
+	m_iBoundLandImprovement = GC.getInfoTypeForString(szTextVal, true);
+	szTextVal = kResults.GetText("BoundWaterImprovement");
+	m_iBoundWaterImprovement = GC.getInfoTypeForString(szTextVal, true);
+#endif
 
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
 	szTextVal = kResults.GetText("PromotionClass");
@@ -811,6 +822,18 @@ int CvUnitEntry::GetExtraXPValueAttack() const
 int CvUnitEntry::GetExtraXPValueDefense() const
 {
 	return m_iExtraXPValueDefense;
+}
+#endif
+
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+int CvUnitEntry::GetBoundLandImprovement() const
+{
+	return m_iBoundLandImprovement;
+}
+
+int CvUnitEntry::GetBoundWaterImprovement() const
+{
+	return m_iBoundWaterImprovement;
 }
 #endif
 

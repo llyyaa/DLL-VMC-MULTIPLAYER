@@ -123,6 +123,7 @@ public:
 	int GetPlotYieldChange(int i, int j) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
 	int GetCityExtraMissionarySpreads() const;
@@ -183,6 +184,7 @@ protected:
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
 	int m_iCityExtraMissionarySpreads;
@@ -464,6 +466,7 @@ public:
 	int GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
 	int GetCityExtraMissionarySpreads() const;
