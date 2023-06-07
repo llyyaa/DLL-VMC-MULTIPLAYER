@@ -240,6 +240,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piDomainFreeExperiencePerGreatWork(NULL),
 
 #if defined(MOD_ROG_CORE)
+	m_piYieldModifierFromWonder(NULL),
+
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
 	m_piDomainFreeExperienceGlobal(),
 #endif
@@ -309,6 +311,8 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWork);
 
 #if defined(MOD_ROG_CORE)
+	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
+	
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
 	m_piDomainFreeExperienceGlobal.clear();
 #endif
@@ -642,6 +646,11 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldChangePerPop, "Building_YieldChangesPerPop", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangePerReligion, "Building_YieldChangesPerReligion", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifier, "Building_YieldModifiers", "BuildingType", szBuildingType);
+
+#if defined(MOD_ROG_CORE)
+	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
+#endif
+
 	kUtility.SetYields(m_piAreaYieldModifier, "Building_AreaYieldModifiers", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piGlobalYieldModifier, "Building_GlobalYieldModifiers", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piTechEnhancedYieldChange, "Building_TechEnhancedYieldChanges", "BuildingType", szBuildingType);
@@ -2244,6 +2253,15 @@ bool CvBuildingEntry::IsScienceBuilding() const
 		bRtnValue = true;
 	}
 
+#if defined(MOD_ROG_CORE)
+	else if (GetYieldModifierFromWonder(YIELD_SCIENCE) > 0)
+	{
+		bRtnValue = true;
+	}
+
+#endif
+	
+
 	return bRtnValue;
 }
 
@@ -2390,6 +2408,24 @@ int* CvBuildingEntry::GetYieldModifierArray() const
 {
 	return m_piYieldModifier;
 }
+
+
+#if defined(MOD_ROG_CORE)
+int CvBuildingEntry::GetYieldModifierFromWonder(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldModifierFromWonder ? m_piYieldModifierFromWonder[i] : -1;
+}
+
+/// Array of yield modifiers
+int* CvBuildingEntry::GetYieldModifierFromWonderArray() const
+{
+	return m_piYieldModifierFromWonder;
+}
+#endif
+
+
 
 /// Modifier to yield by type in area
 int CvBuildingEntry::GetAreaYieldModifier(int i) const

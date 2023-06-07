@@ -1281,6 +1281,9 @@ public:
 	void updateExtraYieldThreshold(YieldTypes eIndex);
 
 #if defined(MOD_ROG_CORE)
+	int getWorldWonderCityYieldRateModifier(YieldTypes eIndex) const;
+	void changeWorldWonderCityYieldRateModifier(YieldTypes eIndex, int iChange);
+
 	int GetImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield) const;
 	void ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield, int iChange);
 #endif
@@ -2367,6 +2370,8 @@ protected:
 #endif
 
 #if defined(MOD_ROG_CORE)
+	std::vector<int> m_aiWorldWonderCityYieldRateModifier;
+
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainFreeExperiencePerGreatWorkGlobal;
 
 	std::map<int, int> m_piDomainFreeExperience;

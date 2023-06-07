@@ -11369,6 +11369,20 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 
 	if (getNumWorldWonders() > 0)
 	{
+#ifdef MOD_ROG_CORE
+		if (MOD_ROG_CORE)
+		{
+			iTempMod += GET_PLAYER(getOwner()).getWorldWonderCityYieldRateModifier(eIndex);
+			if (iTempMod != 0)
+			{
+				if (toolTipSink)
+					GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL", iTempMod);
+			}
+			iModifier += iTempMod;
+		}
+#endif
+
+
 		if (!owner.GetCityWithWorldWonderYieldModifier().empty())
 		{
 			iTempMod = 0;

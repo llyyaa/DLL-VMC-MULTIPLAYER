@@ -346,6 +346,12 @@ public:
 	int* GetYieldChangePerReligionArray() const;
 	int GetYieldModifier(int i) const;;
 	int* GetYieldModifierArray() const;
+
+#if defined(MOD_ROG_CORE)
+	int GetYieldModifierFromWonder(int i) const;;
+	int* GetYieldModifierFromWonderArray() const;
+#endif
+
 	int GetAreaYieldModifier(int i) const;
 	int* GetAreaYieldModifierArray() const;
 	int GetGlobalYieldModifier(int i) const;
@@ -686,6 +692,12 @@ private:
 	int* m_piYieldChangePerPop;
 	int* m_piYieldChangePerReligion;
 	int* m_piYieldModifier;
+
+#if defined(MOD_ROG_CORE)
+	int* m_piYieldModifierFromWonder;
+#endif
+
+
 	int* m_piAreaYieldModifier;
 	int* m_piGlobalYieldModifier;
 	int* m_piTechEnhancedYieldChange;

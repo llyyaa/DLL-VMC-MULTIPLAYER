@@ -1217,6 +1217,11 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_piDomainFreeExperience.clear();
 #endif
 
+#ifdef MOD_ROG_CORE
+	m_aiWorldWonderCityYieldRateModifier.clear();
+	m_aiWorldWonderCityYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
+#endif
+
 	m_aiCoastalCityYieldChange.clear();
 	m_aiCoastalCityYieldChange.resize(NUM_YIELD_TYPES, 0);
 
@@ -1235,10 +1240,14 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiYieldRateModifier.clear();
 	m_aiYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
 
+
+
 #ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
 	m_aiGoldenAgeYieldRateModifier.clear();
 	m_aiGoldenAgeYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
 #endif
+
+
 
 	m_aiCapitalYieldRateModifier.clear();
 	m_aiCapitalYieldRateModifier.resize(NUM_YIELD_TYPES, 0);
@@ -9578,6 +9587,9 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 #if defined(MOD_ROG_CORE)
 
+		changeWorldWonderCityYieldRateModifier(((YieldTypes)iI), (pBuildingInfo->GetYieldModifierFromWonder(iI) * iChange));
+
+
 		int iMod = pBuildingInfo->GetGreatWorkYieldChange(iI) * iChange;
 		if (iMod != 0)
 		{
@@ -16440,6 +16452,36 @@ void CvPlayer::ChangeDomainFreeExperience(DomainTypes eIndex, int iChange)
 	m_piDomainFreeExperience[(int)eIndex] += iChange;
 }
 #endif
+
+
+
+#if defined(MOD_ROG_CORE)
+int CvPlayer::getWorldWonderCityYieldRateModifier(YieldTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiWorldWonderCityYieldRateModifier[eIndex];
+}
+void CvPlayer::changeWorldWonderCityYieldRateModifier(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiWorldWonderCityYieldRateModifier[eIndex] += iChange;
+
+		invalidateYieldRankCache(eIndex);
+
+		if (getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
+#endif
+
+
 //	--------------------------------------------------------------------------------
 int CvPlayer::getMilitaryFoodProductionCount() const
 {
@@ -19467,6 +19509,13 @@ void CvPlayer::changeYieldRateModifier(YieldTypes eIndex, int iChange)
 		}
 	}
 }
+
+
+
+
+
+
+
 
 #ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
 int CvPlayer::getGoldenAgeYieldRateModifier(YieldTypes eIndex) const
@@ -26197,6 +26246,11 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_piDomainFreeExperience;
 #endif
 
+#ifdef MOD_ROG_CORE
+	kStream >> m_aiWorldWonderCityYieldRateModifier;
+#endif
+
+
 	kStream >> m_aiCoastalCityYieldChange;
 	kStream >> m_aiCapitalYieldChange;
 	kStream >> m_aiCapitalYieldPerPopChange;
@@ -26812,12 +26866,18 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_piDomainFreeExperience;
 #endif
 
+#ifdef MOD_ROG_CORE
+	kStream << m_aiWorldWonderCityYieldRateModifier;
+#endif
+
 	kStream << m_aiCoastalCityYieldChange;
 	kStream << m_aiCapitalYieldChange;
 	kStream << m_aiCapitalYieldPerPopChange;
 	kStream << m_aiSeaPlotYield;
 	kStream << m_aiYieldRateModifier;
 	kStream << m_aiCapitalYieldRateModifier;
+
+
 
 #ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
 	kStream << m_aiGoldenAgeYieldRateModifier;
