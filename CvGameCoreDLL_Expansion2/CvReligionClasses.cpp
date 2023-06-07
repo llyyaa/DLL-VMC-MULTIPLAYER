@@ -6648,6 +6648,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	iRtnValue += pEntry->GetCityExtraMissionarySpreads() * iFlavorReligon;
 	iRtnValue += pEntry->GetHolyCityPressureModifier() / 10 * iFlavorReligon;
 	iRtnValue += pEntry->GetHolyCityUnitExperence() * (iFlavorDefense + iFlavorOffense) / 2;
+	iRtnValue += pEntry->GetLandmarksTourismPercent() * iFlavorCulture;
 #endif
 
 	//----------------

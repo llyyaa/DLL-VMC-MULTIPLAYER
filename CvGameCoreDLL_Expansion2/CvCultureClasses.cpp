@@ -4466,6 +4466,17 @@ int CvCityCulture::GetBaseTourismBeforeModifiers()
 #endif
 
 	int iPercent = m_pCity->GetCityBuildings()->GetLandmarksTourismPercent();
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	ReligionTypes eCityReligion = m_pCity->GetCityReligions()->GetReligiousMajority();
+	if(MOD_BELIEF_NEW_EFFECT_FOR_SP && eCityReligion != NO_RELIGION)
+	{
+		int iReligionPercent = GC.getGame().GetGameReligions()->GetReligion(eCityReligion,m_pCity->getOwner())->m_Beliefs.GetLandmarksTourismPercent();
+		if(iReligionPercent != 0 && GET_PLAYER(m_pCity->getOwner()).HasReligion(eCityReligion))
+		{
+			iPercent += iReligionPercent;
+		}
+	}
+#endif
 	if (iPercent > 0)
 	{
 		int iFromWonders = GetCultureFromWonders();
@@ -4746,6 +4757,17 @@ CvString CvCityCulture::GetTourismTooltip()
 	// Landmarks, Wonders, Natural Wonders, Improvements
 	int iTileTourism = 0;
 	int iPercent = m_pCity->GetCityBuildings()->GetLandmarksTourismPercent();
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	ReligionTypes eCityReligion = m_pCity->GetCityReligions()->GetReligiousMajority();
+	if(MOD_BELIEF_NEW_EFFECT_FOR_SP && eCityReligion != NO_RELIGION)
+	{
+		int iReligionPercent = GC.getGame().GetGameReligions()->GetReligion(eCityReligion,m_pCity->getOwner())->m_Beliefs.GetLandmarksTourismPercent();
+		if(iReligionPercent != 0 && GET_PLAYER(m_pCity->getOwner()).HasReligion(eCityReligion))
+		{
+			iPercent += iReligionPercent;
+		}
+	}
+#endif
 	if (iPercent > 0)
 	{
 		int iFromWonders = GetCultureFromWonders();
@@ -5353,7 +5375,8 @@ int CvCityCulture::GetCultureFromImprovements() const
 						{
 							iRtnValue += pLoopPlot->calculateYield(eYield);
 
-							CvImprovementEntry* pImprovement = GC.getImprovementInfo(eImprovement);
+							//The following lines of code will Double count Yield From Adjacent!
+							/*CvImprovementEntry* pImprovement = GC.getImprovementInfo(eImprovement);
 							if(pImprovement && pImprovement->GetYieldChange(eYield) > 0)
 							{
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -5369,7 +5392,7 @@ int CvCityCulture::GetCultureFromImprovements() const
 									iRtnValue += pLoopPlot->ComputeCultureFromAdjacentImprovement(*pImprovement, eImprovement);
 #endif
 								}
-							}
+							}*/
 						}
 					}
 				}
