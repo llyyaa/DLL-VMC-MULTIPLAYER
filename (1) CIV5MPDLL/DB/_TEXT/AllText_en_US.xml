@@ -2,6 +2,14 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
+
+	<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
+				<Text>
+					[NEWLINE][ICON_BULLET]Global City Fix (World Wonder): {1_Num}%
+				</Text>
+			</Row>
+
+
 		<Row Tag="TXT_KEY_SPY_STATE_TERMINATED">
 			<Text>Eliminated!</Text>
 		</Row>
