@@ -407,7 +407,7 @@ public:
 	}
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	std::vector<int> GetFreePromotionForProphet() const
+	const std::vector<int>& GetFreePromotionForProphet() const
 	{
 		return m_vFreePromotionForProphet;
 	}
