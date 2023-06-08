@@ -123,6 +123,7 @@ public:
 	int GetPlotYieldChange(int i, int j) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetFreePromotionForProphet() const;
 	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
@@ -184,6 +185,7 @@ protected:
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int m_iFreePromotionForProphet;
 	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
@@ -466,6 +468,7 @@ public:
 	int GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	std::vector<int> GetFreePromotionForProphet() const;
 	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;

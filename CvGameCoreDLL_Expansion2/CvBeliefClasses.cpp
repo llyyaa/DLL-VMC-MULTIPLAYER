@@ -58,6 +58,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iInquisitorPressureRetention(0),
 	m_iFaithBuildingTourism(0),
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iFreePromotionForProphet(NO_PROMOTION),
 	m_iLandmarksTourismPercent(0),
 	m_iHolyCityUnitExperence(0),
 	m_iHolyCityPressureModifier(0),
@@ -675,6 +676,11 @@ int CvBeliefEntry::GetPlotYieldChange(int i, int j) const
 }
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+//Extra Free Promotion For Prophet
+int CvBeliefEntry::GetFreePromotionForProphet() const
+{
+	return m_iFreePromotionForProphet;
+}
 //Extra Landmarks Tourism Percent
 int CvBeliefEntry::GetLandmarksTourismPercent() const
 {
@@ -853,6 +859,10 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_eResourceRevealed				  = (ResourceTypes)GC.getInfoTypeForString(szTextVal, true);
 	szTextVal						  = kResults.GetText("SpreadModifierDoublingTech");
 	m_eSpreadModifierDoublingTech     = (TechTypes)GC.getInfoTypeForString(szTextVal, true);
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	szTextVal						  = kResults.GetText("FreePromotionForProphet");
+	m_iFreePromotionForProphet 		  = GC.getInfoTypeForString(szTextVal, true);
+#endif
 
 	//Arrays
 	const char* szBeliefType = GetType();
@@ -2081,6 +2091,21 @@ int CvReligionBeliefs::GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType
 #endif
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+//Is has Extra Landmarks Tourism Percent ?
+std::vector<int> CvReligionBeliefs::GetFreePromotionForProphet() const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	std::vector<int> rtnValue;
+	rtnValue.clear();
+	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
+	{
+		if(HasBelief((BeliefTypes)i) && pBeliefs->GetEntry(i)->GetFreePromotionForProphet() != NO_PROMOTION)
+		{
+			rtnValue.push_back(pBeliefs->GetEntry(i)->GetFreePromotionForProphet());
+		}
+	}
+	return rtnValue;
+}
 //Is has Extra Landmarks Tourism Percent ?
 int CvReligionBeliefs::GetLandmarksTourismPercent() const
 {
