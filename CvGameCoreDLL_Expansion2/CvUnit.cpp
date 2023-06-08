@@ -2484,19 +2484,6 @@ void CvUnit::RemoveDebuffWhenDoTurn()
 	if (m_mapAutoRemovePromotions.empty())
 		return;
 
-	ImprovementTypes eImprovement = plot()->getImprovementType();
-	if(eImprovement != NO_IMPROVEMENT && GC.getImprovementInfo(eImprovement)->IsClearNegativePromotions() && plot()->getOwner() == getOwner() && !plot()->IsImprovementPillaged())
-	{
-		auto& candidatePromotionToClear = GetPromotionsThatCanBeActionCleared();
-		if (!candidatePromotionToClear.empty())
-		{
-			for (auto it = candidatePromotionToClear.begin(); it != candidatePromotionToClear.end(); ++it)
-			{
-				setHasPromotion(*it, false);
-			}
-		}
-	}
-	
 	std::vector<PromotionTypes> vPromotionsToRemove;
 	for (auto iter = m_mapAutoRemovePromotions.begin(); iter != m_mapAutoRemovePromotions.end(); iter++)
 	{
