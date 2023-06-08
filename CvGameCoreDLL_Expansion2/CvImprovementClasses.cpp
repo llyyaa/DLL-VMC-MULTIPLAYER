@@ -112,6 +112,11 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_iLuxuryCopiesSiphonedFromMinor(0),
 	m_iImprovementPillage(NO_IMPROVEMENT),
 	m_iImprovementUpgrade(NO_IMPROVEMENT),
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	m_bClearNegativePromotions(false),
+#endif
+
 #if defined(MOD_GLOBAL_RELOCATION)
 	m_bAllowsRebaseTo(false),
 	m_bAllowsAirliftFrom(false),
@@ -438,6 +443,10 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 #endif
 
 	m_iPillageGold = kResults.GetInt("PillageGold");
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	m_bClearNegativePromotions = kResults.GetBool("ClearNegativePromotions");
+#endif
 	m_bOutsideBorders = kResults.GetBool("OutsideBorders");
 	m_bInAdjacentFriendly = kResults.GetBool("InAdjacentFriendly");
 	m_bIgnoreOwnership = kResults.GetBool("IgnoreOwnership");
@@ -1186,6 +1195,13 @@ void CvImprovementEntry::SetImprovementUpgrade(int i)
 {
 	m_iImprovementUpgrade = i;
 }
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+bool CvImprovementEntry::IsClearNegativePromotions() const
+{
+	return m_bClearNegativePromotions;
+}
+#endif
 
 #if defined(MOD_GLOBAL_RELOCATION)
 bool CvImprovementEntry::IsAllowsRebaseTo() const

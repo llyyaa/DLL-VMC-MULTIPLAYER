@@ -875,7 +875,7 @@ public:
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	void ClearUnitPromotions();
+	void ClearUnitPromotions(bool bOnlyFriendUnit = false);
 #endif
 
 protected:

@@ -2483,7 +2483,7 @@ void CvUnit::RemoveDebuffWhenDoTurn()
 
 	if (m_mapAutoRemovePromotions.empty())
 		return;
-	
+
 	std::vector<PromotionTypes> vPromotionsToRemove;
 	for (auto iter = m_mapAutoRemovePromotions.begin(); iter != m_mapAutoRemovePromotions.end(); iter++)
 	{

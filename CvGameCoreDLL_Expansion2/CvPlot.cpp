@@ -479,6 +479,13 @@ void CvPlot::doTurn()
 	}
 #endif
 
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	if(MOD_GLOBAL_PROMOTIONS_REMOVAL && getImprovementType() != NO_IMPROVEMENT && GC.getImprovementInfo(getImprovementType())->IsClearNegativePromotions() && !IsImprovementPillaged())
+	{
+		ClearUnitPromotions(true);
+	}
+#endif
+
 	// XXX
 #ifdef _DEBUG
 	{
@@ -13084,7 +13091,7 @@ int CvPlot::ChangeXP(int iChange, bool bDoUpdate)
 #endif
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-void CvPlot::ClearUnitPromotions()
+void CvPlot::ClearUnitPromotions(bool bOnlyFriendUnit)
 {
 	if (!MOD_GLOBAL_PROMOTIONS_REMOVAL) return;
 
@@ -13092,7 +13099,7 @@ void CvPlot::ClearUnitPromotions()
 	for (int i = 0; i < iUnitCount; i++)
 	{
 		CvUnit* pLoopUnit = getUnitByIndex(i);
-		if (!pLoopUnit) continue;
+		if (!pLoopUnit || (bOnlyFriendUnit && getOwner() != pLoopUnit->getOwner())) continue;
 
 		auto& candidatePromotionToClear = pLoopUnit->GetPromotionsThatCanBeActionCleared();
 		if (candidatePromotionToClear.empty()) continue;

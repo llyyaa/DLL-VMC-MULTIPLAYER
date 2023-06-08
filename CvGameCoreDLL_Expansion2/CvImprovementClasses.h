@@ -109,6 +109,10 @@ public:
 	bool* GetCreateFeatureOnlyList() const;
 #endif
 
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	bool IsClearNegativePromotions() const;
+#endif
+
 #if defined(MOD_GLOBAL_RELOCATION)
 	bool IsAllowsRebaseTo() const;
 	bool IsAllowsAirliftFrom() const;
@@ -302,6 +306,10 @@ protected:
 	bool* m_iCreateTerrainOnlyList;
 	int* m_iCreateFeatureList;
 	bool* m_iCreateFeatureOnlyList;
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	bool m_bClearNegativePromotions;
 #endif
 
 #if defined(MOD_GLOBAL_RELOCATION)
