@@ -905,6 +905,18 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		GetReligionData()->SetReligion(eReligion);
 #endif
 	}
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	ReligionTypes eUnitReligion = GetReligionData()->GetReligion();
+	if(MOD_BELIEF_NEW_EFFECT_FOR_SP && eUnitReligion != NO_RELIGION && getSpecialUnitType() == (SpecialUnitTypes)GC.getInfoTypeForString("SPECIALUNIT_PEOPLE") && GET_PLAYER(getOwner()).HasReligion(eUnitReligion))
+	{
+		const std::vector<int>& eReligionPromotion = GC.getGame().GetGameReligions()->GetReligion(eUnitReligion,getOwner())->m_Beliefs.GetFreePromotionForProphet();
+		for(int Ii=0; Ii < eReligionPromotion.size(); Ii++)
+		{
+			if(eReligionPromotion[Ii] != NO_PROMOTION)
+				setHasPromotion((PromotionTypes)eReligionPromotion[Ii], true);
+		}
+	}
+#endif
 	if (getUnitInfo().GetOneShotTourism() > 0)
 	{
 		SetTourismBlastStrength(kPlayer.GetCulture()->GetTourismBlastStrength(getUnitInfo().GetOneShotTourism()));

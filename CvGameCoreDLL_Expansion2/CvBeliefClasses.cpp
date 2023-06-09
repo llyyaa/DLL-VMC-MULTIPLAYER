@@ -58,6 +58,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iInquisitorPressureRetention(0),
 	m_iFaithBuildingTourism(0),
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iFreePromotionForProphet(NO_PROMOTION),
 	m_iLandmarksTourismPercent(0),
 	m_iHolyCityUnitExperence(0),
 	m_iHolyCityPressureModifier(0),
@@ -675,6 +676,11 @@ int CvBeliefEntry::GetPlotYieldChange(int i, int j) const
 }
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+//Extra Free Promotion For Prophet
+int CvBeliefEntry::GetFreePromotionForProphet() const
+{
+	return m_iFreePromotionForProphet;
+}
 //Extra Landmarks Tourism Percent
 int CvBeliefEntry::GetLandmarksTourismPercent() const
 {
@@ -853,6 +859,10 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_eResourceRevealed				  = (ResourceTypes)GC.getInfoTypeForString(szTextVal, true);
 	szTextVal						  = kResults.GetText("SpreadModifierDoublingTech");
 	m_eSpreadModifierDoublingTech     = (TechTypes)GC.getInfoTypeForString(szTextVal, true);
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	szTextVal						  = kResults.GetText("FreePromotionForProphet");
+	m_iFreePromotionForProphet 		  = GC.getInfoTypeForString(szTextVal, true);
+#endif
 
 	//Arrays
 	const char* szBeliefType = GetType();
@@ -1238,6 +1248,15 @@ CvReligionBeliefs::CvReligionBeliefs(const CvReligionBeliefs& source)
 	m_iInquisitorPressureRetention = source.m_iInquisitorPressureRetention;
 	m_iFaithBuildingTourism = source.m_iFaithBuildingTourism;
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_vFreePromotionForProphet = source.m_vFreePromotionForProphet;
+	m_iLandmarksTourismPercent = source.m_iLandmarksTourismPercent;
+	m_iHolyCityUnitExperence = source.m_iHolyCityUnitExperence;
+	m_iHolyCityPressureModifier = source.m_iHolyCityPressureModifier;
+	m_iCityExtraMissionarySpreads = source.m_iCityExtraMissionarySpreads;
+	m_bAllowYieldPerBirth = source.m_bAllowYieldPerBirth;
+#endif
+
 	m_eObsoleteEra = source.m_eObsoleteEra;
 	m_eResourceRevealed = source.m_eResourceRevealed;
 	m_eSpreadModifierDoublingTech = source.m_eSpreadModifierDoublingTech;
@@ -1289,6 +1308,15 @@ void CvReligionBeliefs::Reset()
 	m_iSpyPressure = 0;
 	m_iInquisitorPressureRetention = 0;
 	m_iFaithBuildingTourism = 0;
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_vFreePromotionForProphet.clear();
+	m_iLandmarksTourismPercent = 0;
+	m_iHolyCityUnitExperence = 0;
+	m_iHolyCityPressureModifier = 0;
+	m_iCityExtraMissionarySpreads = 0;
+	m_bAllowYieldPerBirth = false;
+#endif
 
 	m_eObsoleteEra = NO_ERA;
 	m_eResourceRevealed = NO_RESOURCE;
@@ -1344,6 +1372,18 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief)
 	m_iSpyPressure += belief->GetSpyPressure();
 	m_iInquisitorPressureRetention += belief->GetInquisitorPressureRetention();
 	m_iFaithBuildingTourism += belief->GetFaithBuildingTourism();
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	if(belief->GetFreePromotionForProphet() != NO_PROMOTION)
+	{
+		m_vFreePromotionForProphet.push_back(belief->GetFreePromotionForProphet());
+	}
+	m_iLandmarksTourismPercent += belief->GetLandmarksTourismPercent();
+	m_iHolyCityUnitExperence += belief->GetHolyCityUnitExperence();
+	m_iHolyCityPressureModifier += belief->GetHolyCityPressureModifier();
+	m_iCityExtraMissionarySpreads += belief->GetCityExtraMissionarySpreads();
+	m_bAllowYieldPerBirth = m_bAllowYieldPerBirth || belief->AllowYieldPerBirth();
+#endif
 
 	m_eObsoleteEra = belief->GetObsoleteEra();
 	m_eResourceRevealed = belief->GetResourceRevealed();
@@ -2081,88 +2121,6 @@ int CvReligionBeliefs::GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType
 #endif
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-//Is has Extra Landmarks Tourism Percent ?
-int CvReligionBeliefs::GetLandmarksTourismPercent() const
-{
-	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
-	int rtnValue = 0;
-
-	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
-	{
-		if(HasBelief((BeliefTypes)i))
-		{
-			rtnValue += pBeliefs->GetEntry(i)->GetLandmarksTourismPercent();
-		}
-	}
-
-	return rtnValue;
-}
-//Is has Extra Experence for Holy City Unit ?
-int CvReligionBeliefs::GetHolyCityUnitExperence() const
-{
-	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
-	int rtnValue = 0;
-
-	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
-	{
-		if(HasBelief((BeliefTypes)i))
-		{
-			rtnValue += pBeliefs->GetEntry(i)->GetHolyCityUnitExperence();
-		}
-	}
-
-	return rtnValue;
-}
-//Is has Extra HolyCity Religious Pressure ?
-int CvReligionBeliefs::GetHolyCityPressureModifier() const
-{
-	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
-	int rtnValue = 0;
-
-	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
-	{
-		if(HasBelief((BeliefTypes)i))
-		{
-			rtnValue += pBeliefs->GetEntry(i)->GetHolyCityPressureModifier();
-		}
-	}
-
-	return rtnValue;
-}
-//Is has Extra Missionary Spreads ?
-int CvReligionBeliefs::GetCityExtraMissionarySpreads() const
-{
-	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
-	int rtnValue = 0;
-
-	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
-	{
-		if(HasBelief((BeliefTypes)i))
-		{
-			rtnValue += pBeliefs->GetEntry(i)->GetCityExtraMissionarySpreads();
-		}
-	}
-
-	return rtnValue;
-}
-/// Is has beliefs allow birth yeild ?
-bool CvReligionBeliefs::AllowYieldPerBirth() const
-{
-	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
-
-	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
-	{
-		if(HasBelief((BeliefTypes)i))
-		{
-			if (pBeliefs->GetEntry(i)->AllowYieldPerBirth())
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
 /// Get yield modifier from beliefs from birth
 int CvReligionBeliefs::GetYieldPerBirth(YieldTypes eYieldType) const
 {
@@ -2402,6 +2360,15 @@ void CvReligionBeliefs::Read(FDataStream& kStream)
 		m_iFaithBuildingTourism = 0;
 	}
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	kStream >> m_vFreePromotionForProphet;
+	kStream >> m_iLandmarksTourismPercent;
+	kStream >> m_iHolyCityUnitExperence;
+	kStream >> m_iHolyCityPressureModifier;
+	kStream >> m_iCityExtraMissionarySpreads;
+	kStream >> m_bAllowYieldPerBirth;
+#endif
+
 	kStream >> m_eObsoleteEra;
 	kStream >> m_eResourceRevealed;
 	kStream >> m_eSpreadModifierDoublingTech;
@@ -2449,6 +2416,15 @@ void CvReligionBeliefs::Write(FDataStream& kStream) const
 	kStream << m_iSpyPressure;
 	kStream << m_iInquisitorPressureRetention;
 	kStream << m_iFaithBuildingTourism;
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	kStream << m_vFreePromotionForProphet;
+	kStream << m_iLandmarksTourismPercent;
+	kStream << m_iHolyCityUnitExperence;
+	kStream << m_iHolyCityPressureModifier;
+	kStream << m_iCityExtraMissionarySpreads;
+	kStream << m_bAllowYieldPerBirth;
+#endif
 
 	kStream << m_eObsoleteEra;
 	kStream << m_eResourceRevealed;

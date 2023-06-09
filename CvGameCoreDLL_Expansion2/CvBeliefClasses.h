@@ -123,6 +123,7 @@ public:
 	int GetPlotYieldChange(int i, int j) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetFreePromotionForProphet() const;
 	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
@@ -184,6 +185,7 @@ protected:
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int m_iFreePromotionForProphet;
 	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
@@ -404,6 +406,33 @@ public:
 		return m_iFaithBuildingTourism;
 	}
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	const std::vector<int>& GetFreePromotionForProphet() const
+	{
+		return m_vFreePromotionForProphet;
+	}
+	int GetLandmarksTourismPercent() const
+	{
+		return m_iLandmarksTourismPercent;
+	}
+	int GetHolyCityUnitExperence() const
+	{
+		return m_iHolyCityUnitExperence;
+	}
+	int GetHolyCityPressureModifier() const
+	{
+		return m_iHolyCityPressureModifier;
+	}
+	int GetCityExtraMissionarySpreads() const
+	{
+		return m_iCityExtraMissionarySpreads;
+	}
+	bool AllowYieldPerBirth() const
+	{
+		return m_bAllowYieldPerBirth;
+	}
+#endif
+
 	EraTypes GetObsoleteEra() const
 	{
 		return m_eObsoleteEra;
@@ -466,11 +495,6 @@ public:
 	int GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	int GetLandmarksTourismPercent() const;
-	int GetHolyCityUnitExperence() const;
-	int GetHolyCityPressureModifier() const;
-	int GetCityExtraMissionarySpreads() const;
-	bool AllowYieldPerBirth() const;
 	int GetYieldPerBirth(YieldTypes eYieldType) const;
 #endif
 	int GetResourceHappiness(ResourceTypes eResource) const;
@@ -515,6 +539,15 @@ private:
 	int m_iSpyPressure;
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	std::vector<int> m_vFreePromotionForProphet;
+	int m_iLandmarksTourismPercent;
+	int m_iHolyCityUnitExperence;
+	int m_iHolyCityPressureModifier;
+	int m_iCityExtraMissionarySpreads;
+	bool m_bAllowYieldPerBirth;
+#endif
 
 	EraTypes m_eObsoleteEra;
 	ResourceTypes m_eResourceRevealed;
