@@ -447,6 +447,9 @@ CvUnit::CvUnit() :
 	, m_iCityAttackFaithBonus(0)
 	, m_iCarrierEXPGivenModifier(0)
 	, m_iRemovePromotionUpgrade(NO_PROMOTION)
+	, m_eAttackChanceFromAttackDamageFormula(NO_LUA_FORMULA)
+	, m_eMovementFromAttackDamageFormula(NO_LUA_FORMULA)
+	, m_eHealPercentFromAttackDamageFormula(NO_LUA_FORMULA)
 #endif
 	, m_iReligiousStrengthLossRivalTerritory(0)
 	, m_iTradeMissionInfluenceModifier(0)
@@ -1334,6 +1337,9 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCityAttackFaithBonus = 0;
 	m_iCarrierEXPGivenModifier = 0;
 	m_iRemovePromotionUpgrade = NO_PROMOTION;
+	m_eAttackChanceFromAttackDamageFormula = NO_LUA_FORMULA;
+	m_eMovementFromAttackDamageFormula = NO_LUA_FORMULA;
+	m_eHealPercentFromAttackDamageFormula = NO_LUA_FORMULA;
 #endif
 	m_iReligiousStrengthLossRivalTerritory = 0;
 	m_iTradeMissionInfluenceModifier = 0;
@@ -6242,7 +6248,48 @@ const int CvUnit::GetRemovePromotionUpgrade() const
 {
 	return m_iRemovePromotionUpgrade;
 }
-//	
+//	--------------------------------------------------------------------------------
+void CvUnit::setAttackChanceFromAttackDamageFormula(int iValue)
+{
+	if(iValue != NO_LUA_FORMULA && m_eAttackChanceFromAttackDamageFormula == NO_LUA_FORMULA)
+	{
+		m_eAttackChanceFromAttackDamageFormula = iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+const int CvUnit::GetAttackChanceFromAttackDamageFormula() const
+{
+	return m_eAttackChanceFromAttackDamageFormula;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::setMovementFromAttackDamageFormula(int iValue)
+{
+	if(iValue != NO_LUA_FORMULA && m_eMovementFromAttackDamageFormula == NO_LUA_FORMULA)
+	{
+		m_eMovementFromAttackDamageFormula = iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+const int CvUnit::GetMovementFromAttackDamageFormula() const
+{
+	return m_eMovementFromAttackDamageFormula;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::setHealPercentFromAttackDamageFormula(int iValue)
+{
+	if(iValue != NO_LUA_FORMULA && m_eHealPercentFromAttackDamageFormula == NO_LUA_FORMULA)
+	{
+		m_eHealPercentFromAttackDamageFormula = iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+const int CvUnit::GetHealPercentFromAttackDamageFormula() const
+{
+	return m_eHealPercentFromAttackDamageFormula;
+}
 #endif
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeReligiousStrengthLossRivalTerritory(int iValue)
@@ -24047,7 +24094,10 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeUnitAttackFaithBonus((thisPromotion.GetUnitAttackFaithBonus()) * iChange);
 		ChangeCityAttackFaithBonus((thisPromotion.GetCityAttackFaithBonus()) * iChange);
 		ChangeCarrierEXPGivenModifier((thisPromotion.GetCarrierEXPGivenModifier()) * iChange);
-		setRemovePromotionUpgrade(thisPromotion.GetRemovePromotionUpgrade() ? thisPromotion.GetRemovePromotionUpgrade() : -1);
+		setRemovePromotionUpgrade(thisPromotion.GetRemovePromotionUpgrade() ? thisPromotion.GetRemovePromotionUpgrade() : NO_PROMOTION);
+		setAttackChanceFromAttackDamageFormula(thisPromotion.GetAttackChanceFromAttackDamageFormula() ? thisPromotion.GetAttackChanceFromAttackDamageFormula() : NO_LUA_FORMULA);
+		setMovementFromAttackDamageFormula(thisPromotion.GetMovementFromAttackDamageFormula() ? thisPromotion.GetMovementFromAttackDamageFormula() : NO_LUA_FORMULA);
+		setHealPercentFromAttackDamageFormula(thisPromotion.GetHealPercentFromAttackDamageFormula() ? thisPromotion.GetHealPercentFromAttackDamageFormula() : NO_LUA_FORMULA);
 #endif
 		ChangeReligiousStrengthLossRivalTerritory((thisPromotion.GetReligiousStrengthLossRivalTerritory()) *  iChange);
 		ChangeTradeMissionInfluenceModifier((thisPromotion.GetTradeMissionInfluenceModifier()) * iChange);
@@ -24574,6 +24624,9 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCityAttackFaithBonus;
 	kStream >> m_iCarrierEXPGivenModifier;
 	kStream >> m_iRemovePromotionUpgrade;
+	kStream >> m_eAttackChanceFromAttackDamageFormula;
+	kStream >> m_eMovementFromAttackDamageFormula;
+	kStream >> m_eHealPercentFromAttackDamageFormula;
 #endif
 	kStream >> m_iReligiousStrengthLossRivalTerritory;
 	kStream >> m_iTradeMissionInfluenceModifier;
@@ -24922,6 +24975,9 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCityAttackFaithBonus;
 	kStream << m_iCarrierEXPGivenModifier;
 	kStream << m_iRemovePromotionUpgrade;
+	kStream << m_eAttackChanceFromAttackDamageFormula;
+	kStream << m_eMovementFromAttackDamageFormula;
+	kStream << m_eHealPercentFromAttackDamageFormula;
 #endif
 	kStream << m_iReligiousStrengthLossRivalTerritory;
 	kStream << m_iTradeMissionInfluenceModifier;

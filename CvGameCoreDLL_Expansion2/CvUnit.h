@@ -1744,6 +1744,15 @@ public:
 
 	void setRemovePromotionUpgrade(int iValue);
 	const int GetRemovePromotionUpgrade() const;
+
+	void setAttackChanceFromAttackDamageFormula(int iValue);
+	const int GetAttackChanceFromAttackDamageFormula() const;
+
+	void setMovementFromAttackDamageFormula(int iValue);
+	const int GetMovementFromAttackDamageFormula() const;
+
+	void setHealPercentFromAttackDamageFormula(int iValue);
+	const int GetHealPercentFromAttackDamageFormula() const;
 #endif
 
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
@@ -2289,6 +2298,9 @@ protected:
 	int m_iCityAttackFaithBonus;
 	int m_iCarrierEXPGivenModifier;
 	int m_iRemovePromotionUpgrade;
+	int m_eAttackChanceFromAttackDamageFormula;
+	int m_eMovementFromAttackDamageFormula;
+	int m_eHealPercentFromAttackDamageFormula;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;

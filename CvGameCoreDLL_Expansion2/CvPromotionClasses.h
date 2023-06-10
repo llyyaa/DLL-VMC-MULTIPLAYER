@@ -238,6 +238,9 @@ public:
 	int GetCityAttackFaithBonus() const;
 	int GetCarrierEXPGivenModifier() const;
 	int GetRemovePromotionUpgrade() const;
+	int GetAttackChanceFromAttackDamageFormula() const;
+	int GetMovementFromAttackDamageFormula() const;
+	int GetHealPercentFromAttackDamageFormula() const;
 #endif
 	int GetReligiousStrengthLossRivalTerritory() const;
 	
@@ -553,6 +556,9 @@ protected:
 	int m_iCityAttackFaithBonus;
 	int m_iCarrierEXPGivenModifier;
 	int m_iRemovePromotionUpgrade;
+	int m_eAttackChanceFromAttackDamageFormula;
+	int m_eMovementFromAttackDamageFormula;
+	int m_eHealPercentFromAttackDamageFormula;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
