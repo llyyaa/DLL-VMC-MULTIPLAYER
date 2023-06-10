@@ -439,7 +439,7 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 		}
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-		DoInstantYieldFromCombat(kCombatInfo);
+		DoBounsFromCombatDamage(kCombatInfo);
 #endif		
 #if defined(MOD_API_UNIT_STATS)
 		pkDefender->changeDamage(iAttackerDamageInflicted, pkAttacker->getOwner(), pkAttacker->GetID());
@@ -1112,7 +1112,7 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 					//pkDLLInterface->AddMessage(uiParentEventID, pkDefender->getOwner(), false, 0, ""/*, "AS2D_COMBAT", MESSAGE_TYPE_DISPLAY_ONLY, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_WHITE"), pkDefender->getX(), pkDefender->getY(), true, true*/);
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-					DoInstantYieldFromCombat(kCombatInfo);
+					DoBounsFromCombatDamage(kCombatInfo);
 #endif	
 					//set damage but don't update entity damage visibility
 #if defined(MOD_API_UNIT_STATS)
@@ -1282,7 +1282,7 @@ void CvUnitCombat::ResolveRangedCityVsUnitCombat(const CvCombatInfo& kCombatInfo
 					}
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-					DoInstantYieldFromCombat(kCombatInfo);
+					DoBounsFromCombatDamage(kCombatInfo);
 #endif	
 					//set damage but don't update entity damage visibility
 #if defined(MOD_API_UNIT_STATS)
@@ -1353,7 +1353,7 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 	if(pkAttacker && pkDefender)
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-		DoInstantYieldFromCombat(kCombatInfo);
+		DoBounsFromCombatDamage(kCombatInfo);
 		if(pkAttacker->GetLostAllMovesAttackCity() > 0)
 		{
 			pkAttacker->setMoves(0);
@@ -1868,7 +1868,7 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 #endif
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-					DoInstantYieldFromCombat(kCombatInfo);
+					DoBounsFromCombatDamage(kCombatInfo);
 #endif	
 #if defined(MOD_API_UNIT_STATS)
 					pkAttacker->changeDamage(iDefenderDamageInflicted, pkDefender->getOwner(), pkDefender->GetID());
@@ -2307,7 +2307,7 @@ void CvUnitCombat::ResolveAirSweep(const CvCombatInfo& kCombatInfo, uint uiParen
 			}
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-			DoInstantYieldFromCombat(kCombatInfo);
+			DoBounsFromCombatDamage(kCombatInfo);
 #endif	
 
 #if defined(MOD_API_UNIT_STATS)
@@ -4545,6 +4545,7 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 	DoKillCitizens(kCombatInfo);
 	DoStackingFightBack(kCombatInfo);
 	DoStopAttacker(kCombatInfo);
+	DoBounsFromCombatDamageWhenFinish(kCombatInfo);
 }
 
 bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
@@ -5160,23 +5161,101 @@ void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPl
 #endif
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-void CvUnitCombat::DoInstantYieldFromCombat(const CvCombatInfo & kCombatInfo)
+void CvUnitCombat::DoBounsFromCombatDamage(const CvCombatInfo & kCombatInfo)
+{
+	if (!MOD_PROMOTION_NEW_EFFECT_FOR_SP) return;
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	// Only work when unit vs unit
+	if (pAttackerUnit == nullptr || pDefenderUnit == nullptr) return;
+	int iAttackDamage = kCombatInfo.getDamageInflicted(BATTLE_UNIT_ATTACKER);
+	bool bEmenyDeath = iAttackDamage >= pDefenderUnit->GetCurrHitPoints();
+	iAttackDamage = iAttackDamage < pDefenderUnit->GetCurrHitPoints() ? iAttackDamage : pDefenderUnit->GetCurrHitPoints();
+
+	//Get Instant Yield Output From Attack Damage
+	DoInstantYieldFromCombat(pAttackerUnit,kCombatInfo,iAttackDamage);
+}
+
+void CvUnitCombat::DoBounsFromCombatDamageWhenFinish(const CvCombatInfo& kCombatInfo)
 {
 	if (!MOD_PROMOTION_NEW_EFFECT_FOR_SP) return;
 #if !defined(SHOW_PLOT_POPUP)
 	float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 3;
 #endif
+
 	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
 	// Only work when unit vs unit
 	if (pAttackerUnit == nullptr || pDefenderUnit == nullptr) return;
+	int iAttackDamage = kCombatInfo.getDamageInflicted(BATTLE_UNIT_ATTACKER);
+	bool bEmenyDeath = iAttackDamage >= pDefenderUnit->GetCurrHitPoints();
+	iAttackDamage = iAttackDamage < pDefenderUnit->GetCurrHitPoints() ? iAttackDamage : pDefenderUnit->GetCurrHitPoints();
+
+	//Get Extra Attack From Attack Damage
+	int iAttackChanceFromAttackDamageFormula = pAttackerUnit->GetAttackChanceFromAttackDamageFormula();
+	if(iAttackChanceFromAttackDamageFormula != NO_LUA_FORMULA)
+	{
+		auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator((LuaFormulaTypes)iAttackChanceFromAttackDamageFormula);
+		if (evaluator != nullptr)
+		{
+			auto result = evaluator->Evaluate<bool>(iAttackDamage,bEmenyDeath);
+			if(result.ok && result.value)
+				pAttackerUnit->setMadeAttack(false);
+		}
+	}
+
+	//Get Extra Movement From Attack Damage
+	int iMovementFromAttackDamageFormula = pAttackerUnit->GetMovementFromAttackDamageFormula();
+	if(iMovementFromAttackDamageFormula != NO_LUA_FORMULA)
+	{
+		auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator((LuaFormulaTypes)iMovementFromAttackDamageFormula);
+		if (evaluator != nullptr)
+		{
+			auto result = evaluator->Evaluate<int>(iAttackDamage, bEmenyDeath);
+			if(result.ok && result.value > 0)
+			{
+				pAttackerUnit->setMoves(pAttackerUnit->movesLeft() + result.value);
+				CvString colorString;
+				CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
+				if (kAttackPlayer.GetID() == GC.getGame().getActivePlayer())
+				{
+					char text[256] = {0};
+					colorString = "[COLOR_YELLOW]+%d[ENDCOLOR][ICON_MOVES]";
+					sprintf_s(text, colorString, result.value / GC.getMOVE_DENOMINATOR());
+#if defined(SHOW_PLOT_POPUP)
+					SHOW_PLOT_POPUP(pAttackerUnit->plot(), pAttackerUnit->getOwner(), text, 0.0);
+#else
+					GC.GetEngineUserInterface()->AddPopupText(pAttackerUnit->getX(), pAttackerUnit->getY(), text, fDelay);
+#endif
+				}
+			}
+				
+		}
+	}
+
+	//Get Extra Heal Percent From Attack Damage
+	int iHealPercentFromAttackDamageFormula = pAttackerUnit->GetHealPercentFromAttackDamageFormula();
+	if(iHealPercentFromAttackDamageFormula != NO_LUA_FORMULA)
+	{
+		auto* evaluator = GC.GetLuaEvaluatorManager()->GetEvaluator((LuaFormulaTypes)iHealPercentFromAttackDamageFormula);
+		if (evaluator != nullptr)
+		{
+			auto result = evaluator->Evaluate<int>(iAttackDamage, pAttackerUnit->GetMaxHitPoints(),bEmenyDeath);
+			if(result.ok && result.value > 0)
+				pAttackerUnit->changeDamage(-result.value);
+		}
+	}
+}
+void CvUnitCombat::DoInstantYieldFromCombat(const CvUnit* pAttackerUnit, const CvCombatInfo & kCombatInfo, int iAttackDamage)
+{
+#if !defined(SHOW_PLOT_POPUP)
+	float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 3;
+#endif
 	int iUnitAttackFaithBonus = pAttackerUnit->GetUnitAttackFaithBonus();
 	if(iUnitAttackFaithBonus <= 0) return;
 
 	CvString colorString;
 	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
-	int iAttackDamage = kCombatInfo.getDamageInflicted(BATTLE_UNIT_ATTACKER);
-	iAttackDamage = iAttackDamage < pDefenderUnit->GetCurrHitPoints() ? iAttackDamage : pDefenderUnit->GetCurrHitPoints();
 	int iFaithBonus = iAttackDamage * iUnitAttackFaithBonus /100;
 	
 	kAttackPlayer.ChangeFaith(iFaithBonus);

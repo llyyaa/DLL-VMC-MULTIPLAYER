@@ -191,6 +191,9 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCityAttackFaithBonus(0),
 	m_iCarrierEXPGivenModifier(0),
 	m_iRemovePromotionUpgrade(NO_PROMOTION),
+	m_eAttackChanceFromAttackDamageFormula(NO_LUA_FORMULA),
+	m_eMovementFromAttackDamageFormula(NO_LUA_FORMULA),
+	m_eHealPercentFromAttackDamageFormula(NO_LUA_FORMULA),
 #endif
 
 	m_iReligiousStrengthLossRivalTerritory(0),
@@ -661,6 +664,9 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCarrierEXPGivenModifier = kResults.GetInt("CarrierEXPGivenModifier");
 	const char* szRemovePromotionUpgrade = kResults.GetText("RemovePromotionUpgrade");
 	m_iRemovePromotionUpgrade = GC.getInfoTypeForString(szRemovePromotionUpgrade, true);
+	m_eAttackChanceFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("AttackChanceFromAttackDamage")));
+	m_eMovementFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("MovementFromAttackDamage")));
+	m_eHealPercentFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("HealPercentFromAttackDamage")));
 #endif
 	m_iReligiousStrengthLossRivalTerritory = kResults.GetInt("ReligiousStrengthLossRivalTerritory");
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
@@ -2139,6 +2145,21 @@ int CvPromotionEntry::GetCarrierEXPGivenModifier() const
 int CvPromotionEntry::GetRemovePromotionUpgrade() const
 {
 	return m_iRemovePromotionUpgrade;
+}
+
+int CvPromotionEntry::GetAttackChanceFromAttackDamageFormula() const
+{
+	return m_eAttackChanceFromAttackDamageFormula;
+}
+
+int CvPromotionEntry::GetMovementFromAttackDamageFormula() const
+{
+	return m_eMovementFromAttackDamageFormula;
+}
+
+int CvPromotionEntry::GetHealPercentFromAttackDamageFormula() const
+{
+	return m_eHealPercentFromAttackDamageFormula;
 }
 #endif
 

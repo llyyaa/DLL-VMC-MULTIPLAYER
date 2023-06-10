@@ -87,7 +87,9 @@ public:
 
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	static void DoInstantYieldFromCombat(const CvCombatInfo& kCombatInfo);
+	static void DoBounsFromCombatDamage(const CvCombatInfo& kCombatInfo);
+	static void DoBounsFromCombatDamageWhenFinish(const CvCombatInfo& kCombatInfo);
+	static void DoInstantYieldFromCombat(const CvUnit* pAttackerUnit,const CvCombatInfo & kCombatInfo,int iAttackDamage);
 	static void DoGiveEXPToCarrier(const CvCombatInfo& kCombatInfo);
 #endif
 #if defined(MOD_GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY)
