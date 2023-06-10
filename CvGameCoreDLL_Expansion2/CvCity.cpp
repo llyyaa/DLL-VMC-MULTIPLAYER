@@ -19633,7 +19633,7 @@ int CvCity::CountWorkedImprovement(ImprovementTypes iImprovementType) const
 		}
 
 		// Not being worked by this city
-		if (pLoopPlot->getWorkingCity() != this || !pLoopPlot->isBeingWorked() || !pLoopPlot->IsImprovementPillaged()) {
+		if (pLoopPlot->getWorkingCity() != this || !pLoopPlot->isBeingWorked() || pLoopPlot->IsImprovementPillaged()) {
 			continue;
 		}
 
