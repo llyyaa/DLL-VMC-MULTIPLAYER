@@ -376,6 +376,9 @@ public:
 #if defined(MOD_ROG_CORE)
 	int GetDomainFreeExperiencePerGreatWorkGlobal(int i) const;
 	int GetDomainFreeExperienceGlobal(int i) const;
+
+	int GetResourceQuantityFromImprovement(int i, int j) const;
+	int* GetResourceQuantityFromImprovementArray(int i);
 #endif
 
 	int GetDomainProductionModifier(int i) const;
@@ -519,6 +522,8 @@ private:
 #endif
 
 #if defined(MOD_ROG_CORE)
+	int** m_ppiResourceQuantityFromImprovement;
+
 	int* m_piGreatWorkYieldChange;
 
 	int m_iExtraDamageHeal;
