@@ -240,6 +240,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piDomainFreeExperiencePerGreatWork(NULL),
 
 #if defined(MOD_ROG_CORE)
+	m_ppiResourceQuantityFromImprovement(NULL),
+
 	m_piYieldModifierFromWonder(NULL),
 
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
@@ -355,6 +357,11 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChangeGlobal);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChangeLocal);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldModifiers);
+
+	if (m_ppiResourceQuantityFromImprovement != NULL)
+	{
+		CvDatabaseUtility::SafeDelete2DArray(m_ppiResourceQuantityFromImprovement);
+	}
 #endif
 
 
@@ -701,6 +708,38 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.PopulateArrayByValue(m_piResourceQuantityFromPOP, "Resources", "Building_ResourceQuantityFromPOP", "ResourceType", "BuildingType", szBuildingType, "Modifier");
 
 #endif
+
+#if defined(MOD_BALANCE_CORE)
+	const size_t lenBuildingType = strlen(szBuildingType);
+
+	//m_ppiResourceQuantityFromImprovement
+	{
+		const int iNumResource = kUtility.MaxRows("Resources");
+		const int iNumImprovement = kUtility.MaxRows("Improvements");
+		kUtility.Initialize2DArray(m_ppiResourceQuantityFromImprovement, iNumResource, iNumImprovement);
+
+		std::string sqlKey = "Building_ImprovementResourcesQuantity";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(sqlKey, "select Resources.ID as ResourcesID, Improvements.ID as ImprovementsID, Value from Building_ImprovementResourcesQuantity inner join Resources on Resources.Type = ResourceType inner join Improvements on Improvements.Type = ImprovementType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType, lenBuildingType, false);
+
+		while (pResults->Step())
+		{
+			const int ResourcesID = pResults->GetInt(0);
+			const int ImprovementsID = pResults->GetInt(1);
+			const int Value = pResults->GetInt(2);
+
+			m_ppiResourceQuantityFromImprovement[ResourcesID][ImprovementsID] = Value;
+		}
+
+		pResults->Reset();
+	}
+#endif
+
 
 	//ResourceYieldChanges
 	{
@@ -2613,6 +2652,27 @@ int CvBuildingEntry::GetResourceQuantityRequirement(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piResourceQuantityRequirements ? m_piResourceQuantityRequirements[i] : -1;
 }
+
+
+
+#if defined(MOD_ROG_CORE)
+/// Accessor:: Does this Unit have a different CombatType in a new Era?
+int CvBuildingEntry::GetResourceQuantityFromImprovement(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumResourceInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < GC.getNumImprovementInfos(), "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppiResourceQuantityFromImprovement ? m_ppiResourceQuantityFromImprovement[i][j] : 0;
+}
+int* CvBuildingEntry::GetResourceQuantityFromImprovementArray(int i)
+{
+	return m_ppiResourceQuantityFromImprovement[i];
+}
+#endif
+
+
+
 
 /// Resources provided once constructed
 int CvBuildingEntry::GetResourceQuantity(int i) const
