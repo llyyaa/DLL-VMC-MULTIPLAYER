@@ -124,6 +124,9 @@ public:
 	int GetNumWorkablePlots() const;
 #endif
 
+
+	
+
 	int GetMinorFriendCount(const bool bExcludeNonAlive) const;
 	int GetMinorAllyCount(const bool bExcludeNonAlive) const;
 
@@ -2317,6 +2320,9 @@ protected:
 	int m_iMedianTechPercentage;
 	FAutoVariable<int, CvPlayer> m_iNumFreePolicies;
 	FAutoVariable<int, CvPlayer> m_iNumFreePoliciesEver; 
+
+
+
 	int m_iNumFreeTenets;
     int m_iMaxEffectiveCities;
 
@@ -2625,4 +2631,7 @@ void SyncPlayer();
 void ClearPlayerDeltas();
 }
 
+
+
 #endif
+
