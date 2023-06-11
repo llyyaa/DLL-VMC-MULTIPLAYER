@@ -8055,6 +8055,11 @@ UnitTypes CvGame::GetCsGiftSpawnUnitType(PlayerTypes ePlayer)
 		// Exclude unique units
 		if (eLoopUnit != pkUnitClassInfo->getDefaultUnitIndex()) continue;
 
+#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
+		// Exclude if this unit is invalid for Minor Gifts
+		if(MOD_GLOBAL_EXCLUDE_FROM_GIFTS && pkUnitInfo->IsNoMinorGifts()) continue;
+#endif
+
 		// Must be able to train this thing
 		if (!GET_PLAYER(ePlayer).canTrain(eLoopUnit, false, false, false, /*bIgnoreUniqueUnitStatus*/ true)) continue;
 

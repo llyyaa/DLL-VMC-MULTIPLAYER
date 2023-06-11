@@ -16284,6 +16284,10 @@ void CvCity::doProduction(bool bAllowNoProduction)
 			{
 #if defined(MOD_PROCESS_STOCKPILE)
 				popOrder(0, !isProductionProcess(), true);
+				if (!isHuman() || isProductionAutomated())
+				{
+					AI_chooseProduction(false /*bInterruptWonders*/); // the previous order is finished. choose next one.
+				}
 #else
 				popOrder(0, true, true);
 #endif
