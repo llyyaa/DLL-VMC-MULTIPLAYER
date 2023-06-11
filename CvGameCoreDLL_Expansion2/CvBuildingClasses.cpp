@@ -242,6 +242,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_ROG_CORE)
 	m_ppiResourceQuantityFromImprovement(NULL),
 
+
 	m_piYieldModifierFromWonder(NULL),
 
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
@@ -362,6 +363,8 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	{
 		CvDatabaseUtility::SafeDelete2DArray(m_ppiResourceQuantityFromImprovement);
 	}
+
+
 #endif
 
 
@@ -738,6 +741,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 		pResults->Reset();
 	}
+
+
 #endif
 
 
@@ -2656,7 +2661,6 @@ int CvBuildingEntry::GetResourceQuantityRequirement(int i) const
 
 
 #if defined(MOD_ROG_CORE)
-/// Accessor:: Does this Unit have a different CombatType in a new Era?
 int CvBuildingEntry::GetResourceQuantityFromImprovement(int i, int j) const
 {
 	CvAssertMsg(i < GC.getNumResourceInfos(), "Index out of bounds");
@@ -2669,6 +2673,8 @@ int* CvBuildingEntry::GetResourceQuantityFromImprovementArray(int i)
 {
 	return m_ppiResourceQuantityFromImprovement[i];
 }
+
+
 #endif
 
 
