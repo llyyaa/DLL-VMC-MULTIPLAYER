@@ -1552,11 +1552,15 @@ public:
 	bool isNukeImmune() const;
 	bool IsRough() const;
 
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
+#if defined(MOD_MORE_NATURAL_WONDER)
 	bool IsNaturalWonder(bool orPseudoNatural = false) const;
 	bool IsPseudoNaturalWonder() const;
 #else
 	bool IsNaturalWonder() const;
+#endif
+
+#if defined(MOD_MORE_NATURAL_WONDER)
+	int getPromotionIfOwned() const;
 #endif
 
 	const char* getArtDefineTag() const;
@@ -1622,8 +1626,9 @@ protected:
 	bool m_bNukeImmune;
 	bool m_bRough;
 	bool m_bNaturalWonder;
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
+#if defined(MOD_MORE_NATURAL_WONDER)
 	bool m_bPseudoNaturalWonder;
+	int m_iPromotionIfOwned;
 #endif
 	// Set each time the game is started
 	bool m_bClearable;
