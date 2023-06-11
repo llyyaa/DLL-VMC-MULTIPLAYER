@@ -524,6 +524,7 @@ private:
 #if defined(MOD_ROG_CORE)
 	int** m_ppiResourceQuantityFromImprovement;
 
+
 	int* m_piGreatWorkYieldChange;
 
 	int m_iExtraDamageHeal;
