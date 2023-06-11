@@ -416,8 +416,9 @@ CvPlayer::CvPlayer() :
 #if defined(MOD_ROG_CORE)
 	, m_aiDomainFreeExperiencePerGreatWorkGlobal("CvPlayer::m_aiDomainFreeExperiencePerGreatWorkGlobal", m_syncArchive)
 	, m_piDomainFreeExperience()
-	//, m_piDomainFreeExperience("CvPlayer::m_piDomainFreeExperience", m_syncArchive)
 #endif
+
+
 
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
 	, m_aiCapitalYieldChange("CvPlayer::m_aiCapitalYieldChange", m_syncArchive)
@@ -487,6 +488,9 @@ CvPlayer::CvPlayer() :
 	, m_iNumFreePolicies("CvPlayer::m_iNumFreePolicies", m_syncArchive)
 	, m_iNumFreePoliciesEver("CvPlayer::m_iNumFreePoliciesEver", m_syncArchive)
 	, m_iNumFreeTenets(0)
+
+
+
 	, m_iMaxEffectiveCities(1)
 	, m_iLastSliceMoved(0)
 	, m_eEndTurnBlockingType(NO_ENDTURN_BLOCKING_TYPE)
@@ -935,6 +939,7 @@ void CvPlayer::uninit()
 	m_piDomainFreeExperience.clear();
 #endif
 
+
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	m_iConversionModifier = 0;
 #endif
@@ -1216,6 +1221,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	m_piDomainFreeExperience.clear();
 #endif
+
+
 
 #ifdef MOD_ROG_CORE
 	m_aiWorldWonderCityYieldRateModifier.clear();
@@ -12778,6 +12785,7 @@ int CvPlayer::GetHappinessFromNaturalWonders() const
 
 		int iPlotHappiness = GC.getFeatureInfo(eFeature)->getInBorderHappiness();
 
+
 		if(iPlotHappiness > 0)
 		{
 			// Trait boosts this further?
@@ -12793,6 +12801,8 @@ int CvPlayer::GetHappinessFromNaturalWonders() const
 
 	return iHappiness;
 }
+
+
 
 //	--------------------------------------------------------------------------------
 /// Extra Happiness from every connected Luxury
@@ -20709,13 +20719,31 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 					iCityPOPResource += (pLoopCity->getPopulation() * pLoopCity->GetResourceQuantityFromPOP(eIndex));
 				}
 
-				ImprovementTypes eImprovement;
-				int iNumImprovementInfos = GC.getNumImprovementInfos();
-				for (int iImprovementLoop = 0; iImprovementLoop < iNumImprovementInfos; iImprovementLoop++)
+
+				int iNumBuildingInfos = GC.getNumBuildingInfos();
+				for (int iI = 0; iI < iNumBuildingInfos; iI++)
 				{
-					eImprovement = (ImprovementTypes)iImprovementLoop;
-					iCityImprovementResource += pLoopCity->CountResourceFromImprovement(eImprovement, eIndex);
+					const BuildingTypes eBuilding = static_cast<BuildingTypes>(iI);
+
+					CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
+
+					if (pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
+					{
+						//ImprovementTypes eImprovement;
+						//int iNumImprovementInfos = GC.getNumImprovementInfos();
+						for (int iI = 0; iI < GC.getNumImprovementInfos(); iI++)
+						{
+							//eImprovement = (ImprovementTypes)iImprovementLoop;
+							ImprovementTypes eImprovement = (ImprovementTypes)iI;
+
+							 iCityImprovementResource += pLoopCity->CountResourceFromImprovement(eBuilding, eImprovement, eIndex);
+								
+							
+						}
+					}
 				}
+			
+
 
 				for (const auto& info : GetCityResourcesFromPolicy())
 				{
@@ -26257,6 +26285,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_piDomainFreeExperience;
 #endif
 
+
+
 #ifdef MOD_ROG_CORE
 	kStream >> m_aiWorldWonderCityYieldRateModifier;
 #endif
@@ -26876,6 +26906,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiDomainFreeExperiencePerGreatWorkGlobal;
 	kStream << m_piDomainFreeExperience;
 #endif
+
+
 
 #ifdef MOD_ROG_CORE
 	kStream << m_aiWorldWonderCityYieldRateModifier;
