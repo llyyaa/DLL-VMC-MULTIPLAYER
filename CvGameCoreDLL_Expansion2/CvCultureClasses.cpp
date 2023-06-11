@@ -5329,7 +5329,11 @@ int CvCityCulture::GetCultureFromNaturalWonders() const
 					// Working the Plot?
 					if (m_pCity->GetCityCitizens()->IsWorkingPlot(pLoopPlot))
 					{
-						if(pLoopPlot->getFeatureType() != NO_FEATURE && GC.getFeatureInfo(pLoopPlot->getFeatureType())->IsNaturalWonder())
+#if defined(MOD_MORE_NATURAL_WONDER)
+						if (pLoopPlot->getFeatureType() != NO_FEATURE && GC.getFeatureInfo(pLoopPlot->getFeatureType())->IsNaturalWonder(true))
+#else
+						if (pLoopPlot->getFeatureType() != NO_FEATURE && GC.getFeatureInfo(pLoopPlot->getFeatureType())->IsNaturalWonder())
+#endif
 						{
 							iRtnValue += pLoopPlot->getYield(YIELD_CULTURE);
 						}
