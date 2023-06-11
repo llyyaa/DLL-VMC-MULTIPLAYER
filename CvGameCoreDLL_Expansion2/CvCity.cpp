@@ -9303,7 +9303,12 @@ int CvCity::GetYieldPerTurnFromUnimprovedFeatures(YieldTypes eYield) const
 	{
 		FeatureTypes eFeature = (FeatureTypes) iI;
 
-		if (!GC.getFeatureInfo(eFeature)->IsNaturalWonder()) {
+#if defined(MOD_MORE_NATURAL_WONDER)
+		if (!GC.getFeatureInfo(eFeature)->IsNaturalWonder(true))
+#else
+		if (!GC.getFeatureInfo(eFeature)->IsNaturalWonder())
+#endif
+		{
 			int iBaseYield = kPlayer.getCityYieldFromUnimprovedFeature(eFeature, eYield);
 			iBaseYield += kPlayer.GetPlayerTraits()->GetCityYieldFromUnimprovedFeature(eFeature, eYield);
 		
@@ -19637,11 +19642,11 @@ int CvCity::CountWorkedImprovement(ImprovementTypes iImprovementType) const
 		}
 
 		// Not being worked by this city
-		if (pLoopPlot->getWorkingCity() != this || !pLoopPlot->isBeingWorked() || pLoopPlot->IsImprovementPillaged()) {
+		if (pLoopPlot->getWorkingCity() != this || !pLoopPlot->isBeingWorked() ) {
 			continue;
 		}
 
-		if (pLoopPlot->HasImprovement(iImprovementType)) {
+		if (pLoopPlot->HasImprovement(iImprovementType) && !pLoopPlot->IsImprovementPillaged()) {
 			++iCount;
 		}
 	}
@@ -19963,19 +19968,16 @@ void CvCity::ChangeSiegeKillCitizensModifier(int iChange)
 
 
 
+
+
 #if defined(MOD_ROG_CORE)
-int CvCity::CountResourceFromImprovement(ImprovementTypes iImprovementType, ResourceTypes eResource) const
+int CvCity::CountResourceFromImprovement(BuildingTypes eBuilding, ImprovementTypes iImprovementType, ResourceTypes eResource) const
 {
 
 	int iCount = 0;
 	int iBuilding = 0;
 	int iImprovement = 0;
 	int iValue = 0;
-
-	int iNumBuildingInfos = GC.getNumBuildingInfos();
-	for (int iI = 0; iI < iNumBuildingInfos; iI++)
-	{
-		const BuildingTypes eBuilding = static_cast<BuildingTypes>(iI);
 
 		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
 		if (pkBuildingInfo)
@@ -19993,8 +19995,7 @@ int CvCity::CountResourceFromImprovement(ImprovementTypes iImprovementType, Reso
 				}
 			}
 		}
-	}
-
+	
 	return iCount;
 }
 #endif
