@@ -982,6 +982,8 @@
 
     <Row Class="2" Name="ROG_CORE" Value="1"/>
 
+<Row Class="4" Name="MORE_NATURAL_WONDER" Value="1"/>
+
     <Row Class="3"  Name="EVENTS_UNIT_CAN_RANGEATTACK" Value="1"/>
     <!--GameEvents.UnitCanRangeAttackPlot.Add(function(iPlayer, iUnit, iPlotX, iPlotY, bNeedWar) return true end)-->
     <Row Class="3"  Name="EVENTS_UNIT_DO_TURN" Value="1"/>
