@@ -659,9 +659,19 @@ void CvTacticalAI::LaunchAttack(void* pAttacker, CvTacticalTarget* pTarget, bool
 		bool bSendAttack = pUnit->getMoves() > 0 && !pUnit->isOutOfAttacks();
 		if(bSendAttack)
 		{
+			auto x = pTarget->GetTargetX();
+			auto y = pTarget->GetTargetY();
+			auto* pPlot = GC.getMap().plot(x, y);
 			if(bRanged && pUnit->getDomainType() != DOMAIN_AIR)	// Air attack is ranged, but it goes through the 'move to' mission.
 			{
-				pUnit->PushMission(CvTypes::getMISSION_RANGE_ATTACK(), pTarget->GetTargetX(), pTarget->GetTargetY());
+				if (MOD_SP_SMART_AI && pUnit->IsCanAttackWithMove() && pPlot && pPlot->isCity() && pPlot->getPlotCity() != nullptr && pPlot->getPlotCity()->getDamage() >= pPlot->getPlotCity()->GetMaxHitPoints() - 1)
+				{
+					pUnit->PushMission(CvTypes::getMISSION_MOVE_TO(), pTarget->GetTargetX(), pTarget->GetTargetY());
+				}
+				else
+				{
+					pUnit->PushMission(CvTypes::getMISSION_RANGE_ATTACK(), pTarget->GetTargetX(), pTarget->GetTargetY());
+				}
 			}
 			//else if (pUnit->canNuke(NULL)) // NUKE tactical attack (ouch)
 			//{

@@ -1136,6 +1136,8 @@
     <Row Class="4" Name="PROMOTIONS_EXTRARES_BONUS" Value="0"/>
 
     <Row Class="6" Name="RESOURCE_EXTRA_BUFF" Value="0"/>
+
+    <Row Class="6" Name="SP_SMART_AI" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>
