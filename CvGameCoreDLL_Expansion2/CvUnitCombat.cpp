@@ -5164,6 +5164,7 @@ void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPl
 void CvUnitCombat::DoBounsFromCombatDamage(const CvCombatInfo & kCombatInfo)
 {
 	if (!MOD_PROMOTION_NEW_EFFECT_FOR_SP) return;
+	if (!ShouldDoNewBattleEffects(kCombatInfo)) return;
 	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
 	// Only work when unit vs unit

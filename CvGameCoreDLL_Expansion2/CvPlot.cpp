@@ -5481,11 +5481,10 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 			setOwnershipDuration(0);
 
 #if defined(MOD_MORE_NATURAL_WONDER)
+			FeatureTypes eFeature = getFeatureType();
+			CvFeatureInfo* pFeatureInfo = GC.getFeatureInfo(eFeature);
 			if(MOD_MORE_NATURAL_WONDER)
 			{
-				FeatureTypes eFeature = getFeatureType();
-				CvFeatureInfo* pFeatureInfo = GC.getFeatureInfo(eFeature);
-
 				if (pFeatureInfo && eNewValue != NO_PLAYER)
 				{
 		
@@ -5505,7 +5504,7 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 			if(isOwned())
 			{
 #if defined(MOD_BALANCE_CORE)
-				if (pFeatureInfo && eOldOwner != NO_PLAYER)
+				if (MOD_BALANCE_CORE && pFeatureInfo && eOldOwner != NO_PLAYER)
 				{
 
 					PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
@@ -5516,7 +5515,7 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 							GET_PLAYER(eOldOwner).ChangeFreePromotionCount(eFreePromotion, -1);
 						}
 
-					}
+				}
 			}
 #endif
 
