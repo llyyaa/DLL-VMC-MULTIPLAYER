@@ -10449,7 +10449,10 @@ void CvCity::SetPuppet(bool bValue)
 	if(IsPuppet() != bValue)
 	{
 #if defined(MOD_EVENTS_CITY_PUPPETED)
-		GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityPuppeted, getOwner(), GetID());
+		if(MOD_EVENTS_CITY_PUPPETED)
+		{
+			GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityPuppeted, getOwner(), GetID());
+		}
 #endif
 		m_bPuppet = bValue;
 	}
@@ -11008,7 +11011,10 @@ void CvCity::SetWeLoveTheKingDayCounter(int iValue)
 	else if (iValue == 0)
 	{
 #if defined(MOD_EVENTS_WLKD_DAY)
-		GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityEndsWLTKD, getOwner(), getX(), getY(), iValue);
+		if(MOD_EVENTS_WLKD_DAY)
+		{
+			GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityEndsWLTKD, getOwner(), getX(), getY(), iValue);
+		}
 #endif
 	}
 	m_iWeLoveTheKingDayCounter = iValue;

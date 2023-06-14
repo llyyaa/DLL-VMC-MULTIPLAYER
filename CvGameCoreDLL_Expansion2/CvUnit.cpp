@@ -8255,12 +8255,15 @@ bool CvUnit::createGreatWork()
 			}
 		}
 
-#if defined(MOD_EVENTS_GREAT_WORK_CREATED)
-		CvGameCulture* pCulture = GC.getGame().GetGameCulture();
-		if (pCulture != NULL)
+#if defined(EVENTS_GREAT_WORK_CREATED)
+		if(EVENTS_GREAT_WORK_CREATED)
 		{
-			int iValue = (int)eGreatWorkType;
-			GAMEEVENTINVOKE_HOOK(GAMEEVENT_GreatWorkCreated, getOwner(), GetID(), iValue);
+			CvGameCulture* pCulture = GC.getGame().GetGameCulture();
+			if (pCulture != NULL)
+			{
+				int iValue = (int)eGreatWorkType;
+				GAMEEVENTINVOKE_HOOK(GAMEEVENT_GreatWorkCreated, getOwner(), GetID(), iValue);
+			}
 		}
 #endif
 
@@ -9642,9 +9645,10 @@ bool CvUnit::DoSpreadReligion()
 			}
 
 #if defined(MOD_EVENTS_GREAT_PEOPLE_BOOST)
+			if(MOD_EVENTS_GREAT_PEOPLE_BOOST)
 			{
 				GAMEEVENTINVOKE_HOOK(GAMEEVENT_FaithDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
-			 }
+			}
 #endif
 
 			if(IsGreatPerson())
@@ -10135,6 +10139,7 @@ bool CvUnit::discover()
 
 
 #if defined(MOD_EVENTS_GREAT_PEOPLE_BOOST)
+	if(MOD_EVENTS_GREAT_PEOPLE_BOOST)
 	{
 		//int iBeakersBonus = getDiscoverAmount();
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_ScienceDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
@@ -10360,6 +10365,7 @@ bool CvUnit::hurry()
 
 
 #if defined(MOD_EVENTS_GREAT_PEOPLE_BOOST)
+	if(MOD_EVENTS_GREAT_PEOPLE_BOOST)
 	{
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_ProductionDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
 	}
@@ -10492,6 +10498,7 @@ bool CvUnit::trade()
 	}
 
 #if defined(MOD_EVENTS_GREAT_PEOPLE_BOOST)
+	if(MOD_EVENTS_GREAT_PEOPLE_BOOST)
 	{
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_GoldDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
 	}
@@ -10852,6 +10859,7 @@ bool CvUnit::DoCultureBomb()
 			gDLL->GameplayUnitActivate(pDllUnit.get());
 		}
 #if defined(MOD_EVENTS_GREAT_PEOPLE_BOOST)
+		if(MOD_EVENTS_GREAT_PEOPLE_BOOST)
 		{
 			GAMEEVENTINVOKE_HOOK(GAMEEVENT_CultureBombDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
 		}
@@ -11058,6 +11066,7 @@ bool CvUnit::goldenAge()
 	}
 
 #if defined(MOD_EVENTS_GREAT_PEOPLE_BOOST)
+	if(MOD_EVENTS_GREAT_PEOPLE_BOOST)
 	{
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_GoldenAgeDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
 	}
@@ -11204,6 +11213,7 @@ bool CvUnit::givePolicies()
 
 
 #if defined(MOD_EVENTS_GREAT_PEOPLE_BOOST)
+	if(MOD_EVENTS_GREAT_PEOPLE_BOOST)
 	{
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_CultureDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
 	}
@@ -11315,6 +11325,7 @@ bool CvUnit::blastTourism()
 	}
 
 #if defined(MOD_EVENTS_GREAT_PEOPLE_BOOST)
+	if(MOD_EVENTS_GREAT_PEOPLE_BOOST)
 	{
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_TourismDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
 	}
