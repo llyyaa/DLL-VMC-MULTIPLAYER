@@ -982,17 +982,17 @@
 
     <Row Class="2" Name="ROG_CORE" Value="1"/>
 
-    <Row Class="4" Name="MORE_NATURAL_WONDER" Value="1"/>
+    <Row Class="4" Name="MORE_NATURAL_WONDER" Value="0"/>
 
-    <Row Class="3"  Name="EVENTS_UNIT_CAN_RANGEATTACK" Value="1"/>
+    <Row Class="3"  Name="EVENTS_UNIT_CAN_RANGEATTACK" Value="0"/>
     <!--GameEvents.UnitCanRangeAttackPlot.Add(function(iPlayer, iUnit, iPlotX, iPlotY, bNeedWar) return true end)-->
-    <Row Class="3"  Name="EVENTS_UNIT_DO_TURN" Value="1"/>
+    <Row Class="3"  Name="EVENTS_UNIT_DO_TURN" Value="0"/>
     <!-- GameEvents.UnitDoTurn.Add(function(iPlayer, iUnit, iPlotX, iPlotY) end)-->
     <Row Class="3"  Name="EVENTS_UNIT_MOVE" Value="0"/>
     <!--GameEvents.UnitMoveInto.Add(function(iPlayer, iUnit, iUsedMoves, iOldPlotX, iOldPlotY,iNewPlotX, iNewPlotY) end)-->
-    <Row Class="3" Name="EVENTS_GREAT_WORK_CREATED" Value="1"/>
+    <Row Class="3" Name="EVENTS_GREAT_WORK_CREATED" Value="0"/>
     <!--GameEvents.GreatWorkCreated.Add(function(iPlayer, iUnit, iGreatWork) end)--> 
-    <Row Class="3" Name="EVENTS_GREAT_PEOPLE_BOOST" Value="1"/> 
+    <Row Class="3" Name="EVENTS_GREAT_PEOPLE_BOOST" Value="0"/> 
     <!--GameEvents.ScienceDiscover.Add(function(iPlayer,iUnit,iX,iY,bIsGreatPerson) end)-->   
     <!--GameEvents.CultureDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->   
     <!--GameEvents.TourismDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->   
@@ -1001,16 +1001,16 @@
     <!--GameEvents.GoldenAgeDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
     <!--GameEvents.CultureBombDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
     <!--GameEvents.FaithDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
-    <Row Class="3" Name="EVENTS_CITY_PUPPETED" Value="1"/>
+    <Row Class="3" Name="EVENTS_CITY_PUPPETED" Value="0"/>
     <!--GameEvents.CityPuppeted.Add(function(playerID, cityID) end)--> 
-    <Row Class="3" Name="EVENTS_CITY_RANGE_STRIKE" Value="1"/>
+    <Row Class="3" Name="EVENTS_CITY_RANGE_STRIKE" Value="0"/>
     <!--GameEvents.CityRangedStrike.Add(function(iPlayer,iAttCity,idefPlayer,idefUnit,iX, iY) end)--> 
-    <Row Class="3" Name="EVENTS_TILE_SET_OWNER" Value="1"/>
+    <Row Class="3" Name="EVENTS_TILE_SET_OWNER" Value="0"/>
     <!--GameEvents.TileSetOwnership.Add(iPlotX, iPlotY, iOldOwner,iNewOwner) end)--> 
-    <Row Class="3" Name="EVENTS_WLKD_DAY" Value="1"/>
+    <Row Class="3" Name="EVENTS_WLKD_DAY" Value="0"/>
     <!--GameEvents.CityBeginsWLTKD.Add(iPlayer, iPlotX, iPlotY, iChange) end)--> 
     <!--GameEvents.CityEndsWLTKD.Add(iPlayer, iPlotX, iPlotY) end)--> 
-    <Row Class="3" Name="EVENTS_IMPROVEMENTS_PILLAGED" Value="1"/>  
+    <Row Class="3" Name="EVENTS_IMPROVEMENTS_PILLAGED" Value="0"/>  
     <!--GameEvents.TileImprovementPillaged.Add(iPlotX, iPlotY, iOwner,iImprovement,bPillaged) end)-->
 
     <!-- GameEvents.GetImprovementXPPerTurn.Add(function(iX, iY, iImprovementType, iCurrentXP, iOwner, iWorkCity) return 0 end); // notice: the iOnwer or iWorkCity may be -1 -->

@@ -1354,7 +1354,7 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		DoBounsFromCombatDamage(kCombatInfo);
-		if(pkAttacker->GetLostAllMovesAttackCity() > 0)
+		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && pkAttacker->GetLostAllMovesAttackCity() > 0)
 		{
 			pkAttacker->setMoves(0);
 			if (pkAttacker->getOwner() == GC.getGame().getActivePlayer())
