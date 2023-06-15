@@ -866,7 +866,11 @@ int PathDestValid(int iToX, int iToY, const void* pointer, CvAStar* finder)
 		return TRUE;
 	}
 
+#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+	if(pToPlot->isMountain() && !pToPlot->isCity() && !pUnit->canFound(pToPlot) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
+#else 
 	if(pToPlot->isMountain() && !pToPlot->isCity() && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
+#endif
 	{
 		return FALSE;
 	}
@@ -1098,11 +1102,10 @@ int PathCost(CvAStarNode* parent, CvAStarNode* node, int data, const void* point
 			if (!pCacheData->isHuman() || pCacheData->IsAutomated())
 			{
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
-				if (pUnit->canFound(pToPlot))
+				if (MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && !pUnit->canFound(pToPlot))
 				{
-					iCost += GC.getINFLUENCE_HILL_COST();
+					iCost += PATH_END_TURN_MOUNTAIN_WEIGHT;
 				}
-				else iCost += PATH_END_TURN_MOUNTAIN_WEIGHT;
 #else
 				iCost += PATH_END_TURN_MOUNTAIN_WEIGHT;
 #endif
@@ -1351,7 +1354,7 @@ int PathValid(CvAStarNode* parent, CvAStarNode* node, int data, const void* poin
 						}
 
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
-						if (kNodeCacheData.bIsMountain && !kNodeCacheData.bIsCity && !(iFinderIgnoreStacking) && (!bIsHuman || bAIControl))
+						if (kNodeCacheData.bIsMountain && !kNodeCacheData.bIsCity && !(iFinderIgnoreStacking) && (!bIsHuman || bAIControl) && !pUnit->canFound(pToPlot))
 						{
 							return FALSE;
 						}
@@ -1682,7 +1685,11 @@ int IgnoreUnitsDestValid(int iToX, int iToY, const void* pointer, CvAStar* finde
 		return FALSE;
 	}
 
+#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+	if((pToPlot->isMountain() && !pToPlot->isCity() && !pUnit->canFound(pToPlot)) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
+#else
 	if((pToPlot->isMountain() && !pToPlot->isCity()) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
+#endif
 	{
 		return FALSE;
 	}

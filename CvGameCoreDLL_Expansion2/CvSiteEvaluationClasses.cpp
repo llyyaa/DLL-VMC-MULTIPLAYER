@@ -672,7 +672,7 @@ int CvCitySiteEvaluator::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, YieldT
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
 	if (MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && pPlot->isMountain() && pPlayer->GetCanFoundMountainCity())
 	{
-		rtnValue += (int)rtnValue * (iIncaMountainCityValue + pPlayer->GetCurrentEra());
+		rtnValue += (int)rtnValue * (iIncaMountainCityValue + pPlayer->GetCurrentEra()) * 2;
 	}
 #endif
 
