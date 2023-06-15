@@ -1102,7 +1102,7 @@ int PathCost(CvAStarNode* parent, CvAStarNode* node, int data, const void* point
 			if (!pCacheData->isHuman() || pCacheData->IsAutomated())
 			{
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
-				if (MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && !pUnit->canFound(pToPlot))
+				if (!MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY || !pUnit->canFound(pToPlot))
 				{
 					iCost += PATH_END_TURN_MOUNTAIN_WEIGHT;
 				}
