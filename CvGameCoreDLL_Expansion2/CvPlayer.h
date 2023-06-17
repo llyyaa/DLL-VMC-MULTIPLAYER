@@ -493,6 +493,9 @@ public:
 	int GetFaithEverGenerated() const;
 	void SetFaithEverGenerated(int iNewValue);
 	void ChangeFaithEverGenerated(int iChange);
+	int GetCachedTotalFaithPerTurn() const;
+	void SetCachedTotalFaithPerTurn(int iValue);
+
 
 	// Happiness
 
@@ -2047,6 +2050,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iCulturePerTechResearched;
 	int m_iFaith;
 	int m_iFaithEverGenerated;
+	int m_iCachedTotalFaithPerTurn;
 	FAutoVariable<int, CvPlayer> m_iHappiness;
 	FAutoVariable<int, CvPlayer> m_iUprisingCounter;
 	FAutoVariable<int, CvPlayer> m_iExtraHappinessPerLuxury;
