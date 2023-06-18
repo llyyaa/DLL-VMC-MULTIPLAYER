@@ -5164,11 +5164,11 @@ void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPl
 void CvUnitCombat::DoBounsFromCombatDamage(const CvCombatInfo & kCombatInfo)
 {
 	if (!MOD_PROMOTION_NEW_EFFECT_FOR_SP) return;
-	if (!ShouldDoNewBattleEffects(kCombatInfo)) return;
 	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
 	// Only work when unit vs unit
 	if (pAttackerUnit == nullptr || pDefenderUnit == nullptr) return;
+	if (pAttackerUnit->GetUnitAttackFaithBonus() <= 0) return;
 	int iAttackDamage = kCombatInfo.getDamageInflicted(BATTLE_UNIT_ATTACKER);
 	bool bEmenyDeath = iAttackDamage >= pDefenderUnit->GetCurrHitPoints();
 	iAttackDamage = iAttackDamage < pDefenderUnit->GetCurrHitPoints() ? iAttackDamage : pDefenderUnit->GetCurrHitPoints();
@@ -5253,12 +5253,11 @@ void CvUnitCombat::DoInstantYieldFromCombat(const CvUnit* pAttackerUnit, const C
 	float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 3;
 #endif
 	int iUnitAttackFaithBonus = pAttackerUnit->GetUnitAttackFaithBonus();
-	if(iUnitAttackFaithBonus <= 0) return;
 
 	CvString colorString;
 	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
 	int iFaithBonus = iAttackDamage * iUnitAttackFaithBonus /100;
-	
+	if(iFaithBonus <= 0) return;
 	kAttackPlayer.ChangeFaith(iFaithBonus);
 	if (kAttackPlayer.GetID() == GC.getGame().getActivePlayer())
 	{
