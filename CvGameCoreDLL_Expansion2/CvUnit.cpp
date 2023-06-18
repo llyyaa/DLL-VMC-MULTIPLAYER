@@ -8985,7 +8985,11 @@ bool CvUnit::canFound(const CvPlot* pPlot, bool bTestVisible) const
 	return true;
 }
 
-
+//	--------------------------------------------------------------------------------
+bool CvUnit::canFoundMountainCity() const
+{
+	return MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && AI_getUnitAIType() == UNITAI_SETTLE && GET_PLAYER(getOwner()).GetCanFoundMountainCity();
+}
 //	--------------------------------------------------------------------------------
 bool CvUnit::found()
 {

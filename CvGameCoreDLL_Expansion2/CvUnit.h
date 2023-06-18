@@ -347,6 +347,9 @@ public:
 	bool pillage();
 
 	bool canFound(const CvPlot* pPlot, bool bTestVisible = false) const;
+#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+	bool canFoundMountainCity() const;
+#endif	
 	bool found();
 
 	bool canJoin(const CvPlot* pPlot, SpecialistTypes eSpecialist) const;

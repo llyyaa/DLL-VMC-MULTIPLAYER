@@ -867,7 +867,7 @@ int PathDestValid(int iToX, int iToY, const void* pointer, CvAStar* finder)
 	}
 
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
-	if(pToPlot->isMountain() && !pToPlot->isCity() && !pUnit->canFound(pToPlot) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
+	if(pToPlot->isMountain() && !pToPlot->isCity() && !pUnit->canFoundMountainCity() && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
 #else 
 	if(pToPlot->isMountain() && !pToPlot->isCity() && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
 #endif
@@ -1102,7 +1102,7 @@ int PathCost(CvAStarNode* parent, CvAStarNode* node, int data, const void* point
 			if (!pCacheData->isHuman() || pCacheData->IsAutomated())
 			{
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
-				if (!MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY || !pUnit->canFound(pToPlot))
+				if (!pUnit->canFoundMountainCity())
 				{
 					iCost += PATH_END_TURN_MOUNTAIN_WEIGHT;
 				}
@@ -1686,7 +1686,7 @@ int IgnoreUnitsDestValid(int iToX, int iToY, const void* pointer, CvAStar* finde
 	}
 
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
-	if((pToPlot->isMountain() && !pToPlot->isCity() && !pUnit->canFound(pToPlot)) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
+	if((pToPlot->isMountain() && !pToPlot->isCity() && !(pUnit->canFoundMountainCity())) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
 #else
 	if((pToPlot->isMountain() && !pToPlot->isCity()) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
 #endif
