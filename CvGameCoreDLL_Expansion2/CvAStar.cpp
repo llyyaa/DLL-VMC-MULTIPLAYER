@@ -1686,7 +1686,7 @@ int IgnoreUnitsDestValid(int iToX, int iToY, const void* pointer, CvAStar* finde
 	}
 
 #ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
-	if((pToPlot->isMountain() && !pToPlot->isCity() && !(pUnit->canFoundMountainCity())) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
+	if((pToPlot->isMountain() && !pToPlot->isCity() && !pUnit->canFoundMountainCity()) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
 #else
 	if((pToPlot->isMountain() && !pToPlot->isCity()) && (!pCacheData->isHuman() || pCacheData->IsAutomated()))
 #endif
