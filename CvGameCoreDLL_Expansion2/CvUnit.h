@@ -1731,6 +1731,10 @@ public:
 	int GetCityAttackPlunderModifier() const;
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	const int GetOriginalCapitalDamageFixTotal() const;
+	const int GetOriginalCapitalDamageFix() const;
+	void ChangeOriginalCapitalDamageFix(int iValue);
+
 	const int GetMultipleInitExperence() const;
 	void ChangeMultipleInitExperence(int iValue);
 
@@ -2295,6 +2299,7 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iOriginalCapitalDamageFix;
 	int m_iMultipleInitExperence;
 	int m_iLostAllMovesAttackCity;
 	int m_iUnitAttackFaithBonus;

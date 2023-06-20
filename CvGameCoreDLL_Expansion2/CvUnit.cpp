@@ -441,6 +441,7 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	, m_iOriginalCapitalDamageFix(0)
 	, m_iMultipleInitExperence(0)
 	, m_iLostAllMovesAttackCity(0)
 	, m_iUnitAttackFaithBonus(0)
@@ -1335,6 +1336,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iOriginalCapitalDamageFix = 0;
 	m_iMultipleInitExperence = 0;
 	m_iLostAllMovesAttackCity = 0;
 	m_iUnitAttackFaithBonus = 0;
@@ -6193,6 +6195,20 @@ int CvUnit::GetCityAttackPlunderModifier() const
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeOriginalCapitalDamageFix(int iValue)
+{
+	m_iOriginalCapitalDamageFix += iValue;
+}
+const int CvUnit::GetOriginalCapitalDamageFix() const
+{
+	return m_iOriginalCapitalDamageFix;
+}
+const int CvUnit::GetOriginalCapitalDamageFixTotal() const
+{
+	int OriginalCapitalFixTotal = m_iOriginalCapitalDamageFix * (GET_MY_PLAYER().CountAllOriginalCapitalCity() -1);
+	return OriginalCapitalFixTotal > 0 ? OriginalCapitalFixTotal : 0;
+}
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeMultipleInitExperence(int iValue)
 {
@@ -13679,27 +13695,31 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 	iModifier += iTempModifier;
 
 #if defined(MOD_ROG_CORE)
-	//  modifier always applies for own OriginalCapital
-	int numOriginalCapital;
-	int numAttackMod;
-
-	numOriginalCapital = kPlayer.CountAllOriginalCapitalCity();
-
-	if (numOriginalCapital > 0)
+	int NumOriginalCapitalAttackMod = getNumOriginalCapitalAttackMod();
+	if(NumOriginalCapitalAttackMod != 0)
 	{
-		numAttackMod = (numOriginalCapital - 1);
+		//  modifier always applies for own OriginalCapital
+		int numOriginalCapital;
+		int numAttackMod;
+
+		numOriginalCapital = kPlayer.CountAllOriginalCapitalCity();
+
+		if (numOriginalCapital > 0)
+		{
+			numAttackMod = (numOriginalCapital - 1);
 
 
-		if (numAttackMod > GC.getORIGINAL_CAPITAL_MODMAX())
-		{
-			numAttackMod = GC.getORIGINAL_CAPITAL_MODMAX();
+			if (numAttackMod > GC.getORIGINAL_CAPITAL_MODMAX())
+			{
+				numAttackMod = GC.getORIGINAL_CAPITAL_MODMAX();
+			}
+			else if (numAttackMod < GC.getORIGINAL_CAPITAL_MODMAX())
+			{
+				numAttackMod = numOriginalCapital - 1;
+			}
+			iTempModifier = (numAttackMod * NumOriginalCapitalAttackMod);
+			iModifier += iTempModifier;
 		}
-		else if (numAttackMod < GC.getORIGINAL_CAPITAL_MODMAX())
-		{
-			numAttackMod = numOriginalCapital - 1;
-		}
-		iTempModifier = (numAttackMod * getNumOriginalCapitalAttackMod());
-		iModifier += iTempModifier;
 	}
 #endif
 
@@ -14062,26 +14082,30 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 #endif
 
 #if defined(MOD_ROG_CORE)
-	//  modifier always applies for own OriginalCapital
-	int numOriginalCapital;
-	int numDefenseMod;
-
-	numOriginalCapital = kPlayer.CountAllOriginalCapitalCity();
-
-	if (numOriginalCapital > 0)
+	int NumOriginalCapitalDefenseMod = getNumOriginalCapitalDefenseMod();
+	if(NumOriginalCapitalDefenseMod != 0)
 	{
-		numDefenseMod = (numOriginalCapital - 1);
+		//  modifier always applies for own OriginalCapital
+		int numOriginalCapital;
+		int numDefenseMod;
 
-		if (numDefenseMod > GC.getORIGINAL_CAPITAL_MODMAX())
+		numOriginalCapital = kPlayer.CountAllOriginalCapitalCity();
+
+		if (numOriginalCapital > 0)
 		{
-			numDefenseMod = GC.getORIGINAL_CAPITAL_MODMAX();
+			numDefenseMod = (numOriginalCapital - 1);
+
+			if (numDefenseMod > GC.getORIGINAL_CAPITAL_MODMAX())
+			{
+				numDefenseMod = GC.getORIGINAL_CAPITAL_MODMAX();
+			}
+			else if (numDefenseMod < GC.getORIGINAL_CAPITAL_MODMAX())
+			{
+				numDefenseMod = numOriginalCapital - 1;
+			}
+			iTempModifier = (numDefenseMod * NumOriginalCapitalDefenseMod);
+			iModifier += iTempModifier;
 		}
-		else if (numDefenseMod < GC.getORIGINAL_CAPITAL_MODMAX())
-		{
-			numDefenseMod = numOriginalCapital - 1;
-		}
-		iTempModifier = (numDefenseMod * getNumOriginalCapitalDefenseMod());
-		iModifier += iTempModifier;
 	}
 #endif
 
@@ -14763,27 +14787,31 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 		iModifier += getAttackModifier();
 
 #if defined(MOD_ROG_CORE)
-		//  modifier always applies for own OriginalCapital
-		int numOriginalCapital;
-		int numAttackMod;
-
-		numOriginalCapital = kPlayer.CountAllOriginalCapitalCity();
-
-		if (numOriginalCapital > 0)
+		int iNumOriginalCapitalAttackMod = getNumOriginalCapitalAttackMod();
+		if(iNumOriginalCapitalAttackMod != 0)
 		{
-			numAttackMod = (numOriginalCapital - 1);
+			//  modifier always applies for own OriginalCapital
+			int numOriginalCapital;
+			int numAttackMod;
 
-			if (numAttackMod > GC.getORIGINAL_CAPITAL_MODMAX())
-			{
-				numAttackMod = GC.getORIGINAL_CAPITAL_MODMAX();
-			}
-			else if (numAttackMod < GC.getORIGINAL_CAPITAL_MODMAX())
-			{
-				numAttackMod = numOriginalCapital - 1;
-			}
+			numOriginalCapital = kPlayer.CountAllOriginalCapitalCity();
 
-			iTempModifier = (numAttackMod * getNumOriginalCapitalAttackMod());
-			iModifier += iTempModifier;
+			if (numOriginalCapital > 0)
+			{
+				numAttackMod = (numOriginalCapital - 1);
+
+				if (numAttackMod > GC.getORIGINAL_CAPITAL_MODMAX())
+				{
+					numAttackMod = GC.getORIGINAL_CAPITAL_MODMAX();
+				}
+				else if (numAttackMod < GC.getORIGINAL_CAPITAL_MODMAX())
+				{
+					numAttackMod = numOriginalCapital - 1;
+				}
+
+				iTempModifier = (numAttackMod * iNumOriginalCapitalAttackMod);
+				iModifier += iTempModifier;
+			}
 		}
 #endif
 
@@ -14985,29 +15013,33 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 /////end
 
 #if defined(MOD_ROG_CORE)
-//  modifier always applies for own OriginalCapital
-		int numOriginalCapital;
-		int numDefenseMod;
-
-		//CvPlayer& kPlayer = GET_PLAYER(getOwner());
-
-		numOriginalCapital = kPlayer.CountAllOriginalCapitalCity();
-
-		if (numOriginalCapital > 0)
+		int iNumOriginalCapitalDefenseMod = getNumOriginalCapitalDefenseMod();
+		if(iNumOriginalCapitalDefenseMod != 0)
 		{
-			numDefenseMod = (numOriginalCapital - 1);
+			//  modifier always applies for own OriginalCapital
+			int numOriginalCapital;
+			int numDefenseMod;
 
-			if (numDefenseMod > GC.getORIGINAL_CAPITAL_MODMAX())
-			{
-				numDefenseMod = GC.getORIGINAL_CAPITAL_MODMAX();
-			}
-			else if (numDefenseMod < GC.getORIGINAL_CAPITAL_MODMAX())
-			{
-				numDefenseMod = numOriginalCapital - 1;
-			}
+			//CvPlayer& kPlayer = GET_PLAYER(getOwner());
 
-			iTempModifier = (numDefenseMod * getNumOriginalCapitalDefenseMod());
-			iModifier += iTempModifier;
+			numOriginalCapital = kPlayer.CountAllOriginalCapitalCity();
+
+			if (numOriginalCapital > 0)
+			{
+				numDefenseMod = (numOriginalCapital - 1);
+
+				if (numDefenseMod > GC.getORIGINAL_CAPITAL_MODMAX())
+				{
+					numDefenseMod = GC.getORIGINAL_CAPITAL_MODMAX();
+				}
+				else if (numDefenseMod < GC.getORIGINAL_CAPITAL_MODMAX())
+				{
+					numDefenseMod = numOriginalCapital - 1;
+				}
+
+				iTempModifier = (numDefenseMod * iNumOriginalCapitalDefenseMod);
+				iModifier += iTempModifier;
+			}
 		}
 #endif
 
@@ -24107,6 +24139,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		ChangeOriginalCapitalDamageFix((thisPromotion.GetOriginalCapitalDamageFix()) * iChange);
 		ChangeMultipleInitExperence((thisPromotion.GetMultipleInitExperence()) * iChange);
 		ChangeLostAllMovesAttackCity((thisPromotion.GetLostAllMovesAttackCity()) * iChange);
 		ChangeUnitAttackFaithBonus((thisPromotion.GetUnitAttackFaithBonus()) * iChange);
@@ -24636,6 +24669,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream >> m_iOriginalCapitalDamageFix;
 	kStream >> m_iMultipleInitExperence;
 	kStream >> m_iLostAllMovesAttackCity;
 	kStream >> m_iUnitAttackFaithBonus;
@@ -24987,6 +25021,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_iOriginalCapitalDamageFix;
 	kStream << m_iMultipleInitExperence;
 	kStream << m_iLostAllMovesAttackCity;
 	kStream << m_iUnitAttackFaithBonus;

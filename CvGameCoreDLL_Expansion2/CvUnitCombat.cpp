@@ -4454,6 +4454,12 @@ void UnitAttackInflictDamageIntervene(InflictDamageContext* ctx)
 	// Unit VS Unit
 	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr && ctx->pDefenderCity == nullptr)
 	{
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && ctx->pAttackerUnit->GetOriginalCapitalDamageFix() !=0)
+		{
+			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
+		}
+#endif
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetAttackInflictDamageChange();
 		if (ctx->pDefenderUnit != nullptr)
 		{
@@ -4480,6 +4486,13 @@ void SiegeInflictDamageIntervene(InflictDamageContext* ctx)
 	// Unit VS City
 	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr && ctx->pDefenderCity != nullptr)
 	{
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && ctx->pAttackerUnit->GetOriginalCapitalDamageFix() !=0)
+		{
+			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
+		}
+#endif
+		
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetSiegeInflictDamageChange();
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetSiegeInflictDamageChangeMaxHPPercent() * ctx->pDefenderCity->GetMaxHitPoints() / 100;
 	}
