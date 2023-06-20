@@ -775,6 +775,10 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 				setHasPromotion(ePromotion, true);
 			}
 
+			else if (::IsPromotionValidForUnitPromotions(ePromotion, *this))
+			{
+				setHasPromotion(ePromotion, true);
+			}
 		}
 	}
 

@@ -364,6 +364,9 @@ public:
 	bool GetFeatureImpassable(int i) const;
 	bool GetUnitCombatClass(int i) const;
 	bool GetCivilianUnitType(int i) const;
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+	const std::vector<int>& GetPrePromotions() const;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	bool GetUnitType(int i) const;
@@ -778,6 +781,9 @@ protected:
 	bool* m_pbFeatureImpassable;
 	bool* m_pbUnitCombat;
 	bool* m_pbCivilianUnitType;
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+	std::vector<int> m_vPrePromotions;
+#endif	
 
 
 	bool* m_pbUnitType;

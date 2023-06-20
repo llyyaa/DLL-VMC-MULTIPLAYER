@@ -1102,6 +1102,8 @@
     <!-- see DDL_Traits.sql -->
     <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
 
+    <Row Class="6" Name="POLICY_FREE_PROMOTION_FOR_PROMOTION" Value="1"/>
+
     <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
     <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
     <Row Class="6" Name="PROMOTION_COLLATERAL_DAMAGE" Value="0"/>

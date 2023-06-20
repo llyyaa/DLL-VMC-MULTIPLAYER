@@ -366,6 +366,9 @@ CvPromotionEntry::~CvPromotionEntry(void)
 	SAFE_DELETE_ARRAY(m_pbUnitName);
 #endif
 	SAFE_DELETE_ARRAY(m_pbPostCombatRandomPromotion);
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+	m_vPrePromotions.clear();
+#endif
 }
 //------------------------------------------------------------------------------
 bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
@@ -820,6 +823,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	DEBUG_VARIABLE(iNumDomains);
 	const int iNumUnitCombatClasses = kUtility.MaxRows("UnitCombatInfos");
 	const int iNumUnitTypes = kUtility.MaxRows("Units");
+	const int iNumUnitPromotions = kUtility.MaxRows("UnitPromotions");
 
 	const char* szPromotionType = GetType();
 
@@ -1171,6 +1175,35 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 		pResults->Reset();
 	}
+
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+	//UnitPromotions_Promotions
+	{
+		m_vPrePromotions.clear();
+		std::string sqlKey = "m_vPrePromotions";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if (pResults == NULL)
+		{
+			const char* szSQL = "select UnitPromotions.ID from UnitPromotions_Promotions inner join UnitPromotions where FreePromotionType = ? and PrePromotionType = UnitPromotions.Type;";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		CvAssert(pResults);
+		if (!pResults) return false;
+
+		pResults->Bind(1, szPromotionType);
+
+		while (pResults->Step())
+		{
+			const int iPrePromotion = (PromotionTypes)pResults->GetInt(0);
+			CvAssert(iPrePromotion < iNumUnitPromotions);
+			m_vPrePromotions.push_back(iPrePromotion);
+		}
+
+		pResults->Reset();
+
+	}
+#endif
 
 
 
@@ -2911,6 +2944,13 @@ bool CvPromotionEntry::GetUnitCombatClass(int i) const
 
 	return false;
 }
+
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+const std::vector<int>& CvPromotionEntry::GetPrePromotions() const
+{
+	return m_vPrePromotions;
+}
+#endif
 
 
 

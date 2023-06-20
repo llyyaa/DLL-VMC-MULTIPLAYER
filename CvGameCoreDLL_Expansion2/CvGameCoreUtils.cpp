@@ -369,7 +369,23 @@ bool IsPromotionValidForUnitCombatType(PromotionTypes ePromotion, UnitTypes eUni
 	return true;
 }
 
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+bool IsPromotionValidForUnitPromotions(PromotionTypes ePromotion, CvUnit& pUnit)
+{
+	CvPromotionEntry* promotionInfo = GC.getPromotionInfo(ePromotion);
+	if(promotionInfo == NULL) return false;
 
+	const std::vector<int>& prePromotions = promotionInfo->GetPrePromotions();
+
+	for(int Ii=0; Ii < prePromotions.size(); Ii++)
+	{
+		if(prePromotions[Ii] != NO_PROMOTION && pUnit.isHasPromotion((PromotionTypes)prePromotions[Ii]))
+			return true;
+	}
+
+	return false;
+}
+#endif
 
 /// Is this a valid Promotion for the Unit Type?
 bool IsPromotionValidForUnitType(PromotionTypes ePromotion, UnitTypes eUnit)
