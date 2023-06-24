@@ -185,6 +185,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iOriginalCapitalDamageFix(0),
 	m_iMultipleInitExperence(0),
 	m_iLostAllMovesAttackCity(0),
 	m_iUnitAttackFaithBonus(0),
@@ -366,6 +367,9 @@ CvPromotionEntry::~CvPromotionEntry(void)
 	SAFE_DELETE_ARRAY(m_pbUnitName);
 #endif
 	SAFE_DELETE_ARRAY(m_pbPostCombatRandomPromotion);
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+	m_vPrePromotions.clear();
+#endif
 }
 //------------------------------------------------------------------------------
 bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
@@ -657,6 +661,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iOriginalCapitalDamageFix = kResults.GetInt("OriginalCapitalDamageFix");
 	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
 	m_iLostAllMovesAttackCity = kResults.GetInt("LostAllMovesAttackCity");
 	m_iUnitAttackFaithBonus = kResults.GetInt("UnitAttackFaithBonus");
@@ -820,6 +825,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	DEBUG_VARIABLE(iNumDomains);
 	const int iNumUnitCombatClasses = kUtility.MaxRows("UnitCombatInfos");
 	const int iNumUnitTypes = kUtility.MaxRows("Units");
+	const int iNumUnitPromotions = kUtility.MaxRows("UnitPromotions");
 
 	const char* szPromotionType = GetType();
 
@@ -1171,6 +1177,35 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 		pResults->Reset();
 	}
+
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+	//UnitPromotions_Promotions
+	{
+		m_vPrePromotions.clear();
+		std::string sqlKey = "m_vPrePromotions";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if (pResults == NULL)
+		{
+			const char* szSQL = "select UnitPromotions.ID from UnitPromotions_Promotions inner join UnitPromotions where FreePromotionType = ? and PrePromotionType = UnitPromotions.Type;";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		CvAssert(pResults);
+		if (!pResults) return false;
+
+		pResults->Bind(1, szPromotionType);
+
+		while (pResults->Step())
+		{
+			const int iPrePromotion = (PromotionTypes)pResults->GetInt(0);
+			CvAssert(iPrePromotion < iNumUnitPromotions);
+			m_vPrePromotions.push_back(iPrePromotion);
+		}
+
+		pResults->Reset();
+
+	}
+#endif
 
 
 
@@ -2116,6 +2151,11 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 }
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvPromotionEntry::GetOriginalCapitalDamageFix() const
+{
+	return m_iOriginalCapitalDamageFix;
+}
+
 int CvPromotionEntry::GetMultipleInitExperence() const
 {
 	return m_iMultipleInitExperence;
@@ -2911,6 +2951,13 @@ bool CvPromotionEntry::GetUnitCombatClass(int i) const
 
 	return false;
 }
+
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+const std::vector<int>& CvPromotionEntry::GetPrePromotions() const
+{
+	return m_vPrePromotions;
+}
+#endif
 
 
 

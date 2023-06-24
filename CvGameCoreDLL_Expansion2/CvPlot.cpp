@@ -5483,16 +5483,18 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 #if defined(MOD_MORE_NATURAL_WONDER)
 			FeatureTypes eFeature = getFeatureType();
 			CvFeatureInfo* pFeatureInfo = GC.getFeatureInfo(eFeature);
-
-			if (pFeatureInfo && eNewValue != NO_PLAYER)
+			if(MOD_MORE_NATURAL_WONDER)
 			{
-	
-				PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
-				if (eFreePromotion != NO_PROMOTION)
+				if (pFeatureInfo && eNewValue != NO_PLAYER)
 				{
-					if (!GET_PLAYER(eNewValue).IsFreePromotion(eFreePromotion))
+		
+					PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
+					if (eFreePromotion != NO_PROMOTION)
 					{
-						GET_PLAYER(eNewValue).ChangeFreePromotionCount(eFreePromotion, 1);
+						if (!GET_PLAYER(eNewValue).IsFreePromotion(eFreePromotion))
+						{
+							GET_PLAYER(eNewValue).ChangeFreePromotionCount(eFreePromotion, 1);
+						}
 					}
 				}
 			}
@@ -5502,7 +5504,7 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 			if(isOwned())
 			{
 #if defined(MOD_BALANCE_CORE)
-				if (pFeatureInfo && eOldOwner != NO_PLAYER)
+				if (MOD_BALANCE_CORE && pFeatureInfo && eOldOwner != NO_PLAYER)
 				{
 
 					PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
@@ -5513,7 +5515,7 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 							GET_PLAYER(eOldOwner).ChangeFreePromotionCount(eFreePromotion, -1);
 						}
 
-					}
+				}
 			}
 #endif
 

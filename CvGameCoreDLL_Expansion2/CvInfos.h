@@ -2454,6 +2454,7 @@ inline FDataStream& operator<<(FDataStream& os, const PolicyYieldInfo& kYield)
 	os << (int)kYield.ePolicy;
 	os << (int)kYield.eYield;
 	os << kYield.iYield;
+	os << (int)kYield.eLuaFormula;
 	return os;
 }
 
@@ -2462,6 +2463,7 @@ inline FDataStream& operator>>(FDataStream& is, PolicyYieldInfo& kYield)
 	is >> (int&)kYield.ePolicy;
 	is >> (int&)kYield.eYield;
 	is >> kYield.iYield;
+	is >> (int&)kYield.eLuaFormula;
 	return is;
 }
 

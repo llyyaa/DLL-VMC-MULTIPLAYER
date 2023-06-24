@@ -232,6 +232,7 @@ public:
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int GetOriginalCapitalDamageFix() const;
 	int GetMultipleInitExperence() const;
 	int GetLostAllMovesAttackCity() const;
 	int GetUnitAttackFaithBonus() const;
@@ -364,6 +365,9 @@ public:
 	bool GetFeatureImpassable(int i) const;
 	bool GetUnitCombatClass(int i) const;
 	bool GetCivilianUnitType(int i) const;
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+	const std::vector<int>& GetPrePromotions() const;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	bool GetUnitType(int i) const;
@@ -550,6 +554,7 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iOriginalCapitalDamageFix;
 	int m_iMultipleInitExperence;
 	int m_iLostAllMovesAttackCity;
 	int m_iUnitAttackFaithBonus;
@@ -778,6 +783,9 @@ protected:
 	bool* m_pbFeatureImpassable;
 	bool* m_pbUnitCombat;
 	bool* m_pbCivilianUnitType;
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+	std::vector<int> m_vPrePromotions;
+#endif	
 
 
 	bool* m_pbUnitType;

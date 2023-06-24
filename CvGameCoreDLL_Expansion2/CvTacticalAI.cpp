@@ -4244,7 +4244,11 @@ void CvTacticalAI::PlotSingleHexOperationMoves(CvAIEscortedOperation* pOperation
 						// can move that escort can't -- like minor civ territory), then find a new path based on moving the escort
 						if(pCell->IsFriendlyTurnEndTile() || !pBlockingUnit)
 						{
+#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+							if(!pEscort->GeneratePath(pOperation->GetTargetPlot(), 0, false /*bReuse*/) && !pOperation->GetTargetPlot()->isMountain())
+#else
 							if(!pEscort->GeneratePath(pOperation->GetTargetPlot(), 0, false /*bReuse*/))
+#endif
 							{
 								pOperation->RetargetCivilian(pCivilian.pointer(), pThisArmy);
 								pCivilian->finishMoves();
@@ -4278,6 +4282,21 @@ void CvTacticalAI::PlotSingleHexOperationMoves(CvAIEscortedOperation* pOperation
 										LogTacticalMessage(strLogString);
 									}
 								}
+#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+								else if(MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && pEscortMove->isMountain())
+								{
+									ExecuteMoveToPlot(pCivilian, pEscortMove, true);
+									pEscort->finishMoves();
+									if(GC.getLogging() && GC.getAILogging())
+									{
+										CvString strLogString;
+										CvString strTemp;
+										strTemp = pCivilian->getUnitInfo().GetDescription();
+										strLogString.Format("Moving %s to target mountain, X: %d, Y: %d, Escort stand", strTemp.GetCString(), pCivilian->getX(), pCivilian->getY());
+										LogTacticalMessage(strLogString);
+									}
+								}
+#endif
 								else
 								{
 									// Didn't find an alternative, retarget operation

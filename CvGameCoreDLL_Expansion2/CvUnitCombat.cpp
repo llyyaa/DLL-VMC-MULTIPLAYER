@@ -1354,7 +1354,7 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		DoBounsFromCombatDamage(kCombatInfo);
-		if(pkAttacker->GetLostAllMovesAttackCity() > 0)
+		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && pkAttacker->GetLostAllMovesAttackCity() > 0)
 		{
 			pkAttacker->setMoves(0);
 			if (pkAttacker->getOwner() == GC.getGame().getActivePlayer())
@@ -4454,6 +4454,12 @@ void UnitAttackInflictDamageIntervene(InflictDamageContext* ctx)
 	// Unit VS Unit
 	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr && ctx->pDefenderCity == nullptr)
 	{
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && ctx->pAttackerUnit->GetOriginalCapitalDamageFix() !=0)
+		{
+			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
+		}
+#endif
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetAttackInflictDamageChange();
 		if (ctx->pDefenderUnit != nullptr)
 		{
@@ -4480,6 +4486,13 @@ void SiegeInflictDamageIntervene(InflictDamageContext* ctx)
 	// Unit VS City
 	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr && ctx->pDefenderCity != nullptr)
 	{
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && ctx->pAttackerUnit->GetOriginalCapitalDamageFix() !=0)
+		{
+			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
+		}
+#endif
+		
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetSiegeInflictDamageChange();
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetSiegeInflictDamageChangeMaxHPPercent() * ctx->pDefenderCity->GetMaxHitPoints() / 100;
 	}
@@ -5168,6 +5181,7 @@ void CvUnitCombat::DoBounsFromCombatDamage(const CvCombatInfo & kCombatInfo)
 	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
 	// Only work when unit vs unit
 	if (pAttackerUnit == nullptr || pDefenderUnit == nullptr) return;
+	if (pAttackerUnit->GetUnitAttackFaithBonus() <= 0) return;
 	int iAttackDamage = kCombatInfo.getDamageInflicted(BATTLE_UNIT_ATTACKER);
 	bool bEmenyDeath = iAttackDamage >= pDefenderUnit->GetCurrHitPoints();
 	iAttackDamage = iAttackDamage < pDefenderUnit->GetCurrHitPoints() ? iAttackDamage : pDefenderUnit->GetCurrHitPoints();
@@ -5252,12 +5266,11 @@ void CvUnitCombat::DoInstantYieldFromCombat(const CvUnit* pAttackerUnit, const C
 	float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 3;
 #endif
 	int iUnitAttackFaithBonus = pAttackerUnit->GetUnitAttackFaithBonus();
-	if(iUnitAttackFaithBonus <= 0) return;
 
 	CvString colorString;
 	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
 	int iFaithBonus = iAttackDamage * iUnitAttackFaithBonus /100;
-	
+	if(iFaithBonus <= 0) return;
 	kAttackPlayer.ChangeFaith(iFaithBonus);
 	if (kAttackPlayer.GetID() == GC.getGame().getActivePlayer())
 	{

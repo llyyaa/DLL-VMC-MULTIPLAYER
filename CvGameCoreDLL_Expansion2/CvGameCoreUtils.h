@@ -386,7 +386,9 @@ bool IsPromotionValidForCivilianUnitType(PromotionTypes ePromotion, UnitTypes eU
 
 
 bool IsPromotionValidForUnitType(PromotionTypes ePromotion, UnitTypes eUnit);
-
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+bool IsPromotionValidForUnitPromotions(PromotionTypes ePromotion, CvUnit& pUnit);
+#endif
 
 bool isPromotionValid(PromotionTypes ePromotion, UnitTypes eUnit, bool bLeader, bool bTestingPrereq=false);
 

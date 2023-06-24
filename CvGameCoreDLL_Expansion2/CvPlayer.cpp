@@ -11766,8 +11766,11 @@ int CvPlayer::GetTotalFaithPerTurn() const
 	int iFaithPerTurn = 0;
 
 	// If we're in anarchy, then no Faith is generated!
-	if(IsAnarchy())
+	if (IsAnarchy())
+	{
+		const_cast<CvPlayer*>(this)->SetCachedTotalFaithPerTurn(0);
 		return 0;
+	}
 
 	// Faith per turn from Cities
 	iFaithPerTurn += GetFaithPerTurnFromCities();
@@ -11783,6 +11786,7 @@ int CvPlayer::GetTotalFaithPerTurn() const
 	// Faith per turn from Religion (Founder beliefs)
 	iFaithPerTurn += GetFaithPerTurnFromReligion();
 
+	const_cast<CvPlayer*>(this)->SetCachedTotalFaithPerTurn(iFaithPerTurn);
 	return iFaithPerTurn;
 }
 
@@ -11935,6 +11939,16 @@ void CvPlayer::ChangeFaithEverGenerated(int iChange)
 	SetFaithEverGenerated(GetFaithEverGenerated() + iChange);
 }
 
+int CvPlayer::GetCachedTotalFaithPerTurn() const
+{
+	return m_iCachedTotalFaithPerTurn;
+}
+
+void CvPlayer::SetCachedTotalFaithPerTurn(int iValue)
+{
+	m_iCachedTotalFaithPerTurn = iValue;
+}
+
 //	--------------------------------------------------------------------------------
 /// Updates how much Happiness we have
 void CvPlayer::DoUpdateHappiness()
@@ -12007,7 +12021,19 @@ void CvPlayer::SetHappiness(int iNewValue)
 /// How much over our Happiness limit are we?
 int CvPlayer::GetExcessHappiness() const
 {
-	return GetHappiness() - GetUnhappiness();
+	int result = GetHappiness() - GetUnhappiness();
+	const_cast<CvPlayer*>(this)->SetCachedExcessHappiness(result);
+	return result;
+}
+
+int CvPlayer::GetCachedExcessHappiness() const
+{
+	return m_iCachedExcessHappiness;
+}
+
+void CvPlayer::SetCachedExcessHappiness(int value)
+{
+	m_iCachedExcessHappiness = value;
 }
 
 //	--------------------------------------------------------------------------------
@@ -20709,7 +20735,6 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 		int iLoop = 0;
 		int iCityPOPResource = 0;
 		int iCityResourceFromPolicy = 0;
-		int iCityImprovementResource = 0;
 		for (pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 		{
 			if (pLoopCity != NULL)
@@ -20718,33 +20743,6 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 				{
 					iCityPOPResource += (pLoopCity->getPopulation() * pLoopCity->GetResourceQuantityFromPOP(eIndex));
 				}
-
-
-				int iNumBuildingInfos = GC.getNumBuildingInfos();
-				for (int iI = 0; iI < iNumBuildingInfos; iI++)
-				{
-					const BuildingTypes eBuilding = static_cast<BuildingTypes>(iI);
-
-					CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
-
-					if (pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
-					{
-						//ImprovementTypes eImprovement;
-						//int iNumImprovementInfos = GC.getNumImprovementInfos();
-						for (int iI = 0; iI < GC.getNumImprovementInfos(); iI++)
-						{
-							//eImprovement = (ImprovementTypes)iImprovementLoop;
-							ImprovementTypes eImprovement = (ImprovementTypes)iI;
-
-							 iCityImprovementResource += pLoopCity->CountResourceFromImprovement(eBuilding, eImprovement, eIndex);
-								
-							
-						}
-					}
-				}
-			
-
-
 				for (const auto& info : GetCityResourcesFromPolicy())
 				{
 					if (info.eResource == eIndex && MeetCityResourceRequirement(info, pLoopCity, this))
@@ -20756,7 +20754,6 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 		}
 
 		iTotalNumResource += iCityPOPResource / 100;
-		iTotalNumResource += iCityImprovementResource;
 		iTotalNumResource += iCityResourceFromPolicy;
 #endif
 
@@ -21381,6 +21378,10 @@ void CvPlayer::ChangeFreePromotionCount(PromotionTypes ePromotion, int iChange)
 					pLoopUnit->setHasPromotion(ePromotion, true);
 				}
 
+				else if (::IsPromotionValidForUnitPromotions(ePromotion, *pLoopUnit))
+				{
+					pLoopUnit->setHasPromotion(ePromotion, true);
+				}
 			}
 		}
 	}
@@ -25943,7 +25944,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iCulturePerTechResearched;
 	kStream >> m_iFaith;
 	kStream >> m_iFaithEverGenerated;
+	kStream >> m_iCachedTotalFaithPerTurn;
 	kStream >> m_iHappiness;
+	kStream >> m_iCachedExcessHappiness;
 	kStream >> m_iUprisingCounter;
 	kStream >> m_iExtraHappinessPerLuxury;
 	kStream >> m_iUnhappinessFromUnits;
@@ -26647,7 +26650,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iCulturePerTechResearched;
 	kStream << m_iFaith;
 	kStream << m_iFaithEverGenerated;
+	kStream << m_iCachedTotalFaithPerTurn;
 	kStream << m_iHappiness;
+	kStream << m_iCachedExcessHappiness;
 	kStream << m_iUprisingCounter;
 	kStream << m_iExtraHappinessPerLuxury;
 	kStream << m_iUnhappinessFromUnits;
@@ -30317,7 +30322,7 @@ int CvPlayer::GetHappinessFromFaith() const
 		return 0;
 	}
 
-	return m_iGlobalHappinessFromFaithPercent * GetTotalFaithPerTurn() / 100;
+	return m_iGlobalHappinessFromFaithPercent * GetCachedTotalFaithPerTurn() / 100;
 }
 
 LuaFormulaTypes CvPlayer::GetCaptureCityResistanceTurnsChangeFormula() const
@@ -30564,7 +30569,7 @@ int CvPlayer::GetYieldModifierFromHappiness(CvYieldInfo* info) const
 		return 0;
 	}
 
-	auto result = evaluator->Evaluate<int>(GetExcessHappiness(), getNumCities());
+	auto result = evaluator->Evaluate<int>(GetCachedExcessHappiness(), getNumCities());
 	if (!result.ok)
 	{
 		return 0;
@@ -30587,7 +30592,7 @@ int CvPlayer::GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const
 		{
 			continue;
 		}
-		auto result = evaluator->Evaluate<int>(GetExcessHappiness());
+		auto result = evaluator->Evaluate<int>(GetCachedExcessHappiness());
 		if (result.ok)
 		{
 			ret += result.value;

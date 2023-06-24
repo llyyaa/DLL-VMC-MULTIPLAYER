@@ -496,6 +496,9 @@ public:
 	int GetFaithEverGenerated() const;
 	void SetFaithEverGenerated(int iNewValue);
 	void ChangeFaithEverGenerated(int iChange);
+	int GetCachedTotalFaithPerTurn() const;
+	void SetCachedTotalFaithPerTurn(int iValue);
+
 
 	// Happiness
 
@@ -504,6 +507,8 @@ public:
 	void SetHappiness(int iNewValue);
 
 	int GetExcessHappiness() const;
+	int GetCachedExcessHappiness() const;
+	void SetCachedExcessHappiness(int value);
 	bool IsEmpireUnhappy() const;
 	bool IsEmpireVeryUnhappy() const;
 	bool IsEmpireSuperUnhappy() const;
@@ -2088,7 +2093,9 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iCulturePerTechResearched;
 	int m_iFaith;
 	int m_iFaithEverGenerated;
+	int m_iCachedTotalFaithPerTurn;
 	FAutoVariable<int, CvPlayer> m_iHappiness;
+	int m_iCachedExcessHappiness = 0;
 	FAutoVariable<int, CvPlayer> m_iUprisingCounter;
 	FAutoVariable<int, CvPlayer> m_iExtraHappinessPerLuxury;
 	FAutoVariable<int, CvPlayer> m_iUnhappinessFromUnits;
