@@ -7,6 +7,7 @@
 	------------------------------------------------------------------------------------------------------- */
 #include "CvGameCoreDLLPCH.h"
 #include "CvGameCoreDLLUtil.h"
+#include "CvTraitClasses.h"
 #include "ICvDLLUserInterface.h"
 #include "CvGameCoreUtils.h"
 #include "CvInfosSerializationHelper.h"
@@ -1294,6 +1295,18 @@ int CvTraitEntry::GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYie
 }
 #endif
 
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+int CvTraitEntry::GetSpreadReligionFromKilledUnitStrengthPercent() const
+{
+  return m_iSpreadReligionFromKilledUnitStrengthPercent;
+}
+
+int CvTraitEntry::GetSpreadReligionRadius() const
+{
+  return m_iSpreadReligionRadius;
+}
+#endif
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2017,6 +2030,11 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		}
 	}
 
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  m_iSpreadReligionFromKilledUnitStrengthPercent = kResults.GetInt("SpreadReligionFromKilledUnitStrengthPercent");
+  m_iSpreadReligionRadius = kResults.GetInt("SpreadReligionRadius");
+#endif
+
 	return true;
 }
 
@@ -2318,6 +2336,11 @@ void CvPlayerTraits::InitPlayerTraits()
 			{
 				m_bCanFoundCoastCity = trait->IsCanFoundCoastCity();
 			}
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+      m_iSpreadReligionFromKilledUnitStrengthPercent = trait->GetSpreadReligionFromKilledUnitStrengthPercent();
+      m_iSpreadReligionRadius = trait->GetSpreadReligionRadius();
 #endif
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
@@ -2839,6 +2862,11 @@ void CvPlayerTraits::Reset()
 		FreeResourceXCities temp;
 		m_aFreeResourceXCities.push_back(temp);
 	}
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
+  m_iSpreadReligionRadius = 0;
+#endif
 }
 
 /// Does this player possess a specific trait?
@@ -4317,6 +4345,11 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	}
 
 	kStream >> m_piPerMajorReligionFollowerYieldModifier;
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  kStream >> m_iSpreadReligionFromKilledUnitStrengthPercent;
+  kStream >> m_iSpreadReligionRadius;
+#endif
 }
 
 /// Serialization write
@@ -4539,6 +4572,11 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	}
 
 	kStream << m_piPerMajorReligionFollowerYieldModifier;
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  kStream << m_iSpreadReligionFromKilledUnitStrengthPercent;
+  kStream << m_iSpreadReligionRadius;
+#endif
 }
 
 // PRIVATE METHODS
@@ -4696,3 +4734,15 @@ bool CvPlayerTraits::ConvertBarbarianNavalUnit(UnitHandle pUnit)
 		return false;
 	}
 }
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+int CvPlayerTraits::GetSpreadReligionFromKilledUnitStrengthPercent() const
+{
+  return m_iSpreadReligionFromKilledUnitStrengthPercent;
+}
+
+int CvPlayerTraits::GetSpreadReligionRadius() const
+{
+  return m_iSpreadReligionRadius;
+}
+#endif

@@ -257,6 +257,11 @@ public:
 	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYield) const;
 #endif
 
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  int GetSpreadReligionFromKilledUnitStrengthPercent() const;
+  int GetSpreadReligionRadius() const;
+#endif
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -449,6 +454,11 @@ protected:
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
+  int m_iSpreadReligionRadius = 0;
 #endif
 
 private:
@@ -1058,6 +1068,11 @@ public:
 	}
 #endif
 
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  int GetSpreadReligionFromKilledUnitStrengthPercent() const;
+  int GetSpreadReligionRadius() const;
+#endif
+
 	// Maya calendar routines
 	bool IsUsingMayaCalendar() const;
 	bool IsEndOfMayaLongCount();
@@ -1285,6 +1300,11 @@ private:
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
+  int m_iSpreadReligionRadius = 0;
 #endif
 };
 

@@ -577,6 +577,8 @@ int CustomMods::getOption(string sOption, int defValue) {
 		MOD_OPT_CACHE(RESOURCE_EXTRA_BUFF);
 
 		MOD_OPT_CACHE(SP_SMART_AI);
+
+		MOD_OPT_CACHE(TRAITS_SPREAD_RELIGION_AFTER_KILLING);
 		
 		m_bInit = true;
 	}

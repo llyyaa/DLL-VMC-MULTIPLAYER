@@ -5202,8 +5202,7 @@ void CvUnitCombat::DoBounsFromCombatDamageWhenFinish(const CvCombatInfo& kCombat
 	// Only work when unit vs unit
 	if (pAttackerUnit == nullptr || pDefenderUnit == nullptr) return;
 	int iAttackDamage = kCombatInfo.getDamageInflicted(BATTLE_UNIT_ATTACKER);
-	bool bEmenyDeath = iAttackDamage >= pDefenderUnit->GetCurrHitPoints();
-	iAttackDamage = iAttackDamage < pDefenderUnit->GetCurrHitPoints() ? iAttackDamage : pDefenderUnit->GetCurrHitPoints();
+	bool bEmenyDeath = pDefenderUnit->IsDead() || pDefenderUnit->isDelayedDeath();
 
 	//Get Extra Attack From Attack Damage
 	int iAttackChanceFromAttackDamageFormula = pAttackerUnit->GetAttackChanceFromAttackDamageFormula();

@@ -6,6 +6,7 @@
 	All rights reserved. 
 	------------------------------------------------------------------------------------------------------- */
 
+#include "CustomMods.h"
 #include "CvGameCoreDLLPCH.h"
 #include "CvGlobals.h"
 #include "CvArea.h"
@@ -15042,6 +15043,62 @@ void CvPlayer::changeGreatGeneralRateModFromBldgs(int ichange)
 	m_iGreatGeneralRateModFromBldgs += ichange;
 }
 
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+void static DoSpreadReligionAfterKilling(CvPlayer* pKillingPlayer, CvUnit* pKilledUnit)
+{
+  if (pKillingPlayer == nullptr || pKilledUnit == nullptr || !pKillingPlayer->GetReligions()->HasCreatedReligion())
+    return;
+
+  if (pKillingPlayer->GetPlayerTraits()->GetSpreadReligionRadius() == 0 || 
+      pKillingPlayer->GetPlayerTraits()->GetSpreadReligionFromKilledUnitStrengthPercent() == 0)
+    return;
+
+  CvPlot* pPlot = pKilledUnit->plot();
+  const int iX = pPlot->getX();
+  const int iY = pPlot->getY();
+  const int iRadius = pKillingPlayer->GetPlayerTraits()->GetSpreadReligionRadius();
+  std::tr1::unordered_set<CvCity*> sCities;
+  for (int i = -iRadius; i <= iRadius; ++i)
+  {
+    for (int j = -iRadius; j <= iRadius; ++j)
+    {
+			CvPlot* pLoopPlot = ::plotXYWithRangeCheck(iX, iY, i, j, iRadius);
+      if (pLoopPlot == nullptr || !pLoopPlot->isCity() || pLoopPlot->getOwner() != pKilledUnit->getOwner())
+        continue;
+
+      sCities.insert(pLoopPlot->getPlotCity());
+    }
+  }
+
+  if (sCities.empty())
+    return;
+
+  const int iKilledUnitStrength = std::max(pKilledUnit->GetBaseRangedCombatStrength(),
+      pKilledUnit->GetBaseCombatStrength());
+  const int iSpreadReligionPressure = iKilledUnitStrength *
+                                      pKillingPlayer->GetPlayerTraits()->GetSpreadReligionFromKilledUnitStrengthPercent() / 100;
+  CvString reportString;
+  reportString.Format("+%d[ICON_RELIGION]", iSpreadReligionPressure);
+  const auto kTargetReligion = pKillingPlayer->GetReligions()->GetReligionCreatedByPlayer();
+  for (auto it = sCities.begin(); iSpreadReligionPressure > 0 && it != sCities.end(); ++it)
+  {
+    CvCity* city = *it;
+
+	city->GetCityReligions()->AddReligiousPressure(CvReligiousFollowChangeReason::FOLLOWER_CHANGE_KILLING,
+		kTargetReligion, iSpreadReligionPressure);
+    if (pKillingPlayer->isHuman())
+    {
+#if defined(SHOW_PLOT_POPUP)
+      SHOW_PLOT_POPUP(GC.getMap().plot(city->plot()->getX(), city->plot()->getY()), NO_PLAYER, reportString, 0.0f);
+#else
+      GC.GetEngineUserInterface()->AddPopupText(iX, iY, text, fDelay);
+#endif
+    }
+  }
+
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 /// Do effects when a unit is killed in combat
 #if defined(MOD_API_EXTENSIONS)
@@ -15078,6 +15135,13 @@ void CvPlayer::DoUnitKilledCombat(PlayerTypes eKilledPlayer, UnitTypes eUnitType
 		pKilledPlayer.ChangeWarCasualtiesCounter(iDelta < 0 ? 0 : iDelta);
 		pKilledPlayer.CheckAndUpdateWarCasualtiesCounter();
 	}
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  if (MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING)
+  {
+    DoSpreadReligionAfterKilling(this, pKilledUnit);
+  }
 #endif
 }
 
@@ -30397,7 +30461,7 @@ int CvPlayer::GetUnhappinessModFromResource() const
 	{
 		ret += CalculateUnhappinessModFromResource(info, m_paiNumResourceAvailableCache[info->GetID()]);
 	}
-	return 0;
+	return ret;
 }
 
 int CvPlayer::CalculateUnhappinessModFromResource(CvResourceInfo* info, int num) const
