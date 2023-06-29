@@ -455,6 +455,8 @@ void CvPlot::doTurn()
 	// Clear world anchor
 	SetWorldAnchor(NO_WORLD_ANCHOR);
 
+	CvImprovementEntry* pInfo = GC.getImprovementInfo(getImprovementType());
+
 #ifdef MOD_IMPROVEMENTS_UPGRADE
 	if (MOD_IMPROVEMENTS_UPGRADE)
 	{
@@ -464,7 +466,6 @@ void CvPlot::doTurn()
 			bChangeXP = false;
 		}
 		else {
-			CvImprovementEntry* pInfo = GC.getImprovementInfo(getImprovementType());
 			bChangeXP = pInfo && (pInfo->GetEnableUpgrade() || pInfo->GetEnableDowngrade());
 		}
 
@@ -474,6 +475,33 @@ void CvPlot::doTurn()
 			if (iXPChange != 0)
 			{
 				ChangeXP(iXPChange, true);
+			}
+		}
+	}
+#endif
+
+#ifdef MOD_IMPROVEMENTS_UNIT_XP_PER_TURN
+	if (pInfo && MOD_IMPROVEMENTS_UNIT_XP_PER_TURN && !pInfo->GetUnitXPPerTurnVec().empty())
+	{
+		for (const auto& info : pInfo->GetUnitXPPerTurnVec())
+		{
+			for (int iUnitIndex = 0; iUnitIndex < getNumUnits(); iUnitIndex++)
+			{
+				CvUnit* unit = getUnitByIndex(iUnitIndex);
+				bool ok = true;
+				if (ok && info.eUnitType != NO_UNIT && static_cast<UnitTypes>(unit->getUnitInfo().GetID()) != info.eUnitType)
+				{
+					ok = false;
+				}
+				if (ok && info.ePromotionType != NO_PROMOTION && !unit->HasPromotion(info.ePromotionType))
+				{
+					ok = false;
+				}
+
+				if (ok)
+				{
+					unit->changeExperienceTimes100(info.iValue * 100);
+				}
 			}
 		}
 	}
@@ -9097,6 +9125,37 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 						}
 					}
 				}
+			}
+#endif
+
+#if defined(MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT)
+			if (MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT && !pImprovement->GetYieldChangesPerUnitVec().empty())
+			{
+				int iChange = 0;
+				for (const auto& info : pImprovement->GetYieldChangesPerUnitVec())
+				{
+					if (info.eYieldType != eYield) continue;
+
+					for(int iUnitLoop = 0; iUnitLoop < getNumUnits(); iUnitLoop++)
+					{
+						bool ok = true;
+						CvUnit* loopUnit = getUnitByIndex(iUnitLoop);
+						if (ok && info.eUnitType != NO_UNIT && static_cast<UnitTypes>(loopUnit->getUnitInfo().GetID()) != info.eUnitType)
+						{
+							ok = false;
+						}
+						if (ok && info.ePromotionType != NO_PROMOTION && !loopUnit->HasPromotion(info.ePromotionType))
+						{
+							ok = false;
+						}
+
+						if (ok)
+						{
+							iChange += info.iYield;
+						}
+					}
+				}
+				iYield += iChange;
 			}
 #endif
 		}

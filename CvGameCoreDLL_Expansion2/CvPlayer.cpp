@@ -2352,6 +2352,7 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	tempReligions.Copy(pOldCity->GetCityReligions());
 
 	iBattleDamage = pOldCity->getDamage();
+    CvPlayer &kOldCityPlayer = GET_PLAYER(pOldCity->getOriginalOwner());
 
 	// Traded cities between humans don't heal (an exploit would be to trade a city back and forth between teammates to get an instant heal.)
 	if(!bGift || !isHuman() || !GET_PLAYER(pOldCity->getOwner()).isHuman())
@@ -2395,7 +2396,6 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 						kData.m_bTransferred = false;
 						paGreatWorkData.push_back(kData);
 
-						CvPlayer &kOldCityPlayer = GET_PLAYER(pOldCity->getOriginalOwner());
 						if (kOldCityPlayer.GetCulture()->GetSwappableWritingIndex() == iGreatWork)
 						{
 							kOldCityPlayer.GetCulture()->SetSwappableWritingIndex(-1);
@@ -3247,6 +3247,13 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	if (MOD_GLOBAL_CITY_SCALES && pNewCity) pNewCity->UpdateScaleBuildings();
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	if (MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY && pNewCity && pNewCity->GetCityReligions()->IsHolyCityAnyReligion()) {
+		kOldCityPlayer.UpdateCachedCapturedHolyCity();
+		this->UpdateCachedCapturedHolyCity();
+	}
 #endif
 
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
@@ -26672,6 +26679,10 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iGlobalHappinessFromFaithPercent;
 	kStream >> m_iHappinessInWLTKDCities;
 
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	kStream >> m_iCachedCapturedHolyCity;
+#endif
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -27242,6 +27253,10 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	kStream << m_iGlobalHappinessFromFaithPercent;
 	kStream << m_iHappinessInWLTKDCities;
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	kStream << m_iCachedCapturedHolyCity;
+#endif
 }
 
 //	--------------------------------------------------------------------------------
@@ -30671,3 +30686,25 @@ int CvPlayer::GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const
 	const int iYieldModFromGws = info->getGreakWorkYieldMod();
 	return iNum * iYieldModFromGws;
 }
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+int CvPlayer::GetCachedCapturedHolyCity() const
+{
+    return m_iCachedCapturedHolyCity;
+}
+
+void CvPlayer::UpdateCachedCapturedHolyCity()
+{
+  	int result = 0;
+	int iLoop = 0;
+	for(CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	{
+		if (pLoopCity && pLoopCity->GetCityReligions()->IsHolyCityAnyReligion())
+		{
+		result++;
+		}
+	}
+
+  	m_iCachedCapturedHolyCity = result;
+}
+#endif

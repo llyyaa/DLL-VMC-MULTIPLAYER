@@ -5526,13 +5526,22 @@ int CvCity::GetFaithPurchaseCost(UnitTypes eUnit, bool bIncludeBeliefDiscounts)
 			}
 		}
 #endif
-		EraTypes eEra = GET_TEAM(GET_PLAYER(getOwner()).getTeam()).GetCurrentEra();
+		CvPlayerAI& kOwner = GET_PLAYER(getOwner());
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+		if (iCost <= 0 && MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+			&& (pkUnitInfo->GetUnitCombatType() != -1)
+			&& kOwner.GetPlayerTraits()->GetFaithPurchaseCombatUnitCostPercent() > 0 && this->canTrain(eUnit))
+		{
+			iCost = pkUnitInfo->GetProductionCost() * kOwner.GetPlayerTraits()->GetFaithPurchaseCombatUnitCostPercent() / 100;
+		}
+#endif
+		EraTypes eEra = GET_TEAM(kOwner.getTeam()).GetCurrentEra();
 		int iMultiplier = GC.getEraInfo(eEra)->getFaithCostMultiplier();
 		iCost = iCost * iMultiplier / 100;
 
 		if (pkUnitInfo->IsSpreadReligion() || pkUnitInfo->IsRemoveHeresy())
 		{
-			iMultiplier = (100 + GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_FAITH_COST_MODIFIER));
+			iMultiplier = (100 + kOwner.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_FAITH_COST_MODIFIER));
 			iCost = iCost * iMultiplier / 100;
 		}
 	}

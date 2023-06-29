@@ -9,6 +9,8 @@
 
 #ifndef CIV5_IMPROVEMENT_CLASSES_H
 #define CIV5_IMPROVEMENT_CLASSES_H
+#include "CvInfos.h"
+#include "CustomMods.h"
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -255,6 +257,27 @@ public:
 	ImprovementTypes GetDowngradeImprovementType() const;
 #endif
 
+#ifdef MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT
+	struct YieldChangesPerUnit {
+		YieldTypes eYieldType = NO_YIELD;
+		int iYield = 0;
+		UnitTypes eUnitType = NO_UNIT;
+		PromotionTypes ePromotionType = NO_PROMOTION;
+	};
+
+	std::vector<YieldChangesPerUnit>& GetYieldChangesPerUnitVec();
+#endif
+
+#ifdef MOD_IMPROVEMENTS_UNIT_XP_PER_TURN
+	struct UnitXPPerTurn {
+		int iValue = 0;
+		UnitTypes eUnitType = NO_UNIT;
+		PromotionTypes ePromotionType = NO_PROMOTION;
+	};
+
+	std::vector<UnitXPPerTurn>& GetUnitXPPerTurnVec();
+#endif
+
 	//---------------------------------------PROTECTED MEMBER VARIABLES---------------------------------
 protected:
 	void InitImprovementResourceList(CvImprovementResourceInfo** ppImprovementResource, int iListLen);
@@ -419,6 +442,14 @@ protected:
 
 	bool m_bEnableDowngrade = false;
 	ImprovementTypes m_eDowngradeImprovementType = NO_IMPROVEMENT;
+#endif
+
+#ifdef MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT
+	std::vector<YieldChangesPerUnit> m_vYieldChangesPerUnit;
+#endif
+
+#ifdef MOD_IMPROVEMENTS_UNIT_XP_PER_TURN
+	std::vector<UnitXPPerTurn> m_vUnitXPPerTurn;
 #endif
 
 	CvImprovementResourceInfo* m_paImprovementResource;

@@ -6,6 +6,7 @@
 	All rights reserved. 
 	------------------------------------------------------------------------------------------------------- */
 #include "CvGameCoreDLLPCH.h"
+#include "CvGlobals.h"
 #include "ICvDLLUserInterface.h"
 #include "CvGameCoreUtils.h"
 #include "CvImprovementClasses.h"
@@ -424,6 +425,59 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	}
 #endif
 
+	//Arrays
+	const char* szImprovementType = GetType();
+	const size_t lenImprovementType = strlen(szImprovementType);
+
+#ifdef MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT
+	{
+		std::string strKey = "Improvements - YieldChangesPerUnit";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Improvement_YieldChangesPerUnit where ImprovementType = ?");
+		}
+
+		pResults->Bind(1, szImprovementType, lenImprovementType, false);
+
+		while (pResults->Step())
+		{
+			YieldChangesPerUnit info;
+			info.eYieldType = static_cast<YieldTypes>(GC.getInfoTypeForString(pResults->GetText("YieldType")));
+			info.iYield = pResults->GetInt("Yield");
+			info.eUnitType = static_cast<UnitTypes>(GC.getInfoTypeForString(pResults->GetText("UnitType")));
+			info.ePromotionType = static_cast<PromotionTypes>(GC.getInfoTypeForString(pResults->GetText("PromotionType")));
+			m_vYieldChangesPerUnit.push_back(info);
+		}
+
+		pResults->Reset();
+	}
+#endif
+
+#ifdef MOD_IMPROVEMENTS_UNIT_XP_PER_TURN
+	{
+		std::string strKey = "Improvements - UnitXPPerTurn";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Improvement_UnitXPPerTurn where ImprovementType = ?");
+		}
+
+		pResults->Bind(1, szImprovementType, lenImprovementType, false);
+
+		while (pResults->Step())
+		{
+			UnitXPPerTurn info;
+			info.iValue = pResults->GetInt("Value");
+			info.eUnitType = static_cast<UnitTypes>(GC.getInfoTypeForString(pResults->GetText("UnitType")));
+			info.ePromotionType = static_cast<PromotionTypes>(GC.getInfoTypeForString(pResults->GetText("PromotionType")));
+			m_vUnitXPPerTurn.push_back(info);
+		}
+
+		pResults->Reset();
+	}
+#endif
+
 #if defined(MOD_ROG_CORE)
 	m_iWonderProductionModifier = kResults.GetInt("WonderProductionModifier");
 	m_iNearbyFriendHeal = kResults.GetInt("NearbyFriendHeal");
@@ -479,10 +533,6 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 	const char* szImprovementUpgrade = kResults.GetText("ImprovementUpgrade");
 	m_iImprovementUpgrade = GC.getInfoTypeForString(szImprovementUpgrade, true);
-
-	//Arrays
-	const char* szImprovementType = GetType();
-	const size_t lenImprovementType = strlen(szImprovementType);
 
 	kUtility.PopulateArrayByExistence(m_pbTerrainMakesValid,
 	                                  "Terrains",
@@ -1868,6 +1918,20 @@ bool CvImprovementEntry::GetEnableDowngrade() const
 ImprovementTypes CvImprovementEntry::GetDowngradeImprovementType() const
 {
 	return this->m_eDowngradeImprovementType;
+}
+#endif
+
+#ifdef MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT
+std::vector<CvImprovementEntry::YieldChangesPerUnit>& CvImprovementEntry::GetYieldChangesPerUnitVec()
+{
+	return m_vYieldChangesPerUnit;
+}
+#endif
+
+#ifdef MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT
+std::vector<CvImprovementEntry::UnitXPPerTurn>& CvImprovementEntry::GetUnitXPPerTurnVec()
+{
+	return m_vUnitXPPerTurn;
 }
 #endif
 
