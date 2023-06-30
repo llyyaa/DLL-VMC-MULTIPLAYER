@@ -6,6 +6,8 @@
 	All rights reserved. 
 	------------------------------------------------------------------------------------------------------- */
 
+#include "CustomMods.h"
+#include "CvCorruption.h"
 #include "CvGameCoreDLLPCH.h"
 #include "CvGlobals.h"
 #include "CvCity.h"
@@ -832,6 +834,11 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	if (MOD_GLOBAL_CITY_SCALES)
 		UpdateScaleBuildings();
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	if (MOD_GLOBAL_CORRUPTION)
+		UpdateCorruption();
 #endif
 
 	AI_init();
@@ -10465,6 +10472,11 @@ void CvCity::SetPuppet(bool bValue)
 #endif
 		m_bPuppet = bValue;
 	}
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	if (MOD_GLOBAL_CORRUPTION)
+		UpdateCorruption();
+#endif
 }
 
 //	--------------------------------------------------------------------------------
@@ -17001,6 +17013,11 @@ void CvCity::read(FDataStream& kStream)
 	m_eCityScale = (CityScaleTypes)iCityScale;
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	kStream >> m_iCachedCorruptionScore;
+	kStream >> (int&) m_eCachedCorruptionLevel;
+#endif
+
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 	kStream >> m_iSiegeKillCitizensModifier;
 #endif
@@ -17318,6 +17335,11 @@ void CvCity::write(FDataStream& kStream) const
 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	kStream << (int) m_eCityScale;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	kStream << m_iCachedCorruptionScore;
+	kStream << (int) m_eCachedCorruptionLevel;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
@@ -19979,4 +20001,143 @@ void CvCity::ChangeSiegeKillCitizensModifier(int iChange)
 {
 	m_iSiegeKillCitizensModifier += iChange;
 }
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvCity::GetCorruptionScore() const
+{
+	return m_iCachedCorruptionScore;
+}
+
+CorruptionLevelTypes CvCity::GetCorruptionLevel() const
+{
+	return m_eCachedCorruptionLevel;
+}
+
+void CvCity::UpdateCorruption()
+{
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+	if (!owner.isHuman())
+	{
+		return;
+	}
+
+	const int oldScore = m_iCachedCorruptionScore;
+	const CorruptionLevelTypes eOldLevel = m_eCachedCorruptionLevel;
+	auto* pOldLevel = GC.getCorruptionLevelInfo(eOldLevel);
+
+	const int newScore = CalculateTotalCorruptionScore();
+	CvCorruptionLevel* pNewLevel = nullptr;
+	if (isCapital())
+	{
+		pNewLevel = GC.getCapitalCityCorruptionLevel();
+	}
+	else if (IsPuppet())
+	{
+		pNewLevel = GC.getPuppetCityCorruptionLevel();
+	}
+	else
+	{
+		pNewLevel = DecideCorruptionLevelForNormalCity(newScore);
+	}
+
+	if (pNewLevel == pOldLevel)
+	{
+		m_iCachedCorruptionScore = newScore;
+		return;
+	}
+
+	bool haveOldPublicSecurityBuilding = false;
+	if (pOldLevel)
+	{
+		auto cityHall = owner.GetCivBuilding(pOldLevel->GetCityHallBuildingClass());
+		if (cityHall != NO_BUILDING)
+		{
+			GetCityBuildings()->SetNumRealBuilding(cityHall, 0);
+		}
+		auto publicSecurity = owner.GetCivBuilding(pOldLevel->GetPublicSecurityBuildingClass());
+		if (publicSecurity != NO_BUILDING)
+		{
+			haveOldPublicSecurityBuilding = GetCityBuildings()->GetNumRealBuilding(publicSecurity) > 0;
+			GetCityBuildings()->SetNumRealBuilding(publicSecurity, 0);
+		}
+	}
+
+	if (pNewLevel)
+	{
+		auto cityHall = owner.GetCivBuilding(pNewLevel->GetCityHallBuildingClass());
+		if (cityHall != NO_BUILDING)
+		{
+			GetCityBuildings()->SetNumRealBuilding(cityHall, 1);
+		}
+
+		auto publicSecurity = owner.GetCivBuilding(pNewLevel->GetPublicSecurityBuildingClass());
+		if (publicSecurity != NO_BUILDING && haveOldPublicSecurityBuilding 
+				&& pOldLevel->GetScoreLowerBoundBase() > pNewLevel->GetScoreLowerBoundBase())
+		{
+			GetCityBuildings()->SetNumRealBuilding(publicSecurity, 1);
+		}
+	}
+
+	m_iCachedCorruptionScore = newScore;
+	m_eCachedCorruptionLevel = pNewLevel ? static_cast<CorruptionLevelTypes>(pNewLevel->GetID()) : INVALID_CORRUPTION;
+}
+
+int CvCity::CalculateTotalCorruptionScore() const
+{
+	int score = 0;
+	score += CalculateCorruptionScoreFromDistance();
+
+	int modifier = 100;
+	modifier += CalculateCorruptionScoreModifierFromSpy();
+	modifier += CalculateCorruptionScoreModifierFromPolicy();
+
+	score = score * modifier / 100;
+	score = std::max(0, score);
+	return score;
+}
+
+int CvCity::CalculateCorruptionScoreFromDistance() const
+{
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+	CvCity* capital = owner.getCapitalCity();
+	if (capital == nullptr || capital == this)
+	{
+		return 0;
+	}
+
+	int capX = capital->plot()->getX();
+	int capY = capital->plot()->getY();
+	int cityX = this->plot()->getX();
+	int cityY = this->plot()->getY();
+
+	return plotDistance(capX, capY, cityX, cityY);
+}
+
+int CvCity::CalculateCorruptionScoreModifierFromSpy() const
+{
+	// TODO
+	return 0;
+}
+
+int CvCity::CalculateCorruptionScoreModifierFromPolicy() const
+{
+	// TODO
+	return 0;
+}
+
+CvCorruptionLevel* CvCity::DecideCorruptionLevelForNormalCity(const int score) const
+{
+	CvCorruptionLevel* result = nullptr;
+	for (auto* level : GC.getOrderedNormalCityCorruptionLevels())
+	{
+		if (level->GetScoreLowerBound(GC.getMap().getGridWidth(), GC.getMap().getGridHeight()) > score)
+		{
+			break;
+		}
+		result = level;
+	}
+	return result;
+}
+
 #endif

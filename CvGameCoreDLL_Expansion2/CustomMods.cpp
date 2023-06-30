@@ -585,6 +585,8 @@ int CustomMods::getOption(string sOption, int defValue) {
 
 		MOD_OPT_CACHE(IMPROVEMENTS_YIELD_CHANGE_PER_UNIT);
 		MOD_OPT_CACHE(IMPROVEMENTS_UNIT_XP_PER_TURN);
+
+		MOD_OPT_CACHE(GLOBAL_CORRUPTION);
 		
 		m_bInit = true;
 	}

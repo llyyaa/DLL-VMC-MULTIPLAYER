@@ -554,6 +554,9 @@
     <ClCompile Include="CvCityScaleClasses.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CvCorruption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="CvPromotionCollectionClasses.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1358,6 +1361,9 @@
       <Filter>FireWorks Headers\Win32</Filter>
     </ClInclude>
     <ClInclude Include="CvCityScaleClasses.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CvCorruption.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CvPromotionCollectionClasses.h">

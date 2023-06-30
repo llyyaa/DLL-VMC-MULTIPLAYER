@@ -707,6 +707,12 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetScale);
 	Method(CanGrowNormally);
 #endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	Method(GetCorruptionScore);
+	Method(GetCorruptionLevel);
+	Method(UpdateCorruption);
+#endif
 }
 //------------------------------------------------------------------------------
 void CvLuaCity::HandleMissingInstance(lua_State* L)
@@ -4672,4 +4678,10 @@ int CvLuaCity::lIsSecondaryReligionActive(lua_State* L)
 #ifdef MOD_GLOBAL_CITY_SCALES
 LUAAPIIMPL(City, GetScale)
 LUAAPIIMPL(City, CanGrowNormally)
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+LUAAPIIMPL(City, GetCorruptionScore);
+LUAAPIIMPL(City, GetCorruptionLevel);
+LUAAPIIMPL(City, UpdateCorruption);
 #endif
