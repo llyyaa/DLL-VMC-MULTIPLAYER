@@ -4730,7 +4730,7 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 				pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
 			}
 		}
-		if (kDefensePlayer.isHuman())
+		if (GET_PLAYER(pAOEUnit->getOwner()).isHuman())
 		{
 			if (bAOEKill)
 			{
