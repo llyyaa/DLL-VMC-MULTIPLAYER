@@ -222,7 +222,8 @@ public:
 	int GetBuildingClassHappiness(int i) const;
 	int GetBuildingClassProductionModifier(int i) const;
 	int GetBuildingClassTourismModifier(int i) const;
-	int GetNumFreeUnitsByClass(int i) const;
+	int GetNumFreeUnitsByClass() const;
+	std::pair<UnitClassTypes, int>* GetFreeUnitsByClass() const;
 	int GetTourismByUnitClassCreated(int i) const;
 	int GetImprovementCultureChanges(int i) const;
 
@@ -488,7 +489,8 @@ private:
 	int* m_paiBuildingClassProductionModifiers;
 	int* m_paiBuildingClassTourismModifiers;
 	int* m_paiBuildingClassHappiness;
-	int* m_paiFreeUnitClasses;
+	int m_iNumFreeUnitClass;
+	std::pair<UnitClassTypes, int>* m_pFreeUnitClasses;
 	int* m_paiTourismOnUnitCreation;
 
 //	bool* m_pabHurry;
