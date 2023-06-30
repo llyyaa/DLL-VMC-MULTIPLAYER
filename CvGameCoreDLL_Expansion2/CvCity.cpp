@@ -6693,116 +6693,121 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 			int iFreeUnitLoop;
 
-			for(int iUnitLoop = 0; iUnitLoop < GC.getNumUnitInfos(); iUnitLoop++)
+			int iNumFreeUnit = pBuildingInfo->GetNumFreeUnit();
+			if(iNumFreeUnit > 0)
 			{
-				const UnitTypes eUnit = static_cast<UnitTypes>(iUnitLoop);
-				CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUnit);
-				if(pkUnitInfo)
+				std::pair<UnitTypes, int>* pFreeUnits = pBuildingInfo->GetFreeUnits();
+				for(int iUnitLoop = 0; iUnitLoop < iNumFreeUnit; iUnitLoop++)
 				{
-					for(iFreeUnitLoop = 0; iFreeUnitLoop < pBuildingInfo->GetNumFreeUnits(iUnitLoop); iFreeUnitLoop++)
+					const UnitTypes eUnit = pFreeUnits[iUnitLoop].first;
+					CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUnit);
+					if(pkUnitInfo)
 					{
-						// Get the right unit of this class for this civ
-						const UnitTypes eFreeUnitType = (UnitTypes)thisCiv.getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
-
-						// Great prophet?
-						if(GC.GetGameUnits()->GetEntry(eFreeUnitType)->IsFoundReligion())
+						for(iFreeUnitLoop = 0; iFreeUnitLoop < pFreeUnits[iUnitLoop].second; iFreeUnitLoop++)
 						{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-							GetCityCitizens()->DoSpawnGreatPerson(eFreeUnitType, true /*bIncrementCount*/, true, MOD_GLOBAL_TRULY_FREE_GP);
-#else
-							GetCityCitizens()->DoSpawnGreatPerson(eFreeUnitType, true /*bIncrementCount*/, true);
-#endif
-						}
-						else
-						{
-							pFreeUnit = owningPlayer.initUnit(eFreeUnitType, getX(), getY());
+							// Get the right unit of this class for this civ
+							const UnitTypes eFreeUnitType = (UnitTypes)thisCiv.getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
 
-							// Bump up the count
-							if(pFreeUnit->IsGreatGeneral())
+							// Great prophet?
+							if(GC.GetGameUnits()->GetEntry(eFreeUnitType)->IsFoundReligion())
 							{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-								owningPlayer.incrementGreatGeneralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-								owningPlayer.incrementGreatGeneralsCreated();
-#endif
-								if (!pFreeUnit->jumpToNearestValidPlot())
-									pFreeUnit->kill(false);	// Could not find a valid spot!
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+								GetCityCitizens()->DoSpawnGreatPerson(eFreeUnitType, true /*bIncrementCount*/, true, MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+								GetCityCitizens()->DoSpawnGreatPerson(eFreeUnitType, true /*bIncrementCount*/, true);
+	#endif
 							}
-							else if(pFreeUnit->IsGreatAdmiral())
+							else
 							{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-								owningPlayer.incrementGreatAdmiralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-								owningPlayer.incrementGreatAdmiralsCreated();
-#endif
-								CvPlot *pSpawnPlot = owningPlayer.GetGreatAdmiralSpawnPlot(pFreeUnit);
-								if (pFreeUnit->plot() != pSpawnPlot)
+								pFreeUnit = owningPlayer.initUnit(eFreeUnitType, getX(), getY());
+
+								// Bump up the count
+								if(pFreeUnit->IsGreatGeneral())
 								{
-									pFreeUnit->setXY(pSpawnPlot->getX(), pSpawnPlot->getY());
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+									owningPlayer.incrementGreatGeneralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+									owningPlayer.incrementGreatGeneralsCreated();
+	#endif
+									if (!pFreeUnit->jumpToNearestValidPlot())
+										pFreeUnit->kill(false);	// Could not find a valid spot!
 								}
-							}
-							else if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_WRITER"))
-							{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-								owningPlayer.incrementGreatWritersCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-								owningPlayer.incrementGreatWritersCreated();
-#endif
-								if (!pFreeUnit->jumpToNearestValidPlot())
-									pFreeUnit->kill(false);	// Could not find a valid spot!
-							}							
-							else if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_ARTIST"))
-							{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-								owningPlayer.incrementGreatArtistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-								owningPlayer.incrementGreatArtistsCreated();
-#endif
-								if (!pFreeUnit->jumpToNearestValidPlot())
-									pFreeUnit->kill(false);	// Could not find a valid spot!
-							}							
-							else if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MUSICIAN"))
-							{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-								owningPlayer.incrementGreatMusiciansCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-								owningPlayer.incrementGreatMusiciansCreated();
-#endif
-								if (!pFreeUnit->jumpToNearestValidPlot())
-									pFreeUnit->kill(false);	// Could not find a valid spot!
-							}							
-							else if (pFreeUnit->IsGreatPerson())
-							{
-#if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
-								if (MOD_GLOBAL_SEPARATE_GP_COUNTERS) {
-									if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MERCHANT")) {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										owningPlayer.incrementGreatMerchantsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										owningPlayer.incrementGreatMerchantsCreated();
-#endif
-									} else if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST")) {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										owningPlayer.incrementGreatScientistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										owningPlayer.incrementGreatScientistsCreated();
-#endif
-									} else {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										owningPlayer.incrementGreatEngineersCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										owningPlayer.incrementGreatEngineersCreated();
-#endif
+								else if(pFreeUnit->IsGreatAdmiral())
+								{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+									owningPlayer.incrementGreatAdmiralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+									owningPlayer.incrementGreatAdmiralsCreated();
+	#endif
+									CvPlot *pSpawnPlot = owningPlayer.GetGreatAdmiralSpawnPlot(pFreeUnit);
+									if (pFreeUnit->plot() != pSpawnPlot)
+									{
+										pFreeUnit->setXY(pSpawnPlot->getX(), pSpawnPlot->getY());
 									}
-								} else
-#endif
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-								owningPlayer.incrementGreatPeopleCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-								owningPlayer.incrementGreatPeopleCreated();
-#endif
-								if (!pFreeUnit->jumpToNearestValidPlot())
-									pFreeUnit->kill(false);	// Could not find a valid spot!
+								}
+								else if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_WRITER"))
+								{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+									owningPlayer.incrementGreatWritersCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+									owningPlayer.incrementGreatWritersCreated();
+	#endif
+									if (!pFreeUnit->jumpToNearestValidPlot())
+										pFreeUnit->kill(false);	// Could not find a valid spot!
+								}							
+								else if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_ARTIST"))
+								{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+									owningPlayer.incrementGreatArtistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+									owningPlayer.incrementGreatArtistsCreated();
+	#endif
+									if (!pFreeUnit->jumpToNearestValidPlot())
+										pFreeUnit->kill(false);	// Could not find a valid spot!
+								}							
+								else if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MUSICIAN"))
+								{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+									owningPlayer.incrementGreatMusiciansCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+									owningPlayer.incrementGreatMusiciansCreated();
+	#endif
+									if (!pFreeUnit->jumpToNearestValidPlot())
+										pFreeUnit->kill(false);	// Could not find a valid spot!
+								}							
+								else if (pFreeUnit->IsGreatPerson())
+								{
+	#if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
+									if (MOD_GLOBAL_SEPARATE_GP_COUNTERS) {
+										if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MERCHANT")) {
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											owningPlayer.incrementGreatMerchantsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											owningPlayer.incrementGreatMerchantsCreated();
+	#endif
+										} else if (pkUnitInfo->GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST")) {
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											owningPlayer.incrementGreatScientistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											owningPlayer.incrementGreatScientistsCreated();
+	#endif
+										} else {
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											owningPlayer.incrementGreatEngineersCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											owningPlayer.incrementGreatEngineersCreated();
+	#endif
+										}
+									} else
+	#endif
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+									owningPlayer.incrementGreatPeopleCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+									owningPlayer.incrementGreatPeopleCreated();
+	#endif
+									if (!pFreeUnit->jumpToNearestValidPlot())
+										pFreeUnit->kill(false);	// Could not find a valid spot!
+								}
 							}
 						}
 					}
