@@ -25476,162 +25476,167 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 				int iX = getCapitalCity()->getX();
 				int iY = getCapitalCity()->getY();
 
-				for(iI = 0; iI < GC.getNumUnitClassInfos(); iI++)
+				int iNumFreeUnitClass = pPolicy->GetNumFreeUnitsByClass();
+				if(iNumFreeUnitClass > 0)
 				{
-					const UnitClassTypes eUnitClass = static_cast<UnitClassTypes>(iI);
-					CvUnitClassInfo* pkUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
-					if(pkUnitClassInfo)
+					std::pair<UnitClassTypes, int>* pFreeUnitClasses = pPolicy->GetFreeUnitsByClass();
+					for(iI = 0; iI < iNumFreeUnitClass; iI++)
 					{
-						int iNumFreeUnits = pPolicy->GetNumFreeUnitsByClass(eUnitClass);
-						if(iNumFreeUnits > 0)
+						const UnitClassTypes eUnitClass = pFreeUnitClasses[iI].first;
+						CvUnitClassInfo* pkUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
+						if(pkUnitClassInfo)
 						{
-							const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);
-							CvUnitEntry* pUnitEntry = GC.getUnitInfo(eUnit);
-							if(GC.getGame().isOption(GAMEOPTION_ONE_CITY_CHALLENGE) && isHuman() && pUnitEntry != NULL && pUnitEntry->IsFound())
+							int iNumFreeUnits = pFreeUnitClasses[iI].second;
+							if(iNumFreeUnits > 0)
 							{
-								continue;
-							}
-
-							for(int iUnitLoop = 0; iUnitLoop < iNumFreeUnits; iUnitLoop++)
-							{
-								CvUnit* pNewUnit = NULL;
-
-								// slewis
-								// for venice
-								if (pUnitEntry->IsFound() && GetPlayerTraits()->IsNoAnnexing())
+								const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);
+								CvUnitEntry* pUnitEntry = GC.getUnitInfo(eUnit);
+								if(GC.getGame().isOption(GAMEOPTION_ONE_CITY_CHALLENGE) && isHuman() && pUnitEntry != NULL && pUnitEntry->IsFound())
 								{
-									// drop a merchant of venice instead
-									// find the eUnit replacement that's the merchant of venice
-									for(int iVeniceSearch = 0; iVeniceSearch < GC.getNumUnitClassInfos(); iVeniceSearch++)
+									continue;
+								}
+
+								for(int iUnitLoop = 0; iUnitLoop < iNumFreeUnits; iUnitLoop++)
+								{
+									CvUnit* pNewUnit = NULL;
+
+									// slewis
+									// for venice
+									if (pUnitEntry->IsFound() && GetPlayerTraits()->IsNoAnnexing())
 									{
-										const UnitClassTypes eVeniceUnitClass = static_cast<UnitClassTypes>(iVeniceSearch);
-										CvUnitClassInfo* pkVeniceUnitClassInfo = GC.getUnitClassInfo(eVeniceUnitClass);
-										if(pkVeniceUnitClassInfo)
+										// drop a merchant of venice instead
+										// find the eUnit replacement that's the merchant of venice
+										for(int iVeniceSearch = 0; iVeniceSearch < GC.getNumUnitClassInfos(); iVeniceSearch++)
 										{
-											const UnitTypes eMerchantOfVeniceUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eVeniceUnitClass);
-											if (eMerchantOfVeniceUnit != NO_UNIT)
+											const UnitClassTypes eVeniceUnitClass = static_cast<UnitClassTypes>(iVeniceSearch);
+											CvUnitClassInfo* pkVeniceUnitClassInfo = GC.getUnitClassInfo(eVeniceUnitClass);
+											if(pkVeniceUnitClassInfo)
 											{
-												CvUnitEntry* pVeniceUnitEntry = GC.getUnitInfo(eMerchantOfVeniceUnit);
-												if (pVeniceUnitEntry->IsCanBuyCityState())
+												const UnitTypes eMerchantOfVeniceUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eVeniceUnitClass);
+												if (eMerchantOfVeniceUnit != NO_UNIT)
 												{
-													pNewUnit = initUnit(eMerchantOfVeniceUnit, iX, iY);				
-													break;
+													CvUnitEntry* pVeniceUnitEntry = GC.getUnitInfo(eMerchantOfVeniceUnit);
+													if (pVeniceUnitEntry->IsCanBuyCityState())
+													{
+														pNewUnit = initUnit(eMerchantOfVeniceUnit, iX, iY);				
+														break;
+													}
 												}
 											}
 										}
 									}
-								}
-								else
-								{
-									pNewUnit = initUnit(eUnit, iX, iY);
-								}
-
-								CvAssert(pNewUnit);
-
-								if (pNewUnit)
-								{
-									if(pNewUnit->IsGreatGeneral())
-									{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										incrementGreatGeneralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										incrementGreatGeneralsCreated();
-#endif
-										pNewUnit->jumpToNearestValidPlot();
-									}
-									else if(pNewUnit->IsGreatAdmiral())
-									{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										incrementGreatAdmiralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										incrementGreatAdmiralsCreated();
-#endif
-										CvPlot *pSpawnPlot = GetGreatAdmiralSpawnPlot(pNewUnit);
-										if (pNewUnit->plot() != pSpawnPlot)
-										{
-											pNewUnit->setXY(pSpawnPlot->getX(), pSpawnPlot->getY());
-										}
-									}
-									else if(pNewUnit->getUnitInfo().IsFoundReligion())
-									{
-										ReligionTypes eReligion = GetReligions()->GetReligionCreatedByPlayer();
-										int iReligionSpreads = pNewUnit->getUnitInfo().GetReligionSpreads();
-										int iReligiousStrength = pNewUnit->getUnitInfo().GetReligiousStrength();
-										if(iReligionSpreads > 0 && eReligion > RELIGION_PANTHEON)
-										{
-											pNewUnit->GetReligionData()->SetSpreadsLeft(iReligionSpreads);
-											pNewUnit->GetReligionData()->SetReligiousStrength(iReligiousStrength);
-											pNewUnit->GetReligionData()->SetReligion(eReligion);
-										}
-									}
-									else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_WRITER"))
-									{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										incrementGreatWritersCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										incrementGreatWritersCreated();
-#endif
-
-										if (pNewUnit->getUnitInfo().GetOneShotTourism() > 0)
-										{
-											pNewUnit->SetTourismBlastStrength(GetCulture()->GetTourismBlastStrength(pNewUnit->getUnitInfo().GetOneShotTourism()));
-										}
-
-										pNewUnit->jumpToNearestValidPlot();
-									}							
-									else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_ARTIST"))
-									{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										incrementGreatArtistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										incrementGreatArtistsCreated();
-#endif
-										pNewUnit->jumpToNearestValidPlot();
-									}							
-									else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MUSICIAN"))
-									{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										incrementGreatMusiciansCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										incrementGreatMusiciansCreated();
-#endif
-										pNewUnit->jumpToNearestValidPlot();
-									}
-									else if(pNewUnit->IsGreatPerson())
-									{
-#if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
-										if (MOD_GLOBAL_SEPARATE_GP_COUNTERS) {
-											if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MERCHANT")) {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-												incrementGreatMerchantsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-												incrementGreatMerchantsCreated();
-#endif
-											} else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST")) {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-												incrementGreatScientistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-												incrementGreatScientistsCreated();
-#endif
-											} else {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-												incrementGreatEngineersCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-												incrementGreatEngineersCreated();
-#endif
-											}
-										} else
-#endif
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-										incrementGreatPeopleCreated(MOD_GLOBAL_TRULY_FREE_GP);
-#else
-										incrementGreatPeopleCreated();
-#endif
-										pNewUnit->jumpToNearestValidPlot();
-									}
 									else
 									{
-										pNewUnit->jumpToNearestValidPlot();
+										pNewUnit = initUnit(eUnit, iX, iY);
+									}
+
+									CvAssert(pNewUnit);
+
+									if (pNewUnit)
+									{
+										if(pNewUnit->IsGreatGeneral())
+										{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											incrementGreatGeneralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											incrementGreatGeneralsCreated();
+	#endif
+											pNewUnit->jumpToNearestValidPlot();
+										}
+										else if(pNewUnit->IsGreatAdmiral())
+										{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											incrementGreatAdmiralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											incrementGreatAdmiralsCreated();
+	#endif
+											CvPlot *pSpawnPlot = GetGreatAdmiralSpawnPlot(pNewUnit);
+											if (pNewUnit->plot() != pSpawnPlot)
+											{
+												pNewUnit->setXY(pSpawnPlot->getX(), pSpawnPlot->getY());
+											}
+										}
+										else if(pNewUnit->getUnitInfo().IsFoundReligion())
+										{
+											ReligionTypes eReligion = GetReligions()->GetReligionCreatedByPlayer();
+											int iReligionSpreads = pNewUnit->getUnitInfo().GetReligionSpreads();
+											int iReligiousStrength = pNewUnit->getUnitInfo().GetReligiousStrength();
+											if(iReligionSpreads > 0 && eReligion > RELIGION_PANTHEON)
+											{
+												pNewUnit->GetReligionData()->SetSpreadsLeft(iReligionSpreads);
+												pNewUnit->GetReligionData()->SetReligiousStrength(iReligiousStrength);
+												pNewUnit->GetReligionData()->SetReligion(eReligion);
+											}
+										}
+										else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_WRITER"))
+										{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											incrementGreatWritersCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											incrementGreatWritersCreated();
+	#endif
+
+											if (pNewUnit->getUnitInfo().GetOneShotTourism() > 0)
+											{
+												pNewUnit->SetTourismBlastStrength(GetCulture()->GetTourismBlastStrength(pNewUnit->getUnitInfo().GetOneShotTourism()));
+											}
+
+											pNewUnit->jumpToNearestValidPlot();
+										}							
+										else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_ARTIST"))
+										{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											incrementGreatArtistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											incrementGreatArtistsCreated();
+	#endif
+											pNewUnit->jumpToNearestValidPlot();
+										}							
+										else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MUSICIAN"))
+										{
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											incrementGreatMusiciansCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											incrementGreatMusiciansCreated();
+	#endif
+											pNewUnit->jumpToNearestValidPlot();
+										}
+										else if(pNewUnit->IsGreatPerson())
+										{
+	#if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
+											if (MOD_GLOBAL_SEPARATE_GP_COUNTERS) {
+												if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MERCHANT")) {
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+													incrementGreatMerchantsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+													incrementGreatMerchantsCreated();
+	#endif
+												} else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST")) {
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+													incrementGreatScientistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+													incrementGreatScientistsCreated();
+	#endif
+												} else {
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+													incrementGreatEngineersCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+													incrementGreatEngineersCreated();
+	#endif
+												}
+											} else
+	#endif
+	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+											incrementGreatPeopleCreated(MOD_GLOBAL_TRULY_FREE_GP);
+	#else
+											incrementGreatPeopleCreated();
+	#endif
+											pNewUnit->jumpToNearestValidPlot();
+										}
+										else
+										{
+											pNewUnit->jumpToNearestValidPlot();
+										}
 									}
 								}
 							}

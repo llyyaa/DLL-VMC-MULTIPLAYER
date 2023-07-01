@@ -392,7 +392,8 @@ public:
 	int GetLocalResourceOr(int i) const;
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
-	int GetNumFreeUnits(int i) const;
+	int GetNumFreeUnit() const;
+	std::pair<UnitTypes, int>* GetFreeUnits() const;
 
 	int GetResourceYieldChange(int i, int j) const;
 	int* GetResourceYieldChangeArray(int i) const;
@@ -725,7 +726,8 @@ private:
 #endif 
 
 	bool* m_pbBuildingClassNeededInCity;
-	int* m_piNumFreeUnits;
+	int m_iNumFreeUnit;
+	std::pair<UnitTypes, int>* m_pFreeUnits;
 
 	int** m_ppaiResourceYieldChange;
 	int** m_ppaiFeatureYieldChange;

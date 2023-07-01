@@ -195,7 +195,6 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_paiBuildingClassProductionModifiers(NULL),
 	m_paiBuildingClassTourismModifiers(NULL),
 	m_paiBuildingClassHappiness(NULL),
-	m_paiFreeUnitClasses(NULL),
 	m_paiTourismOnUnitCreation(NULL),
 	m_paiHurryModifier(NULL),
 	m_pabSpecialistValid(NULL),
@@ -222,7 +221,9 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_ppiBuildingClassYieldModifiers(NULL),
 	m_ppiBuildingClassYieldChanges(NULL),
 	m_piFlavorValue(NULL),
-	m_eFreeBuildingOnConquest(NO_BUILDING)
+	m_eFreeBuildingOnConquest(NO_BUILDING),
+	m_iNumFreeUnitClass(0),
+	m_pFreeUnitClasses(nullptr)
 {
 }
 
@@ -247,7 +248,6 @@ CvPolicyEntry::~CvPolicyEntry(void)
 	SAFE_DELETE_ARRAY(m_paiBuildingClassProductionModifiers);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassTourismModifiers);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassHappiness);
-	SAFE_DELETE_ARRAY(m_paiFreeUnitClasses);
 	SAFE_DELETE_ARRAY(m_paiTourismOnUnitCreation);
 
 //	SAFE_DELETE_ARRAY(m_pabHurry);
@@ -276,6 +276,10 @@ CvPolicyEntry::~CvPolicyEntry(void)
 #endif
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldModifiers);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldChanges);
+	if(m_pFreeUnitClasses)
+	{
+		delete m_pFreeUnitClasses;
+	}
 }
 
 /// Read from XML file (pass 1)
@@ -500,8 +504,43 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.PopulateArrayByValue(m_paiBuildingClassTourismModifiers, "BuildingClasses", "Policy_BuildingClassTourismModifiers", "BuildingClassType", "PolicyType", szPolicyType, "TourismModifier");
 	kUtility.PopulateArrayByValue(m_paiBuildingClassHappiness, "BuildingClasses", "Policy_BuildingClassHappiness", "BuildingClassType", "PolicyType", szPolicyType, "Happiness");
 
-	kUtility.PopulateArrayByValue(m_paiFreeUnitClasses, "UnitClasses", "Policy_FreeUnitClasses", "UnitClassType", "PolicyType", szPolicyType, "Count");
 	kUtility.PopulateArrayByValue(m_paiTourismOnUnitCreation, "UnitClasses", "Policy_TourismOnUnitCreation", "UnitClassType", "PolicyType", szPolicyType, "Tourism");
+
+	//Policy Free Units
+	{
+		std::string strKey("Policy_FreeUnitClasses_MaxRow");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select count(*) from Policy_FreeUnitClasses where PolicyType = ?");
+		}
+
+		pResults->Bind(1, szPolicyType);
+		pResults->Step();
+		m_iNumFreeUnitClass = pResults->GetInt(0);
+		pResults->Reset();
+		m_pFreeUnitClasses = new std::pair<UnitClassTypes, int>[m_iNumFreeUnitClass];
+	}
+	{
+		std::string strKey("Policy_FreeUnitClasses");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select UnitClasses.ID as UnitClassID, Count from Policy_FreeUnitClasses inner join UnitClasses on UnitClasses.Type = UnitClassType where PolicyType = ?");
+		}
+
+		pResults->Bind(1, szPolicyType);
+		int idx = 0;
+		while (pResults->Step())
+		{
+			const int UnitID = pResults->GetInt(0);
+			const int iUnitNum = pResults->GetInt(1);
+			m_pFreeUnitClasses[idx] = std::make_pair((UnitClassTypes)UnitID, iUnitNum);
+			idx++;
+		}
+
+		pResults->Reset();
+	}
 
 	//BuildingYieldModifiers
 	{
@@ -2280,11 +2319,13 @@ int CvPolicyEntry::GetBuildingClassHappiness(int i) const
 }
 
 /// Number of free Units provided by this Policy
-int CvPolicyEntry::GetNumFreeUnitsByClass(int i) const
+int CvPolicyEntry::GetNumFreeUnitsByClass() const
 {
-	CvAssertMsg(i < GC.getNumUnitClassInfos(), "Index out of bounds");
-	CvAssertMsg(i > -1, "Index out of bounds");
-	return m_paiFreeUnitClasses ? m_paiFreeUnitClasses[i] : -1;
+	return m_iNumFreeUnitClass;
+}
+std::pair<UnitClassTypes, int>* CvPolicyEntry::GetFreeUnitsByClass() const
+{
+	return m_pFreeUnitClasses;
 }
 
 /// Instant tourism bump when a unit of a particular class is created

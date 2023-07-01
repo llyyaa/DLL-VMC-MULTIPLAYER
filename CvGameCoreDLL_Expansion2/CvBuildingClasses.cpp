@@ -254,7 +254,6 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piLocalResourceOrs(NULL),
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
-	m_piNumFreeUnits(NULL),
 	m_bArtInfoEraVariation(false),
 	m_bArtInfoCulturalVariation(false),
 	m_bArtInfoRandomVariation(false),
@@ -273,8 +272,11 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iNumThemingBonuses(0),
 
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
-	m_bHasYieldFromOtherYield(false)
+	m_bHasYieldFromOtherYield(false),
 #endif
+	m_iNumFreeUnit(0),
+	m_pFreeUnits(nullptr)
+
 {
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
 		for (int i = 0; i < NUM_YIELD_TYPES; i++) {
@@ -324,7 +326,6 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piLocalResourceOrs);
 	SAFE_DELETE_ARRAY(m_paiHurryModifier);
 	SAFE_DELETE_ARRAY(m_pbBuildingClassNeededInCity);
-	SAFE_DELETE_ARRAY(m_piNumFreeUnits);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassHappiness);
 	SAFE_DELETE_ARRAY(m_paThemingBonusInfo);
 
@@ -362,6 +363,11 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiPlotYieldChange);
 #endif
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldChanges);
+
+	if(m_pFreeUnits)
+	{
+		delete m_pFreeUnits;
+	}
 
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
 	if (MOD_API_BUILDING_ENABLE_PURCHASE_UNITS) {
@@ -678,8 +684,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 	kUtility.PopulateArrayByValue(m_piPrereqNumOfBuildingClass, "BuildingClasses", "Building_PrereqBuildingClasses", "BuildingClassType", "BuildingType", szBuildingType, "NumBuildingNeeded");
 	kUtility.PopulateArrayByExistence(m_pbBuildingClassNeededInCity, "BuildingClasses", "Building_ClassesNeededInCity", "BuildingClassType", "BuildingType", szBuildingType);
-	//kUtility.PopulateArrayByExistence(m_piNumFreeUnits, "Units", "Building_FreeUnits", "UnitType", "BuildingType", szBuildingType);
-	kUtility.PopulateArrayByValue(m_piNumFreeUnits, "Units", "Building_FreeUnits", "UnitType", "BuildingType", szBuildingType, "NumUnits");
 	kUtility.PopulateArrayByValue(m_paiBuildingClassHappiness, "BuildingClasses", "Building_BuildingClassHappiness", "BuildingClassType", "BuildingType", szBuildingType, "Happiness");
 
 	kUtility.PopulateArrayByExistence(m_piLockedBuildingClasses, "BuildingClasses", "Building_LockedBuildingClasses", "BuildingClassType", "BuildingType", szBuildingType);
@@ -898,6 +902,41 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 
 #endif
+	//Building Free Units
+	{
+		std::string strKey("Building_FreeUnits_MaxRow");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select count(*) from Building_FreeUnits where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+		pResults->Step();
+		m_iNumFreeUnit = pResults->GetInt(0);
+		pResults->Reset();
+		m_pFreeUnits = new std::pair<UnitTypes, int>[m_iNumFreeUnit];
+	}
+	{
+		std::string strKey("Building_FreeUnits");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Units.ID as UnitID, NumUnits from Building_FreeUnits inner join Units on Units.Type = UnitType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+		int idx = 0;
+		while (pResults->Step())
+		{
+			const int UnitID = pResults->GetInt(0);
+			const int iUnitNum = pResults->GetInt(1);
+			m_pFreeUnits[idx] = std::make_pair((UnitTypes)UnitID, iUnitNum);
+			idx++;
+		}
+
+		pResults->Reset();
+	}
 
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
 	//Buildings enable city to purchase units.
@@ -2833,12 +2872,14 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 	return m_pbBuildingClassNeededInCity ? m_pbBuildingClassNeededInCity[i] : false;
 }
 
-/// Free units which appear near the capital
-int CvBuildingEntry::GetNumFreeUnits(int i) const
+/// Free units which appear near city
+int CvBuildingEntry::GetNumFreeUnit() const
 {
-	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
-	CvAssertMsg(i > -1, "Index out of bounds");
-	return m_piNumFreeUnits ? m_piNumFreeUnits[i] : -1;
+	return m_iNumFreeUnit;
+}
+std::pair<UnitTypes, int>* CvBuildingEntry::GetFreeUnits() const
+{
+	return m_pFreeUnits;
 }
 
 /// Change to Resource yield by type
