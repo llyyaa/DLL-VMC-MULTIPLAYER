@@ -25100,6 +25100,14 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 	int iInstanceFoodThresholdPercent = pPolicy->GetInstantFoodThresholdPercent();
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	if (pPolicy->GetCorruptionLevelReduceByOne())
+	{
+		ChangeCorruptionLevelReduceByOneRC(iChange);
+	}
+	ChangeCorruptionScoreModifierFromPolicy(iChange * pPolicy->GetCorruptionScoreModifier());
+#endif
+
 	// Loop through Cities
 	int iLoop;
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
@@ -25281,6 +25289,13 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		if (MOD_GLOBAL_CITY_SCALES)
 		{
 			pLoopCity->UpdateScaleBuildings();
+		}
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+		if (MOD_GLOBAL_CORRUPTION && pPolicy->IsInvolveCorruption())
+		{
+			pLoopCity->UpdateCorruption();
 		}
 #endif
 
@@ -26683,6 +26698,11 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iCachedCapturedHolyCity;
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	kStream >> m_iCorruptionScoreModifierFromPolicy;
+	kStream >> m_iCorruptionLevelReduceByOneRC;
+#endif
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -27256,6 +27276,11 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	kStream << m_iCachedCapturedHolyCity;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	kStream << m_iCorruptionScoreModifierFromPolicy;
+	kStream << m_iCorruptionLevelReduceByOneRC;
 #endif
 }
 
@@ -30706,5 +30731,32 @@ void CvPlayer::UpdateCachedCapturedHolyCity()
 	}
 
   	m_iCachedCapturedHolyCity = result;
+}
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvPlayer::GetCorruptionScoreModifierFromPolicy() const
+{
+	return m_iCorruptionScoreModifierFromPolicy;
+}
+
+void CvPlayer::ChangeCorruptionScoreModifierFromPolicy(int change)
+{
+	m_iCorruptionScoreModifierFromPolicy += change;
+}
+
+int CvPlayer::GetCorruptionLevelReduceByOneRC() const
+{
+	return m_iCorruptionLevelReduceByOneRC;
+}
+
+bool CvPlayer::IsCorruptionLevelReduceByOne() const
+{
+	return m_iCorruptionLevelReduceByOneRC > 0;
+}
+
+void CvPlayer::ChangeCorruptionLevelReduceByOneRC(int change)
+{
+	m_iCorruptionLevelReduceByOneRC += change;
 }
 #endif

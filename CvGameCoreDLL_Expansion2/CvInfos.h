@@ -1439,6 +1439,10 @@ public:
 	const std::vector<YieldInfo>& GetGlobalYieldModifiers() const;
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScoreChange() const;
+#endif
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 protected:
 	int m_iResourceClassType;
@@ -1503,6 +1507,10 @@ protected:
 	LuaFormulaTypes m_eGoldHurryCostModifierFormula = NO_LUA_FORMULA;
 
 	std::vector<YieldInfo> m_vGlobalYieldModifiers;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCorruptionScoreChange = 0;
 #endif
 
 private:

@@ -1100,12 +1100,17 @@ public:
 	CorruptionLevelTypes GetCorruptionLevel() const;
 	void UpdateCorruption();
 
-	int CalculateTotalCorruptionScore() const;
+	int CalculateTotalCorruptionScore(CvString* toolTipSink) const;
 	int CalculateCorruptionScoreFromDistance() const;
 	int CalculateCorruptionScoreModifierFromSpy() const;
-	int CalculateCorruptionScoreModifierFromPolicy() const;
 
 	CvCorruptionLevel* DecideCorruptionLevelForNormalCity(const int score) const;
+
+	int GetCorruptionScoreChangeFromBuilding() const;
+	void ChangeCorruptionScoreChangeFromBuilding(int value);
+
+	int GetCorruptionLevelChangeFromBuilding() const;
+	void ChangeCorruptionLevelChangeFromBuilding(int value);
 #endif
 
 protected:
@@ -1323,6 +1328,9 @@ protected:
 #ifdef MOD_GLOBAL_CORRUPTION
 	int m_iCachedCorruptionScore = 0;
 	CorruptionLevelTypes m_eCachedCorruptionLevel = INVALID_CORRUPTION;
+
+	int m_iCorruptionScoreChangeFromBuilding = 0;
+	int m_iCorruptionLevelChangeFromBuilding = 0;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER

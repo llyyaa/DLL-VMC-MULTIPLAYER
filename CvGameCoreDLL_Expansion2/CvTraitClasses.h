@@ -275,6 +275,11 @@ public:
 	int GetFaithPurchaseCostPercent() const;
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	bool GetCorruptionLevelReduceByOne() const;
+	int GetMaxCorruptionLevel() const;
+#endif
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -485,6 +490,11 @@ protected:
 
 #ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
 	int m_iFaithPurchaseCombatUnitCostPercent = 0;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	bool m_bCorruptionLevelReduceByOne = 0;
+	int m_iMaxCorruptionLevel = -1;
 #endif
 
 private:
@@ -1131,6 +1141,11 @@ public:
 	bool IsCanFoundCoastCity() const;
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	bool GetCorruptionLevelReduceByOne() const;
+	int GetMaxCorruptionLevel() const;
+#endif
+
 	// Serialization
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
@@ -1357,6 +1372,11 @@ private:
 
 #ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
 	int m_iFaithPurchaseCombatUnitCostPercent = 0;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	bool m_bCorruptionLevelReduceByOne = 0;
+	int m_iMaxCorruptionLevel = -1;
 #endif
 };
 

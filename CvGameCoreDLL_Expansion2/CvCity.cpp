@@ -7034,6 +7034,17 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		ChangeSiegeKillCitizensModifier(pBuildingInfo->GetSiegeKillCitizensModifier() * iChange);
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+		ChangeCorruptionScoreChangeFromBuilding(pBuildingInfo->GetCorruptionScoreChange() * iChange);
+		ChangeCorruptionLevelChangeFromBuilding(pBuildingInfo->GetCorruptionLevelChange() * iChange);
+
+		if (pBuildingInfo->GetCorruptionScoreChange() * iChange != 0 || 
+			pBuildingInfo->GetCorruptionLevelChange() * iChange != 0)
+		{
+			UpdateCorruption();
+		}
+#endif
+
 		if (pBuildingInfo->AffectSpiesNow() && iChange > 0)
 		{
 			for (uint ui = 0; ui < MAX_MAJOR_CIVS; ui++)
@@ -17016,6 +17027,8 @@ void CvCity::read(FDataStream& kStream)
 #ifdef MOD_GLOBAL_CORRUPTION
 	kStream >> m_iCachedCorruptionScore;
 	kStream >> (int&) m_eCachedCorruptionLevel;
+	kStream >> m_iCorruptionScoreChangeFromBuilding;
+	kStream >> m_iCorruptionLevelChangeFromBuilding;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
@@ -17340,6 +17353,8 @@ void CvCity::write(FDataStream& kStream) const
 #ifdef MOD_GLOBAL_CORRUPTION
 	kStream << m_iCachedCorruptionScore;
 	kStream << (int) m_eCachedCorruptionLevel;
+	kStream << m_iCorruptionScoreChangeFromBuilding;
+	kStream << m_iCorruptionLevelChangeFromBuilding;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
@@ -20026,7 +20041,7 @@ void CvCity::UpdateCorruption()
 	const CorruptionLevelTypes eOldLevel = m_eCachedCorruptionLevel;
 	auto* pOldLevel = GC.getCorruptionLevelInfo(eOldLevel);
 
-	const int newScore = CalculateTotalCorruptionScore();
+	const int newScore = CalculateTotalCorruptionScore(nullptr);
 	CvCorruptionLevel* pNewLevel = nullptr;
 	if (isCapital())
 	{
@@ -20083,14 +20098,28 @@ void CvCity::UpdateCorruption()
 	m_eCachedCorruptionLevel = pNewLevel ? static_cast<CorruptionLevelTypes>(pNewLevel->GetID()) : INVALID_CORRUPTION;
 }
 
-int CvCity::CalculateTotalCorruptionScore() const
+int CvCity::CalculateTotalCorruptionScore(CvString* toolTipSink) const
 {
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+
 	int score = 0;
 	score += CalculateCorruptionScoreFromDistance();
+	
+	auto resource = plot() ? plot()->getResourceType() : NO_RESOURCE;
+	auto* resourceInfo = GC.getResourceInfo(resource);
+	if (resourceInfo != nullptr)
+	{
+		score += resourceInfo->GetCorruptionScoreChange();
+	}
+
+	score += GetCorruptionScoreChangeFromBuilding();
+
+	score = std::max(0, score);
 
 	int modifier = 100;
 	modifier += CalculateCorruptionScoreModifierFromSpy();
-	modifier += CalculateCorruptionScoreModifierFromPolicy();
+	modifier += owner.GetCorruptionScoreModifierFromPolicy();
+	modifier = std::max(0, modifier);
 
 	score = score * modifier / 100;
 	score = std::max(0, score);
@@ -20116,28 +20145,94 @@ int CvCity::CalculateCorruptionScoreFromDistance() const
 
 int CvCity::CalculateCorruptionScoreModifierFromSpy() const
 {
-	// TODO
-	return 0;
-}
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+	auto* espionage = owner.GetEspionage();
+	if (espionage == nullptr)
+	{
+		return 0;
+	}
 
-int CvCity::CalculateCorruptionScoreModifierFromPolicy() const
-{
-	// TODO
-	return 0;
+	int spyIndex = espionage->GetSpyIndexInCity(const_cast<CvCity*>(this));
+	if (spyIndex == -1)
+	{
+		return 0;
+	}
+
+	int rank = espionage->m_aSpyList[spyIndex].m_eRank + 1;
+	return -rank * 33;
 }
 
 CvCorruptionLevel* CvCity::DecideCorruptionLevelForNormalCity(const int score) const
 {
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
 	CvCorruptionLevel* result = nullptr;
-	for (auto* level : GC.getOrderedNormalCityCorruptionLevels())
+	int resultIndex = -1;
+	for (int index = 0; index < GC.getOrderedNormalCityCorruptionLevels().size(); index++)
 	{
+		auto* level = GC.getOrderedNormalCityCorruptionLevels()[index];
 		if (level->GetScoreLowerBound(GC.getMap().getGridWidth(), GC.getMap().getGridHeight()) > score)
 		{
 			break;
 		}
 		result = level;
+		resultIndex = index;
 	}
+
+	if (resultIndex > 1)
+	{
+		if (owner.IsCorruptionLevelReduceByOne() || owner.GetPlayerTraits()->GetCorruptionLevelReduceByOne())
+		{
+			resultIndex--;
+			result = GC.getOrderedNormalCityCorruptionLevels()[resultIndex];
+		}
+	}
+
+	if (GetCorruptionLevelChangeFromBuilding() != 0)
+	{
+		bool oldNoneZero = resultIndex > 0;
+		resultIndex = resultIndex + GetCorruptionLevelChangeFromBuilding();
+		if (oldNoneZero)
+		{
+			resultIndex = std::max(1, resultIndex);
+		}
+		else
+		{
+			resultIndex = std::max(0, resultIndex);
+		}
+
+		if (resultIndex > GC.getOrderedNormalCityCorruptionLevels().size() - 1)
+		{
+			resultIndex = GC.getOrderedNormalCityCorruptionLevels().size() - 1;
+		}
+		result = GC.getOrderedNormalCityCorruptionLevels()[resultIndex];
+	}
+
+	if (owner.GetPlayerTraits()->GetMaxCorruptionLevel() >= 0 && resultIndex > owner.GetPlayerTraits()->GetMaxCorruptionLevel())
+	{
+		resultIndex = owner.GetPlayerTraits()->GetMaxCorruptionLevel();
+		result = GC.getOrderedNormalCityCorruptionLevels()[resultIndex];
+	}
+
 	return result;
 }
 
+int CvCity::GetCorruptionScoreChangeFromBuilding() const
+{
+	return m_iCorruptionScoreChangeFromBuilding;
+}
+
+void CvCity::ChangeCorruptionScoreChangeFromBuilding(int value)
+{
+	m_iCorruptionScoreChangeFromBuilding += value;
+}
+
+int CvCity::GetCorruptionLevelChangeFromBuilding() const
+{
+	return m_iCorruptionLevelChangeFromBuilding;
+}
+
+void CvCity::ChangeCorruptionLevelChangeFromBuilding(int value)
+{
+	m_iCorruptionLevelChangeFromBuilding += value;
+}
 #endif
