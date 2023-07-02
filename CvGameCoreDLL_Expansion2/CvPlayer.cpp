@@ -17095,6 +17095,18 @@ void CvPlayer::setCapitalCity(CvCity* pNewCapitalCity)
 			m_iCapitalCityID = pNewCapitalCity->GetID();
 
 			pNewCapitalCity->SetEverCapital(true);
+
+#ifdef MOD_GLOBAL_CORRUPTION
+			if (MOD_GLOBAL_CORRUPTION)
+			{
+				int iLoop = 0;
+				for(CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+				{
+					pLoopCity->UpdateCorruption();
+				}
+			}
+#endif
+
 		}
 		else
 		{
