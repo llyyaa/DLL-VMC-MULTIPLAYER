@@ -3,6 +3,34 @@
 	<!-- Espionage.xml -->
 	<Language_en_US>
 
+<Row Tag="TXT_KEY_YIELD_HEALTH">
+				<Text>HEALTH</Text>
+			</Row>
+<Row Tag="TXT_KEY_YIELD_DISEASE">
+				<Text>DISEASE</Text>
+			</Row>
+
+<Row Tag="TXT_KEY_YIELD_CRIME">
+				<Text>CRIME</Text>
+			</Row>
+
+<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
+				<Text>SOVEREIGNTY</Text>
+			</Row>
+<Row Tag="TXT_KEY_YIELD_LOYALTY">
+				<Text>LOYALTY</Text>
+			</Row>
+<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
+				<Text>GENERAL</Text>
+			</Row>
+<Row Tag="TXT_KEY_YIELD_GREAT_ADMIRAL_POINTS">
+				<Text>ADMIRAL</Text>
+			</Row>
+
+
+
+
+
 	<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
 				<Text>
 					[NEWLINE][ICON_BULLET]Global City Fix (World Wonder): {1_Num}%
