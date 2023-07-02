@@ -1574,10 +1574,6 @@ void CvBuilderTaskingAI::AddChopDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMo
 				}
 				break;
 			case YIELD_FAITH:
-				//if (GC.getFlavorTypes((FlavorTypes)iFlavorLoop) == "FLAVOR_SCIENCE")
-				//{
-				//	iYieldDifferenceWeight += iDeltaYield * pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)iFlavorLoop) * GC.getBUILDER_TASKING_PLOT_EVAL_MULTIPLIER_SCIENCE();
-				//}
 				break;
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
@@ -1585,6 +1581,17 @@ void CvBuilderTaskingAI::AddChopDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMo
 #endif
 #if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			case YIELD_GOLDEN_AGE_POINTS:
+				break;
+#endif
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+			case YIELD_GREAT_GENERAL_POINTS:
+			case YIELD_GREAT_ADMIRAL_POINTS:
+			case YIELD_HEALTH:
+			case YIELD_DISEASE:
+			case YIELD_CRIME:
+			case YIELD_LOYALTY:
+			case YIELD_SOVEREIGNTY:
 				break;
 #endif
 			}

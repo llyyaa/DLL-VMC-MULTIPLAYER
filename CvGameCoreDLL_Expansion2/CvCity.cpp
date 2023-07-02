@@ -11537,6 +11537,66 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
 			break;
 #endif
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+		case YIELD_GREAT_GENERAL_POINTS:
+			iTempMod = GC.getPUPPET_GREAT_GENERAL_POINTS_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+			break;
+
+
+		case YIELD_GREAT_ADMIRAL_POINTS:
+			iTempMod = GC.getPUPPET_GREAT_ADMIRAL_POINTS_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+			break;
+
+
+		case YIELD_HEALTH:
+			iTempMod = GC.getPUPPET_HEALTH_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+			break;
+
+		case YIELD_DISEASE:
+			iTempMod = GC.getPUPPET_DISEASE_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+			break;
+
+
+		case YIELD_CRIME:
+			iTempMod = GC.getPUPPET_CRIME_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+			break;
+
+
+		case YIELD_LOYALTY:
+			iTempMod = GC.getPUPPET_LOYALTY_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+			break;
+
+
+
+		case YIELD_SOVEREIGNTY:
+			iTempMod = GC.getPUPPET_SOVEREIGNTY_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+			break;
+#endif
+
+
 		}
 	}
 
@@ -11608,6 +11668,20 @@ int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const
 			return 0;
 		}
 #endif
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+		if (eIndex == YIELD_GREAT_GENERAL_POINTS)
+		{
+			return 0;
+		}
+		if (eIndex == YIELD_GREAT_ADMIRAL_POINTS)
+		{
+			return 0;
+		}
+#endif
+
+
 	}
 
 	int iProcessYield = 0;

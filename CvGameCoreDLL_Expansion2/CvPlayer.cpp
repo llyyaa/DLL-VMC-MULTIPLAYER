@@ -11443,6 +11443,18 @@ void CvPlayer::DoYieldBonusFromKill(YieldTypes eYield, UnitTypes eAttackingUnitT
 			case YIELD_GOLDEN_AGE_POINTS:
 				break;
 #endif
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+			case YIELD_GREAT_GENERAL_POINTS:
+			case YIELD_GREAT_ADMIRAL_POINTS:
+			case YIELD_HEALTH:
+			case YIELD_DISEASE:
+			case YIELD_CRIME:
+			case YIELD_LOYALTY:
+			case YIELD_SOVEREIGNTY:  
+				// Not supported, as not accumulated turn-on-turn
+				break;
+#endif
 			}
 
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -11515,6 +11527,19 @@ void CvPlayer::DoYieldBonusFromKill(YieldTypes eYield, UnitTypes eAttackingUnitT
 					ChangeGoldenAgeProgressMeter(iValue);
 					break;
 #endif
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+				case YIELD_GREAT_GENERAL_POINTS:
+					changeCombatExperienceTimes100(iValue * 100);
+					break;
+
+				case YIELD_GREAT_ADMIRAL_POINTS:
+					changeCombatExperienceTimes100(iValue * 100);
+					break;
+#endif
+
+
 				case YIELD_SCIENCE:
 					TechTypes eCurrentTech = GetPlayerTechs()->GetCurrentResearch();
 					if(eCurrentTech == NO_TECH)

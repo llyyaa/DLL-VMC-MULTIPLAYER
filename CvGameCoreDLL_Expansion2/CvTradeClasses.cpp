@@ -2509,6 +2509,38 @@ int CvPlayerTrade::GetTradeConnectionRiverValueModifierTimes100(const TradeConne
 //	--------------------------------------------------------------------------------
 int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTradeConnection, YieldTypes eYield, bool bAsOriginPlayer)
 {
+
+
+	// TODO: This switch should probably go in a function.
+	switch (eYield)
+	{
+	case YIELD_FOOD:
+	case YIELD_PRODUCTION:
+	case YIELD_GOLD:
+	case YIELD_SCIENCE:
+	case YIELD_CULTURE:
+	case YIELD_FAITH:
+#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
+	case YIELD_TOURISM:
+#endif
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+	case YIELD_GOLDEN_AGE_POINTS:
+#endif
+		break; // Yields applicable to trade.
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	case NO_YIELD:
+	case YIELD_GREAT_GENERAL_POINTS:
+	case YIELD_GREAT_ADMIRAL_POINTS:
+	case YIELD_HEALTH:
+	case YIELD_DISEASE:
+	case YIELD_CRIME:
+	case YIELD_LOYALTY:
+	case YIELD_SOVEREIGNTY:
+		return 0; // Yields not applicable to trade.
+#endif
+	}
+
+
 	CvGameTrade* pTrade = GC.getGame().GetGameTrade();
 	int iValue = 0;
 	CvCity* pOriginCity = CvGameTrade::GetOriginCity(kTradeConnection);
@@ -2519,7 +2551,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 		{
 			switch (eYield)
 			{
-			case YIELD_GOLD:
+			     case YIELD_GOLD:
 				{
 					int iBaseValue = GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 					int iOriginPerTurnBonus = GetTradeConnectionGPTValueTimes100(kTradeConnection, eYield, bAsOriginPlayer, true);

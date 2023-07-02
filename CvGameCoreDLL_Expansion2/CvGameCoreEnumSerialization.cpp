@@ -59,6 +59,32 @@ std::string toString(const YieldTypes& v)
 		return std::string("YIELD_GOLDEN_AGE_POINTS");
 		break;
 #endif
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	case YIELD_GREAT_GENERAL_POINTS:
+		return std::string("YIELD_GREAT_GENERAL_POINTS");
+		break;
+	case YIELD_GREAT_ADMIRAL_POINTS:
+		return std::string("YIELD_GREAT_ADMIRAL_POINTS");
+		break;
+	case YIELD_HEALTH:
+		return std::string("YIELD_HEALTH");
+		break;
+	case YIELD_DISEASE:
+		return std::string("YIELD_DISEASE");
+		break;
+
+	case YIELD_CRIME:
+		return std::string("YIELD_CRIME");
+		break;
+	case YIELD_LOYALTY:
+		return std::string("YIELD_LOYALTY");
+		break;
+	case YIELD_SOVEREIGNTY:
+		return std::string("YIELD_SOVEREIGNTY");
+		break;
+#endif
+
 	default:
 		return std::string("INVALID ENUM VALUE");
 		break;
