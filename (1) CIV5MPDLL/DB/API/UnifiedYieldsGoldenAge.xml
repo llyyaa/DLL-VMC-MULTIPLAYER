@@ -41,7 +41,7 @@
 		<Row>
 			<ID>10</ID>
 			<Type>YIELD_HEALTH</Type>
-			<Description>TXT_KEY_YIELD_JFD_HEALTH</Description>
+			<Description>TXT_KEY_YIELD_HEALTH</Description>
 			<IconString>[ICON_CULTURE]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
@@ -49,7 +49,7 @@
 		<Row>
 			<ID>11</ID>
 			<Type>YIELD_DISEASE</Type>
-			<Description>TXT_KEY_YIELD_JFD_DISEASE</Description>
+			<Description>TXT_KEY_YIELD_DISEASE</Description>
 			<IconString>[ICON_CULTURE]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
@@ -57,7 +57,7 @@
 		<Row>
 			<ID>12</ID>
 			<Type>YIELD_CRIME</Type>
-			<Description>TXT_KEY_YIELD_JFD_CRIME</Description>
+			<Description>TXT_KEY_YIELD_CRIME</Description>
 			<IconString>[ICON_CULTURE]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
@@ -65,7 +65,7 @@
 		<Row>
 			<ID>13</ID>
 			<Type>YIELD_LOYALTY</Type>
-			<Description>TXT_KEY_YIELD_JFD_LOYALTY</Description>
+			<Description>TXT_KEY_YIELD_LOYALTY</Description>
 			<IconString>[ICON_CULTURE]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
@@ -73,7 +73,7 @@
 		<Row>
 			<ID>14</ID>
 			<Type>YIELD_SOVEREIGNTY</Type>
-			<Description>TXT_KEY_YIELD_JFD_SOVEREIGNTY</Description>
+			<Description>TXT_KEY_YIELD_SOVEREIGNTY</Description>
 			<IconString>[ICON_CULTURE]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
