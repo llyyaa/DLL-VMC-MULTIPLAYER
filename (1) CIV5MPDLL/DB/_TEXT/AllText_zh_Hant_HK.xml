@@ -2,6 +2,29 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
+<Row Tag="TXT_KEY_YIELD_HEALTH">
+				<Text>健康</Text>
+			</Row>
+<Row Tag="TXT_KEY_YIELD_DISEASE">
+				<Text>疾病</Text>
+			</Row>
+
+<Row Tag="TXT_KEY_YIELD_CRIME">
+				<Text>犯罪率</Text>
+			</Row>
+
+<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
+				<Text>权威</Text>
+			</Row>
+<Row Tag="TXT_KEY_YIELD_LOYALTY">
+				<Text>忠诚度</Text>
+			</Row>
+<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
+				<Text>大军事家点数</Text>
+			</Row>
+<Row Tag="TXT_KEY_YIELD_GREAT_ADMIRAL_POINTS">
+				<Text>海军统帅点数</Text>
+			</Row>
 
 
 <Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
