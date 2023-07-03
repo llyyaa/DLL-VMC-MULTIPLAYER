@@ -420,7 +420,8 @@ public:
 	void DoJONSCultureLevelIncrease();
 	int GetJONSCultureThreshold() const;
 
-	int getJONSCulturePerTurn() const;
+	//int getJONSCulturePerTurn() const;
+	int getJONSCulturePerTurn(bool bStatic = true) const;
 
 	int GetBaseJONSCulturePerTurn() const;
 
@@ -445,6 +446,13 @@ public:
 	int getCultureRateModifier() const;
 	void changeCultureRateModifier(int iChange);
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	void SetBaseTourism(int iValue);
+	int GetBaseTourism() const;
+	void SetBaseTourismBeforeModifiers(int iValue);
+	int GetBaseTourismBeforeModifiers() const;
+#endif
 	// END Culture
 
 #if defined(MOD_API_EXTENSIONS)
@@ -452,7 +460,12 @@ public:
 	void changeTourismRateModifier(int iChange);
 #endif
 
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	int GetFaithPerTurn(bool bStatic = true) const;
+#else
 	int GetFaithPerTurn() const;
+#endif
+
 	int GetFaithPerTurnFromBuildings() const;
 	void ChangeFaithPerTurnFromBuildings(int iChange);
 
@@ -681,8 +694,11 @@ public:
 #endif
 
 	int getBaseYieldRateModifier(YieldTypes eIndex, int iExtra = 0, CvString* toolTipSink = NULL) const;
-	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade) const;
-	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const;
+
+
+	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic = true) const;
+	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic = true) const;
+
 #if defined(MOD_PROCESS_STOCKPILE)
 	int getBasicYieldRateTimes100(const YieldTypes eIndex, const bool bIgnoreTrade, const bool bIgnoreFromOtherYield) const;
 #endif
@@ -718,6 +734,28 @@ public:
 	int GetYieldPerReligionTimes100(YieldTypes eIndex) const;
 	void ChangeYieldPerReligionTimes100(YieldTypes eIndex, int iChange);
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+
+	void UpdateCityYields(YieldTypes eYield);
+	void SetStaticYield(YieldTypes eYield, int iValue);
+	int GetStaticYield(YieldTypes eYield) const;
+
+
+	void SetYieldModifierFromHealth(YieldTypes eYield, int iValue);
+	int GetYieldModifierFromHealth(YieldTypes eYield) const;
+
+	void SetYieldModifierFromCrime(YieldTypes eYield, int iValue);
+	int GetYieldModifierFromCrime(YieldTypes eYield) const;
+
+
+
+	void SetYieldFromHealth(YieldTypes eYield, int iValue);
+	int GetYieldFromHealth(YieldTypes eYield) const;
+
+	void SetYieldFromCrime(YieldTypes eYield, int iValue);
+	int GetYieldFromCrime(YieldTypes eYield) const;
+#endif
 
 	void changeNukeInterceptionChance(int iValue);
 	int getNukeInterceptionChance() const;
@@ -1127,6 +1165,12 @@ protected:
 	int m_iFaithPerTurnFromBuildings;
 	int m_iFaithPerTurnFromPolicies;
 	int m_iFaithPerTurnFromReligion;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	int m_iBaseTourism;
+	int m_iBaseTourismBeforeModifiers;
+#endif
+
 	FAutoVariable<int, CvCity> m_iCultureRateModifier;
 	FAutoVariable<int, CvCity> m_iNumWorldWonders;
 	FAutoVariable<int, CvCity> m_iNumTeamWonders;
@@ -1245,6 +1289,15 @@ protected:
 
 
 	std::vector<int> m_aiYieldPerReligion;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	std::vector<int> m_aiStaticCityYield;
+	std::vector<int> m_aiYieldFromHealth;
+	std::vector<int> m_aiYieldFromCrime;
+	std::vector<int> m_aiYieldModifierFromHealth;
+	std::vector<int> m_aiYieldModifierFromCrime;
+#endif
+
 	FAutoVariable<std::vector<int>, CvCity> m_aiPowerYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiExtraSpecialistYield;

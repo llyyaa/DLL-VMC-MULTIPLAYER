@@ -558,6 +558,22 @@ protected:
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	static int lGetBaseYieldRateFromOtherYield(lua_State* L);
 #endif
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)	
+	static int lGetYieldModifierFromHealth(lua_State* L);
+	static int lSetYieldModifierFromHealth(lua_State* L);
+
+	static int lGetYieldModifierFromCrime(lua_State* L);
+	static int lSetYieldModifierFromCrime(lua_State* L);
+
+	static int lGetYieldFromHealth(lua_State* L);
+	static int lSetYieldFromHealth(lua_State* L);
+
+	static int lGetYieldFromCrime(lua_State* L);
+	static int lSetYieldFromCrime(lua_State* L);
+#endif
+
+
 #if defined(MOD_API_LUA_EXTENSIONS)
 	LUAAPIEXTN(AddMessage, void, sMessage, iNotifyPlayer);
 #endif
