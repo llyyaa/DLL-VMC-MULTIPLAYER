@@ -194,6 +194,8 @@ CvCity::CvCity() :
 	, m_iFaithPerTurnFromBuildings(0)
 	, m_iFaithPerTurnFromPolicies(0)
 	, m_iFaithPerTurnFromReligion(0)
+	, m_iBaseTourism(0)
+	, m_iBaseTourismBeforeModifiers(0)
 	, m_iCultureRateModifier("CvCity::m_iCultureRateModifier", m_syncArchive)
 	, m_iNumWorldWonders("CvCity::m_iNumWorldWonders", m_syncArchive)
 	, m_iNumTeamWonders("CvCity::m_iNumTeamWonders", m_syncArchive)
@@ -990,6 +992,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iFaithPerTurnFromBuildings = 0;
 	m_iFaithPerTurnFromPolicies = 0;
 	m_iFaithPerTurnFromReligion = 0;
+	m_iBaseTourism = 0;
+	m_iBaseTourismBeforeModifiers = 0;
 	m_iCultureRateModifier = 0;
 	m_iNumWorldWonders = 0;
 	m_iNumTeamWonders = 0;
@@ -1089,6 +1093,15 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #endif
 
 	m_aiYieldPerReligion.resize(NUM_YIELD_TYPES);
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	m_aiStaticCityYield.resize(NUM_YIELD_TYPES);
+	m_aiYieldFromHealth.resize(NUM_YIELD_TYPES);
+	m_aiYieldFromCrime.resize(NUM_YIELD_TYPES);
+	m_aiYieldModifierFromHealth.resize(NUM_YIELD_TYPES);
+	m_aiYieldModifierFromCrime.resize(NUM_YIELD_TYPES);
+#endif
+
 	m_aiYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiPowerYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiResourceYieldRateModifier.resize(NUM_YIELD_TYPES);
@@ -1107,6 +1120,15 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiBaseYieldRateFromReligion[iI] = 0;
 		m_aiYieldPerPop.setAt(iI, 0);
 		m_aiYieldPerReligion[iI] = 0;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+		m_aiStaticCityYield[iI] = 0;
+		m_aiYieldFromHealth[iI] = 0;
+		m_aiYieldFromCrime[iI] = 0;
+		m_aiYieldModifierFromHealth[iI] = 0;
+		m_aiYieldModifierFromCrime[iI] = 0;
+#endif
+
 		m_aiYieldRateModifier.setAt(iI, 0);
 		m_aiPowerYieldRateModifier.setAt(iI, 0);
 		m_aiResourceYieldRateModifier.setAt(iI, 0);
@@ -8987,7 +9009,7 @@ int CvCity::GetJONSCultureThreshold() const
 
 
 //	--------------------------------------------------------------------------------
-int CvCity::getJONSCulturePerTurn() const
+int CvCity::getJONSCulturePerTurn(bool bStatic) const
 {
 	VALIDATE_OBJECT
 
@@ -9085,6 +9107,14 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	if (MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD)
 		iCulturePerTurn += GetBaseYieldRateFromOtherYield(YIELD_CULTURE);
+#endif
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	{
+		iCulturePerTurn += GetYieldFromHealth(YIELD_CULTURE);
+
+		iCulturePerTurn += GetYieldFromCrime(YIELD_CULTURE);
+	}
 #endif
 
 	return iCulturePerTurn;
@@ -9187,7 +9217,11 @@ int CvCity::GetJONSCulturePerTurnFromLeagues() const
 }
 
 //	--------------------------------------------------------------------------------
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+int CvCity::GetFaithPerTurn(bool bStatic) const
+#else
 int CvCity::GetFaithPerTurn() const
+#endif
 {
 	VALIDATE_OBJECT
 
@@ -9470,6 +9504,37 @@ void CvCity::changeCultureRateModifier(int iChange)
 		m_iCultureRateModifier = (m_iCultureRateModifier + iChange);
 	}
 }
+
+
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetBaseTourism() const
+{
+	VALIDATE_OBJECT
+	return m_iBaseTourism;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::SetBaseTourism(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iBaseTourism = iValue;
+}
+//	--------------------------------------------------------------------------------
+int CvCity::GetBaseTourismBeforeModifiers() const
+{
+	VALIDATE_OBJECT
+	return m_iBaseTourismBeforeModifiers;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::SetBaseTourismBeforeModifiers(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iBaseTourismBeforeModifiers = iValue;
+}
+
+
 
 #if defined(MOD_API_EXTENSIONS)
 //	--------------------------------------------------------------------------------
@@ -10688,6 +10753,15 @@ int CvCity::GetLocalHappiness() const
 		iLocalHappiness += kPlayer.GetHappinessInWLTKDCities();
 	}
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	{
+		int iCrime = GetYieldFromCrime(YIELD_CRIME);
+		iLocalHappiness += iCrime;
+	}
+#endif
+
+
 	int iLocalHappinessCap = getPopulation();
 
 	// India has unique way to compute local happiness cap
@@ -11362,6 +11436,27 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		}
 	}
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	if (GetYieldModifierFromHealth(eIndex) != 0)
+	{
+		iTempMod = GetYieldModifierFromHealth(eIndex);
+		iModifier += iTempMod;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_YIELD_MODIFIER_HEALTH", iTempMod);
+	}
+
+
+	if (GetYieldModifierFromCrime(eIndex) != 0 && eIndex != YIELD_CRIME)
+	{
+		iTempMod = GetYieldModifierFromCrime(eIndex);
+		iModifier += iTempMod;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_YIELD_MODIFIER_CRIME", iTempMod);
+	}
+
+#endif
+
 	// From the number of great work
 #ifdef MOD_BALANCE_CORE
 	if (MOD_BALANCE_CORE)
@@ -11636,16 +11731,27 @@ int CvCity::getHappinessModifier(YieldTypes eIndex) const
 }
 
 //	--------------------------------------------------------------------------------
-int CvCity::getYieldRate(YieldTypes eIndex, bool bIgnoreTrade) const
+int CvCity::getYieldRate(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic) const
 {
 	VALIDATE_OBJECT
+
+		if (bStatic && !bIgnoreTrade)
+		{
+			return (GetStaticYield(eIndex) / 100);
+		}
+
 	return (getYieldRateTimes100(eIndex, bIgnoreTrade) / 100);
 }
 
 //	--------------------------------------------------------------------------------
-int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const
+int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic) const
 {
 	VALIDATE_OBJECT
+
+	if (bStatic && !bIgnoreTrade)
+	{
+	 return GetStaticYield(eIndex);
+	}
 
 	// Resistance - no Science, Gold or Production (Prod handled in ProductionDifference)
 	if(IsResistance() || IsRazing())
@@ -12143,7 +12249,7 @@ void CvCity::ChangeYieldPerPopInEmpireTimes100(YieldTypes eIndex, int iChange)
 int CvCity::GetYieldPerReligionTimes100(YieldTypes eIndex) const
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
 
 	return m_aiYieldPerReligion[eIndex];
@@ -12154,7 +12260,7 @@ int CvCity::GetYieldPerReligionTimes100(YieldTypes eIndex) const
 void CvCity::ChangeYieldPerReligionTimes100(YieldTypes eIndex, int iChange)
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
 
 	if(iChange != 0)
@@ -13042,6 +13148,11 @@ void CvCity::updateStrengthValue()
 
 	// Player-wide strength mod (Policies, etc.)
 	iStrengthMod += GET_PLAYER(getOwner()).GetCityStrengthMod();
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	// Crime
+	iStrengthMod += GetYieldModifierFromCrime(YIELD_CRIME);
+#endif
 
 #if defined(MOD_ROG_CORE)
 	iStrengthMod += GET_PLAYER(getOwner()).GetGlobalCityStrengthMod();
@@ -16728,6 +16839,9 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iFaithPerTurnFromPolicies;
 	kStream >> m_iFaithPerTurnFromReligion;
 
+	kStream >> m_iBaseTourism;
+	kStream >> m_iBaseTourismBeforeModifiers;
+
 	kStream >> m_iCultureRateModifier;
 	kStream >> m_iNumWorldWonders;
 	kStream >> m_iNumTeamWonders;
@@ -16869,6 +16983,15 @@ void CvCity::read(FDataStream& kStream)
 			m_aiYieldPerReligion[iI] = 0;
 		}
 	}
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	kStream >> m_aiStaticCityYield;
+	kStream >> m_aiYieldFromHealth;
+	kStream >> m_aiYieldFromCrime;
+	kStream >> m_aiYieldModifierFromHealth;
+	kStream >> m_aiYieldModifierFromCrime;
+#endif
+
 	kStream >> m_aiYieldRateModifier;
 	kStream >> m_aiPowerYieldRateModifier;
 	kStream >> m_aiResourceYieldRateModifier;
@@ -17151,6 +17274,11 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iFaithPerTurnFromBuildings;
 	kStream << m_iFaithPerTurnFromPolicies;
 	kStream << m_iFaithPerTurnFromReligion;
+
+
+	kStream << m_iBaseTourism;
+	kStream << m_iBaseTourismBeforeModifiers;
+
 	kStream << m_iCultureRateModifier;
 	kStream << m_iNumWorldWonders;
 	kStream << m_iNumTeamWonders;
@@ -17263,6 +17391,16 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiYieldPerPop;
 	kStream << m_aiYieldFromProcessModifier;
 	kStream << m_aiYieldPerReligion;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	kStream << m_aiStaticCityYield;
+	kStream << m_aiYieldFromHealth;
+	kStream << m_aiYieldFromCrime;
+	kStream << m_aiYieldModifierFromHealth;
+	kStream << m_aiYieldModifierFromCrime;
+#endif
+
+
 	kStream << m_aiYieldRateModifier;
 	kStream << m_aiPowerYieldRateModifier;
 	kStream << m_aiResourceYieldRateModifier;
@@ -20057,5 +20195,110 @@ int CvCity::GetSiegeKillCitizensModifier() const
 void CvCity::ChangeSiegeKillCitizensModifier(int iChange)
 {
 	m_iSiegeKillCitizensModifier += iChange;
+}
+#endif
+
+
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+
+void CvCity::UpdateCityYields(YieldTypes eYield)
+{
+	if (eYield == YIELD_CULTURE)
+	{
+		SetStaticYield(eYield, getJONSCulturePerTurn(false) * 100);
+	}
+	else if (eYield == YIELD_FAITH)
+	{
+		SetStaticYield(eYield, GetFaithPerTurn(false) * 100);
+	}
+	else
+	{
+		SetStaticYield(eYield, getYieldRateTimes100(eYield, false, false));
+	}
+
+	//don't forget tourism
+	if (eYield == YIELD_CULTURE || eYield == YIELD_TOURISM)
+	{
+		GetCityCulture()->CalculateBaseTourismBeforeModifiers();
+		GetCityCulture()->CalculateBaseTourism();
+	}
+}
+
+
+void CvCity::SetStaticYield(YieldTypes eYield, int iValue)
+{
+	CvAssertMsg(eYield >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	m_aiStaticCityYield[eYield] = iValue;
+}
+
+int CvCity::GetStaticYield(YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	return m_aiStaticCityYield[eYield];
+}
+
+
+void CvCity::SetYieldFromHealth(YieldTypes eYield, int iValue)
+{
+	if (GetYieldFromHealth(eYield) != iValue)
+	{
+		m_aiYieldFromHealth[eYield] = iValue;
+		UpdateCityYields(eYield);
+	}
+}
+int CvCity::GetYieldFromHealth(YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	return m_aiYieldFromHealth[eYield];
+}
+
+void CvCity::SetYieldFromCrime(YieldTypes eYield, int iValue)
+{
+	if (GetYieldFromCrime(eYield) != iValue)
+	{
+		m_aiYieldFromCrime[eYield] = iValue;
+		UpdateCityYields(eYield);
+	}
+}
+int CvCity::GetYieldFromCrime(YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eYield >= 0, "eYield expected to be >= 0");
+	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eYield expected to be < NUM_YIELD_TYPES");
+
+	return m_aiYieldFromCrime[eYield];
+}
+
+
+
+void CvCity::SetYieldModifierFromHealth(YieldTypes eYield, int iValue)
+{
+	if (GetYieldModifierFromHealth(eYield) != iValue)
+	{
+		m_aiYieldModifierFromHealth[eYield] = iValue;
+		UpdateCityYields(eYield);
+	}
+}
+int CvCity::GetYieldModifierFromHealth(YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	return m_aiYieldModifierFromHealth[eYield];
+}
+
+void CvCity::SetYieldModifierFromCrime(YieldTypes eYield, int iValue)
+{
+	if (GetYieldModifierFromCrime(eYield) != iValue)
+	{
+		m_aiYieldModifierFromCrime[eYield] = iValue;
+		UpdateCityYields(eYield);
+	}
+}
+int CvCity::GetYieldModifierFromCrime(YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	return m_aiYieldModifierFromCrime[eYield];
 }
 #endif
