@@ -1333,6 +1333,18 @@ int CvTraitEntry::GetFaithPurchaseCostPercent() const
 }
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+bool CvTraitEntry::GetCorruptionLevelReduceByOne() const
+{
+	return m_bCorruptionLevelReduceByOne;
+}
+
+int CvTraitEntry::GetMaxCorruptionLevel() const
+{
+	return m_iMaxCorruptionLevel;
+}
+#endif
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2073,6 +2085,12 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 #ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
 	m_iFaithPurchaseCombatUnitCostPercent = kResults.GetInt("FaithPurchaseCombatUnitCostPercent");
 #endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_bCorruptionLevelReduceByOne = kResults.GetBool("CorruptionLevelReduceByOne");
+	m_iMaxCorruptionLevel = kResults.GetInt("MaxCorruptionLevel");
+#endif
+
 	return true;
 }
 
@@ -2392,6 +2410,11 @@ void CvPlayerTraits::InitPlayerTraits()
 
 #ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
 			m_iFaithPurchaseCombatUnitCostPercent = trait->GetFaithPurchaseCostPercent();
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+			m_bCorruptionLevelReduceByOne = trait->GetCorruptionLevelReduceByOne();
+			m_iMaxCorruptionLevel = trait->GetMaxCorruptionLevel();
 #endif
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
@@ -4414,6 +4437,11 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 #ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
 	kStream >> m_iFaithPurchaseCombatUnitCostPercent;
 #endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	kStream >> m_bCorruptionLevelReduceByOne;
+	kStream >> m_iMaxCorruptionLevel;
+#endif
 }
 
 /// Serialization write
@@ -4654,6 +4682,11 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 #ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
 	kStream << m_iFaithPurchaseCombatUnitCostPercent;
 #endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	kStream << m_bCorruptionLevelReduceByOne;
+	kStream << m_iMaxCorruptionLevel;
+#endif
 }
 
 // PRIVATE METHODS
@@ -4847,5 +4880,17 @@ int CvPlayerTraits::GetSiegeDamagePercentIfSameReligion() const
 int CvPlayerTraits::GetFaithPurchaseCombatUnitCostPercent() const
 {
 	return m_iFaithPurchaseCombatUnitCostPercent;
+}
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+bool CvPlayerTraits::GetCorruptionLevelReduceByOne() const
+{
+	return m_bCorruptionLevelReduceByOne ;
+}
+
+int CvPlayerTraits::GetMaxCorruptionLevel() const
+{
+	return m_iMaxCorruptionLevel;
 }
 #endif

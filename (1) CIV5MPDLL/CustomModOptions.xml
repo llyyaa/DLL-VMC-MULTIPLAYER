@@ -1148,6 +1148,8 @@
 
     <Row Class="6" Name="IMPROVEMENTS_YIELD_CHANGE_PER_UNIT" Value="0"/>
     <Row Class="6" Name="IMPROVEMENTS_UNIT_XP_PER_TURN" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_CORRUPTION" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>

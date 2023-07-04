@@ -9,6 +9,7 @@
 
 // city.h
 
+#include "CvCorruption.h"
 #ifndef CIV5_CITY_H
 #define CIV5_CITY_H
 
@@ -1132,6 +1133,24 @@ public:
 
 	int iScratch; // know the scope of your validity
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScore() const;
+	CorruptionLevelTypes GetCorruptionLevel() const;
+	void UpdateCorruption();
+
+	int CalculateTotalCorruptionScore(CvString* toolTipSink) const;
+	int CalculateCorruptionScoreFromDistance() const;
+	int CalculateCorruptionScoreModifierFromSpy() const;
+
+	CvCorruptionLevel* DecideCorruptionLevelForNormalCity(const int score) const;
+
+	int GetCorruptionScoreChangeFromBuilding() const;
+	void ChangeCorruptionScoreChangeFromBuilding(int value);
+
+	int GetCorruptionLevelChangeFromBuilding() const;
+	void ChangeCorruptionLevelChangeFromBuilding(int value);
+#endif
+
 protected:
 	FAutoArchiveClassContainer<CvCity> m_syncArchive;
 
@@ -1357,6 +1376,14 @@ protected:
 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eCityScale = NO_CITY_SCALE;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCachedCorruptionScore = 0;
+	CorruptionLevelTypes m_eCachedCorruptionLevel = INVALID_CORRUPTION;
+
+	int m_iCorruptionScoreChangeFromBuilding = 0;
+	int m_iCorruptionLevelChangeFromBuilding = 0;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER

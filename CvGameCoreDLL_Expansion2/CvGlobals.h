@@ -155,6 +155,10 @@ class ICvUnit1;
 #include "CvCityScaleClasses.h"
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+#include "CvCorruption.h"
+#endif
+
 #ifdef MOD_PROMOTION_COLLECTIONS
 #include "CvPromotionCollectionClasses.h"
 #endif
@@ -422,6 +426,18 @@ public:
 
 	void sortAndUpdateOrderedCityScale(const std::vector<CvCityScaleEntry*>&);
 	CvCityScaleEntry* getCityScaleInfoByPopulation(int iPopulation) const;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int getNumCorruptionLevel();
+	std::vector<CvCorruptionLevel*>& getCorruptionLevelInfo();
+	CvCorruptionLevel* getCorruptionLevelInfo(CorruptionLevelTypes eCorruptionLevel);
+
+	std::vector<CvCorruptionLevel*>& getOrderedNormalCityCorruptionLevels();
+	void initCityCorruptionLevelsByCityType();
+
+	CvCorruptionLevel* getPuppetCityCorruptionLevel() const;
+	CvCorruptionLevel* getCapitalCityCorruptionLevel() const;
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS
@@ -7853,6 +7869,13 @@ protected:
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CvCityScaleXMLEntries* m_pCityScales;
 	std::vector<CvCityScaleEntry*> m_vOrderedCityScales; // order by min population
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	CvCorruptionLevelXMLEntries* m_pCorruptionInfo;
+	std::vector<CvCorruptionLevel*> m_vOrderedNormalCityCorruptionLevels; // order by score lower bound.
+	CvCorruptionLevel* m_pPuppetCityCorruptionLevel = nullptr;
+	CvCorruptionLevel* m_pCapitalCityCorruptionLevel = nullptr;
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS

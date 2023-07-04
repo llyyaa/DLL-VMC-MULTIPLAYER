@@ -4783,6 +4783,14 @@ int CvResourceInfo::getFlavorValue(int i) const
 	CvAssertMsg(i > -1, "index out of bounds");
 	return m_piFlavor[i];
 }
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvResourceInfo::GetCorruptionScoreChange() const
+{
+	return m_iCorruptionScoreChange;
+}
+#endif
+
 //------------------------------------------------------------------------------
 bool CvResourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -4826,6 +4834,10 @@ bool CvResourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility
 	m_iRandAppearance2 = kResults.GetInt("RandApp2");
 	m_iRandAppearance3 = kResults.GetInt("RandApp3");
 	m_iRandAppearance4 = kResults.GetInt("RandApp4");
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_iCorruptionScoreChange = kResults.GetInt("CorruptionScoreChange");
+#endif
 
 	m_eResourceUsage   = (ResourceUsageTypes)kResults.GetInt("ResourceUsage");
 

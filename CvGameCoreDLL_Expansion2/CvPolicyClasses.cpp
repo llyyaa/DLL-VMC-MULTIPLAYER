@@ -9,6 +9,7 @@
 #include "CvGameCoreDLLUtil.h"
 #include "CvPolicyAI.h"
 #include "CvFlavorManager.h"
+#include "CvPolicyClasses.h"
 #include "ICvDLLUserInterface.h"
 #include "CvGameCoreUtils.h"
 #include "CvEconomicAI.h"
@@ -1067,6 +1068,11 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #ifdef MOD_RESOURCE_EXTRA_BUFF
 	m_iResourceUnhappinessModifier = kResults.GetInt("ResourceUnhappinessModifier");
 	m_iResourceCityConnectionTradeRouteGoldModifier = kResults.GetInt("ResourceCityConnectionTradeRouteGoldModifier");
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_iCorruptionScoreModifier = kResults.GetInt("CorruptionScoreModifier");
+	m_bCorruptionLevelReduceByOne = kResults.GetBool("CorruptionLevelReduceByOne");
 #endif
 
 #if defined(MOD_RELIGION_POLICY_BRANCH_FAITH_GP)
@@ -2673,6 +2679,23 @@ int CvPolicyEntry::GetResourceUnhappinessModifier() const
 int CvPolicyEntry::GetResourceCityConnectionTradeRouteGoldModifier() const
 {
 	return m_iResourceCityConnectionTradeRouteGoldModifier;
+}
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvPolicyEntry::GetCorruptionScoreModifier() const
+{
+	return m_iCorruptionScoreModifier;
+}
+
+bool CvPolicyEntry::GetCorruptionLevelReduceByOne() const
+{
+	return m_bCorruptionLevelReduceByOne;
+}
+
+bool CvPolicyEntry::IsInvolveCorruption() const
+{
+	return m_iCorruptionScoreModifier != 0 || m_bCorruptionLevelReduceByOne;
 }
 #endif
 

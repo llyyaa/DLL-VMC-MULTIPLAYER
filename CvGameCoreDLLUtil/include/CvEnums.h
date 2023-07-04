@@ -1602,6 +1602,12 @@ enum CityScaleTypes {
 };
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+enum CorruptionLevelTypes {
+	INVALID_CORRUPTION = -1
+};
+#endif
+
 enum LuaFormulaTypes {
 	NO_LUA_FORMULA = -1
 };

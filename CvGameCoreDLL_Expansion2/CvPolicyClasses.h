@@ -298,6 +298,12 @@ public:
 	int GetResourceCityConnectionTradeRouteGoldModifier() const;
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScoreModifier() const;
+	bool GetCorruptionLevelReduceByOne() const;
+	bool IsInvolveCorruption() const;
+#endif
+
 private:
 	int m_iTechPrereq;
 	int m_iCultureCost;
@@ -551,6 +557,11 @@ private:
 #endif
 
 	std::vector<PolicyResourceInfo> m_vCityResources;
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCorruptionScoreModifier = 0;
+	bool m_bCorruptionLevelReduceByOne = false;
+#endif
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

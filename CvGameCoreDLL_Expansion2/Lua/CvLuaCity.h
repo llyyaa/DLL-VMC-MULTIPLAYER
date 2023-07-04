@@ -647,6 +647,12 @@ protected:
 	LUAAPIEXTN(GetScale, int);
 	LUAAPIEXTN(CanGrowNormally, bool);
 #endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	LUAAPIEXTN(GetCorruptionScore, int);
+	LUAAPIEXTN(GetCorruptionLevel, int);
+	LUAAPIEXTN(UpdateCorruption);
+#endif
 };
 
 #endif //CVLUACITY_H

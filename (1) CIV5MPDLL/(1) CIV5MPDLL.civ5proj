@@ -493,6 +493,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/Corruption/Corruption.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/IMPROVEMENTS/Improvements_Create_Item.sql</FileName>
       </Action>
       <Action>
@@ -593,6 +598,7 @@
     <Folder Include="DB\API" />
     <Folder Include="DB\BUGFIX" />
     <Folder Include="DB\CONFIG" />
+    <Folder Include="DB\Corruption\" />
     <Folder Include="DB\DIPLOMACY" />
     <Folder Include="DB\EVENTS" />
     <Folder Include="DB\GLOBAL" />
@@ -964,6 +970,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB\IMPROVEMENTS\Improvement_Upgrade_Downgrade.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\Corruption\Corruption.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

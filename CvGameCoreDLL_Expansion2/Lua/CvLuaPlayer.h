@@ -1214,6 +1214,11 @@ protected:
 	LUAAPIEXTN(GetYieldModifierFromHappiness, int, eYieldType);
 	LUAAPIEXTN(GetYieldModifierFromNumGreakWork, int, eYieldType);
 	LUAAPIEXTN(GetYieldModifierFromHappinessPolicy, int, eYieldType);
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	LUAAPIEXTN(IsCorruptionLevelReduceByOne, bool);
+	LUAAPIEXTN(GetCorruptionScoreModifierFromPolicy, int);
+#endif
 };
 
 #endif //CVLUAPLAYER_H

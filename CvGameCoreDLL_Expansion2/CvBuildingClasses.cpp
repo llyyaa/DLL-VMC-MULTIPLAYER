@@ -5,6 +5,7 @@
 	All other marks and trademarks are the property of their respective owners.  
 	All rights reserved. 
 	------------------------------------------------------------------------------------------------------- */
+#include "CvBuildingClasses.h"
 #include "CvGameCoreDLLPCH.h"
 #include "ICvDLLUserInterface.h"
 #include "CvGameCoreUtils.h"
@@ -556,6 +557,11 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 	m_iSiegeKillCitizensModifier = kResults.GetInt("SiegeKillCitizensModifier");
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_iCorruptionScoreChange = kResults.GetInt("CorruptionScoreChange");
+	m_iCorruptionLevelChange = kResults.GetInt("CorruptionLevelChange");
 #endif
 
 	//References
@@ -1768,6 +1774,18 @@ int CvBuildingEntry::GetLandTileTurnDamage() const
 int CvBuildingEntry::GetSiegeKillCitizensModifier() const
 {
 	return m_iSiegeKillCitizensModifier;
+}
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvBuildingEntry::GetCorruptionScoreChange() const
+{
+	return m_iCorruptionScoreChange;
+}
+
+int CvBuildingEntry::GetCorruptionLevelChange() const
+{
+	return m_iCorruptionLevelChange;
 }
 #endif
 

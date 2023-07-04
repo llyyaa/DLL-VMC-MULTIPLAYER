@@ -1294,6 +1294,9 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetYieldModifierFromHappiness);
 	Method(GetYieldModifierFromNumGreakWork);
 	Method(GetYieldModifierFromHappinessPolicy);
+
+	Method(IsCorruptionLevelReduceByOne);
+	Method(GetCorruptionScoreModifierFromPolicy);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12452,3 +12455,6 @@ int CvLuaPlayer::lGetYieldModifierFromHappinessPolicy(lua_State* L)
 	lua_pushinteger(L, result);
 	return 1;
 }
+
+LUAAPIIMPL(Player, IsCorruptionLevelReduceByOne)
+LUAAPIIMPL(Player, GetCorruptionScoreModifierFromPolicy)

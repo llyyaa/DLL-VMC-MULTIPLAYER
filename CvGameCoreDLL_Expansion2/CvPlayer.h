@@ -2028,6 +2028,14 @@ public:
 	void UpdateCachedCapturedHolyCity();
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScoreModifierFromPolicy() const;
+	void ChangeCorruptionScoreModifierFromPolicy(int change);
+	int GetCorruptionLevelReduceByOneRC() const;
+	bool IsCorruptionLevelReduceByOne() const;
+	void ChangeCorruptionLevelReduceByOneRC(int change);
+#endif
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2635,6 +2643,11 @@ protected:
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
   	int m_iCachedCapturedHolyCity = 0;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCorruptionScoreModifierFromPolicy = 0;
+	int m_iCorruptionLevelReduceByOneRC = 0;
 #endif
 
 };

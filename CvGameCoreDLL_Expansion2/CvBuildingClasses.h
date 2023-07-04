@@ -438,6 +438,11 @@ public:
 	int GetSiegeKillCitizensModifier() const;
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScoreChange() const;
+	int GetCorruptionLevelChange() const;
+#endif
+
 private:
 	int m_iBuildingClassType;
 	const CvBuildingClassInfo* m_pkBuildingClassInfo;
@@ -751,6 +756,11 @@ private:
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eEnableCityScaleGrowth = NO_CITY_SCALE;
 	bool m_bEnableAllCityScaleGrowth = false;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCorruptionScoreChange = 0;
+	int m_iCorruptionLevelChange = 0;
 #endif
 };
 

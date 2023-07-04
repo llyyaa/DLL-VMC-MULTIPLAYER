@@ -9,6 +9,7 @@
 // Author -	Mustafa Thamer
 //			Jon Shafer - 03/2005
 
+#include "CvCorruption.h"
 #include "CvGameCoreDLLPCH.h"
 #include "CvGlobals.h"
 #include "CvRandom.h"
@@ -2253,6 +2254,10 @@ void CvGlobals::init()
 	m_pCityScales = FNEW(CvCityScaleXMLEntries, c_eCiv5GameplayDLL, 0);
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_pCorruptionInfo = FNEW(CvCorruptionLevelXMLEntries, c_eCiv5GameplayDLL, 0);
+#endif
+
 #ifdef MOD_PROMOTION_COLLECTIONS
 	m_pPromotionCollections = FNEW(CvPromotionCollectionEntries, c_eCiv5GameplayDLL, 0);
 #endif
@@ -2365,6 +2370,10 @@ void CvGlobals::uninit()
 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	SAFE_DELETE(m_pCityScales);
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	SAFE_DELETE(m_pCorruptionInfo);
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS
@@ -3332,6 +3341,67 @@ CvCityScaleEntry* CvGlobals::getCityScaleInfoByPopulation(int iPopulation) const
 
 	return nullptr;
 }
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvGlobals::getNumCorruptionLevel()
+{
+	return m_pCorruptionInfo->GetEntries().size();
+}
+
+std::vector<CvCorruptionLevel*>& CvGlobals::getCorruptionLevelInfo()
+{
+	return m_pCorruptionInfo->GetEntries();
+}
+
+CvCorruptionLevel* CvGlobals::getCorruptionLevelInfo(CorruptionLevelTypes eCorruptionLevel)
+{
+	return m_pCorruptionInfo->GetEntry(eCorruptionLevel);
+}
+
+std::vector<CvCorruptionLevel*>& CvGlobals::getOrderedNormalCityCorruptionLevels()
+{
+	return m_vOrderedNormalCityCorruptionLevels;
+}
+
+void CvGlobals::initCityCorruptionLevelsByCityType()
+{
+	m_vOrderedNormalCityCorruptionLevels.clear();
+	auto& corruptionLevels = getCorruptionLevelInfo();
+	for (auto* level : corruptionLevels)
+	{
+		if (level == nullptr)
+		{
+			continue;
+		}
+		if (level->IsCapital())
+		{
+			m_pCapitalCityCorruptionLevel = level;
+			continue;
+		}
+		if (level->IsPuppet())
+		{
+			m_pPuppetCityCorruptionLevel = level;
+			continue;
+		}
+		m_vOrderedNormalCityCorruptionLevels.push_back(level);
+	}
+
+	std::sort(m_vOrderedNormalCityCorruptionLevels.begin(), m_vOrderedNormalCityCorruptionLevels.end(), [](CvCorruptionLevel* a, CvCorruptionLevel* b) {
+		return a->GetScoreLowerBoundBase() < b->GetScoreLowerBoundBase();
+	});
+}
+
+CvCorruptionLevel* CvGlobals::getPuppetCityCorruptionLevel() const
+{
+	return m_pPuppetCityCorruptionLevel;
+}
+
+CvCorruptionLevel* CvGlobals::getCapitalCityCorruptionLevel() const
+{
+	return m_pCapitalCityCorruptionLevel;
+}
+
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS
