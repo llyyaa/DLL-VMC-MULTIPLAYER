@@ -2531,11 +2531,6 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 	case NO_YIELD:
 	case YIELD_GREAT_GENERAL_POINTS:
 	case YIELD_GREAT_ADMIRAL_POINTS:
-	case YIELD_HEALTH:
-	case YIELD_DISEASE:
-	case YIELD_CRIME:
-	case YIELD_LOYALTY:
-	case YIELD_SOVEREIGNTY:
 		return 0; // Yields not applicable to trade.
 #endif
 	}
