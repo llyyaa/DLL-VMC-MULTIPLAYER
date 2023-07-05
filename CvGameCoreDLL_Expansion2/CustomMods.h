@@ -490,6 +490,8 @@
 //   GameEvents.ReligionReformed.Add(function(iPlayer, iReligion, iBelief1) end) (v65)
 #define MOD_EVENTS_FOUND_RELIGION                   gCustomMods.isEVENTS_FOUND_RELIGION()
 
+
+
 // Events sent when choosing beliefs
 //   GameEvents.PlayerCanHaveBelief.Add(function(iPlayer, iBelief) return true end)
 //   GameEvents.ReligionCanHaveBelief.Add(function(iPlayer, iReligion, iBelief) return true end)
@@ -1285,6 +1287,8 @@ enum BattleTypeTypes
 #define GAMEEVENT_CanAddEnemyPromotion			"CanAddEnemyPromotion",		        "iiiiiii"
 #define GAMEEVENT_OnTriggerAddEnemyPromotion			"OnTriggerAddEnemyPromotion",		        "iiiiiiiiiii"
 #define GAMEEVENT_CanRemovePromotion "CanRemovePromotion", "iii"
+
+#define GAMEEVENT_LoyaltyStateChanged       "LoyaltyStateChanged", "iiii"
 
 // Serialization wrappers
 #define MOD_SERIALIZE

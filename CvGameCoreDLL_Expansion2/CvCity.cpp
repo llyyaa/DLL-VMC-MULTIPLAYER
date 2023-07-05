@@ -318,6 +318,21 @@ CvCity::CvCity() :
 
 	, m_aiYieldFromProcessModifier("CvCity::m_aiYieldFromProcessModifier", m_syncArchive)
 
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	, m_iAdditionalFood(0)
+	, m_iOrganizedCrime(0)
+	, m_iResistanceCounter(0)
+	, m_iPlagueCounter(0)
+	, m_iPlagueTurns(0)
+	, m_iPlagueType(0)
+	, m_iLoyaltyCounter(0)
+	, m_iDisloyaltyCounter(0)
+	, m_iLoyaltyStateType(0)
+	, m_aiYieldModifierFromHealth(0)
+	, m_aiYieldModifierFromCrime(0)
+	, m_aiYieldFromHealth(0)
+	, m_aiYieldFromCrime(0)
+#endif
 
 #if defined(MOD_ROG_CORE)
 	, m_ppaaiImprovementYieldChange(0)
@@ -1102,6 +1117,16 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiYieldPerReligion.resize(NUM_YIELD_TYPES);
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	m_iAdditionalFood = 0;
+	m_iOrganizedCrime = -1;
+	m_iResistanceCounter = 0;
+	m_iPlagueCounter = 0;
+	m_iPlagueTurns = -1;
+	m_iPlagueType = -1;
+	m_iLoyaltyCounter = 0;
+	m_iDisloyaltyCounter = 0;
+	m_iLoyaltyStateType = 0;
+
 	m_aiStaticCityYield.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromHealth.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromCrime.resize(NUM_YIELD_TYPES);
@@ -1977,6 +2002,16 @@ void CvCity::doTurn()
 		setDamage(0);
 	}
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	{
+		if (GetPlagueTurns() > 0)
+		{
+			ChangePlagueTurns(-1);
+		}
+	}
+#endif
+
 	setDrafted(false);
 	setMadeAttack(false);
 	GetCityBuildings()->SetSoldBuildingThisTurn(false);
@@ -2217,25 +2252,28 @@ bool CvCity::canBeSelected() const
 
 
 //	--------------------------------------------------------------------------------
-void CvCity::updateYield()
+void CvCity::updateYield(bool bRecalcPlotYields)
 {
 	VALIDATE_OBJECT
-	CvPlot* pLoopPlot;
-	int iI;
+		if (bRecalcPlotYields)
+		{
+			CvPlot* pLoopPlot;
+			int iI;
 
 #if defined(MOD_GLOBAL_CITY_WORKING)
-	for(iI = 0; iI < GetNumWorkablePlots(); iI++)
+			for (iI = 0; iI < GetNumWorkablePlots(); iI++)
 #else
-	for(iI = 0; iI < NUM_CITY_PLOTS; iI++)
+			for (iI = 0; iI < NUM_CITY_PLOTS; iI++)
 #endif
-	{
-		pLoopPlot = GetCityCitizens()->GetCityPlotFromIndex(iI);
+			{
+				pLoopPlot = GetCityCitizens()->GetCityPlotFromIndex(iI);
 
-		if(pLoopPlot != NULL)
-		{
-			pLoopPlot->updateYield();
+				if (pLoopPlot != NULL)
+				{
+					pLoopPlot->updateYield();
+				}
+			}
 		}
-	}
 }
 
 //	--------------------------------------------------------------------------------
@@ -7556,9 +7594,9 @@ void CvCity::processSpecialist(SpecialistTypes eSpecialist, int iChange)
 
 //	--------------------------------------------------------------------------------
 /// Process the majority religion changing for a city
-void CvCity::UpdateReligion(ReligionTypes eNewMajority)
+void CvCity::UpdateReligion(ReligionTypes eNewMajority, bool bRecalcPlotYields)
 {
-	updateYield();
+	updateYield(bRecalcPlotYields);
 
 	// Reset city level yields
 	m_iJONSCulturePerTurnFromReligion = 0;
@@ -7906,6 +7944,8 @@ int CvCity::foodConsumption(bool /*bNoAngry*/, int iExtra) const
 	int iPopulation = getPopulation() + iExtra;
 
 	int iFoodPerPop = /*2*/ GC.getFOOD_CONSUMPTION_PER_POPULATION();
+
+	iFoodPerPop += GetAdditionalFood() * 100;
 
 	int iNum = iPopulation * iFoodPerPop;
 
@@ -12516,6 +12556,17 @@ int CvCity::GetTradeYieldModifier(YieldTypes eIndex, CvString* toolTipSink) cons
 				*toolTipSink += GetLocalizedText("TXT_KEY_GOLDEN_AGE_POINTS_FROM_TRADE_ROUTES", iReturnValue / 100.0f);
 				break;
 #endif
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+			case YIELD_GREAT_GENERAL_POINTS:
+			case YIELD_GREAT_ADMIRAL_POINTS:
+			case YIELD_HEALTH:
+			case YIELD_DISEASE:
+			case YIELD_CRIME:
+			case YIELD_LOYALTY:
+			case YIELD_SOVEREIGNTY:
+				break;
+#endif
 			}
 		}
 	}
@@ -17008,6 +17059,16 @@ void CvCity::read(FDataStream& kStream)
 	}
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	kStream >> m_iAdditionalFood;
+	kStream >> m_iOrganizedCrime;
+	kStream >> m_iResistanceCounter;
+	kStream >> m_iPlagueCounter;
+	kStream >> m_iPlagueTurns;
+	kStream >> m_iPlagueType;
+	kStream >> m_iLoyaltyCounter;
+	kStream >> m_iDisloyaltyCounter;
+	kStream >> m_iLoyaltyStateType;
+
 	kStream >> m_aiStaticCityYield;
 	kStream >> m_aiYieldFromHealth;
 	kStream >> m_aiYieldFromCrime;
@@ -17423,6 +17484,16 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiYieldPerReligion;
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	kStream << m_iAdditionalFood;
+	kStream << m_iOrganizedCrime;
+	kStream << m_iResistanceCounter;
+	kStream << m_iPlagueCounter;
+	kStream << m_iPlagueTurns;
+	kStream << m_iPlagueType;
+	kStream << m_iLoyaltyCounter;
+	kStream << m_iDisloyaltyCounter;
+	kStream << m_iLoyaltyStateType;
+
 	kStream << m_aiStaticCityYield;
 	kStream << m_aiYieldFromHealth;
 	kStream << m_aiYieldFromCrime;
@@ -20238,6 +20309,158 @@ void CvCity::ChangeSiegeKillCitizensModifier(int iChange)
 
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
+int CvCity::GetAdditionalFood() const
+{
+	VALIDATE_OBJECT
+	return m_iAdditionalFood;
+}
+void CvCity::SetAdditionalFood(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iAdditionalFood = iValue;
+}
+
+int CvCity::GetOrganizedCrime() const
+{
+	return m_iOrganizedCrime;
+}
+void CvCity::SetOrganizedCrime(int iValue)
+{
+	if (m_iOrganizedCrime != iValue)
+	{
+		m_iOrganizedCrime = iValue;
+	}
+}
+bool CvCity::HasOrganizedCrime()
+{
+	return(m_iOrganizedCrime >= 0);
+}
+
+void CvCity::ChangeResistanceCounter(int iValue)
+{
+	if (iValue != 0)
+	{
+		m_iResistanceCounter += iValue;
+	}
+}
+void CvCity::SetResistanceCounter(int iValue)
+{
+	if (iValue != m_iResistanceCounter)
+	{
+		m_iResistanceCounter = iValue;
+	}
+}
+int CvCity::GetResistanceCounter() const
+{
+	return m_iResistanceCounter;
+}
+
+void CvCity::ChangePlagueCounter(int iValue)
+{
+	if (iValue != 0)
+	{
+		m_iPlagueCounter += iValue;
+	}
+}
+void CvCity::SetPlagueCounter(int iValue)
+{
+	if (iValue != m_iPlagueCounter)
+	{
+		m_iPlagueCounter = iValue;
+	}
+}
+int CvCity::GetPlagueCounter() const
+{
+	return m_iPlagueCounter;
+}
+
+int CvCity::GetPlagueTurns() const
+{
+	return m_iPlagueTurns;
+}
+void CvCity::ChangePlagueTurns(int iValue) //Set in city::doturn
+{
+	if (iValue != 0)
+	{
+		m_iPlagueTurns += iValue;
+	}
+}
+void CvCity::SetPlagueTurns(int iValue)
+{
+	if (iValue != m_iPlagueTurns)
+	{
+		m_iPlagueTurns = iValue;
+	}
+}
+
+
+int CvCity::GetPlagueType() const
+{
+	return m_iPlagueType;
+}
+void CvCity::SetPlagueType(int iValue)
+{
+	if (iValue != m_iPlagueTurns)
+	{
+		m_iPlagueType = iValue;
+	}
+}
+bool CvCity::HasPlague()
+{
+	return(m_iPlagueType >= 0);
+}
+
+void CvCity::ChangeLoyaltyCounter(int iValue)
+{
+	if (iValue != 0)
+	{
+		m_iLoyaltyCounter += iValue;
+	}
+}
+void CvCity::SetLoyaltyCounter(int iValue)
+{
+	if (iValue != m_iLoyaltyCounter)
+	{
+		m_iLoyaltyCounter = iValue;
+	}
+}
+int CvCity::GetLoyaltyCounter() const
+{
+	return m_iLoyaltyCounter;
+}
+
+void CvCity::ChangeDisloyaltyCounter(int iValue)
+{
+	if (iValue != 0)
+	{
+		m_iDisloyaltyCounter += iValue;
+	}
+}
+void CvCity::SetDisloyaltyCounter(int iValue)
+{
+	if (iValue != m_iDisloyaltyCounter)
+	{
+		m_iDisloyaltyCounter = iValue;
+	}
+}
+int CvCity::GetDisloyaltyCounter() const
+{
+	return m_iDisloyaltyCounter;
+}
+
+int CvCity::GetLoyaltyState() const
+{
+	return m_iLoyaltyStateType;
+}
+void CvCity::SetLoyaltyState(int iLoyalty)
+{
+	if (iLoyalty != m_iLoyaltyStateType)
+	{
+		int iOldLoyalty = m_iLoyaltyStateType;
+		GAMEEVENTINVOKE_HOOK(GAMEEVENT_LoyaltyStateChanged, getOwner(), GetID(), iOldLoyalty, iLoyalty);
+		m_iLoyaltyStateType = iLoyalty;
+	}
+}
 
 void CvCity::UpdateCityYields(YieldTypes eYield)
 {

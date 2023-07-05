@@ -91,7 +91,7 @@ public:
 	bool canBeSelected() const;
 	void updateSelectedCity();
 
-	void updateYield();
+	void updateYield(bool bRecalcPlotYields = true);
 
 	bool IsIndustrialRouteToCapital() const;
 	void SetIndustrialRouteToCapital(bool bValue);
@@ -293,7 +293,7 @@ public:
 	void processProcess(ProcessTypes eProcess, int iChange);
 	void processSpecialist(SpecialistTypes eSpecialist, int iChange);
 
-	void UpdateReligion(ReligionTypes eNewMajority);
+	void UpdateReligion(ReligionTypes eNewMajority, bool bRecalcPlotYields = true);
 
 	int GetCultureFromSpecialist(SpecialistTypes eSpecialist) const;
 
@@ -737,6 +737,45 @@ public:
 
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
+
+	int GetAdditionalFood() const;
+	void SetAdditionalFood(int iValue);
+
+	int GetOrganizedCrime() const;
+	void SetOrganizedCrime(int iValue);
+	bool HasOrganizedCrime();
+
+	void ChangeResistanceCounter(int iValue);
+	void SetResistanceCounter(int iValue);
+	int GetResistanceCounter() const;
+
+	void ChangePlagueCounter(int iValue);
+	void SetPlagueCounter(int iValue);
+	int GetPlagueCounter() const;
+
+	int GetPlagueTurns() const;
+	void ChangePlagueTurns(int iValue); //Set in city::doturn
+	void SetPlagueTurns(int iValue);
+
+	int GetSappedTurns() const;
+	void SetSappedTurns(int iValue);
+	void ChangeSappedTurns(int iValue);
+
+	int GetPlagueType() const;
+	void SetPlagueType(int iValue);
+	bool HasPlague();
+
+	void ChangeLoyaltyCounter(int iValue);
+	void SetLoyaltyCounter(int iValue);
+	int GetLoyaltyCounter() const;
+
+	void ChangeDisloyaltyCounter(int iValue);
+	void SetDisloyaltyCounter(int iValue);
+	int GetDisloyaltyCounter() const;
+
+	int GetLoyaltyState() const;
+	void SetLoyaltyState(int iLoyalty);
+
 
 	void UpdateCityYields(YieldTypes eYield);
 	void SetStaticYield(YieldTypes eYield, int iValue);
@@ -1310,6 +1349,16 @@ protected:
 	std::vector<int> m_aiYieldPerReligion;
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	int m_iAdditionalFood;
+	int m_iOrganizedCrime;
+	int m_iResistanceCounter;
+	int m_iPlagueCounter;
+	int m_iPlagueTurns;
+	int m_iPlagueType;
+	int m_iLoyaltyCounter;
+	int m_iDisloyaltyCounter;
+	int m_iLoyaltyStateType;
+
 	std::vector<int> m_aiStaticCityYield;
 	std::vector<int> m_aiYieldFromHealth;
 	std::vector<int> m_aiYieldFromCrime;
