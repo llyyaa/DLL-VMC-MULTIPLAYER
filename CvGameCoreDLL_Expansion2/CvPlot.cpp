@@ -12183,14 +12183,14 @@ int CvPlot::getYieldWithBuild(BuildTypes eBuild, YieldTypes eYield, bool bWithUp
 		eImprovement = getImprovementType();
 		if(eImprovement != NO_IMPROVEMENT)
 		{
-			for(int iI = 0; iI < NUM_YIELD_TYPES; iI++)
-			{
-				iYield += GC.getImprovementInfo(eImprovement)->GetRouteYieldChanges(eRoute, iI);
+			//for(int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+			//{
+				iYield += GC.getImprovementInfo(eImprovement)->GetRouteYieldChanges(eRoute, eYield);
 				if(getRouteType() != NO_ROUTE)
 				{
-					iYield -= GC.getImprovementInfo(eImprovement)->GetRouteYieldChanges(getRouteType(), iI);
+					iYield -= GC.getImprovementInfo(eImprovement)->GetRouteYieldChanges(getRouteType(), eYield);
 				}
-			}
+		//	}
 		}
 	}
 
