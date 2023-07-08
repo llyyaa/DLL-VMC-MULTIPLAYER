@@ -1286,6 +1286,8 @@ enum BattleTypeTypes
 #define GAMEEVENT_OnTriggerAddEnemyPromotion			"OnTriggerAddEnemyPromotion",		        "iiiiiiiiiii"
 #define GAMEEVENT_CanRemovePromotion "CanRemovePromotion", "iii"
 
+#define GAMEEVENT_LoyaltyStateChanged       "LoyaltyStateChanged", "iiii"
+
 // Serialization wrappers
 #define MOD_SERIALIZE
 

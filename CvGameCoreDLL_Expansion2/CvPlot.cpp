@@ -9454,6 +9454,7 @@ void CvPlot::updateYield()
 				if(isBeingWorked())
 				{
 					pWorkingCity->ChangeBaseYieldRateFromTerrain(((YieldTypes)iI), (getYield((YieldTypes)iI) - iOldYield));
+					pWorkingCity->UpdateCityYields((YieldTypes)iI);
 				}
 
 				// JON: New City Citizens AI shoulud update here 08/17/09

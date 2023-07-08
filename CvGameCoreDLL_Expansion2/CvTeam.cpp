@@ -6741,6 +6741,11 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 			kPlayer.ChangeInfluenceSpreadModifier(pTech->GetInfluenceSpreadModifier() * iChange);
 			kPlayer.ChangeExtraVotesPerDiplomat(pTech->GetExtraVotesPerDiplomat() * iChange);
 
+
+			int iLoop2 = 0;
+			for (CvCity* pLoopCity2 = kPlayer.firstCity(&iLoop2); pLoopCity2 != NULL; pLoopCity2 = kPlayer.nextCity(&iLoop2))
+				pLoopCity2->UpdateAllNonPlotYields();
+
 			// Free promotion from this tech?
 			for(int iPromotion = 0; iPromotion < GC.getNumPromotionInfos(); iPromotion++)
 			{
@@ -6777,6 +6782,7 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 
 				// Another?
 				iUnitClass = kPlayer.GetPlayerTraits()->GetNextFreeUnit();
+
 			}
 		}
 	}

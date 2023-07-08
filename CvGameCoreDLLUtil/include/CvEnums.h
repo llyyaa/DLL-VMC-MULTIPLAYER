@@ -3265,4 +3265,19 @@ enum DiplomacyPlayerType
 };
 #endif
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+enum LoyaltyStateTypes
+{
+	NO_LOYALTY_TYPE = -1,
+	LOYALTY_NEUTRAL = 0,
+	LOYALTY_PATRIOTIC = 1,
+	LOYALTY_ALLEGIANT = 2,
+	LOYALTY_REBELLIOUS = 3,
+	LOYALTY_SEPARATIST = 4,
+
+	NUM_LOYALTY_TYPES
+};
+#endif
+
 #endif //CVENUMS_H

@@ -8275,8 +8275,10 @@ bool CvUnit::createGreatWork()
 			}
 		}
 
-#if defined(EVENTS_GREAT_WORK_CREATED)
-		if(EVENTS_GREAT_WORK_CREATED)
+		pCity->UpdateAllNonPlotYields();
+
+#if defined(MOD_EVENTS_GREAT_WORK_CREATED)
+		if(MOD_EVENTS_GREAT_WORK_CREATED)
 		{
 			CvGameCulture* pCulture = GC.getGame().GetGameCulture();
 			if (pCulture != NULL)

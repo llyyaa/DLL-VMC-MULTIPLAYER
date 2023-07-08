@@ -695,6 +695,12 @@ bool CvGameCulture::SwapGreatWorks (PlayerTypes ePlayer1, int iWork1, PlayerType
 	
 	GC.GetEngineUserInterface()->setDirty(GreatWorksScreen_DIRTY_BIT, true);
 
+	pCity1->UpdateAllNonPlotYields();
+	if (pCity1 != pCity2)
+	{
+		pCity2->UpdateAllNonPlotYields();
+	}
+
 	return true;
 }
 
@@ -720,6 +726,12 @@ void CvGameCulture::MoveGreatWorks(PlayerTypes ePlayer, int iCity1, int iBuildin
 	int workType2 = pCity2->GetCityBuildings()->GetBuildingGreatWork((BuildingClassTypes)iBuildingClass2, iWorkIndex2);
 	pCity1->GetCityBuildings()->SetBuildingGreatWork((BuildingClassTypes)iBuildingClass1, iWorkIndex1, workType2);
 	pCity2->GetCityBuildings()->SetBuildingGreatWork((BuildingClassTypes)iBuildingClass2, iWorkIndex2, workType1);
+
+	pCity1->UpdateAllNonPlotYields();
+	if (pCity1 != pCity2)
+	{
+		pCity2->UpdateAllNonPlotYields();
+	}
 }
 
 /// How many civs do we need to be influential over to win?
@@ -1233,6 +1245,8 @@ void CvPlayerCulture::MoveWorks (GreatWorkSlotType eType, vector<CvGreatWorkBuil
 	*/
 #endif
 
+	bool bUpdate = false;
+
 	// First building that are not endangered
 	// CUSTOMLOG("  ... theming safe buildings");
 	vector<CvGreatWorkBuildingInMyEmpire>::iterator itBuilding;
@@ -1244,6 +1258,7 @@ void CvPlayerCulture::MoveWorks (GreatWorkSlotType eType, vector<CvGreatWorkBuil
 			if (ThemeBuilding(itBuilding, works1, works2, false /*bConsiderOtherPlayers*/))
 			{
 				itBuilding->m_bThemed = true;
+				bUpdate = true;
 			}
 		}
 	}
@@ -1258,6 +1273,7 @@ void CvPlayerCulture::MoveWorks (GreatWorkSlotType eType, vector<CvGreatWorkBuil
 			if (ThemeBuilding(itBuilding, works1, works2, false /*bConsiderOtherPlayers*/))
 			{
 				itBuilding->m_bThemed = true;
+				bUpdate = true;
 			}
 		}
 	}
@@ -1273,6 +1289,7 @@ void CvPlayerCulture::MoveWorks (GreatWorkSlotType eType, vector<CvGreatWorkBuil
 				if (ThemeBuilding(itBuilding, works1, works2, true /*bConsiderOtherPlayers*/))
 				{
 					itBuilding->m_bThemed = true;
+					bUpdate = true;
 				}
 			}
 		}
@@ -1324,7 +1341,7 @@ void CvPlayerCulture::MoveWorks (GreatWorkSlotType eType, vector<CvGreatWorkBuil
 	}
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
-	MoveSingleWorks(buildings, works1, works2, eFocusYield);
+	bool bSecondUpdate = MoveSingleWorks(buildings, works1, works2, eFocusYield, true);
 #else
 	// Fill unthemed buildings, first those that aren't endangered
 	for (itBuilding = buildings.begin(); itBuilding != buildings.end(); itBuilding++)
@@ -1342,6 +1359,38 @@ void CvPlayerCulture::MoveWorks (GreatWorkSlotType eType, vector<CvGreatWorkBuil
 		}
 	}
 #endif
+
+
+	if (bSecondUpdate || bUpdate)
+	{
+		std::vector<CvCity*> CityList;
+		for (itBuilding = buildings.begin(); itBuilding != buildings.end(); itBuilding++)
+		{
+			CvCity* pCity = m_pPlayer->getCity(itBuilding->m_iCityID);
+			if (pCity != NULL)
+			{
+				bool bAlreadyChecked = false;
+				if (CityList.size() > 0)
+				{
+					for (uint ui = 0; ui < CityList.size(); ui++)
+					{
+						if (pCity == CityList[ui])
+						{
+							bAlreadyChecked = true;
+							break;
+						}
+					}
+				}
+
+				if (bAlreadyChecked)
+					continue;
+
+				pCity->UpdateAllNonPlotYields();
+				CityList.push_back(pCity);
+			}
+		}
+	}
+
 }
 
 /// Uses the available Great Works to fill a building with those works that provide the best Theming Bonus
@@ -1801,7 +1850,7 @@ bool CvPlayerCulture::ThemeEqualArtArtifact(CvGreatWorkBuildingInMyEmpire kBldg,
 }
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
-void CvPlayerCulture::MoveSingleWorks(vector<CvGreatWorkBuildingInMyEmpire> &buildings, vector<CvGreatWorkInMyEmpire> &works1, vector<CvGreatWorkInMyEmpire> &works2, YieldTypes eFocusYield)
+bool CvPlayerCulture::MoveSingleWorks(vector<CvGreatWorkBuildingInMyEmpire> &buildings, vector<CvGreatWorkInMyEmpire> &works1, vector<CvGreatWorkInMyEmpire> &works2, YieldTypes eFocusYield, bool bPuppet)
 {
 	// CUSTOMLOG("Move Single Works");
 	vector<CvGreatWorkBuildingInMyEmpire>::iterator itBuilding;
@@ -2284,6 +2333,9 @@ void CvPlayerCulture::DoArchaeologyChoice (ArchaeologyChoiceType eChoice)
 				pHousingCity = m_pPlayer->GetCulture()->GetClosestAvailableGreatWorkSlot(pUnit->getX(),pUnit->getY(), eArtArtifactSlot, &eBuildingToHouse, &iSlot);
 				int iGWindex = 	pCulture->CreateGreatWork(eGreatArtifact, eClass, pPlot->GetArchaeologicalRecord().m_ePlayer1, pPlot->GetArchaeologicalRecord().m_eEra, "");
 				pHousingCity->GetCityBuildings()->SetBuildingGreatWork(eBuildingToHouse, iSlot, iGWindex);
+
+				pHousingCity->UpdateAllNonPlotYields();
+
 				pPlot->setImprovementType(NO_IMPROVEMENT);
 				pUnit->kill(true);
 			}
@@ -2298,6 +2350,7 @@ void CvPlayerCulture::DoArchaeologyChoice (ArchaeologyChoiceType eChoice)
 				int iGWindex = 	pCulture->CreateGreatWork(eGreatArtifact, eClass, pPlot->GetArchaeologicalRecord().m_ePlayer2, pPlot->GetArchaeologicalRecord().m_eEra, "");
 				pHousingCity->GetCityBuildings()->SetBuildingGreatWork(eBuildingToHouse, iSlot, iGWindex);
 				pPlot->setImprovementType(NO_IMPROVEMENT);
+				pHousingCity->UpdateAllNonPlotYields();
 				pUnit->kill(true);
 			}
 			break;
@@ -2313,6 +2366,7 @@ void CvPlayerCulture::DoArchaeologyChoice (ArchaeologyChoiceType eChoice)
 				pHousingCity->GetCityBuildings()->SetBuildingGreatWork(eBuildingToHouse, iSlot, iGWindex);
 				pPlot->setImprovementType(NO_IMPROVEMENT);
 				pUnit->kill(true);
+				pHousingCity->UpdateAllNonPlotYields();
 			}
 			break;
 
@@ -2749,13 +2803,13 @@ int CvPlayerCulture::GetInfluencePerTurn(PlayerTypes ePlayer) const
 				iModifier = pLoopCity->GetCityCulture()->GetTourismMultiplier(kOtherPlayer.GetID(), false, false, false, false, false);
 			}
 
-			int iInfluenceToAdd = pLoopCity->GetCityCulture()->GetBaseTourism();
+			int iInfluenceToAdd = pLoopCity->GetBaseTourism();
 
 			// if we have the internet online, check to see if the opponent has the firewall
 			// if they have the firewall, deduct the internet bonus from them
 			if (iTechSpreadModifier > 0 && bTargetHasGreatFirewall)
 			{
-				int iInfluenceWithoutModifier = pLoopCity->GetCityCulture()->GetBaseTourismBeforeModifiers();
+				int iInfluenceWithoutModifier = pLoopCity->GetBaseTourismBeforeModifiers();
 				int iInfluenceWithTechModifier = iInfluenceWithoutModifier * iTechSpreadModifier;
 				iInfluenceToAdd -= (iInfluenceWithTechModifier / 100);
 			}
@@ -3170,7 +3224,7 @@ int CvPlayerCulture::GetTourism()
 		int iLoop;
 		for(pCity = m_pPlayer->firstCity(&iLoop); pCity != NULL; pCity = m_pPlayer->nextCity(&iLoop))
 		{
-			iRtnValue += pCity->GetCityCulture()->GetBaseTourism();
+			iRtnValue += pCity->GetBaseTourism();
 		}
 
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
@@ -4437,12 +4491,13 @@ GreatWorkSlotType CvCityCulture::GetSlotTypeFirstAvailableCultureBuilding() cons
 }
 
 /// Compute raw tourism from this city
-int CvCityCulture::GetBaseTourismBeforeModifiers()
+void CvCityCulture::CalculateBaseTourismBeforeModifiers()
 {
 	// If we're in Resistance, then no Tourism!
 	if(m_pCity->IsResistance() || m_pCity->IsRazing())
 	{
-		return 0;
+		m_pCity->SetBaseTourismBeforeModifiers(0);
+		return;
 	}
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
@@ -4559,14 +4614,20 @@ int CvCityCulture::GetBaseTourismBeforeModifiers()
 		}
 	}
 
-	return iBase;
+	m_pCity->SetBaseTourismBeforeModifiers(max(0, iBase));
+	return;
 }
 
 /// What is the tourism output ignoring player-specific modifiers?
-int CvCityCulture::GetBaseTourism()
+void CvCityCulture::CalculateBaseTourism()
 {
-	int iBase = GetBaseTourismBeforeModifiers();
-	int iModifier = m_pCity->getBaseYieldRateModifier(YIELD_TOURISM) - 100;
+	int iBase = m_pCity->GetBaseTourismBeforeModifiers() * 100;
+	if (iBase <= 0)
+	{
+		m_pCity->SetBaseTourism(0);
+		return;
+	}
+	int iModifier = 0;
 
 	CvPlayer &kPlayer = GET_PLAYER(m_pCity->getOwner());
 	int iTechSpreadModifier = kPlayer.GetInfluenceSpreadModifier();
@@ -4619,7 +4680,7 @@ int CvCityCulture::GetBaseTourism()
 		iBase = iBase * (100 + iModifier) / 100;
 	}
 
-	return iBase;
+	m_pCity->SetBaseTourism(max(0, iBase));
 }
 
 /// What is the tourism modifier for one player

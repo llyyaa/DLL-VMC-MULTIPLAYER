@@ -1600,12 +1600,17 @@ void CvCityCitizens::DoReallocateCitizens()
 		ChangeNumDefaultSpecialists(-1);
 	}
 
+
+
 	// Now put all of the unallocated guys back
 	int iNumToAllocate = GetNumUnassignedCitizens();
 	for(int iUnallocatedLoop = 0; iUnallocatedLoop < iNumToAllocate; iUnallocatedLoop++)
 	{
 		DoAddBestCitizenFromUnassigned();
 	}
+
+	// do a single update, but treat player happiness as constant
+	m_pCity->UpdateAllNonPlotYields();
 }
 
 
@@ -1707,6 +1712,8 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 				}
 			}
 		}
+
+		m_pCity->UpdateAllNonPlotYields();
 
 		if(GetCity()->isCitySelected())
 		{
@@ -2396,6 +2403,12 @@ void CvCityCitizens::DoAddSpecialistToBuilding(BuildingTypes eBuilding, bool bFo
 		GetCity()->UpdateReligion(GetCity()->GetCityReligions()->GetReligiousMajority());
 
 		ChangeNumUnassignedCitizens(-1);
+
+		//we added the first specialist, this may have religious effects
+		if (GetTotalSpecialistCount() == 1)
+		{
+			GetCity()->UpdateAllNonPlotYields();
+		}
 
 		ICvUserInterface2* pkIFace = GC.GetEngineUserInterface();
 		pkIFace->setDirty(GameData_DIRTY_BIT, true);

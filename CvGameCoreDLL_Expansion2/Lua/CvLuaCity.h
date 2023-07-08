@@ -565,6 +565,57 @@ protected:
 	LUAAPIEXTN(AddMessage, void, sMessage, iNotifyPlayer);
 #endif
 
+	static int lGetAdditionalFood(lua_State* L);
+	static int lSetAdditionalFood(lua_State* L);
+	static int lSetMadeAttack(lua_State* L);
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	
+	static int lGetOrganizedCrime(lua_State* L);
+	static int lSetOrganizedCrime(lua_State* L);
+	static int lHasOrganizedCrime(lua_State* L);
+
+	static int lChangeResistanceCounter(lua_State* L);
+	static int lSetResistanceCounter(lua_State* L);
+	static int lGetResistanceCounter(lua_State* L);
+
+	static int lChangePlagueCounter(lua_State* L);
+	static int lSetPlagueCounter(lua_State* L);
+	static int lGetPlagueCounter(lua_State* L);
+
+	static int lGetPlagueTurns(lua_State* L);
+	static int lChangePlagueTurns(lua_State* L);
+	static int lSetPlagueTurns(lua_State* L);
+
+	static int lGetPlagueType(lua_State* L);
+	static int lSetPlagueType(lua_State* L);
+	static int lHasPlague(lua_State* L);
+
+	static int lChangeLoyaltyCounter(lua_State* L);
+	static int lSetLoyaltyCounter(lua_State* L);
+	static int lGetLoyaltyCounter(lua_State* L);
+
+	static int lChangeDisloyaltyCounter(lua_State* L);
+	static int lSetDisloyaltyCounter(lua_State* L);
+	static int lGetDisloyaltyCounter(lua_State* L);
+
+	static int lGetLoyaltyState(lua_State* L);
+	static int lSetLoyaltyState(lua_State* L);
+	static int lHasLoyaltyState(lua_State* L);
+
+	static int lGetYieldModifierFromHealth(lua_State* L);
+	static int lSetYieldModifierFromHealth(lua_State* L);
+
+	static int lGetYieldModifierFromCrime(lua_State* L);
+	static int lSetYieldModifierFromCrime(lua_State* L);
+
+	static int lGetYieldFromHealth(lua_State* L);
+	static int lSetYieldFromHealth(lua_State* L);
+
+	static int lGetYieldFromCrime(lua_State* L);
+	static int lSetYieldFromCrime(lua_State* L);
+#endif
+
 #if defined(MOD_API_LUA_EXTENSIONS)
 	LUAAPIEXTN(HasBelief, bool, iBeliefType);
 	LUAAPIEXTN(HasBuilding, bool, iBuildingType);

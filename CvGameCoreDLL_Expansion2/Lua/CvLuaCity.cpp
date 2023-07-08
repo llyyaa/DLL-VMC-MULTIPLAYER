@@ -24,7 +24,7 @@
 using namespace CvLuaArgs;
 void CvLuaCity::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaCity::lKill);
-
+	REGIST_STATIC_FUNCTION(CvLuaCity::lSetMadeAttack);
 	REGIST_STATIC_FUNCTION(CvLuaCity::lClearOrderQueue);
 	REGIST_STATIC_FUNCTION(CvLuaCity::lClearWorkingOverride);
 	REGIST_STATIC_FUNCTION(CvLuaCity::lClearGreatWorks);
@@ -90,6 +90,57 @@ void CvLuaCity::RegistStaticFunctions() {
 //------------------------------------------------------------------------------
 void CvLuaCity::PushMethods(lua_State* L, int t)
 {
+	Method(GetAdditionalFood);
+	Method(SetAdditionalFood);
+	Method(SetMadeAttack);
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+
+	Method(GetOrganizedCrime);
+	Method(SetOrganizedCrime);
+	Method(HasOrganizedCrime);
+
+	Method(ChangeResistanceCounter);
+	Method(SetResistanceCounter);
+	Method(GetResistanceCounter);
+
+	Method(ChangePlagueCounter);
+	Method(SetPlagueCounter);
+	Method(GetPlagueCounter);
+
+	Method(GetPlagueTurns);
+	Method(ChangePlagueTurns);
+	Method(SetPlagueTurns);
+
+	Method(GetPlagueType);
+	Method(SetPlagueType);
+	Method(HasPlague);
+
+	Method(ChangeLoyaltyCounter);
+	Method(SetLoyaltyCounter);
+	Method(GetLoyaltyCounter);
+
+	Method(ChangeDisloyaltyCounter);
+	Method(SetDisloyaltyCounter);
+	Method(GetDisloyaltyCounter);
+
+	Method(GetLoyaltyState);
+	Method(SetLoyaltyState);
+	Method(HasLoyaltyState);
+
+	Method(GetYieldModifierFromHealth);
+	Method(SetYieldModifierFromHealth);
+
+	Method(GetYieldModifierFromCrime);
+	Method(SetYieldModifierFromCrime);
+
+	Method(GetYieldFromHealth);
+	Method(SetYieldFromHealth);
+
+	Method(GetYieldFromCrime);
+	Method(SetYieldFromCrime);
+#endif
+
 	Method(SendAndExecuteLuaFunction);
 	Method(SendAndExecuteLuaFunctionPostpone);
 
@@ -740,6 +791,272 @@ int CvLuaCity::lIsNone(lua_State* L)
 
 	return 1;
 }
+
+int CvLuaCity::lGetAdditionalFood(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iAdditionalFood = pkCity->GetAdditionalFood();
+	lua_pushinteger(L, iAdditionalFood);
+
+	return 1;
+}
+int CvLuaCity::lSetAdditionalFood(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iFood = lua_tointeger(L, 2);
+	pkCity->SetAdditionalFood(iFood);
+	return 1;
+}
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+int CvLuaCity::lSetMadeAttack(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const bool bNewValue = lua_toboolean(L, 2);
+
+	pkCity->setMadeAttack(bNewValue);
+	return 0;
+}
+
+int CvLuaCity::lGetOrganizedCrime(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	lua_pushinteger(L, pkCity->GetOrganizedCrime());
+	return 1;
+}
+int CvLuaCity::lSetOrganizedCrime(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->SetOrganizedCrime(iValue);
+	return 1;
+}
+int CvLuaCity::lHasOrganizedCrime(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+
+	lua_pushboolean(L, pkCity->HasOrganizedCrime());
+
+	return 1;
+}
+
+int CvLuaCity::lChangeResistanceCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->ChangeResistanceCounter(iValue);
+	return 1;
+}
+int CvLuaCity::lSetResistanceCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->SetResistanceCounter(iValue);
+	return 1;
+}
+int CvLuaCity::lGetResistanceCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	lua_pushinteger(L, pkCity->GetResistanceCounter());
+	return 1;
+}
+int CvLuaCity::lChangePlagueCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->ChangePlagueCounter(iValue);
+	return 1;
+}
+int CvLuaCity::lSetPlagueCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->SetPlagueCounter(iValue);
+	return 1;
+}
+int CvLuaCity::lGetPlagueCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	lua_pushinteger(L, pkCity->GetPlagueCounter());
+	return 1;
+}
+int CvLuaCity::lGetPlagueTurns(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	lua_pushinteger(L, pkCity->GetPlagueTurns());
+	return 1;
+}
+int CvLuaCity::lChangePlagueTurns(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->ChangePlagueTurns(iValue);
+	return 1;
+}
+int CvLuaCity::lSetPlagueTurns(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->SetPlagueTurns(iValue);
+	return 1;
+}
+
+int CvLuaCity::lGetPlagueType(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	lua_pushinteger(L, pkCity->GetPlagueType());
+	return 1;
+}
+int CvLuaCity::lSetPlagueType(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->SetPlagueType(iValue);
+	return 1;
+}
+int CvLuaCity::lHasPlague(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+
+	lua_pushboolean(L, pkCity->HasPlague());
+
+	return 1;
+}
+
+int CvLuaCity::lChangeLoyaltyCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->ChangeLoyaltyCounter(iValue);
+	return 1;
+}
+int CvLuaCity::lSetLoyaltyCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->SetLoyaltyCounter(iValue);
+	return 1;
+}
+int CvLuaCity::lGetLoyaltyCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	lua_pushinteger(L, pkCity->GetLoyaltyCounter());
+	return 1;
+}
+int CvLuaCity::lChangeDisloyaltyCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->ChangeDisloyaltyCounter(iValue);
+	return 1;
+}
+int CvLuaCity::lSetDisloyaltyCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	pkCity->SetDisloyaltyCounter(iValue);
+	return 1;
+}
+int CvLuaCity::lGetDisloyaltyCounter(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	lua_pushinteger(L, pkCity->GetDisloyaltyCounter());
+	return 1;
+}
+int CvLuaCity::lGetLoyaltyState(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int eLoyalty = pkCity->GetLoyaltyState();
+	lua_pushinteger(L, (LoyaltyStateTypes)eLoyalty);
+	return 1;
+}
+int CvLuaCity::lSetLoyaltyState(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const LoyaltyStateTypes eLoyalty = (LoyaltyStateTypes)lua_tointeger(L, 2);
+	pkCity->SetLoyaltyState((int)eLoyalty);
+	return 1;
+}
+
+int CvLuaCity::lHasLoyaltyState(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	const bool bValue = (pkCity->GetLoyaltyState() == iValue);
+	lua_pushboolean(L, bValue);
+
+	return 1;
+}
+
+int CvLuaCity::lGetYieldFromHealth(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	const int iValue = pkCity->GetYieldFromHealth(eYield);
+	lua_pushinteger(L, iValue);
+	return 1;
+}
+int CvLuaCity::lSetYieldFromHealth(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 3);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	pkCity->SetYieldFromHealth(eYield, iValue);
+	return 1;
+}
+
+int CvLuaCity::lGetYieldFromCrime(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	const int iValue = pkCity->GetYieldFromCrime(eYield);
+	lua_pushinteger(L, iValue);
+	return 1;
+}
+int CvLuaCity::lSetYieldFromCrime(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 3);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	pkCity->SetYieldFromCrime(eYield, iValue);
+	return 1;
+}
+//------------------------------------------------------------------------------
+int CvLuaCity::lGetYieldModifierFromHealth(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	const int iValue = pkCity->GetYieldModifierFromHealth(eYield);
+	lua_pushinteger(L, iValue);
+	return 1;
+}
+int CvLuaCity::lSetYieldModifierFromHealth(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 3);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	pkCity->SetYieldModifierFromHealth(eYield, iValue);
+	return 1;
+}
+
+int CvLuaCity::lGetYieldModifierFromCrime(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	const int iValue = pkCity->GetYieldModifierFromCrime(eYield);
+	lua_pushinteger(L, iValue);
+	return 1;
+}
+int CvLuaCity::lSetYieldModifierFromCrime(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 3);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	pkCity->SetYieldModifierFromCrime(eYield, iValue);
+	return 1;
+}
+#endif
+
 //------------------------------------------------------------------------------
 //void kill();
 int CvLuaCity::lKill(lua_State* L)
@@ -2542,7 +2859,7 @@ int CvLuaCity::lGetNumGreatWorkSlots(lua_State* L)
 int CvLuaCity::lGetBaseTourism(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
-	lua_pushinteger(L, pkCity->GetCityCulture()->GetBaseTourism());
+	lua_pushinteger(L, pkCity->GetBaseTourism());
 	return 1;
 }
 //------------------------------------------------------------------------------

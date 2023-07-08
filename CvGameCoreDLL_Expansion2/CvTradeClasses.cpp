@@ -3051,6 +3051,9 @@ bool CvPlayerTrade::CreateTradeRoute(CvCity* pOriginCity, CvCity* pDestCity, Dom
 			}
 			gDLL->TradeVisuals_NewRoute(iRouteIndex, m_pPlayer->GetID(),pTrade->m_aTradeConnections[iRouteIndex].m_eConnectionType, nPlots, plotsX, plotsY);
 			gDLL->TradeVisuals_UpdateRouteDirection(iRouteIndex, pTrade->m_aTradeConnections[iRouteIndex].m_bTradeUnitMovingForward);
+
+			pOriginCity->UpdateAllNonPlotYields();
+			pDestCity->UpdateAllNonPlotYields();
 		}
 	}
 
@@ -3467,6 +3470,13 @@ bool CvPlayerTrade::PlunderTradeRoute(int iTradeConnectionID)
 	{
 		return false;
 	}
+
+	if (pOriginCity != NULL && pDestCity != NULL)
+	{
+		pOriginCity->UpdateAllNonPlotYields();
+		pDestCity->UpdateAllNonPlotYields();
+	}
+
 
 #if defined(MOD_TRADE_ROUTE_SCALING)
 	int iPlunderGoldValue = GD_INT_GET(TRADE_ROUTE_BASE_PLUNDER_GOLD);

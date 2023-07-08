@@ -91,7 +91,14 @@ public:
 	bool canBeSelected() const;
 	void updateSelectedCity();
 
-	void updateYield();
+	void updateYield(bool bRecalcPlotYields = true);
+
+
+	void UpdateAllNonPlotYields();
+	void UpdateCityYields(YieldTypes eYield);
+	void SetStaticYield(YieldTypes eYield, int iValue);
+	int GetStaticYield(YieldTypes eYield) const;
+
 
 	bool IsIndustrialRouteToCapital() const;
 	void SetIndustrialRouteToCapital(bool bValue);
@@ -421,7 +428,7 @@ public:
 	void DoJONSCultureLevelIncrease();
 	int GetJONSCultureThreshold() const;
 
-	int getJONSCulturePerTurn() const;
+	int getJONSCulturePerTurn(bool bStatic = true) const;
 
 	int GetBaseJONSCulturePerTurn() const;
 
@@ -446,6 +453,10 @@ public:
 	int getCultureRateModifier() const;
 	void changeCultureRateModifier(int iChange);
 
+	void SetBaseTourism(int iValue);
+	int GetBaseTourism() const;
+	void SetBaseTourismBeforeModifiers(int iValue);
+	int GetBaseTourismBeforeModifiers() const;
 	// END Culture
 
 #if defined(MOD_API_EXTENSIONS)
@@ -453,7 +464,9 @@ public:
 	void changeTourismRateModifier(int iChange);
 #endif
 
-	int GetFaithPerTurn() const;
+
+	int GetFaithPerTurn(bool bStatic = true) const;
+
 	int GetFaithPerTurnFromBuildings() const;
 	void ChangeFaithPerTurnFromBuildings(int iChange);
 
@@ -683,8 +696,8 @@ public:
 #endif
 
 	int getBaseYieldRateModifier(YieldTypes eIndex, int iExtra = 0, CvString* toolTipSink = NULL) const;
-	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade) const;
-	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const;
+	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic = true) const;
+	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic = true) const;
 #if defined(MOD_PROCESS_STOCKPILE)
 	int getBasicYieldRateTimes100(const YieldTypes eIndex, const bool bIgnoreTrade, const bool bIgnoreFromOtherYield) const;
 #endif
@@ -1114,6 +1127,62 @@ public:
 	void ChangeCorruptionLevelChangeFromBuilding(int value);
 #endif
 
+	int GetAdditionalFood() const;
+	void SetAdditionalFood(int iValue);
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	bool IsColony() const;
+	void SetColony(bool bValue);
+
+
+	int GetOrganizedCrime() const;
+	void SetOrganizedCrime(int iValue);
+	bool HasOrganizedCrime();
+
+	void ChangeResistanceCounter(int iValue);
+	void SetResistanceCounter(int iValue);
+	int GetResistanceCounter() const;
+
+	void ChangePlagueCounter(int iValue);
+	void SetPlagueCounter(int iValue);
+	int GetPlagueCounter() const;
+
+	int GetPlagueTurns() const;
+	void ChangePlagueTurns(int iValue); //Set in city::doturn
+	void SetPlagueTurns(int iValue);
+
+;
+	int GetPlagueType() const;
+	void SetPlagueType(int iValue);
+	bool HasPlague();
+
+	void ChangeLoyaltyCounter(int iValue);
+	void SetLoyaltyCounter(int iValue);
+	int GetLoyaltyCounter() const;
+
+	void ChangeDisloyaltyCounter(int iValue);
+	void SetDisloyaltyCounter(int iValue);
+	int GetDisloyaltyCounter() const;
+
+	int GetLoyaltyState() const;
+	void SetLoyaltyState(int iLoyalty);
+
+
+	void SetYieldModifierFromHealth(YieldTypes eYield, int iValue);
+	int GetYieldModifierFromHealth(YieldTypes eYield) const;
+
+	void SetYieldModifierFromCrime(YieldTypes eYield, int iValue);
+	int GetYieldModifierFromCrime(YieldTypes eYield) const;
+
+
+	void SetYieldFromHealth(YieldTypes eYield, int iValue);
+	int GetYieldFromHealth(YieldTypes eYield) const;
+
+	void SetYieldFromCrime(YieldTypes eYield, int iValue);
+	int GetYieldFromCrime(YieldTypes eYield) const;
+#endif
+
 protected:
 	FAutoArchiveClassContainer<CvCity> m_syncArchive;
 
@@ -1336,6 +1405,27 @@ protected:
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 	int m_iSiegeKillCitizensModifier = 0;
+#endif
+
+	int m_iAdditionalFood;
+	int m_iBaseTourism;
+	int m_iBaseTourismBeforeModifiers;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	bool m_bIsColony;
+	int m_iOrganizedCrime;
+	int m_iResistanceCounter;
+	int m_iPlagueCounter;
+	int m_iPlagueTurns;
+	int m_iPlagueType;
+	int m_iLoyaltyCounter;
+	int m_iDisloyaltyCounter;
+	int m_iLoyaltyStateType;
+	std::vector<int> m_aiYieldModifierFromHealth;
+	std::vector<int> m_aiYieldModifierFromCrime;
+	std::vector<int> m_aiYieldFromHealth;
+	std::vector<int> m_aiYieldFromCrime;
+	std::vector<int> m_aiStaticCityYield;
 #endif
 
 	CvCityBuildings* m_pCityBuildings;
