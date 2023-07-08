@@ -39,6 +39,7 @@
 			<Type>YIELD_HEALTH</Type>
 			<Description>TXT_KEY_YIELD_HEALTH</Description>
 			<IconString>[ICON_CULTURE]</IconString>
+			<ImageTexture>YieldAtlas_128_Health.dds</ImageTexture>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
@@ -48,6 +49,7 @@
 			<Description>TXT_KEY_YIELD_DISEASE</Description>
 			<IconString>[ICON_CULTURE]</IconString>
 			<MinCity>0</MinCity>
+			<ImageTexture>YieldAtlas_128_Disease.dds</ImageTexture>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
 		<Row>
@@ -62,7 +64,7 @@
 			<ID>13</ID>
 			<Type>YIELD_LOYALTY</Type>
 			<Description>TXT_KEY_YIELD_LOYALTY</Description>
-			<IconString>[ICON_CULTURE]</IconString>
+			<IconString>[ICON_SILVER_FIST]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
