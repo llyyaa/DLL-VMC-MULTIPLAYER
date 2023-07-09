@@ -313,6 +313,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(IsHasBuildingClass);
 	Method(SetNumRealBuildingClass);
 #endif
+	Method(GetLocalBuildingClassYield);
+
 	Method(GetNumActiveBuilding);
 	Method(GetID);
 	Method(GetX);
@@ -2310,6 +2312,22 @@ int CvLuaCity::lIsHasBuildingClass(lua_State* L)
 	BuildingTypes eBuilding = pkPlayer.GetCivBuilding(eBuildingClassType);
 	lua_pushboolean(L, eBuilding == NO_BUILDING ? false : pkCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0);
 
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+int CvLuaCity::lGetLocalBuildingClassYield(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const BuildingClassTypes eBuildingClassType = (BuildingClassTypes)lua_tointeger(L, 2);
+	const YieldTypes eIndex = (YieldTypes)lua_tointeger(L, 3);
+	int iResult = 0;
+	if (eBuildingClassType != NO_BUILDINGCLASS && eIndex != NO_YIELD)
+	{
+		iResult = pkCity->getLocalBuildingClassYield(eBuildingClassType, eIndex);
+	}
+
+	lua_pushinteger(L, iResult);
 	return 1;
 }
 

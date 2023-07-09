@@ -20674,76 +20674,25 @@ int CvCity::GetYieldFromCrime(YieldTypes eYield) const
 #endif
 
 
-FDataStream& operator<<(FDataStream& saveTo, const SCityExtraYields& readFrom)
-{
-	saveTo << readFrom.forTerrain;
-	saveTo << readFrom.forXTerrain;
-	saveTo << readFrom.forTerrainFromBuildings;
-	saveTo << readFrom.forTerrainFromReligion;
-
-	saveTo << readFrom.forFeature;
-	saveTo << readFrom.forXFeature;
-	saveTo << readFrom.forFeatureFromBuildings;
-	saveTo << readFrom.forFeatureFromReligion;
-	saveTo << readFrom.forFeatureUnimproved;
-
-	saveTo << readFrom.forImprovement;
-	saveTo << readFrom.forSpecialist;
-	saveTo << readFrom.forResource;
-	saveTo << readFrom.forPlot;
-	saveTo << readFrom.forYield;
-	saveTo << readFrom.forActualYield;
-	saveTo << readFrom.forLocalBuilding;
-	saveTo << readFrom.forReligionBuilding;
-	return saveTo;
-}
-FDataStream& operator>>(FDataStream& loadFrom, SCityExtraYields& writeTo)
-{
-	loadFrom >> writeTo.forTerrain;
-	loadFrom >> writeTo.forXTerrain;
-	loadFrom >> writeTo.forTerrainFromBuildings;
-	loadFrom >> writeTo.forTerrainFromReligion;
-
-	loadFrom >> writeTo.forFeature;
-	loadFrom >> writeTo.forXFeature;
-	loadFrom >> writeTo.forFeatureFromBuildings;
-	loadFrom >> writeTo.forFeatureFromReligion;
-	loadFrom >> writeTo.forFeatureUnimproved;
-
-	loadFrom >> writeTo.forImprovement;
-	loadFrom >> writeTo.forSpecialist;
-	loadFrom >> writeTo.forResource;
-	loadFrom >> writeTo.forPlot;
-	loadFrom >> writeTo.forYield;
-	loadFrom >> writeTo.forActualYield;
-	loadFrom >> writeTo.forLocalBuilding;
-	loadFrom >> writeTo.forReligionBuilding;
-	return loadFrom;
-}
-
-
-
-
-//	--------------------------------------------------------------------------------
-
+#if defined(MOD_ROG_CORE)
 //	--------------------------------------------------------------------------------
 int CvCity::GetNearbyMountains() const
 {
 	VALIDATE_OBJECT
-	return m_iNumNearbyMountains;
+		return m_iNumNearbyMountains;
 }
 
 //	--------------------------------------------------------------------------------
 void CvCity::ChangeNearbyMountains(int iChange)
 {
 	VALIDATE_OBJECT
-	SetNearbyMountains(GetNearbyMountains() + iChange);
+		SetNearbyMountains(GetNearbyMountains() + iChange);
 }
 //	--------------------------------------------------------------------------------
 void CvCity::SetNearbyMountains(int iValue)
 {
 	VALIDATE_OBJECT
-	m_iNumNearbyMountains = iValue;
+		m_iNumNearbyMountains = iValue;
 }
 
 void CvCity::UpdateYieldPerXTerrain(YieldTypes eYield, TerrainTypes eTerrain)
@@ -20890,7 +20839,7 @@ void CvCity::ChangeNumFeatureWorked(FeatureTypes eFeature, int iChange)
 void CvCity::SetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield, int iValue)
 {
 	VALIDATE_OBJECT
-	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+		CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	SCityExtraYields& y = m_yieldChanges[eYield];
@@ -20903,7 +20852,7 @@ void CvCity::SetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield, int i
 int CvCity::GetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield) const
 {
 	VALIDATE_OBJECT
-	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+		CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	return ModifierLookup(m_yieldChanges[eYield].forXTerrain, eTerrain);
@@ -20914,7 +20863,7 @@ int CvCity::GetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield) const
 int CvCity::GetYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, YieldTypes eYield) const
 {
 	VALIDATE_OBJECT
-	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+		CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	return ModifierLookup(m_yieldChanges[eYield].forTerrainFromBuildings, eTerrain);
@@ -20924,7 +20873,7 @@ int CvCity::GetYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, Yiel
 void CvCity::ChangeYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, YieldTypes eYield, int iChange)
 {
 	VALIDATE_OBJECT
-	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+		CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	SCityExtraYields& y = m_yieldChanges[eYield];
@@ -20937,7 +20886,7 @@ void CvCity::ChangeYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, 
 int CvCity::GetYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, YieldTypes eYield) const
 {
 	VALIDATE_OBJECT
-	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
+		CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	return ModifierLookup(m_yieldChanges[eYield].forFeatureFromBuildings, eFeature);
@@ -20947,7 +20896,7 @@ int CvCity::GetYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, Yiel
 void CvCity::ChangeYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, YieldTypes eYield, int iChange)
 {
 	VALIDATE_OBJECT
-	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
+		CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	SCityExtraYields& y = m_yieldChanges[eYield];
@@ -20963,7 +20912,7 @@ void CvCity::ChangeYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, 
 int CvCity::GetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield) const
 {
 	VALIDATE_OBJECT
-	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Terrain index.");
+		CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	return ModifierLookup(m_yieldChanges[eYield].forXFeature, eFeature);
@@ -20974,7 +20923,7 @@ int CvCity::GetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield) const
 void CvCity::SetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield, int iValue)
 {
 	VALIDATE_OBJECT
-	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
+		CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
 	SCityExtraYields& y = m_yieldChanges[eYield];
@@ -20985,7 +20934,7 @@ void CvCity::SetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield, int i
 void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 {
 	VALIDATE_OBJECT
-	int iYieldBase = 0;
+		int iYieldBase = 0;
 	int iYieldReligion = 0;
 
 	int iValidTiles = 0;
@@ -21053,7 +21002,7 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 			}
 			else
 				bTest = true;
-	
+
 			if (bTest)
 			{
 				iValidTiles = GetNumFeatureWorked(eFeature);
@@ -21080,6 +21029,57 @@ void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
 		}
 	}
 }
+#endif
+
+
+FDataStream& operator<<(FDataStream& saveTo, const SCityExtraYields& readFrom)
+{
+	saveTo << readFrom.forTerrain;
+	saveTo << readFrom.forXTerrain;
+	saveTo << readFrom.forTerrainFromBuildings;
+	saveTo << readFrom.forTerrainFromReligion;
+
+	saveTo << readFrom.forFeature;
+	saveTo << readFrom.forXFeature;
+	saveTo << readFrom.forFeatureFromBuildings;
+	saveTo << readFrom.forFeatureFromReligion;
+	saveTo << readFrom.forFeatureUnimproved;
+
+	saveTo << readFrom.forImprovement;
+	saveTo << readFrom.forSpecialist;
+	saveTo << readFrom.forResource;
+	saveTo << readFrom.forPlot;
+	saveTo << readFrom.forYield;
+	saveTo << readFrom.forActualYield;
+	saveTo << readFrom.forLocalBuilding;
+	saveTo << readFrom.forReligionBuilding;
+	return saveTo;
+}
+FDataStream& operator>>(FDataStream& loadFrom, SCityExtraYields& writeTo)
+{
+	loadFrom >> writeTo.forTerrain;
+	loadFrom >> writeTo.forXTerrain;
+	loadFrom >> writeTo.forTerrainFromBuildings;
+	loadFrom >> writeTo.forTerrainFromReligion;
+
+	loadFrom >> writeTo.forFeature;
+	loadFrom >> writeTo.forXFeature;
+	loadFrom >> writeTo.forFeatureFromBuildings;
+	loadFrom >> writeTo.forFeatureFromReligion;
+	loadFrom >> writeTo.forFeatureUnimproved;
+
+	loadFrom >> writeTo.forImprovement;
+	loadFrom >> writeTo.forSpecialist;
+	loadFrom >> writeTo.forResource;
+	loadFrom >> writeTo.forPlot;
+	loadFrom >> writeTo.forYield;
+	loadFrom >> writeTo.forActualYield;
+	loadFrom >> writeTo.forLocalBuilding;
+	loadFrom >> writeTo.forReligionBuilding;
+	return loadFrom;
+}
+
+
 
 
 

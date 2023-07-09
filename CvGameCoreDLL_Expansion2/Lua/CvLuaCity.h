@@ -191,6 +191,7 @@ protected:
 	LUAAPIEXTN(IsHasBuildingClass, bool, iBuildingClassType);
 	LUAAPIEXTN(SetNumRealBuildingClass, int, iBuildingClassType, iNum);
 #endif
+	static int lGetLocalBuildingClassYield(lua_State* L);
 	static int lGetNumActiveBuilding(lua_State* L);
 	static int lGetID(lua_State* L);
 	static int lGetX(lua_State* L);
