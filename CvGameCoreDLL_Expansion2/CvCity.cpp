@@ -113,6 +113,54 @@ void ClearCityDeltas()
 }
 }
 
+//helper function for managing extra yields
+template <typename T>
+bool ModifierUpdateInsertRemove(vector<pair<T, int>>& container, T key, int value, bool modifyExisting)
+{
+	for (typename vector<pair<T, int>>::iterator it = container.begin(); it != container.end(); ++it)
+	{
+		if (it->first == key)
+		{
+			if (modifyExisting && value != 0)
+			{
+				it->second += value;
+				if (it->second == 0)
+					container.erase(it);
+				return true; //update was made
+			}
+
+			if (!modifyExisting && value != it->second)
+			{
+				it->second = value;
+				if (it->second == 0)
+					container.erase(it);
+				return true; //update was made
+			}
+
+			return false; //no change
+		}
+	}
+
+	//if we're here we don't have an entry yet
+	if (value != 0)
+	{
+		container.push_back(make_pair(key, value));
+		return true; //update was made
+	}
+
+	return false;
+}
+
+template <typename T>
+int ModifierLookup(const vector<pair<T, int>>& container, T key)
+{
+	for (typename vector<pair<T, int>>::const_iterator it = container.begin(); it != container.end(); ++it)
+		if (it->first == key)
+			return it->second;
+
+	return 0;
+}
+
 void CvCity::ExtractToArg(BasicArguments* arg) {
 	arg->set_argtype("CvCity");
 	arg->set_identifier1(getOwner());
@@ -138,6 +186,8 @@ CvCity* CvCity::Provide(PlayerTypes player, int cityID) {
 	if (!rtn) throw NetworkMessageNullPointerExceptopn("CvCity", player, cityID);
 	return rtn;
 }
+
+
 
 //	--------------------------------------------------------------------------------
 // Public Functions...
@@ -193,7 +243,6 @@ CvCity::CvCity() :
 	, m_iJONSCulturePerTurnFromPolicies("CvCity::m_iJONSCulturePerTurnFromPolicies", m_syncArchive)
 	, m_iJONSCulturePerTurnFromSpecialists("CvCity::m_iJONSCulturePerTurnFromSpecialists", m_syncArchive)
 	, m_iJONSCulturePerTurnFromReligion("CvCity::m_iJONSCulturePerTurnFromReligion", m_syncArchive)
-	, m_iFaithPerTurnFromBuildings(0)
 	, m_iFaithPerTurnFromPolicies(0)
 	, m_iFaithPerTurnFromReligion(0)
 	, m_iCultureRateModifier("CvCity::m_iCultureRateModifier", m_syncArchive)
@@ -307,21 +356,7 @@ CvCity::CvCity() :
 	, m_strName("")
 	, m_orderQueue()
 	, m_aaiBuildingSpecialistUpgradeProgresses(0)
-	, m_ppaiResourceYieldChange(0)
-	, m_ppaiFeatureYieldChange(0)
-	, m_ppaiTerrainYieldChange(0)
-#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
-	, m_ppaiPlotYieldChange(0)	
-#endif
-
 	, m_aiYieldFromProcessModifier("CvCity::m_aiYieldFromProcessModifier", m_syncArchive)
-
-
-#if defined(MOD_ROG_CORE)
-	, m_ppaaiImprovementYieldChange(0)
-	, m_ppiSpecialistYieldChange(0)
-#endif
-
 
 	, m_pCityBuildings(FNEW(CvCityBuildings, c_eCiv5GameplayDLL, 0))
 	, m_pCityStrategyAI(FNEW(CvCityStrategyAI, c_eCiv5GameplayDLL, 0))
@@ -338,9 +373,15 @@ CvCity::CvCity() :
 	, m_aiYieldRank("CvCity::m_aiYieldRank", m_syncArchive)
 	, m_abYieldRankValid("CvCity::m_abYieldRankValid", m_syncArchive)
 	, m_bOwedCultureBuilding(false)
+
+	, m_yieldChanges(NUM_YIELD_TYPES)
+
 #if defined(MOD_BUGFIX_FREE_FOOD_BUILDING)
 	, m_bOwedFoodBuilding(false)
 #endif
+		, m_paiNumTerrainWorked()
+		, m_paiNumFeatureWorked()
+		, m_iNumNearbyMountains()
 		, m_iAdditionalFood()
 		, m_iBaseTourism()
 		, m_iBaseTourismBeforeModifiers()
@@ -896,65 +937,6 @@ void CvCity::uninit()
 	}
 	SAFE_DELETE_ARRAY(m_aaiBuildingSpecialistUpgradeProgresses);
 
-	if(m_ppaiResourceYieldChange)
-	{
-		for(int i=0; i < GC.getNumResourceInfos(); i++)
-		{
-			SAFE_DELETE_ARRAY(m_ppaiResourceYieldChange[i]);
-		}
-	}
-	SAFE_DELETE_ARRAY(m_ppaiResourceYieldChange);
-
-	if(m_ppaiFeatureYieldChange)
-	{
-		for(int i=0; i < GC.getNumFeatureInfos(); i++)
-		{
-			SAFE_DELETE_ARRAY(m_ppaiFeatureYieldChange[i]);
-		}
-	}
-	SAFE_DELETE_ARRAY(m_ppaiFeatureYieldChange);
-
-	if(m_ppaiTerrainYieldChange)
-	{
-		for(int i=0; i < GC.getNumTerrainInfos(); i++)
-		{
-			SAFE_DELETE_ARRAY(m_ppaiTerrainYieldChange[i]);
-		}
-	}
-	SAFE_DELETE_ARRAY(m_ppaiTerrainYieldChange);
-
-#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
-	if(m_ppaiPlotYieldChange)
-	{
-		for(int i=0; i < GC.getNumPlotInfos(); i++)
-		{
-			SAFE_DELETE_ARRAY(m_ppaiPlotYieldChange[i]);
-		}
-	}
-	SAFE_DELETE_ARRAY(m_ppaiPlotYieldChange);
-#endif
-
-
-#if defined(MOD_ROG_CORE) 
-	if (m_ppaaiImprovementYieldChange)
-	{
-		for (int i = 0; i < GC.getNumImprovementInfos(); i++)
-		{
-			SAFE_DELETE_ARRAY(m_ppaaiImprovementYieldChange[i]);
-		}
-	}
-	SAFE_DELETE_ARRAY(m_ppaaiImprovementYieldChange);
-
-
-	if (m_ppiSpecialistYieldChange)
-	{
-		for (int i = 0; i < GC.getNumSpecialistInfos(); i++)
-		{
-			SAFE_DELETE_ARRAY(m_ppiSpecialistYieldChange[i]);
-		}
-	}
-	SAFE_DELETE_ARRAY(m_ppiSpecialistYieldChange);
-#endif
 
 	m_pCityBuildings->Uninit();
 	m_pCityStrategyAI->Uninit();
@@ -968,6 +950,8 @@ void CvCity::uninit()
 #if defined(MOD_ROG_CORE) 
 	m_aiYieldPerPopInEmpire.clear();
 #endif
+
+	m_yieldChanges.clear();
 }
 
 //	--------------------------------------------------------------------------------
@@ -996,6 +980,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iAutomatons = 0;
 #endif
 
+	m_iNumNearbyMountains = 0;
 	m_iAdditionalFood = 0;
 	m_iBaseTourism = 0;
 	m_iBaseTourismBeforeModifiers = 0;
@@ -1031,7 +1016,6 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iJONSCulturePerTurnFromPolicies = 0;
 	m_iJONSCulturePerTurnFromSpecialists = 0;
 	m_iJONSCulturePerTurnFromReligion = 0;
-	m_iFaithPerTurnFromBuildings = 0;
 	m_iFaithPerTurnFromPolicies = 0;
 	m_iFaithPerTurnFromReligion = 0;
 	m_iCultureRateModifier = 0;
@@ -1252,6 +1236,26 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #endif
 		}
 
+
+		int iNumTerrainInfos = GC.getNumTerrainInfos();
+		int iNumFeatureInfos = GC.getNumFeatureInfos();
+		int iNumResourceInfos = GC.getNumResourceInfos();
+
+		m_paiNumTerrainWorked.clear();
+		m_paiNumTerrainWorked.resize(iNumTerrainInfos);
+		for (iI = 0; iI < iNumTerrainInfos; iI++)
+		{
+			m_paiNumTerrainWorked[iI] = 0;
+		}
+
+		m_paiNumFeatureWorked.clear();
+		m_paiNumFeatureWorked.resize(iNumFeatureInfos);
+		for (iI = 0; iI < iNumFeatureInfos; iI++)
+		{
+			m_paiNumFeatureWorked[iI] = 0;
+		}
+
+
 		int iNumProjectInfos = GC.getNumProjectInfos();
 		m_paiProjectProduction.clear();
 		m_paiProjectProduction.resize(iNumProjectInfos);
@@ -1345,84 +1349,9 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 			}
 		}
 
-		int iNumResourceInfos = GC.getNumResourceInfos();
-		CvAssertMsg(m_ppaiResourceYieldChange==NULL, "about to leak memory, CvCity::m_ppaiResourceYieldChange");
-		m_ppaiResourceYieldChange = FNEW(int*[iNumResourceInfos], c_eCiv5GameplayDLL, 0);
-		for(iI = 0; iI < iNumResourceInfos; iI++)
-		{
-			m_ppaiResourceYieldChange[iI] = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
-			for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
-			{
-				m_ppaiResourceYieldChange[iI][iJ] = 0;
-			}
-		}
-
-
-#if defined(MOD_ROG_CORE)
-		//int iNumImprovementInfos = GC.getNumImprovementInfos();
-		CvAssertMsg(m_ppaaiImprovementYieldChange == NULL, "about to leak memory, CvCity::m_ppaaiImprovementYieldChange");
-		m_ppaaiImprovementYieldChange = FNEW(int* [iNumImprovementInfos], c_eCiv5GameplayDLL, 0);
-		for (iI = 0; iI < iNumImprovementInfos; iI++)
-		{
-			m_ppaaiImprovementYieldChange[iI] = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
-			for (iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
-			{
-				m_ppaaiImprovementYieldChange[iI][iJ] = 0;
-			}
-		}
-
-		//int iNumSpecialistInfos = GC.getNumSpecialistInfos();
-		CvAssertMsg(m_ppiSpecialistYieldChange == NULL, "about to leak memory, CvCity::m_ppiSpecialistYieldChange");
-		m_ppiSpecialistYieldChange = FNEW(int* [iNumSpecialistInfos], c_eCiv5GameplayDLL, 0);
-		for (iI = 0; iI < iNumSpecialistInfos; iI++)
-		{
-			m_ppiSpecialistYieldChange[iI] = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
-			for (iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
-			{
-				m_ppiSpecialistYieldChange[iI][iJ] = 0;
-			}
-		}
-#endif
-
-
-		int iNumFeatureInfos = GC.getNumFeatureInfos();
-		CvAssertMsg(m_ppaiFeatureYieldChange==NULL, "about to leak memory, CvCity::m_ppaiFeatureYieldChange");
-		m_ppaiFeatureYieldChange = FNEW(int*[iNumFeatureInfos], c_eCiv5GameplayDLL, 0);
-		for(iI = 0; iI < iNumFeatureInfos; iI++)
-		{
-			m_ppaiFeatureYieldChange[iI] = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
-			for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
-			{
-				m_ppaiFeatureYieldChange[iI][iJ] = 0;
-			}
-		}
-
-		int iNumTerrainInfos = GC.getNumTerrainInfos();
-		CvAssertMsg(m_ppaiTerrainYieldChange==NULL, "about to leak memory, CvCity::m_ppaiTerrainYieldChange");
-		m_ppaiTerrainYieldChange = FNEW(int*[iNumTerrainInfos], c_eCiv5GameplayDLL, 0);
-		for(iI = 0; iI < iNumTerrainInfos; iI++)
-		{
-			m_ppaiTerrainYieldChange[iI] = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
-			for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
-			{
-				m_ppaiTerrainYieldChange[iI][iJ] = 0;
-			}
-		}
-
-#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
-		int iNumPlotInfos = GC.getNumPlotInfos();
-		CvAssertMsg(m_ppaiPlotYieldChange==NULL, "about to leak memory, CvCity::m_ppaiPlotYieldChange");
-		m_ppaiPlotYieldChange = FNEW(int*[iNumPlotInfos], c_eCiv5GameplayDLL, 0);
-		for(iI = 0; iI < iNumPlotInfos; iI++)
-		{
-			m_ppaiPlotYieldChange[iI] = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
-			for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
-			{
-				m_ppaiPlotYieldChange[iI][iJ] = 0;
-			}
-		}
-#endif
 	}
+
+	m_yieldChanges = vector<SCityExtraYields>(NUM_YIELD_TYPES);
 
 	if(!bConstructorCall)
 	{
@@ -3552,8 +3481,7 @@ int CvCity::GetResourceExtraYield(ResourceTypes eResource, YieldTypes eYield) co
 	VALIDATE_OBJECT
 	CvAssertMsg(eResource > -1 && eResource < GC.getNumResourceInfos(), "Invalid resource index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
-
-	return m_ppaiResourceYieldChange[eResource][eYield];
+	return ModifierLookup(m_yieldChanges[eYield].forResource, eResource);
 }
 
 //	--------------------------------------------------------------------------------
@@ -3563,12 +3491,9 @@ void CvCity::ChangeResourceExtraYield(ResourceTypes eResource, YieldTypes eYield
 	CvAssertMsg(eResource > -1 && eResource < GC.getNumResourceInfos(), "Invalid resource index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
-	if(iChange != 0)
-	{
-		m_ppaiResourceYieldChange[eResource][eYield] += iChange;
-
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forResource, eResource, iChange, true))
 		updateYield();
-	}
 }
 
 
@@ -3577,12 +3502,10 @@ void CvCity::ChangeResourceExtraYield(ResourceTypes eResource, YieldTypes eYield
 /// Extra yield for a improvement this city is working?
 int CvCity::GetImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield) const
 {
-
 	VALIDATE_OBJECT
 	CvAssertMsg(eImprovement > -1 && eImprovement < GC.getNumImprovementInfos(), "eImprovement is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
-
-	return m_ppaaiImprovementYieldChange[eImprovement][eYield];
+	return ModifierLookup(m_yieldChanges[eYield].forImprovement, eImprovement);
 
 }
 
@@ -3592,13 +3515,9 @@ void CvCity::ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldTyp
 	VALIDATE_OBJECT
 	CvAssertMsg(eImprovement > -1 && eImprovement < GC.getNumImprovementInfos(), "eImprovement is expected to be within maximum bounds (invalid Index)");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
-
-	if (iChange != 0)
-	{
-		m_ppaaiImprovementYieldChange[eImprovement][eYield] += iChange;
-
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forImprovement, eImprovement, iChange, true))
 		updateYield();
-	}
 
 }
 #endif
@@ -3610,8 +3529,7 @@ int CvCity::GetFeatureExtraYield(FeatureTypes eFeature, YieldTypes eYield) const
 	VALIDATE_OBJECT
 	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
-
-	return m_ppaiFeatureYieldChange[eFeature][eYield];
+	return ModifierLookup(m_yieldChanges[eYield].forFeature, eFeature);
 }
 
 //	--------------------------------------------------------------------------------
@@ -3621,12 +3539,9 @@ void CvCity::ChangeFeatureExtraYield(FeatureTypes eFeature, YieldTypes eYield, i
 	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
-	if(iChange != 0)
-	{
-		m_ppaiFeatureYieldChange[eFeature][eYield] += iChange;
-
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forFeature, eFeature, iChange, true))
 		updateYield();
-	}
 }
 
 //	--------------------------------------------------------------------------------
@@ -3636,8 +3551,7 @@ int CvCity::GetTerrainExtraYield(TerrainTypes eTerrain, YieldTypes eYield) const
 	VALIDATE_OBJECT
 	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
-
-	return m_ppaiTerrainYieldChange[eTerrain][eYield];
+	return ModifierLookup(m_yieldChanges[eYield].forTerrain, eTerrain);
 }
 
 //	--------------------------------------------------------------------------------
@@ -3647,12 +3561,9 @@ void CvCity::ChangeTerrainExtraYield(TerrainTypes eTerrain, YieldTypes eYield, i
 	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
 	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
 
-	if(iChange != 0)
-	{
-		m_ppaiTerrainYieldChange[eTerrain][eYield] += iChange;
-
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forTerrain, eTerrain, iChange, true))
 		updateYield();
-	}
 }
 
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
@@ -3660,32 +3571,15 @@ void CvCity::ChangeTerrainExtraYield(TerrainTypes eTerrain, YieldTypes eYield, i
 /// Extra yield for a Plot this city is working?
 int CvCity::GetPlotExtraYield(PlotTypes ePlot, YieldTypes eYield) const
 {
-	VALIDATE_OBJECT
-	if (MOD_API_PLOT_YIELDS) {
-		CvAssertMsg(ePlot > -1 && ePlot < GC.getNumPlotInfos(), "Invalid Plot index.");
-		CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
-
-		return m_ppaiPlotYieldChange[ePlot][eYield];
-	} else {
-		return 0;
-	}
+	return ModifierLookup(m_yieldChanges[eYield].forPlot, ePlot);
 }
 
 //	--------------------------------------------------------------------------------
 void CvCity::ChangePlotExtraYield(PlotTypes ePlot, YieldTypes eYield, int iChange)
 {
-	VALIDATE_OBJECT
-	if (MOD_API_PLOT_YIELDS) {
-		CvAssertMsg(ePlot > -1 && ePlot < GC.getNumPlotInfos(), "Invalid Plot index.");
-		CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
-
-		if(iChange != 0)
-		{
-			m_ppaiPlotYieldChange[ePlot][eYield] += iChange;
-
-			updateYield();
-		}
-	}
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forPlot, ePlot, iChange, true))
+		updateYield();
 }
 #endif
 
@@ -3834,7 +3728,7 @@ void CvCity::ChangeNumResourceLocal(ResourceTypes eResource, int iChange)
 #if defined(MOD_BUGFIX_MINOR)
 						iCulture *= GetCityBuildings()->GetNumBuilding(eBuilding);
 #endif
-						ChangeJONSCulturePerTurnFromBuildings(iCulture * iChange);
+						ChangeBaseYieldRateFromBuildings(YIELD_CULTURE, iCulture * iChange);
 
 					// Does eBuilding give faith with eResource?
 					int iFaith = pkBuildingInfo->GetResourceFaithChange(eResource);
@@ -3843,7 +3737,7 @@ void CvCity::ChangeNumResourceLocal(ResourceTypes eResource, int iChange)
 #if defined(MOD_BUGFIX_MINOR)
 						iFaith *= GetCityBuildings()->GetNumBuilding(eBuilding);
 #endif
-						ChangeFaithPerTurnFromBuildings(iFaith * iChange);
+					ChangeBaseYieldRateFromBuildings(YIELD_FAITH, iFaith * iChange);
 				}
 			}
 		}
@@ -6770,6 +6664,7 @@ void CvCity::conscript()
 	}
 }
 
+
 //	--------------------------------------------------------------------------------
 int CvCity::getResourceYieldRateModifier(YieldTypes eIndex, ResourceTypes eResource) const
 {
@@ -7118,7 +7013,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		{
 			iBuildingCulture += owningPlayer.GetPlayerTraits()->GetCultureBuildingYieldChange();
 		}
-		ChangeJONSCulturePerTurnFromBuildings(iBuildingCulture * iChange);
+
+		ChangeBaseYieldRateFromBuildings(YIELD_CULTURE, iBuildingCulture* iChange);
+
 		changeCultureRateModifier(pBuildingInfo->GetCultureRateModifier() * iChange);
 		changePlotCultureCostModifier(pBuildingInfo->GetPlotCultureCostModifier() * iChange);
 		changePlotBuyCostModifier(pBuildingInfo->GetPlotBuyCostModifier() * iChange);
@@ -7130,8 +7027,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		changeCityAutomatonWorkersChange(pBuildingInfo->GetCityAutomatonWorkersChange() * iChange);
 #endif
 
-		int iBuildingFaith = pBuildingInfo->GetYieldChange(YIELD_FAITH);
-		ChangeFaithPerTurnFromBuildings(iBuildingFaith * iChange);
+
 		m_pCityReligions->ChangeReligiousPressureModifier(pBuildingInfo->GetReligiousPressureModifier() * iChange);
 
 		PolicyTypes ePolicy;
@@ -7166,8 +7062,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		ChangeTradeRouteTargetBonus(pBuildingInfo->GetTradeRouteTargetBonus() * iChange);
 		ChangeTradeRouteRecipientBonus(pBuildingInfo->GetTradeRouteRecipientBonus() * iChange);
 		
-#if defined(MOD_ROG_CORE)
-		// Hurries
+
 		for (int iI = 0; iI < GC.getNumSpecialistInfos(); iI++)
 		{
 			for (int iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
@@ -7175,7 +7070,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				changeSpecialistExtraYield(((SpecialistTypes)iI), ((YieldTypes)iJ), (pBuildingInfo->GetSpecialistYieldChangeLocal(iI, iJ) * iChange));
 			}
 		}
-#endif
+
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 		ChangeSiegeKillCitizensModifier(pBuildingInfo->GetSiegeKillCitizensModifier() * iChange);
@@ -7215,12 +7110,12 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				owningPlayer.changeNumResourceTotal(eResource, iNumResource);
 			}
 
-#if defined(MOD_ROG_CORE)
-			if (MOD_ROG_CORE && (pBuildingInfo->GetResourceQuantityFromPOP(iResourceLoop) > 0))
+
+			if ((pBuildingInfo->GetResourceQuantityFromPOP(iResourceLoop) > 0))
 			{
 				ChangeResourceQuantityFromPOP(eResource, pBuildingInfo->GetResourceQuantityFromPOP(iResourceLoop) * iChange);
 			}
-#endif
+
 
 			// Do we have this resource local?
 			if(IsHasResourceLocal(eResource, /*bTestVisible*/ false))
@@ -7230,7 +7125,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 				if(iCulture != 0)
 				{
-					ChangeJONSCulturePerTurnFromBuildings(iCulture * m_paiNumResourcesLocal[eResource]);
+					ChangeBaseYieldRateFromBuildings(YIELD_CULTURE, iCulture * m_paiNumResourcesLocal[eResource]);
 				}
 
 				// What about faith?
@@ -7238,7 +7133,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 				if(iFaith != 0)
 				{
-					ChangeFaithPerTurnFromBuildings(iFaith * m_paiNumResourcesLocal[eResource]);
+					ChangeBaseYieldRateFromBuildings(YIELD_FAITH, iFaith* m_paiNumResourcesLocal[eResource]);
 				}
 			}
 		}
@@ -7351,18 +7246,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			int iTraitBuildingClassBonus = owningPlayer.GetPlayerTraits()->GetBuildingClassYieldChange(eBuildingClass, eYield);
 			if(iTraitBuildingClassBonus > 0)
 			{
-				if(eYield == YIELD_CULTURE)
-				{
-					ChangeJONSCulturePerTurnFromBuildings(iTraitBuildingClassBonus * iChange);
-				}
-				else if(eYield == YIELD_FAITH)
-				{
-					ChangeFaithPerTurnFromBuildings(iTraitBuildingClassBonus * iChange);
-				}
-				else
-				{
 					ChangeBaseYieldRateFromBuildings(eYield, iTraitBuildingClassBonus * iChange);
-				}
 			}
 #endif
 
@@ -7389,7 +7273,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 					if (pkLocalBuilding)
 					{
 	
-						int iYieldChange = 0;
+						//int iYieldChange = 0;
+
+						int iYieldChange = pBuildingInfo->GetBuildingClassLocalYieldChange(iJ, iI);
 
 						if (isWorldWonderClass(*pkBuildingClassLocalInfo) && pBuildingInfo->GetYieldChangeWorldWonder(iI) != 0)
 						{
@@ -7399,7 +7285,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 						if (iYieldChange != 0)
 						{
 							m_pCityBuildings->ChangeBuildingYieldChange(eBuildingClassLocal, eYield, (iYieldChange * iChange));
-							//changeLocalBuildingClassYield(eBuildingClassLocal, eYield, (iYieldChange* iChange));
+							changeLocalBuildingClassYield(eBuildingClassLocal, eYield, (iYieldChange* iChange));
 						}
 					}
 				}
@@ -7410,31 +7296,17 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 #if defined(MOD_API_UNIFIED_YIELDS)
 			if (pkBuildingClassInfo && isWorldWonderClass(*pkBuildingClassInfo))
 			{
-
+				ChangeBaseYieldRateFromBuildings(eYield, GetPlayer()->GetYieldChangeWorldWonder(eYield) * iChange);
+				ChangeBaseYieldRateFromBuildings(eYield, GetPlayer()->GetPlayerTraits()->GetYieldChangeWorldWonder(eYield) * iChange);
 
 #if defined(MOD_ROG_CORE)
 				int iGlobalWonderBonus = owningPlayer.GetWorldWonderYieldChange(iI);
 				if (iGlobalWonderBonus != 0)
 				{
 					m_pCityBuildings->ChangeBuildingYieldChange(eBuildingClass, eYield, (iGlobalWonderBonus * iChange));
+					changeLocalBuildingClassYield(eBuildingClass, eYield, (iGlobalWonderBonus * iChange));
 				}
 #endif
-
-				if(eYield == YIELD_CULTURE)
-				{
-					ChangeJONSCulturePerTurnFromBuildings(GetPlayer()->GetYieldChangeWorldWonder(eYield) * iChange);
-					ChangeJONSCulturePerTurnFromBuildings(GetPlayer()->GetPlayerTraits()->GetYieldChangeWorldWonder(eYield) * iChange);
-				}
-				else if(eYield == YIELD_FAITH)
-				{
-					ChangeFaithPerTurnFromBuildings(GetPlayer()->GetYieldChangeWorldWonder(eYield) * iChange);
-					ChangeFaithPerTurnFromBuildings(GetPlayer()->GetPlayerTraits()->GetYieldChangeWorldWonder(eYield) * iChange);
-				}
-				else
-				{
-					ChangeBaseYieldRateFromBuildings(eYield, GetPlayer()->GetYieldChangeWorldWonder(eYield) * iChange);
-					ChangeBaseYieldRateFromBuildings(eYield, GetPlayer()->GetPlayerTraits()->GetYieldChangeWorldWonder(eYield) * iChange);
-				}
 			}
 #endif
 
@@ -7454,11 +7326,13 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			for(int iJ = 0; iJ < GC.getNumFeatureInfos(); iJ++)
 			{
 				ChangeFeatureExtraYield(((FeatureTypes)iJ), eYield, (GC.getBuildingInfo(eBuilding)->GetFeatureYieldChange(iJ, eYield) * iChange));
+				ChangeYieldPerXFeatureFromBuildingsTimes100(((FeatureTypes)iJ), eYield, (GC.getBuildingInfo(eBuilding)->GetYieldPerXFeature(iJ, eYield) * iChange));
 			}
 
 			for(int iJ = 0; iJ < GC.getNumTerrainInfos(); iJ++)
 			{
 				ChangeTerrainExtraYield(((TerrainTypes)iJ), eYield, (GC.getBuildingInfo(eBuilding)->GetTerrainYieldChange(iJ, eYield) * iChange));
+				ChangeYieldPerXTerrainFromBuildingsTimes100(((TerrainTypes)iJ), eYield, (GC.getBuildingInfo(eBuilding)->GetYieldPerXTerrain(iJ, eYield) * iChange));
 			}
 
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
@@ -7472,36 +7346,14 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			{
 				if(owningTeam.GetTeamTechs()->HasTech((TechTypes)pBuildingInfo->GetEnhancedYieldTech()))
 				{
-					if(eYield == YIELD_CULTURE)
-					{
-						ChangeJONSCulturePerTurnFromBuildings(pBuildingInfo->GetTechEnhancedYieldChange(eYield) * iChange);
-					}
-					else if(eYield == YIELD_FAITH)
-					{
-						ChangeFaithPerTurnFromBuildings(pBuildingInfo->GetTechEnhancedYieldChange(eYield) * iChange);
-					}
-					else
-					{
 						ChangeBaseYieldRateFromBuildings(eYield, pBuildingInfo->GetTechEnhancedYieldChange(eYield) * iChange);
-					}
 				}
 			}
 
 			int iBuildingClassBonus = owningPlayer.GetBuildingClassYieldChange(eBuildingClass, eYield);
 			if(iBuildingClassBonus > 0)
 			{
-				if(eYield == YIELD_CULTURE)
-				{
-					ChangeJONSCulturePerTurnFromBuildings(iBuildingClassBonus * iChange);
-				}
-				else if(eYield == YIELD_FAITH)
-				{
-					ChangeFaithPerTurnFromBuildings(iBuildingClassBonus * iChange);
-				}
-				else
-				{
 					ChangeBaseYieldRateFromBuildings(eYield, iBuildingClassBonus * iChange);
-				}
 			}
 		}
 
@@ -9284,18 +9136,9 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 int CvCity::GetJONSCulturePerTurnFromBuildings() const
 {
 	VALIDATE_OBJECT
-	return m_iJONSCulturePerTurnFromBuildings;
+	return GetBaseYieldRateFromBuildings(YIELD_CULTURE);
 }
 
-//	--------------------------------------------------------------------------------
-void CvCity::ChangeJONSCulturePerTurnFromBuildings(int iChange)
-{
-	VALIDATE_OBJECT
-	if(iChange != 0)
-	{
-		m_iJONSCulturePerTurnFromBuildings = (m_iJONSCulturePerTurnFromBuildings + iChange);
-	}
-}
 
 //	--------------------------------------------------------------------------------
 int CvCity::GetJONSCulturePerTurnFromPolicies() const
@@ -9473,18 +9316,10 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 int CvCity::GetFaithPerTurnFromBuildings() const
 {
 	VALIDATE_OBJECT
-	return m_iFaithPerTurnFromBuildings;
+	return GetBaseYieldRateFromBuildings(YIELD_FAITH);
 }
 
-//	--------------------------------------------------------------------------------
-void CvCity::ChangeFaithPerTurnFromBuildings(int iChange)
-{
-	VALIDATE_OBJECT
-	if(iChange != 0)
-	{
-		m_iFaithPerTurnFromBuildings = (m_iFaithPerTurnFromBuildings + iChange);
-	}
-}
+
 
 //	--------------------------------------------------------------------------------
 int CvCity::GetFaithPerTurnFromPolicies() const
@@ -9502,6 +9337,10 @@ void CvCity::ChangeFaithPerTurnFromPolicies(int iChange)
 		m_iFaithPerTurnFromPolicies = (m_iFaithPerTurnFromPolicies + iChange);
 	}
 }
+
+
+
+
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -9609,32 +9448,28 @@ int CvCity::GetFaithPerTurnFromTraits() const
 #endif
 
 
-#if defined(MOD_ROG_CORE)
+
 
 //	--------------------------------------------------------------------------------
 int CvCity::getSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2) const
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eIndex1 > -1 && eIndex1 < GC.getNumSpecialistInfos(), "eIndex1 expected to be < GC.getNumSpecialistInfos()");
+	CvAssertMsg(eIndex1 > -1 && eIndex1 < GC.getNumSpecialistInfos(), "eIndex1 expected to be < GC.getNumSpecialistInfos()");
 	CvAssertMsg(eIndex2 > -1 && eIndex2 < NUM_YIELD_TYPES, "eIndex2 expected to be < NUM_YIELD_TYPES");
-	return m_ppiSpecialistYieldChange[eIndex1][eIndex2];
+	return ModifierLookup(m_yieldChanges[eIndex2].forSpecialist, eIndex1);
 }
+
 //	--------------------------------------------------------------------------------
 void CvCity::changeSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2, int iChange)
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eIndex1 > -1 && eIndex1 < GC.getNumSpecialistInfos(), "eIndex1 expected to be < GC.getNumSpecialistInfos()");
+	CvAssertMsg(eIndex1 > -1 && eIndex1 < GC.getNumSpecialistInfos(), "eIndex1 expected to be < GC.getNumSpecialistInfos()");
 	CvAssertMsg(eIndex2 > -1 && eIndex2 < NUM_YIELD_TYPES, "Invalid yield index.");
-
-	if (iChange != 0)
-	{
-		m_ppiSpecialistYieldChange[eIndex1][eIndex2] += iChange;
-
+	SCityExtraYields& y = m_yieldChanges[eIndex2];
+	if (ModifierUpdateInsertRemove(y.forSpecialist, eIndex1, iChange, true))
 		updateExtraSpecialistYield();
-	}
-
 }
-#endif
+
 
 
 
@@ -9644,6 +9479,7 @@ int CvCity::GetFaithPerTurnFromReligion() const
 {
 	VALIDATE_OBJECT
 	return m_iFaithPerTurnFromReligion;
+	//return GetBaseYieldRateFromReligion(YIELD_FAITH);
 }
 
 //	--------------------------------------------------------------------------------
@@ -12016,7 +11852,7 @@ int CvCity::getBasicYieldRateTimes100(const YieldTypes eIndex, const bool bIgnor
 }
 
 
-#if defined(MOD_ROG_CORE)
+
 //	--------------------------------------------------------------------------------
 int CvCity::GetResourceQuantityFromPOP(ResourceTypes eResource) const
 {
@@ -12038,7 +11874,7 @@ void CvCity::ChangeResourceQuantityFromPOP(ResourceTypes eResource, int iChange)
 		CvAssert(GetResourceQuantityFromPOP(eResource) >= 0);
 	}
 }
-#endif
+
 
 //	--------------------------------------------------------------------------------
 int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield) const
@@ -17012,7 +16848,6 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iJONSCulturePerTurnFromPolicies;
 	kStream >> m_iJONSCulturePerTurnFromSpecialists;
 	kStream >> m_iJONSCulturePerTurnFromReligion;
-	kStream >> m_iFaithPerTurnFromBuildings;
 	kStream >> m_iFaithPerTurnFromPolicies;
 	kStream >> m_iFaithPerTurnFromReligion;
 
@@ -17309,25 +17144,6 @@ void CvCity::read(FDataStream& kStream)
 			m_orderQueue.insertAtEnd(&Data);
 	}
 
-
-
-#if defined(MOD_ROG_CORE)
-	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_ppaaiImprovementYieldChange, NUM_YIELD_TYPES, GC.getNumImprovementInfos());
-
-	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_ppiSpecialistYieldChange, NUM_YIELD_TYPES, GC.getNumSpecialistInfos());
-#endif
-
-	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_ppaiResourceYieldChange, NUM_YIELD_TYPES, GC.getNumResourceInfos());
-
-	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_ppaiFeatureYieldChange, NUM_YIELD_TYPES, GC.getNumFeatureInfos());
-
-	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_ppaiTerrainYieldChange, NUM_YIELD_TYPES, GC.getNumTerrainInfos());
-
-#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
-	// MOD_SERIALIZE_READ - v57/v58/v59 broke the save format  couldn't be helped, but don't make a habit of it!!!
-	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_ppaiPlotYieldChange, NUM_YIELD_TYPES, GC.getNumPlotInfos());
-#endif
-
 	kStream >> m_iPopulationRank;
 	kStream >> m_bPopulationRankValid;
 	kStream >> m_aiBaseYieldRank;
@@ -17347,9 +17163,13 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_strName;
 
 	kStream >> m_bOwedCultureBuilding;
+
+
+
 #if defined(MOD_BUGFIX_FREE_FOOD_BUILDING)
 	MOD_SERIALIZE_READ(30, kStream, m_bOwedFoodBuilding, false);
 #endif
+
 
 	m_pCityStrategyAI->Read(kStream);
 	if(m_eOwner != NO_PLAYER)
@@ -17379,6 +17199,10 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iSiegeKillCitizensModifier;
 #endif
 
+	kStream >> m_yieldChanges;
+	kStream >> m_paiNumTerrainWorked;
+	kStream >> m_paiNumFeatureWorked;
+	kStream >> m_iNumNearbyMountains;
 	kStream >> m_iAdditionalFood;
 	kStream >> m_iBaseTourism;
 	kStream >> m_iBaseTourismBeforeModifiers;
@@ -17464,7 +17288,6 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iJONSCulturePerTurnFromPolicies;
 	kStream << m_iJONSCulturePerTurnFromSpecialists;
 	kStream << m_iJONSCulturePerTurnFromReligion;
-	kStream << m_iFaithPerTurnFromBuildings;
 	kStream << m_iFaithPerTurnFromPolicies;
 	kStream << m_iFaithPerTurnFromReligion;
 	kStream << m_iCultureRateModifier;
@@ -17666,25 +17489,6 @@ void CvCity::write(FDataStream& kStream) const
 		kStream << pData->bRush;
 	}
 
-
-#if defined(MOD_ROG_CORE)
-	CvInfosSerializationHelper::WriteHashedDataArray<ImprovementTypes>(kStream, m_ppaaiImprovementYieldChange, NUM_YIELD_TYPES, GC.getNumImprovementInfos());
-
-	CvInfosSerializationHelper::WriteHashedDataArray<SpecialistTypes>(kStream, m_ppiSpecialistYieldChange, NUM_YIELD_TYPES, GC.getNumSpecialistInfos());
-#endif
-
-
-	CvInfosSerializationHelper::WriteHashedDataArray<ResourceTypes>(kStream, m_ppaiResourceYieldChange, NUM_YIELD_TYPES, GC.getNumResourceInfos());
-
-	CvInfosSerializationHelper::WriteHashedDataArray<FeatureTypes>(kStream, m_ppaiFeatureYieldChange, NUM_YIELD_TYPES, GC.getNumFeatureInfos());
-
-	CvInfosSerializationHelper::WriteHashedDataArray<TerrainTypes>(kStream, m_ppaiTerrainYieldChange, NUM_YIELD_TYPES, GC.getNumTerrainInfos());
-
-#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
-	// MOD_SERIALIZE_WRITE - v57/v58/v59 broke the save format  couldn't be helped, but don't make a habit of it!!!
-	CvInfosSerializationHelper::WriteHashedDataArray<PlotTypes>(kStream, m_ppaiPlotYieldChange, NUM_YIELD_TYPES, GC.getNumPlotInfos());
-#endif
-
 	kStream << m_iPopulationRank;
 	kStream << m_bPopulationRankValid;
 	kStream << m_aiBaseYieldRank;
@@ -17701,6 +17505,9 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_bRouteToCapitalConnectedThisTurn;
 	kStream << m_strName;
 	kStream << m_bOwedCultureBuilding;
+
+
+
 #if defined(MOD_BUGFIX_FREE_FOOD_BUILDING)
 	MOD_SERIALIZE_WRITE(kStream, m_bOwedFoodBuilding);
 #endif
@@ -17726,6 +17533,10 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iSiegeKillCitizensModifier;
 #endif
 
+	kStream << m_yieldChanges;
+	kStream << m_paiNumTerrainWorked;
+	kStream << m_paiNumFeatureWorked;
+	kStream << m_iNumNearbyMountains;
 	kStream << m_iAdditionalFood;
 	kStream << m_iBaseTourism;
 	kStream << m_iBaseTourismBeforeModifiers;
@@ -20623,7 +20434,17 @@ void CvCity::ChangeCorruptionLevelChangeFromBuilding(int value)
 }
 #endif
 
+int CvCity::getLocalBuildingClassYield(BuildingClassTypes eBuilding, YieldTypes eYield)	const
+{
+	return ModifierLookup(m_yieldChanges[eYield].forLocalBuilding, eBuilding);
+}
 
+//	--------------------------------------------------------------------------------
+void CvCity::changeLocalBuildingClassYield(BuildingClassTypes eBuilding, YieldTypes eYield, int iChange)
+{
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	ModifierUpdateInsertRemove(y.forLocalBuilding, eBuilding, iChange, true);
+}
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 
@@ -20844,9 +20665,423 @@ void CvCity::SetYieldFromCrime(YieldTypes eYield, int iValue)
 int CvCity::GetYieldFromCrime(YieldTypes eYield) const
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eYield >= 0, "eYield expected to be >= 0");
+	CvAssertMsg(eYield >= 0, "eYield expected to be >= 0");
 	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eYield expected to be < NUM_YIELD_TYPES");
 
 	return m_aiYieldFromCrime[eYield];
 }
+
 #endif
+
+
+FDataStream& operator<<(FDataStream& saveTo, const SCityExtraYields& readFrom)
+{
+	saveTo << readFrom.forTerrain;
+	saveTo << readFrom.forXTerrain;
+	saveTo << readFrom.forTerrainFromBuildings;
+	saveTo << readFrom.forTerrainFromReligion;
+
+	saveTo << readFrom.forFeature;
+	saveTo << readFrom.forXFeature;
+	saveTo << readFrom.forFeatureFromBuildings;
+	saveTo << readFrom.forFeatureFromReligion;
+	saveTo << readFrom.forFeatureUnimproved;
+
+	saveTo << readFrom.forImprovement;
+	saveTo << readFrom.forSpecialist;
+	saveTo << readFrom.forResource;
+	saveTo << readFrom.forPlot;
+	saveTo << readFrom.forYield;
+	saveTo << readFrom.forActualYield;
+	saveTo << readFrom.forLocalBuilding;
+	saveTo << readFrom.forReligionBuilding;
+	return saveTo;
+}
+FDataStream& operator>>(FDataStream& loadFrom, SCityExtraYields& writeTo)
+{
+	loadFrom >> writeTo.forTerrain;
+	loadFrom >> writeTo.forXTerrain;
+	loadFrom >> writeTo.forTerrainFromBuildings;
+	loadFrom >> writeTo.forTerrainFromReligion;
+
+	loadFrom >> writeTo.forFeature;
+	loadFrom >> writeTo.forXFeature;
+	loadFrom >> writeTo.forFeatureFromBuildings;
+	loadFrom >> writeTo.forFeatureFromReligion;
+	loadFrom >> writeTo.forFeatureUnimproved;
+
+	loadFrom >> writeTo.forImprovement;
+	loadFrom >> writeTo.forSpecialist;
+	loadFrom >> writeTo.forResource;
+	loadFrom >> writeTo.forPlot;
+	loadFrom >> writeTo.forYield;
+	loadFrom >> writeTo.forActualYield;
+	loadFrom >> writeTo.forLocalBuilding;
+	loadFrom >> writeTo.forReligionBuilding;
+	return loadFrom;
+}
+
+
+
+
+//	--------------------------------------------------------------------------------
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetNearbyMountains() const
+{
+	VALIDATE_OBJECT
+	return m_iNumNearbyMountains;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeNearbyMountains(int iChange)
+{
+	VALIDATE_OBJECT
+	SetNearbyMountains(GetNearbyMountains() + iChange);
+}
+//	--------------------------------------------------------------------------------
+void CvCity::SetNearbyMountains(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iNumNearbyMountains = iValue;
+}
+
+void CvCity::UpdateYieldPerXTerrain(YieldTypes eYield, TerrainTypes eTerrain)
+{
+	VALIDATE_OBJECT
+		int iYield = 0;
+
+	int iValidTilesTerrain = 0;
+	int iBaseYieldBuildings = 0;
+
+	//Passed in a terrain? Let's only update that.
+	if (eTerrain != NO_TERRAIN)
+	{
+		iBaseYieldBuildings = GetYieldPerXTerrainFromBuildingsTimes100(eTerrain, eYield);
+
+		if (iBaseYieldBuildings > 0)
+		{
+			if (eTerrain == TERRAIN_MOUNTAIN)
+			{
+				iValidTilesTerrain = GetNearbyMountains();
+			}
+			else if (eTerrain == TERRAIN_SNOW)
+			{
+				iValidTilesTerrain = CountTerrain(TERRAIN_SNOW);
+			}
+			else
+			{
+				iValidTilesTerrain = GetNumTerrainWorked(eTerrain);
+			}
+
+			iYield = (iValidTilesTerrain * iBaseYieldBuildings) / 100;
+
+			//iDifference determines +/- of difference of old value
+			int iDifference = iYield - GetYieldPerXTerrain(eTerrain, eYield);
+
+			//Change base rate first
+			ChangeBaseYieldRateFromBuildings(eYield, iDifference);
+
+			//then set base rate for retrieval next time.
+			SetYieldPerXTerrain(eTerrain, eYield, iYield);
+		}
+		else if (GetYieldPerXTerrain(eTerrain, eYield) > 0)
+		{
+			//No bonuses? Clear it out.
+			ChangeBaseYieldRateFromBuildings(eYield, -GetYieldPerXTerrain(eTerrain, eYield));
+			SetYieldPerXTerrain(eTerrain, eYield, 0);
+		}
+	}
+	else
+	{
+		for (int iI = 0; iI < GC.getNumTerrainInfos(); iI++)
+		{
+			eTerrain = (TerrainTypes)iI;
+			if (eTerrain == NO_TERRAIN)
+			{
+				continue;
+			}
+
+			iBaseYieldBuildings = GetYieldPerXTerrainFromBuildingsTimes100(eTerrain, eYield);
+
+			if (iBaseYieldBuildings > 0)
+			{
+				if (eTerrain == TERRAIN_MOUNTAIN)
+				{
+					iValidTilesTerrain = GetNearbyMountains();
+				}
+				else if (eTerrain == TERRAIN_SNOW)
+				{
+					iValidTilesTerrain = CountTerrain(TERRAIN_SNOW);
+				}
+				else
+				{
+					iValidTilesTerrain = GetNumTerrainWorked(eTerrain);
+				}
+
+				iYield = (iValidTilesTerrain * iBaseYieldBuildings) / 100;
+
+				//iDifference determines +/- of difference of old value
+				int iDifference = iYield - GetYieldPerXTerrain(eTerrain, eYield);
+
+				//Change base rate first
+				ChangeBaseYieldRateFromBuildings(eYield, iDifference);
+
+				//then set base rate for retrieval next time.
+				SetYieldPerXTerrain(eTerrain, eYield, iYield);
+			}
+			else if (GetYieldPerXTerrain(eTerrain, eYield) > 0)
+			{
+				//No bonuses? Clear it out.
+				ChangeBaseYieldRateFromBuildings(eYield, -GetYieldPerXTerrain(eTerrain, eYield));
+				SetYieldPerXTerrain(eTerrain, eYield, 0);
+			}
+		}
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetNumTerrainWorked(TerrainTypes eTerrain)
+{
+	CvAssertMsg(eTerrain >= 0, "eTerrain is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eTerrain < GC.getNumTerrainInfos(), "eTerrain is expected to be within maximum bounds (invalid Index)");
+	return m_paiNumTerrainWorked[eTerrain];
+}
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeNumTerrainWorked(TerrainTypes eTerrain, int iChange)
+{
+	CvAssertMsg(eTerrain >= 0, "eTerrain is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eTerrain < GC.getNumTerrainInfos(), "eTerrain is expected to be within maximum bounds (invalid Index)");
+	m_paiNumTerrainWorked[eTerrain] = m_paiNumTerrainWorked[eTerrain] + iChange;
+	CvAssert(GetNumTerrainWorked(eTerrain) >= 0);
+
+	//Update yields
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+
+		UpdateYieldPerXTerrain(((YieldTypes)iI), eTerrain);
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetNumFeatureWorked(FeatureTypes eFeature)
+{
+	CvAssertMsg(eFeature >= 0, "eFeature is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eFeature < GC.getNumFeatureInfos(), "eFeature is expected to be within maximum bounds (invalid Index)");
+	return m_paiNumFeatureWorked[eFeature];
+}
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeNumFeatureWorked(FeatureTypes eFeature, int iChange)
+{
+	CvAssertMsg(eFeature >= 0, "eFeature is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eFeature < GC.getNumFeatureInfos(), "eFeature is expected to be within maximum bounds (invalid Index)");
+	m_paiNumFeatureWorked[eFeature] = m_paiNumFeatureWorked[eFeature] + iChange;
+	CvAssert(GetNumFeatureWorked(eFeature) >= 0);
+
+	//Update yields
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		UpdateYieldPerXFeature(((YieldTypes)iI), eFeature);
+	}
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvCity::SetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield, int iValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
+
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forXTerrain, eTerrain, iValue, false))
+		updateYield(false);
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield for a Terrain this city is working?
+int CvCity::GetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
+
+	return ModifierLookup(m_yieldChanges[eYield].forXTerrain, eTerrain);
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield for a Terrain this city is working?
+int CvCity::GetYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
+
+	return ModifierLookup(m_yieldChanges[eYield].forTerrainFromBuildings, eTerrain);
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, YieldTypes eYield, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eTerrain > -1 && eTerrain < GC.getNumTerrainInfos(), "Invalid Terrain index.");
+	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
+
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forTerrainFromBuildings, eTerrain, iChange, true))
+		updateYield(false);
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield for a Feature this city is working?
+int CvCity::GetYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
+	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
+
+	return ModifierLookup(m_yieldChanges[eYield].forFeatureFromBuildings, eFeature);
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, YieldTypes eYield, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
+	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
+
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forFeatureFromBuildings, eFeature, iChange, true))
+	{
+		updateYield(false);
+		UpdateYieldPerXFeature(eYield, eFeature);
+	}
+}
+
+//	--------------------------------------------------------------------------------
+/// Extra yield for a Feature this city is working?
+int CvCity::GetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Terrain index.");
+	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
+
+	return ModifierLookup(m_yieldChanges[eYield].forXFeature, eFeature);
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvCity::SetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield, int iValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eFeature > -1 && eFeature < GC.getNumFeatureInfos(), "Invalid Feature index.");
+	CvAssertMsg(eYield > -1 && eYield < NUM_YIELD_TYPES, "Invalid yield index.");
+
+	SCityExtraYields& y = m_yieldChanges[eYield];
+	if (ModifierUpdateInsertRemove(y.forXFeature, eFeature, iValue, false))
+		updateYield(false);
+}
+
+void CvCity::UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature)
+{
+	VALIDATE_OBJECT
+	int iYieldBase = 0;
+	int iYieldReligion = 0;
+
+	int iValidTiles = 0;
+	int iBaseYield = 0;
+	int iBaseYieldReligion = 0;
+
+
+	//If we passed in a feature, let's only refresh that.
+	if (eFeature != NO_FEATURE)
+	{
+		iYieldBase = 0;
+
+		iBaseYield = GetYieldPerXFeatureFromBuildingsTimes100(eFeature, eYield);
+
+		bool bTest = false;
+		if (iBaseYield <= 0)
+		{
+			ChangeBaseYieldRateFromBuildings(eYield, -GetYieldPerXFeature(eFeature, eYield));
+			SetYieldPerXFeature(eFeature, eYield, 0);
+		}
+		else
+			bTest = true;
+		if (bTest)
+		{
+			iValidTiles = GetNumFeatureWorked(eFeature);
+			if (iValidTiles > 0)
+			{
+				//Gain 1 yield per x valid tiles - so if 'x' is 3, and you have 3 tiles that match, you get 1 yield
+				iYieldBase = (iValidTiles * iBaseYield) / 100;
+				iYieldReligion = (iValidTiles * iBaseYieldReligion) / 100;
+
+				//iDifference determines +/- of difference of old value
+				int iBaseDifference = iYieldBase - GetYieldPerXFeature(eFeature, eYield);
+
+				//Change base rate first
+				ChangeBaseYieldRateFromBuildings(eYield, iBaseDifference);
+				SetYieldPerXFeature(eFeature, eYield, iYieldBase);
+			}
+			else
+			{
+				ChangeBaseYieldRateFromBuildings(eYield, -GetYieldPerXFeature(eFeature, eYield));
+				SetYieldPerXFeature(eFeature, eYield, 0);
+
+			}
+		}
+	}
+	else
+	{
+		for (int iI = 0; iI < GC.getNumFeatureInfos(); iI++)
+		{
+			eFeature = (FeatureTypes)iI;
+			if (eFeature == NO_FEATURE)
+			{
+				continue;
+			}
+			iYieldBase = 0;
+
+			iBaseYield = GetYieldPerXFeatureFromBuildingsTimes100(eFeature, eYield);
+
+			bool bTest = false;
+			if (iBaseYield <= 0)
+			{
+				ChangeBaseYieldRateFromBuildings(eYield, -GetYieldPerXFeature(eFeature, eYield));
+				SetYieldPerXFeature(eFeature, eYield, 0);
+			}
+			else
+				bTest = true;
+	
+			if (bTest)
+			{
+				iValidTiles = GetNumFeatureWorked(eFeature);
+				if (iValidTiles > 0)
+				{
+					//Gain 1 yield per x valid tiles - so if 'x' is 3, and you have 3 tiles that match, you get 1 yield
+					iYieldBase = (iValidTiles * iBaseYield) / 100;
+					iYieldReligion = (iValidTiles * iBaseYieldReligion) / 100;
+
+					//iDifference determines +/- of difference of old value
+					int iDifference = iYieldBase - GetYieldPerXFeature(eFeature, eYield);
+
+					//Change base rate first
+					ChangeBaseYieldRateFromBuildings(eYield, iDifference);
+					SetYieldPerXFeature(eFeature, eYield, iYieldBase);
+				}
+				else
+				{
+					ChangeBaseYieldRateFromBuildings(eYield, -GetYieldPerXFeature(eFeature, eYield));
+					SetYieldPerXFeature(eFeature, eYield, 0);
+
+				}
+			}
+		}
+	}
+}
+
+
+
+
+

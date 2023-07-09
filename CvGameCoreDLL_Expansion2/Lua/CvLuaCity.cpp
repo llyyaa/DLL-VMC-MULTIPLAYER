@@ -2751,7 +2751,10 @@ int CvLuaCity::lGetJONSCulturePerTurnFromBuildings(lua_State* L)
 //void ChangeJONSCulturePerTurnFromBuildings(int iChange);
 int CvLuaCity::lChangeJONSCulturePerTurnFromBuildings(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromBuildings);
+	CvCity* pkCity = GetInstance(L);
+	int iChange = lua_tointeger(L, 2);
+	pkCity->ChangeBaseYieldRateFromBuildings(YIELD_CULTURE, iChange);
+	return 0;
 }
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromPolicies() const;

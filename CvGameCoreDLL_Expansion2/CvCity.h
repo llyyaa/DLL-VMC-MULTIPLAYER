@@ -23,6 +23,8 @@
 #include "CvBuildingClasses.h"
 #include "CvPreGame.h"
 
+#include "CvSerialize.h"
+
 // 0 = center of city, 1-6 = the edge of city on points, 7-12 = one tile out
 #define NUM_CITY_BUILDING_DISPLAY_SLOTS (13)
 
@@ -37,6 +39,22 @@ class CvCityReligions;
 class CvCityEspionage;
 class CvCityCulture;
 class CvPlayer;
+
+
+ struct SCityExtraYields
+{
+	vector<pair<TerrainTypes, int>> forTerrain, forXTerrain, forTerrainFromBuildings, forTerrainFromReligion;
+	vector<pair<FeatureTypes, int>> forFeature, forXFeature, forFeatureFromBuildings, forFeatureFromReligion, forFeatureUnimproved;
+	vector<pair<ImprovementTypes, int>> forImprovement;
+	vector<pair<SpecialistTypes, int>> forSpecialist;
+	vector<pair<ResourceTypes, int>> forResource;
+	vector<pair<PlotTypes, int>> forPlot;
+	vector<pair<YieldTypes, int>> forYield, forActualYield;
+	vector<pair<BuildingClassTypes, int>> forLocalBuilding, forReligionBuilding;
+};
+
+
+
 
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 enum YieldFromYieldStruct {
@@ -161,6 +179,8 @@ public:
 	void SetFeatureSurrounded(bool bValue);
 	void DoUpdateFeatureSurrounded();
 
+	const SCityExtraYields& GetYieldChanges(YieldTypes eYield) const { return m_yieldChanges[eYield]; }
+
 	int GetResourceExtraYield(ResourceTypes eResource, YieldTypes eYield) const;
 	void ChangeResourceExtraYield(ResourceTypes eResource, YieldTypes eYield, int iChange);
 
@@ -170,13 +190,43 @@ public:
 	int GetTerrainExtraYield(TerrainTypes eTerrain, YieldTypes eYield) const;
 	void ChangeTerrainExtraYield(TerrainTypes eTerrain, YieldTypes eYield, int iChange);
 
-#if defined(MOD_ROG_CORE)
+
 	int GetImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield) const;
 	void ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield, int iChange);
 
+#if defined(MOD_ROG_CORE)
+	int GetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield) const;
+
+	int GetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield) const;
+
+	void UpdateYieldPerXTerrain(YieldTypes eYield, TerrainTypes eTerrain = NO_TERRAIN);
+
+	void ChangeNumTerrainWorked(TerrainTypes eTerrain, int iChange);
+	int GetNumTerrainWorked(TerrainTypes eTerrain);
+
+
+	void ChangeNumFeatureWorked(FeatureTypes eFeature, int iChange);
+	int GetNumFeatureWorked(FeatureTypes eFeature);
+
+
+	void SetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield, int iValue);
+
+
+	int GetYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, YieldTypes eYield) const;
+	void ChangeYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, YieldTypes eYield, int iChange);
+
+
+	int GetYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, YieldTypes eYield) const;
+	void ChangeYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, YieldTypes eYield, int iChange);
+
+
+	void SetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield, int iValue);
+	void UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature = NO_FEATURE);
+#endif
+
 	int getSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2) const;
 	void changeSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2, int iChange);
-#endif
+
 
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
 	int GetPlotExtraYield(PlotTypes ePlot, YieldTypes eYield) const;
@@ -292,6 +342,7 @@ public:
 	int conscriptMinCityPopulation() const;
 	bool canConscript() const;
 	void conscript();
+
 
 	int getResourceYieldRateModifier(YieldTypes eIndex, ResourceTypes eResource) const;
 
@@ -433,7 +484,7 @@ public:
 	int GetBaseJONSCulturePerTurn() const;
 
 	int GetJONSCulturePerTurnFromBuildings() const;
-	void ChangeJONSCulturePerTurnFromBuildings(int iChange);
+
 
 	int GetJONSCulturePerTurnFromPolicies() const;
 	void ChangeJONSCulturePerTurnFromPolicies(int iChange);
@@ -468,7 +519,6 @@ public:
 	int GetFaithPerTurn(bool bStatic = true) const;
 
 	int GetFaithPerTurnFromBuildings() const;
-	void ChangeFaithPerTurnFromBuildings(int iChange);
 
 	int GetFaithPerTurnFromPolicies() const;
 	void ChangeFaithPerTurnFromPolicies(int iChange);
@@ -640,6 +690,10 @@ public:
 	void SetOwedFoodBuilding(bool bNewValue);
 #endif
 
+	void ChangeNearbyMountains(int iNewValue);
+	int GetNearbyMountains() const;
+	void SetNearbyMountains(int iValue);
+
 	bool IsBlockaded() const;
 
 	int GetWeLoveTheKingDayCounter() const;
@@ -737,11 +791,10 @@ public:
 	void changeNukeInterceptionChance(int iValue);
 	int getNukeInterceptionChance() const;
 
-#if defined(MOD_ROG_CORE)
+
 	int GetResourceQuantityFromPOP(ResourceTypes eResource) const;
 	void ChangeResourceQuantityFromPOP(ResourceTypes eResource, int iChange);
-	//void SetResourceQuantityFromPOP(ResourceTypes eResource, int iValue);
-#endif
+
 
 #if defined(MOD_ROG_CORE)
 	int GetYieldPerPopInEmpireTimes100(YieldTypes eIndex) const;
@@ -987,6 +1040,9 @@ public:
 	CvCityEspionage* GetCityEspionage() const;
 	CvCityCulture* GetCityCulture() const;
 
+	template<typename City, typename Visitor>
+	static void Serialize(City& city, Visitor& visitor);
+
 	void read(FDataStream& kStream);
 	void write(FDataStream& kStream) const;
 
@@ -1213,7 +1269,6 @@ protected:
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromPolicies;
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromSpecialists;
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromReligion;
-	int m_iFaithPerTurnFromBuildings;
 	int m_iFaithPerTurnFromPolicies;
 	int m_iFaithPerTurnFromReligion;
 	FAutoVariable<int, CvCity> m_iCultureRateModifier;
@@ -1375,21 +1430,11 @@ protected:
 	bool m_bOwedFoodBuilding;
 #endif
 
+	int m_iNumNearbyMountains;
+
 	mutable FFastSmallFixedList< OrderData, 25, true, c_eCiv5GameplayDLL > m_orderQueue;
 
 	int** m_aaiBuildingSpecialistUpgradeProgresses;
-	int** m_ppaiResourceYieldChange;
-	int** m_ppaiFeatureYieldChange;
-	int** m_ppaiTerrainYieldChange;
-#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
-	int** m_ppaiPlotYieldChange;
-#endif
-
-#if defined(MOD_ROG_CORE)
-	int** m_ppaaiImprovementYieldChange;
-	int** m_ppiSpecialistYieldChange;
-
-#endif
 
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eCityScale = NO_CITY_SCALE;
@@ -1406,6 +1451,11 @@ protected:
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 	int m_iSiegeKillCitizensModifier = 0;
 #endif
+
+	std::vector<int> m_paiNumTerrainWorked;
+	std::vector<int> m_paiNumFeatureWorked;
+
+	vector<SCityExtraYields> m_yieldChanges; //[NUM_YIELD_TYPES]
 
 	int m_iAdditionalFood;
 	int m_iBaseTourism;
@@ -1484,3 +1534,8 @@ void ClearCityDeltas();
 }
 
 #endif
+
+
+FDataStream& operator>>(FDataStream& loadFrom, SCityExtraYields& writeTo);
+FDataStream& operator<<(FDataStream& saveTo, const SCityExtraYields& readFrom);
+

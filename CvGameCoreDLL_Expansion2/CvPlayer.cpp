@@ -346,6 +346,7 @@ CvPlayer::CvPlayer() :
 	, m_iScenarioScore4("CvPlayer::m_iScenarioScore4", m_syncArchive)
 	, m_iScoreFromFutureTech("CvPlayer::m_iScoreFromFutureTech", m_syncArchive)
 	, m_iCombatExperience("CvPlayer::m_iCombatExperience", m_syncArchive)
+	, m_piNumBuildings()
 	, m_iLifetimeCombatExperience(0)
 	, m_iNavalCombatExperience(0)
 #if defined(MOD_UNITS_XP_TIMES_100)
@@ -1565,6 +1566,10 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 		{
 			m_ppaaiImprovementYieldChange.setAt(i, yield);
 		}
+
+		m_piNumBuildings.clear();
+		m_piNumBuildings.resize(GC.getNumBuildingInfos(), 0);
+
 
 		m_ppaaiBuildingClassYieldMod.clear();
 		m_ppaaiBuildingClassYieldMod.resize(GC.getNumBuildingClassInfos());
@@ -5996,24 +6001,42 @@ int CvPlayer::countCityFeatures(FeatureTypes eFeature) const
 
 
 //	--------------------------------------------------------------------------------
-int CvPlayer::countNumBuildings(BuildingTypes eBuilding) const
+int CvPlayer::countNumBuildings(BuildingTypes eBuilding, bool bReset) const
 {
-	const CvCity* pLoopCity;
-	int iCount;
-	int iLoop;
-
-	iCount = 0;
-
-	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	if (bReset)
 	{
-		if(pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
+		int iCount = 0;
+		int iLoop = 0;
+
+		for (const CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 		{
-			iCount += pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding);
+			if (pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
+			{
+				iCount += pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding);
+			}
 		}
+
+		//const call hack
+		GET_PLAYER(GetID()).setNumBuildings(eBuilding, iCount);
 	}
 
-	return iCount;
+	return getNumBuildings(eBuilding);
 }
+
+void CvPlayer::setNumBuildings(BuildingTypes eBuilding, int iValue)
+{
+	CvAssertMsg(eBuilding >= 0, "eBuilding is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eBuilding < GC.getNumBuildingInfos(), "eBuilding is expected to be within maximum bounds (invalid Index)");
+
+	m_piNumBuildings[eBuilding] = iValue;
+}
+int CvPlayer::getNumBuildings(BuildingTypes eBuilding) const
+{
+	CvAssertMsg(eBuilding >= 0, "eIndex1 is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eBuilding < GC.getNumBuildingInfos(), "eIndex1 is expected to be within maximum bounds (invalid Index)");
+	return m_piNumBuildings[eBuilding];
+}
+
 
 //	--------------------------------------------------------------------------------
 /// How many cities in the empire surrounded by features?
@@ -9620,7 +9643,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 
 
-#if defined(MOD_ROG_CORE)
+
 	for (iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
 	{
 		YieldTypes eYield = (YieldTypes)iJ;
@@ -9639,7 +9662,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 			}
 		}
 	}
-#endif
+
 
 	for(iI = 0; iI < GC.getNumSpecialistInfos(); iI++)
 	{
@@ -9681,109 +9704,82 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	ChangeExtraLeagueVotes(pBuildingInfo->GetExtraLeagueVotes() * iChange);
 
 	// Loop through Cities
-	int iLoop;
-	CvCity* pLoopCity;
-	int iBuildingCount;
-	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	int iLoop = 0;
+	int iBuildingCount = 0;
+	for (CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 	{
 		// Building modifiers
 		BuildingClassTypes eBuildingClass;
 
-#if defined(MOD_ROG_CORE)
 		CvCityBuildings* pLoopCityBuildings = pLoopCity->GetCityBuildings();
-#endif
 
-		for(iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+		for (iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
-			eBuildingClass = (BuildingClassTypes) iI;
+			eBuildingClass = (BuildingClassTypes)iI;
 
 			CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
-			if(!pkBuildingClassInfo)
+			if (!pkBuildingClassInfo)
 			{
 				continue;
 			}
 
-			eBuilding = (BuildingTypes) getCivilizationInfo().getCivilizationBuildings(eBuildingClass);
+			BuildingTypes eTestBuilding = NO_BUILDING;
 
-			if(eBuilding != NO_BUILDING)
+			eTestBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(eBuildingClass);
+
+			if (eTestBuilding != NO_BUILDING)
 			{
-				CvBuildingEntry* pkBuilding = GC.getBuildingInfo(eBuilding);
-
-#if defined(MOD_ROG_CORE)
+				CvBuildingEntry* pkBuilding = GC.getBuildingInfo(eTestBuilding);
 				CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
-#endif
-
-				if(pkBuilding)
+				if (pkBuilding)
 				{
-					iBuildingCount = pLoopCity->GetCityBuildings()->GetNumRealBuilding(eBuilding);
-
-					if(iBuildingCount > 0)
+					iBuildingCount = pLoopCityBuildings->GetNumBuilding(eTestBuilding);
+					if (iBuildingCount > 0)
 					{
-						pLoopCity->ChangeJONSCulturePerTurnFromBuildings(pBuildingInfo->GetBuildingClassYieldChange(eBuildingClass, YIELD_CULTURE) * iBuildingCount * iChange);
-
 						// Building Class Yield Stuff
-						for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
+						for (iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
 						{
-							switch(iJ)
+							YieldTypes eYield = (YieldTypes)iJ;
+							int iYieldChange = pBuildingInfo->GetBuildingClassYieldChange(eBuildingClass, eYield);
+							if (iYieldChange > 0)
 							{
-							case YIELD_CULTURE:
-							{
-								// Skip, handled above
-								break;
+								pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYieldChange * iBuildingCount * iChange);
 							}
-							case YIELD_FAITH:
+
+							int iWonderYieldChange = pBuildingInfo->GetYieldChangeWorldWonderGlobal(eYield);
+							if (iWonderYieldChange > 0 && isWorldWonderClass(*pkBuildingClassInfo))
 							{
-								pLoopCity->ChangeFaithPerTurnFromBuildings(pBuildingInfo->GetBuildingClassYieldChange(eBuildingClass, iJ) * iBuildingCount * iChange);
-								break;
+								pLoopCityBuildings->ChangeBuildingYieldChange(eBuildingClass, eYield, (iWonderYieldChange * iBuildingCount * iChange));
+								pLoopCity->changeLocalBuildingClassYield(eBuildingClass, eYield, (iWonderYieldChange * iBuildingCount * iChange));
 							}
-							default:
+
+							int iYieldMod = pBuildingInfo->GetBuildingClassYieldModifier(eBuildingClass, eYield);
+							if (iYieldMod != 0)
 							{
-								YieldTypes eYield = (YieldTypes) iJ;
-								int iYieldChange = pBuildingInfo->GetBuildingClassYieldChange(eBuildingClass, eYield);
-								if(iYieldChange > 0)
-								{
-									pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYieldChange * iBuildingCount * iChange);
-								}
-
-#if defined(MOD_ROG_CORE)
-								int iWonderYieldChange = pBuildingInfo->GetYieldChangeWorldWonderGlobal(eYield);
-								if (iWonderYieldChange > 0 && isWorldWonderClass(*pkBuildingClassInfo))
-								{
-									pLoopCityBuildings->ChangeBuildingYieldChange(eBuildingClass, eYield, (iWonderYieldChange * iBuildingCount * iChange));
-								}
-
-								//////////////////////////////////////////////////////////////////////////////////////
-
-								int iYieldMod = pBuildingInfo->GetBuildingClassYieldModifier(eBuildingClass, eYield);
-								if (iYieldMod != 0)
-								{
-									pLoopCity->changeYieldRateModifier(eYield, iYieldMod * iBuildingCount * iChange);
-								}
-#endif
-							}
+								pLoopCity->changeYieldRateModifier(eYield, iYieldMod * iBuildingCount * iChange);
 							}
 						}
 					}
 				}
+
 			}
 		}
 	}
-
 #if defined(MOD_ROG_CORE)
 	//Refresh cache data.
-	countNumBuildings(eBuilding);
+	countNumBuildings(eBuilding, true);
 #endif
 }
 
 
-#if defined(MOD_ROG_CORE)
+
 //	--------------------------------------------------------------------------------
 /// Get yield change from buildings for a specific building class
 int CvPlayer::GetBuildingClassYieldModifier(BuildingClassTypes eBuildingClass, YieldTypes eYieldType)
 {
 	return GetBuildingClassYieldModifier(eBuildingClass, eYieldType, GetTotalBuildingCount());
 }
-#endif
+
 
 //	--------------------------------------------------------------------------------
 /// Get yield change from buildings for a specific building class
@@ -9815,7 +9811,7 @@ int CvPlayer::GetBuildingClassYieldChange(BuildingClassTypes eBuildingClass, Yie
 
 
 
-#if defined(MOD_ROG_CORE)
+
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetBuildingClassYieldModifier(BuildingClassTypes eBuildingClass, YieldTypes eYieldType, const vector<int>& preexistingBuildingsCount)
 {
@@ -9869,7 +9865,7 @@ int CvPlayer::GetWorldWonderYieldChange(int iYield)
 	}
 	return rtnValue;
 }
-#endif
+
 
 //	--------------------------------------------------------------------------------
 /// Can we eBuild on pPlot?
@@ -20838,7 +20834,7 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 
 	if(pkResource->getResourceUsage() == RESOURCEUSAGE_STRATEGIC)
 	{
-#if defined(MOD_ROG_CORE)
+
 		const CvCity* pLoopCity = NULL;
 		int iLoop = 0;
 		int iCityPOPResource = 0;
@@ -20863,7 +20859,7 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 
 		iTotalNumResource += iCityPOPResource / 100;
 		iTotalNumResource += iCityResourceFromPolicy;
-#endif
+
 
 	if(GetStrategicResourceMod() != 0)
 		{
@@ -25306,18 +25302,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 				YieldTypes eYield = (YieldTypes) iI;
 				int iYield = pPolicy->GetYieldChangeWorldWonder(iI);
 
-				if (eYield == YIELD_CULTURE)
-				{
-					pLoopCity->ChangeJONSCulturePerTurnFromBuildings(iYield * iTotalWonders * iChange);
-				}
-				else if (eYield == YIELD_FAITH)
-				{
-					pLoopCity->ChangeFaithPerTurnFromBuildings(iYield * iTotalWonders * iChange);
-				}
-				else
-				{
-					pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYield * iTotalWonders * iChange);
-				}
+				pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYield * iTotalWonders * iChange);
 			}
 		}
 #endif
@@ -26310,6 +26295,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iScoreFromFutureTech;
 	kStream >> m_iScenarioScore4;
 	kStream >> m_iCombatExperience;
+
+	kStream >> m_piNumBuildings;
+
 	kStream >> m_iNavalCombatExperience;
 	kStream >> m_iLifetimeCombatExperience;
 #if defined(MOD_UNITS_XP_TIMES_100)
@@ -26961,6 +26949,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iScoreFromFutureTech;
 	kStream << m_iScenarioScore4;
 	kStream << m_iCombatExperience;
+
+	kStream << m_piNumBuildings;
+
 	kStream << m_iNavalCombatExperience;
 	kStream << m_iLifetimeCombatExperience;
 #if defined(MOD_UNITS_XP_TIMES_100)

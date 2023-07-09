@@ -183,6 +183,7 @@
     <ClCompile Include="CvPlotInfo.cpp" />
     <ClCompile Include="CvPromotionCollectionClasses.cpp" />
     <ClCompile Include="CvQuestInfo.cpp" />
+    <ClCompile Include="CvSerialize.cpp" />
     <ClCompile Include="CvTargeting.cpp" />
     <ClCompile Include="FunctionsRef.cpp" />
     <ClCompile Include="LargeArgContainer.pb.cpp" />
@@ -494,6 +495,7 @@
     <ClInclude Include="CvLuaFormula.h" />
     <ClInclude Include="CvMap.h" />
     <ClInclude Include="CvMapGenerator.h" />
+    <ClInclude Include="CvMeta.h" />
     <ClInclude Include="CvMilitaryAI.h" />
     <ClInclude Include="CvMinorCivAI.h" />
     <ClInclude Include="CvNotificationClasses.h" />
@@ -520,7 +522,10 @@
     <ClInclude Include="CvReligionClasses.h" />
     <ClInclude Include="CvReplayInfo.h" />
     <ClInclude Include="CvReplayMessage.h" />
+    <ClInclude Include="CvSerialize.h" />
     <ClInclude Include="CvSiteEvaluationClasses.h" />
+    <ClInclude Include="CvSpan.h" />
+    <ClInclude Include="CvSpanSerialization.h" />
     <ClInclude Include="CvStartPositioner.h" />
     <ClInclude Include="cvStopWatch.h" />
     <ClInclude Include="CvStructs.h" />

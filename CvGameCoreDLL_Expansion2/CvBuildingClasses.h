@@ -214,11 +214,10 @@ public:
 #endif
 
 
-#if defined(MOD_ROG_CORE)
+
 	int GetResourceQuantityFromPOP(int i) const;
 	int GetYieldChangeWorldWonder(int i) const;
 	int GetYieldChangeWorldWonderGlobal(int i) const;
-#endif
 
 	int GetYieldFromProcessModifier(int i) const;
 	int* GetYieldFromProcessModifierArray() const;
@@ -227,18 +226,26 @@ public:
 	int* GetYieldFromProcessModifierArrayGlobal() const;
 
 
-#if defined(MOD_ROG_CORE)
 	int GetResourceYieldChangeGlobal(int iResource, int iYieldType) const;
 	int GetImprovementYieldChange(int i, int j) const;
 	int* GetImprovementYieldChangeArray(int i) const;
 
 	int GetImprovementYieldChangeGlobal(int i, int j) const;
 	int* GetImprovementYieldChangeGlobalArray(int i) const;
+
+
+	int GetYieldPerXTerrain(int i, int j) const;
+	int* GetYieldPerXTerrainArray(int i) const;
+
+	int GetYieldPerXFeature(int i, int j) const;
+	int* GetYieldPerXFeatureArray(int i) const;
+
 	int GetSpecialistYieldChangeLocal(int i, int j) const;
 	int* GetSpecialistYieldChangeLocalArray(int i) const;
 
 	int GetBuildingClassYieldModifier(int i, int j) const;
-#endif
+	int GetBuildingClassLocalYieldChange(int i, int j) const;
+
 
 
 	int GetMinAreaSize() const;
@@ -557,6 +564,8 @@ private:
 
 	int** m_ppaiImprovementYieldChange;
 	int** m_ppaiImprovementYieldChangeGlobal;
+	int** m_ppaiYieldPerXTerrain;
+	int** m_ppaiYieldPerXFeature;
 	int** m_ppaiSpecialistYieldChangeLocal;
 #endif
 
@@ -572,6 +581,7 @@ private:
 
 #if defined(MOD_ROG_CORE)
 	int** m_ppiBuildingClassYieldModifiers;
+	int** m_ppiBuildingClassLocalYieldChanges;
 #endif
 
 	int m_iMinAreaSize;

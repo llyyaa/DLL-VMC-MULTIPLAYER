@@ -5031,33 +5031,13 @@ void CvTeam::enhanceBuilding(BuildingTypes eIndex, int iChange)
 						{
 							for(int k = 0; k < NUM_YIELD_TYPES; k++)
 							{
-								if((YieldTypes)k == YIELD_CULTURE)
-								{
-#if defined(MOD_BUGFIX_MINOR)
-									int iEnhancedYield = thisBuildingEntry->GetTechEnhancedYieldChange(k) * pLoopCity->GetCityBuildings()->GetNumBuilding(eIndex);
-									pLoopCity->ChangeJONSCulturePerTurnFromBuildings(iEnhancedYield * iChange);
-#else
-									pLoopCity->ChangeJONSCulturePerTurnFromBuildings(thisBuildingEntry->GetTechEnhancedYieldChange(k) * iChange);
-#endif
-								}
-								else if((YieldTypes)k == YIELD_FAITH)
-								{
-#if defined(MOD_BUGFIX_MINOR)
-									int iEnhancedYield = thisBuildingEntry->GetTechEnhancedYieldChange(k) * pLoopCity->GetCityBuildings()->GetNumBuilding(eIndex);
-									pLoopCity->ChangeFaithPerTurnFromBuildings(iEnhancedYield * iChange);
-#else
-									pLoopCity->ChangeFaithPerTurnFromBuildings(thisBuildingEntry->GetTechEnhancedYieldChange(k) * iChange);
-#endif
-								}
-								else
-								{
 #if defined(MOD_BUGFIX_MINOR)
 									int iEnhancedYield = thisBuildingEntry->GetTechEnhancedYieldChange(k) * pLoopCity->GetCityBuildings()->GetNumBuilding(eIndex);
 									pLoopCity->ChangeBaseYieldRateFromBuildings(((YieldTypes)k), iEnhancedYield * iChange);
 #else
 									pLoopCity->ChangeBaseYieldRateFromBuildings(((YieldTypes)k), thisBuildingEntry->GetTechEnhancedYieldChange(k) * iChange);
 #endif
-								}
+						
 							}
 						}
 					}
@@ -6707,7 +6687,7 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 	}
 
 
-#if defined(MOD_ROG_CORE)
+
 	for (iI = 0; iI < MAX_PLAYERS; iI++)
 	{
 		CvPlayer& kPlayer = GET_PLAYER((PlayerTypes)iI);
@@ -6726,7 +6706,7 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 			}
 		}
 	}
-#endif
+
 
 	CvPlot* pNewUnitPlot;
 	for(iI = 0; iI < MAX_PLAYERS; iI++)

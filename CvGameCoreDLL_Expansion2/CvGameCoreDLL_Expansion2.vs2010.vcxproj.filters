@@ -566,6 +566,9 @@
     <ClCompile Include="CvLuaFormula.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CvSerialize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="banned.h">
@@ -1373,6 +1376,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CvLuaFormula.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CvSerialize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CvSpanSerialization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CvSpan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CvMeta.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

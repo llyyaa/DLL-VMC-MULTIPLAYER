@@ -183,12 +183,17 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppiResourceYieldChangeGlobal(),
 	m_ppaiImprovementYieldChange(NULL),
 	m_ppaiImprovementYieldChangeGlobal(NULL),
+
+	m_ppaiYieldPerXTerrain(NULL),
+	m_ppaiYieldPerXFeature(NULL),
+
 	m_ppaiSpecialistYieldChangeLocal(NULL),
 
 	m_piYieldChangeWorldWonder(NULL),
 	m_piYieldChangeWorldWonderGlobal(NULL),
 
 	m_ppiBuildingClassYieldModifiers(NULL),
+	m_ppiBuildingClassLocalYieldChanges(NULL),
 	m_piYieldChangePerPopInEmpire(),
 #endif
 
@@ -355,8 +360,13 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	m_ppiResourceYieldChangeGlobal.clear();
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChangeGlobal);
+
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiYieldPerXTerrain);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiYieldPerXFeature);
+
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChangeLocal);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldModifiers);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassLocalYieldChanges);
 #endif
 
 
@@ -854,6 +864,52 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	}
 
 
+	//xTerrainYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppaiYieldPerXTerrain, "Terrains", "Yields");
+
+		std::string strKey("Building_YieldPerXTerrainTimes100");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Terrains.ID as TerrainID, Yields.ID as YieldID, Yield from Building_YieldPerXTerrainTimes100 inner join Terrains on Terrains.Type = TerrainType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int TerrainID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiYieldPerXTerrain[TerrainID][YieldID] = yield;
+		}
+	}
+	//xFeatureYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppaiYieldPerXFeature, "Features", "Yields");
+
+		std::string strKey("Building_YieldPerXFeatureTimes100");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Features.ID as FeatureID, Yields.ID as YieldID, Yield from Building_YieldPerXFeatureTimes100 inner join Features on Features.Type = FeatureType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int FeatureID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiYieldPerXFeature[FeatureID][YieldID] = yield;
+		}
+	}
+
+
 	//Building_YieldChangesPerPopInEmpire
 	{
 		std::string strKey("Building_YieldChangesPerPopInEmpire");
@@ -1138,6 +1194,30 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 			const int iYieldModifier = pResults->GetInt(2);
 
 			m_ppiBuildingClassYieldModifiers[BuildingClassID][iYieldID] = iYieldModifier;
+		}
+	}
+
+
+	//BuildingClassLocalYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppiBuildingClassLocalYieldChanges, "BuildingClasses", "Yields");
+
+		std::string strKey("Building_BuildingClassLocalYieldChanges");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select BuildingClasses.ID as BuildingClassID, Yields.ID as YieldID, YieldChange from Building_BuildingClassLocalYieldChanges inner join BuildingClasses on BuildingClasses.Type = BuildingClassType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int BuildingClassID = pResults->GetInt(0);
+			const int iYieldID = pResults->GetInt(1);
+			const int iYieldChange = pResults->GetInt(2);
+
+			m_ppiBuildingClassLocalYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
 		}
 	}
 #endif
@@ -2764,7 +2844,6 @@ bool CvBuildingEntry::IsAllowInstantYield() const
 }
 #endif
 
-#if defined(MOD_ROG_CORE)
 // Resource provided by Population
 int CvBuildingEntry::GetResourceQuantityFromPOP(int i) const
 {
@@ -2772,9 +2851,9 @@ int CvBuildingEntry::GetResourceQuantityFromPOP(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piResourceQuantityFromPOP ? m_piResourceQuantityFromPOP[i] : -1;
 }
-#endif
 
-#if defined(MOD_ROG_CORE)
+
+
 int CvBuildingEntry::GetYieldChangeWorldWonder(int i) const
 {
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
@@ -2787,10 +2866,8 @@ int CvBuildingEntry::GetYieldChangeWorldWonderGlobal(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piYieldChangeWorldWonderGlobal ? m_piYieldChangeWorldWonderGlobal[i] : 0;
 }
-#endif
 
 
-#if defined(MOD_ROG_CORE)
 /// Change to Improvement yield by type
 int CvBuildingEntry::GetImprovementYieldChange(int i, int j) const
 {
@@ -2830,6 +2907,42 @@ int* CvBuildingEntry::GetImprovementYieldChangeGlobalArray(int i) const
 	return m_ppaiImprovementYieldChangeGlobal[i];
 }
 
+/// Change to Terrain yield by type
+int CvBuildingEntry::GetYieldPerXTerrain(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiYieldPerXTerrain ? m_ppaiYieldPerXTerrain[i][j] : -1;
+}
+
+/// Array of changes to Feature yield
+int* CvBuildingEntry::GetYieldPerXTerrainArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiYieldPerXTerrain[i];
+}
+
+int CvBuildingEntry::GetYieldPerXFeature(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiYieldPerXFeature ? m_ppaiYieldPerXFeature[i][j] : -1;
+}
+
+/// Array of changes to Feature yield
+int* CvBuildingEntry::GetYieldPerXFeatureArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiYieldPerXFeature[i];
+}
+
+
 /// Change to specialist yield by type
 int CvBuildingEntry::GetSpecialistYieldChangeLocal(int i, int j) const
 {
@@ -2866,10 +2979,8 @@ int CvBuildingEntry::GetResourceYieldChangeGlobal(int iResource, int iYieldType)
 
 	return 0;
 }
-#endif
 
 
-#if defined(MOD_ROG_CORE)
 /// Yield change for a specific BuildingClass by yield type
 int CvBuildingEntry::GetBuildingClassYieldModifier(int i, int j) const
 {
@@ -2879,7 +2990,17 @@ int CvBuildingEntry::GetBuildingClassYieldModifier(int i, int j) const
 	CvAssertMsg(j > -1, "Index out of bounds");
 	return m_ppiBuildingClassYieldModifiers[i][j];
 }
-#endif
+
+/// Yield change for a specific BuildingClass by yield type
+int CvBuildingEntry::GetBuildingClassLocalYieldChange(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumBuildingClassInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppiBuildingClassLocalYieldChanges[i][j];
+}
+
 
 
 /// Can it only built if there is a building of this class in the city?

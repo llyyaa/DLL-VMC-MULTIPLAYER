@@ -243,7 +243,10 @@ public:
 	// End Civ 5 Score
 
 	int countCityFeatures(FeatureTypes eFeature) const;
-	int countNumBuildings(BuildingTypes eBuilding) const;
+	int countNumBuildings(BuildingTypes eBuilding, bool bReset = false) const;
+
+	void setNumBuildings(BuildingTypes eBuilding, int iValue);
+	int getNumBuildings(BuildingTypes eBuilding) const;
 	//int countNumCitiesConnectedToCapital() const;
 
 	int countCitiesFeatureSurrounded() const;
@@ -2282,6 +2285,9 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iScenarioScore4;
 	FAutoVariable<int, CvPlayer> m_iScoreFromFutureTech;
 	FAutoVariable<int, CvPlayer> m_iCombatExperience;
+
+	std::vector<int> m_piNumBuildings;
+
 	int m_iLifetimeCombatExperience;
 	int m_iNavalCombatExperience;
 #if defined(MOD_UNITS_XP_TIMES_100)
