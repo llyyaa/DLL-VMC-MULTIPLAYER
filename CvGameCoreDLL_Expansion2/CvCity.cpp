@@ -17763,13 +17763,8 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 	// Requires coast
 	if(pkBuildingInfo->IsWater())
 	{
-#ifdef MOD_TRAITS_CAN_FOUND_COAST_CITY
 		if (!isCoastal(pkBuildingInfo->GetMinAreaSize()))
 			return false;
-#else
-		if (!isCoastal(pkBuildingInfo->GetMinAreaSize()))
-			return false;
-#endif
 	}
 
 	// Requires River
@@ -17785,6 +17780,14 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 		if(!plot()->isFreshWater())
 			return false;
 	}
+
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	if(pkBuildingInfo->IsAnyWater())
+	{
+		if(!(isCoastal(pkBuildingInfo->GetMinAreaSize()) || plot()->isFreshWater()))
+			return false;
+	}
+#endif
 
 	// Requires adjacent Mountain
 	if(pkBuildingInfo->IsMountain())

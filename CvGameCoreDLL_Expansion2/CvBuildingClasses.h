@@ -183,6 +183,9 @@ public:
 	int* GetInstantYieldArray() const;
 	bool IsAllowInstantYield() const;
 #endif
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	bool IsAnyWater() const;
+#endif
 
 #if defined(MOD_ROG_CORE)
 	int GetGreatWorkYieldChange(int i) const;
@@ -522,6 +525,9 @@ private:
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	int* m_piInstantYield;
 	bool m_bAllowInstantYield;
+#endif
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	bool m_bAnyWater;
 #endif
 
 #if defined(MOD_ROG_CORE)
