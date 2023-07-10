@@ -7008,13 +7008,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			owningPlayer.ChangeUnhappinessMod(pBuildingInfo->GetUnhappinessModifier() * iChange);
 		}
 
-		int iBuildingCulture = pBuildingInfo->GetYieldChange(YIELD_CULTURE);
-		if(iBuildingCulture > 0)
-		{
-			iBuildingCulture += owningPlayer.GetPlayerTraits()->GetCultureBuildingYieldChange();
-		}
 
-		ChangeBaseYieldRateFromBuildings(YIELD_CULTURE, iBuildingCulture* iChange);
+
+		//ChangeBaseYieldRateFromBuildings(YIELD_CULTURE, iBuildingCulture* iChange);
 
 		changeCultureRateModifier(pBuildingInfo->GetCultureRateModifier() * iChange);
 		changePlotCultureCostModifier(pBuildingInfo->GetPlotCultureCostModifier() * iChange);
@@ -7215,7 +7211,18 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			changeRiverPlotYield(eYield, (pBuildingInfo->GetRiverPlotYieldChange(eYield) * iChange));
 			changeLakePlotYield(eYield, (pBuildingInfo->GetLakePlotYieldChange(eYield) * iChange));
 			changeSeaResourceYield(eYield, (pBuildingInfo->GetSeaResourceYieldChange(eYield) * iChange));
+
+			int iBuildingCulture = pBuildingInfo->GetYieldChange(YIELD_CULTURE);
+
+			if (iBuildingCulture > 0)
+			{
+				ChangeBaseYieldRateFromBuildings(YIELD_CULTURE, owningPlayer.GetPlayerTraits()->GetCultureBuildingYieldChange());
+				//iBuildingCulture += owningPlayer.GetPlayerTraits()->GetCultureBuildingYieldChange();
+			}
+
 			ChangeBaseYieldRateFromBuildings(eYield, ((pBuildingInfo->GetYieldChange(eYield) + m_pCityBuildings->GetBuildingYieldChange(eBuildingClass, eYield)) * iChange));
+
+
 			ChangeYieldPerPopTimes100(eYield, pBuildingInfo->GetYieldChangePerPop(eYield) * iChange);
 			ChangeYieldPerReligionTimes100(eYield, pBuildingInfo->GetYieldChangePerReligion(eYield) * iChange);
 			changeYieldRateModifier(eYield, (pBuildingInfo->GetYieldModifier(eYield) * iChange));
@@ -7223,6 +7230,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			CvPlayerPolicies* pPolicies = GET_PLAYER(getOwner()).GetPlayerPolicies();
 			changeYieldRateModifier(eYield, pPolicies->GetBuildingClassYieldModifier(eBuildingClass, eYield) * iChange);
 			ChangeBaseYieldRateFromBuildings(eYield, pPolicies->GetBuildingClassYieldChange(eBuildingClass, eYield) * iChange);
+
 
 #if defined(MOD_ROG_CORE)
 			ChangeYieldPerPopInEmpireTimes100(eYield, pBuildingInfo->GetYieldChangePerPopInEmpire(eYield)* iChange);
