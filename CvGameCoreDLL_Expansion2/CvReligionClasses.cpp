@@ -6452,11 +6452,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 			GreatPersonTypes eGP = (GreatPersonTypes)iJ;
 			if (eGP == NO_GREATPERSON)
 				continue;
-
-			if (pEntry->GetGreatPersonPoints(eGP,pCity->isCapital()) > 0)
-			{
-				iTempValue += (pEntry->GetGreatPersonPoints(eGP,pCity->isCapital()) * iFlavorGP) / 10;
-			}
+			iTempValue += (pEntry->GetGreatPersonPoints(eGP,pCity->isCapital(),false) * iFlavorGP) / 10;
 		}
 		iRtnValue += iTempValue;
 	}

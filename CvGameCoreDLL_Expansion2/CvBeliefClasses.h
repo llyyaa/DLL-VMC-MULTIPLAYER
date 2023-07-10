@@ -125,7 +125,8 @@ public:
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	bool IsGreatPersonPointsCapital() const;
 	bool IsGreatPersonPointsPerCity() const;
-	int GetGreatPersonPoints(int i, bool bCapital) const;
+	bool IsGreatPersonPointsHolyCity() const;
+	int GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) const;
 	int GetFreePromotionForProphet() const;
 	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
@@ -190,6 +191,7 @@ protected:
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	bool m_bGreatPersonPointsCapital;
 	bool m_bGreatPersonPointsPerCity;
+	bool m_bGreatPersonPointsHolyCity;
 	int* m_piGreatPersonPoints;
 	int m_iFreePromotionForProphet;
 	int m_iLandmarksTourismPercent;
@@ -505,7 +507,7 @@ public:
 	int GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	int GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, bool bCapital) const;
+	int GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, bool bCapital, bool bHolyCity) const;
 	int GetYieldPerBirth(YieldTypes eYieldType) const;
 #endif
 	int GetResourceHappiness(ResourceTypes eResource) const;
