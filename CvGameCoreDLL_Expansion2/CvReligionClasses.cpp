@@ -3719,9 +3719,11 @@ BeliefTypes CvCityReligions::GetSecondaryReligionPantheonBelief()
 			const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eSecondary, m_pCity->getOwner());
 			if(pReligion)
 			{
+				const BeliefTypes eMjBelief = GetMajorReligionPantheonBelief();
 				for(int iI = 0; iI < pReligion->m_Beliefs.GetNumBeliefs(); iI++)
 				{
 					const BeliefTypes eBelief = pReligion->m_Beliefs.GetBelief(iI);
+					if(eMjBelief == eBelief) continue;
 					CvBeliefEntry* pEntry = GC.GetGameBeliefs()->GetEntry((int)eBelief);
 					if(pEntry && pEntry->IsPantheonBelief())
 					{
