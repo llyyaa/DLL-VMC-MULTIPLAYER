@@ -12,3 +12,4 @@ create table Building_YieldFromOtherYield(
 );
 
 ALTER TABLE Buildings ADD COLUMN 'AllowInstantYield' BOOLEAN DEFAULT 0;
+ALTER TABLE Buildings ADD COLUMN 'AnyWater' BOOLEAN DEFAULT 0;

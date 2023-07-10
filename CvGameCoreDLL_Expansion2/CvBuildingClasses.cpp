@@ -172,6 +172,9 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piInstantYield(NULL),
 	m_bAllowInstantYield(false),
 #endif
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_bAnyWater(false),
+#endif
 
 	m_piYieldFromProcessModifier(NULL),
 	m_piYieldFromProcessModifierGlobal(NULL),
@@ -435,6 +438,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	m_bAllowInstantYield = kResults.GetBool("AllowInstantYield");
+#endif
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_bAnyWater = kResults.GetBool("AnyWater");
 #endif
 	m_bMountain = kResults.GetBool("Mountain");
 	m_bHill = kResults.GetBool("Hill");
@@ -2841,6 +2847,12 @@ int* CvBuildingEntry::GetInstantYieldArray() const
 bool CvBuildingEntry::IsAllowInstantYield() const
 {
 	return m_bAllowInstantYield;
+}
+#endif
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+bool CvBuildingEntry::IsAnyWater() const
+{
+	return m_bAnyWater;
 }
 #endif
 
