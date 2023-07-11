@@ -146,6 +146,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_bPurchaseOnly(false),
 #endif
 
+	m_bMoveAfterCreated(false),
+
 #if defined(MOD_ROG_CORE)
 	m_piGreatWorkYieldChange(NULL),
 
@@ -414,6 +416,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 		m_bPurchaseOnly = kResults.GetBool("PurchaseOnly");
 	}
 #endif
+
+	m_bMoveAfterCreated = kResults.GetBool("MoveAfterCreated");
 
 #if defined(MOD_ROG_CORE)
 	m_iExtraDamageHeal = kResults.GetInt("ExtraDamageHeal");
@@ -2222,6 +2226,10 @@ bool CvBuildingEntry::IsPurchaseOnly() const
 }
 #endif
 
+bool CvBuildingEntry::IsMoveAfterCreated() const
+{
+	return m_bMoveAfterCreated;
+}
 
 
 #if defined(MOD_ROG_CORE)

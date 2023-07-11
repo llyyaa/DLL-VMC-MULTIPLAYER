@@ -15723,7 +15723,7 @@ void CvCity::Purchase(UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectT
 			if (iResult != FFreeList::INVALID_INDEX)
 			{
 				CvUnit* pUnit = kPlayer.getUnit(iResult);
-				if (!pUnit->getUnitInfo().CanMoveAfterPurchase())
+				if (!pUnit->getUnitInfo().CanMoveAfterPurchase() && !kPlayer.IsPlayerMoveAfterCreated())
 				{
 					pUnit->setMoves(0);
 				}

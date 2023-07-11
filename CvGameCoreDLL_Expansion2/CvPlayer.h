@@ -991,6 +991,9 @@ public:
 	bool isHalfSpecialistFood() const;
 	void changeHalfSpecialistFoodCount(int iChange);
 
+	bool IsPlayerMoveAfterCreated() const;
+	void ChangePlayerMoveAfterCreated(int iChange);
+
 #if defined(MOD_ROG_CORE)
 	void ChangeDomainFreeExperiencePerGreatWorkGlobal(DomainTypes eDomain, int iChange);
 	int GetDomainFreeExperiencePerGreatWorkGlobal(DomainTypes eDomain) const;
@@ -2400,6 +2403,8 @@ protected:
 #ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
 	std::vector<int> m_aiGoldenAgeYieldRateModifier;
 #endif
+
+	int m_iMoveAfterCreated;
 
 #if defined(MOD_ROG_CORE)
 	std::vector<int> m_aiWorldWonderCityYieldRateModifier;

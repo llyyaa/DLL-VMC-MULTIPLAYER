@@ -314,6 +314,7 @@ public:
 	bool IsAddsFreshWater() const;
 	bool IsPurchaseOnly() const;
 #endif
+	bool IsMoveAfterCreated() const;
 	bool IsMountain() const;
 	bool IsHill() const;
 	bool IsFlat() const;
@@ -668,6 +669,7 @@ private:
 	bool m_bAddsFreshWater;
 	bool m_bPurchaseOnly;
 #endif
+	bool m_bMoveAfterCreated;
 	bool m_bMountain;
 	bool m_bHill;
 	bool m_bFlat;

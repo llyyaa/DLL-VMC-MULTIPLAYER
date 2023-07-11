@@ -355,6 +355,8 @@ CvPlayer::CvPlayer() :
 	, m_iNavalCombatExperienceTimes100(0)
 #endif
 
+	, m_iMoveAfterCreated(0)
+
 #if defined(MOD_ROG_CORE)
 	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
 	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
@@ -415,6 +417,7 @@ CvPlayer::CvPlayer() :
 	, m_ePersonalityType("CvPlayer::m_ePersonalityType", m_syncArchive)
 	, m_aiCityYieldChange("CvPlayer::m_aiCityYieldChange", m_syncArchive)
 
+	
 #if defined(MOD_ROG_CORE)
 	, m_aiDomainFreeExperiencePerGreatWorkGlobal("CvPlayer::m_aiDomainFreeExperiencePerGreatWorkGlobal", m_syncArchive)
 	, m_piDomainFreeExperience()
@@ -1106,6 +1109,8 @@ void CvPlayer::uninit()
 	m_iLifetimeCombatExperienceTimes100 = 0;
 	m_iNavalCombatExperienceTimes100 = 0;
 #endif
+
+	m_iMoveAfterCreated = 0;
 
 #if defined(MOD_ROG_CORE)
 	m_iGlobalCityStrengthMod = 0;
@@ -9382,6 +9387,8 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 {
 	int iI, iJ;
 
+
+	
 	CvBuildingEntry* pBuildingInfo = GC.getBuildingInfo(eBuilding);
 	if(pBuildingInfo == NULL)
 		return;
@@ -9505,6 +9512,13 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 			}
 		}
 	}
+
+
+	if (pBuildingInfo->IsMoveAfterCreated())
+	{
+		ChangePlayerMoveAfterCreated(pBuildingInfo->IsMoveAfterCreated() ? iChange : 0);
+	}
+
 
 #if defined(MOD_ROG_CORE)
 	for (int iDomains = 0; iDomains < NUM_DOMAIN_TYPES; iDomains++)
@@ -16542,6 +16556,21 @@ void CvPlayer::changeHalfSpecialistFoodCount(int iChange)
 		CvAssert(getHalfSpecialistFoodCount() >= 0);
 	}
 }
+
+
+bool CvPlayer::IsPlayerMoveAfterCreated() const
+{
+	return m_iMoveAfterCreated > 0;
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangePlayerMoveAfterCreated(int iChange)
+{
+	m_iMoveAfterCreated += iChange;
+}
+
+
 
 #if defined(MOD_ROG_CORE)
 //	--------------------------------------------------------------------------------
@@ -26314,6 +26343,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	MOD_SERIALIZE_READ(74, kStream, m_iNavalCombatExperienceTimes100, m_iNavalCombatExperience*100);
 	MOD_SERIALIZE_READ(74, kStream, m_iLifetimeCombatExperienceTimes100, m_iLifetimeCombatExperience*100);
 #endif
+	kStream >> m_iMoveAfterCreated;
 	kStream >> m_iBorderObstacleCount;
 	kStream >> m_iNextOperationID;
 	kStream >> m_iCostNextPolicy;
@@ -26968,6 +26998,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	MOD_SERIALIZE_WRITE(kStream, m_iNavalCombatExperienceTimes100);
 	MOD_SERIALIZE_WRITE(kStream, m_iLifetimeCombatExperienceTimes100);
 #endif
+	kStream << m_iMoveAfterCreated;
 	kStream << m_iBorderObstacleCount;
 	kStream << m_iNextOperationID;
 	kStream << m_iCostNextPolicy;
