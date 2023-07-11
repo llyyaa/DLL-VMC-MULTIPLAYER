@@ -132,6 +132,8 @@ public:
 	int GetFreeBuildingClass() const;
 	int GetFreeBuildingThisCity() const;
 	int GetFreePromotion() const;
+	int GetFreePromotion2() const;
+	int GetFreePromotion3() const;
 	int GetTrainedFreePromotion() const;
 	int GetFreePromotionRemoved() const;
 	int GetProductionCost() const;
@@ -483,6 +485,8 @@ private:
 	int m_iFreeBuildingClass;
 	int m_iFreeBuildingThisCity;
 	int m_iFreePromotion;
+	int m_iFreePromotion2;
+	int m_iFreePromotion3;
 	int m_iTrainedFreePromotion;
 	int m_iFreePromotionRemoved;
 	int m_iProductionCost;
