@@ -10155,14 +10155,14 @@ int CvCity::GetGreatPersonPointsFromReligion(GreatPersonTypes eGreatPersonTypes)
 		const CvReligion* pkReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion,getOwner());
 		if(pkReligion->m_Beliefs.HasGreatPersonPoints())
 		{
-			resValue += pkReligion->m_Beliefs.GetGreatPersonPoints(eGreatPersonTypes,isCapital());
+			resValue += pkReligion->m_Beliefs.GetGreatPersonPoints(eGreatPersonTypes,isCapital(),GetCityReligions()->IsHolyCityForReligion(eReligion));
 		}
 	}
 	
 	BeliefTypes eBelief = GetCityReligions()->GetSecondaryReligionPantheonBelief();
 	if(eBelief != NO_BELIEF)
 	{
-		resValue +=  GC.GetGameBeliefs()->GetEntry(eBelief)->GetGreatPersonPoints(eGreatPersonTypes,isCapital());
+		resValue +=  GC.GetGameBeliefs()->GetEntry(eBelief)->GetGreatPersonPoints(eGreatPersonTypes,isCapital(),false);
 	}
 
 	return resValue;

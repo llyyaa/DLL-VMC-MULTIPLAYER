@@ -9767,7 +9767,8 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	}
 #if defined(MOD_ROG_CORE)
 	//Refresh cache data.
-	countNumBuildings(eBuilding, true);
+	//countNumBuildings(eBuilding, true);
+	setNumBuildings(eBuilding, getNumBuildings(eBuilding) + iChange);
 #endif
 }
 

@@ -60,6 +60,7 @@ CvBeliefEntry::CvBeliefEntry() :
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	m_bGreatPersonPointsCapital(false),
 	m_bGreatPersonPointsPerCity(false),
+	m_bGreatPersonPointsHolyCity(false),
 	m_piGreatPersonPoints(NULL),
 	m_iFreePromotionForProphet(NO_PROMOTION),
 	m_iLandmarksTourismPercent(0),
@@ -688,7 +689,11 @@ bool CvBeliefEntry::IsGreatPersonPointsPerCity() const
 {
 	return m_bGreatPersonPointsPerCity;
 }
-int CvBeliefEntry::GetGreatPersonPoints(int i, bool bCapital) const
+bool CvBeliefEntry::IsGreatPersonPointsHolyCity() const
+{
+	return m_bGreatPersonPointsHolyCity;
+}
+int CvBeliefEntry::GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) const
 {
 	CvAssertMsg(i < GC.getNumGreatPersonInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
@@ -696,6 +701,7 @@ int CvBeliefEntry::GetGreatPersonPoints(int i, bool bCapital) const
 	int resValue = 0;
 	resValue += (m_bGreatPersonPointsPerCity ? m_piGreatPersonPoints[i] : 0);
 	resValue += (bCapital && m_bGreatPersonPointsCapital ? m_piGreatPersonPoints[i] : 0);
+	resValue += (bHolyCity && m_bGreatPersonPointsHolyCity ? m_piGreatPersonPoints[i] : 0);
 
 	return resValue;
 }
@@ -874,6 +880,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	m_bGreatPersonPointsCapital	  	  = kResults.GetBool("GreatPersonPointsCapital");
 	m_bGreatPersonPointsPerCity	  	  = kResults.GetBool("GreatPersonPointsPerCity");
+	m_bGreatPersonPointsHolyCity	  = kResults.GetBool("GreatPersonPointsHolyCity");
 	m_bAllowYieldPerBirth	  		  = kResults.GetBool("AllowYieldPerBirth");
 #endif
 	//References
@@ -1404,7 +1411,7 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief)
 	m_iFaithBuildingTourism += belief->GetFaithBuildingTourism();
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	m_bGreatPersonPoints = m_bGreatPersonPoints || belief->IsGreatPersonPointsCapital() || belief->IsGreatPersonPointsPerCity();	
+	m_bGreatPersonPoints = m_bGreatPersonPoints || belief->IsGreatPersonPointsCapital() || belief->IsGreatPersonPointsPerCity() || belief->IsGreatPersonPointsHolyCity();	
 	if(belief->GetFreePromotionForProphet() != NO_PROMOTION)
 	{
 		m_vFreePromotionForProphet.push_back(belief->GetFreePromotionForProphet());
@@ -2052,7 +2059,7 @@ int CvReligionBeliefs::GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 /// Get Great Person Points from beliefs
-int CvReligionBeliefs::GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, bool bCapital) const
+int CvReligionBeliefs::GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, bool bCapital, bool bHolyCity) const
 {
 	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
 	int rtnValue = 0;
@@ -2060,7 +2067,7 @@ int CvReligionBeliefs::GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, 
 	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
 	{
 		CvBeliefEntry* pBeliefEntry = pBeliefs->GetEntry(*i);
-		int iValue = pBeliefEntry->GetGreatPersonPoints(eGreatPersonTypes, bCapital);
+		int iValue = pBeliefEntry->GetGreatPersonPoints(eGreatPersonTypes, bCapital, bHolyCity);
 		if (iValue != 0)
 		{
 			rtnValue += iValue;
