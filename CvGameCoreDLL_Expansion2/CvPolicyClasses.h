@@ -230,6 +230,7 @@ public:
 	int GetHurryModifier(int i) const;
 	bool IsSpecialistValid(int i) const;
 	int GetImprovementYieldChanges(int i, int j) const;
+	int GetCityLoveKingDayYieldMod(int i) const;
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
 	int GetPlotYieldChanges(int i, int j) const;
 #endif
@@ -499,6 +500,7 @@ private:
 	std::pair<UnitClassTypes, int>* m_pFreeUnitClasses;
 	int* m_paiTourismOnUnitCreation;
 
+	int* m_piCityLoveKingDayYieldMod;
 //	bool* m_pabHurry;
 	bool* m_pabSpecialistValid;
 	int** m_ppiImprovementYieldChanges;

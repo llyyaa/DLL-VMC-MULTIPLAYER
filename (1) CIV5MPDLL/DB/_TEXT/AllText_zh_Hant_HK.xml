@@ -2,6 +2,13 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
+
+	<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
+		<Text>
+			[NEWLINE][ICON_BULLET]愛領袖日修正(政策): {1_Num}%
+		</Text>
+	</Row>
+
 <Row Tag="TXT_KEY_YIELD_HEALTH">
 				<Text>健康</Text>
 			</Row>

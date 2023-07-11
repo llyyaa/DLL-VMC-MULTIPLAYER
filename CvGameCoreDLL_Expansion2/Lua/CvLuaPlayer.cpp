@@ -790,6 +790,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetSeaPlotYield);
 	Method(GetYieldRateModifier);
+	Method(GetCityLoveKingDayYieldMod);
 	Method(GetCapitalYieldRateModifier);
 	Method(GetExtraYieldThreshold);
 
@@ -7540,6 +7541,12 @@ int CvLuaPlayer::lGetPlayerColors(lua_State* L)
 int CvLuaPlayer::lGetSeaPlotYield(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::getSeaPlotYield);
+}
+//------------------------------------------------------------------------------
+//int getYieldRateModifier(YieldTypes eIndex);
+int CvLuaPlayer::lGetCityLoveKingDayYieldMod(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::getCityLoveKingDayYieldMod);
 }
 //------------------------------------------------------------------------------
 //int getYieldRateModifier(YieldTypes eIndex);

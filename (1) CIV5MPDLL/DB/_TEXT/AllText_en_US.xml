@@ -3,6 +3,11 @@
 	<!-- Espionage.xml -->
 	<Language_en_US>
 
+	<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
+		<Text>
+			[NEWLINE][ICON_BULLET]We Love King Day(Policy): {1_Num}%
+		</Text>
+	</Row>
 <Row Tag="TXT_KEY_YIELD_HEALTH">
 				<Text>HEALTH</Text>
 			</Row>

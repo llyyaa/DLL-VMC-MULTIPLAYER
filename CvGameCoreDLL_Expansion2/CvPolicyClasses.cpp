@@ -221,6 +221,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 #endif
 	m_ppiBuildingClassYieldModifiers(NULL),
 	m_ppiBuildingClassYieldChanges(NULL),
+	m_piCityLoveKingDayYieldMod(NULL),
 	m_piFlavorValue(NULL),
 	m_eFreeBuildingOnConquest(NO_BUILDING),
 	m_iNumFreeUnitClass(0),
@@ -254,7 +255,7 @@ CvPolicyEntry::~CvPolicyEntry(void)
 //	SAFE_DELETE_ARRAY(m_pabHurry);
 	SAFE_DELETE_ARRAY(m_paiHurryModifier);
 	SAFE_DELETE_ARRAY(m_pabSpecialistValid);
-
+	SAFE_DELETE_ARRAY(m_piCityLoveKingDayYieldMod);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiImprovementYieldChanges);
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiPlotYieldChanges);
@@ -489,6 +490,8 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.SetYields(m_piCapitalYieldModifier, "Policy_CapitalYieldModifiers", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piGreatWorkYieldChange, "Policy_GreatWorkYieldChanges", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piSpecialistExtraYield, "Policy_SpecialistExtraYields", "PolicyType", szPolicyType);
+
+	kUtility.SetYields(m_piCityLoveKingDayYieldMod, "Policy_CityLoveKingDayYieldMod", "PolicyType", szPolicyType);
 
 	kUtility.SetFlavors(m_piFlavorValue, "Policy_Flavors", "PolicyType", szPolicyType);
 
@@ -2374,6 +2377,14 @@ int CvPolicyEntry::GetImprovementYieldChanges(int i, int j) const
 	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
 	CvAssertMsg(j > -1, "Index out of bounds");
 	return m_ppiImprovementYieldChanges[i][j];
+}
+
+/// Does this Policy boost yields from golden ages?
+int CvPolicyEntry::GetCityLoveKingDayYieldMod(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piCityLoveKingDayYieldMod[i];
 }
 
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)

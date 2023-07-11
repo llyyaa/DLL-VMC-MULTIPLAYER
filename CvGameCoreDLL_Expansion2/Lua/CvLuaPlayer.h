@@ -691,6 +691,7 @@ protected:
 	static int lGetPlayerColor(lua_State* L);
 
 	static int lGetSeaPlotYield(lua_State* L);
+	static int lGetCityLoveKingDayYieldMod(lua_State* L);
 	static int lGetYieldRateModifier(lua_State* L);
 	static int lGetCapitalYieldRateModifier(lua_State* L);
 	static int lGetExtraYieldThreshold(lua_State* L);
