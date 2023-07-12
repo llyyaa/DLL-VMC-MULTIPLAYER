@@ -321,5 +321,8 @@
 				[NEWLINE][ICON_BULLET]快樂度修正(政策): {1_Num}%
 			</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CO_CITY_TOURISM_NUM_GREAT_WORK">
+				<Text>+{1_num}%獎勵 來自傑作數量</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

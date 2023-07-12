@@ -322,7 +322,9 @@
 				[NEWLINE][ICON_BULLET]快乐度修正(政策): {1_Num}%
 			</Text>
 		</Row>
-		
+		<Row Tag="TXT_KEY_CO_CITY_TOURISM_NUM_GREAT_WORK">
+			<Text>+{1_num}%奖励 来自杰作数量</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

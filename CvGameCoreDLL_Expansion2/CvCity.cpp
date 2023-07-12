@@ -11515,7 +11515,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 #ifdef MOD_ROG_CORE
 		if (MOD_ROG_CORE)
 		{
-			iTempMod += GET_PLAYER(getOwner()).getWorldWonderCityYieldRateModifier(eIndex);
+			iTempMod = GET_PLAYER(getOwner()).getWorldWonderCityYieldRateModifier(eIndex);
 			if (iTempMod != 0)
 			{
 				if (toolTipSink)

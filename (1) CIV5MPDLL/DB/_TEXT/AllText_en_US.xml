@@ -325,6 +325,9 @@
 				[NEWLINE][ICON_BULLET] Global Modifier for Happiness (Policy): {1_Num}%
 			</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CO_CITY_TOURISM_NUM_GREAT_WORK">
+				<Text>+{1_Num}% Bonus from Num of Great Works</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>
