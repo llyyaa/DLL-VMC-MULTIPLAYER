@@ -2880,9 +2880,7 @@ int CvLuaCity::lGetNumGreatWorkSlots(lua_State* L)
 int CvLuaCity::lGetBaseTourism(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
-	int iValue = pkCity->GetBaseTourism();
-		iValue /= 100;
-	lua_pushinteger(L, iValue);
+	lua_pushinteger(L, pkCity->GetBaseTourism());
 	return 1;
 }
 //------------------------------------------------------------------------------

@@ -4623,13 +4623,13 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers()
 /// What is the tourism output ignoring player-specific modifiers?
 void CvCityCulture::CalculateBaseTourism()
 {
-	int iBase = m_pCity->GetBaseTourismBeforeModifiers() * 100;
+	int iBase = m_pCity->GetBaseTourismBeforeModifiers();
 	if (iBase <= 0)
 	{
 		m_pCity->SetBaseTourism(0);
 		return;
 	}
-	int iModifier = 0;
+	int iModifier = m_pCity->getBaseYieldRateModifier(YIELD_TOURISM) - 100;
 
 	CvPlayer &kPlayer = GET_PLAYER(m_pCity->getOwner());
 	int iTechSpreadModifier = kPlayer.GetInfluenceSpreadModifier();
