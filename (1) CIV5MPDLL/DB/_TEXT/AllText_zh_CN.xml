@@ -325,6 +325,15 @@
 		<Row Tag="TXT_KEY_CO_CITY_TOURISM_NUM_GREAT_WORK">
 			<Text>+{1_num}%奖励 来自杰作数量</Text>
 		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_EMBARGO_IDEOLOGY">
+			<Text>无法与非同一意识形态的文明以及非结盟城邦建立国际[ICON_INTERNATIONAL_TRADE]商路。已结盟的城邦[ICON_INFLUENCE]影响力不会衰退。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_COLD_WAR">
+			<Text>冷战</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_COLD_WAR_HELP">
+			<Text>意识形态分歧已将世界推入冷战，经济和政治派系正在根据各自秉持的意识形态而形成。[NEWLINE][NEWLINE]如果决议通过，所有文明只能与和他们意识形态相同的文明或结盟的城邦建立[ICON_INTERNATIONAL_TRADE]国际商路。并且，与结盟城邦的[ICON_INFLUENCE]影响力不再衰退。[NEWLINE][NEWLINE]在有文明研发完成原子理论之后即可提案。</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

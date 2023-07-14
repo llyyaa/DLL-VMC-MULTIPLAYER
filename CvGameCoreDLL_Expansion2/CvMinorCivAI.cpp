@@ -6227,6 +6227,16 @@ int CvMinorCivAI::GetFriendshipChangePerTurnTimes100(PlayerTypes ePlayer)
 	iChangeThisTurn *= GC.getGame().getGameSpeedInfo().getGoldGiftMod();
 	iChangeThisTurn /= 100;
 
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	if (iChangeThisTurn < 0 && MOD_VOTING_NEW_EFFECT_FOR_SP)
+	{
+		// Cold War fun?
+		if (IsAllies(ePlayer) && GC.getGame().GetGameLeagues()->IsColdWarActive())
+		{
+			iChangeThisTurn = 0;
+		}
+	}
+#endif
 	return iChangeThisTurn;
 }
 
