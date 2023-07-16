@@ -124,6 +124,9 @@ struct CvResolutionEffects
 	int iScienceyGreatPersonRateMod;
 	int iGreatPersonTileImprovementCulture;
 	int iLandmarkCulture;
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	bool bEmbargoIdeology;
+#endif
 };
 
 FDataStream& operator>>(FDataStream&, CvResolutionEffects&);
@@ -575,6 +578,10 @@ public:
 	int GetPressureForIdeology(PolicyBranchTypes eIdeology);
 	int GetArtsyGreatPersonRateModifier();
 	int GetScienceyGreatPersonRateModifier();
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	bool IsIdeologyEmbargoed(PlayerTypes eTrader, PlayerTypes eRecipient);
+	bool IsColdWarActive();
+#endif
 
 	// Text composition for UI
 	CvString GetResolutionName(ResolutionTypes eResolution, int iResolutionID, int iProposerChoice, bool bIncludePrefix);
@@ -723,6 +730,10 @@ public:
 	int GetPressureForIdeology(PlayerTypes ePlayer, PolicyBranchTypes eIdeology);
 	int GetArtsyGreatPersonRateModifier(PlayerTypes ePlayer);
 	int GetScienceyGreatPersonRateModifier(PlayerTypes ePlayer);
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	bool IsIdeologyEmbargoed(PlayerTypes eTrader, PlayerTypes eRecipient);
+	bool IsColdWarActive();
+#endif
 
 	// General Logging
 	CvString GetLogFileName() const;
@@ -1239,7 +1250,9 @@ public:
 	int GetScienceyGreatPersonRateMod() const;
 	int GetGreatPersonTileImprovementCulture() const;
 	int GetLandmarkCulture() const;
-
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	bool IsEmbargoIdeology() const;
+#endif
 protected:
 	ResolutionDecisionTypes m_eVoterDecision;
 	ResolutionDecisionTypes m_eProposerDecision;
@@ -1274,6 +1287,9 @@ protected:
 	int m_iScienceyGreatPersonRateMod;
 	int m_iGreatPersonTileImprovementCulture;
 	int m_iLandmarkCulture;
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	bool m_bEmbargoIdeology;
+#endif
 
 private:
 	CvResolutionEntry(const CvResolutionEntry&);

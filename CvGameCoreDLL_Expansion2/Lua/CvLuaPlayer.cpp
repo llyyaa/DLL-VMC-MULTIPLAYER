@@ -2831,9 +2831,7 @@ int CvLuaPlayer::lGetInfluenceSpyRankTooltip(lua_State* L)
 int CvLuaPlayer::lGetTourism(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
-	int iResult = pkPlayer->GetCulture()->GetTourism();
-	iResult /= 100;
-	lua_pushinteger(L, iResult);
+	lua_pushinteger(L, pkPlayer->GetCulture()->GetTourism());
 	return 1;
 }
 //------------------------------------------------------------------------------

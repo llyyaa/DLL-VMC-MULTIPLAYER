@@ -1170,9 +1170,10 @@ public:
 	CorruptionLevelTypes GetCorruptionLevel() const;
 	void UpdateCorruption();
 
-	int CalculateTotalCorruptionScore(CvString* toolTipSink) const;
+	int CalculateTotalCorruptionScore() const;
 	int CalculateCorruptionScoreFromDistance() const;
 	int CalculateCorruptionScoreModifierFromSpy() const;
+	int CalculateCorruptionScoreFromResource() const;
 
 	CvCorruptionLevel* DecideCorruptionLevelForNormalCity(const int score) const;
 
@@ -1181,6 +1182,10 @@ public:
 
 	int GetCorruptionLevelChangeFromBuilding() const;
 	void ChangeCorruptionLevelChangeFromBuilding(int value);
+
+	int GetCorruptionScoreModifierFromPolicy() const;
+	int GetMaxCorruptionLevel() const;
+	bool IsCorruptionLevelReduceByOne() const;
 #endif
 
 	int GetAdditionalFood() const;

@@ -2,6 +2,8 @@ create table CorruptionLevels (
     ID integer primary key autoincrement not null,
     Type text not null unique,
 
+    IconString text not null default '',
+
     ScoreLowerBoundBase integer not null default 0,
     MapWidthModifier integer not null default 0,
     MapHeightModifier integer not null default 0,

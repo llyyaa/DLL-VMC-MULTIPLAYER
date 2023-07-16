@@ -201,6 +201,9 @@ CvResolutionEffects::CvResolutionEffects(void)
 	iScienceyGreatPersonRateMod = 0;
 	iGreatPersonTileImprovementCulture = 0;
 	iLandmarkCulture = 0;
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	bEmbargoIdeology = false;
+#endif
 }
 
 CvResolutionEffects::CvResolutionEffects(ResolutionTypes eType)
@@ -234,6 +237,9 @@ CvResolutionEffects::CvResolutionEffects(ResolutionTypes eType)
 		iScienceyGreatPersonRateMod			= pInfo->GetScienceyGreatPersonRateMod();
 		iGreatPersonTileImprovementCulture	= pInfo->GetGreatPersonTileImprovementCulture();
 		iLandmarkCulture					= pInfo->GetLandmarkCulture();
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+		bEmbargoIdeology					= pInfo->IsEmbargoIdeology();
+#endif
 	}
 }
 
@@ -300,6 +306,11 @@ bool CvResolutionEffects::HasOngoingEffects() const
 	if (iLandmarkCulture != 0)
 		return true;
 
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	if (bEmbargoIdeology)
+		return true;	
+#endif	
+
 	return false;
 }
 
@@ -330,6 +341,9 @@ void CvResolutionEffects::AddOngoingEffects(const CvResolutionEffects* pOtherEff
 	iScienceyGreatPersonRateMod				+= pOtherEffects->iScienceyGreatPersonRateMod;
 	iGreatPersonTileImprovementCulture		+= pOtherEffects->iGreatPersonTileImprovementCulture;
 	iLandmarkCulture						+= pOtherEffects->iLandmarkCulture;
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	bEmbargoIdeology						|= pOtherEffects->bEmbargoIdeology; // target ideology	
+#endif		
 }
 
 // Serialization Read
@@ -433,6 +447,10 @@ FDataStream& operator>>(FDataStream& loadFrom, CvResolutionEffects& writeTo)
 		writeTo.iLandmarkCulture = 0;
 	}
 
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	loadFrom >> writeTo.bEmbargoIdeology;
+#endif	
+
 	return loadFrom;
 }
 
@@ -468,6 +486,10 @@ FDataStream& operator<<(FDataStream& saveTo, const CvResolutionEffects& readFrom
 	saveTo << readFrom.iScienceyGreatPersonRateMod;
 	saveTo << readFrom.iGreatPersonTileImprovementCulture;
 	saveTo << readFrom.iLandmarkCulture;
+
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	saveTo << readFrom.bEmbargoIdeology;
+#endif	
 
 	return saveTo;
 }
@@ -1460,6 +1482,26 @@ void CvActiveResolution::DoEffects(PlayerTypes ePlayer)
 		}
 		// Refresh yield
 	}
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	if (GetEffects()->bEmbargoIdeology)
+	{
+		PlayerTypes eLoopPlayer;
+		for (int iPlayerLoop = 0; iPlayerLoop < MAX_CIV_PLAYERS; iPlayerLoop++)
+		{
+			eLoopPlayer = (PlayerTypes) iPlayerLoop;
+			if (GET_PLAYER(eLoopPlayer).isAlive() && !GET_PLAYER(eLoopPlayer).isMinorCiv())
+			{
+				PolicyBranchTypes eOurIdeology = GET_PLAYER(ePlayer).GetPlayerPolicies()->GetLateGamePolicyTree();
+				PolicyBranchTypes eTheirIdeology = GET_PLAYER(eLoopPlayer).GetPlayerPolicies()->GetLateGamePolicyTree();
+				if ((eOurIdeology != eTheirIdeology) && (eOurIdeology != NO_POLICY_BRANCH_TYPE) && (eTheirIdeology != NO_POLICY_BRANCH_TYPE))
+				{
+					GC.getGame().GetGameTrade()->ClearTradePlayerToPlayer(ePlayer, eLoopPlayer);
+				}
+			}
+		}
+		GC.getGame().GetGameTrade()->ClearAllCityStateTradeRoutesSpecial();
+	}
+#endif
 	
 	m_iTurnEnacted = GC.getGame().getGameTurn();
 }
@@ -1636,6 +1678,11 @@ void CvActiveResolution::RemoveEffects(PlayerTypes ePlayer)
 		}
 		// Refresh yield
 	}
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	if (GetEffects()->bEmbargoIdeology)
+	{
+	}
+#endif
 	
 	m_iTurnEnacted = -1;
 }
@@ -2778,6 +2825,21 @@ bool CvLeague::IsResolutionEffectsValid(ResolutionTypes eResolution, int iPropos
 			return false;
 		}
 	}
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	if (pInfo->IsEmbargoIdeology())
+	{
+		if (GC.getGame().isOption(GAMEOPTION_NO_POLICIES))
+		{
+			if (sTooltipSink != NULL)
+			{
+				(*sTooltipSink) += "[NEWLINE][NEWLINE][COLOR_WARNING_TEXT]";
+				(*sTooltipSink) += Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_INVALID_RESOLUTION_GAMEOPTION").toUTF8();
+				(*sTooltipSink) += "[ENDCOLOR]";
+			}
+			return false;
+		}
+	}
+#endif
 
 	return true;
 }
@@ -5088,6 +5150,13 @@ std::vector<CvString> CvLeague::GetCurrentEffectsSummary(PlayerTypes /*eObserver
 		sTemp << effects.iLandmarkCulture;
 		vsEffects.push_back(sTemp.toUTF8());
 	}
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	if (effects.bEmbargoIdeology)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_EMBARGO_IDEOLOGY");
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+#endif
 
 	if (vsEffects.empty())
 	{
@@ -6489,6 +6558,49 @@ CvLeague::Project* CvLeague::GetProject(LeagueProjectTypes eLeagueProject)
 	CvAssertMsg(pFound != NULL, "Could not retrieve project based on project type. Please send Anton your save file and version.");
 	return pFound;
 }
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+bool CvLeague::IsIdeologyEmbargoed(PlayerTypes eTrader, PlayerTypes eRecipient)
+{
+	CvAssertMsg(eTrader >= 0 && eTrader < MAX_CIV_PLAYERS, "Invalid index for eTrader. Please send Anton your save file and version.");
+	if (eTrader < 0 || eTrader >= MAX_CIV_PLAYERS) return false;
+
+	for (ActiveResolutionList::iterator it = m_vActiveResolutions.begin(); it != m_vActiveResolutions.end(); it++)
+	{ 
+		if (it->GetEffects()->bEmbargoIdeology)
+		{
+			if(GET_PLAYER(eTrader).isMinorCiv() && !GET_PLAYER(eTrader).GetMinorCivAI()->IsAllies(eRecipient))
+			{
+				return true;
+			}
+			else if(GET_PLAYER(eRecipient).isMinorCiv() && !GET_PLAYER(eRecipient).GetMinorCivAI()->IsAllies(eTrader))
+			{
+				return true;
+			}
+			else
+			{
+				PolicyBranchTypes eOurIdeology = GET_PLAYER(eTrader).GetPlayerPolicies()->GetLateGamePolicyTree();
+				PolicyBranchTypes eTheirIdeology = GET_PLAYER(eRecipient).GetPlayerPolicies()->GetLateGamePolicyTree();
+				if (eOurIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE)
+				{
+					if(eTheirIdeology != eOurIdeology)
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+bool CvLeague::IsColdWarActive()
+{
+	for (ActiveResolutionList::iterator it = m_vActiveResolutions.begin(); it != m_vActiveResolutions.end(); it++)
+	{
+		if (it->GetEffects()->bEmbargoIdeology) return true;
+	}
+	return false;
+}
+#endif
 
 // Serialization Read
 FDataStream& operator>>(FDataStream& loadFrom, CvLeague& writeTo)
@@ -7380,6 +7492,34 @@ int CvGameLeagues::GetScienceyGreatPersonRateModifier(PlayerTypes ePlayer)
 	}
 	return iValue;
 }
+
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+bool CvGameLeagues::IsIdeologyEmbargoed(PlayerTypes eTrader, PlayerTypes eRecipient)
+{
+	for (LeagueList::iterator it = m_vActiveLeagues.begin(); it != m_vActiveLeagues.end(); it++)
+	{
+		if (it->IsMember(eTrader))
+		{
+			if (it->IsIdeologyEmbargoed(eTrader, eRecipient))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+bool CvGameLeagues::IsColdWarActive()
+{
+	for (LeagueList::iterator it = m_vActiveLeagues.begin(); it != m_vActiveLeagues.end(); it++)
+	{
+		if (it->IsColdWarActive())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+#endif
 
 CvString CvGameLeagues::GetLogFileName() const
 {
@@ -9573,6 +9713,76 @@ int CvLeagueAI::ScoreVoteChoiceYesNo(CvProposal* pProposal, int iChoice, bool bE
 		}
 		iScore += iTempScore;
 	}
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	//COLD WAR
+	if (pProposal->GetEffects()->bEmbargoIdeology)
+	{
+		int iExtra = 0;
+		PlayerTypes eLoopPlayer;
+		PolicyBranchTypes ePlayerIdeology = GET_PLAYER(GetPlayer()->GetID()).GetPlayerPolicies()->GetLateGamePolicyTree();
+		
+		for (int iPlayerLoop = 0; iPlayerLoop < MAX_CIV_PLAYERS; iPlayerLoop++)
+		{
+			eLoopPlayer = (PlayerTypes) iPlayerLoop;
+			if (GET_PLAYER(eLoopPlayer).isMajorCiv() && GET_PLAYER(eLoopPlayer).isAlive() && eLoopPlayer != GetPlayer()->GetID())
+			{
+				PolicyBranchTypes eOtherIdeology = GET_PLAYER(eLoopPlayer).GetPlayerPolicies()->GetLateGamePolicyTree();
+				if (eOtherIdeology != NO_POLICY_BRANCH_TYPE)
+				{
+					MajorCivOpinionTypes eOpinion = GetPlayer()->GetDiplomacyAI()->GetMajorCivOpinion(eLoopPlayer);
+					//How many connections do we have with people of other ideologies?
+					if (eOtherIdeology != ePlayerIdeology)
+					{
+						// Trade connections
+						if (GC.getGame().GetGameTrade()->IsPlayerConnectedToPlayer(GetPlayer()->GetID(), eLoopPlayer))
+						{
+							iExtra -= 75 * GC.getGame().GetGameTrade()->CountNumPlayerConnectionsToPlayer(GetPlayer()->GetID(), eLoopPlayer);
+						}
+						// any people we like with different ideologies?
+						if (eOpinion > MAJOR_CIV_OPINION_NEUTRAL)
+						{
+							iExtra -= 25 * (eOpinion - MAJOR_CIV_OPINION_NEUTRAL);
+						}
+					}
+					else
+					{
+						// Trade connections
+						if (GC.getGame().GetGameTrade()->IsPlayerConnectedToPlayer(GetPlayer()->GetID(), eLoopPlayer))
+						{
+							iExtra += 75 * GC.getGame().GetGameTrade()->CountNumPlayerConnectionsToPlayer(GetPlayer()->GetID(), eLoopPlayer);
+						}
+					}
+				}
+			}
+		}
+		for (int iMinor = MAX_MAJOR_CIVS; iMinor < MAX_CIV_PLAYERS; iMinor++)
+		{
+			PlayerTypes eMinor = (PlayerTypes) iMinor;
+			if (GET_PLAYER(eMinor).isAlive() && GET_PLAYER(eMinor).isMinorCiv())
+			{
+				// do we have trade routes with non-alled CS?
+				if(!GET_PLAYER(eMinor).GetMinorCivAI()->IsAllies(GetPlayer()->GetID()))
+				{
+					if (GC.getGame().GetGameTrade()->IsPlayerConnectedToPlayer(GetPlayer()->GetID(), eMinor))
+					{
+						iExtra -= 75 * GC.getGame().GetGameTrade()->CountNumPlayerConnectionsToPlayer(GetPlayer()->GetID(), eMinor);
+					}
+					else
+					{
+						iExtra -= 25;
+					}
+				}
+				// no influence decay
+				else
+				{
+					iExtra += 75;
+				}
+			}
+		}
+
+		iScore += iExtra;
+	}
+#endif
 
 	// == Diplomat knowledge, Vote Commitments we secured ==
 
@@ -10494,6 +10704,9 @@ CvResolutionEntry::CvResolutionEntry(void)
 	m_iScienceyGreatPersonRateMod		= 0;
 	m_iGreatPersonTileImprovementCulture= 0;
 	m_iLandmarkCulture					= 0;
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	m_bEmbargoIdeology					= false;
+#endif
 }
 
 CvResolutionEntry::~CvResolutionEntry(void)
@@ -10540,7 +10753,9 @@ bool CvResolutionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtil
 	m_iScienceyGreatPersonRateMod		= kResults.GetInt("ScienceyGreatPersonRateMod");
 	m_iGreatPersonTileImprovementCulture= kResults.GetInt("GreatPersonTileImprovementCulture");
 	m_iLandmarkCulture					= kResults.GetInt("LandmarkCulture");
-
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	m_bEmbargoIdeology					= kResults.GetBool("EmbargoIdeology");
+#endif
 	return true;
 }
 
@@ -10708,6 +10923,12 @@ int CvResolutionEntry::GetLandmarkCulture() const
 {
 	return m_iLandmarkCulture;
 }
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+bool CvResolutionEntry::IsEmbargoIdeology() const
+{
+	return m_bEmbargoIdeology;
+}
+#endif
 
 // ================================================================================
 //			CvResolutionXMLEntries

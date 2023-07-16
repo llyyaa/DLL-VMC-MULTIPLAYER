@@ -11515,7 +11515,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 #ifdef MOD_ROG_CORE
 		if (MOD_ROG_CORE)
 		{
-			iTempMod += GET_PLAYER(getOwner()).getWorldWonderCityYieldRateModifier(eIndex);
+			iTempMod = GET_PLAYER(getOwner()).getWorldWonderCityYieldRateModifier(eIndex);
 			if (iTempMod != 0)
 			{
 				if (toolTipSink)
@@ -20262,7 +20262,7 @@ void CvCity::UpdateCorruption()
 	const CorruptionLevelTypes eOldLevel = m_eCachedCorruptionLevel;
 	auto* pOldLevel = GC.getCorruptionLevelInfo(eOldLevel);
 
-	const int newScore = CalculateTotalCorruptionScore(nullptr);
+	const int newScore = CalculateTotalCorruptionScore();
 	CvCorruptionLevel* pNewLevel = nullptr;
 	if (isCapital())
 	{
@@ -20319,24 +20319,25 @@ void CvCity::UpdateCorruption()
 	m_eCachedCorruptionLevel = pNewLevel ? static_cast<CorruptionLevelTypes>(pNewLevel->GetID()) : INVALID_CORRUPTION;
 }
 
-int CvCity::CalculateTotalCorruptionScore(CvString* toolTipSink) const
+int CvCity::CalculateCorruptionScoreFromResource() const
+{
+	auto resource = plot() ? plot()->getResourceType() : NO_RESOURCE;
+	auto* resourceInfo = GC.getResourceInfo(resource);
+	return resourceInfo != nullptr ? resourceInfo->GetCorruptionScoreChange() : 0;
+}
+
+int CvCity::CalculateTotalCorruptionScore() const
 {
 	CvPlayerAI& owner = GET_PLAYER(getOwner());
 
+	// Base Score
 	int score = 0;
 	score += CalculateCorruptionScoreFromDistance();
-	
-	auto resource = plot() ? plot()->getResourceType() : NO_RESOURCE;
-	auto* resourceInfo = GC.getResourceInfo(resource);
-	if (resourceInfo != nullptr)
-	{
-		score += resourceInfo->GetCorruptionScoreChange();
-	}
-
+	score += CalculateCorruptionScoreFromResource();
 	score += GetCorruptionScoreChangeFromBuilding();
-
 	score = std::max(0, score);
 
+	// Score Modifier
 	int modifier = 100;
 	modifier += CalculateCorruptionScoreModifierFromSpy();
 	modifier += owner.GetCorruptionScoreModifierFromPolicy();
@@ -20345,6 +20346,12 @@ int CvCity::CalculateTotalCorruptionScore(CvString* toolTipSink) const
 	score = score * modifier / 100;
 	score = std::max(0, score);
 	return score;
+}
+
+int CvCity::GetCorruptionScoreModifierFromPolicy() const
+{
+	CvPlayerAI &owner = GET_PLAYER(getOwner());
+	return owner.GetCorruptionScoreModifierFromPolicy();
 }
 
 int CvCity::CalculateCorruptionScoreFromDistance() const
@@ -20383,6 +20390,18 @@ int CvCity::CalculateCorruptionScoreModifierFromSpy() const
 	return -rank * 33;
 }
 
+bool CvCity::IsCorruptionLevelReduceByOne() const
+{
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+	return owner.IsCorruptionLevelReduceByOne() || owner.GetPlayerTraits()->GetCorruptionLevelReduceByOne();
+}
+
+int CvCity::GetMaxCorruptionLevel() const
+{
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+	return owner.GetPlayerTraits()->GetMaxCorruptionLevel();
+}
+
 CvCorruptionLevel* CvCity::DecideCorruptionLevelForNormalCity(const int score) const
 {
 	CvPlayerAI& owner = GET_PLAYER(getOwner());
@@ -20401,7 +20420,7 @@ CvCorruptionLevel* CvCity::DecideCorruptionLevelForNormalCity(const int score) c
 
 	if (resultIndex > 1)
 	{
-		if (owner.IsCorruptionLevelReduceByOne() || owner.GetPlayerTraits()->GetCorruptionLevelReduceByOne())
+		if (IsCorruptionLevelReduceByOne())
 		{
 			resultIndex--;
 			result = GC.getOrderedNormalCityCorruptionLevels()[resultIndex];
@@ -20428,9 +20447,9 @@ CvCorruptionLevel* CvCity::DecideCorruptionLevelForNormalCity(const int score) c
 		result = GC.getOrderedNormalCityCorruptionLevels()[resultIndex];
 	}
 
-	if (owner.GetPlayerTraits()->GetMaxCorruptionLevel() >= 0 && resultIndex > owner.GetPlayerTraits()->GetMaxCorruptionLevel())
+	if (GetMaxCorruptionLevel() >= 0 && resultIndex > GetMaxCorruptionLevel())
 	{
-		resultIndex = owner.GetPlayerTraits()->GetMaxCorruptionLevel();
+		resultIndex = GetMaxCorruptionLevel();
 		result = GC.getOrderedNormalCityCorruptionLevels()[resultIndex];
 	}
 

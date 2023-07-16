@@ -28922,6 +28922,13 @@ bool CvPlayer::IsAllowedToTradeWith(PlayerTypes eOtherPlayer)
 	{
 		return false;
 	}
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	if (MOD_VOTING_NEW_EFFECT_FOR_SP && GC.getGame().GetGameLeagues()->IsIdeologyEmbargoed(GetID(), eOtherPlayer) && eOtherPlayer != m_eID)
+	{
+		return false;
+	}
+#endif
+	
 
 	return true;
 }

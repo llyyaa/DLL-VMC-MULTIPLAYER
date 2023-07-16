@@ -691,6 +691,16 @@ protected:
 	LUAAPIEXTN(GetCorruptionScore, int);
 	LUAAPIEXTN(GetCorruptionLevel, int);
 	LUAAPIEXTN(UpdateCorruption);
+	LUAAPIEXTN(CalculateTotalCorruptionScore, int);
+	LUAAPIEXTN(CalculateCorruptionScoreFromDistance, int);
+	LUAAPIEXTN(CalculateCorruptionScoreModifierFromSpy, int);
+	LUAAPIEXTN(GetCorruptionScoreChangeFromBuilding, int);
+	LUAAPIEXTN(GetCorruptionLevelChangeFromBuilding, int);
+	LUAAPIEXTN(CalculateCorruptionScoreFromResource, int);
+	LUAAPIEXTN(DecideCorruptionLevelForNormalCity, CorruptionLevelTypes, int);
+	LUAAPIEXTN(GetCorruptionScoreModifierFromPolicy, int);
+	LUAAPIEXTN(GetMaxCorruptionLevel, int);
+	LUAAPIEXTN(IsCorruptionLevelReduceByOne, bool);
 #endif
 };
 

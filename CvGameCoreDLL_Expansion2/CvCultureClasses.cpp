@@ -1911,33 +1911,35 @@ bool CvPlayerCulture::MoveSingleWorks(vector<CvGreatWorkBuildingInMyEmpire> &bui
 		}
 	}
 
+	bool bUpdate = false;
 	for (itBuilding = homelandBuildingsFocus.begin(); itBuilding != homelandBuildingsFocus.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
 	for (itBuilding = puppetBuildingsFocus.begin(); itBuilding != puppetBuildingsFocus.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
 	for (itBuilding = homelandBuildingsAny.begin(); itBuilding != homelandBuildingsAny.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
 	for (itBuilding = puppetBuildingsAny.begin(); itBuilding != puppetBuildingsAny.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
 	for (itBuilding = homelandBuildingsNone.begin(); itBuilding != homelandBuildingsNone.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
 	for (itBuilding = puppetBuildingsNone.begin(); itBuilding != puppetBuildingsNone.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
 	for (itBuilding = endangeredBuildingsFocus.begin(); itBuilding != endangeredBuildingsFocus.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
 	for (itBuilding = endangeredBuildingsAny.begin(); itBuilding != endangeredBuildingsAny.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
 	for (itBuilding = endangeredBuildingsNone.begin(); itBuilding != endangeredBuildingsNone.end(); itBuilding++) {
-		FillBuilding(itBuilding, works1, works2);
+		bUpdate = FillBuilding(itBuilding, works1, works2);
 	}
+	return bUpdate;
 }
 #endif
 
@@ -4621,13 +4623,13 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers()
 /// What is the tourism output ignoring player-specific modifiers?
 void CvCityCulture::CalculateBaseTourism()
 {
-	int iBase = m_pCity->GetBaseTourismBeforeModifiers() * 100;
+	int iBase = m_pCity->GetBaseTourismBeforeModifiers();
 	if (iBase <= 0)
 	{
 		m_pCity->SetBaseTourism(0);
 		return;
 	}
-	int iModifier = 0;
+	int iModifier = m_pCity->getBaseYieldRateModifier(YIELD_TOURISM) - 100;
 
 	CvPlayer &kPlayer = GET_PLAYER(m_pCity->getOwner());
 	int iTechSpreadModifier = kPlayer.GetInfluenceSpreadModifier();
@@ -5127,6 +5129,16 @@ CvString CvCityCulture::GetTourismTooltip()
 		}
 	}
 
+	int iGreakWorkModifier = kCityPlayer.GetYieldModifierFromNumGreakWork(GC.getYieldInfo(YIELD_TOURISM));
+	if (iGreakWorkModifier > 0)
+	{
+		if (szRtnValue.length() > 0)
+		{
+			szRtnValue += "[NEWLINE][NEWLINE]";
+		}
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_NUM_GREAT_WORK", iGreakWorkModifier);
+		szRtnValue += szTemp;
+	}
 	int iTechSpreadModifier = kCityPlayer.GetInfluenceSpreadModifier();
 	if (iTechSpreadModifier > 0)
 	{

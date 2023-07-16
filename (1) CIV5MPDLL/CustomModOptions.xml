@@ -1098,9 +1098,12 @@
     <!-- see Belief_Table_Changes.sql -->
     <Row Class="6" Name="BELIEF_NEW_EFFECT_FOR_SP" Value="1"/>
 
-     <!-- table changes: -->
+    <!-- table changes: -->
     <!-- see DLL_Buildings.sql -->
     <Row Class="6" Name="BUILDING_NEW_EFFECT_FOR_SP" Value="1"/>
+    <!-- table changes: -->
+    <!-- see Resolutions.sql -->
+    <Row Class="6" Name="VOTING_NEW_EFFECT_FOR_SP" Value="1"/>
 
     <!-- table changes: -->
     <!-- see DDL_Traits.sql -->
