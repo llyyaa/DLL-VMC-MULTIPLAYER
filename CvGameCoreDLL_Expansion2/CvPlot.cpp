@@ -8834,7 +8834,7 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 						iYield += pImprovement->GetAdjacentCityYieldChange(eYield);
 					}
 				}
-				else if(pAdjacentPlot->isMountain())
+				if(pAdjacentPlot->isMountain())
 				{
 					iYield += pImprovement->GetAdjacentMountainYieldChange(eYield);
 				}

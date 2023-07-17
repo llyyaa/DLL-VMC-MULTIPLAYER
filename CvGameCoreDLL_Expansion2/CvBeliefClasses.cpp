@@ -1524,7 +1524,8 @@ int CvReligionBeliefs:: GetWonderProductionModifier(EraTypes eWonderEra) const
 	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
 	{
 		CvBeliefEntry* pBeliefEntry = pBeliefs->GetEntry(*i);
-		if((int)eWonderEra < (int)pBeliefEntry->GetObsoleteEra())
+		int iObsoleteEra = pBeliefEntry->GetObsoleteEra();
+		if((iObsoleteEra != NO_ERA && (int)eWonderEra < iObsoleteEra) || iObsoleteEra == NO_ERA)
 		{
 			rtnValue += pBeliefEntry->GetWonderProductionModifier();
 		}
