@@ -4298,13 +4298,6 @@ int CvCity::getProductionExperience(UnitTypes eUnit)
 		{
 			DomainTypes eDomain = (DomainTypes)pkUnitInfo->GetDomainType();
 			UnitCombatTypes eUnitCombat = (UnitCombatTypes)(pkUnitInfo->GetUnitCombatType());
-			//if(pkUnitInfo->GetUnitCombatType() != NO_UNITCOMBAT)
-			//{
-				//iExperience += getUnitCombatFreeExperience((UnitCombatTypes)(pkUnitInfo->GetUnitCombatType()));
-				//iExperience += kOwner.getUnitCombatFreeExperiences((UnitCombatTypes) pkUnitInfo->GetUnitCombatType());
-			//}
-			//iExperience += getDomainFreeExperience((DomainTypes)(pkUnitInfo->GetDomainType()));
-			//iExperience += getDomainFreeExperienceFromGreatWorks((DomainTypes)(pkUnitInfo->GetDomainType()));
 
 			if (eUnitCombat != NO_UNITCOMBAT)
 			{

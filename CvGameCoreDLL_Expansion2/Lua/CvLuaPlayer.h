@@ -492,6 +492,8 @@ protected:
 	static int lGetMaxTeamBuildingProductionModifier(lua_State* L);
 	static int lGetMaxPlayerBuildingProductionModifier(lua_State* L);
 	static int lGetFreeExperience(lua_State* L);
+	static int lGetUnitCombatFreeExperiences(lua_State* L);
+	static int lGetDomainFreeExperience(lua_State* L);
 	static int lGetFeatureProductionModifier(lua_State* L);
 	static int lGetWorkerSpeedModifier(lua_State* L);
 	static int lGetImprovementUpgradeRateModifier(lua_State* L);
