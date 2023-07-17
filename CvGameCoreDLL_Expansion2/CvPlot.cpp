@@ -5515,6 +5515,8 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 			{
 				if (pFeatureInfo && eNewValue != NO_PLAYER)
 				{
+					if (pFeatureInfo->getInBorderHappiness() > 0)
+						GET_PLAYER(eNewValue).SetNaturalWonderOwned(eFeature, true);
 		
 					PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
 					if (eFreePromotion != NO_PROMOTION)
@@ -5534,6 +5536,8 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 #if defined(MOD_BALANCE_CORE)
 				if (MOD_BALANCE_CORE && pFeatureInfo && eOldOwner != NO_PLAYER)
 				{
+					if (pFeatureInfo->getInBorderHappiness() > 0)
+						GET_PLAYER(eOldOwner).SetNaturalWonderOwned(eFeature, false);
 
 					PromotionTypes eFreePromotion = (PromotionTypes)pFeatureInfo->getPromotionIfOwned();
 					if (eFreePromotion != NO_PROMOTION)
@@ -5542,9 +5546,9 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 						{
 							GET_PLAYER(eOldOwner).ChangeFreePromotionCount(eFreePromotion, -1);
 						}
-
+					}
 				}
-			}
+			
 #endif
 
 #if defined(MOD_API_EXTENSIONS)

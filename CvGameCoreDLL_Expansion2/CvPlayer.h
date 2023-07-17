@@ -546,6 +546,8 @@ public:
 	int GetHappinessFromReligion();
 	int GetHappinessFromNaturalWonders() const;
 
+	void SetNaturalWonderOwned(FeatureTypes eFeature, bool bValue);
+
 	int GetExtraHappinessPerLuxury() const;
 	void ChangeExtraHappinessPerLuxury(int iChange);
 
@@ -2416,6 +2418,8 @@ protected:
 
 	std::map<int, int> m_piDomainFreeExperience;
 #endif
+
+	std::vector<FeatureTypes> m_ownedNaturalWonders;
 
 	typedef std::pair<uint, int> PlayerOptionEntry;
 	typedef std::vector< PlayerOptionEntry > PlayerOptionsVector;

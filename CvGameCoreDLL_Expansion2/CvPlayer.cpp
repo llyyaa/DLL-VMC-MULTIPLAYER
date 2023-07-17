@@ -493,7 +493,7 @@ CvPlayer::CvPlayer() :
 	, m_iNumFreePolicies("CvPlayer::m_iNumFreePolicies", m_syncArchive)
 	, m_iNumFreePoliciesEver("CvPlayer::m_iNumFreePoliciesEver", m_syncArchive)
 	, m_iNumFreeTenets(0)
-
+	, m_ownedNaturalWonders()
 
 
 	, m_iMaxEffectiveCities(1)
@@ -940,6 +940,7 @@ void CvPlayer::uninit()
 	m_iEspionageModifier = 0;
 	m_iSpyStartingRank = 0;
 
+	
 #if defined(MOD_ROG_CORE)
 	m_piDomainFreeExperience.clear();
 #endif
@@ -1229,7 +1230,7 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_piDomainFreeExperience.clear();
 #endif
 
-
+	m_ownedNaturalWonders.clear();
 
 #ifdef MOD_ROG_CORE
 	m_aiWorldWonderCityYieldRateModifier.clear();
@@ -12845,42 +12846,39 @@ int CvPlayer::GetHappinessFromNaturalWonders() const
 		iHappiness /= 100;
 	}
 
-	for(int iI = 0; iI < GC.getMap().numPlots(); iI++)
+
+
+	for (vector<FeatureTypes>::const_iterator it = m_ownedNaturalWonders.begin(); it != m_ownedNaturalWonders.end(); ++it)
 	{
-		CvPlot* pPlot = GC.getMap().plotByIndexUnchecked(iI);
-		if(pPlot == NULL)
+		int iPlotHappiness = GC.getFeatureInfo(*it)->getInBorderHappiness();
+
+		// Trait boosts this further?
+		if (m_pTraits->GetNaturalWonderYieldModifier() > 0)
 		{
-			continue;
+			iPlotHappiness *= (100 + m_pTraits->GetNaturalWonderYieldModifier());
+			iPlotHappiness /= 100;
 		}
 
-		if(pPlot->getOwner() != m_eID)
-		{
-			continue;
-		}
-
-		FeatureTypes eFeature = pPlot->getFeatureType();
-		if(eFeature == NO_FEATURE)
-		{
-			continue;
-		}
-
-		int iPlotHappiness = GC.getFeatureInfo(eFeature)->getInBorderHappiness();
-
-
-		if(iPlotHappiness > 0)
-		{
-			// Trait boosts this further?
-			if(m_pTraits->GetNaturalWonderYieldModifier() > 0)
-			{
-				iPlotHappiness *= (100 + m_pTraits->GetNaturalWonderYieldModifier());
-				iPlotHappiness /= 100;
-			}
-
-			iHappiness += iPlotHappiness;
-		}
+		iHappiness += iPlotHappiness;
 	}
 
 	return iHappiness;
+}
+
+
+
+void CvPlayer::SetNaturalWonderOwned(FeatureTypes eFeature, bool bValue)
+{
+	VALIDATE_OBJECT
+		CvAssertMsg(eFeature >= 0, "eFeature is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eFeature < GC.getNumFeatureInfos(), "eEvent is expected to be within maximum bounds (invalid Index)");
+
+	vector<FeatureTypes>::const_iterator it = std::find(m_ownedNaturalWonders.begin(), m_ownedNaturalWonders.end(), eFeature);
+
+	if (bValue && it == m_ownedNaturalWonders.end())
+		m_ownedNaturalWonders.push_back(eFeature);
+	else if (!bValue && it != m_ownedNaturalWonders.end())
+		m_ownedNaturalWonders.erase(it);
 }
 
 
@@ -26474,7 +26472,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_piDomainFreeExperience;
 #endif
 
-
+	kStream >> m_ownedNaturalWonders;
 
 #ifdef MOD_ROG_CORE
 	kStream >> m_aiWorldWonderCityYieldRateModifier;
@@ -27112,7 +27110,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_piDomainFreeExperience;
 #endif
 
-
+	kStream << m_ownedNaturalWonders;
 
 #ifdef MOD_ROG_CORE
 	kStream << m_aiWorldWonderCityYieldRateModifier;
