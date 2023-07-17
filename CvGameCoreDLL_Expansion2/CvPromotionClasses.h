@@ -226,6 +226,16 @@ public:
 	int GetHPHealedIfDefeatEnemy() const;
 	int GetGoldenAgeValueFromKills() const;
 	int GetExtraWithdrawal() const;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	int GetPlagueChance() const;
+	bool IsPlague() const;
+	int GetPlaguePromotion() const;
+	int GetPlagueID() const;
+	int GetPlaguePriority() const;
+	int GetPlagueIDImmunity() const;
+	bool IsImmuePlague() const;
+#endif
 	int GetEmbarkExtraVisibility() const;
 	int GetEmbarkDefenseModifier() const;
 	int GetCapitalDefenseModifier() const;
@@ -548,6 +558,16 @@ protected:
 	int m_iHPHealedIfDefeatEnemy;
 	int m_iGoldenAgeValueFromKills;
 	int m_iExtraWithdrawal;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	int m_iPlagueChance;
+	bool m_bIsPlague;
+	int m_iPlaguePromotion;
+	int m_iPlagueID;
+	int m_iPlaguePriority;
+	int m_iPlagueIDImmunity;
+	int m_bImmuePlague;
+#endif
 	int m_iEmbarkExtraVisibility;
 	int m_iEmbarkDefenseModifier;
 	int m_iCapitalDefenseModifier;

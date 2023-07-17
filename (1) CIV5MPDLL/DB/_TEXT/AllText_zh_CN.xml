@@ -3,6 +3,19 @@
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
 
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
+			<Text>战斗期间，一种致命的病毒通过你的{1_Unit}转播给了敌方的{2_Unit}!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_S">
+			<Text>你的{1_Unit}传播了病毒!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_THEM">
+			<Text>战斗期间，一种致命的病毒通过敌人的{2_Unit}传播给了你的{1_Unit}!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_THEM_S">
+			<Text>病毒传播给了你的{1_Unit}!</Text>
+		</Row>
+
 	<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
 		<Text>
 			[NEWLINE][ICON_BULLET]爱领袖日修正(政策): {1_Num}%

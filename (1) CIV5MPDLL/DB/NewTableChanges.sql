@@ -75,6 +75,8 @@ ALTER TABLE Improvements ADD COLUMN 'ImprovementResourceQuantity' INTEGER DEFAUL
 
 INSERT INTO Defines(Name, Value) VALUES('ORIGINAL_CAPITAL_MODMAX', 10);
 
+INSERT INTO Defines(Name, Value) VALUES('CITY_FRESH_WATER_HEALTH_YIELD', 2);
+
 CREATE TABLE IF NOT EXISTS UnitPromotions_PromotionModifiers (
     `PromotionType` TEXT NOT NULL,
     `OtherPromotionType` TEXT NOT NULL,
@@ -155,3 +157,10 @@ ALTER TABLE UnitPromotions  ADD COLUMN 'ShowInUnitPanel' INTEGER DEFAULT 1;
 ALTER TABLE UnitPromotions ADD COLUMN 'ShowInTooltip' INTEGER DEFAULT 1;
 ALTER TABLE UnitPromotions ADD COLUMN 'ShowInPedia' INTEGER DEFAULT 1;
 
+
+ALTER TABLE UnitPromotions ADD COLUMN 'PlagueChance' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'PlaguePromotion' TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
+ALTER TABLE UnitPromotions ADD COLUMN 'IsPlague' BOOLEAN DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'PlagueID' INTEGER DEFAULT -1;
+ALTER TABLE UnitPromotions ADD COLUMN 'PlaguePriority' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'PlagueIDImmunity' INTEGER DEFAULT 0;

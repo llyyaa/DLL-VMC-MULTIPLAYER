@@ -237,6 +237,23 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 		InterveneInflictDamage(&ctx);
 #endif
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+		if (MOD_PLAGUE_TRANSFER)
+		{
+			//Chance to spread promotion?
+			if (kAttacker.getPlagueChance() > 0)
+			{
+				kAttacker.DoPlagueTransfer(*pkDefender);
+			}
+			if (pkDefender->getPlagueChance() > 0 && !pkDefender->IsCanAttackRanged())
+			{
+				pkDefender->DoPlagueTransfer(kAttacker);
+			}
+		}
+#endif
+
+
 		int iAttackerTotalDamageInflicted = iAttackerDamageInflicted + pkDefender->getDamage();
 		int iDefenderTotalDamageInflicted = iDefenderDamageInflicted + kAttacker.getDamage();
 
@@ -759,6 +776,19 @@ void CvUnitCombat::GenerateRangedCombatInfo(CvUnit& kAttacker, CvUnit* pkDefende
 #endif
 
 		iTotalDamage = std::max(pkDefender->getDamage(), pkDefender->getDamage() + iDamage);
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+		//Chance to spread promotion?
+		if (MOD_PLAGUE_TRANSFER)
+		{
+			if (kAttacker.getPlagueChance() > 0)
+			{
+				kAttacker.DoPlagueTransfer(*pkDefender);
+			}
+		}
+#endif
+
 	}
 	else // plot.isCity()
 	{

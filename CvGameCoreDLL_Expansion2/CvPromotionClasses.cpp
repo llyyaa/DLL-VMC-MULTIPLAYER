@@ -179,6 +179,15 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iHPHealedIfDefeatEnemy(0),
 	m_iGoldenAgeValueFromKills(0),
 	m_iExtraWithdrawal(0),
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	m_iPlagueChance(0),
+	m_bIsPlague(false),
+	m_iPlaguePromotion(NO_PROMOTION),
+	m_iPlagueID(NO_PROMOTION),
+	m_iPlaguePriority(0),
+	m_iPlagueIDImmunity(-1),
+	m_bImmuePlague(false),
+#endif
 	m_iEmbarkExtraVisibility(0),
 	m_iEmbarkDefenseModifier(0),
 	m_iCapitalDefenseModifier(0),
@@ -655,6 +664,18 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iHPHealedIfDefeatEnemy = kResults.GetInt("HPHealedIfDestroyEnemy");
 	m_iGoldenAgeValueFromKills = kResults.GetInt("GoldenAgeValueFromKills");
 	m_iExtraWithdrawal = kResults.GetInt("ExtraWithdrawal");
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	m_iPlagueChance = kResults.GetInt("PlagueChance");
+	m_bIsPlague = kResults.GetBool("IsPlague");
+
+	const char* szPlaguePromotion = kResults.GetText("PlaguePromotion");
+	m_iPlaguePromotion = GC.getInfoTypeForString(szPlaguePromotion, true);
+
+	m_iPlagueID = kResults.GetInt("PlagueID");
+	m_iPlaguePriority = kResults.GetInt("PlaguePriority");
+	m_iPlagueIDImmunity = kResults.GetInt("PlagueIDImmunity");
+	m_bImmuePlague = kResults.GetBool("ImmuePlague");
+#endif
 	m_iEmbarkExtraVisibility = kResults.GetInt("EmbarkExtraVisibility");
 	m_iEmbarkDefenseModifier = kResults.GetInt("EmbarkDefenseModifier");
 	m_iCapitalDefenseModifier = kResults.GetInt("CapitalDefenseModifier");
@@ -2119,6 +2140,45 @@ int CvPromotionEntry::GetExtraWithdrawal() const
 {
 	return m_iExtraWithdrawal;
 }
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+/// Chance to transmit a promotion on melee (heyo)
+int CvPromotionEntry::GetPlagueChance() const
+{
+	return m_iPlagueChance;
+}
+/// Transmittable promotions
+bool CvPromotionEntry::IsPlague() const
+{
+	return m_bIsPlague;
+}
+
+int CvPromotionEntry::GetPlaguePromotion() const
+{
+	return m_iPlaguePromotion;
+}
+
+int CvPromotionEntry::GetPlagueID() const
+{
+	return m_iPlagueID;
+}
+
+int CvPromotionEntry::GetPlaguePriority() const
+{
+	return m_iPlaguePriority;
+}
+
+int CvPromotionEntry::GetPlagueIDImmunity() const
+{
+	return m_iPlagueIDImmunity;
+}
+
+bool CvPromotionEntry::IsImmuePlague() const
+{
+	return m_bImmuePlague;
+}
+#endif
+
 
 /// Accessor: extra sight range when embarked
 int CvPromotionEntry::GetEmbarkExtraVisibility() const

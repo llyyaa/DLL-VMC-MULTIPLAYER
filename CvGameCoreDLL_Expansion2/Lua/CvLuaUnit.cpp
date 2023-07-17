@@ -481,6 +481,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(IsInvisibleInvalid);
 #endif
 	Method(IsNukeImmune);
+	Method(IsImmuePlague);
 	Method(IsRangeAttackOnlyInDomain);
 	Method(IsCityAttackOnly);
 	Method(IsImmueMeleeAttack);
@@ -3443,6 +3444,16 @@ int CvLuaUnit::lIsNukeImmune(lua_State* L)
 	lua_pushboolean(L, bResult);
 	return 1;
 }
+
+int CvLuaUnit::lIsImmuePlague(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const bool bResult = pkUnit->IsImmuePlague();
+
+	lua_pushboolean(L, bResult);
+	return 1;
+}
+
 //------------------------------------------------------------------------------
 //int maxInterceptionProbability();
 int CvLuaUnit::lMaxInterceptionProbability(lua_State* L)

@@ -1099,6 +1099,34 @@ public:
 	int getExtraWithdrawal() const;
 	void changeExtraWithdrawal(int iChange);
 
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	int getPlagueChance() const;
+	void changePlagueChance(int iChange);
+
+	int getPlaguePromotionID() const;
+	void setPlagued(bool bValue);
+	bool isPlagued() const;
+
+	int getPlagueID() const;
+	void setPlagueID(int iValue);
+
+	int getPlaguePriority() const;
+	void setPlaguePriority(int iValue);
+
+	int getPlagueIDImmunity() const;
+	void setPlagueIDImmunity(int iValue);
+
+	int getPlaguePromotion() const;
+	void setPlaguePromotion(int iValue);
+
+	bool CanPlague(CvUnit* pOtherUnit) const;
+
+	void DoPlagueTransfer(CvUnit& defender);
+
+	bool IsImmuePlague() const;
+	void ChangeImmuePlagueCount(int iChange);
+#endif
+
 	int getExtraEnemyHeal() const;
 	void changeExtraEnemyHeal(int iChange);
 
@@ -1961,6 +1989,17 @@ protected:
 	FAutoVariable<int, CvUnit> m_iExtraFirstStrikes;
 	FAutoVariable<int, CvUnit> m_iExtraChanceFirstStrikes;
 	FAutoVariable<int, CvUnit> m_iExtraWithdrawal;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	int m_iPlagueChance;
+	bool m_bIsPlagued;
+	int m_iPlagueID;
+	int m_iPlaguePriority;
+	int m_iPlagueIDImmunity;
+	int m_iPlaguePromotion;
+	int m_iImmuePlague;
+#endif
+
 	FAutoVariable<int, CvUnit> m_iExtraEnemyHeal;
 	FAutoVariable<int, CvUnit> m_iExtraNeutralHeal;
 	FAutoVariable<int, CvUnit> m_iExtraFriendlyHeal;

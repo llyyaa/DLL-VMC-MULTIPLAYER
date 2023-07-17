@@ -11928,6 +11928,19 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	
+	if (eIndex == YIELD_HEALTH) 
+	{
+		if (plot()->isFreshWater())
+		{
+			iValue += GC.getCITY_FRESH_WATER_HEALTH_YIELD();
+		}
+		else
+		{
+			iValue += -GC.getCITY_FRESH_WATER_HEALTH_YIELD();
+		}
+	}
+
 
 	iValue += GetYieldFromHealth(eIndex);
 	if (eIndex != YIELD_CRIME)
