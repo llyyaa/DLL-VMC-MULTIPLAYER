@@ -1317,6 +1317,15 @@ void CvGame::initDiplomacy()
 				}
 			}
 		}
+		if(kTeamA.isObserver())
+		{
+			for(int iJ = 0; iJ < MAX_CIV_TEAMS; iJ++)
+			{
+				const TeamTypes eTeamB = static_cast<TeamTypes>(iJ);
+				if(iI != iJ)
+					kTeamA.makeHasMet(eTeamB,true);
+			}
+		}
 	}
 }
 
