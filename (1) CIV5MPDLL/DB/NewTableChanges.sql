@@ -75,7 +75,7 @@ ALTER TABLE Improvements ADD COLUMN 'ImprovementResourceQuantity' INTEGER DEFAUL
 
 INSERT INTO Defines(Name, Value) VALUES('ORIGINAL_CAPITAL_MODMAX', 10);
 
-INSERT INTO Defines(Name, Value) VALUES('CITY_FRESH_WATER_HEALTH_YIELD', 2);
+INSERT INTO Defines(Name, Value) VALUES('FRESH_WATER_HEALTH_YIELD', 2);
 
 CREATE TABLE IF NOT EXISTS UnitPromotions_PromotionModifiers (
     `PromotionType` TEXT NOT NULL,
