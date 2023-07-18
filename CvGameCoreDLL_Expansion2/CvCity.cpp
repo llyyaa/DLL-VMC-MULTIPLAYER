@@ -11404,6 +11404,26 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	auto& owner = GET_PLAYER(getOwner());
 	CvYieldInfo* pYield = GC.getYieldInfo(eIndex);
 
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	if (eIndex != YIELD_HEALTH)
+	{
+		iTempMod = GetYieldModifierFromHealth(eIndex);
+		iModifier += iTempMod;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD", iTempMod);
+	}
+
+	if (eIndex != YIELD_CRIME)
+	{
+		iTempMod = GetYieldModifierFromCrime(eIndex);
+		iModifier += iTempMod;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD", iTempMod);
+	}
+#endif
+
+
 	// Yield Rate Modifier
 	iTempMod = getYieldRateModifier(eIndex);
 	iModifier += iTempMod;
