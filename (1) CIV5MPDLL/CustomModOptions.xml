@@ -961,7 +961,7 @@
 
 	<Row Class="2" Name="API_VP_ADJACENT_YIELD_BOOST" Value="1"/>
 
-<Row Class="2" Name="PLAGUE_TRANSFER" Value="0"/>
+
 
     <!-- GameEvents.TradeRouteMove.Add(function(iX, iY, iUnit, iOwner, iOriginalPlayer, iOriginalCity, iDestPlayer, iDestCity) end) -->
 	<Row Class="2" Name="EVENTS_TRADE_ROUTE_MOVE" Value="1"/>

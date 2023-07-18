@@ -239,8 +239,7 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
-		if (MOD_PLAGUE_TRANSFER)
-		{
+
 			//Chance to spread promotion?
 			if (kAttacker.getPlagueChance() > 0)
 			{
@@ -250,7 +249,6 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 			{
 				pkDefender->DoPlagueTransfer(kAttacker);
 			}
-		}
 #endif
 
 
@@ -780,13 +778,10 @@ void CvUnitCombat::GenerateRangedCombatInfo(CvUnit& kAttacker, CvUnit* pkDefende
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 		//Chance to spread promotion?
-		if (MOD_PLAGUE_TRANSFER)
-		{
 			if (kAttacker.getPlagueChance() > 0)
 			{
 				kAttacker.DoPlagueTransfer(*pkDefender);
 			}
-		}
 #endif
 
 	}

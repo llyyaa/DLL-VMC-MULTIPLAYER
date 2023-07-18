@@ -568,6 +568,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetExtraSpecialistYieldOfType);
 
 	Method(GetDomainFreeExperience);
+	Method(GetDomainFreeExperienceFromGreatWorks);
+	Method(GetDomainFreeExperienceFromGreatWorksGlobal);
 	Method(GetDomainProductionModifier);
 
 	Method(IsEverOwned);
@@ -3849,6 +3851,21 @@ int CvLuaCity::lGetDomainFreeExperience(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::getDomainFreeExperience);
 }
+
+//------------------------------------------------------------------------------
+//int getDomainFreeExperience(DomainTypes eIndex);
+int CvLuaCity::lGetDomainFreeExperienceFromGreatWorks(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::getDomainFreeExperienceFromGreatWorks);
+}
+
+//------------------------------------------------------------------------------
+//int getDomainFreeExperience(DomainTypes eIndex);
+int CvLuaCity::lGetDomainFreeExperienceFromGreatWorksGlobal(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::getDomainFreeExperienceFromGreatWorksGlobal);
+}
+
 //------------------------------------------------------------------------------
 //int getDomainProductionModifier(DomainTypes eIndex);
 int CvLuaCity::lGetDomainProductionModifier(lua_State* L)

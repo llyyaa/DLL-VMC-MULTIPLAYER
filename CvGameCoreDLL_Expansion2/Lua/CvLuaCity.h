@@ -436,6 +436,8 @@ protected:
 	static int lGetExtraSpecialistYieldOfType(lua_State* L);
 
 	static int lGetDomainFreeExperience(lua_State* L);
+	static int lGetDomainFreeExperienceFromGreatWorks(lua_State* L);
+	static int lGetDomainFreeExperienceFromGreatWorksGlobal(lua_State* L);
 	static int lGetDomainProductionModifier(lua_State* L);
 
 	static int lIsEverOwned(lua_State* L);
