@@ -133,7 +133,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 
 	Method(GetYieldModifierFromCrime);
 	Method(SetYieldModifierFromCrime);
-
+	Method(GetYieldFromHappiness);
+	Method(SetYieldFromHappiness);
 	Method(GetYieldFromHealth);
 	Method(SetYieldFromHealth);
 
@@ -999,6 +1000,24 @@ int CvLuaCity::lHasLoyaltyState(lua_State* L)
 	const bool bValue = (pkCity->GetLoyaltyState() == iValue);
 	lua_pushboolean(L, bValue);
 
+	return 1;
+}
+
+
+int CvLuaCity::lGetYieldFromHappiness(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	const int iValue = pkCity->GetYieldFromHappiness(eYield);
+	lua_pushinteger(L, iValue);
+	return 1;
+}
+int CvLuaCity::lSetYieldFromHappiness(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iValue = lua_tointeger(L, 3);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	pkCity->SetYieldFromHappiness(eYield, iValue);
 	return 1;
 }
 

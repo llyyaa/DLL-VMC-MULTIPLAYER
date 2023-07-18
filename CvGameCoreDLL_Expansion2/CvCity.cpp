@@ -398,6 +398,7 @@ CvCity::CvCity() :
 		, m_iLoyaltyStateType()
 		, m_aiYieldModifierFromHealth()
 		, m_aiYieldModifierFromCrime()
+		, m_aiYieldFromHappiness()
 		, m_aiYieldFromHealth()
 		, m_aiYieldFromCrime()
 		, m_aiStaticCityYield()
@@ -1176,6 +1177,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 	m_aiYieldModifierFromHealth.resize(NUM_YIELD_TYPES);
 	m_aiYieldModifierFromCrime.resize(NUM_YIELD_TYPES);
+	m_aiYieldFromHappiness.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromHealth.resize(NUM_YIELD_TYPES);
 	m_aiYieldFromCrime.resize(NUM_YIELD_TYPES);
 	m_aiStaticCityYield.resize(NUM_YIELD_TYPES);
@@ -1189,6 +1191,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 		m_aiYieldModifierFromHealth[iI] = 0;
 		m_aiYieldModifierFromCrime[iI] = 0;
+		m_aiYieldFromHappiness[iI] = 0;
 		m_aiYieldFromHealth[iI] = 0;
 		m_aiYieldFromCrime[iI] = 0;
 		m_aiStaticCityYield[iI] = 0;
@@ -7705,6 +7708,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 			continue;
 
 		UpdateCityYields(eYield);
+		UpdateYieldPerXFeature(eYield);
+		UpdateYieldPerXTerrain(eYield, TERRAIN_MOUNTAIN);
+		UpdateYieldPerXFeature(eYield);
 		updateExtraSpecialistYield(eYield);
 	}
 #endif
@@ -9126,7 +9132,7 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 	if (MOD_API_UNIFIED_YIELDS_MORE)
 	{
 		iCulturePerTurn += GetYieldFromHealth(YIELD_CULTURE);
-
+		iCulturePerTurn += GetYieldFromHappiness(YIELD_CULTURE);
 		iCulturePerTurn += GetYieldFromCrime(YIELD_CULTURE);
 	}
 
@@ -9258,6 +9264,7 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 
 	if (MOD_API_UNIFIED_YIELDS_MORE)
 	{
+		iFaith += GetYieldFromHappiness(YIELD_FAITH);
 		iFaith += GetYieldFromHealth(YIELD_FAITH);
 		iFaith += GetYieldFromCrime(YIELD_FAITH);
 	}
@@ -11765,6 +11772,20 @@ int CvCity::getHappinessModifier(YieldTypes eIndex) const
 			iModifier = iUnhappy * GC.getVERY_UNHAPPY_GOLD_PENALTY_PER_UNHAPPY();
 			iModifier = max (iModifier, GC.getVERY_UNHAPPY_MAX_GOLD_PENALTY());
 		}
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+		else if (eIndex == YIELD_DISEASE)
+		{
+			iModifier = iUnhappy * GC.getVERY_UNHAPPY_DISEASE_PENALTY_PER_UNHAPPY();
+			iModifier = max(iModifier, GC.getVERY_UNHAPPY_MAX_DISEASE_PENALTY());
+		}
+
+		else if (eIndex == YIELD_CRIME)
+		{
+			iModifier = iUnhappy * GC.getVERY_UNHAPPY_CRIME_PENALTY_PER_UNHAPPY();
+			iModifier = max(iModifier, GC.getVERY_UNHAPPY_MAX_CRIME_PENALTY());
+		}
+#endif
 	}
 
 	return iModifier;
@@ -11961,8 +11982,8 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 		}
 	}
 
-
 	iValue += GetYieldFromHealth(eIndex);
+	iValue += GetYieldFromHappiness(eIndex);
 	if (eIndex != YIELD_CRIME)
 	{
 		iValue += GetYieldFromCrime(eIndex);
@@ -17266,6 +17287,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iLoyaltyStateType;
 	kStream >> m_aiYieldModifierFromHealth;
 	kStream >> m_aiYieldModifierFromCrime;
+	kStream >> m_aiYieldFromHappiness;
 	kStream >> m_aiYieldFromHealth;
 	kStream >> m_aiYieldFromCrime;
 	kStream >> m_aiStaticCityYield;
@@ -17600,6 +17622,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iLoyaltyStateType;
 	kStream << m_aiYieldModifierFromHealth;
 	kStream << m_aiYieldModifierFromCrime;
+	kStream << m_aiYieldFromHappiness;
 	kStream << m_aiYieldFromHealth;
 	kStream << m_aiYieldFromCrime;
 	kStream << m_aiStaticCityYield;
@@ -20707,6 +20730,20 @@ int CvCity::GetYieldModifierFromCrime(YieldTypes eYield) const
 {
 	VALIDATE_OBJECT
 	return m_aiYieldModifierFromCrime[eYield];
+}
+
+void CvCity::SetYieldFromHappiness(YieldTypes eYield, int iValue)
+{
+	if (GetYieldFromHappiness(eYield) != iValue)
+	{
+		m_aiYieldFromHappiness[eYield] = iValue;
+		UpdateCityYields(eYield);
+	}
+}
+int CvCity::GetYieldFromHappiness(YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+		return m_aiYieldFromHappiness[eYield];
 }
 
 

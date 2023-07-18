@@ -1236,6 +1236,8 @@ public:
 	void SetYieldModifierFromCrime(YieldTypes eYield, int iValue);
 	int GetYieldModifierFromCrime(YieldTypes eYield) const;
 
+	void SetYieldFromHappiness(YieldTypes eYield, int iValue);
+	int GetYieldFromHappiness(YieldTypes eYield) const;
 
 	void SetYieldFromHealth(YieldTypes eYield, int iValue);
 	int GetYieldFromHealth(YieldTypes eYield) const;
@@ -1478,6 +1480,7 @@ protected:
 	int m_iLoyaltyStateType;
 	std::vector<int> m_aiYieldModifierFromHealth;
 	std::vector<int> m_aiYieldModifierFromCrime;
+	std::vector<int> m_aiYieldFromHappiness;
 	std::vector<int> m_aiYieldFromHealth;
 	std::vector<int> m_aiYieldFromCrime;
 	std::vector<int> m_aiStaticCityYield;

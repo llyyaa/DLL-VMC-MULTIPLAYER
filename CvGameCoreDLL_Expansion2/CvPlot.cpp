@@ -8361,6 +8361,16 @@ void CvPlot::updateWorkingCity()
 }
 
 
+bool CvPlot::isEffectiveOwner(const CvCity* pCity) const
+{
+	//no override
+	if (m_workingCityOverride.isInvalid())
+		return m_workingCity == pCity->GetIDInfo();
+
+	//with override
+	return m_workingCityOverride == pCity->GetIDInfo();
+}
+
 //	--------------------------------------------------------------------------------
 CvCity* CvPlot::getWorkingCityOverride() const
 {

@@ -238,6 +238,8 @@ public:
 	int GetImprovementYieldChangeGlobal(int i, int j) const;
 	int* GetImprovementYieldChangeGlobalArray(int i) const;
 
+	int GetFeatureYieldChangesGlobal(int i, int j) const;
+	int GetTerrainYieldChangesGlobal(int i, int j) const;
 
 	int GetYieldPerXTerrain(int i, int j) const;
 	int* GetYieldPerXTerrainArray(int i) const;
@@ -575,6 +577,8 @@ private:
 
 	int** m_ppaiImprovementYieldChange;
 	int** m_ppaiImprovementYieldChangeGlobal;
+	int** m_ppiFeatureYieldChangesGlobal;
+	int** m_ppiTerrainYieldChangesGlobal;
 	int** m_ppaiYieldPerXTerrain;
 	int** m_ppaiYieldPerXFeature;
 	int** m_ppaiSpecialistYieldChangeLocal;

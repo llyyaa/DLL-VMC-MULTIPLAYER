@@ -612,6 +612,8 @@ protected:
 	static int lGetYieldModifierFromCrime(lua_State* L);
 	static int lSetYieldModifierFromCrime(lua_State* L);
 
+	static int lGetYieldFromHappiness(lua_State* L);
+	static int lSetYieldFromHappiness(lua_State* L);
 	static int lGetYieldFromHealth(lua_State* L);
 	static int lSetYieldFromHealth(lua_State* L);
 

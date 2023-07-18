@@ -9639,6 +9639,18 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 	for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
+
+		for (iJ = 0; iJ < GC.getNumFeatureInfos(); iJ++)
+		{
+			changeFeatureYieldChange(((FeatureTypes)iJ), ((YieldTypes)iI), (pBuildingInfo->GetFeatureYieldChangesGlobal(iJ, iI) * iChange));
+		}
+		for (iJ = 0; iJ < GC.getNumTerrainInfos(); iJ++)
+		{
+			changeTerrainYieldChange(((TerrainTypes)iJ), ((YieldTypes)iI), (pBuildingInfo->GetTerrainYieldChangesGlobal(iJ, iI) * iChange));
+		}
+
+
+
 		pArea->changeYieldRateModifier(GetID(), ((YieldTypes)iI), (pBuildingInfo->GetAreaYieldModifier(iI) * iChange));
 		changeYieldRateModifier(((YieldTypes)iI), (pBuildingInfo->GetGlobalYieldModifier(iI) * iChange));
 

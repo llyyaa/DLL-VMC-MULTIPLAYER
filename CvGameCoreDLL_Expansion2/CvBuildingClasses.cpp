@@ -190,7 +190,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppiResourceYieldChangeGlobal(),
 	m_ppaiImprovementYieldChange(NULL),
 	m_ppaiImprovementYieldChangeGlobal(NULL),
-
+	m_ppiFeatureYieldChangesGlobal(NULL),
+	m_ppiTerrainYieldChangesGlobal(NULL),
 	m_ppaiYieldPerXTerrain(NULL),
 	m_ppaiYieldPerXFeature(NULL),
 
@@ -367,7 +368,8 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	m_ppiResourceYieldChangeGlobal.clear();
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChangeGlobal);
-
+	CvDatabaseUtility::SafeDelete2DArray(m_ppiTerrainYieldChangesGlobal);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChangeGlobal);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiYieldPerXTerrain);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiYieldPerXFeature);
 
@@ -786,6 +788,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 		}
 	}
 #if defined(MOD_ROG_CORE)
+
+
 	//Building_DomainFreeExperiencesGlobal
 	{
 		std::string strKey("Building_DomainFreeExperiencesGlobal");
@@ -881,6 +885,49 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 		}
 	}
 
+	{
+		kUtility.Initialize2DArray(m_ppiFeatureYieldChangesGlobal, "Features", "Yields");
+
+		std::string strKey("Building_FeatureYieldChangesGlobal");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Features.ID as FeatureID, Yields.ID as YieldID, Yield from Building_FeatureYieldChangesGlobal inner join Features on Features.Type = FeatureType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int FeatureID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppiFeatureYieldChangesGlobal[FeatureID][YieldID] = yield;
+		}
+	}
+
+	{
+		kUtility.Initialize2DArray(m_ppiTerrainYieldChangesGlobal, "Terrains", "Yields");
+
+		std::string strKey("Building_TerrainYieldChangesGlobal");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Terrains.ID as TerrainID, Yields.ID as YieldID, Yield from Building_TerrainYieldChangesGlobal inner join Terrains on Terrains.Type = TerrainType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int TerrainID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppiTerrainYieldChangesGlobal[TerrainID][YieldID] = yield;
+		}
+	}
 
 	//xTerrainYieldChanges
 	{
@@ -2945,6 +2992,27 @@ int* CvBuildingEntry::GetImprovementYieldChangeGlobalArray(int i) const
 	//CvAssertMsg(i < GC.getNumImprovementInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_ppaiImprovementYieldChangeGlobal[i];
+}
+
+
+/// Change to Improvement yield by type
+int CvBuildingEntry::GetFeatureYieldChangesGlobal(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppiFeatureYieldChangesGlobal[i][j];  
+}
+
+
+int CvBuildingEntry::GetTerrainYieldChangesGlobal(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppiTerrainYieldChangesGlobal[i][j];
 }
 
 /// Change to Terrain yield by type

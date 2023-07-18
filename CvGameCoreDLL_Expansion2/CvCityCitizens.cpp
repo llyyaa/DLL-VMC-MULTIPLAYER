@@ -1688,28 +1688,52 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 			// Now working pPlot
 			if(IsWorkingPlot(pPlot))
 			{
-				//if (iIndex != CITY_HOME_PLOT)
-				//{
-				//	GetCity()->changeWorkingPopulation(1);
-				//}
 
 				for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 				{
 					GetCity()->ChangeBaseYieldRateFromTerrain(((YieldTypes)iI), pPlot->getYield((YieldTypes)iI));
 				}
+
+				if (iIndex != CITY_HOME_PLOT)
+				{
+					if (!pPlot->isEffectiveOwner(m_pCity))
+						pPlot->setWorkingCityOverride(m_pCity);
+
+					if (pPlot->getTerrainType() != NO_TERRAIN)
+					{
+						GetCity()->ChangeNumTerrainWorked(pPlot->getTerrainType(), 1);
+		
+					}
+					if (pPlot->getFeatureType() != NO_FEATURE)
+					{
+						GetCity()->ChangeNumFeatureWorked(pPlot->getFeatureType(), 1);
+					}
+
+				}
+
+
 			}
 			// No longer working pPlot
 			else
 			{
-				//if (iIndex != CITY_HOME_PLOT)
-				//{
-				//	GetCity()->changeWorkingPopulation(-1);
-				//}
-
+	
 				for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 				{
 					GetCity()->ChangeBaseYieldRateFromTerrain(((YieldTypes)iI), -pPlot->getYield((YieldTypes)iI));
 				}
+
+				if (iIndex != CITY_HOME_PLOT)
+				{
+					if (pPlot->getTerrainType() != NO_TERRAIN)
+					{
+						GetCity()->ChangeNumTerrainWorked(pPlot->getTerrainType(), -1);
+					}
+					if (pPlot->getFeatureType() != NO_FEATURE)
+					{
+						GetCity()->ChangeNumFeatureWorked(pPlot->getFeatureType(), -1);
+					}
+				}
+		
 			}
 		}
 
