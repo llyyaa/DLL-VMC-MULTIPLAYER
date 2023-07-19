@@ -66,6 +66,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iLandmarksTourismPercent(0),
 	m_iHolyCityUnitExperence(0),
 	m_iHolyCityPressureModifier(0),
+	m_iSameReligionMinorRecoveryModifier(0),
 	m_iCityExtraMissionarySpreads(0),
 	m_bAllowYieldPerBirth(false),
 	m_piYieldPerBirth(NULL),
@@ -725,6 +726,11 @@ int CvBeliefEntry::GetHolyCityPressureModifier() const
 {
 	return m_iHolyCityPressureModifier;
 }
+//Extra MinorCiv Friendship Recovery from SameReligion
+int CvBeliefEntry::GetSameReligionMinorRecoveryModifier() const
+{
+	return m_iSameReligionMinorRecoveryModifier;
+}
 //Extra Missionary Spreads
 int CvBeliefEntry::GetCityExtraMissionarySpreads() const
 {
@@ -867,6 +873,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iHolyCityUnitExperence	  	  = kResults.GetInt("HolyCityUnitExperence");
 	m_iCityExtraMissionarySpreads	  = kResults.GetInt("CityExtraMissionarySpreads");
 	m_iHolyCityPressureModifier	  	  = kResults.GetInt("HolyCityPressureModifier");
+	m_iSameReligionMinorRecoveryModifier = kResults.GetInt("SameReligionMinorRecoveryModifier");
 #endif
 
 	m_bPantheon						  = kResults.GetBool("Pantheon");
@@ -1289,6 +1296,7 @@ CvReligionBeliefs::CvReligionBeliefs(const CvReligionBeliefs& source)
 	m_iLandmarksTourismPercent = source.m_iLandmarksTourismPercent;
 	m_iHolyCityUnitExperence = source.m_iHolyCityUnitExperence;
 	m_iHolyCityPressureModifier = source.m_iHolyCityPressureModifier;
+	m_iSameReligionMinorRecoveryModifier = source.m_iSameReligionMinorRecoveryModifier;
 	m_iCityExtraMissionarySpreads = source.m_iCityExtraMissionarySpreads;
 	m_bAllowYieldPerBirth = source.m_bAllowYieldPerBirth;
 #endif
@@ -1351,6 +1359,7 @@ void CvReligionBeliefs::Reset()
 	m_iLandmarksTourismPercent = 0;
 	m_iHolyCityUnitExperence = 0;
 	m_iHolyCityPressureModifier = 0;
+	m_iSameReligionMinorRecoveryModifier = 0;
 	m_iCityExtraMissionarySpreads = 0;
 	m_bAllowYieldPerBirth = false;
 #endif
@@ -1419,6 +1428,7 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief)
 	m_iLandmarksTourismPercent += belief->GetLandmarksTourismPercent();
 	m_iHolyCityUnitExperence += belief->GetHolyCityUnitExperence();
 	m_iHolyCityPressureModifier += belief->GetHolyCityPressureModifier();
+	m_iSameReligionMinorRecoveryModifier += belief->GetSameReligionMinorRecoveryModifier();
 	m_iCityExtraMissionarySpreads += belief->GetCityExtraMissionarySpreads();
 	m_bAllowYieldPerBirth = m_bAllowYieldPerBirth || belief->AllowYieldPerBirth();
 #endif
@@ -2290,6 +2300,7 @@ void CvReligionBeliefs::Read(FDataStream& kStream)
 	kStream >> m_iLandmarksTourismPercent;
 	kStream >> m_iHolyCityUnitExperence;
 	kStream >> m_iHolyCityPressureModifier;
+	kStream >> m_iSameReligionMinorRecoveryModifier;
 	kStream >> m_iCityExtraMissionarySpreads;
 	kStream >> m_bAllowYieldPerBirth;
 #endif
@@ -2348,6 +2359,7 @@ void CvReligionBeliefs::Write(FDataStream& kStream) const
 	kStream << m_iLandmarksTourismPercent;
 	kStream << m_iHolyCityUnitExperence;
 	kStream << m_iHolyCityPressureModifier;
+	kStream << m_iSameReligionMinorRecoveryModifier;
 	kStream << m_iCityExtraMissionarySpreads;
 	kStream << m_bAllowYieldPerBirth;
 #endif

@@ -578,6 +578,9 @@ public:
 	TechTypes GetGoodTechPlayerDoesntHave(PlayerTypes ePlayer, int iRoughTechValue) const;
 
 	bool IsSameReligionAsMajor(PlayerTypes eMajor);
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetSameReligionRecoveryModifier(PlayerTypes eMajor);
+#endif
 
 	CvString GetStatusChangeDetails(PlayerTypes ePlayer, bool bAdd, bool bFriends, bool bAllies);
 	pair<CvString, CvString> GetStatusChangeNotificationStrings(PlayerTypes ePlayer, bool bAdd, bool bFriends, bool bAllies, PlayerTypes eOldAlly, PlayerTypes eNewAlly);

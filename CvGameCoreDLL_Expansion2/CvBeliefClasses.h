@@ -131,6 +131,7 @@ public:
 	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
+	int GetSameReligionMinorRecoveryModifier() const;
 	int GetCityExtraMissionarySpreads() const;
 	bool AllowYieldPerBirth() const;
 	int GetYieldPerBirth(int i) const;
@@ -197,6 +198,7 @@ protected:
 	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
+	int m_iSameReligionMinorRecoveryModifier;
 	int m_iCityExtraMissionarySpreads;
 	bool m_bAllowYieldPerBirth;
 	int* m_piYieldPerBirth;
@@ -435,6 +437,10 @@ public:
 	{
 		return m_iHolyCityPressureModifier;
 	}
+	int GetSameReligionMinorRecoveryModifier() const
+	{
+		return m_iSameReligionMinorRecoveryModifier;
+	}
 	int GetCityExtraMissionarySpreads() const
 	{
 		return m_iCityExtraMissionarySpreads;
@@ -559,6 +565,7 @@ private:
 	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
+	int m_iSameReligionMinorRecoveryModifier;
 	int m_iCityExtraMissionarySpreads;
 	bool m_bAllowYieldPerBirth;
 #endif

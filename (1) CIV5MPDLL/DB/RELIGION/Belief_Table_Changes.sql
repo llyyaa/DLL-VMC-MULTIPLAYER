@@ -19,3 +19,5 @@ CREATE TABLE Belief_GreatPersonPoints (
 ALTER TABLE Beliefs ADD COLUMN 'GreatPersonPointsPerCity' BOOLEAN DEFAULT 0;
 ALTER TABLE Beliefs ADD COLUMN 'GreatPersonPointsCapital' BOOLEAN DEFAULT 0;
 ALTER TABLE Beliefs ADD COLUMN 'GreatPersonPointsHolyCity' BOOLEAN DEFAULT 0;
+
+ALTER TABLE Beliefs ADD COLUMN 'SameReligionMinorRecoveryModifier' INTEGER DEFAULT 0;

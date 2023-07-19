@@ -6186,7 +6186,9 @@ int CvMinorCivAI::GetFriendshipChangePerTurnTimes100(PlayerTypes ePlayer)
 		int iRecoveryMod = 100;
 		iRecoveryMod += iTraitMod;
 		iRecoveryMod += iReligionMod;
-		
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+		iRecoveryMod += GetSameReligionRecoveryModifier(ePlayer);
+#endif
 		if (iRecoveryMod < 0)
 			iRecoveryMod = 0;
 
@@ -10711,6 +10713,27 @@ bool CvMinorCivAI::IsSameReligionAsMajor(PlayerTypes eMajor)
 	}
 	return false;
 }
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+int CvMinorCivAI::GetSameReligionRecoveryModifier(PlayerTypes eMajor)
+{
+	if(!MOD_BELIEF_NEW_EFFECT_FOR_SP) return 0;
+	CvPlayer* pkPlayer = GetPlayer();
+	if(pkPlayer)
+	{
+		CvCity* pkCity = pkPlayer->getCapitalCity();
+		if(pkCity)
+		{
+			ReligionTypes eMinorReligion = pkCity->GetCityReligions()->GetReligiousMajority();
+			if (eMinorReligion == NO_RELIGION) return 0;
+			ReligionTypes eMajorReligion = GC.getGame().GetGameReligions()->GetReligionCreatedByPlayer(eMajor);
+			if (eMajorReligion == NO_RELIGION) return 0;
+			return eMinorReligion == eMajorReligion ? GC.getGame().GetGameReligions()->GetReligion(eMajorReligion,eMajor)->m_Beliefs.GetSameReligionMinorRecoveryModifier() : 0;
+		}
+	}
+	return 0;
+}
+#endif
 
 CvString CvMinorCivAI::GetStatusChangeDetails(PlayerTypes ePlayer, bool bAdd, bool bFriends, bool bAllies)
 {

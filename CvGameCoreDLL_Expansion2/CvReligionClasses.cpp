@@ -6695,6 +6695,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 
 	// Minimum influence with city states
 	iRtnValue += iFlavorDiplomacy * pEntry->GetCityStateMinimumInfluence() / 7;
+	iRtnValue += iFlavorDiplomacy * pEntry->GetSameReligionMinorRecoveryModifier() / 100;
 
 	// Yields for foreign followers
 	for(int iI = 0; iI < NUM_YIELD_TYPES; iI++)
