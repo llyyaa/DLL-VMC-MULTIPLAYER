@@ -506,6 +506,7 @@ protected:
 	static int lIsWorkingPlot(lua_State* L);
 	static int lAlterWorkingPlot(lua_State* L);
 	static int lIsForcedWorkingPlot(lua_State* L);
+	static int lSetForcedWorkingPlot(lua_State* L);
 	static int lGetNumForcedWorkingPlots(lua_State* L);
 	static int lGetNumRealBuilding(lua_State* L);
 	static int lSetNumRealBuilding(lua_State* L);

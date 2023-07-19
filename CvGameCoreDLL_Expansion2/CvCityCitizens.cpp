@@ -1774,6 +1774,10 @@ void CvCityCitizens::DoAlterWorkingPlot(int iIndex)
 
 		if(pPlot != NULL)
 		{
+			if(pPlot->getWorkingCity() != m_pCity)
+			{
+				pPlot->getWorkingCity()->GetCityCitizens()->SetForcedWorkingPlot(pPlot,false);
+			}
 			if(IsCanWork(pPlot))
 			{
 //				GetCity()->setCitizensAutomated(false);
