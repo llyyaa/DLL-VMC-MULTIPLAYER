@@ -25208,6 +25208,9 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeCorruptionScoreModifierFromPolicy(iChange * pPolicy->GetCorruptionScoreModifier());
 #endif
 
+	bool bGarrisonFreeMaintenance = pPolicy->IsGarrisonFreeMaintenance();
+	bool bCulturePerGarrisonedUnit = pPolicy->GetCulturePerGarrisonedUnit();
+
 	// Loop through Cities
 	int iLoop;
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
@@ -25260,11 +25263,21 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 		// Free Culture-per-turn in every City
 		int iCityCultureChange = pPolicy->GetCulturePerCity() * iChange;
-		if(pLoopCity->GetGarrisonedUnit() != NULL)
+		if(bCulturePerGarrisonedUnit)
 		{
-			iCityCultureChange += (pPolicy->GetCulturePerGarrisonedUnit() * iChange);
+			iCityCultureChange += (pLoopCity->plot()->getNumUnits() * pPolicy->GetCulturePerGarrisonedUnit() * iChange);
 		}
 		pLoopCity->ChangeJONSCulturePerTurnFromPolicies(iCityCultureChange);
+		
+		if(bGarrisonFreeMaintenance)
+		{
+			int iUnitLoop;
+			CvPlot* pPlot = pLoopCity->plot();
+			for(iUnitLoop = 0; iUnitLoop < pPlot->getNumUnits(); iUnitLoop++)
+			{
+				changeExtraUnitCost(-pPlot->getUnitByIndex(iUnitLoop)->getUnitInfo().GetExtraMaintenanceCost() * iChange);
+			}
+		}
 		
 #if defined(MOD_API_UNIFIED_YIELDS)
 		int iTotalWonders = 0;

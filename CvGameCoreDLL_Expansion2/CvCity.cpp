@@ -834,9 +834,18 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 	DLLUI->setDirty(NationalBorders_DIRTY_BIT, true);
 
 	// Garrisoned?
-	if (GetGarrisonedUnit())
+	int iGarrisonedUnits = plot()->getNumUnits();
+	if (iGarrisonedUnits > 0)
 	{
-		ChangeJONSCulturePerTurnFromPolicies(GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON));
+		ChangeJONSCulturePerTurnFromPolicies(GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON) * iGarrisonedUnits);
+		if(kPlayer.IsGarrisonFreeMaintenance())
+		{
+			int iUnitLoop;
+			for(iUnitLoop = 0; iUnitLoop < plot()->getNumUnits(); iUnitLoop++)
+			{
+				kPlayer.changeExtraUnitCost(-pPlot->getUnitByIndex(iUnitLoop)->getUnitInfo().GetExtraMaintenanceCost());
+			}
+		}
 	}
 
 #if defined(MOD_GLOBAL_CITY_FOREST_BONUS)
