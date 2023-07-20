@@ -3462,7 +3462,7 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::Attack(CvUnit& kAttacker, CvPlot& targ
 			// Killed him, move to the plot if we can.
 			if(targetPlot.getNumVisibleEnemyDefenders(&kAttacker) == 0)
 			{
-				if (kAttacker.UnitMove(&targetPlot, true, &kAttacker, true))
+				if (kAttacker.UnitMove(&targetPlot, true, &kAttacker, true) && !kAttacker.canMoveAfterAttacking())
 					kAttacker.finishMoves();	// Burn all the moves we have
 			}
 			return eFireSupportResult;
