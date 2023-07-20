@@ -639,6 +639,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(IsWorkingPlot);
 	Method(AlterWorkingPlot);
 	Method(IsForcedWorkingPlot);
+	Method(SetForcedWorkingPlot);
 	Method(GetNumRealBuilding);
 
 	Method(SetNumRealBuilding);
@@ -4474,6 +4475,17 @@ int CvLuaCity::lIsForcedWorkingPlot(lua_State* L)
 	const bool bResult = pkCity->GetCityCitizens()->IsForcedWorkingPlot(pkPlot);
 
 	lua_pushboolean(L, bResult);
+	return 1;
+}
+//------------------------------------------------------------------------------
+//void SetForcedWorkingPlot(CyPlot* pPlot);
+int CvLuaCity::lSetForcedWorkingPlot(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	CvPlot* pkPlot = CvLuaPlot::GetInstance(L, 2);
+	bool bNewValue = luaL_optbool(L, 3, false);
+	pkCity->GetCityCitizens()->SetForcedWorkingPlot(pkPlot, bNewValue);
+
 	return 1;
 }
 //------------------------------------------------------------------------------
