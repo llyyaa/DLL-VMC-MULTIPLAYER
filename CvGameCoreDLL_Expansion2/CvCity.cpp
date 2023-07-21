@@ -834,16 +834,19 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 	DLLUI->setDirty(NationalBorders_DIRTY_BIT, true);
 
 	// Garrisoned?
-	int iGarrisonedUnits = plot()->getNumUnits();
-	if (iGarrisonedUnits > 0)
+	if (plot()->getNumUnits() > 0)
 	{
-		ChangeJONSCulturePerTurnFromPolicies(GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON) * iGarrisonedUnits);
-		if(kPlayer.IsGarrisonFreeMaintenance())
+		bool bGarrisonFreeMaintenance = kPlayer.IsGarrisonFreeMaintenance();
+		for(int iUnitLoop = 0; iUnitLoop < plot()->getNumUnits(); iUnitLoop++)
 		{
-			int iUnitLoop;
-			for(iUnitLoop = 0; iUnitLoop < plot()->getNumUnits(); iUnitLoop++)
+			CvUnit* iUnit = pPlot->getUnitByIndex(iUnitLoop);
+			if(iUnit->GetBaseCombatStrength(true/*bIgnoreEmbarked*/) > 0 && iUnit->getDomainType() == DOMAIN_LAND)
 			{
-				kPlayer.changeExtraUnitCost(-pPlot->getUnitByIndex(iUnitLoop)->getUnitInfo().GetExtraMaintenanceCost());
+				ChangeJONSCulturePerTurnFromPolicies(GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON));
+				if(bGarrisonFreeMaintenance)
+				{
+					kPlayer.changeExtraUnitCost(iUnit->getUnitInfo().GetExtraMaintenanceCost());
+				}
 			}
 		}
 	}

@@ -25288,21 +25288,29 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 		// Free Culture-per-turn in every City
 		int iCityCultureChange = pPolicy->GetCulturePerCity() * iChange;
-		if(bCulturePerGarrisonedUnit)
+
+		//Culture and Extra Unit Cost from Policy
+		CvPlot* pPlot = pLoopCity->plot();
+		if (pPlot->getNumUnits() > 0)
 		{
-			iCityCultureChange += (pLoopCity->plot()->getNumUnits() * pPolicy->GetCulturePerGarrisonedUnit() * iChange);
-		}
-		pLoopCity->ChangeJONSCulturePerTurnFromPolicies(iCityCultureChange);
-		
-		if(bGarrisonFreeMaintenance)
-		{
-			int iUnitLoop;
-			CvPlot* pPlot = pLoopCity->plot();
-			for(iUnitLoop = 0; iUnitLoop < pPlot->getNumUnits(); iUnitLoop++)
+			for(int iUnitLoop = 0; iUnitLoop < pPlot->getNumUnits(); iUnitLoop++)
 			{
-				changeExtraUnitCost(-pPlot->getUnitByIndex(iUnitLoop)->getUnitInfo().GetExtraMaintenanceCost() * iChange);
+				CvUnit* iUnit = pPlot->getUnitByIndex(iUnitLoop);
+				if(iUnit->GetBaseCombatStrength(true/*bIgnoreEmbarked*/) > 0 && iUnit->getDomainType() == DOMAIN_LAND)
+				{
+					if(bCulturePerGarrisonedUnit)
+					{
+						iCityCultureChange += (pPolicy->GetCulturePerGarrisonedUnit() * iChange);
+					}
+					if(bGarrisonFreeMaintenance)
+					{
+						changeExtraUnitCost(-iUnit->getUnitInfo().GetExtraMaintenanceCost() * iChange);
+					}
+				}
 			}
 		}
+
+		pLoopCity->ChangeJONSCulturePerTurnFromPolicies(iCityCultureChange);
 		
 #if defined(MOD_API_UNIFIED_YIELDS)
 		int iTotalWonders = 0;
