@@ -1851,6 +1851,8 @@ void CvCity::kill()
 
 	pUnitNode = oldUnits.head();
 
+	bool bGarrisonFreeMaintenance = GET_PLAYER(eOwner).IsGarrisonFreeMaintenance();
+
 	while(pUnitNode != NULL)
 	{
 		pLoopUnit = ::getUnit(*pUnitNode);
@@ -1858,6 +1860,10 @@ void CvCity::kill()
 
 		if(pLoopUnit)
 		{
+			if(bGarrisonFreeMaintenance && pLoopUnit->GetBaseCombatStrength(true/*bIgnoreEmbarked*/) > 0 && pLoopUnit->getDomainType() == DOMAIN_LAND)
+			{
+				GET_PLAYER(eOwner).changeExtraUnitCost(pLoopUnit->getUnitInfo().GetExtraMaintenanceCost());
+			}
 			if(pLoopUnit->IsImmobile())
 			{
 				pLoopUnit->kill(false, eOwner);
