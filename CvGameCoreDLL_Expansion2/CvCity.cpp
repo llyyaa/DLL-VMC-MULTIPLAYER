@@ -11795,13 +11795,13 @@ int CvCity::getHappinessModifier(YieldTypes eIndex) const
 		else if (eIndex == YIELD_DISEASE)
 		{
 			iModifier = iUnhappy * GC.getVERY_UNHAPPY_DISEASE_PENALTY_PER_UNHAPPY();
-			iModifier = max(iModifier, GC.getVERY_UNHAPPY_MAX_DISEASE_PENALTY());
+			iModifier = min(iModifier, GC.getVERY_UNHAPPY_MAX_DISEASE_PENALTY());
 		}
 
 		else if (eIndex == YIELD_CRIME)
 		{
 			iModifier = iUnhappy * GC.getVERY_UNHAPPY_CRIME_PENALTY_PER_UNHAPPY();
-			iModifier = max(iModifier, GC.getVERY_UNHAPPY_MAX_CRIME_PENALTY());
+			iModifier = min(iModifier, GC.getVERY_UNHAPPY_MAX_CRIME_PENALTY());
 		}
 #endif
 	}
