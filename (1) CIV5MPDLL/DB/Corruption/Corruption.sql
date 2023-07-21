@@ -23,3 +23,11 @@ alter table Policies add column CorruptionLevelReduceByOne boolean not null defa
 alter table Traits add column CorruptionLevelReduceByOne boolean not null default 0;
 alter table Traits add column MaxCorruptionLevel integer not null default -1;
 alter table Buildings add column CorruptionLevelChange integer not null default 0;
+
+create table Policy_CorruptionLevelPolicyCostModifier (
+    PolicyType text not null,
+    CorruptionLevelType text not null,
+    Modifier integer not null default 0
+);
+
+INSERT INTO Defines(Name, Value) VALUES('CORRUPTION_SCORE_PER_DISTANCE', 100);

@@ -835,9 +835,21 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 	DLLUI->setDirty(NationalBorders_DIRTY_BIT, true);
 
 	// Garrisoned?
-	if (GetGarrisonedUnit())
+	if (plot()->getNumUnits() > 0)
 	{
-		ChangeJONSCulturePerTurnFromPolicies(GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON));
+		bool bGarrisonFreeMaintenance = kPlayer.IsGarrisonFreeMaintenance();
+		for(int iUnitLoop = 0; iUnitLoop < plot()->getNumUnits(); iUnitLoop++)
+		{
+			CvUnit* iUnit = pPlot->getUnitByIndex(iUnitLoop);
+			if(iUnit->GetBaseCombatStrength(true/*bIgnoreEmbarked*/) > 0 && iUnit->getDomainType() == DOMAIN_LAND)
+			{
+				ChangeJONSCulturePerTurnFromPolicies(GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON));
+				if(bGarrisonFreeMaintenance)
+				{
+					kPlayer.changeExtraUnitCost(iUnit->getUnitInfo().GetExtraMaintenanceCost());
+				}
+			}
+		}
 	}
 
 #if defined(MOD_GLOBAL_CITY_FOREST_BONUS)
@@ -1842,6 +1854,8 @@ void CvCity::kill()
 
 	pUnitNode = oldUnits.head();
 
+	bool bGarrisonFreeMaintenance = GET_PLAYER(eOwner).IsGarrisonFreeMaintenance();
+
 	while(pUnitNode != NULL)
 	{
 		pLoopUnit = ::getUnit(*pUnitNode);
@@ -1849,6 +1863,10 @@ void CvCity::kill()
 
 		if(pLoopUnit)
 		{
+			if(bGarrisonFreeMaintenance && pLoopUnit->GetBaseCombatStrength(true/*bIgnoreEmbarked*/) > 0 && pLoopUnit->getDomainType() == DOMAIN_LAND)
+			{
+				GET_PLAYER(eOwner).changeExtraUnitCost(pLoopUnit->getUnitInfo().GetExtraMaintenanceCost());
+			}
 			if(pLoopUnit->IsImmobile())
 			{
 				pLoopUnit->kill(false, eOwner);
@@ -20302,7 +20320,7 @@ CorruptionLevelTypes CvCity::GetCorruptionLevel() const
 void CvCity::UpdateCorruption()
 {
 	CvPlayerAI& owner = GET_PLAYER(getOwner());
-	if (!owner.isHuman())
+	if (!owner.EnableCorruption())
 	{
 		return;
 	}
@@ -20326,9 +20344,11 @@ void CvCity::UpdateCorruption()
 		pNewLevel = DecideCorruptionLevelForNormalCity(newScore);
 	}
 
+	m_iCachedCorruptionScore = newScore;
+	m_eCachedCorruptionLevel = pNewLevel ? static_cast<CorruptionLevelTypes>(pNewLevel->GetID()) : INVALID_CORRUPTION;
+
 	if (pNewLevel == pOldLevel)
 	{
-		m_iCachedCorruptionScore = newScore;
 		return;
 	}
 
@@ -20363,9 +20383,6 @@ void CvCity::UpdateCorruption()
 			GetCityBuildings()->SetNumRealBuilding(publicSecurity, 1);
 		}
 	}
-
-	m_iCachedCorruptionScore = newScore;
-	m_eCachedCorruptionLevel = pNewLevel ? static_cast<CorruptionLevelTypes>(pNewLevel->GetID()) : INVALID_CORRUPTION;
 }
 
 int CvCity::CalculateCorruptionScoreFromResource() const
@@ -20417,7 +20434,7 @@ int CvCity::CalculateCorruptionScoreFromDistance() const
 	int cityX = this->plot()->getX();
 	int cityY = this->plot()->getY();
 
-	return plotDistance(capX, capY, cityX, cityY);
+	return plotDistance(capX, capY, cityX, cityY) * GC.getCORRUPTION_SCORE_PER_DISTANCE();
 }
 
 int CvCity::CalculateCorruptionScoreModifierFromSpy() const

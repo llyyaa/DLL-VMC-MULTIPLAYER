@@ -2040,11 +2040,16 @@ public:
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION
+	bool EnableCorruption() const;
+
 	int GetCorruptionScoreModifierFromPolicy() const;
 	void ChangeCorruptionScoreModifierFromPolicy(int change);
 	int GetCorruptionLevelReduceByOneRC() const;
 	bool IsCorruptionLevelReduceByOne() const;
 	void ChangeCorruptionLevelReduceByOneRC(int change);
+
+	int GetCorruptionLevelPolicyCostModifier(CorruptionLevelTypes level) const;
+	void ChangeCorruptionLevelPolicyCostModifier(CorruptionLevelTypes level, int change);
 #endif
 
 protected:
@@ -2666,6 +2671,8 @@ protected:
 #ifdef MOD_GLOBAL_CORRUPTION
 	int m_iCorruptionScoreModifierFromPolicy = 0;
 	int m_iCorruptionLevelReduceByOneRC = 0;
+
+	std::vector<int> m_paiCorruptionLevelPolicyCostModifier;
 #endif
 
 };

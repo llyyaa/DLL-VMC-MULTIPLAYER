@@ -914,6 +914,33 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 		pResults->Reset();
 	}
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	{
+		static size_t size = kUtility.MaxRows("CorruptionLevels");
+		m_paiCorruptionLevelPolicyCostModifier.resize(size, 0);
+
+		std::string sqlKey = "m_paiCorruptionLevelPolicyCostModifier";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if(pResults == NULL)
+		{
+			const char* szSQL = "select * from Policy_CorruptionLevelPolicyCostModifier where PolicyType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, szPolicyType, false);
+
+		while(pResults->Step())
+		{
+			int level = GC.getInfoTypeForString(pResults->GetText("CorruptionLevelType"));
+			int value = pResults->GetInt("Modifier");
+			if (level >= 0 && level < size)
+				m_paiCorruptionLevelPolicyCostModifier[level] += value;
+		}
+
+		pResults->Reset();
+	}
+#endif
+
 	//UnitCombatFreePromotions
 	{
 		m_FreePromotionUnitCombats.clear();
@@ -2707,6 +2734,16 @@ bool CvPolicyEntry::GetCorruptionLevelReduceByOne() const
 bool CvPolicyEntry::IsInvolveCorruption() const
 {
 	return m_iCorruptionScoreModifier != 0 || m_bCorruptionLevelReduceByOne;
+}
+
+int CvPolicyEntry::GetCorruptionLevelPolicyCostModifier(CorruptionLevelTypes level) const
+{
+	if (level < 0 || level >= m_paiCorruptionLevelPolicyCostModifier.size())
+	{
+		return 0;
+	}
+
+	return m_paiCorruptionLevelPolicyCostModifier[level];
 }
 #endif
 
