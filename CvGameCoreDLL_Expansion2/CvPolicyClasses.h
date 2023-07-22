@@ -75,6 +75,8 @@ public:
 	int GetWorkerSpeedModifier() const;
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	int GetWaterBuildSpeedModifier() const;
+	int GetSettlerProductionEraModifier() const;
+	int GetSettlerProductionStartEra() const;
 #endif
 	int GetAllFeatureProduction() const;
 	int GetImprovementCostModifier() const;
@@ -352,6 +354,8 @@ private:
 	int m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	int m_iWaterBuildSpeedModifier;
+	int m_iSettlerProductionEraModifier;
+	int m_iSettlerProductionStartEra;
 #endif
 	int m_iAllFeatureProduction;
 	int m_iImprovementCostModifier;

@@ -275,6 +275,8 @@ CvPlayer::CvPlayer() :
 	, m_iWorkerSpeedModifier("CvPlayer::m_iWorkerSpeedModifier", m_syncArchive)
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	, m_iWaterBuildSpeedModifier("CvPlayer::m_iWaterBuildSpeedModifier", m_syncArchive)
+	, m_iSettlerProductionEraModifier("CvPlayer::m_iSettlerProductionEraModifier", m_syncArchive)
+	, m_iSettlerProductionStartEra("CvPlayer::m_iSettlerProductionStartEra", m_syncArchive)
 #endif
 	, m_iImprovementCostModifier("CvPlayer::m_iImprovementCostModifier", m_syncArchive)
 	, m_iImprovementUpgradeRateModifier("CvPlayer::m_iImprovementUpgradeRateModifier", m_syncArchive)
@@ -1033,6 +1035,8 @@ void CvPlayer::uninit()
 	m_iWorkerSpeedModifier = 0;
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	m_iWaterBuildSpeedModifier = 0;
+	m_iSettlerProductionEraModifier = 0;
+	m_iSettlerProductionStartEra = NO_ERA;
 #endif
 	m_iImprovementCostModifier = 0;
 	m_iImprovementUpgradeRateModifier = 0;
@@ -15994,6 +15998,44 @@ void CvPlayer::changeWaterBuildSpeedModifier(int iChange)
 	m_iWaterBuildSpeedModifier += iChange;
 }
 
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getSettlerProductionEraModifier() const
+{
+	return m_iSettlerProductionEraModifier;
+}
+void CvPlayer::setSettlerProductionEraModifier(int iChange)
+{
+	if(iChange > 0)
+	{
+		m_iSettlerProductionEraModifier = iChange;
+	}
+	else if(iChange < 0)
+	{
+		m_iSettlerProductionEraModifier = 0;
+	}
+
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getSettlerProductionStartEra() const
+{
+	return m_iSettlerProductionStartEra;
+}
+void CvPlayer::setSettlerProductionStartEra(int iChange)
+{
+	if(iChange > NO_ERA)
+	{
+		m_iSettlerProductionStartEra = iChange;
+	}
+	else if(iChange < NO_ERA)
+	{
+		m_iSettlerProductionStartEra = NO_ERA;
+	}
+}
+
+
 #endif
 //	--------------------------------------------------------------------------------
 int CvPlayer::getImprovementCostModifier() const
@@ -16119,7 +16161,12 @@ void CvPlayer::changeWonderProductionModifier(int iChange)
 //	--------------------------------------------------------------------------------
 int CvPlayer::getSettlerProductionModifier() const
 {
-	return m_iSettlerProductionModifier;
+	int res = m_iSettlerProductionModifier;
+	if(getSettlerProductionEraModifier() > 0 && GetCurrentEra() >= getSettlerProductionStartEra())
+	{
+		res += getSettlerProductionEraModifier();
+	}
+	return res;
 }
 
 //	--------------------------------------------------------------------------------
@@ -24893,6 +24940,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changeWorkerSpeedModifier(pPolicy->GetWorkerSpeedModifier() * iChange);
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	changeWaterBuildSpeedModifier(pPolicy->GetWaterBuildSpeedModifier() * iChange);
+	setSettlerProductionEraModifier(pPolicy->GetSettlerProductionEraModifier() * iChange);
+	setSettlerProductionStartEra(pPolicy->GetSettlerProductionStartEra() * iChange);
 #endif
 	changeImprovementCostModifier(pPolicy->GetImprovementCostModifier() * iChange);
 	changeImprovementUpgradeRateModifier(pPolicy->GetImprovementUpgradeRateModifier() * iChange);
@@ -26323,6 +26372,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	kStream >> m_iWaterBuildSpeedModifier;
+	kStream >> m_iSettlerProductionEraModifier;
+	kStream >> m_iSettlerProductionStartEra;
 #endif
 	kStream >> m_iImprovementCostModifier;
 	kStream >> m_iImprovementUpgradeRateModifier;
@@ -27008,6 +27059,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	kStream << m_iWaterBuildSpeedModifier;
+	kStream << m_iSettlerProductionEraModifier;
+	kStream << m_iSettlerProductionStartEra;
 #endif
 	kStream << m_iImprovementCostModifier;
 	kStream << m_iImprovementUpgradeRateModifier;

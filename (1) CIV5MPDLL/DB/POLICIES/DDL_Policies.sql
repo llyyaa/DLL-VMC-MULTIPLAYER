@@ -51,3 +51,7 @@ create table Policy_HappinessYieldModifier (
 
 alter table Policies add column InstantFoodThresholdPercent integer not null default 0;
 alter table Policies add column CaptureCityResistanceTurnsChangeFormula text references LuaFormula(Type);
+
+ALTER TABLE Policies ADD 'WaterBuildSpeedModifier' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD 'SettlerProductionEraModifier' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD 'SettlerProductionStartEra' TEXT DEFAULT NULL REFERENCES Eras(Type);

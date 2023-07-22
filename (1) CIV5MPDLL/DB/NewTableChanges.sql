@@ -141,8 +141,6 @@ ALTER TABLE UnitPromotions ADD 'CaptureDefeatedEnemyChance' BOOLEAN DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'BarbarianCombatBonus' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'CannotBeCaptured' BOOLEAN DEFAULT 0;
 
-ALTER TABLE Policies ADD 'WaterBuildSpeedModifier' INTEGER DEFAULT 0;
-
 ALTER TABLE Features ADD PseudoNaturalWonder INTEGER DEFAULT 0;
 
 ALTER TABLE UnitPromotions ADD 'OriginalCapitalDamageFix' INTEGER DEFAULT 0;

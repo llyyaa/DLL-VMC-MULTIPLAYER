@@ -891,6 +891,12 @@ public:
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	int getWaterBuildSpeedModifier() const;
 	void changeWaterBuildSpeedModifier(int iChange);
+
+	int getSettlerProductionEraModifier() const;
+	void setSettlerProductionEraModifier(int iChange);
+
+	int getSettlerProductionStartEra() const;
+	void setSettlerProductionStartEra(int iChange);
 #endif
 
 	int getImprovementCostModifier() const;
@@ -2227,6 +2233,8 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	FAutoVariable<int, CvPlayer> m_iWaterBuildSpeedModifier;
+	FAutoVariable<int, CvPlayer> m_iSettlerProductionEraModifier;
+	FAutoVariable<int, CvPlayer> m_iSettlerProductionStartEra;
 #endif
 	FAutoVariable<int, CvPlayer> m_iImprovementCostModifier;
 	FAutoVariable<int, CvPlayer> m_iImprovementUpgradeRateModifier;

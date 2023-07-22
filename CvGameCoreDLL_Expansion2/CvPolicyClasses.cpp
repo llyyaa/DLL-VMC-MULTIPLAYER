@@ -65,6 +65,8 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iWorkerSpeedModifier(0),
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	m_iWaterBuildSpeedModifier(0),
+	m_iSettlerProductionEraModifier(0),
+	m_iSettlerProductionStartEra(NO_ERA),
 #endif
 	m_iAllFeatureProduction(0),
 	m_iImprovementCostModifier(0),
@@ -335,6 +337,9 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
 #if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
 	m_iWaterBuildSpeedModifier = kResults.GetInt("WaterBuildSpeedModifier");
+	m_iSettlerProductionEraModifier = kResults.GetInt("SettlerProductionEraModifier");
+	const char* szSettlerProductionStartEra = kResults.GetText("SettlerProductionStartEra");
+	m_iSettlerProductionStartEra = GC.getInfoTypeForString(szSettlerProductionStartEra, true);
 #endif
 	m_iAllFeatureProduction = kResults.GetInt("AllFeatureProduction");
 	m_iImprovementCostModifier = kResults.GetInt("ImprovementCostModifier");
@@ -1501,6 +1506,16 @@ int CvPolicyEntry::GetWorkerSpeedModifier() const
 int CvPolicyEntry::GetWaterBuildSpeedModifier() const
 {
 	return m_iWaterBuildSpeedModifier;
+}
+/// Settler Production Era Modifier
+int CvPolicyEntry::GetSettlerProductionEraModifier() const
+{
+	return m_iSettlerProductionEraModifier;
+}
+/// Settler Production Extea Modifier Start Era
+int CvPolicyEntry::GetSettlerProductionStartEra() const
+{
+	return m_iSettlerProductionStartEra;
 }
 #endif
 /// How much Production does removing ALL Features now give us?
