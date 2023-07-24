@@ -3,13 +3,13 @@
 	<!-- Espionage.xml -->
 	<Language_en_US>
 
-  <Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
-      <Text>[NEWLINE][ICON_BULLET]City Modifier for Health: {1_Num}%</Text>
-    </Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
+			<Text>[NEWLINE][ICON_BULLET]City Modifier for Health: {1_Num}%</Text>
+		</Row>
 
-	 <Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
-      <Text>[NEWLINE][ICON_BULLET]City Modifier for Crime: {1_Num}%</Text>
-    </Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
+    		<Text>[NEWLINE][ICON_BULLET]City Modifier for Crime: {1_Num}%</Text>
+    	</Row>
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
 			<Text>A virulent plague was spread from your {1_Unit} to their {2_Unit} during combat!</Text>
 		</Row>
@@ -23,58 +23,42 @@
 			<Text>Plague spreads to your {1_Unit}!</Text>
 		</Row>
 
-
-	<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
-		<Text>
-			[NEWLINE][ICON_BULLET]We Love King Day(Policy): {1_Num}%
-		</Text>
-	</Row>
-<Row Tag="TXT_KEY_YIELD_HEALTH">
-				<Text>HEALTH</Text>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
+			<Text>[NEWLINE][ICON_BULLET]We Love King Day(Policy): {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_HEALTH">
+			<Text>HEALTH</Text>
 			</Row>
-<Row Tag="TXT_KEY_YIELD_DISEASE">
-				<Text>DISEASE</Text>
-			</Row>
+		<Row Tag="TXT_KEY_YIELD_DISEASE">
+			<Text>DISEASE</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_CRIME">
+			<Text>CRIME</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
+			<Text>SOVEREIGNTY</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_LOYALTY">
+			<Text>LOYALTY</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
+			<Text>GENERAL</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_GREAT_ADMIRAL_POINTS">
+			<Text>ADMIRAL</Text>
+		</Row>
 
-<Row Tag="TXT_KEY_YIELD_CRIME">
-				<Text>CRIME</Text>
-			</Row>
-
-<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
-				<Text>SOVEREIGNTY</Text>
-			</Row>
-<Row Tag="TXT_KEY_YIELD_LOYALTY">
-				<Text>LOYALTY</Text>
-			</Row>
-<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
-				<Text>GENERAL</Text>
-			</Row>
-<Row Tag="TXT_KEY_YIELD_GREAT_ADMIRAL_POINTS">
-				<Text>ADMIRAL</Text>
-			</Row>
-
-
-
-
-
-	<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
-				<Text>
-					[NEWLINE][ICON_BULLET]Global City Fix (World Wonder): {1_Num}%
-				</Text>
-			</Row>
-
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
+			<Text>[NEWLINE][ICON_BULLET]Global City Fix (World Wonder): {1_Num}%</Text>
+		</Row>
 
 		<Row Tag="TXT_KEY_SPY_STATE_TERMINATED">
 			<Text>Eliminated!</Text>
 		</Row>
 
-
-	<Row Tag="TXT_KEY_PRODMOD_WONDER_IMPROVEMENT">
-			<Text>
-				[NEWLINE][ICON_BULLET]Improved facilities provide spectacle construction bonus: {1_Num}%。
-			</Text>
+		<Row Tag="TXT_KEY_PRODMOD_WONDER_IMPROVEMENT">
+			<Text>[NEWLINE][ICON_BULLET]Improved facilities provide spectacle construction bonus: {1_Num}%。</Text>
 		</Row>
-
 	</Language_en_US>
 
 	<!-- GoodyHutMessages.xml -->
@@ -392,6 +376,18 @@
 
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_ANNEX_PUPPET_LEVEL_PREVIEW">
 			<Text>If you annex this city, the estimated city hall level is: {1_level}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TOURISM_FROM_CITY_RATE">
+			<Text>{1_Num}[ICON_TOURISM]Tourism from City Production Rate</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_BEFORE_MODIFIER">
+			<Text>{1_Num}Point [ICON_TOURISM]base Tourism Output:</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITY_TOURISM_MODIFIER_FROM_WORLD_CONGRESS">
+			<Text>+{1_Num}% Bonus from World Congress({2_Num} turns)</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_MODIFIER">
+			<Text>{1_Num}% [ICON_TOURISM]Tourism Modifier Internal:</Text>
 		</Row>
 	</Language_en_US>
 

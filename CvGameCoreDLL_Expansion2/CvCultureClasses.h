@@ -338,8 +338,8 @@ public:
 	void ClearGreatWorks();
 	GreatWorkSlotType GetSlotTypeFirstAvailableCultureBuilding() const;
 
-	void CalculateBaseTourismBeforeModifiers();
-	void CalculateBaseTourism();
+	void CalculateBaseTourismBeforeModifiers(CvString& toolTipSink);
+	int CalculateBaseTourism(CvString& toolTipSink);
 
 	int GetTourismMultiplier(PlayerTypes ePlayer, bool bIgnoreReligion, bool bIgnoreOpenBorders, bool bIgnoreTrade, bool bIgnorePolicies, bool bIgnoreIdeologies) const;
 

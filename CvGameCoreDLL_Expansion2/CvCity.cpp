@@ -2291,8 +2291,9 @@ void CvCity::UpdateCityYields(YieldTypes eYield)
 	//don't forget tourism
 	if (eYield == YIELD_CULTURE || eYield == YIELD_TOURISM)
 	{
-		GetCityCulture()->CalculateBaseTourismBeforeModifiers();
-		GetCityCulture()->CalculateBaseTourism();
+		CvString Null;
+		GetCityCulture()->CalculateBaseTourismBeforeModifiers(Null);
+		GetCityCulture()->CalculateBaseTourism(Null);
 	}
 }
 
@@ -11476,7 +11477,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	{
 		iTempMod = GetYieldModifierFromHealth(eIndex);
 		iModifier += iTempMod;
-		if (toolTipSink)
+		if (iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD", iTempMod);
 	}
 
@@ -11484,7 +11485,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	{
 		iTempMod = GetYieldModifierFromCrime(eIndex);
 		iModifier += iTempMod;
-		if (toolTipSink)
+		if (iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD", iTempMod);
 	}
 #endif
@@ -11493,19 +11494,19 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	// Yield Rate Modifier
 	iTempMod = getYieldRateModifier(eIndex);
 	iModifier += iTempMod;
-	if(toolTipSink)
+	if(iTempMod != 0 && toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD", iTempMod);
 
 	// Resource Yield Rate Modifier
 	iTempMod = getResourceYieldRateModifier(eIndex);
 	iModifier += iTempMod;
-	if(toolTipSink)
+	if(iTempMod != 0 && toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_RESOURCES", iTempMod);
 
 	// Happiness Yield Rate Modifier
 	iTempMod = getHappinessModifier(eIndex);
 	iModifier += iTempMod;
-	if(toolTipSink)
+	if(iTempMod != 0 && toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HAPPINESS", iTempMod);
 
 	// Area Yield Rate Modifier
@@ -11513,14 +11514,14 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	{
 		iTempMod = area()->getYieldRateModifier(getOwner(), eIndex);
 		iModifier += iTempMod;
-		if(toolTipSink)
+		if(iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_AREA", iTempMod);
 	}
 
 	// Player Yield Rate Modifier
 	iTempMod = GET_PLAYER(getOwner()).getYieldRateModifier(eIndex);
 	iModifier += iTempMod;
-	if(toolTipSink)
+	if(iTempMod != 0 && toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_PLAYER", iTempMod);
 
 	// Player Capital Yield Rate Modifier
@@ -11528,7 +11529,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	{
 		iTempMod = GET_PLAYER(getOwner()).getCapitalYieldRateModifier(eIndex);
 		iModifier += iTempMod;
-		if(toolTipSink)
+		if(iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_CAPITAL", iTempMod);
 	}
 
@@ -11554,7 +11555,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			}
 #endif
 			iModifier += iTempMod;
-			if (toolTipSink)
+			if (iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_GOLDEN_AGE", iTempMod);
 		}
 	}
@@ -11595,11 +11596,8 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		if (MOD_ROG_CORE)
 		{
 			iTempMod = GET_PLAYER(getOwner()).getWorldWonderCityYieldRateModifier(eIndex);
-			if (iTempMod != 0)
-			{
-				if (toolTipSink)
-					GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL", iTempMod);
-			}
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL", iTempMod);
 			iModifier += iTempMod;
 		}
 #endif
@@ -11623,12 +11621,9 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	if (MOD_RESOURCE_EXTRA_BUFF)
 	{
 		iTempMod = owner.GetGlobalYieldModifierFromResource(eIndex);
-		if (iTempMod != 0)
-		{
-			iModifier += iTempMod;
-			if (toolTipSink)
-				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_RESOURCE_BUFF", iTempMod);
-		}
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_RESOURCE_BUFF", iTempMod);
 	}
 #endif
 	
@@ -11687,7 +11682,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 #endif
 
 		iModifier += iTempMod;
-		if (toolTipSink)
+		if (iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_BELIEF", iTempMod);
 	}
 
@@ -11696,7 +11691,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	{	
 		iTempMod = GetCityBuildings()->GetCityStateTradeRouteProductionModifier();
 		iModifier += iTempMod;
-		if(toolTipSink){
+		if(iTempMod != 0 && toolTipSink){
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HANSE", iTempMod);
 		}
 	}

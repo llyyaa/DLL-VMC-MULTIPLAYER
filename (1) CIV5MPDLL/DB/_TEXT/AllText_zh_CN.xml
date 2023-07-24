@@ -2,14 +2,12 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
-
- <Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
-      <Text>[NEWLINE][ICON_BULLET]健康度的城市修正值: {1_Num}%</Text>
-    </Row>
-
-	 <Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
-      <Text>[NEWLINE][ICON_BULLET]犯罪率的城市修正值: {1_Num}%</Text>
-    </Row>
+ 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
+      		<Text>[NEWLINE][ICON_BULLET]健康度的城市修正值: {1_Num}%</Text>
+    	</Row>
+	 	<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
+     		<Text>[NEWLINE][ICON_BULLET]犯罪率的城市修正值: {1_Num}%</Text>
+    	</Row>
 
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
 			<Text>战斗期间，一种致命的病毒通过你的{1_Unit}转播给了敌方的{2_Unit}!</Text>
@@ -24,49 +22,40 @@
 			<Text>病毒传播给了你的{1_Unit}!</Text>
 		</Row>
 
-	<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
-		<Text>
-			[NEWLINE][ICON_BULLET]爱领袖日修正(政策): {1_Num}%
-		</Text>
-	</Row>
-
-	<Row Tag="TXT_KEY_YIELD_HEALTH">
-				<Text>健康</Text>
-			</Row>
-<Row Tag="TXT_KEY_YIELD_DISEASE">
-				<Text>疾病</Text>
-			</Row>
-
-<Row Tag="TXT_KEY_YIELD_CRIME">
-				<Text>犯罪率</Text>
-			</Row>
-
-<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
-				<Text>权威</Text>
-			</Row>
-<Row Tag="TXT_KEY_YIELD_LOYALTY">
-				<Text>忠诚度</Text>
-			</Row>
-<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
-				<Text>大军事家点数</Text>
-			</Row>
-<Row Tag="TXT_KEY_YIELD_GREAT_ADMIRAL_POINTS">
-				<Text>海军统帅点数</Text>
-			</Row>
-
-
-
-<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
-				<Text>
-					[NEWLINE][ICON_BULLET]全局城市修正(世界奇观): {1_Num}%
-				</Text>
-			</Row>
-
-
-	<Row Tag="TXT_KEY_PRODMOD_WONDER_IMPROVEMENT">
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
 			<Text>
-				[NEWLINE][ICON_BULLET]改良设施提供奇观建造加成: {1_Num}%。
+				[NEWLINE][ICON_BULLET]爱领袖日修正(政策): {1_Num}%
 			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_YIELD_HEALTH">
+			<Text>健康</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_DISEASE">
+			<Text>疾病</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_CRIME">
+			<Text>犯罪率</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
+			<Text>权威</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_LOYALTY">
+			<Text>忠诚度</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
+			<Text>大军事家点数</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_GREAT_ADMIRAL_POINTS">
+			<Text>海军统帅点数</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
+			<Text>[NEWLINE][ICON_BULLET]全局城市修正(世界奇观): {1_Num}%</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_WONDER_IMPROVEMENT">
+			<Text>[NEWLINE][ICON_BULLET]改良设施提供奇观建造加成: {1_Num}%。</Text>
 		</Row>
 
 		<Row Tag="TXT_KEY_SPY_STATE_TERMINATED">
@@ -389,6 +378,21 @@
 
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_ANNEX_PUPPET_LEVEL_PREVIEW">
 			<Text>如果你吞并该城市，预计市政厅等级为：{1_level}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TOURISM_FROM_CITY_RATE">
+			<Text>{1_Num}[ICON_TOURISM]魅力 来自产能转换</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_BEFORE_MODIFIER">
+			<Text>共计{1_Num}点基础[ICON_TOURISM]魅力产出:</Text>
+		</Row>
+		<Replace Tag="TXT_KEY_CO_CITY_TOURISM_THEMING_BONUSES">
+			<Text>{1_Num}[ICON_TOURISM]魅力 来自博物馆和奇观主题奖励</Text>
+		</Replace>
+		<Row Tag="TXT_KEY_CITY_TOURISM_MODIFIER_FROM_WORLD_CONGRESS">
+			<Text>+{1_Num}%奖励{2_Num}回合 来自世界议会</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_MODIFIER">
+			<Text>共计{1_Num}%国内[ICON_TOURISM]魅力加成:</Text>
 		</Row>
 	</Language_zh_CN>
 
