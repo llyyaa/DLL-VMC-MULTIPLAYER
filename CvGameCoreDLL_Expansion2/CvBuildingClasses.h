@@ -254,7 +254,6 @@ public:
 	int GetBuildingClassLocalYieldChange(int i, int j) const;
 
 #if defined(MOD_ROG_CORE)
-	int GetNumFreeSpecialUnits(int i) const;
 	int GetSpecificGreatPersonRateModifier(int) const;
 #endif
 
@@ -410,8 +409,9 @@ public:
 	int GetLocalResourceOr(int i) const;
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
-	int GetNumFreeUnit(int i) const;
-	//std::pair<UnitTypes, int>* GetFreeUnits() const;
+	int GetNumFreeUnit() const;
+	int GetNumFreeUnitTotal() const;
+	std::pair<UnitTypes, int>* GetFreeUnits() const;
 
 	int GetResourceYieldChange(int i, int j) const;
 	int* GetResourceYieldChangeArray(int i) const;
@@ -591,7 +591,6 @@ private:
 	int* m_piYieldFromProcessModifierGlobal;
 
 #if defined(MOD_ROG_CORE)
-	int* m_piNumSpecFreeUnits;
 	int* m_paiSpecificGreatPersonRateModifier;
 
 	int* m_piYieldChangeWorldWonder;
@@ -763,7 +762,9 @@ private:
 #endif 
 
 	bool* m_pbBuildingClassNeededInCity;
-	int* m_piNumFreeUnits;
+	int m_iNumFreeUnit;
+	int m_iNumFreeUnitTotal;
+	std::pair<UnitTypes, int>* m_pFreeUnits;
 
 	int** m_ppaiResourceYieldChange;
 	int** m_ppaiFeatureYieldChange;

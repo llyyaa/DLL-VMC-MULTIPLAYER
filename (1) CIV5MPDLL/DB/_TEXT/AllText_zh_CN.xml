@@ -343,9 +343,6 @@
 				[NEWLINE][ICON_BULLET]快乐度修正(政策): {1_Num}%
 			</Text>
 		</Row>
-		<Row Tag="TXT_KEY_CO_CITY_TOURISM_NUM_GREAT_WORK">
-			<Text>+{1_num}%奖励 来自杰作数量</Text>
-		</Row>
 		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_EMBARGO_IDEOLOGY">
 			<Text>无法与非同一意识形态的文明以及非结盟城邦建立国际[ICON_INTERNATIONAL_TRADE]商路。已结盟的城邦[ICON_INFLUENCE]影响力不会衰退。</Text>
 		</Row>

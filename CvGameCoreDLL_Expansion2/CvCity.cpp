@@ -6753,21 +6753,31 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 	
 			// Free Units
-			CvUnit* pFreeUnit = NULL;
+			CvUnit* pFreeUnit;
+			int iFreeUnitLoop;
 
-			int iFreeUnitLoop = 0;
-			int iFreeSpecUnitLoop = 0;
-			for (int iUnitLoop = 0; iUnitLoop < GC.getNumUnitInfos(); iUnitLoop++)
+			int iNumFreeUnitTotal = pBuildingInfo->GetNumFreeUnitTotal();
+			int iNumFreeUnit = pBuildingInfo->GetNumFreeUnit();
+			if(iNumFreeUnitTotal > 0)
 			{
-				const UnitTypes eUnit = static_cast<UnitTypes>(iUnitLoop);
-				CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUnit);
-				if (pkUnitInfo)
+				std::pair<UnitTypes, int>* pFreeUnits = pBuildingInfo->GetFreeUnits();
+				for(int iUnitLoop = 0; iUnitLoop < iNumFreeUnitTotal; iUnitLoop++)
 				{
-						for(iFreeUnitLoop = 0; iFreeUnitLoop < pBuildingInfo->GetNumFreeUnit(iUnitLoop); iFreeUnitLoop++)
+					UnitTypes eUnit = pFreeUnits[iUnitLoop].first;
+					if(GC.getUnitInfo(eUnit))
+					{
+						if(iUnitLoop < iNumFreeUnit)
 						{
 							// Get the right unit of this class for this civ
-							const UnitTypes eFreeUnitType = (UnitTypes)thisCiv.getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
-
+							eUnit = (UnitTypes)thisCiv.getCivilizationUnits((UnitClassTypes)GC.getUnitInfo(eUnit)->GetUnitClassType());
+						}
+					}
+					CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUnit);
+					if(pkUnitInfo)
+					{
+						for(iFreeUnitLoop = 0; iFreeUnitLoop < pFreeUnits[iUnitLoop].second; iFreeUnitLoop++)
+						{
+							const UnitTypes eFreeUnitType = eUnit;
 							// Great prophet?
 							if(GC.GetGameUnits()->GetEntry(eFreeUnitType)->IsFoundReligion())
 							{
@@ -6868,30 +6878,22 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 									if (!pFreeUnit->jumpToNearestValidPlot())
 										pFreeUnit->kill(false);	// Could not find a valid spot!
 								}
+								else
+								{
+									if(iUnitLoop >= iNumFreeUnit)
+									{
+										if (!pFreeUnit->jumpToNearestValidPlot())
+											pFreeUnit->kill(false);
+									}
+									if(pFreeUnit->IsCombatUnit())
+									{
+										addProductionExperience(pFreeUnit);
+									}
+								}
 							}
 						}
-					//}
-				}
-#if defined(MOD_ROG_CORE)
-				for (iFreeSpecUnitLoop = 0; iFreeSpecUnitLoop < pBuildingInfo->GetNumFreeSpecialUnits(iUnitLoop); iFreeSpecUnitLoop++)
-				{
-					pFreeUnit = NULL;
-					const UnitTypes eFreeSpecUnitType = (UnitTypes)pkUnitInfo->GetUnitClassType();
-					if (eFreeSpecUnitType != NO_UNIT)
-					{
-						pFreeUnit = owningPlayer.initUnit(eUnit, getX(), getY());
-					}
-					bool bJumpSuccess = pFreeUnit->jumpToNearestValidPlot();
-					if (bJumpSuccess)
-					{
-						addProductionExperience(pFreeUnit);
-					}
-					else
-					{
-						pFreeUnit->kill(false);
 					}
 				}
-#endif
 
 			}
 
