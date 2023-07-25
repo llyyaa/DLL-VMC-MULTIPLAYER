@@ -535,6 +535,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetAttackBonusTurns);
 	Method(GetCultureBonusTurns);
 	Method(GetTourismBonusTurns);
+	Method(GetInternationalTourismTooltip);
 
 	Method(GetGoldenAgeProgressThreshold);
 	Method(GetGoldenAgeProgressMeter);
@@ -5737,6 +5738,17 @@ int CvLuaPlayer::lGetCultureBonusTurns(lua_State* L)
 int CvLuaPlayer::lGetTourismBonusTurns(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetTourismBonusTurns);
+}
+
+//------------------------------------------------------------------------------
+//CvString GetInternationalTourismTooltip();
+int CvLuaPlayer::lGetInternationalTourismTooltip(lua_State* L)
+{
+	CvString toolTip;
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	toolTip = pkPlayer->GetInternationalTourismTooltip();
+	lua_pushstring(L, toolTip.c_str());
+	return 1;
 }
 
 //------------------------------------------------------------------------------

@@ -682,6 +682,7 @@ public:
 	void ChangeCultureBonusTurns(int iChange);
 	int GetTourismBonusTurns() const;
 	void ChangeTourismBonusTurns(int iChange);
+	CvString GetInternationalTourismTooltip();
 
 
 #if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)

@@ -392,7 +392,13 @@
 			<Text>+{1_Num}%奖励{2_Num}回合 来自世界议会</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_MODIFIER">
-			<Text>共计{1_Num}%国内[ICON_TOURISM]魅力加成:</Text>
+			<Text>[COLOR_POSITIVE_TEXT]{1_Num}%国内[ICON_TOURISM]魅力加成 总计[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PLAYER_TOURISM_INTERNATIONAL_MODIFIER">
+			<Text>[ICON_TOURISM]魅力国际影响如下:</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TOURISM_HELP_INFO">
+			<Text>[ICON_TOURISM]魅力由杰作、文物或建筑来产生，是你将你的文化影响力扩张到其它文明的主要途径。 </Text>
 		</Row>
 	</Language_zh_CN>
 

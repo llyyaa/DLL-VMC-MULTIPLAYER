@@ -4496,6 +4496,10 @@ GreatWorkSlotType CvCityCulture::GetSlotTypeFirstAvailableCultureBuilding() cons
 void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 {
 	bool bShouldBuildTip = !toolTipSink.empty();
+	if(bShouldBuildTip)
+	{
+		toolTipSink = "[NEWLINE]";
+	}
 	// If we're in Resistance, then no Tourism!
 	if(m_pCity->IsResistance() || m_pCity->IsRazing())
 	{
@@ -4670,7 +4674,7 @@ int CvCityCulture::CalculateBaseTourism(CvString& toolTipSink)
 	bool bShouldBuildTip = !toolTipSink.empty();
 	if(bShouldBuildTip)
 	{
-		toolTipSink = "";
+		toolTipSink = "[NEWLINE]";
 	}
 	int iBase = m_pCity->GetBaseTourismBeforeModifiers();
 	if (iBase <= 0)
@@ -4863,206 +4867,25 @@ int CvCityCulture::GetTourismMultiplier(PlayerTypes ePlayer, bool bIgnoreReligio
 /// What is the tooltip describing the tourism output?
 CvString CvCityCulture::GetTourismTooltip()
 {
-	CvString szRtnValue = "";
+	CvString szRtnValue = GetLocalizedText("TXT_KEY_TOURISM_HELP_INFO");
 	CvString szTemp;
-	CvString szTemp2;
- 	CvString sharedReligionCivs = "";
-	CvString openBordersCivs = "";
-	CvString tradeRouteCivs = "";
-	CvString lessHappyCivs = "";
-	CvString commonFoeCivs = "";
-	CvString sharedIdeologyCivs = "";
-	CvString differentIdeologyCivs = "";
-	TeamTypes eTeam = m_pCity->getTeam();
-	CvPlayer &kCityPlayer = GET_PLAYER(m_pCity->getOwner());
-	PolicyBranchTypes eMyIdeology = kCityPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
-	ReligionTypes ePlayerReligion = kCityPlayer.GetReligions()->GetReligionInMostCities();
 
-	//Base Tourism Before Modifiers
 	int iBaseTourismBeforeModifiers = m_pCity->GetBaseTourismBeforeModifiers();
 	if(iBaseTourismBeforeModifiers > 0)
 	{
-		szTemp = GetLocalizedText("TXT_KEY_CITY_BASE_TOURISM_BEFORE_MODIFIER", iBaseTourismBeforeModifiers);
+		szTemp = "Get Base Tourism Before Modifiers";
 		CalculateBaseTourismBeforeModifiers(szTemp);
 		szRtnValue += szTemp;
+		szRtnValue += "[NEWLINE]----------------[NEWLINE]";
+		szRtnValue += GetLocalizedText("TXT_KEY_YIELD_BASE", iBaseTourismBeforeModifiers, GC.getYieldInfo(YIELD_TOURISM)->getIconString());
 	}
 	if(iBaseTourismBeforeModifiers > 0)
 	{
-		szTemp2 = "Get Tourism Modifier Internal";
-		int iModifierInternal = CalculateBaseTourism(szTemp2);
-		szTemp = "[NEWLINE][NEWLINE]";
-		szTemp += GetLocalizedText("TXT_KEY_CITY_BASE_TOURISM_MODIFIER",iModifierInternal);
+		szTemp = "Get Tourism Modifier Internal";
+		int iModifierInternal = CalculateBaseTourism(szTemp);
 		szRtnValue += szTemp;
-		szRtnValue += szTemp2;
-	}
-	
-	// If generating any, itemize which players we have bonuses with
-	if (iBaseTourismBeforeModifiers > 0)
-	{
-		// Get policy bonuses
-		int iLessHappyMod = kCityPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_LESS_HAPPY);
-		int iCommonFoeMod = kCityPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_COMMON_FOE);
-		int iSharedIdeologyMod = kCityPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_SHARED_IDEOLOGY);
-		for (int iLoopPlayer = 0; iLoopPlayer < MAX_MAJOR_CIVS; iLoopPlayer++)
-		{
-			CvPlayer &kPlayer = GET_PLAYER((PlayerTypes)iLoopPlayer);
-			PolicyBranchTypes eTheirIdeology = kPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
-			if (kPlayer.isAlive() && !kPlayer.isMinorCiv() && iLoopPlayer != m_pCity->getOwner() && GET_TEAM(kCityPlayer.getTeam()).isHasMet(GET_PLAYER((PlayerTypes)iLoopPlayer).getTeam()))
-			{
-				// City shares religion with this player
-				if (kPlayer.GetReligions()->HasReligionInMostCities(ePlayerReligion))
-				{
-					if (sharedReligionCivs.length() > 0)
-					{
-						sharedReligionCivs += ", ";
-					}
-					sharedReligionCivs += kPlayer.getCivilizationShortDescription();
-				}
-
-				// Open borders with this player
-				CvTeam &kTeam = GET_TEAM(kPlayer.getTeam());
-				if (kTeam.IsAllowsOpenBordersToTeam(eTeam))
-				{
-					if (openBordersCivs.length() > 0)
-					{
-						openBordersCivs += ", ";
-					}
-					openBordersCivs += kPlayer.getCivilizationShortDescription();
-				}
-
-				// Trade route with this player
-				if (GC.getGame().GetGameTrade()->IsPlayerConnectedToPlayer(m_pCity->getOwner(), (PlayerTypes)iLoopPlayer))
-				{
-					if (tradeRouteCivs.length() > 0)
-					{
-						tradeRouteCivs += ", ";
-					}
-					tradeRouteCivs += kPlayer.getCivilizationShortDescription();
-				}
-
-				// POLICY BONUSES
-				if (iLessHappyMod > 0)
-				{
-					if (kCityPlayer.GetExcessHappiness() > kPlayer.GetExcessHappiness())
-					{
-						if (lessHappyCivs.length() > 0)
-						{
-							lessHappyCivs += ", ";
-						}
-						lessHappyCivs += kPlayer.getCivilizationShortDescription();
-					}
-				}
-				if (iCommonFoeMod > 0)
-				{
-					PlayerTypes eLoopPlayer;
-					for(int iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
-					{
-						eLoopPlayer = (PlayerTypes) iPlayerLoop;
-
-						if(eLoopPlayer !=(PlayerTypes) iLoopPlayer && eLoopPlayer != m_pCity->getOwner() && kCityPlayer.GetDiplomacyAI()->IsPlayerValid(eLoopPlayer))
-						{
-							// Are they at war with me too?
-							if (GET_TEAM(kCityPlayer.getTeam()).isAtWar(GET_PLAYER(eLoopPlayer).getTeam()) && GET_TEAM(kPlayer.getTeam()).isAtWar(GET_PLAYER(eLoopPlayer).getTeam()))
-							{
-								if (commonFoeCivs.length() > 0)
-								{
-									commonFoeCivs += ", ";
-								}
-								commonFoeCivs += kPlayer.getCivilizationShortDescription();
-							}
-						}
-					}
-				}
-
-				// Shared ideology bonus (comes from a policy)
-				if (iSharedIdeologyMod > 0)
-				{
-					if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology == eTheirIdeology)
-					{
-						if (sharedIdeologyCivs.length() > 0)
-						{
-							sharedIdeologyCivs += ", ";
-						}
-						sharedIdeologyCivs += kPlayer.getCivilizationShortDescription();
-					}
-				}
-
-				// Different ideology penalty (applies all the time)
-				if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology != eTheirIdeology)
-				{
-					if (differentIdeologyCivs.length() > 0)
-					{
-						differentIdeologyCivs += ", ";
-					}
-					differentIdeologyCivs += kPlayer.getCivilizationShortDescription();
-				}
-			}
-		}
-
-		// Build the strings
-		if (sharedReligionCivs.length() > 0)
-		{
-			if (szRtnValue.length() > 0)
-			{
-				szRtnValue += "[NEWLINE][NEWLINE]";
-			}
-			szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_RELIGION_BONUS", kCityPlayer.GetCulture()->GetTourismModifierSharedReligion());
-			szRtnValue += szTemp + sharedReligionCivs;
-		}
-		if (openBordersCivs.length() > 0)
-		{
-			if (szRtnValue.length() > 0)
-			{
-				szRtnValue += "[NEWLINE][NEWLINE]";
-			}
-			szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_OPEN_BORDERS_BONUS", kCityPlayer.GetCulture()->GetTourismModifierOpenBorders());
-			szRtnValue += szTemp + openBordersCivs;
-		}
-		if (tradeRouteCivs.length() > 0)
-		{
-			if (szRtnValue.length() > 0)
-			{
-				szRtnValue += "[NEWLINE][NEWLINE]";
-			}
-			szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_TRADE_ROUTE_BONUS", kCityPlayer.GetCulture()->GetTourismModifierTradeRoute());
-			szRtnValue += szTemp + tradeRouteCivs;
-		}
-		if (lessHappyCivs.length() > 0)
-		{
-			if (szRtnValue.length() > 0)
-			{
-				szRtnValue += "[NEWLINE][NEWLINE]";
-			}
-			szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_LESS_HAPPY_BONUS", iLessHappyMod);
-			szRtnValue += szTemp + lessHappyCivs;
-		}
-		if (commonFoeCivs.length() > 0)
-		{
-			if (szRtnValue.length() > 0)
-			{
-				szRtnValue += "[NEWLINE][NEWLINE]";
-			}
-			szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_COMMON_FOE_BONUS", iCommonFoeMod);
-			szRtnValue += szTemp + commonFoeCivs;
-		}
-		if (sharedIdeologyCivs.length() > 0)
-		{
-			if (szRtnValue.length() > 0)
-			{
-				szRtnValue += "[NEWLINE][NEWLINE]";
-			}
-			szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_SHARED_IDEOLOGY_BONUS", iSharedIdeologyMod);
-			szRtnValue += szTemp + sharedIdeologyCivs;
-		}
-		if (differentIdeologyCivs.length() > 0)
-		{
-			if (szRtnValue.length() > 0)
-			{
-				szRtnValue += "[NEWLINE][NEWLINE]";
-			}
-			szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_DIFFERENT_IDEOLOGY_PENALTY", GC.getTOURISM_MODIFIER_DIFFERENT_IDEOLOGIES());
-			szRtnValue += szTemp + differentIdeologyCivs;
-		}
+		szRtnValue += "[NEWLINE]----------------[NEWLINE]";
+		szRtnValue += GetLocalizedText("TXT_KEY_CITY_BASE_TOURISM_MODIFIER",iModifierInternal);
 	}
 	return szRtnValue;
 }

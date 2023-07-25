@@ -14207,6 +14207,175 @@ void CvPlayer::ChangeTourismBonusTurns(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+// Itemize which players we have Tourism bonuses with
+CvString CvPlayer::GetInternationalTourismTooltip()
+{
+	CvString szRtnValue = "";
+	if(GetCulture()->GetTourism() <= 0) return szRtnValue;
+	else
+	{
+		szRtnValue = "[NEWLINE][NEWLINE]";
+		szRtnValue += GetLocalizedText("TXT_KEY_PLAYER_TOURISM_INTERNATIONAL_MODIFIER");
+	}
+	
+	
+	CvString szTemp;
+	CvString sharedReligionCivs = "";
+	CvString openBordersCivs = "";
+	CvString tradeRouteCivs = "";
+	CvString lessHappyCivs = "";
+	CvString commonFoeCivs = "";
+	CvString sharedIdeologyCivs = "";
+	CvString differentIdeologyCivs = "";
+	TeamTypes eTeam = getTeam();
+	PolicyBranchTypes eMyIdeology = GetPlayerPolicies()->GetLateGamePolicyTree();
+	ReligionTypes ePlayerReligion = GetReligions()->GetReligionInMostCities();
+	// Get policy bonuses
+	int iLessHappyMod = GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_LESS_HAPPY);
+	int iCommonFoeMod = GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_COMMON_FOE);
+	int iSharedIdeologyMod = GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_SHARED_IDEOLOGY);
+	for (int iLoopPlayer = 0; iLoopPlayer < MAX_MAJOR_CIVS; iLoopPlayer++)
+	{
+		CvPlayer &kPlayer = GET_PLAYER((PlayerTypes)iLoopPlayer);
+		PolicyBranchTypes eTheirIdeology = kPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
+		if (kPlayer.isAlive() && !kPlayer.isMinorCiv() && iLoopPlayer != GetID() && GET_TEAM(eTeam).isHasMet(GET_PLAYER((PlayerTypes)iLoopPlayer).getTeam()))
+		{
+			// City shares religion with this player
+			if (kPlayer.GetReligions()->HasReligionInMostCities(ePlayerReligion))
+			{
+				if (sharedReligionCivs.length() > 0)
+				{
+					sharedReligionCivs += ", ";
+				}
+				sharedReligionCivs += kPlayer.getCivilizationShortDescription();
+			}
+
+			// Open borders with this player
+			CvTeam &kTeam = GET_TEAM(kPlayer.getTeam());
+			if (kTeam.IsAllowsOpenBordersToTeam(eTeam))
+			{
+				if (openBordersCivs.length() > 0)
+				{
+					openBordersCivs += ", ";
+				}
+				openBordersCivs += kPlayer.getCivilizationShortDescription();
+			}
+
+			// Trade route with this player
+			if (GC.getGame().GetGameTrade()->IsPlayerConnectedToPlayer(GetID(), (PlayerTypes)iLoopPlayer))
+			{
+				if (tradeRouteCivs.length() > 0)
+				{
+					tradeRouteCivs += ", ";
+				}
+				tradeRouteCivs += kPlayer.getCivilizationShortDescription();
+			}
+
+			// POLICY BONUSES
+			if (iLessHappyMod > 0)
+			{
+				if (GetExcessHappiness() > kPlayer.GetExcessHappiness())
+				{
+					if (lessHappyCivs.length() > 0)
+					{
+						lessHappyCivs += ", ";
+					}
+					lessHappyCivs += kPlayer.getCivilizationShortDescription();
+				}
+			}
+			if (iCommonFoeMod > 0)
+			{
+				PlayerTypes eLoopPlayer;
+				for(int iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
+				{
+					eLoopPlayer = (PlayerTypes) iPlayerLoop;
+
+					if(eLoopPlayer !=(PlayerTypes) iLoopPlayer && eLoopPlayer != GetID() && GetDiplomacyAI()->IsPlayerValid(eLoopPlayer))
+					{
+						// Are they at war with me too?
+						if (GET_TEAM(eTeam).isAtWar(GET_PLAYER(eLoopPlayer).getTeam()) && GET_TEAM(kPlayer.getTeam()).isAtWar(GET_PLAYER(eLoopPlayer).getTeam()))
+						{
+							if (commonFoeCivs.length() > 0)
+							{
+								commonFoeCivs += ", ";
+							}
+							commonFoeCivs += kPlayer.getCivilizationShortDescription();
+						}
+					}
+				}
+			}
+
+			// Shared ideology bonus (comes from a policy)
+			if (iSharedIdeologyMod > 0)
+			{
+				if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology == eTheirIdeology)
+				{
+					if (sharedIdeologyCivs.length() > 0)
+					{
+						sharedIdeologyCivs += ", ";
+					}
+					sharedIdeologyCivs += kPlayer.getCivilizationShortDescription();
+				}
+			}
+
+			// Different ideology penalty (applies all the time)
+			if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology != eTheirIdeology)
+			{
+				if (differentIdeologyCivs.length() > 0)
+				{
+					differentIdeologyCivs += ", ";
+				}
+				differentIdeologyCivs += kPlayer.getCivilizationShortDescription();
+			}
+		}
+	}
+
+	// Build the strings
+	if (sharedReligionCivs.length() > 0)
+	{
+		szRtnValue += "[NEWLINE][ICON_BULLET]";
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_RELIGION_BONUS", GetCulture()->GetTourismModifierSharedReligion());
+		szRtnValue += szTemp + sharedReligionCivs;
+	}
+	if (openBordersCivs.length() > 0)
+	{
+		szRtnValue += "[NEWLINE][ICON_BULLET]";
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_OPEN_BORDERS_BONUS", GetCulture()->GetTourismModifierOpenBorders());
+		szRtnValue += szTemp + openBordersCivs;
+	}
+	if (tradeRouteCivs.length() > 0)
+	{
+		szRtnValue += "[NEWLINE][ICON_BULLET]";
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_TRADE_ROUTE_BONUS", GetCulture()->GetTourismModifierTradeRoute());
+		szRtnValue += szTemp + tradeRouteCivs;
+	}
+	if (lessHappyCivs.length() > 0)
+	{
+		szRtnValue += "[NEWLINE][ICON_BULLET]";
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_LESS_HAPPY_BONUS", iLessHappyMod);
+		szRtnValue += szTemp + lessHappyCivs;
+	}
+	if (commonFoeCivs.length() > 0)
+	{
+		szRtnValue += "[NEWLINE][ICON_BULLET]";
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_COMMON_FOE_BONUS", iCommonFoeMod);
+		szRtnValue += szTemp + commonFoeCivs;
+	}
+	if (sharedIdeologyCivs.length() > 0)
+	{
+		szRtnValue += "[NEWLINE][ICON_BULLET]";
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_SHARED_IDEOLOGY_BONUS", iSharedIdeologyMod);
+		szRtnValue += szTemp + sharedIdeologyCivs;
+	}
+	if (differentIdeologyCivs.length() > 0)
+	{
+		szRtnValue += "[NEWLINE][ICON_BULLET]";
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_DIFFERENT_IDEOLOGY_PENALTY", GC.getTOURISM_MODIFIER_DIFFERENT_IDEOLOGIES());
+		szRtnValue += szTemp + differentIdeologyCivs;
+	}
+	return szRtnValue;
+}
+//	--------------------------------------------------------------------------------
 #if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 int CvPlayer::GetGoldenAgePointPerTurnFromCitys() const
 {
