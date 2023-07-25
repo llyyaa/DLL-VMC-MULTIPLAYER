@@ -387,7 +387,7 @@
 			<Text>+{1_Num}% Bonus from World Congress({2_Num} turns)</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_MODIFIER">
-			<Text>[COLOR_POSITIVE_TEXT]{1_Num}% Internal [ICON_TOURISM] Tourism Modifier Total[ENDCOLOR]</Text>
+			<Text>[COLOR_POSITIVE_TEXT]{1_Num}%{2_IconString} Modifier Total[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PLAYER_TOURISM_INTERNATIONAL_MODIFIER">
 			<Text>[ICON_TOURISM]The International influence of Tourism:</Text>

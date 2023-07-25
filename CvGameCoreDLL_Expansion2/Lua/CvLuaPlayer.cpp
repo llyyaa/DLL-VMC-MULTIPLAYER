@@ -1299,6 +1299,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetYieldModifierFromNumGreakWork);
 	Method(GetYieldModifierFromHappinessPolicy);
 
+	Method(GetGlobalYieldModifierFromResource);
+
 	Method(IsCorruptionLevelReduceByOne);
 	Method(GetCorruptionScoreModifierFromPolicy);
 }
@@ -12483,6 +12485,15 @@ int CvLuaPlayer::lGetYieldModifierFromHappinessPolicy(lua_State* L)
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
 	int result = pkPlayer->GetYieldModifierFromHappinessPolicy(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetGlobalYieldModifierFromResource(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetGlobalYieldModifierFromResource(eYield);
 	lua_pushinteger(L, result);
 	return 1;
 }

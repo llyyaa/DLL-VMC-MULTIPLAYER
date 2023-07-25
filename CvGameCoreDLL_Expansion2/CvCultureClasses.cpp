@@ -4885,7 +4885,7 @@ CvString CvCityCulture::GetTourismTooltip()
 		int iModifierInternal = CalculateBaseTourism(szTemp);
 		szRtnValue += szTemp;
 		szRtnValue += "[NEWLINE]----------------[NEWLINE]";
-		szRtnValue += GetLocalizedText("TXT_KEY_CITY_BASE_TOURISM_MODIFIER",iModifierInternal);
+		szRtnValue += GetLocalizedText("TXT_KEY_CITY_BASE_TOURISM_MODIFIER", iModifierInternal, GC.getYieldInfo(YIELD_TOURISM)->getIconString());
 	}
 	return szRtnValue;
 }

@@ -392,7 +392,7 @@
 			<Text>+{1_Num}%奖励{2_Num}回合 来自世界议会</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_MODIFIER">
-			<Text>[COLOR_POSITIVE_TEXT]{1_Num}%国内[ICON_TOURISM]魅力加成 总计[ENDCOLOR]</Text>
+			<Text>[COLOR_POSITIVE_TEXT]{1_Num}%{2_IconString}加成 总计[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PLAYER_TOURISM_INTERNATIONAL_MODIFIER">
 			<Text>[ICON_TOURISM]魅力国际影响如下:</Text>

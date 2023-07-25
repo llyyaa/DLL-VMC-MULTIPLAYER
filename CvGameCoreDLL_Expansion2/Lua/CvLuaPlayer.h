@@ -1219,6 +1219,8 @@ protected:
 	LUAAPIEXTN(GetYieldModifierFromNumGreakWork, int, eYieldType);
 	LUAAPIEXTN(GetYieldModifierFromHappinessPolicy, int, eYieldType);
 
+	LUAAPIEXTN(GetGlobalYieldModifierFromResource, int, eYieldType);
+
 #ifdef MOD_GLOBAL_CORRUPTION
 	LUAAPIEXTN(IsCorruptionLevelReduceByOne, bool);
 	LUAAPIEXTN(GetCorruptionScoreModifierFromPolicy, int);
