@@ -8011,6 +8011,10 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 			}
 			
 		}
+		else if (eThisPlayersUnitType != eUnit)
+		{
+			return false;
+		}
 #else
 		if (eThisPlayersUnitType != eUnit)
 		{
