@@ -140,6 +140,7 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_bFreshWaterMakesValid(false),
 	m_bRiverSideMakesValid(false),
 	m_bNoFreshWater(false),
+	m_bIsFreshWater(false),
 #if defined(MOD_API_EXTENSIONS)
 	m_bAddsFreshWater(false),
 #endif
@@ -347,6 +348,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	m_bFreshWaterMakesValid = kResults.GetBool("FreshWaterMakesValid");
 	m_bRiverSideMakesValid = kResults.GetBool("RiverSideMakesValid");
 	m_bNoFreshWater = kResults.GetBool("NoFreshWater");
+	m_bIsFreshWater = kResults.GetBool("IsFreshWater");
 #if defined(MOD_API_EXTENSIONS)
 	if (MOD_API_EXTENSIONS) {
 		m_bAddsFreshWater = kResults.GetBool("AddsFreshWater");
@@ -1328,6 +1330,12 @@ bool CvImprovementEntry::IsRiverSideMakesValid() const
 bool CvImprovementEntry::IsNoFreshWater() const
 {
 	return m_bNoFreshWater;
+}
+
+/// Can only built next on a tile with fresh water
+bool CvImprovementEntry::IsFreshWater() const
+{
+	return m_bIsFreshWater;
 }
 
 #if defined(MOD_API_EXTENSIONS)

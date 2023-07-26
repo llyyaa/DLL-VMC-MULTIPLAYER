@@ -138,6 +138,7 @@ public:
 	bool IsFreshWaterMakesValid() const;
 	bool IsRiverSideMakesValid() const;
 	bool IsNoFreshWater() const;
+	bool IsFreshWater() const;
 #if defined(MOD_API_EXTENSIONS)
 	bool IsAddsFreshWater() const;
 #endif
@@ -358,6 +359,7 @@ protected:
 	bool m_bFreshWaterMakesValid;
 	bool m_bRiverSideMakesValid;
 	bool m_bNoFreshWater;
+	bool m_bIsFreshWater;
 #if defined(MOD_API_EXTENSIONS)
 	bool m_bAddsFreshWater;
 #endif

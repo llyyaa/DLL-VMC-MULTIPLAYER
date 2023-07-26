@@ -2436,6 +2436,11 @@ bool CvPlot::canHaveImprovement(ImprovementTypes eImprovement, TeamTypes eTeam, 
 		return false;
 	}
 
+	if(pkImprovementInfo->IsFreshWater() && !bIsFreshWater)
+	{
+		return false;
+	}
+
 	if(pkImprovementInfo->IsRequiresFlatlands() && !isFlatlands())
 	{
 		return false;
