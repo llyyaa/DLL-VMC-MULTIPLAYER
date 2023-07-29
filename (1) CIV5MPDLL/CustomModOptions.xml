@@ -216,7 +216,7 @@
 	
     <!-- Units of this type will not be gifted by City States (v46) -->
     <!-- See also: "Civilization - Morindim" -->
-    <Row Class="4" Name="GLOBAL_EXCLUDE_FROM_GIFTS" Value="0" DbUpdates="1"/>
+    <Row Class="4" Name="GLOBAL_EXCLUDE_FROM_GIFTS" Value="1" DbUpdates="1"/>
 
     <!-- Units of this type may move after being upgraded (v46) -->
     <!-- See also: "Civilization - Morindim" -->
