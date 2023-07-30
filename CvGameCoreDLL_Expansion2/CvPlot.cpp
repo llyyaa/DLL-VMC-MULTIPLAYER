@@ -12230,9 +12230,9 @@ int CvPlot::getYieldWithBuild(BuildTypes eBuild, YieldTypes eYield, bool bWithUp
 #if defined(MOD_API_UNIFIED_YIELDS)
 			}
 #endif
-#if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 			if (getOwner() == ePlayer)
 			{
+#if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 				for (int iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
 				{
 					CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
@@ -12249,8 +12249,18 @@ int CvPlot::getYieldWithBuild(BuildTypes eBuild, YieldTypes eYield, bool bWithUp
 						}
 					}
 				}
-			}
 #endif
+				if (!IsImprovementPillaged())
+				{
+					CvCity* pWorkingCity = getWorkingCity();
+					if (NULL != pWorkingCity)
+					{
+						// Extra yield for improvements
+						iYield += pWorkingCity->GetImprovementExtraYield(eImprovement, eYield);
+						iYield += GET_PLAYER(ePlayer).GetImprovementExtraYield(eImprovement, eYield);
+					}
+				}
+			}
 		}
 	}
 
