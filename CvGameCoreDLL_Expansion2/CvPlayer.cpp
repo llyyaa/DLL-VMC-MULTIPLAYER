@@ -9865,7 +9865,27 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 /// Get yield change from buildings for a specific building class
 int CvPlayer::GetBuildingClassYieldModifier(BuildingClassTypes eBuildingClass, YieldTypes eYieldType)
 {
-	return GetBuildingClassYieldModifier(eBuildingClass, eYieldType, GetTotalBuildingCount());
+	//return GetBuildingClassYieldModifier(eBuildingClass, eYieldType, GetTotalBuildingCount());
+	int rtnValue = 0;
+	CvBuildingXMLEntries* pBuildings = GC.GetGameBuildings();
+	if (pBuildings)
+	{
+		for (int i = 0; i < pBuildings->GetNumBuildings(); i++)
+		{
+			// Do we have this building anywhere in empire?
+			int iNum = getNumBuildings((BuildingTypes)i);
+			if (iNum > 0)
+			{
+				CvBuildingEntry* pEntry = pBuildings->GetEntry(i);
+				if (pEntry)
+				{
+					rtnValue += (pEntry->GetBuildingClassYieldModifier(eBuildingClass, eYieldType) * iNum);
+				}
+			}
+		}
+	}
+
+	return rtnValue;
 }
 
 

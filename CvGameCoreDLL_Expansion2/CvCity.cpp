@@ -7359,6 +7359,8 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				}
 			}
 
+			//Gobal Building Class Yield Changes
+			changeYieldRateModifier((YieldTypes)iI, owningPlayer.GetBuildingClassYieldModifier((BuildingClassTypes)pBuildingInfo->GetBuildingClassType(), (YieldTypes)iI) * iChange);
 #endif
 
 #if defined(MOD_API_UNIFIED_YIELDS)
