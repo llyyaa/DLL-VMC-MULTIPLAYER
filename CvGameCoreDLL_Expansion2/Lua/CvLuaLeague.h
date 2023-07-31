@@ -85,6 +85,7 @@ protected:
 
 	static int lGetArtsyGreatPersonRateModifier(lua_State* L);
 	static int lGetScienceyGreatPersonRateModifier(lua_State* L);
+	static int lGetGreatDoctorPersonRateModifier(lua_State* L);
 
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_EXTENSIONS)
 	LUAAPIEXTN(IsPlayerEmbargoed, bool, iPlayer);
