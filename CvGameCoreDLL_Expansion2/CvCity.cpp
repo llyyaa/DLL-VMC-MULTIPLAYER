@@ -11853,10 +11853,10 @@ int CvCity::getHappinessModifier(YieldTypes eIndex) const
 int CvCity::getYieldRate(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic) const
 {
 	VALIDATE_OBJECT
-		if (bStatic && !bIgnoreTrade)
-		{
-			return (GetStaticYield(eIndex) / 100);
-		}
+	if (bStatic && !bIgnoreTrade)
+	{
+		return (GetStaticYield(eIndex) / 100);
+	}
 
 	return (getYieldRateTimes100(eIndex, bIgnoreTrade) / 100);
 }
@@ -11866,10 +11866,10 @@ int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bSta
 {
 	VALIDATE_OBJECT
 
-		if (bStatic && !bIgnoreTrade)
-		{
-			return GetStaticYield(eIndex);
-		}
+	if (bStatic && !bIgnoreTrade)
+	{
+		return GetStaticYield(eIndex);
+	}
 
 	// Resistance - no Science, Gold or Production (Prod handled in ProductionDifference)
 	if(IsResistance() || IsRazing())
@@ -12035,6 +12035,172 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 #endif
 
 	return iValue;
+}
+
+//	--------------------------------------------------------------------------------
+CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	CvString szRtnValue = "";
+	if(IsResistance() || IsRazing())
+	{
+		if(eIndex == YIELD_GOLD || eIndex == YIELD_SCIENCE || eIndex == YIELD_TOURISM || eIndex == YIELD_GOLDEN_AGE_POINTS)
+		{
+			return szRtnValue;
+		}
+	}
+
+	const char* YieldIcon = GC.getYieldInfo(eIndex)->getIconString();
+	int iBaseValue = 0;
+	if(getProductionToYieldModifier(eIndex) != 0)
+	{
+#if defined(MOD_PROCESS_STOCKPILE)
+		// We want to process production to production and call it stockpiling!
+		iBaseValue = getBasicYieldRateTimes100(YIELD_PRODUCTION, false, false) * (getProductionToYieldModifier(eIndex) + GetYieldFromProcessModifier(eIndex) + GET_PLAYER(getOwner()).GetYieldFromProcessModifierGlobal(eIndex)) / 100;
+#else
+		CvAssertMsg(eIndex != YIELD_PRODUCTION, "GAMEPLAY: should not be trying to convert Production into Production via process.");
+
+		iBaseValue = getYieldRateTimes100(YIELD_PRODUCTION, false) * (getProductionToYieldModifier(eIndex) + GetYieldFromProcessModifier(eIndex) + GET_PLAYER(getOwner()).GetYieldFromProcessModifierGlobal(eIndex)) / 100;
+#endif
+	}
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO", iBaseValue, YieldIcon);
+	}
+
+#if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES) || defined(MOD_API_UNIFIED_YIELDS)
+	iBaseValue = GetBaseYieldRateFromGreatWorks(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_GREATWORK", iBaseValue, YieldIcon);
+	}
+#endif
+	iBaseValue = GetBaseYieldRateFromTerrain(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TERRAIN", iBaseValue, YieldIcon);
+	}
+#if defined(MOD_API_UNIFIED_YIELDS)
+	iBaseValue = GetYieldPerTurnFromUnimprovedFeatures(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_UNIMPROVEMENT_FEATURES", iBaseValue, YieldIcon);
+	}
+#endif
+	iBaseValue = GetBaseYieldRateFromBuildings(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_BUILDINGS", iBaseValue, YieldIcon);
+	}
+	iBaseValue = GetBaseYieldRateFromSpecialists(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPECIALISTS", iBaseValue, YieldIcon);
+	}
+	iBaseValue = GetBaseYieldRateFromMisc(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_MISC", iBaseValue, YieldIcon);
+	}
+	iBaseValue = GetBaseYieldRateFromReligion(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_RELIGION", iBaseValue, YieldIcon);
+	}
+
+#ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
+	if (MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD)
+	{
+		iBaseValue = GetBaseYieldRateFromOtherYield(eIndex);
+		if(iBaseValue != 0)
+		{
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OTHER_YIELD", iBaseValue, YieldIcon);
+		}
+	}
+#endif
+
+#if defined(MOD_API_UNIFIED_YIELDS)
+	if (IsRouteToCapitalConnected())
+	{
+		iBaseValue = GET_PLAYER(getOwner()).GetYieldChangeTradeRoute(eIndex);
+		iBaseValue += GET_PLAYER(getOwner()).GetPlayerTraits()->GetYieldChangeTradeRoute(eIndex);
+		if(iBaseValue != 0)
+		{
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_ROUTE", iBaseValue, YieldIcon);
+		}
+	}
+#endif
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	
+	if (eIndex == YIELD_HEALTH) 
+	{
+		if (plot()->isFreshWater())
+		{
+			iBaseValue = GC.getCITY_FRESH_WATER_HEALTH_YIELD();
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FRESH_WATER", iBaseValue, YieldIcon);
+		}
+		else
+		{
+			iBaseValue = -GC.getCITY_FRESH_WATER_HEALTH_YIELD();
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_NO_FRESH_WATER", iBaseValue, YieldIcon);
+		}
+	}
+
+	iBaseValue = GetYieldFromHealth(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_HEALTH", iBaseValue, YieldIcon);
+	}
+	iBaseValue = GetYieldFromHappiness(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_HAPPINESS", iBaseValue, YieldIcon);
+	}
+	if (eIndex != YIELD_CRIME)
+	{
+		iBaseValue = GetYieldFromCrime(eIndex);
+		if(iBaseValue != 0)
+		{
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CRIME", iBaseValue, YieldIcon);
+		}
+	}
+#endif
+
+	double iBaseYieldTimes100 = 0.0;
+	iBaseValue = (GetYieldPerPopTimes100(eIndex) * getPopulation());
+	if(iBaseValue != 0)
+	{
+		iBaseYieldTimes100 = iBaseValue;
+		iBaseYieldTimes100 /= 100;
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POPULATION", iBaseYieldTimes100, YieldIcon);
+	}
+	iBaseValue = (GetYieldPerReligionTimes100(eIndex) * GetCityReligions()->GetNumReligionsWithFollowers());
+	if(iBaseValue != 0)
+	{
+		iBaseYieldTimes100 = iBaseValue;
+		iBaseYieldTimes100 /= 100;
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_RELOGION_POPULATION", iBaseYieldTimes100, YieldIcon);
+	}
+
+#if defined(MOD_ROG_CORE)
+	iBaseValue = (GetYieldPerPopInEmpireTimes100(eIndex) * GET_PLAYER(m_eOwner).getTotalPopulation());
+	if(iBaseValue != 0)
+	{
+		iBaseYieldTimes100 = iBaseValue;
+		iBaseYieldTimes100 /= 100;
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TOTAL_POPULATION", iBaseYieldTimes100, YieldIcon);
+	}
+#endif
+
+	iBaseValue = GET_PLAYER(m_eOwner).GetTrade()->GetTradeValuesAtCityTimes100(this, eIndex);
+	if(iBaseValue != 0 && !bIgnoreTrade)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_VALUE", iBaseValue, YieldIcon);
+	}
+	return szRtnValue;
 }
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES) || defined(MOD_API_UNIFIED_YIELDS)

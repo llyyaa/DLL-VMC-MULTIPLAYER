@@ -754,6 +754,7 @@ public:
 	int getBaseYieldRateModifier(YieldTypes eIndex, int iExtra = 0, CvString* toolTipSink = NULL) const;
 	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic = true) const;
 	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic = true) const;
+	CvString getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade = true) const;
 #if defined(MOD_PROCESS_STOCKPILE)
 	int getBasicYieldRateTimes100(const YieldTypes eIndex, const bool bIgnoreTrade, const bool bIgnoreFromOtherYield) const;
 #endif

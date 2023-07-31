@@ -4536,10 +4536,14 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	// Add in all the tourism from yields
 	int iYieldRate = m_pCity->getYieldRate(YIELD_TOURISM, false);
+	//getYieldRate() multiplied BaseYieldRateModifier()
+	iYieldRate -= GET_PLAYER(m_pCity->getOwner()).GetTrade()->GetTradeValuesAtCityTimes100(m_pCity, YIELD_TOURISM);
+	iYieldRate *= 100;
+	iYieldRate += 50;
+	iYieldRate /= m_pCity->getBaseYieldRateModifier(YIELD_TOURISM);
 	if(bShouldBuildTip && iYieldRate != 0)
 	{
-		toolTipSink += "[NEWLINE][ICON_BULLET]";
-		toolTipSink += GetLocalizedText("TXT_KEY_TOURISM_FROM_CITY_RATE", iYieldRate);
+		toolTipSink += m_pCity->getYieldRateInfoTool(YIELD_TOURISM, true);
 	}
 	iBase += iYieldRate;
 #endif
@@ -4567,7 +4571,7 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 #endif
 		int iTileTourism = (iFromWonders + iFromNaturalWonders + iFromImprovements) * iPercent / 100;
 		iBase += iTileTourism;
-		if(bShouldBuildTip)
+		if(bShouldBuildTip && iTileTourism != 0)
 		{
 			toolTipSink += "[NEWLINE][ICON_BULLET]";
 			toolTipSink += GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_TILES", iTileTourism, iPercent);
@@ -4765,6 +4769,7 @@ int CvCityCulture::CalculateBaseTourism(CvString& toolTipSink)
 	{
 		iBase = iBase * (100 + iModifier) / 100;
 	}
+	iBase += GET_PLAYER(m_pCity->getOwner()).GetTrade()->GetTradeValuesAtCityTimes100(m_pCity, YIELD_TOURISM);
 
 	m_pCity->SetBaseTourism(max(0, iBase));
 	return iModifier;
@@ -4886,6 +4891,12 @@ CvString CvCityCulture::GetTourismTooltip()
 		szRtnValue += szTemp;
 		szRtnValue += "[NEWLINE]----------------[NEWLINE]";
 		szRtnValue += GetLocalizedText("TXT_KEY_CITY_BASE_TOURISM_MODIFIER", iModifierInternal, GC.getYieldInfo(YIELD_TOURISM)->getIconString());
+	}
+	int iTradeValues = GET_PLAYER(m_pCity->getOwner()).GetTrade()->GetTradeValuesAtCityTimes100(m_pCity, YIELD_TOURISM);
+	if(iTradeValues != 0)
+	{
+		szRtnValue += "[NEWLINE]----------------";
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_VALUE", iTradeValues, GC.getYieldInfo(YIELD_TOURISM)->getIconString());
 	}
 	return szRtnValue;
 }

@@ -538,6 +538,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetLakePlotYield);
 
 	Method(GetBaseYieldRate);
+	Method(GetYieldRateInfoTool);
 
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	Method(GetBaseYieldRateFromGreatWorks);
@@ -3735,6 +3736,16 @@ int CvLuaCity::lGetBaseYieldRate(lua_State* L)
 	const int iResult = pkCity->getBaseYieldRate(eIndex, false);
 
 	lua_pushinteger(L, iResult);
+	return 1;
+}
+//------------------------------------------------------------------------------
+//CvString getBaseYieldRate(YieldTypes eIndex);
+int CvLuaCity::lGetYieldRateInfoTool(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eIndex = (YieldTypes)lua_tointeger(L, 2);
+	CvString toolTip = pkCity->getYieldRateInfoTool(eIndex);
+	lua_pushstring(L, toolTip.c_str());
 	return 1;
 }
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)

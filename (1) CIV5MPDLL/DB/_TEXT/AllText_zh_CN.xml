@@ -380,13 +380,13 @@
 			<Text>如果你吞并该城市，预计市政厅等级为：{1_level}</Text>
 		</Row>
 		<Row Tag="TXT_KEY_TOURISM_FROM_CITY_RATE">
-			<Text>{1_Num}[ICON_TOURISM]魅力 来自产能转换</Text>
-		</Row>
-		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_BEFORE_MODIFIER">
-			<Text>共计{1_Num}点基础[ICON_TOURISM]魅力产出:</Text>
+			<Text>{1_Num}[ICON_TOURISM]魅力 来自建筑、地形等:</Text>
 		</Row>
 		<Replace Tag="TXT_KEY_CO_CITY_TOURISM_THEMING_BONUSES">
 			<Text>{1_Num}[ICON_TOURISM]魅力 来自博物馆和奇观主题奖励</Text>
+		</Replace>
+		<Replace Tag="TXT_KEY_CO_CITY_TOURISM_TECH_ENHANCED">
+			<Text>{1_Num}[ICON_TOURISM]魅力 来自科技对建筑加成</Text>
 		</Replace>
 		<Row Tag="TXT_KEY_CITY_TOURISM_MODIFIER_FROM_WORLD_CONGRESS">
 			<Text>+{1_Num}%奖励{2_Num}回合 来自世界议会</Text>
@@ -399,6 +399,67 @@
 		</Row>
 		<Row Tag="TXT_KEY_TOURISM_HELP_INFO">
 			<Text>[ICON_TOURISM]魅力由杰作、文物或建筑来产生，是你将你的文化影响力扩张到其它文明的主要途径。 </Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO">
+			<Text>[NEWLINE]{1_Num}{2_IconString} 来自产能转换</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_GREATWORK">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自杰作额外产出</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TERRAIN">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自地形</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_UNIMPROVEMENT_FEATURES">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自无改良地貌</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_BUILDINGS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自建筑</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPECIALISTS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自专家</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_MISC">
+			<Text>[NEWLINE]{1_Num}{2_IconString} 来自其它渠道</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRAITS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自领袖特质</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_RELIGION">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自宗教</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OTHER_YIELD">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自其他产出</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_ROUTE">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自城市连接</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FRESH_WATER">
+			<Text>[NEWLINE][ICON_BULLET][COLOR_POSITIVE_TEXT]{1_Num}[ENDCOLOR]{2_IconString} 来自临近淡水</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_NO_FRESH_WATER">
+			<Text>[NEWLINE][ICON_BULLET][COLOR_WARNING_TEXT]{1_Num}[ENDCOLOR]{2_IconString} 来自缺乏淡水</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_HEALTH">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自健康度</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_HAPPINESS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自快乐度</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CRIME">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自犯罪率</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POPULATION">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自人口</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_RELOGION_POPULATION">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自宗教人口</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TOTAL_POPULATION">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自全国人口</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_VALUE">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自商路</Text>
 		</Row>
 	</Language_zh_CN>
 

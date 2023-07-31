@@ -14251,12 +14251,6 @@ CvString CvPlayer::GetInternationalTourismTooltip()
 {
 	CvString szRtnValue = "";
 	if(GetCulture()->GetTourism() <= 0) return szRtnValue;
-	else
-	{
-		szRtnValue = "[NEWLINE][NEWLINE]";
-		szRtnValue += GetLocalizedText("TXT_KEY_PLAYER_TOURISM_INTERNATIONAL_MODIFIER");
-	}
-	
 	
 	CvString szTemp;
 	CvString sharedReligionCivs = "";
@@ -14411,6 +14405,10 @@ CvString CvPlayer::GetInternationalTourismTooltip()
 		szRtnValue += "[NEWLINE][ICON_BULLET]";
 		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_DIFFERENT_IDEOLOGY_PENALTY", GC.getTOURISM_MODIFIER_DIFFERENT_IDEOLOGIES());
 		szRtnValue += szTemp + differentIdeologyCivs;
+	}
+	if(szRtnValue.length() > 0)
+	{
+		szRtnValue = "[NEWLINE][NEWLINE]" + GetLocalizedText("TXT_KEY_PLAYER_TOURISM_INTERNATIONAL_MODIFIER") + szRtnValue;
 	}
 	return szRtnValue;
 }
