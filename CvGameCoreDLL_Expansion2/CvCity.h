@@ -224,7 +224,12 @@ public:
 
 	void SetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield, int iValue);
 	void UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature = NO_FEATURE);
+
+	void ChangeNumImprovementWorked(ImprovementTypes eImprovement, int iChange);
+	int GetNumImprovementWorked(ImprovementTypes eImprovement);
 #endif
+
+
 
 	int getSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2) const;
 	void changeSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2, int iChange);
@@ -345,9 +350,10 @@ public:
 	bool canConscript() const;
 	void conscript();
 
-
+	int getImprovementYieldRateModifier(YieldTypes eIndex, ImprovementTypes eImprovement) const;
 	int getResourceYieldRateModifier(YieldTypes eIndex, ResourceTypes eResource) const;
 
+	void processImprovement(ImprovementTypes eResource, int iChange);
 	void processResource(ResourceTypes eResource, int iChange);
 	void processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, bool bObsolete = false, bool bApplyingAllCitiesBonus = false);
 	void processProcess(ProcessTypes eProcess, int iChange);
@@ -831,6 +837,9 @@ public:
 	int getPowerYieldRateModifier(YieldTypes eIndex) const;
 	void changePowerYieldRateModifier(YieldTypes eIndex, int iChange);
 
+	int getImprovementYieldRateModifier(YieldTypes eIndex) const;
+	void changeImprovementYieldRateModifier(YieldTypes eIndex, int iChange);
+
 	int getResourceYieldRateModifier(YieldTypes eIndex) const;
 	void changeResourceYieldRateModifier(YieldTypes eIndex, int iChange);
 
@@ -854,6 +863,11 @@ public:
 	int getDomainFreeExperienceFromGreatWorks(DomainTypes eIndex) const;
 	
 #if defined(MOD_ROG_CORE)
+	int GetYieldFromConstruction(YieldTypes eIndex) const;
+	void ChangeYieldFromConstruction(YieldTypes eIndex, int iChange);
+	int GetYieldFromUnitProduction(YieldTypes eIndex) const;
+	void ChangeYieldFromUnitProduction(YieldTypes eIndex, int iChange);
+
 	int getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) const;
 #endif
 
@@ -1404,8 +1418,10 @@ protected:
 
 
 #if defined(MOD_ROG_CORE)
-	std::map<int, int> m_aiYieldPerPopInEmpire;
+	std::vector<int> m_aiYieldFromConstruction;
+	std::vector<int> m_aiYieldFromUnitProduction;
 
+	std::map<int, int> m_aiYieldPerPopInEmpire;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
 	std::vector<int> m_aiSpecialistRateModifier;
 #endif
@@ -1416,6 +1432,7 @@ protected:
 
 	std::vector<int> m_aiYieldPerReligion;
 	FAutoVariable<std::vector<int>, CvCity> m_aiPowerYieldRateModifier;
+	FAutoVariable<std::vector<int>, CvCity> m_aiImprovementYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiExtraSpecialistYield;
 	FAutoVariable<std::vector<int>, CvCity> m_aiProductionToYieldModifier;
@@ -1481,6 +1498,8 @@ protected:
 	std::vector<int> m_paiNumTerrainWorked;
 	std::vector<int> m_paiNumFeaturelessTerrainWorked;
 	std::vector<int> m_paiNumFeatureWorked;
+
+	std::vector<int> m_paiNumImprovementWorked;
 
 	vector<SCityExtraYields> m_yieldChanges; //[NUM_YIELD_TYPES]
 

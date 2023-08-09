@@ -155,7 +155,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iExtraDamageHeal(0),
 	m_iRangedStrikeModifier(0),
 	m_iPopulationChange(0),
-
+	m_iMinorCivFriendship(0),
 	m_iResetDamageValue(0),
 	m_iReduceDamageValue(0),
 
@@ -255,11 +255,12 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piDomainFreeExperiencePerGreatWork(NULL),
 
 #if defined(MOD_ROG_CORE)
-	m_piYieldModifierFromWonder(NULL),
+	m_piYieldFromConstruction(NULL),
+	m_piYieldFromUnitProduction(NULL),
 
+	m_piYieldModifierFromWonder(NULL),
 	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
 	m_piDomainFreeExperienceGlobal(),
-
 	m_paiSpecificGreatPersonRateModifier(NULL),
 #endif
 
@@ -277,6 +278,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppaiResourceYieldChange(NULL),
 	m_ppaiFeatureYieldChange(NULL),
 	m_ppaiSpecialistYieldChange(NULL),
+	m_ppaiImprovementYieldModifier(NULL),
 	m_ppaiResourceYieldModifier(NULL),
 	m_ppaiTerrainYieldChange(NULL),
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
@@ -330,8 +332,10 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWork);
 
 #if defined(MOD_ROG_CORE)
+	SAFE_DELETE_ARRAY(m_piYieldFromConstruction);
+	SAFE_DELETE_ARRAY(m_piYieldFromUnitProduction);
+
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
-	
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
 	m_piDomainFreeExperienceGlobal.clear();
 #endif
@@ -364,6 +368,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiFeatureYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChange);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldModifier);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldModifier);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainYieldChange);
 
@@ -430,7 +435,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraDamageHeal = kResults.GetInt("ExtraDamageHeal");
 	m_iRangedStrikeModifier = kResults.GetInt("RangedStrikeModifier");
 	m_iPopulationChange = kResults.GetInt("PopulationChange");
-
+	m_iMinorCivFriendship = kResults.GetInt("MinorCivFriendship");
 	m_iResetDamageValue = kResults.GetInt("ResetDamageValue");
 	m_iReduceDamageValue = kResults.GetInt("ReduceDamageValue");
 
@@ -695,6 +700,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldModifier, "Building_YieldModifiers", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromInternal, "Building_YieldFromInternalTR", "BuildingType", szBuildingType);
 #if defined(MOD_ROG_CORE)
+	kUtility.SetYields(m_piYieldFromConstruction, "Building_YieldFromConstruction", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromUnitProduction, "Building_YieldFromUnitProduction", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
 #endif
 
@@ -1222,6 +1229,30 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 			const int yield = pResults->GetInt(2);
 
 			m_ppaiSpecialistYieldChange[SpecialistID][YieldID] = yield;
+		}
+	}
+
+
+	//ResourceYieldModifiers
+	{
+		kUtility.Initialize2DArray(m_ppaiImprovementYieldModifier, "Improvements", "Yields");
+
+		std::string strKey("Building_ImprovementYieldModifiers");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Improvements.ID as ImprovementID, Yields.ID as YieldID, Yield from Building_ImprovementYieldModifiers inner join Improvements on Improvements.Type = ImprovementType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int ImprovementID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiImprovementYieldModifier[ImprovementID][YieldID] = yield;
 		}
 	}
 
@@ -1914,6 +1945,11 @@ int CvBuildingEntry::GetExtraDamageHeal() const
 int CvBuildingEntry::GetPopulationChange() const
 {
 	return m_iPopulationChange;
+}
+
+int CvBuildingEntry::GetMinorCivFriendship() const
+{
+	return m_iMinorCivFriendship;
 }
 
 int CvBuildingEntry::GetResetDamageValue() const
@@ -2678,6 +2714,31 @@ int* CvBuildingEntry::GetYieldModifierArray() const
 
 
 #if defined(MOD_ROG_CORE)
+/// Does this  grant yields from constructing buildings?
+int CvBuildingEntry::GetYieldFromConstruction(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromConstruction[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromConstructionArray() const
+{
+	return m_piYieldFromConstruction;
+}
+
+int CvBuildingEntry::GetYieldFromUnitProduction(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromUnitProduction[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromUnitProductionArray() const
+{
+	return m_piYieldFromUnitProduction;
+}
+
 int CvBuildingEntry::GetYieldModifierFromWonder(int i) const
 {
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
@@ -3242,6 +3303,25 @@ int* CvBuildingEntry::GetSpecialistYieldChangeArray(int i) const
 	CvAssertMsg(i < GC.getNumSpecialistInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_ppaiSpecialistYieldChange[i];
+}
+
+
+/// Modifier to Improvement yield
+int CvBuildingEntry::GetImprovementYieldModifier(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumImprovementInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiImprovementYieldModifier ? m_ppaiImprovementYieldModifier[i][j] : -1;
+}
+
+/// Array of modifiers to Improvement yield
+int* CvBuildingEntry::GetImprovementYieldModifierArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumImprovementInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiImprovementYieldModifier[i];
 }
 
 /// Modifier to resource yield

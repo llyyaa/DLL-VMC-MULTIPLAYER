@@ -203,7 +203,7 @@ public:
 	int GetExtraDamageHeal() const;
 	int CityRangedStrikeModifier() const;
 	int GetPopulationChange() const;
-
+	int GetMinorCivFriendship() const;
 	int GetGlobalCityStrengthMod() const;
 	int GetGlobalRangedStrikeModifier() const;
 
@@ -362,6 +362,11 @@ public:
 	int* GetYieldModifierArray() const;
 
 #if defined(MOD_ROG_CORE)
+	int GetYieldFromConstruction(int i) const;
+	int* GetYieldFromConstructionArray() const;
+	int GetYieldFromUnitProduction(int i) const;
+	int* GetYieldFromUnitProductionArray() const;
+
 	int GetYieldModifierFromWonder(int i) const;;
 	int* GetYieldModifierFromWonderArray() const;
 #endif
@@ -416,6 +421,8 @@ public:
 	int* GetFeatureYieldChangeArray(int i) const;
 	int GetSpecialistYieldChange(int i, int j) const;
 	int* GetSpecialistYieldChangeArray(int i) const;
+	int GetImprovementYieldModifier(int i, int j) const;
+	int* GetImprovementYieldModifierArray(int i) const;
 	int GetResourceYieldModifier(int i, int j) const;
 	int* GetResourceYieldModifierArray(int i) const;
 	int GetTerrainYieldChange(int i, int j) const;
@@ -550,7 +557,7 @@ private:
 	int m_iExtraDamageHeal;
 	int m_iRangedStrikeModifier;
 	int m_iPopulationChange;
-
+	int m_iMinorCivFriendship;
 	int m_iResetDamageValue;
 	int m_iReduceDamageValue;
 
@@ -729,6 +736,8 @@ private:
 	int* m_piYieldModifier;
 
 #if defined(MOD_ROG_CORE)
+	int* m_piYieldFromConstruction;
+	int* m_piYieldFromUnitProduction;
 	int* m_piYieldModifierFromWonder;
 #endif
 
@@ -767,6 +776,7 @@ private:
 	int** m_ppaiResourceYieldChange;
 	int** m_ppaiFeatureYieldChange;
 	int** m_ppaiSpecialistYieldChange;
+	int** m_ppaiImprovementYieldModifier;
 	int** m_ppaiResourceYieldModifier;
 	int** m_ppaiTerrainYieldChange;
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)

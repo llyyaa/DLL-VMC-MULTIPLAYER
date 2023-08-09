@@ -445,9 +445,9 @@ void CvPlot::doTurn()
 #endif
 
 #if defined(MOD_MORE_NATURAL_WONDER)
-	if (MOD_VOLCANO_BREAK && IsVolcano())
+	if (MOD_VOLCANO_BREAK && IsVolcano() && GC.getGame().getGameTurn() > 6)
 	{
-		if (GetBreakTurns() > 0)
+		if (GetBreakTurns() > 0  )
 		{
 			ChangeBreakTurns(-1);
 		}
@@ -3079,7 +3079,7 @@ int CvPlot::getBuildTime(BuildTypes eBuild, PlayerTypes ePlayer) const
 	}
 	// End Repair time mod
 
-	if(getFeatureType() != NO_FEATURE)
+	if (getFeatureType() != NO_FEATURE)
 	{
 		iTime += GC.getBuildInfo(eBuild)->getFeatureTime(getFeatureType());
 	}
@@ -7207,6 +7207,11 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue, PlayerTypes eBuilder
 	if (eNewValue > NO_IMPROVEMENT && GC.getImprovementInfo(eNewValue) == NULL) return;
 #endif
 
+	// Clear the pillage state if the improvement was replaced by any means
+	//bool bPillageStateChanged = IsImprovementPillaged();
+	//if (bPillageStateChanged)
+	//SetImprovementPillaged(false, false);
+
 	if (eBuilder != NO_PLAYER)
 	{
 		if (getOwner() != eBuilder && !GET_PLAYER(eBuilder).isMinorCiv())
@@ -7218,6 +7223,35 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue, PlayerTypes eBuilder
 
 	if(eOldImprovement != eNewValue)
 	{
+#if defined(MOD_IMPROVEMENT_FUNCTION)
+		if (MOD_IMPROVEMENT_FUNCTION)
+		{
+			CvCity* pOwningCity = getWorkingCity();
+			if (pOwningCity != NULL)
+			{
+				//City already working this plot? Adjust improvements being worked as needed.
+				if (pOwningCity->GetCityCitizens()->IsWorkingPlot(this))
+				{
+					//New improvement over old? Remove old, add new.
+					if (eOldImprovement != NO_IMPROVEMENT)
+					{
+						pOwningCity->ChangeNumImprovementWorked(eOldImprovement, -1);
+						//We added new improvement (wasn't deleted) - add here.
+						if (eNewValue != NO_IMPROVEMENT)
+						{
+							pOwningCity->ChangeNumImprovementWorked(eNewValue, 1);
+						}
+					}
+					//New improvement over nothing? Add it in.
+					else if (eNewValue != NO_IMPROVEMENT)
+					{
+						pOwningCity->ChangeNumImprovementWorked(eNewValue, 1);
+					}
+				}
+			}
+		}
+#endif
+
 		PlayerTypes owningPlayerID = getOwner();
 		if(eOldImprovement != NO_IMPROVEMENT)
 		{
@@ -7850,12 +7884,15 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue, PlayerTypes eBuilder
 		{
 			setLayoutDirty(true);
 		}
-		
-#if defined(MOD_EVENTS_TILE_IMPROVEMENTS)
-		if (MOD_EVENTS_TILE_IMPROVEMENTS) {
+	}
+
+	if (eOldImprovement != eNewValue )
+	//if (eOldImprovement != eNewValue || bPillageStateChanged)
+	{
+		if (MOD_EVENTS_TILE_IMPROVEMENTS)
+		{
 			GAMEEVENTINVOKE_HOOK(GAMEEVENT_TileImprovementChanged, getX(), getY(), getOwner(), eOldImprovement, eNewValue, IsImprovementPillaged());
 		}
-#endif
 	}
 }
 
@@ -7929,11 +7966,31 @@ void CvPlot::SetImprovementPillaged(bool bPillaged)
 			{
 				GET_PLAYER(getOwner()).changeNumResourceTotal(eResourceFromImprovement, iQuantity, true);
 			}
-
 		}
 #endif
 
-		
+#if defined(MOD_IMPROVEMENT_FUNCTION)
+		if (MOD_IMPROVEMENT_FUNCTION)
+		{
+			if (getImprovementType() != NO_IMPROVEMENT)
+			{
+
+				if (getWorkingCity() != NULL)
+				{
+					if (bPillaged && (getWorkingCity()->GetCityCitizens()->IsWorkingPlot(this)))
+					{
+						getWorkingCity()->ChangeNumImprovementWorked(getImprovementType(), -1);
+					}
+					else if (!bPillaged && (getWorkingCity()->GetCityCitizens()->IsWorkingPlot(this)))
+					{
+						getWorkingCity()->ChangeNumImprovementWorked(getImprovementType(), 1);
+					}
+				}
+
+			}
+		}
+#endif
+
 #if defined(MOD_EVENTS_TILE_IMPROVEMENTS)
 		if (bEvents && MOD_EVENTS_TILE_IMPROVEMENTS) {
 			GAMEEVENTINVOKE_HOOK(GAMEEVENT_TileImprovementChanged, getX(), getY(), getOwner(), getImprovementType(), getImprovementType(), IsImprovementPillaged());

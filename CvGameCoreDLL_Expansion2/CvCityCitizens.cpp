@@ -1757,9 +1757,17 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 						GetCity()->ChangeNumFeatureWorked(pPlot->getFeatureType(), 1);
 					}
 
+#if defined(MOD_IMPROVEMENT_FUNCTION)
+					if (MOD_IMPROVEMENT_FUNCTION)
+					{
+						if (pPlot->getImprovementType() != NO_IMPROVEMENT && !pPlot->IsImprovementPillaged())
+						{
+							GetCity()->ChangeNumImprovementWorked(pPlot->getImprovementType(), 1);
+						}
+
+					}
+#endif
 				}
-
-
 			}
 			// No longer working pPlot
 			else
@@ -1785,6 +1793,17 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 					{
 						GetCity()->ChangeNumFeatureWorked(pPlot->getFeatureType(), -1);
 					}
+
+#if defined(MOD_IMPROVEMENT_FUNCTION)
+					if (MOD_IMPROVEMENT_FUNCTION)
+					{
+						if (pPlot->getImprovementType() != NO_IMPROVEMENT && !pPlot->IsImprovementPillaged())
+						{
+							GetCity()->ChangeNumImprovementWorked(pPlot->getImprovementType(), -1);
+						}
+
+					}
+#endif
 				}
 		
 			}

@@ -891,6 +891,7 @@
 // SOME BASE FOUNCTION
 #define MOD_TRAIN_ALL_CORE                             gCustomMods.isTRAIN_ALL_CORE()
 #define MOD_ROG_CORE                                   gCustomMods.isROG_CORE()
+#define MOD_IMPROVEMENT_FUNCTION                       gCustomMods.isIMPROVEMENT_FUNCTION()
 #define MOD_MORE_NATURAL_WONDER					       gCustomMods.isMORE_NATURAL_WONDER()
 
 #define MOD_GLOBAL_UNLIMITED_ONE_TURN_GROWTH             gCustomMods.isGLOBAL_UNLIMITED_ONE_TURN_GROWTH()
@@ -1106,7 +1107,7 @@ enum BattleTypeTypes
 #define GAMEEVENT_BarbariansCampCleared			"BarbariansCampCleared",		"iii"
 #define GAMEEVENT_BarbariansCampCanSpawnUnit	"BarbariansCampCanSpawnUnit",	"ii"
 #define GAMEEVENT_BarbariansCampGetSpawnUnit	"BarbariansCampGetSpawnUnit",	"iii"
-#define GAMEEVENT_BarbariansSpawnedUnit			"BarbariansSpawnedUnit",		"iii"
+#define GAMEEVENT_BarbariansSpawnedUnit			"BarbariansSpawnedUnit",		"iiiii"
 #define GAMEEVENT_BattleDamageDelta				"BattleDamageDelta",			"ii"
 // BattleCustomDamage(iBattleUnitType, iBattleType,
 //                    iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity, iAttackDamage,
@@ -1618,6 +1619,7 @@ public:
 	MOD_OPT_DECL(ERA_EFFECTS_EXTENSIONS);
 	MOD_OPT_DECL(TRAIN_ALL_CORE);
 	MOD_OPT_DECL(ROG_CORE);
+	MOD_OPT_DECL(IMPROVEMENT_FUNCTION);
 	MOD_OPT_DECL(MORE_NATURAL_WONDER);
 
 	MOD_OPT_DECL(EVENTS_TILE_SET_OWNER);

@@ -90,9 +90,7 @@ public:
 
 #if defined(MOD_ROG_CORE)
 	int GetWonderProductionModifier() const;
-
 	int GetNearbyFriendHeal() const;
-
 	int GetResourceFromImprovement() const;
 	int GetResourceQuantityFromImprovement() const;
 #endif
