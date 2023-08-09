@@ -12120,7 +12120,12 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 	{
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO", iBaseValue, YieldIcon);
 	}
-
+	//Special case: Yield from Policy, only for Faith and Culture
+	iBaseValue = GetBaseYieldRateFromPolicy(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POLICY", iBaseValue, YieldIcon);
+	}
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES) || defined(MOD_API_UNIFIED_YIELDS)
 	iBaseValue = GetBaseYieldRateFromGreatWorks(eIndex);
 	if(iBaseValue != 0)
@@ -12140,6 +12145,18 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_UNIMPROVEMENT_FEATURES", iBaseValue, YieldIcon);
 	}
 #endif
+	//Special case: Yield from trait
+	iBaseValue = GetBaseYieldRateFromTrait(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRAITS", iBaseValue, YieldIcon);
+	}
+	//Special case: Yield from Leagues
+	iBaseValue = GetBaseYieldRateFromLeagues(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_LEAGUES", iBaseValue, YieldIcon);
+	}
 	iBaseValue = GetBaseYieldRateFromBuildings(eIndex);
 	if(iBaseValue != 0)
 	{
@@ -12163,6 +12180,8 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 	}
 
 	iBaseValue = GetBaseYieldRateFromReligion(eIndex);
+	//Special case for FAITH and Culture
+	iBaseValue += GetBaseYieldRateFromReligionSpecialCase(eIndex);
 	if(iBaseValue != 0)
 	{
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_RELIGION", iBaseValue, YieldIcon);
@@ -12274,6 +12293,74 @@ int CvCity::GetBaseYieldRateFromGreatWorks(YieldTypes eIndex) const
 }
 #endif
 
+//	--------------------------------------------------------------------------------
+/// Base yield rate from Policy --TODO this is a very simple func now
+int CvCity::GetBaseYieldRateFromPolicy(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	switch (eIndex)
+	{
+	case YIELD_CULTURE:
+		return GetJONSCulturePerTurnFromPolicies();
+	case YIELD_FAITH:
+		return GetFaithPerTurnFromPolicies();
+	default:
+		return 0;
+	}
+
+}
+//	--------------------------------------------------------------------------------
+/// Base yield rate from Trait --TODO this is a very simple func now
+int CvCity::GetBaseYieldRateFromTrait(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	switch (eIndex)
+	{
+	case YIELD_CULTURE:
+		return GetJONSCulturePerTurnFromTraits();
+	default:
+		return 0;
+	}
+
+}
+//	--------------------------------------------------------------------------------
+/// Base yield rate from Religion Special Case --TODO this is a very simple func now
+int CvCity::GetBaseYieldRateFromReligionSpecialCase(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	switch (eIndex)
+	{
+	case YIELD_CULTURE:
+		return GetJONSCulturePerTurnFromReligion();
+	case YIELD_FAITH:
+		return GetFaithPerTurnFromReligion();
+	default:
+		return 0;
+	}
+
+}
+//	--------------------------------------------------------------------------------
+/// Base yield rate from Leagues --TODO this is a very simple func now
+int CvCity::GetBaseYieldRateFromLeagues(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	switch (eIndex)
+	{
+	case YIELD_CULTURE:
+		return GetJONSCulturePerTurnFromLeagues();
+	default:
+		return 0;
+	}
+
+}
 //	--------------------------------------------------------------------------------
 /// Base yield rate from Terrain
 int CvCity::GetBaseYieldRateFromTerrain(YieldTypes eIndex) const

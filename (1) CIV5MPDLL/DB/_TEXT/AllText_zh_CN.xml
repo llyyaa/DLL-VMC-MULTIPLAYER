@@ -3,15 +3,15 @@
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
 
-                               <Row Tag="TXT_KEY_PRODMOD_SPIES">
+        <Row Tag="TXT_KEY_PRODMOD_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]活跃间谍数的城市修正值: {1_Num}%</Text>
 		</Row>
  		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
       		<Text>[NEWLINE][ICON_BULLET]健康度的城市修正值: {1_Num}%</Text>
-    	                 </Row>
+    	</Row>
 	 	<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
      		<Text>[NEWLINE][ICON_BULLET]犯罪率的城市修正值: {1_Num}%</Text>
-    	                </Row>
+    	</Row>
 
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
 			<Text>战斗期间，一种致命的病毒通过你的{1_Unit}转播给了敌方的{2_Unit}!</Text>
@@ -465,24 +465,29 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_VALUE">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自商路</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POLICY">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自政策</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_LEAGUES">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自世界议会</Text>
+		</Row>
 
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
 			<Text>[NEWLINE]{1_Num}{2_IconString} 来自已完成计划</Text>
 		</Row>
 
-
 		<Row Tag="TXT_KEY_VOLCAN_EVENT_TITLE">
-				<Text>火山爆发！</Text>
-			</Row>
-			<Row Tag="TXT_KEY_VOLCANO_EVENT_1">
-				<Text>一处火山发生了小规模喷发。</Text>
-			</Row>
-			<Row Tag="TXT_KEY_VOLCANO_EVENT_2">
-				<Text>一处火山发生了大规模喷发。</Text>
-			</Row>
-			<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
-				<Text>一处火山发生了超大规模喷发。</Text>
-			</Row>
+			<Text>火山爆发！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_1">
+			<Text>一处火山发生了小规模喷发。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_2">
+			<Text>一处火山发生了大规模喷发。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
+			<Text>一处火山发生了超大规模喷发。</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

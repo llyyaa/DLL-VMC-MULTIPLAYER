@@ -2,17 +2,16 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
-	               <Row Tag="TXT_KEY_PRODMOD_SPIES">
+	    <Row Tag="TXT_KEY_PRODMOD_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]Active Spies Modifier: {1_Num}%</Text>
 		</Row>
-
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
 			<Text>[NEWLINE][ICON_BULLET]City Modifier for Health: {1_Num}%</Text>
 		</Row>
-
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
     		<Text>[NEWLINE][ICON_BULLET]City Modifier for Crime: {1_Num}%</Text>
-    	                 </Row>
+    	</Row>
+
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
 			<Text>A virulent plague was spread from your {1_Unit} to their {2_Unit} during combat!</Text>
 		</Row>
@@ -459,23 +458,28 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_VALUE">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Trade Route</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POLICY">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Policy</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_LEAGUES">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Leagues</Text>
+		</Row>
+        <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
 			<Text>[NEWLINE]{1_Num}{2_IconString} from Projects</Text>
 		</Row>
 
-
-<Row Tag="TXT_KEY_VOLCAN_EVENT_TITLE">
-				<Text>Volcanic eruptions！</Text>
-			</Row>
-			<Row Tag="TXT_KEY_VOLCANO_EVENT_1">
-				<Text>A small eruption of a volcano occurred。</Text>
-			</Row>
-			<Row Tag="TXT_KEY_VOLCANO_EVENT_2">
-				<Text>A large eruption of a volcano occurred。</Text>
-			</Row>
-			<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
-				<Text>A supermassive eruption of a volcano occurred。</Text>
-			</Row>
+		<Row Tag="TXT_KEY_VOLCAN_EVENT_TITLE">
+			<Text>Volcanic eruptions！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_1">
+			<Text>A small eruption of a volcano occurred。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_2">
+			<Text>A large eruption of a volcano occurred。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
+			<Text>A supermassive eruption of a volcano occurred。</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

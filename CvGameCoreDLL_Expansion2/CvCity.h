@@ -766,6 +766,10 @@ public:
 	int GetBaseYieldRateFromGreatWorks(YieldTypes eIndex) const;
 #endif
 
+	int GetBaseYieldRateFromPolicy(YieldTypes eIndex) const;
+	int GetBaseYieldRateFromTrait(YieldTypes eIndex) const;
+	int GetBaseYieldRateFromReligionSpecialCase(YieldTypes eIndex) const;
+	int GetBaseYieldRateFromLeagues(YieldTypes eIndex) const;
 	int GetBaseYieldRateFromTerrain(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromTerrain(YieldTypes eIndex, int iChange);
 
