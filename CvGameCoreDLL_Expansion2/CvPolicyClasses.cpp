@@ -64,6 +64,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iFreeExperience(0),
 	m_iWorkerSpeedModifier(0),
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iNumTradeRouteBonus(0),
 	m_iWaterBuildSpeedModifier(0),
 	m_iSettlerProductionEraModifier(0),
 	m_iSettlerProductionStartEra(NO_ERA),
@@ -341,6 +342,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iFreeExperience = kResults.GetInt("FreeExperience");
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iNumTradeRouteBonus = kResults.GetInt("NumTradeRouteBonus");
 	m_iWaterBuildSpeedModifier = kResults.GetInt("WaterBuildSpeedModifier");
 	m_iSettlerProductionEraModifier = kResults.GetInt("SettlerProductionEraModifier");
 	const char* szSettlerProductionStartEra = kResults.GetText("SettlerProductionStartEra");
@@ -1510,6 +1512,11 @@ int CvPolicyEntry::GetWorkerSpeedModifier() const
 	return m_iWorkerSpeedModifier;
 }
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+/// Num Trade Route Bonus
+int CvPolicyEntry::GetNumTradeRouteBonus() const
+{
+	return m_iNumTradeRouteBonus;
+}
 /// build on water
 int CvPolicyEntry::GetWaterBuildSpeedModifier() const
 {

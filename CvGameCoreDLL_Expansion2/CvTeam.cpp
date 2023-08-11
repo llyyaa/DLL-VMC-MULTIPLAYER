@@ -6731,6 +6731,7 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 			kPlayer.changeWorkerSpeedModifier(pTech->GetWorkerSpeedModifier() * iChange);
 			kPlayer.ChangeInfluenceSpreadModifier(pTech->GetInfluenceSpreadModifier() * iChange);
 			kPlayer.ChangeExtraVotesPerDiplomat(pTech->GetExtraVotesPerDiplomat() * iChange);
+			kPlayer.changeNumTradeRouteBonus(pTech->GetNumInternationalTradeRoutesChange() * iChange);
 
 
 			int iLoop2 = 0;

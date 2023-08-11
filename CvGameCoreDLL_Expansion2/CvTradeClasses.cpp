@@ -3927,65 +3927,7 @@ uint CvPlayerTrade::GetNumTradeRoutesPossible (void)
 	if (m_pPlayer->getCivilizationType() == NO_CIVILIZATION)
 		return 0;
 
-	CvPlayerTechs* pMyPlayerTechs = m_pPlayer->GetPlayerTechs();
-	CvTeamTechs* pMyTeamTechs = GET_TEAM(GET_PLAYER(m_pPlayer->GetID()).getTeam()).GetTeamTechs();
-	CvTechEntry* pTechInfo = NULL; 
-
-	CvTechXMLEntries* pMyPlayerTechEntries = pMyPlayerTechs->GetTechs();
-	CvAssert(pMyPlayerTechEntries);
-	if (pMyPlayerTechEntries == NULL)
-		return 0;
-
-	for(int iTechLoop = 0; iTechLoop < pMyPlayerTechEntries->GetNumTechs(); iTechLoop++)
-	{
-		TechTypes eTech = (TechTypes)iTechLoop;
-		if (!pMyTeamTechs->HasTech(eTech))
-		{
-			continue;
-		}
-
-		pTechInfo = pMyPlayerTechEntries->GetEntry(eTech);
-		CvAssertMsg(pTechInfo, "null tech entry");
-		if (pTechInfo)
-		{
-			iNumRoutes += pTechInfo->GetNumInternationalTradeRoutesChange();
-		}
-	}
-
-	CvCivilizationInfo& kCivInfo = m_pPlayer->getCivilizationInfo();
-	int iLoop = 0;
-	CvCity* pLoopCity;
-	for(pLoopCity = m_pPlayer->firstCity(&iLoop); pLoopCity != NULL; pLoopCity = m_pPlayer->nextCity(&iLoop))
-	{
-		for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
-		{
-			BuildingTypes eBuilding = (BuildingTypes)kCivInfo.getCivilizationBuildings(iI);
-			if(eBuilding != NO_BUILDING)
-			{
-				CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(eBuilding);
-				if (!pBuildingEntry)
-				{
-					continue;
-				}
-
-				if (pBuildingEntry)
-				{
-					if (pLoopCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID()))
-					{
-						int iNumRouteBonus = pBuildingEntry->GetNumTradeRouteBonus();
-						if (iNumRouteBonus != 0)
-						{
-#if defined(MOD_BUGFIX_MINOR)
-							iNumRoutes += (iNumRouteBonus * pLoopCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID()));
-#else
-							iNumRoutes += iNumRouteBonus;
-#endif
-						}
-					}
-				}
-			}
-		}
-	}
+	iNumRoutes += m_pPlayer->getNumTradeRouteBonus();
 
 	int iModifier = 100 + m_pPlayer->GetPlayerTraits()->GetNumTradeRoutesModifier();
 	iNumRoutes *= iModifier;
