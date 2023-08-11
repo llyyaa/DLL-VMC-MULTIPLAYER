@@ -889,7 +889,7 @@ public:
 	int getWorkerSpeedModifier() const;
 	void changeWorkerSpeedModifier(int iChange);
 
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	int getWaterBuildSpeedModifier() const;
 	void changeWaterBuildSpeedModifier(int iChange);
 
@@ -2239,7 +2239,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iFreeExperienceFromMinors;
 	FAutoVariable<int, CvPlayer> m_iFeatureProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	FAutoVariable<int, CvPlayer> m_iWaterBuildSpeedModifier;
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionEraModifier;
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionStartEra;

@@ -1083,7 +1083,7 @@
     
     <!-- table changes: -->
     <!-- see NewTableChanges.sql -->
-    <Row Class="6" Name="POLICY_WATER_BUILD_SPEED_MODIFIER" Value="0"/>
+    <Row Class="6" Name="POLICY_NEW_EFFECT_FOR_SP" Value="0"/>
 
     <!-- table changes: -->
     <!-- ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0; -->

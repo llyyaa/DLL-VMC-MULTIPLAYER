@@ -3131,8 +3131,8 @@ int CvPlot::getBuildTurnsLeft(BuildTypes eBuild, PlayerTypes ePlayer, int iNowEx
 		}
 	}
 
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
-	if(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER && GC.getBuildInfo(eBuild)->IsWater())
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	if(MOD_POLICY_NEW_EFFECT_FOR_SP && GC.getBuildInfo(eBuild)->IsWater())
 	{
 		iThenBuildRate *= (100 + GET_PLAYER(ePlayer).getWaterBuildSpeedModifier());
 		iThenBuildRate /= 100;
@@ -10967,8 +10967,8 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 			}
 		}
 
-#if defined(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER)
-		if(MOD_POLICY_WATER_BUILD_SPEED_MODIFIER && pkBuildInfo->IsWater())
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+		if(MOD_POLICY_NEW_EFFECT_FOR_SP && pkBuildInfo->IsWater())
 		{
 			iChange *= (100 + kPlayer.getWaterBuildSpeedModifier());
 			iChange /= 100;

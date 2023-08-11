@@ -812,10 +812,12 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 				setHasPromotion(ePromotion, true);
 			}
 
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 			else if (::IsPromotionValidForUnitPromotions(ePromotion, *this))
 			{
 				setHasPromotion(ePromotion, true);
 			}
+#endif
 		}
 	}
 
