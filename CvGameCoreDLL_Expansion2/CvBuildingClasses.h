@@ -411,6 +411,9 @@ public:
 	int GetLocalResourceOr(int i) const;
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	bool IsBuildingClassNeededGlobal(int i) const;
+#endif
 	int GetNumFreeUnit() const;
 	int GetNumFreeUnitTotal() const;
 	std::pair<UnitTypes, int>* GetFreeUnits() const;
@@ -767,6 +770,9 @@ private:
 #endif 
 
 	bool* m_pbBuildingClassNeededInCity;
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	bool* m_pbBuildingClassNeededGlobal;
+#endif
 	int m_iNumFreeUnit;
 	int m_iNumFreeUnitTotal;
 	std::pair<UnitTypes, int>* m_pFreeUnits;

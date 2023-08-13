@@ -13,3 +13,10 @@ create table Building_YieldFromOtherYield(
 
 ALTER TABLE Buildings ADD COLUMN 'AllowInstantYield' BOOLEAN DEFAULT 0;
 ALTER TABLE Buildings ADD COLUMN 'AnyWater' BOOLEAN DEFAULT 0;
+
+CREATE TABLE Building_ClassesNeededGlobal(
+	'BuildingType' text , 
+	'BuildingClassType' text , 
+	foreign key (BuildingType) references Buildings(Type), 
+	foreign key (BuildingClassType) references BuildingClasses(Type)
+);

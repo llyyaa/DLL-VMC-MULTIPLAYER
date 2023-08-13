@@ -24746,6 +24746,15 @@ int CvPlayer::getAdvancedStartBuildingCost(BuildingTypes eBuilding, bool bAdd, C
 										return -1;
 									}
 								}
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+								if(pkBuildingLoopInfo->IsBuildingClassNeededGlobal(iBuildingClassPrereqLoop))
+								{
+									if((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(iBuildingClassPrereqLoop)) == eBuilding && getNumBuildings(eBuilding) == 1)
+									{
+										return -1;
+									}
+								}
+#endif
 							}
 						}
 					}

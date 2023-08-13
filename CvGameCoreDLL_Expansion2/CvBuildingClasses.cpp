@@ -272,6 +272,9 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piLocalResourceOrs(NULL),
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_pbBuildingClassNeededGlobal(NULL),
+#endif
 	m_bArtInfoEraVariation(false),
 	m_bArtInfoCulturalVariation(false),
 	m_bArtInfoRandomVariation(false),
@@ -347,6 +350,9 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piLocalResourceOrs);
 	SAFE_DELETE_ARRAY(m_paiHurryModifier);
 	SAFE_DELETE_ARRAY(m_pbBuildingClassNeededInCity);
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	SAFE_DELETE_ARRAY(m_pbBuildingClassNeededGlobal);
+#endif
 	SAFE_DELETE_ARRAY(m_paiBuildingClassHappiness);
 	SAFE_DELETE_ARRAY(m_paThemingBonusInfo);
 
@@ -733,6 +739,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 	kUtility.PopulateArrayByValue(m_piPrereqNumOfBuildingClass, "BuildingClasses", "Building_PrereqBuildingClasses", "BuildingClassType", "BuildingType", szBuildingType, "NumBuildingNeeded");
 	kUtility.PopulateArrayByExistence(m_pbBuildingClassNeededInCity, "BuildingClasses", "Building_ClassesNeededInCity", "BuildingClassType", "BuildingType", szBuildingType);
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	kUtility.PopulateArrayByExistence(m_pbBuildingClassNeededGlobal, "BuildingClasses", "Building_ClassesNeededGlobal", "BuildingClassType", "BuildingType", szBuildingType);
+#endif
 	kUtility.PopulateArrayByValue(m_paiBuildingClassHappiness, "BuildingClasses", "Building_BuildingClassHappiness", "BuildingClassType", "BuildingType", szBuildingType, "Happiness");
 
 	kUtility.PopulateArrayByExistence(m_piLockedBuildingClasses, "BuildingClasses", "Building_LockedBuildingClasses", "BuildingClassType", "BuildingType", szBuildingType);
@@ -3236,6 +3245,16 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_pbBuildingClassNeededInCity ? m_pbBuildingClassNeededInCity[i] : false;
 }
+
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+/// Can it only built if there is a building of this class Global?
+bool CvBuildingEntry::IsBuildingClassNeededGlobal(int i) const
+{
+	CvAssertMsg(i < GC.getNumBuildingClassInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_pbBuildingClassNeededGlobal ? m_pbBuildingClassNeededGlobal[i] : false;
+}
+#endif
 
 /// Free units which appear near city
 int CvBuildingEntry::GetNumFreeUnit() const

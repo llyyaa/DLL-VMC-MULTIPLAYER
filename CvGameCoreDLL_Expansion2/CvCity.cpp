@@ -3256,6 +3256,20 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 				}
 			}
 		}
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+		if(pkBuildingInfo->IsBuildingClassNeededGlobal(iI))
+		{
+			ePrereqBuilding = ((BuildingTypes)(thisCivInfo.getCivilizationBuildings(iI)));
+
+			if(ePrereqBuilding != NO_BUILDING)
+			{
+				if(0 == GET_PLAYER(getOwner()).getNumBuildings(ePrereqBuilding))
+				{
+					return false;
+				}
+			}
+		}
+#endif
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -7476,7 +7490,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				}
 			}
 
-			//Gobal Building Class Yield Changes
+			//Global Building Class Yield Changes
 			changeYieldRateModifier((YieldTypes)iI, owningPlayer.GetBuildingClassYieldModifier((BuildingClassTypes)pBuildingInfo->GetBuildingClassType(), (YieldTypes)iI) * iChange);
 #endif
 
@@ -16330,6 +16344,21 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 							}
 						}
 					}
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+					if(pkBuildingInfo->IsBuildingClassNeededGlobal(iI))
+					{
+						CvCivilizationInfo& thisCivInfo = getCivilizationInfo();
+						ePrereqBuilding = ((BuildingTypes)(thisCivInfo.getCivilizationBuildings(iI)));
+						
+						if(ePrereqBuilding != NO_BUILDING)
+						{
+							if(0 == GET_PLAYER(getOwner()).getNumBuildings(ePrereqBuilding))
+							{
+								return false;
+							}
+						}
+					}
+#endif
 				}
 #if !defined(MOD_BUGFIX_MINOR)
 			}
