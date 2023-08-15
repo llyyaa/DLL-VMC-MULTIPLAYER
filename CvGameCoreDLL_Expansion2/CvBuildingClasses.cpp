@@ -177,9 +177,6 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piInstantYield(NULL),
 	m_bAllowInstantYield(false),
 #endif
-#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
-	m_bAnyWater(false),
-#endif
 	m_piYieldFromInternal(NULL),
 	m_piYieldFromProcessModifier(NULL),
 	m_piYieldFromProcessModifierGlobal(NULL),
@@ -273,6 +270,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_bAnyWater(false),
 	m_pbBuildingClassNeededGlobal(NULL),
 #endif
 	m_bArtInfoEraVariation(false),
@@ -3042,12 +3040,6 @@ bool CvBuildingEntry::IsAllowInstantYield() const
 	return m_bAllowInstantYield;
 }
 #endif
-#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
-bool CvBuildingEntry::IsAnyWater() const
-{
-	return m_bAnyWater;
-}
-#endif
 
 // Resource provided by Population
 int CvBuildingEntry::GetResourceQuantityFromPOP(int i) const
@@ -3247,6 +3239,10 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+bool CvBuildingEntry::IsAnyWater() const
+{
+	return m_bAnyWater;
+}
 /// Can it only built if there is a building of this class Global?
 bool CvBuildingEntry::IsBuildingClassNeededGlobal(int i) const
 {

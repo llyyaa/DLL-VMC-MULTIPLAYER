@@ -301,7 +301,7 @@
 
 		<Row Tag="TXT_KEY_TP_HAPPINESS_FAITH">
 			<Text>
-				{1_Happiness} 来自[ICON_PEACE]信仰。
+				{1_Happiness}来自[ICON_PEACE]信仰。
 			</Text>
 		</Row>
 

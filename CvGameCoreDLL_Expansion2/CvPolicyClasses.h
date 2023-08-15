@@ -74,6 +74,7 @@ public:
 	int GetFreeExperience() const;
 	int GetWorkerSpeedModifier() const;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int GetHappinessPerPolicy() const;
 	int GetNumTradeRouteBonus() const;
 	int GetWaterBuildSpeedModifier() const;
 	int GetSettlerProductionEraModifier() const;
@@ -362,6 +363,7 @@ private:
 	int m_iFreeExperience;
 	int m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int m_iHappinessPerPolicy;
 	int m_iNumTradeRouteBonus;
 	int m_iWaterBuildSpeedModifier;
 	int m_iSettlerProductionEraModifier;

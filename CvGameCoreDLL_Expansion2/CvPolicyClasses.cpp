@@ -64,6 +64,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iFreeExperience(0),
 	m_iWorkerSpeedModifier(0),
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iHappinessPerPolicy(0),
 	m_iNumTradeRouteBonus(0),
 	m_iWaterBuildSpeedModifier(0),
 	m_iSettlerProductionEraModifier(0),
@@ -342,6 +343,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iFreeExperience = kResults.GetInt("FreeExperience");
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iHappinessPerPolicy = kResults.GetInt("HappinessPerPolicy");
 	m_iNumTradeRouteBonus = kResults.GetInt("NumTradeRouteBonus");
 	m_iWaterBuildSpeedModifier = kResults.GetInt("WaterBuildSpeedModifier");
 	m_iSettlerProductionEraModifier = kResults.GetInt("SettlerProductionEraModifier");
@@ -1512,6 +1514,11 @@ int CvPolicyEntry::GetWorkerSpeedModifier() const
 	return m_iWorkerSpeedModifier;
 }
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+/// Happiness Per Policies
+int CvPolicyEntry::GetHappinessPerPolicy() const
+{
+	return m_iHappinessPerPolicy;
+}
 /// Num Trade Route Bonus
 int CvPolicyEntry::GetNumTradeRouteBonus() const
 {

@@ -890,6 +890,9 @@ public:
 	void changeWorkerSpeedModifier(int iChange);
 
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int getHappinessPerPolicy() const;
+	void changeHappinessPerPolicy(int iChange);
+
 	int getNumTradeRouteBonus() const;
 	void changeNumTradeRouteBonus(int iChange);
 
@@ -2243,6 +2246,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iFeatureProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	FAutoVariable<int, CvPlayer> m_iHappinessPerPolicy;
 	FAutoVariable<int, CvPlayer> m_iNumTradeRouteBonus;
 	FAutoVariable<int, CvPlayer> m_iWaterBuildSpeedModifier;
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionEraModifier;

@@ -185,9 +185,6 @@ public:
 	int* GetInstantYieldArray() const;
 	bool IsAllowInstantYield() const;
 #endif
-#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
-	bool IsAnyWater() const;
-#endif
 
 #if defined(MOD_ROG_CORE)
 	int GetGreatWorkYieldChange(int i) const;
@@ -412,6 +409,7 @@ public:
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	bool IsAnyWater() const;
 	bool IsBuildingClassNeededGlobal(int i) const;
 #endif
 	int GetNumFreeUnit() const;
@@ -549,9 +547,6 @@ private:
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	int* m_piInstantYield;
 	bool m_bAllowInstantYield;
-#endif
-#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
-	bool m_bAnyWater;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -771,6 +766,7 @@ private:
 
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	bool m_bAnyWater;
 	bool* m_pbBuildingClassNeededGlobal;
 #endif
 	int m_iNumFreeUnit;

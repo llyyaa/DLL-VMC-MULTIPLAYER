@@ -274,6 +274,7 @@ CvPlayer::CvPlayer() :
 	, m_iFeatureProductionModifier("CvPlayer::m_iFeatureProductionModifier", m_syncArchive)
 	, m_iWorkerSpeedModifier("CvPlayer::m_iWorkerSpeedModifier", m_syncArchive)
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	, m_iHappinessPerPolicy("CvPlayer::m_iHappinessPerPolicy", m_syncArchive)
 	, m_iNumTradeRouteBonus("CvPlayer::m_iNumTradeRouteBonus", m_syncArchive)
 	, m_iWaterBuildSpeedModifier("CvPlayer::m_iWaterBuildSpeedModifier", m_syncArchive)
 	, m_iSettlerProductionEraModifier("CvPlayer::m_iSettlerProductionEraModifier", m_syncArchive)
@@ -1036,6 +1037,7 @@ void CvPlayer::uninit()
 	m_iFeatureProductionModifier = 0;
 	m_iWorkerSpeedModifier = 0;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iHappinessPerPolicy = 0;
 	m_iNumTradeRouteBonus = 0;
 	m_iWaterBuildSpeedModifier = 0;
 	m_iSettlerProductionEraModifier = 0;
@@ -12716,6 +12718,19 @@ int CvPlayer::GetHappinessFromPolicies() const
 		}
 	}
 
+	// Increase from num policies
+	if(m_iHappinessPerPolicy > 0)
+	{
+		int iHappinessFromPolicyNum = 0;
+#if defined(MOD_BUGFIX_DUMMY_POLICIES)
+		iHappinessFromPolicyNum += GetPlayerPolicies()->GetNumPoliciesOwned(MOD_BUGFIX_DUMMY_POLICIES) * m_iHappinessPerPolicy;
+#else
+		iHappinessFromPolicyNum += GetPlayerPolicies()->GetNumPoliciesOwned() * m_iHappinessPerPolicy;
+#endif
+		iHappinessFromPolicyNum /= 100;
+		iHappiness += iHappinessFromPolicyNum;
+	}
+
 	return iHappiness;
 }
 
@@ -16229,6 +16244,17 @@ void CvPlayer::changeWorkerSpeedModifier(int iChange)
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+int CvPlayer::getHappinessPerPolicy() const
+{
+	return m_iHappinessPerPolicy;
+}
+void CvPlayer::changeHappinessPerPolicy(int iChange)
+{
+	m_iHappinessPerPolicy += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
 int CvPlayer::getNumTradeRouteBonus() const
 {
 	return m_iNumTradeRouteBonus > 0 ? m_iNumTradeRouteBonus : 0;
@@ -25228,6 +25254,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changeGoldenAgeModifier(pPolicy->GetGoldenAgeDurationMod() * iChange);
 	changeWorkerSpeedModifier(pPolicy->GetWorkerSpeedModifier() * iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	changeHappinessPerPolicy(pPolicy->GetHappinessPerPolicy() * iChange);
 	changeNumTradeRouteBonus(pPolicy->GetNumTradeRouteBonus() * iChange);
 	changeWaterBuildSpeedModifier(pPolicy->GetWaterBuildSpeedModifier() * iChange);
 	setSettlerProductionEraModifier(pPolicy->GetSettlerProductionEraModifier() * iChange);
@@ -26686,6 +26713,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iFeatureProductionModifier;
 	kStream >> m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	kStream >> m_iHappinessPerPolicy;
 	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_iWaterBuildSpeedModifier;
 	kStream >> m_iSettlerProductionEraModifier;
@@ -27375,6 +27403,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iFeatureProductionModifier;
 	kStream << m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	kStream << m_iHappinessPerPolicy;
 	kStream << m_iNumTradeRouteBonus;
 	kStream << m_iWaterBuildSpeedModifier;
 	kStream << m_iSettlerProductionEraModifier;
