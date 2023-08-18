@@ -402,7 +402,7 @@
 		</Row>
 
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO">
-			<Text>[NEWLINE]{1_Num}{2_IconString} from City Production To Yield</Text>
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from City Production To Yield</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_GREATWORK">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Great Works extra Output</Text>

@@ -12231,7 +12231,9 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 	}
 	if(iBaseValue != 0)
 	{
-		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO", iBaseValue, YieldIcon);
+		double iBaseYieldTimes100 = iBaseValue;
+		iBaseYieldTimes100 /= 100;
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO", iBaseYieldTimes100, YieldIcon);
 	}
 	//Special case: Yield from Policy, only for Faith and Culture
 	iBaseValue = GetBaseYieldRateFromPolicy(eIndex);

@@ -408,7 +408,7 @@
 		</Row>
 
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO">
-			<Text>[NEWLINE]{1_Num}{2_IconString} 来自产能转换</Text>
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自产能转换</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_GREATWORK">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自杰作额外产出</Text>
