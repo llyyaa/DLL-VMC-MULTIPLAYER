@@ -277,11 +277,12 @@ CvPlayer::CvPlayer() :
 	, m_iWorkerSpeedModifier("CvPlayer::m_iWorkerSpeedModifier", m_syncArchive)
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	, m_iHappinessPerPolicy("CvPlayer::m_iHappinessPerPolicy", m_syncArchive)
-	, m_iNumTradeRouteBonus("CvPlayer::m_iNumTradeRouteBonus", m_syncArchive)
 	, m_iWaterBuildSpeedModifier("CvPlayer::m_iWaterBuildSpeedModifier", m_syncArchive)
 	, m_iSettlerProductionEraModifier("CvPlayer::m_iSettlerProductionEraModifier", m_syncArchive)
 	, m_iSettlerProductionStartEra("CvPlayer::m_iSettlerProductionStartEra", m_syncArchive)
 #endif
+	, m_iNumTradeRouteBonus("CvPlayer::m_iNumTradeRouteBonus", m_syncArchive)
+	, m_viTradeRouteDomainExtraRange("CvPlayer::m_viTradeRouteDomainExtraRange", m_syncArchive)
 	, m_iImprovementCostModifier("CvPlayer::m_iImprovementCostModifier", m_syncArchive)
 	, m_iImprovementUpgradeRateModifier("CvPlayer::m_iImprovementUpgradeRateModifier", m_syncArchive)
 	, m_iSpecialistProductionModifier("CvPlayer::m_iSpecialistProductionModifier", m_syncArchive)
@@ -1042,11 +1043,13 @@ void CvPlayer::uninit()
 	m_iWorkerSpeedModifier = 0;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	m_iHappinessPerPolicy = 0;
-	m_iNumTradeRouteBonus = 0;
 	m_iWaterBuildSpeedModifier = 0;
 	m_iSettlerProductionEraModifier = 0;
 	m_iSettlerProductionStartEra = NO_ERA;
 #endif
+	m_iNumTradeRouteBonus = 0;
+	m_viTradeRouteDomainExtraRange.clear();
+	m_viTradeRouteDomainExtraRange.resize(NUM_DOMAIN_TYPES, 0);
 	m_iImprovementCostModifier = 0;
 	m_iImprovementUpgradeRateModifier = 0;
 	m_iSpecialistProductionModifier = 0;
@@ -16304,17 +16307,6 @@ void CvPlayer::changeHappinessPerPolicy(int iChange)
 
 
 //	--------------------------------------------------------------------------------
-int CvPlayer::getNumTradeRouteBonus() const
-{
-	return m_iNumTradeRouteBonus > 0 ? m_iNumTradeRouteBonus : 0;
-}
-void CvPlayer::changeNumTradeRouteBonus(int iChange)
-{
-	m_iNumTradeRouteBonus += iChange;
-}
-
-
-//	--------------------------------------------------------------------------------
 int CvPlayer::getWaterBuildSpeedModifier() const
 {
 	return m_iWaterBuildSpeedModifier;
@@ -16363,6 +16355,34 @@ void CvPlayer::setSettlerProductionStartEra(int iChange)
 
 
 #endif
+//	--------------------------------------------------------------------------------
+int CvPlayer::getNumTradeRouteBonus() const
+{
+	return m_iNumTradeRouteBonus > 0 ? m_iNumTradeRouteBonus : 0;
+}
+void CvPlayer::changeNumTradeRouteBonus(int iChange)
+{
+	m_iNumTradeRouteBonus += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getTradeRouteDomainExtraRange(DomainTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	return m_viTradeRouteDomainExtraRange[eIndex];
+}
+void CvPlayer::changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_viTradeRouteDomainExtraRange.setAt(eIndex, m_viTradeRouteDomainExtraRange[eIndex] + iChange);
+}
+
+
 //	--------------------------------------------------------------------------------
 int CvPlayer::getImprovementCostModifier() const
 {
@@ -26782,11 +26802,12 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	kStream >> m_iHappinessPerPolicy;
-	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_iWaterBuildSpeedModifier;
 	kStream >> m_iSettlerProductionEraModifier;
 	kStream >> m_iSettlerProductionStartEra;
 #endif
+	kStream >> m_iNumTradeRouteBonus;
+	kStream >> m_viTradeRouteDomainExtraRange;
 	kStream >> m_iImprovementCostModifier;
 	kStream >> m_iImprovementUpgradeRateModifier;
 	kStream >> m_iSpecialistProductionModifier;
@@ -27474,11 +27495,12 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	kStream << m_iHappinessPerPolicy;
-	kStream << m_iNumTradeRouteBonus;
 	kStream << m_iWaterBuildSpeedModifier;
 	kStream << m_iSettlerProductionEraModifier;
 	kStream << m_iSettlerProductionStartEra;
 #endif
+	kStream << m_iNumTradeRouteBonus;
+	kStream << m_viTradeRouteDomainExtraRange;
 	kStream << m_iImprovementCostModifier;
 	kStream << m_iImprovementUpgradeRateModifier;
 	kStream << m_iSpecialistProductionModifier;

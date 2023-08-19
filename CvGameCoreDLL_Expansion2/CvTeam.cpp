@@ -6732,7 +6732,11 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 			kPlayer.ChangeInfluenceSpreadModifier(pTech->GetInfluenceSpreadModifier() * iChange);
 			kPlayer.ChangeExtraVotesPerDiplomat(pTech->GetExtraVotesPerDiplomat() * iChange);
 			kPlayer.changeNumTradeRouteBonus(pTech->GetNumInternationalTradeRoutesChange() * iChange);
-
+			for (uint uiDomain = 0; uiDomain < NUM_DOMAIN_TYPES; uiDomain++)
+			{
+				DomainTypes eDomain = (DomainTypes)uiDomain;
+				kPlayer.changeTradeRouteDomainExtraRange(eDomain, pTech->GetTradeRouteDomainExtraRange(eDomain) * iChange);
+			}
 
 			int iLoop2 = 0;
 			for (CvCity* pLoopCity2 = kPlayer.firstCity(&iLoop2); pLoopCity2 != NULL; pLoopCity2 = kPlayer.nextCity(&iLoop2))

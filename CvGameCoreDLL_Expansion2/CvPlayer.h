@@ -901,9 +901,6 @@ public:
 	int getHappinessPerPolicy() const;
 	void changeHappinessPerPolicy(int iChange);
 
-	int getNumTradeRouteBonus() const;
-	void changeNumTradeRouteBonus(int iChange);
-
 	int getWaterBuildSpeedModifier() const;
 	void changeWaterBuildSpeedModifier(int iChange);
 
@@ -913,6 +910,11 @@ public:
 	int getSettlerProductionStartEra() const;
 	void setSettlerProductionStartEra(int iChange);
 #endif
+	int getNumTradeRouteBonus() const;
+	void changeNumTradeRouteBonus(int iChange);
+
+	int getTradeRouteDomainExtraRange(DomainTypes eIndex) const;
+	void changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange);
 
 	int getImprovementCostModifier() const;
 	void changeImprovementCostModifier(int iChange);
@@ -2257,11 +2259,12 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	FAutoVariable<int, CvPlayer> m_iHappinessPerPolicy;
-	FAutoVariable<int, CvPlayer> m_iNumTradeRouteBonus;
 	FAutoVariable<int, CvPlayer> m_iWaterBuildSpeedModifier;
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionEraModifier;
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionStartEra;
 #endif
+	FAutoVariable<int, CvPlayer> m_iNumTradeRouteBonus;
+	FAutoVariable<std::vector<int>, CvPlayer> m_viTradeRouteDomainExtraRange;
 	FAutoVariable<int, CvPlayer> m_iImprovementCostModifier;
 	FAutoVariable<int, CvPlayer> m_iImprovementUpgradeRateModifier;
 	FAutoVariable<int, CvPlayer> m_iSpecialistProductionModifier;
