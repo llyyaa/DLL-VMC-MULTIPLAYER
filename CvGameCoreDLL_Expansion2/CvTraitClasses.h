@@ -141,6 +141,8 @@ public:
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	int GetCiviliansFreePromotion() const;
+	int GetTradeRouteLandGoldBonus() const;
+	int GetTradeRouteSeaGoldBonus() const;
 #endif
 
 	TechTypes GetFreeUnitPrereqTech() const;
@@ -379,6 +381,8 @@ protected:
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	int m_iCiviliansFreePromotion;
+	int m_iTradeRouteLandGoldBonus;
+	int m_iTradeRouteSeaGoldBonus;
 #endif
 
 	TechTypes m_eFreeUnitPrereqTech;
@@ -878,6 +882,15 @@ public:
 	{
 		return m_iCiviliansFreePromotion;
 	}
+
+	int GetTradeRouteLandGoldBonus() const
+	{
+		return m_iTradeRouteLandGoldBonus;
+	}
+	int GetTradeRouteSeaGoldBonus() const
+	{
+		return m_iTradeRouteSeaGoldBonus;
+	}
 #endif
 	bool IsTrainedAll() const
 	{
@@ -1262,6 +1275,8 @@ private:
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	int m_iCiviliansFreePromotion;
+	int m_iTradeRouteLandGoldBonus;
+	int m_iTradeRouteSeaGoldBonus;
 #endif
 	// Saved
 	bool m_bTrainedAll;

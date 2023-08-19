@@ -1162,6 +1162,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetInternationalTradeRouteTheirBuildingBonus);
 	Method(GetInternationalTradeRoutePolicyBonus);
 	Method(GetInternationalTradeRouteOtherTraitBonus);
+	Method(GetInternationalTradeRouteTraitBonus);
 	Method(GetInternationalTradeRouteRiverModifier);
 	Method(GetInternationalTradeRouteDomainModifier);
 	Method(GetInternationalTradeRouteTotal);
@@ -3992,6 +3993,31 @@ int CvLuaPlayer::lGetInternationalTradeRouteOtherTraitBonus(lua_State* L)
 	kTradeConnection.m_eConnectionType = TRADE_CONNECTION_INTERNATIONAL;
 
 	int iResult = pPlayerTrade->GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, YIELD_GOLD, bOrigin);
+	lua_pushinteger(L, iResult);
+	return 1;	
+}
+
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetInternationalTradeRouteTraitBonus(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	CvPlayerTrade* pPlayerTrade = pkPlayer->GetTrade();
+	CvCity* pOriginCity = CvLuaCity::GetInstance(L, 2, true);
+	CvCity* pDestCity = CvLuaCity::GetInstance(L, 3, true);
+	DomainTypes eDomain = (DomainTypes)lua_tointeger(L, 4);
+	bool bOrigin = lua_toboolean(L, 5);
+
+	TradeConnection kTradeConnection;
+	kTradeConnection.m_iOriginX = pOriginCity->getX();
+	kTradeConnection.m_iOriginY = pOriginCity->getY();
+	kTradeConnection.m_iDestX = pDestCity->getX();
+	kTradeConnection.m_iDestY = pDestCity->getY();
+	kTradeConnection.m_eOriginOwner = pOriginCity->getOwner();
+	kTradeConnection.m_eDestOwner = pDestCity->getOwner();
+	kTradeConnection.m_eDomain = eDomain;
+	kTradeConnection.m_eConnectionType = TRADE_CONNECTION_INTERNATIONAL;
+
+	int iResult = pPlayerTrade->GetTradeConnectionTraitValueTimes100(kTradeConnection, YIELD_GOLD, bOrigin);
 	lua_pushinteger(L, iResult);
 	return 1;	
 }

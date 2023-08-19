@@ -2283,7 +2283,12 @@ int CvPlayerTrade::GetTradeConnectionYourBuildingValueTimes100(const TradeConnec
 		return 0;
 	}
 
-	int iBonus = CvGameTrade::GetOriginCity(kTradeConnection)->getTradeRouteDomainGoldBonus(kTradeConnection.m_eDomain);
+	int iBonus = 0;
+
+	if (bAsOriginPlayer)
+	{
+		iBonus += CvGameTrade::GetOriginCity(kTradeConnection)->getTradeRouteDomainGoldBonus(kTradeConnection.m_eDomain);
+	}
 
 	if (bAsOriginPlayer)
 	{
@@ -2492,6 +2497,31 @@ int CvPlayerTrade::GetTradeConnectionOtherTraitValueTimes100(const TradeConnecti
 }
 
 //	--------------------------------------------------------------------------------
+int CvPlayerTrade::GetTradeConnectionTraitValueTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield, bool bAsOriginPlayer)
+{
+	int iValue = 0;
+	if (kTradeConnection.m_eConnectionType == TRADE_CONNECTION_INTERNATIONAL)
+	{
+		if (bAsOriginPlayer && eYield == YIELD_GOLD)
+		{
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			switch (kTradeConnection.m_eDomain)
+			{
+			case DOMAIN_SEA:
+				iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerTraits()->GetTradeRouteSeaGoldBonus();
+				break;
+			case DOMAIN_LAND:
+				iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerTraits()->GetTradeRouteLandGoldBonus();
+				break;
+			}
+#endif
+		}
+	}
+
+	return iValue;
+}
+
+//	--------------------------------------------------------------------------------
 int CvPlayerTrade::GetTradeConnectionDomainValueModifierTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield)
 {
 	// unnecessary code to make it compile for now
@@ -2610,6 +2640,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 					int iYourBuildingBonus = GetTradeConnectionYourBuildingValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 					int iTheirBuildingBonus = GetTradeConnectionTheirBuildingValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 					int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+					iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 
 					int iModifier = 100;
 					int iDomainModifier = GetTradeConnectionDomainValueModifierTimes100(kTradeConnection, eYield);
@@ -2655,6 +2686,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #if defined(MOD_API_UNIFIED_YIELDS)
 					int iPolicyBonus = GetTradeConnectionPolicyValueTimes100(kTradeConnection, eYield);
 					int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+					iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 #endif
 
 					iValue = iBaseValue;
@@ -2692,6 +2724,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 						int iDomainModifier = GetTradeConnectionDomainValueModifierTimes100(kTradeConnection, eYield);
 						int iDestRiverModifier = GetTradeConnectionRiverValueModifierTimes100(kTradeConnection, eYield, false);
 						int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
+						iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 
 						iValue = iBaseValue;
 						iValue += iYourBuildingBonus;
@@ -2720,6 +2753,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 						int iBaseValue = GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 #if defined(MOD_API_UNIFIED_YIELDS)
 						int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
+						iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 #endif
 
 						int iModifier = 100;
@@ -2751,6 +2785,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #if defined(MOD_API_UNIFIED_YIELDS)
 					iValue += GetTradeConnectionPolicyValueTimes100(kTradeConnection, eYield);
 					iValue += GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
+					iValue += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 #endif
 #if defined(MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY)
 					CvCity* pOriginCity = CvGameTrade::GetOriginCity(kTradeConnection);
@@ -2802,6 +2837,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #if defined(MOD_API_UNIFIED_YIELDS)
 					iValue += GetTradeConnectionPolicyValueTimes100(kTradeConnection, eYield);
 					iValue += GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
+					iValue += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 #endif
 #if defined(MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY)
 					if (MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY) {

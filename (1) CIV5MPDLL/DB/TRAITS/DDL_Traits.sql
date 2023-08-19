@@ -20,3 +20,6 @@ CREATE TABLE Trait_FreePromotionUnitClasses(
     foreign key (UnitClassType) references UnitClasses(Type), 
     foreign key (PromotionType) references UnitPromotions(Type)
 );
+
+alter table Traits add column `TradeRouteLandGoldBonus` int not null default 0;
+alter table Traits add column `TradeRouteSeaGoldBonus` int not null default 0;

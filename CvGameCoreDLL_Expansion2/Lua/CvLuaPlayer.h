@@ -1084,6 +1084,7 @@ protected:
 	static int lGetInternationalTradeRouteTheirBuildingBonus(lua_State* L);
 	static int lGetInternationalTradeRoutePolicyBonus(lua_State* L);
 	static int lGetInternationalTradeRouteOtherTraitBonus(lua_State* L);
+	static int lGetInternationalTradeRouteTraitBonus(lua_State* L);
 	static int lGetInternationalTradeRouteRiverModifier(lua_State* L);
 	static int lGetInternationalTradeRouteDomainModifier(lua_State* L);
 	static int lGetInternationalTradeRouteTotal(lua_State* L);
