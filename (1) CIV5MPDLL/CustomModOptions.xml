@@ -281,7 +281,7 @@
     <Row Class="6" Name="TRAITS_ANY_BELIEF" Value="0" DbUpdates="1"/>
 
     <!-- Enables additional trade route related traits (v52) -->
-    <Row Class="6" Name="TRAITS_TRADE_ROUTE_BONUSES" Value="0" DbUpdates="1"/>
+    <Row Class="6" Name="TRAITS_TRADE_ROUTE_BONUSES" Value="1" DbUpdates="1"/>
 
     <!-- Enables additional unit supply from traits (v78) -->
     <!-- See also: "Traits - Extra Supply" -->
