@@ -3255,6 +3255,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 					return false;
 				}
 			}
+			else return false;
 		}
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 		if(pkBuildingInfo->IsBuildingClassNeededGlobal(iI))
@@ -3268,6 +3269,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 					return false;
 				}
 			}
+			else return false;
 		}
 #endif
 	}
@@ -16344,6 +16346,7 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 							{
 								return false;
 							}
+							else return false;
 						}
 					}
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -16359,6 +16362,7 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 								return false;
 							}
 						}
+						else return false;
 					}
 #endif
 				}
