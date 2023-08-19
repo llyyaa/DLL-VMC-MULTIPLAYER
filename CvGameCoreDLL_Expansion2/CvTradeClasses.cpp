@@ -2283,43 +2283,7 @@ int CvPlayerTrade::GetTradeConnectionYourBuildingValueTimes100(const TradeConnec
 		return 0;
 	}
 
-	int iBonus = 0;
-	if (bAsOriginPlayer)
-	{
-		CvCity* pOriginCity = CvGameTrade::GetOriginCity(kTradeConnection);
-		for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
-		{
-			BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
-			if(eBuilding != NO_BUILDING)
-			{
-				CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(eBuilding);
-				if (!pBuildingEntry)
-				{
-					continue;
-				}
-
-				if (pBuildingEntry && pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID()))
-				{
-					if (pBuildingEntry->GetTradeRouteSeaGoldBonus() > 0 && kTradeConnection.m_eDomain == DOMAIN_SEA)
-					{
-#if defined(MOD_BUGFIX_MINOR)
-						iBonus += pBuildingEntry->GetTradeRouteSeaGoldBonus() * pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID());
-#else
-						iBonus += pBuildingEntry->GetTradeRouteSeaGoldBonus();
-#endif
-					}
-					else if (pBuildingEntry->GetTradeRouteLandGoldBonus() > 0 && kTradeConnection.m_eDomain == DOMAIN_LAND)
-					{
-#if defined(MOD_BUGFIX_MINOR)
-						iBonus += pBuildingEntry->GetTradeRouteLandGoldBonus() * pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID());
-#else
-						iBonus += pBuildingEntry->GetTradeRouteLandGoldBonus();
-#endif
-					}
-				}
-			}
-		}
-	}
+	int iBonus = CvGameTrade::GetOriginCity(kTradeConnection)->getTradeRouteDomainGoldBonus(kTradeConnection.m_eDomain);
 
 	if (bAsOriginPlayer)
 	{

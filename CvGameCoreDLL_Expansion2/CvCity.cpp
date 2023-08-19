@@ -355,6 +355,7 @@ CvCity::CvCity() :
 	, m_paiUnitCombatProductionModifier("CvCity::m_paiUnitCombatProductionModifier", m_syncArchive)
 	, m_paiFreePromotionCount("CvCity::m_paiFreePromotionCount", m_syncArchive)
 	, m_viTradeRouteDomainRangeModifier("CvCity::m_viTradeRouteDomainRangeModifier", m_syncArchive)
+	, m_viTradeRouteDomainGoldBonus("CvCity::m_viTradeRouteDomainGoldBonus", m_syncArchive)
 
 	, m_iBaseHappinessFromBuildings(0)
 	, m_iUnmoddedHappinessFromBuildings(0)
@@ -1384,8 +1385,11 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		CvAssertMsg((0 < iNumPromotionInfos),  "GC.getNumPromotionInfos() is not greater than zero but an array is being allocated in CvCity::reset");
 		m_paiFreePromotionCount.clear();
 		m_paiFreePromotionCount.resize(iNumPromotionInfos);
+
 		m_viTradeRouteDomainRangeModifier.clear();
 		m_viTradeRouteDomainRangeModifier.resize(NUM_DOMAIN_TYPES, 0);
+		m_viTradeRouteDomainGoldBonus.clear();
+		m_viTradeRouteDomainGoldBonus.resize(NUM_DOMAIN_TYPES, 0);
 
 		for(iI = 0; iI < iNumPromotionInfos; iI++)
 		{
@@ -7120,6 +7124,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 		changeTradeRouteDomainRangeModifier(DOMAIN_LAND, pBuildingInfo->GetTradeRouteLandDistanceModifier() * iChange);
 		changeTradeRouteDomainRangeModifier(DOMAIN_SEA, pBuildingInfo->GetTradeRouteSeaDistanceModifier() * iChange);
+
+		changeTradeRouteDomainGoldBonus(DOMAIN_LAND, pBuildingInfo->GetTradeRouteLandGoldBonus() * iChange);
+		changeTradeRouteDomainGoldBonus(DOMAIN_SEA, pBuildingInfo->GetTradeRouteSeaGoldBonus() * iChange);
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0) && pBuildingInfo->IsAllowInstantYield())
@@ -13759,6 +13766,21 @@ void CvCity::changeTradeRouteDomainRangeModifier(DomainTypes eIndex, int iChange
 
 
 //	--------------------------------------------------------------------------------
+int CvCity::getTradeRouteDomainGoldBonus(DomainTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	return m_viTradeRouteDomainGoldBonus[eIndex];
+}
+void CvCity::changeTradeRouteDomainGoldBonus(DomainTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_viTradeRouteDomainGoldBonus.setAt(eIndex, m_viTradeRouteDomainGoldBonus[eIndex] + iChange);
+}
+//	--------------------------------------------------------------------------------
 int CvCity::getSpecialistFreeExperience() const
 {
 	VALIDATE_OBJECT
@@ -17874,6 +17896,7 @@ void CvCity::read(FDataStream& kStream)
 
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_paiFreePromotionCount.dirtyGet());
 	kStream >> m_viTradeRouteDomainRangeModifier;
+	kStream >> m_viTradeRouteDomainGoldBonus;
 
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	kStream >> m_ppiYieldFromOtherYield;
@@ -18272,6 +18295,7 @@ void CvCity::write(FDataStream& kStream) const
 
 	CvInfosSerializationHelper::WriteHashedDataArray<PromotionTypes, int>(kStream, m_paiFreePromotionCount);
 	kStream << m_viTradeRouteDomainRangeModifier;
+	kStream << m_viTradeRouteDomainGoldBonus;
 
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	kStream << m_ppiYieldFromOtherYield;
