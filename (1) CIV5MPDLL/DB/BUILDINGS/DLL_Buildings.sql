@@ -20,3 +20,6 @@ CREATE TABLE Building_ClassesNeededGlobal(
 	foreign key (BuildingType) references Buildings(Type), 
 	foreign key (BuildingClassType) references BuildingClasses(Type)
 );
+
+ALTER TABLE Buildings ADD 'TradeRouteSeaGoldBonusGlobal' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'TradeRouteLandGoldBonusGlobal' INTEGER DEFAULT 0;

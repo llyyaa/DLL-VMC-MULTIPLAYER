@@ -2284,14 +2284,21 @@ int CvPlayerTrade::GetTradeConnectionYourBuildingValueTimes100(const TradeConnec
 	}
 
 	int iBonus = 0;
+	DomainTypes eDomain = kTradeConnection.m_eDomain;
 
 	if (bAsOriginPlayer)
 	{
-		iBonus += CvGameTrade::GetOriginCity(kTradeConnection)->getTradeRouteDomainGoldBonus(kTradeConnection.m_eDomain);
-	}
+		iBonus += CvGameTrade::GetOriginCity(kTradeConnection)->getTradeRouteDomainGoldBonus(eDomain);
+		switch (eDomain)
+		{
+		case DOMAIN_LAND:
+			iBonus += GET_PLAYER(kTradeConnection.m_eOriginOwner).getTradeRouteLandGoldBonusGlobal();
+			break;
+		case DOMAIN_SEA:
+			iBonus += GET_PLAYER(kTradeConnection.m_eOriginOwner).getTradeRouteSeaGoldBonusGlobal();
+			break;
+		}
 
-	if (bAsOriginPlayer)
-	{
 		iBonus *= (100 + GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerTraits()->GetTradeBuildingModifier());
 		iBonus /= 100;
 	}

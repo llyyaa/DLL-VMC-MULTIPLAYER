@@ -934,6 +934,14 @@ public:
 	int getTradeRouteDomainExtraRange(DomainTypes eIndex) const;
 	void changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange);
 
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int getTradeRouteSeaGoldBonusGlobal() const;
+	void changeTradeRouteSeaGoldBonusGlobal(int iChange);
+
+	int getTradeRouteLandGoldBonusGlobal() const;
+	void changeTradeRouteLandGoldBonusGlobal(int iChange);
+#endif
+
 	int getImprovementCostModifier() const;
 	void changeImprovementCostModifier(int iChange);
 
@@ -2289,6 +2297,10 @@ protected:
 #endif
 	FAutoVariable<int, CvPlayer> m_iNumTradeRouteBonus;
 	FAutoVariable<std::vector<int>, CvPlayer> m_viTradeRouteDomainExtraRange;
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	FAutoVariable<int, CvPlayer> m_iTradeRouteSeaGoldBonusGlobal;
+	FAutoVariable<int, CvPlayer> m_iTradeRouteLandGoldBonusGlobal;
+#endif
 	FAutoVariable<int, CvPlayer> m_iImprovementCostModifier;
 	FAutoVariable<int, CvPlayer> m_iImprovementUpgradeRateModifier;
 	FAutoVariable<int, CvPlayer> m_iSpecialistProductionModifier;

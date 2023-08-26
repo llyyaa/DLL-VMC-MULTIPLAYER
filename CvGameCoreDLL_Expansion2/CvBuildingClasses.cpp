@@ -272,6 +272,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iTradeRouteSeaGoldBonusGlobal(0),
+	m_iTradeRouteLandGoldBonusGlobal(0),
 	m_bAnyWater(false),
 	m_pbBuildingClassNeededGlobal(NULL),
 #endif
@@ -474,6 +476,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_bAllowInstantYield = kResults.GetBool("AllowInstantYield");
 #endif
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iTradeRouteSeaGoldBonusGlobal = kResults.GetInt("TradeRouteSeaGoldBonusGlobal");
+	m_iTradeRouteLandGoldBonusGlobal = kResults.GetInt("TradeRouteLandGoldBonusGlobal");
 	m_bAnyWater = kResults.GetBool("AnyWater");
 #endif
 	m_bMountain = kResults.GetBool("Mountain");
@@ -3306,6 +3310,16 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvBuildingEntry::GetTradeRouteSeaGoldBonusGlobal() const
+{
+	return m_iTradeRouteSeaGoldBonusGlobal;
+}
+
+int CvBuildingEntry::GetTradeRouteLandGoldBonusGlobal() const
+{
+	return m_iTradeRouteLandGoldBonusGlobal;
+}
+
 bool CvBuildingEntry::IsAnyWater() const
 {
 	return m_bAnyWater;
