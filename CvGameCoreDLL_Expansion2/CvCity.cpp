@@ -17141,7 +17141,7 @@ void CvCity::doGrowth()
 			changePopulation(1);
 
 			// Only show notification if the city is small
-			if(getPopulation() <= 5)
+			if(getPopulation() <= GC.getMAX_POPULATION_INCREASE_NOTIOFACATION())
 			{
 				CvNotifications* pNotifications = GET_PLAYER(getOwner()).GetNotifications();
 				if(pNotifications)
@@ -17179,7 +17179,7 @@ void CvCity::doGrowth()
 				changePopulation(1);
 
 				// Only show notification if the city is small
-				if(getPopulation() <= 5)
+				if(getPopulation() <= GC.getMAX_POPULATION_INCREASE_NOTIOFACATION())
 				{
 					CvNotifications* pNotifications = GET_PLAYER(getOwner()).GetNotifications();
 					if(pNotifications)
@@ -17216,7 +17216,7 @@ void CvCity::doGrowth()
 			changePopulation(1);
 
 			// Only show notification if the city is small
-			if(getPopulation() <= 5)
+			if(getPopulation() <= GC.getMAX_POPULATION_INCREASE_NOTIOFACATION())
 			{
 				CvNotifications* pNotifications = GET_PLAYER(getOwner()).GetNotifications();
 				if(pNotifications)
