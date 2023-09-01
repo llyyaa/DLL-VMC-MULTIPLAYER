@@ -2280,14 +2280,28 @@ void CvDiplomacyAI::DoCounters()
 					if (pNotifications){
 						CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_FRIENDSHIP_EXPIRED", GET_PLAYER(GetPlayer()->GetID()).getCivilizationShortDescriptionKey());
 						CvString strSummary = GetLocalizedText("TXT_KEY_NOTIFICATION_FRIENDSHIP_EXPIRED_S");
-						pNotifications->Add(NOTIFICATION_FRIENDSHIP_EXPIRED, strBuffer, strSummary, -1, -1, GetPlayer()->GetID(), eLoopPlayer);				
+						strSummary = GetLocalizedText("[COLOR_NEGATIVE_TEXT]") + strSummary + GetLocalizedText("[ENDCOLOR]");
+						strBuffer = GetLocalizedText("[COLOR_NEGATIVE_TEXT]") + strBuffer + GetLocalizedText("[ENDCOLOR]");
+						pNotifications->Add(NOTIFICATION_FRIENDSHIP_EXPIRED, strBuffer, strSummary, -1, -1, GetPlayer()->GetID(), eLoopPlayer);
+						if (eLoopPlayer == GC.getGame().getActivePlayer())
+						{
+							ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+							pkDLLInterface->AddMessage(0, eLoopPlayer, true, GC.getEVENT_MESSAGE_TIME(), strBuffer);
+						}
 					}
 
 					pNotifications = GET_PLAYER(GetPlayer()->GetID()).GetNotifications();
 					if (pNotifications){
 						CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_FRIENDSHIP_EXPIRED", GET_PLAYER(eLoopPlayer).getCivilizationShortDescriptionKey());
 						CvString strSummary = GetLocalizedText("TXT_KEY_NOTIFICATION_FRIENDSHIP_EXPIRED_S");
+						strSummary = GetLocalizedText("[COLOR_NEGATIVE_TEXT]") + strSummary + GetLocalizedText("[ENDCOLOR]");
+						strBuffer = GetLocalizedText("[COLOR_NEGATIVE_TEXT]") + strBuffer + GetLocalizedText("[ENDCOLOR]");
 						pNotifications->Add(NOTIFICATION_FRIENDSHIP_EXPIRED, strBuffer, strSummary, -1, -1, eLoopPlayer, GetPlayer()->GetID());				
+						if (GetPlayer()->GetID() == GC.getGame().getActivePlayer())
+						{
+							ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+							pkDLLInterface->AddMessage(0, GetPlayer()->GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer);
+						}
 					}
 				}
 			}
