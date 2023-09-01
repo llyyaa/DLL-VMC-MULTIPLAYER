@@ -2460,8 +2460,11 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 		{
 			int iMoveRandPercent = GC.getGame().getJonRandNum(25, "Capture Move Rand") + 1 + 25; // 26 - 50%
 			pkCapturedUnit->setMoves(pkCapturedUnit->maxMoves() * iMoveRandPercent / 100);
-			int iDamagePecent = 100 - (GC.getGame().getJonRandNum(25, "Capture Damage Rand") + 1 + 25); // 51 - 75%
-			pkCapturedUnit->setDamage(pkCapturedUnit->GetMaxHitPoints() * iDamagePecent / 100);
+			if(pkCapturedUnit->IsCombatUnit())
+			{
+				int iDamagePecent = 100 - (GC.getGame().getJonRandNum(25, "Capture Damage Rand") + 1 + 25); // 51 - 75%
+				pkCapturedUnit->setDamage(pkCapturedUnit->GetMaxHitPoints() * iDamagePecent / 100);
+			}
 		}
 		else
 		{
