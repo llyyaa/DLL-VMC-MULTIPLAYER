@@ -16627,8 +16627,8 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 							{
 								return false;
 							}
-							else return false;
 						}
+						else return false;
 					}
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 					if(pkBuildingInfo->IsBuildingClassNeededGlobal(iI))
