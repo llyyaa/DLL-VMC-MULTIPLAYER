@@ -507,9 +507,9 @@
 			<Text>A supermassive eruption of a volcano occurred。</Text>
 		</Row>
 
-    <Row tag="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
-          <Text>You have conquered {1_city} and spread +{2_num}[ICON_TOURISM] tourism influence to all civilizations you have met. </Text>
-    </Row>
+		<Row tag="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
+			<Text>You have conquered {1_city} and spread +{2_num}[ICON_TOURISM] tourism influence to all civilizations you have met. </Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

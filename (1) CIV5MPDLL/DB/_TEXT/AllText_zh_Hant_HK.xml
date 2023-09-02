@@ -512,8 +512,8 @@
 			<Text>一處火山發生了超大規模噴發。</Text>
 		</Row>
 
-    <Row="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
-      <Text>你征服了{1_city}，對所有已見面文明傳播了+{2_num}[ICON_TOURISM]魅力影響。 </Text>
-    </Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
+			<Text>你征服了{1_city}，對所有已見面文明傳播了+{2_num}[ICON_TOURISM]魅力影響。 </Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

@@ -513,7 +513,7 @@
 		</Row>
 
 		<Row Tag="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
-      <Text>你征服了{1_city}，对所有已见面文明传播了+{2_num}[ICON_TOURISM]魅力影响。</Text>
+      		<Text>你征服了{1_city}，对所有已见面文明传播了+{2_num}[ICON_TOURISM]魅力影响。</Text>
 		</Row>
 	</Language_zh_CN>
 
