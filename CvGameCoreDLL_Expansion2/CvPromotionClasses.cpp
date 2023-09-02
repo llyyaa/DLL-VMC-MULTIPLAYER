@@ -27,11 +27,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iPrereqOrPromotion7(NO_PROMOTION),
 	m_iPrereqOrPromotion8(NO_PROMOTION),
 	m_iPrereqOrPromotion9(NO_PROMOTION),
-	m_iPrereqOrPromotion10(NO_PROMOTION),
-	m_iPrereqOrPromotion11(NO_PROMOTION),
-	m_iPrereqOrPromotion12(NO_PROMOTION),
-	m_iPrereqOrPromotion13(NO_PROMOTION),
-
 	m_iTechPrereq(NO_TECH),
 	m_iInvisibleType(NO_INVISIBLE),
 	m_iSeeInvisibleType(NO_INVISIBLE),
@@ -98,11 +93,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iMaxHitPointsModifier(0),
 #endif
 
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-	m_iMoveLeftDefenseMod(0),
-	m_iMoveUsedDefenseMod(0),
-#endif
-
 #if defined(MOD_ROG_CORE)
 	m_iMoveLfetAttackMod(0),
 	m_iMoveUsedAttackMod(0),
@@ -128,15 +118,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyUnitClassBonus(0),
 	m_iNearbyUnitClassBonusRange(0),
 	m_iCombatBonusFromNearbyUnitClass(NO_UNITCLASS),
-
-	m_iAOEDamageOnKill(0),
-	m_iDamageAoEFortified(0),
-	m_iWorkRateMod(0),
-	m_iBarbarianCombatBonus(0),
 #endif
-
-	m_iCaptureDefeatedEnemyChance(0),
-	m_bCannotBeCaptured(false),
 
 #if defined(MOD_ROG_CORE)
 	m_iHPHealedIfDefeatEnemyGlobal(0),
@@ -163,10 +145,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNumWorkAttackMod(0),
 
 	m_bNoResourcePunishment(false),
-
-
-	m_iCurrentHitPointAttackMod(0),
-	m_iCurrentHitPointDefenseMod(0),
 #endif
 
 	m_iUpgradeDiscount(0),
@@ -184,10 +162,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseModifier(0),
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
-	m_iUnitAttackFaithBonus(0),
-	m_iCityAttackFaithBonus(0),
-#endif
 	m_iReligiousStrengthLossRivalTerritory(0),
 	m_iTradeMissionInfluenceModifier(0),
 	m_iTradeMissionGoldModifier(0),
@@ -217,17 +191,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyImprovementCombatBonus(0),
 	m_iNearbyImprovementBonusRange(0),
 	m_eCombatBonusImprovement(NO_IMPROVEMENT),
-#endif
-#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
-	m_iAllyCityStateCombatModifier(0),
-	m_iAllyCityStateCombatModifierMax(0),
-#endif
-#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
-	m_eExtraResourceType(NO_RESOURCE),
-	m_iExtraResourceCombatModifier(0),
-	m_iExtraResourceCombatModifierMax(0),
-	m_iExtraHappinessCombatModifier(0),
-	m_iExtraHappinessCombatModifierMax(0),
 #endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	m_bCanCrossMountains(false),
@@ -269,7 +232,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_bCaptureDefeatedEnemy(false),
 	m_bIgnoreGreatGeneralBenefit(false),
 	m_bIgnoreZOC(false),
-	m_bImmueMeleeAttack(false),
 	m_bHasPostCombatPromotions(false),
 	m_bPostCombatPromotionsExclusive(false),
 	m_bSapper(false),
@@ -304,12 +266,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_pbFeatureImpassable(NULL),
 	m_pbUnitCombat(NULL),
 	m_pbCivilianUnitType(NULL),
-
-
-	m_pbUnitType(NULL),
-
-
-
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	m_pbUnitName(NULL),
 #endif
@@ -350,10 +306,6 @@ CvPromotionEntry::~CvPromotionEntry(void)
 	SAFE_DELETE_ARRAY(m_pbFeatureImpassable);
 	SAFE_DELETE_ARRAY(m_pbUnitCombat);
 	SAFE_DELETE_ARRAY(m_pbCivilianUnitType);
-
-	SAFE_DELETE_ARRAY(m_pbUnitType);
-
-
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	SAFE_DELETE_ARRAY(m_pbUnitName);
 #endif
@@ -398,33 +350,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		if (szTextVal) {
 			m_eCombatBonusImprovement = (ImprovementTypes)GC.getInfoTypeForString(szTextVal, true);
 		}
-	}
-#endif
-
-#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
-	if (MOD_PROMOTIONS_ALLYCITYSTATE_BONUS) {
-		m_iAllyCityStateCombatModifier = kResults.GetInt("AllyCityStateCombatModifier");
-		m_iAllyCityStateCombatModifierMax = kResults.GetInt("AllyCityStateCombatModifierMax");
-	}
-#endif
-
-#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
-	if (MOD_PROMOTIONS_EXTRARES_BONUS) {
-		const char* szTextVal = kResults.GetText("ExtraResourceType");
-		if (szTextVal) {
-			m_eExtraResourceType = (ResourceTypes)GC.getInfoTypeForString(szTextVal, true);
-		}
-		m_iExtraResourceCombatModifier = kResults.GetInt("ExtraResourceCombatModifier");
-		m_iExtraResourceCombatModifierMax = kResults.GetInt("ExtraResourceCombatModifierMax");
-		m_iExtraHappinessCombatModifier = kResults.GetInt("ExtraHappinessCombatModifier");
-		m_iExtraHappinessCombatModifierMax = kResults.GetInt("ExtraHappinessCombatModifierMax");
-	}
-#endif
-
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-	if (MOD_DEFENSE_MOVES_BONUS) {
-		m_iMoveLeftDefenseMod = kResults.GetInt("MoveLeftDefenseMod");
-		m_iMoveUsedDefenseMod = kResults.GetInt("MoveUsedDefenseMod");
 	}
 #endif
 
@@ -473,6 +398,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iMeleeDefenseMod = kResults.GetInt("MeleeDefenseMod");
 #endif
 
+
 #if defined(MOD_ROG_CORE)
 	if (MOD_ROG_CORE) {
 		m_iMoveLfetAttackMod = kResults.GetInt("MoveLfetAttackMod");
@@ -494,19 +420,11 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		m_iOutsideCapitalLandAttackMod = kResults.GetInt("OutsideCapitalLandAttackMod");
 		m_iOnCapitalLandDefenseMod = kResults.GetInt("OnCapitalLandDefenseMod");
 		m_iOutsideCapitalLandDefenseMod = kResults.GetInt("OutsideCapitalLandDefenseMod");
-
-
-		m_iDamageAoEFortified = kResults.GetInt("AoEWhileFortified");
-		m_iWorkRateMod = kResults.GetInt("WorkRateMod");
-		m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
-
-		m_iBarbarianCombatBonus = kResults.GetInt("BarbarianCombatBonus");
 #endif
 
-		m_iCaptureDefeatedEnemyChance = kResults.GetInt("CaptureDefeatedEnemyChance");
-		m_bCannotBeCaptured = kResults.GetBool("CannotBeCaptured");
 
 #if defined(MOD_ROG_CORE)
+		if (MOD_ROG_CORE) {
 			m_iNumSpyDefenseMod = kResults.GetInt("NumSpyDefenseMod");
 			m_iNumSpyAttackMod = kResults.GetInt("NumSpyAttackMod");
 
@@ -517,12 +435,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 			m_iNumWorkAttackMod = kResults.GetInt("NumWorkAttackMod");
 
 			m_bNoResourcePunishment = kResults.GetBool("NoResourcePunishment");
-
-			m_iCurrentHitPointAttackMod = kResults.GetInt("CurrentHitPointAttackMod");
-			m_iCurrentHitPointDefenseMod = kResults.GetInt("CurrentHitPointDefenseMod");
-
-			m_iNearNumEnemyAttackMod = kResults.GetInt("NearNumEnemyAttackMod");
-			m_iNearNumEnemyDefenseMod = kResults.GetInt("NearNumEnemyDefenseMod");
+		}
 #endif
 
 	m_bRoughTerrainEndsTurn = kResults.GetBool("RoughTerrainEndsTurn");
@@ -553,7 +466,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_bCaptureDefeatedEnemy = kResults.GetBool("CaptureDefeatedEnemy");
 	m_bIgnoreGreatGeneralBenefit = kResults.GetBool("IgnoreGreatGeneralBenefit");
 	m_bIgnoreZOC = kResults.GetBool("IgnoreZOC");
-	m_bImmueMeleeAttack = kResults.GetBool("ImmueMeleeAttack");
 	m_bHasPostCombatPromotions = kResults.GetBool("HasPostCombatPromotions");
 	m_bPostCombatPromotionsExclusive = kResults.GetBool("PostCombatPromotionsExclusive");
 	m_bSapper = kResults.GetBool("Sapper");
@@ -648,81 +560,9 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseModifier = kResults.GetInt("CapitalDefenseModifier");
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
-	m_iUnitAttackFaithBonus = kResults.GetInt("UnitAttackFaithBonus");
-	m_iCityAttackFaithBonus = kResults.GetInt("CityAttackFaithBonus");
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
-	const char* szRemovePromotionUpgrade = kResults.GetText("RemovePromotionUpgrade");
-	m_iRemovePromotionUpgrade = GC.getInfoTypeForString(szRemovePromotionUpgrade, true);
-#endif
 	m_iReligiousStrengthLossRivalTerritory = kResults.GetInt("ReligiousStrengthLossRivalTerritory");
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
 	m_iTradeMissionGoldModifier = kResults.GetInt("TradeMissionGoldModifier");
-
-#ifdef MOD_GLOBAL_WAR_CASUALTIES
-	m_iWarCasualtiesModifier = kResults.GetInt("WarCasualtiesModifier");
-#endif
-
-#ifdef MOD_PROMOTION_SPLASH_DAMAGE
-	m_iSplashDamageRadius = kResults.GetInt("SplashDamageRadius");
-	m_iSplashDamagePercent = kResults.GetInt("SplashDamagePercent");
-	m_iSplashDamageFixed = kResults.GetInt("SplashDamageFixed");
-	m_iSplashDamagePlotUnitLimit = kResults.GetInt("SplashDamagePlotUnitLimit");
-	m_iSplashDamageImmune = kResults.GetBool("SplashDamageImmune");
-	m_iSplashXP = kResults.GetInt("SplashXP");
-#endif
-
-#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
-	m_iCollateralDamagePercent = kResults.GetInt("CollateralDamagePercent");
-	m_iCollateralDamageFixed = kResults.GetInt("CollateralDamageFixed");
-	m_iCollateralDamagePlotUnitLimit = kResults.GetInt("CollateralDamagePlotUnitLimit");
-	m_iCollateralDamageImmune = kResults.GetBool("CollateralDamageImmune");
-	m_iCollateralXP = kResults.GetInt("CollateralXP");
-	m_bCollateralOnlyCity = kResults.GetBool("CollateralOnlyCity");
-	m_bCollateralOnlyUnit = kResults.GetBool("CollateralOnlyUnit");
-#endif
-
-#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-	m_bAddEnemyPromotionImmune = kResults.GetBool("AddEnemyPromotionImmune");
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	m_iRemoveAfterXTurns = kResults.GetInt("RemoveAfterXTurns");
-	m_bRemoveAfterFullyHeal = kResults.GetBool("RemoveAfterFullyHeal");
-	m_bRemoveWithLuaCheck = kResults.GetBool("RemoveWithLuaCheck");
-	m_bCanActionClear = kResults.GetBool("CanActionClear");
-#endif
-
-#ifdef MOD_PROMOTION_CITY_DESTROYER
-	m_iDestroyBuildingProbability =  kResults.GetInt("DestroyBuildingProbability");
-	m_iDestroyBuildingNumLimit = kResults.GetInt("DestroyBuildingNumLimit");
-	const char* strDestroyBuildingCollection = kResults.GetText("DestroyBuildingCollection");
-	if (strDestroyBuildingCollection != nullptr)
-	{
-		int iLen = strlen(strDestroyBuildingCollection);
-		if (iLen > 0)
-		{
-			std::string sqlKey = "UnitPromotions_DestroyBuildingCollection";
-			Database::Results* pResults = kUtility.GetResults(sqlKey);
-			if (pResults == NULL)
-			{
-				const char* szSQL = "select ID from BuildingClassCollections where Type = ?;";
-				pResults = kUtility.PrepareResults(sqlKey, szSQL);
-			}
-
-			pResults->Bind(1, strDestroyBuildingCollection, iLen, false);
-			if (pResults->Step())
-			{
-				int id = pResults->GetInt(0);
-				m_iDestroyBuildingCollection = (BuildingClassCollectionsTypes)id;
-			}
-		}
-	}
-
-	m_iSiegeKillCitizensFixed = kResults.GetInt("SiegeKillCitizensFixed");
-	m_iSiegeKillCitizensPercent = kResults.GetInt("SiegeKillCitizensPercent");
-#endif
 
 	//References
 	const char* szLayerAnimationPath = kResults.GetText("LayerAnimationPath");
@@ -736,30 +576,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 	const char* szSeeInvisible = kResults.GetText("SeeInvisible");
 	m_iSeeInvisibleType = GC.getInfoTypeForString(szSeeInvisible, true);
-
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-	const char* szFeatureInvisible = kResults.GetText("FeatureInvisible");
-	m_iFeatureInvisible = GC.getInfoTypeForString(szFeatureInvisible, true);
-	const char* szFeatureInvisible2 = kResults.GetText("FeatureInvisible2");
-	m_iFeatureInvisible2 = GC.getInfoTypeForString(szFeatureInvisible2, true);
-#endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
-#endif
-
-	m_iAttackInflictDamageChange = kResults.GetInt("AttackInflictDamageChange");
-	m_iAttackInflictDamageChangeMaxHPPercent = kResults.GetInt("AttackInflictDamageChangeMaxHPPercent");
-
-	m_iDefenseInflictDamageChange = kResults.GetInt("DefenseInflictDamageChange");
-	m_iDefenseInflictDamageChangeMaxHPPercent = kResults.GetInt("DefenseInflictDamageChangeMaxHPPercent");
-
-	m_iSiegeInflictDamageChange = kResults.GetInt("SiegeInflictDamageChange");
-	m_iSiegeInflictDamageChangeMaxHPPercent = kResults.GetInt("SiegeInflictDamageChangeMaxHPPercent");
-
-	m_iHeavyChargeAddMoves = kResults.GetInt("HeavyChargeAddMoves");
-	m_iHeavyChargeExtraDamage = kResults.GetInt("HeavyChargeExtraDamage");
-	m_iHeavyChargeCollateralFixed = kResults.GetInt("HeavyChargeCollateralFixed");
-	m_iHeavyChargeCollateralPercent = kResults.GetInt("HeavyChargeCollateralPercent");
 
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
@@ -790,18 +606,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 	const char* szPromotionPrereqOr9 = kResults.GetText("PromotionPrereqOr9");
 	m_iPrereqOrPromotion9 = GC.getInfoTypeForString(szPromotionPrereqOr9, true);
-
-	const char* szPromotionPrereqOr10 = kResults.GetText("PromotionPrereqOr10");
-	m_iPrereqOrPromotion10 = GC.getInfoTypeForString(szPromotionPrereqOr10, true);
-
-	const char* szPromotionPrereqOr11 = kResults.GetText("PromotionPrereqOr11");
-	m_iPrereqOrPromotion11 = GC.getInfoTypeForString(szPromotionPrereqOr11, true);
-
-	const char* szPromotionPrereqOr12 = kResults.GetText("PromotionPrereqOr12");
-	m_iPrereqOrPromotion12 = GC.getInfoTypeForString(szPromotionPrereqOr12, true);
-
-	const char* szPromotionPrereqOr13 = kResults.GetText("PromotionPrereqOr13");
-	m_iPrereqOrPromotion13 = GC.getInfoTypeForString(szPromotionPrereqOr13, true);
 
 	//Arrays
 	const int iNumUnitClasses = kUtility.MaxRows("UnitClasses");
@@ -1134,37 +938,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		pResults->Reset();
 	}
 
-
-	//UnitPromotions_UnitType
-	{
-		kUtility.InitializeArray(m_pbUnitType, iNumUnitTypes, false);
-
-		std::string sqlKey = "m_pbUnitType";
-		Database::Results* pResults = kUtility.GetResults(sqlKey);
-		if (pResults == NULL)
-		{
-			const char* szSQL = "select Units.ID from UnitPromotions_UnitType inner join Units On Units.Type = UnitType where PromotionType = ?";
-			pResults = kUtility.PrepareResults(sqlKey, szSQL);
-		}
-
-		CvAssert(pResults);
-		if (!pResults) return false;
-
-		pResults->Bind(1, szPromotionType);
-
-		while (pResults->Step())
-		{
-			const int iUnit = (UnitTypes)pResults->GetInt(0);
-			CvAssert(iUnit < iNumUnitTypes);
-
-			m_pbUnitType[iUnit] = true;
-		}
-
-		pResults->Reset();
-	}
-
-
-
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	if (MOD_PROMOTIONS_UNIT_NAMING)
 	{
@@ -1204,16 +977,13 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 			CvAssert(iOtherPromotionType > -1 && iOtherPromotionType < GC.getNumPromotionInfos());
 
 			const int iModifier = pResults->GetInt("Modifier");
-			if (iModifier != 0)
-				m_pPromotionModifiers[iOtherPromotionType] += iModifier;
+			m_pPromotionModifiers[iOtherPromotionType] += iModifier;
 
 			const int iAttack = pResults->GetInt("Attack");
-			if (iAttack != 0)
-				m_pPromotionAttackModifiers[iOtherPromotionType] += iAttack;
+			m_pPromotionAttackModifiers[iOtherPromotionType] += iAttack;
 
 			const int iDefense = pResults->GetInt("Defense");
-			if (iDefense != 0)
-				m_pPromotionDefenseModifiers[iOtherPromotionType] += iDefense;
+			m_pPromotionDefenseModifiers[iOtherPromotionType] += iDefense;
 		}
 
 		pResults->Reset();
@@ -1356,58 +1126,6 @@ void CvPromotionEntry::SetPrereqOrPromotion9(int i)
 	m_iPrereqOrPromotion9 = i;
 }
 
-/// Accessor: Gets promotion 10 of an either/or promotion prerequisite.
-int CvPromotionEntry::GetPrereqOrPromotion10() const
-{
-	return m_iPrereqOrPromotion10;
-}
-
-/// Accessor: Sets promotion 10 of an either/or promotion prerequisite.
-void CvPromotionEntry::SetPrereqOrPromotion10(int i)
-{
-	m_iPrereqOrPromotion10 = i;
-}
-
-/// Accessor: Gets promotion 10 of an either/or promotion prerequisite.
-int CvPromotionEntry::GetPrereqOrPromotion11() const
-{
-	return m_iPrereqOrPromotion11;
-}
-
-/// Accessor: Sets promotion 11 of an either/or promotion prerequisite.
-void CvPromotionEntry::SetPrereqOrPromotion11(int i)
-{
-	m_iPrereqOrPromotion11 = i;
-}
-
-
-/// Accessor: Gets promotion 11 of an either/or promotion prerequisite.
-int CvPromotionEntry::GetPrereqOrPromotion12() const
-{
-	return m_iPrereqOrPromotion12;
-}
-
-/// Accessor: Sets promotion 10 of an either/or promotion prerequisite.
-void CvPromotionEntry::SetPrereqOrPromotion12(int i)
-{
-	m_iPrereqOrPromotion12 = i;
-}
-
-
-/// Accessor: Gets promotion 11 of an either/or promotion prerequisite.
-int CvPromotionEntry::GetPrereqOrPromotion13() const
-{
-	return m_iPrereqOrPromotion13;
-}
-
-/// Accessor: Sets promotion 10 of an either/or promotion prerequisite.
-void CvPromotionEntry::SetPrereqOrPromotion13(int i)
-{
-	m_iPrereqOrPromotion13 = i;
-}
-
-
-
 /// Accessor: Gets the tech prerequisite for this promotion
 int CvPromotionEntry::GetTechPrereq() const
 {
@@ -1425,24 +1143,6 @@ int CvPromotionEntry::GetSeeInvisibleType() const
 {
 	return m_iSeeInvisibleType;
 }
-
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-int CvPromotionEntry::GetFeatureInvisible() const
-{
-	return m_iFeatureInvisible;
-}
-int CvPromotionEntry::GetFeatureInvisible2() const
-{
-	return m_iFeatureInvisible2;
-}
-#endif
-
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-int CvPromotionEntry::GetMultipleInitExperence() const
-{
-	return m_iMultipleInitExperence;
-}
-#endif
 
 /// Accessor: How many additional tiles this promotion allows a unit to see (can be negative)
 int CvPromotionEntry::GetVisibilityChange() const
@@ -1698,19 +1398,6 @@ bool CvPromotionEntry::IsGreatAdmiral() const
 	return m_bGreatAdmiral;
 }
 
-
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-int CvPromotionEntry::GetMoveLeftDefenseMod() const
-{
-	return m_iMoveLeftDefenseMod;
-}
-
-int CvPromotionEntry::GetMoveUsedDefenseMod() const
-{
-	return m_iMoveUsedDefenseMod;
-}
-#endif
-
 #if defined(MOD_PROMOTIONS_AURA_CHANGE)
 /// Accessor: Does this Promotion change the range of the aura of a Great General or Great Admiral?
 int CvPromotionEntry::GetAuraRangeChange() const
@@ -1835,38 +1522,7 @@ int CvPromotionEntry::GetRangedSupportFireMod() const
 {
 	return m_iRangedSupportFireMod;
 }
-
-/// Accessor: Can this Promotion grant bonuses v. barbarians?
-int CvPromotionEntry::GetBarbarianCombatBonus() const
-{
-	return m_iBarbarianCombatBonus;
-}
-
-int CvPromotionEntry::GetAOEDamageOnKill() const
-{
-	return m_iAOEDamageOnKill;
-}
-
-int CvPromotionEntry::GetDamageAoEFortified() const
-{
-	return m_iDamageAoEFortified;
-}
-int CvPromotionEntry::GetWorkRateMod() const
-{
-	return m_iWorkRateMod;
-}
 #endif
-
-int CvPromotionEntry::GetCaptureDefeatedEnemyChance() const
-{
-	return m_iCaptureDefeatedEnemyChance;
-}
-
-//Cannot be captured
-bool CvPromotionEntry::CannotBeCaptured() const
-{
-	return m_bCannotBeCaptured;
-}
 
 
 
@@ -1906,29 +1562,6 @@ int CvPromotionEntry::GetNumWorkDefenseMod() const
 bool CvPromotionEntry::IsNoResourcePunishment() const
 {
 	return m_bNoResourcePunishment;
-}
-
-
-int CvPromotionEntry::GetCurrentHitPointAttackMod() const
-{
-	return m_iCurrentHitPointAttackMod;
-}
-
-int CvPromotionEntry::GetCurrentHitPointDefenseMod() const
-{
-	return m_iCurrentHitPointDefenseMod;
-}
-
-
-
-int CvPromotionEntry::GetNearNumEnemyAttackMod() const
-{
-	return m_iNearNumEnemyAttackMod;
-}
-
-int CvPromotionEntry::GetNearNumEnemyDefenseMod() const
-{
-	return m_iNearNumEnemyDefenseMod;
 }
 #endif
 
@@ -2113,26 +1746,6 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 	return m_iCityAttackPlunderModifier;
 }
 
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
-/// Accessor: faith earned from damage on an attacked unit
-int CvPromotionEntry::GetUnitAttackFaithBonus() const
-{
-	return m_iUnitAttackFaithBonus;
-}
-/// Accessor: faith earned from damage on an attacked city
-int CvPromotionEntry::GetCityAttackFaithBonus() const
-{
-	return m_iCityAttackFaithBonus;
-}
-#endif
-
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
-int CvPromotionEntry::GetRemovePromotionUpgrade() const
-{
-	return m_iRemovePromotionUpgrade;
-}
-#endif
-
 /// Accessor: loss of strength at end of each turn in rival territory without open borders
 int CvPromotionEntry::GetReligiousStrengthLossRivalTerritory() const
 {
@@ -2286,42 +1899,6 @@ int CvPromotionEntry::GetNearbyImprovementBonusRange() const
 ImprovementTypes CvPromotionEntry::GetCombatBonusImprovement() const
 {
 	return m_eCombatBonusImprovement;
-}
-#endif
-
-#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
-/// Accessor: Permits units to receive a combat bonus from Ally City States
-int CvPromotionEntry::GetAllyCityStateCombatModifier() const
-{
-	return m_iAllyCityStateCombatModifier;
-}
-int CvPromotionEntry::GetAllyCityStateCombatModifierMax() const
-{
-	return m_iAllyCityStateCombatModifierMax;
-}
-#endif
-
-#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
-// Permits units to receive a combat bonus from Extra Resourses/Hapiness
-ResourceTypes CvPromotionEntry::GetExtraResourceType() const
-{
-	return m_eExtraResourceType;
-}
-int CvPromotionEntry::GetExtraResourceCombatModifier() const
-{
-	return m_iExtraResourceCombatModifier;
-}
-int CvPromotionEntry::GetExtraResourceCombatModifierMax() const
-{
-	return m_iExtraResourceCombatModifierMax;
-}
-int CvPromotionEntry::GetExtraHappinessCombatModifier() const
-{
-	return m_iExtraHappinessCombatModifier;
-}
-int CvPromotionEntry::GetExtraHappinessCombatModifierMax() const
-{
-	return m_iExtraHappinessCombatModifierMax;
 }
 #endif
 
@@ -2507,12 +2084,6 @@ bool CvPromotionEntry::IsCaptureDefeatedEnemy() const
 bool CvPromotionEntry::IsIgnoreGreatGeneralBenefit() const
 {
 	return m_bIgnoreGreatGeneralBenefit;
-}
-
-
-bool CvPromotionEntry::IsImmueMeleeAttack() const
-{
-	return m_bImmueMeleeAttack;
 }
 
 /// Accessor: Can this unit ignore ZOC when moving?
@@ -2863,11 +2434,6 @@ bool CvPromotionEntry::GetFeatureImpassable(int i) const
 	return false;
 }
 
-
-
-
-
-
 /// Returns the combat classes that this promotion is available for
 bool CvPromotionEntry::GetUnitCombatClass(int i) const
 {
@@ -2881,23 +2447,6 @@ bool CvPromotionEntry::GetUnitCombatClass(int i) const
 
 	return false;
 }
-
-
-
-/// Returns the  unit type that this promotion is available for
-bool CvPromotionEntry::GetUnitType(int i) const
-{
-	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
-	CvAssertMsg(i > -1, "Index out of bounds");
-
-	if (i > -1 && i < GC.getNumUnitInfos() && m_pbUnitType)
-	{
-		return m_pbUnitType[i];
-	}
-
-	return false;
-}
-
 
 /// Returns the civilian unit type that this promotion is available for
 bool CvPromotionEntry::GetCivilianUnitType(int i) const
@@ -3000,188 +2549,6 @@ int CvPromotionEntry::GetOtherPromotionDefenseModifier(PromotionTypes other) con
 
 	return iterator->second;
 }
-bool CvPromotionEntry::HasOtherPromotionModifier() const
-{
-	return !m_pPromotionModifiers.empty() || !m_pPromotionAttackModifiers.empty() || !m_pPromotionDefenseModifiers.empty();
-}
-std::tr1::unordered_map<PromotionTypes, int>& CvPromotionEntry::GetOtherPromotionModifierMap()
-{
-	return m_pPromotionModifiers;
-}
-std::tr1::unordered_map<PromotionTypes, int>& CvPromotionEntry::GetOtherPromotionAttackModifierMap()
-{
-	return m_pPromotionAttackModifiers;
-}
-std::tr1::unordered_map<PromotionTypes, int>& CvPromotionEntry::GetOtherPromotionDefenseModifierMap()
-{
-	return m_pPromotionDefenseModifiers;
-}
-#endif
-
-#ifdef MOD_GLOBAL_WAR_CASUALTIES
-int CvPromotionEntry::GetWarCasualtiesModifier() const
-{
-	return this->m_iWarCasualtiesModifier;
-}
-#endif
-
-#ifdef MOD_PROMOTION_SPLASH_DAMAGE
-int CvPromotionEntry::GetSplashDamageRadius() const
-{
-	return m_iSplashDamageRadius;
-}
-int CvPromotionEntry::GetSplashDamagePercent() const
-{
-	return m_iSplashDamagePercent;
-}
-int CvPromotionEntry::GetSplashDamageFixed() const
-{
-	return m_iSplashDamageFixed;
-}
-int CvPromotionEntry::GetSplashDamagePlotUnitLimit() const
-{
-	return m_iSplashDamagePlotUnitLimit;
-}
-bool CvPromotionEntry::GetSplashDamageImmune() const
-{
-	return m_iSplashDamageImmune;
-}
-int CvPromotionEntry::GetSplashXP() const
-{
-	return m_iSplashXP;
-}
-#endif
-
-#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
-int CvPromotionEntry::GetCollateralDamagePercent() const
-{
-	return m_iCollateralDamagePercent;
-}
-int CvPromotionEntry::GetCollateralDamageFixed() const
-{
-	return m_iCollateralDamageFixed;
-}
-int CvPromotionEntry::GetCollateralDamagePlotUnitLimit() const
-{
-	return m_iCollateralDamagePlotUnitLimit;
-}
-bool CvPromotionEntry::GetCollateralDamageImmune() const
-{
-	return m_iCollateralDamageImmune;
-}
-int CvPromotionEntry::GetCollateralXP() const
-{
-	return m_iCollateralXP;
-}
-bool CvPromotionEntry::GetCollateralOnlyCity() const
-{
-	return m_bCollateralOnlyCity;
-}
-bool CvPromotionEntry::GetCollateralOnlyUnit() const
-{
-	return m_bCollateralOnlyUnit;
-}
-#endif
-
-int CvPromotionEntry::GetAttackInflictDamageChange() const
-{
-	return m_iAttackInflictDamageChange;
-}
-int CvPromotionEntry::GetAttackInflictDamageChangeMaxHPPercent() const
-{
-	return m_iAttackInflictDamageChangeMaxHPPercent;
-}
-
-int CvPromotionEntry::GetDefenseInflictDamageChange() const
-{
-	return m_iDefenseInflictDamageChange;
-}
-int CvPromotionEntry::GetDefenseInflictDamageChangeMaxHPPercent() const
-{
-	return m_iDefenseInflictDamageChangeMaxHPPercent;
-}
-
-int CvPromotionEntry::GetSiegeInflictDamageChange() const
-{
-	return m_iSiegeInflictDamageChange;
-}
-int CvPromotionEntry::GetSiegeInflictDamageChangeMaxHPPercent() const
-{
-	return m_iSiegeInflictDamageChangeMaxHPPercent;
-}
-
-int CvPromotionEntry::GetHeavyChargeAddMoves() const
-{
-	return m_iHeavyChargeAddMoves;
-}
-int CvPromotionEntry::GetHeavyChargeExtraDamage() const
-{
-	return m_iHeavyChargeExtraDamage;
-}
-int CvPromotionEntry::GetHeavyChargeCollateralFixed() const
-{
-	return m_iHeavyChargeCollateralFixed;
-}
-int CvPromotionEntry::GetHeavyChargeCollateralPercent() const
-{
-	return m_iHeavyChargeCollateralPercent;
-}
-
-#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-bool CvPromotionEntry::GetAddEnemyPromotionImmune() const
-{
-	return m_bAddEnemyPromotionImmune;
-}
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-bool CvPromotionEntry::CanAutoRemove() const{
-	return m_iRemoveAfterXTurns > 0 || m_bRemoveAfterFullyHeal || m_bRemoveWithLuaCheck;
-}
-
-int CvPromotionEntry::GetRemoveAfterXTurns() const{
-	return m_iRemoveAfterXTurns;
-}
-
-bool CvPromotionEntry::GetRemoveAfterFullyHeal() const{
-	return m_bRemoveAfterFullyHeal;
-}
-
-bool CvPromotionEntry::GetRemoveWithLuaCheck() const{
-	return m_bRemoveWithLuaCheck;
-}
-
-bool CvPromotionEntry::GetCanActionClear() const{
-	return m_bCanActionClear;
-}
-#endif
-
-#ifdef MOD_PROMOTION_CITY_DESTROYER
-BuildingClassCollectionsTypes CvPromotionEntry::GetDestroyBuildingCollection() const
-{
-	return m_iDestroyBuildingCollection;
-}
-int CvPromotionEntry::GetDestroyBuildingProbability() const
-{
-	return m_iDestroyBuildingProbability;
-}
-int CvPromotionEntry::GetDestroyBuildingNumLimit() const
-{
-	return m_iDestroyBuildingNumLimit;
-}
-bool CvPromotionEntry::CanDestroyBuildings() const
-{
-	return m_iDestroyBuildingCollection != NO_BUILDINGCLASS_COLLECTION && m_iDestroyBuildingProbability > 0 && m_iDestroyBuildingNumLimit > 0;
-}
-
-int CvPromotionEntry::GetSiegeKillCitizensPercent() const
-{
-	return m_iSiegeKillCitizensPercent;
-}
-int CvPromotionEntry::GetSiegeKillCitizensFixed() const
-{
-	return m_iSiegeKillCitizensFixed;
-}
 #endif
 
 //=====================================
@@ -3272,33 +2639,6 @@ void CvUnitPromotions::Reset()
 	m_kHasPromotion.SetSize(0);
 }
 
-#ifdef MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS
-inline FDataStream& operator<<(FDataStream& os, const std::tr1::unordered_map<PromotionTypes, int>& promotionIntMap)
-{
-	os << promotionIntMap.size();
-	for (auto iter = promotionIntMap.begin(); iter != promotionIntMap.end(); ++iter)
-	{
-		os << (int)iter->first;
-		os << iter->second;
-	}
-	return os;
-}
-inline FDataStream& operator>>(FDataStream& is, std::tr1::unordered_map<PromotionTypes, int>& promotionIntMap)
-{
-	int iSize;
-	is >> iSize;
-	for (int i = 0; i < iSize; i++)
-	{
-		PromotionTypes ePromotion;
-		int iValue;
-		is >> (int&)ePromotion;
-		is >> iValue;
-		promotionIntMap[ePromotion] = iValue;
-	}
-	return is;
-}
-#endif
-
 /// Serialization read
 void CvUnitPromotions::Read(FDataStream& kStream)
 {
@@ -3313,12 +2653,6 @@ void CvUnitPromotions::Read(FDataStream& kStream)
 	int iNumPromotions;
 	kStream >> iNumPromotions;
 	CvAssertMsg(m_pPromotions != NULL && m_pPromotions->GetNumPromotions() > 0, "Number of promotions to serialize is expected to greater than 0");
-
-#ifdef MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS
-	kStream >> m_pPromotionModifiers;
-	kStream >> m_pPromotionAttackModifiers;
-	kStream >> m_pPromotionDefenseModifiers;
-#endif
 
 	PromotionArrayHelpers::Read(kStream, m_kHasPromotion);
 }
@@ -3335,12 +2669,6 @@ void CvUnitPromotions::Write(FDataStream& kStream) const
 	int iNumPromotions = m_pPromotions->GetNumPromotions();
 	kStream << iNumPromotions;
 	CvAssertMsg(iNumPromotions > 0, "Number of promotions to serialize is expected to greater than 0");
-
-#ifdef MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS
-	kStream << m_pPromotionModifiers;
-	kStream << m_pPromotionAttackModifiers;
-	kStream << m_pPromotionDefenseModifiers;
-#endif
 
 	PromotionArrayHelpers::Write(kStream, m_kHasPromotion, iNumPromotions);
 }
@@ -3365,20 +2693,6 @@ bool CvUnitPromotions::HasPromotion(PromotionTypes eIndex) const
 	return false;
 }
 
-static void UpdatePromotionToPromotionModifierMap(std::tr1::unordered_map<PromotionTypes, int>& dest, std::tr1::unordered_map<PromotionTypes, int>& src, int iChange)
-{
-	for (auto iter = src.begin(); iter != src.end(); iter++)
-	{
-		PromotionTypes eOtherPromotion = (PromotionTypes)iter->first;
-		int iModifier = iter->second;
-		dest[eOtherPromotion] += iModifier * iChange;
-		if (dest[eOtherPromotion] == 0)
-		{
-			dest.erase(eOtherPromotion);
-		}
-	}
-}
-
 /// Sets the promotion to a certain value
 void CvUnitPromotions::SetPromotion(PromotionTypes eIndex, bool bValue)
 {
@@ -3388,19 +2702,6 @@ void CvUnitPromotions::SetPromotion(PromotionTypes eIndex, bool bValue)
 	if(eIndex >= 0 && eIndex < GC.getNumPromotionInfos())
 	{
 		m_kHasPromotion.SetBit(eIndex, bValue);
-
-#ifdef MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS
-		CvPromotionEntry* thisPromotion = GC.getPromotionInfo(eIndex);
-		if (MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS && thisPromotion->HasOtherPromotionModifier())
-		{
-			if (!thisPromotion->GetOtherPromotionModifierMap().empty())
-				UpdatePromotionToPromotionModifierMap(m_pPromotionModifiers, thisPromotion->GetOtherPromotionModifierMap(), bValue ? 1 : -1);
-			if (!thisPromotion->GetOtherPromotionAttackModifierMap().empty())
-				UpdatePromotionToPromotionModifierMap(m_pPromotionAttackModifiers, thisPromotion->GetOtherPromotionAttackModifierMap(), bValue ? 1 : -1);
-			if (!thisPromotion->GetOtherPromotionDefenseModifierMap().empty())
-				UpdatePromotionToPromotionModifierMap(m_pPromotionDefenseModifiers, thisPromotion->GetOtherPromotionDefenseModifierMap(), bValue ? 1 : -1);
-		}
-#endif
 	}
 }
 
@@ -3564,29 +2865,53 @@ PromotionTypes CvUnitPromotions::ChangePromotionAfterCombat(PromotionTypes eInde
 }
 
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-int CvUnitPromotions::GetOtherPromotionModifier(PromotionTypes other)
+int CvUnitPromotions::GetOtherPromotionModifier(PromotionTypes other) const
 {
-	return m_pPromotionModifiers[other];
+	int iSum = 0;
+	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
+	{
+		PromotionTypes thisPromotionType = (PromotionTypes)iLoop;
+		CvPromotionEntry* thisPromotion = GC.getPromotionInfo(thisPromotionType);
+		if (thisPromotion == nullptr || !HasPromotion(thisPromotionType))
+		{
+			continue;
+		}
+
+		iSum += thisPromotion->GetOtherPromotionModifier(other);
+	}
+	return iSum;
 }
-int CvUnitPromotions::GetOtherPromotionAttackModifier(PromotionTypes other)
+int CvUnitPromotions::GetOtherPromotionAttackModifier(PromotionTypes other) const
 {
-	return m_pPromotionAttackModifiers[other];
+	int iSum = 0;
+	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
+	{
+		PromotionTypes thisPromotionType = (PromotionTypes)iLoop;
+		CvPromotionEntry* thisPromotion = GC.getPromotionInfo(thisPromotionType);
+		if (thisPromotion == nullptr || !HasPromotion(thisPromotionType))
+		{
+			continue;
+		}
+
+		iSum += thisPromotion->GetOtherPromotionAttackModifier(other);
+	}
+	return iSum;
 }
-int CvUnitPromotions::GetOtherPromotionDefenseModifier(PromotionTypes other)
+int CvUnitPromotions::GetOtherPromotionDefenseModifier(PromotionTypes other) const
 {
-	return m_pPromotionDefenseModifiers[other];
-}
-std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionModifierMap()
-{
-	return m_pPromotionModifiers;
-}
-std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionAttackModifierMap()
-{
-	return m_pPromotionAttackModifiers;
-}
-std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionDefenseModifierMap()
-{
-	return m_pPromotionDefenseModifiers;
+	int iSum = 0;
+	for (int iLoop = 0; iLoop < GC.getNumPromotionInfos(); iLoop++)
+	{
+		PromotionTypes thisPromotionType = (PromotionTypes)iLoop;
+		CvPromotionEntry* thisPromotion = GC.getPromotionInfo(thisPromotionType);
+		if (thisPromotion == nullptr || !HasPromotion(thisPromotionType))
+		{
+			continue;
+		}
+
+		iSum += thisPromotion->GetOtherPromotionDefenseModifier(other);
+	}
+	return iSum;
 }
 #endif
 

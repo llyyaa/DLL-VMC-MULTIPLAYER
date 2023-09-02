@@ -52,27 +52,10 @@ public:
 	int	GetPrereqOrPromotion9() const;
 	void	SetPrereqOrPromotion9(int i);
 
-
-	int	GetPrereqOrPromotion10() const;
-	void	SetPrereqOrPromotion10(int i);
-	int	GetPrereqOrPromotion11() const;
-	void	SetPrereqOrPromotion11(int i);
-	int	GetPrereqOrPromotion12() const;
-	void	SetPrereqOrPromotion12(int i);
-	int	GetPrereqOrPromotion13() const;
-	void	SetPrereqOrPromotion13(int i);
-
 	int  GetTechPrereq() const;
 	int  GetInvisibleType() const;
 	int  GetSeeInvisibleType() const;
 	int  GetVisibilityChange() const;
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-	int GetFeatureInvisible() const;
-	int GetFeatureInvisible2() const;
-#endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	int GetMultipleInitExperence() const;
-#endif
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
 	int  GetReconChange() const;
 #endif
@@ -138,11 +121,6 @@ public:
 	int  GetMaxHitPointsModifier() const;
 #endif
 
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-	int GetMoveLeftDefenseMod() const;
-	int GetMoveUsedDefenseMod() const;
-#endif
-
 #if defined(MOD_ROG_CORE)
 	int GetMoveLfetAttackMod() const;
 	int GetMoveUsedAttackMod() const;
@@ -186,16 +164,7 @@ public:
 	int GetOutsideCapitalLandAttackMod() const;
 	int GetOnCapitalLandDefenseMod() const;
 	int GetOutsideCapitalLandDefenseMod() const;
-
-	int GetBarbarianCombatBonus() const;
-	int GetAOEDamageOnKill() const;
-	int GetDamageAoEFortified() const;
-	int GetWorkRateMod() const;
 #endif
-
-	bool CannotBeCaptured() const;
-	int GetCaptureDefeatedEnemyChance() const;
-
 
 #if defined(MOD_ROG_CORE)
 	int GetNumSpyDefenseMod() const;
@@ -208,13 +177,6 @@ public:
 	int GetNumWorkAttackMod() const;
 
 	bool IsNoResourcePunishment() const;
-
-	int GetCurrentHitPointAttackMod() const;
-	int GetCurrentHitPointDefenseMod() const;
-
-
-	int GetNearNumEnemyAttackMod() const;
-	int GetNearNumEnemyDefenseMod() const;
 #endif
 
 
@@ -234,13 +196,6 @@ public:
 	int GetCapitalDefenseModifier() const;
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
-	int GetUnitAttackFaithBonus() const;
-	int GetCityAttackFaithBonus() const;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
-	int GetRemovePromotionUpgrade() const;
-#endif
 	int GetReligiousStrengthLossRivalTerritory() const;
 	
 	int GetTradeMissionInfluenceModifier() const;
@@ -274,19 +229,6 @@ public:
 	int GetNearbyImprovementBonusRange() const;
 	ImprovementTypes GetCombatBonusImprovement() const;
 #endif
-#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
-	int GetAllyCityStateCombatModifier() const;
-	int GetAllyCityStateCombatModifierMax() const;
-#endif
-
-#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
-	ResourceTypes GetExtraResourceType() const;
-	int GetExtraResourceCombatModifier() const;
-	int GetExtraResourceCombatModifierMax() const;
-	int GetExtraHappinessCombatModifier() const;
-	int GetExtraHappinessCombatModifierMax() const;
-#endif
-
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool CanCrossMountains() const;
 #endif
@@ -327,7 +269,6 @@ public:
 	bool IsCaptureDefeatedEnemy() const;
 	bool IsIgnoreGreatGeneralBenefit() const;
 	bool IsIgnoreZOC() const;
-	bool IsImmueMeleeAttack() const;
 	bool IsSapper() const;
 	bool IsCanHeavyCharge() const;
 	bool HasPostCombatPromotions() const;
@@ -363,11 +304,6 @@ public:
 	bool GetFeatureImpassable(int i) const;
 	bool GetUnitCombatClass(int i) const;
 	bool GetCivilianUnitType(int i) const;
-
-#if defined(MOD_ROG_CORE)
-	bool GetUnitType(int i) const;
-#endif
-
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	bool IsUnitNaming(int i) const;
 	void GetUnitName(UnitTypes eUnit, CvString& sUnitName) const;
@@ -378,74 +314,11 @@ public:
 	int GetOtherPromotionModifier(PromotionTypes other) const;
 	int GetOtherPromotionAttackModifier(PromotionTypes other) const;
 	int GetOtherPromotionDefenseModifier(PromotionTypes other) const;
-	bool HasOtherPromotionModifier() const;
-	std::tr1::unordered_map<PromotionTypes, int>& GetOtherPromotionModifierMap();
-	std::tr1::unordered_map<PromotionTypes, int>& GetOtherPromotionAttackModifierMap();
-	std::tr1::unordered_map<PromotionTypes, int>& GetOtherPromotionDefenseModifierMap();
 #endif
 
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	bool IsCannotBeRangedAttacked() const;
 #endif
-
- #ifdef MOD_GLOBAL_WAR_CASUALTIES
-	int GetWarCasualtiesModifier() const;
- #endif
-
- #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-	bool GetAddEnemyPromotionImmune() const;
- #endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	bool CanAutoRemove() const;
-	int GetRemoveAfterXTurns() const;
-	bool GetRemoveAfterFullyHeal() const;
-	bool GetRemoveWithLuaCheck() const;
-	bool GetCanActionClear() const;
-#endif
-
-#ifdef MOD_PROMOTION_CITY_DESTROYER
-	BuildingClassCollectionsTypes GetDestroyBuildingCollection() const;
-	int GetDestroyBuildingProbability() const;
-	int GetDestroyBuildingNumLimit() const;
-	bool CanDestroyBuildings() const;
-
-	int GetSiegeKillCitizensPercent() const;
-	int GetSiegeKillCitizensFixed() const;
-#endif
-
- #ifdef MOD_PROMOTION_SPLASH_DAMAGE
-	int GetSplashDamageRadius() const;
-	int GetSplashDamagePercent() const;
-	int GetSplashDamageFixed() const;
-	int GetSplashDamagePlotUnitLimit() const;
-	bool GetSplashDamageImmune() const;
-	int GetSplashXP() const;
-#endif
-
-#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
-	int GetCollateralDamagePercent() const;
-	int GetCollateralDamageFixed() const;
-	int GetCollateralDamagePlotUnitLimit() const;
-	bool GetCollateralDamageImmune() const;
-	int GetCollateralXP() const;
-	bool GetCollateralOnlyCity() const;
-	bool GetCollateralOnlyUnit() const;
-#endif
-
-	int GetAttackInflictDamageChange() const;
-	int GetAttackInflictDamageChangeMaxHPPercent() const;
-
-	int GetDefenseInflictDamageChange() const;
-	int GetDefenseInflictDamageChangeMaxHPPercent() const;
-
-	int GetSiegeInflictDamageChange() const;
-	int GetSiegeInflictDamageChangeMaxHPPercent() const;
-
-	int GetHeavyChargeAddMoves() const;
-	int GetHeavyChargeExtraDamage() const;
-	int GetHeavyChargeCollateralFixed() const;
-	int GetHeavyChargeCollateralPercent() const;
 
 protected:
 	int m_iLayerAnimationPath;
@@ -459,21 +332,10 @@ protected:
 	int m_iPrereqOrPromotion7;
 	int m_iPrereqOrPromotion8;
 	int m_iPrereqOrPromotion9;
-	int m_iPrereqOrPromotion10;
-	int m_iPrereqOrPromotion11;
-	int m_iPrereqOrPromotion12;
-	int m_iPrereqOrPromotion13;
 
 	int m_iTechPrereq;
 	int m_iInvisibleType;
 	int m_iSeeInvisibleType;
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-	int m_iFeatureInvisible;
-	int m_iFeatureInvisible2;
-#endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	int m_iMultipleInitExperence;
-#endif
 	int m_iVisibilityChange;
 #if defined(MOD_PROMOTIONS_VARIABLE_RECON)
 	int m_iReconChange;
@@ -551,21 +413,9 @@ protected:
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
-	int m_iUnitAttackFaithBonus;
-	int m_iCityAttackFaithBonus;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
-	int m_iRemovePromotionUpgrade;
-#endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
 	int m_iTradeMissionGoldModifier;
-
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-	int m_iMoveLeftDefenseMod;
-	int m_iMoveUsedDefenseMod;
-#endif
 
 #if defined(MOD_ROG_CORE)
 	int m_iMoveLfetAttackMod;
@@ -574,25 +424,6 @@ protected:
 
 	int m_iRangedSupportFireMod;
 	int m_iMeleeDefenseMod;
-#endif
-
-#ifdef MOD_PROMOTION_SPLASH_DAMAGE
-	int m_iSplashDamagePercent = 0;
-	int m_iSplashDamageRadius = 0;
-	int m_iSplashDamageFixed = 0;
-	int m_iSplashDamagePlotUnitLimit = 0;
-	bool m_iSplashDamageImmune = 0;
-	int m_iSplashXP = 0;
-#endif
-
-#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
-	int m_iCollateralDamagePercent = 0;
-	int m_iCollateralDamageFixed = 0;
-	int m_iCollateralDamagePlotUnitLimit = 0;
-	bool m_iCollateralDamageImmune = 0;
-	int m_iCollateralXP = 0;
-	bool m_bCollateralOnlyCity = false;
-	bool m_bCollateralOnlyUnit = true;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -606,28 +437,14 @@ protected:
 	int m_iNumWorkAttackMod;
 
 	bool m_bNoResourcePunishment;
-
-	int m_iCurrentHitPointAttackMod;
-	int m_iCurrentHitPointDefenseMod;
-
-	int m_iNearNumEnemyAttackMod;
-	int m_iNearNumEnemyDefenseMod;
 #endif
 
 #if defined(MOD_ROG_CORE)
 	int m_iNearbyUnitClassBonus;
 	int m_iNearbyUnitClassBonusRange;
 	UnitClassTypes m_iCombatBonusFromNearbyUnitClass;
-
-
-	int m_iAOEDamageOnKill;
-	int m_iDamageAoEFortified;
-	int m_iWorkRateMod;
-	int m_iBarbarianCombatBonus;
 #endif
 
-	int m_iCaptureDefeatedEnemyChance;
-	bool m_bCannotBeCaptured;
 
 #if defined(MOD_ROG_CORE)	
 	int m_iAoEDamageOnMove;
@@ -688,17 +505,6 @@ protected:
 	int m_iNearbyImprovementBonusRange;
 	ImprovementTypes m_eCombatBonusImprovement;
 #endif
-#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
-	int m_iAllyCityStateCombatModifier;
-	int m_iAllyCityStateCombatModifierMax;
-#endif
-#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
-	ResourceTypes m_eExtraResourceType;
-	int m_iExtraResourceCombatModifier;
-	int m_iExtraResourceCombatModifierMax;
-	int m_iExtraHappinessCombatModifier;
-	int m_iExtraHappinessCombatModifierMax;
-#endif
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
 	bool m_bCanCrossMountains;
 #endif
@@ -739,7 +545,6 @@ protected:
 	bool m_bCaptureDefeatedEnemy;
 	bool m_bIgnoreGreatGeneralBenefit;
 	bool m_bIgnoreZOC;
-	bool m_bImmueMeleeAttack;
 	bool m_bHasPostCombatPromotions;
 	bool m_bPostCombatPromotionsExclusive;
 	bool m_bSapper;
@@ -776,11 +581,6 @@ protected:
 	bool* m_pbFeatureImpassable;
 	bool* m_pbUnitCombat;
 	bool* m_pbCivilianUnitType;
-
-
-	bool* m_pbUnitType;
-
-
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	bool* m_pbUnitName;
 #endif
@@ -795,44 +595,6 @@ protected:
  #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	bool m_bCannotBeRangedAttacked;
  #endif
-
- #ifdef MOD_GLOBAL_WAR_CASUALTIES
-	int m_iWarCasualtiesModifier = 0;
- #endif
-
-#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-	bool m_bAddEnemyPromotionImmune = 0;
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	int m_iRemoveAfterXTurns = 0;
-	bool m_bRemoveAfterFullyHeal = 0;
-	bool m_bRemoveWithLuaCheck = 0;
-	bool m_bCanActionClear = 0;
-#endif
-
-#ifdef MOD_PROMOTION_CITY_DESTROYER
-	BuildingClassCollectionsTypes m_iDestroyBuildingCollection = NO_BUILDINGCLASS_COLLECTION;
-	int m_iDestroyBuildingProbability = 0;
-	int m_iDestroyBuildingNumLimit = 0;
-
-	int m_iSiegeKillCitizensPercent = 0;
-	int m_iSiegeKillCitizensFixed = 0;
-#endif
-
-	int m_iAttackInflictDamageChange = 0;
-	int m_iAttackInflictDamageChangeMaxHPPercent = 0;
-
-	int m_iDefenseInflictDamageChange = 0;
-	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
-
-	int m_iSiegeInflictDamageChange = 0;
-	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
-
-	int m_iHeavyChargeAddMoves = 0;
-	int m_iHeavyChargeExtraDamage = 0;
-	int m_iHeavyChargeCollateralFixed = 0;
-	int m_iHeavyChargeCollateralPercent = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -897,16 +659,17 @@ public:
 
 	PromotionTypes ChangePromotionAfterCombat(PromotionTypes eIndex);
 
+
+
+
 	int GetDomainAttackPercentMod(DomainTypes eDomain) const;
 	int GetDomainDefensePercentMod(DomainTypes eDomain) const;
 
+
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-	int GetOtherPromotionModifier(PromotionTypes other);
-	int GetOtherPromotionAttackModifier(PromotionTypes other);
-	int GetOtherPromotionDefenseModifier(PromotionTypes other);
-	std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionModifierMap();
-	std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionAttackModifierMap();
-	std::tr1::unordered_map<PromotionTypes, int>& CvUnitPromotions::GetOtherPromotionDefenseModifierMap();
+	int GetOtherPromotionModifier(PromotionTypes other) const;
+	int GetOtherPromotionAttackModifier(PromotionTypes other) const;
+	int GetOtherPromotionDefenseModifier(PromotionTypes other) const;
 #endif
 
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
@@ -914,12 +677,6 @@ public:
 #endif
 
 private:
-
-#if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-	std::tr1::unordered_map<PromotionTypes, int> m_pPromotionModifiers; // key: other promotion type, value: modifier * 100
-	std::tr1::unordered_map<PromotionTypes, int> m_pPromotionAttackModifiers; // key: other promotion type, value: attack modifier * 100
-	std::tr1::unordered_map<PromotionTypes, int> m_pPromotionDefenseModifiers; // key: other promotion type, value: defense modifier * 100
-#endif
 
 	bool IsInUseByPlayer(PromotionTypes eIndex, PlayerTypes ePlayer); 
 
@@ -939,163 +696,3 @@ void Write(FDataStream& kStream, const CvBitfield& kPromotions, int iArraySize);
 }
 
 #endif //CIV5_PROMOTION_CLASSES_H
-
-#ifdef MOD_PROMOTION_SPLASH_DAMAGE
-struct SplashInfo {
-	PromotionTypes ePromotion;
-
-	int iRadius;
-	int iPercent;
-	int iFixed;
-	int iPlotUnitLimit;
-
-	SplashInfo() = default;
-
-	SplashInfo(const CvPromotionEntry& promotion) :
-		ePromotion{ (PromotionTypes)promotion.GetID()}, 
-		iRadius{promotion.GetSplashDamageRadius()}, 
-		iPercent{ promotion.GetSplashDamagePercent() }, 
-		iFixed{ promotion.GetSplashDamageFixed() }, 
-		iPlotUnitLimit{ promotion.GetSplashDamagePlotUnitLimit() } {}
-
-	inline void read(FDataStream& kStream) {
-		int iPromotion;
-		kStream >> iPromotion;
-		ePromotion = (PromotionTypes)iPromotion;
-		kStream >> iRadius;
-		kStream >> iPercent;
-		kStream >> iFixed;
-		kStream >> iPlotUnitLimit;
-	}
-
-	inline void write(FDataStream& kStream) const {
-		int iPromotion = (int)ePromotion;
-		kStream << iPromotion;
-		kStream << iRadius;
-		kStream << iPercent;
-		kStream << iFixed;
-		kStream << iPlotUnitLimit;
-	}
-};
-#endif
-
-#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
-struct CollateralInfo {
-	PromotionTypes ePromotion;
-
-	int iPercent = 0;
-	int iFixed = 0;
-	int iPlotUnitLimit = 0;
-	bool bOnlyUnit = true;
-	bool bOnlyCity = false;
-
-	CollateralInfo() = default;
-
-	CollateralInfo(const CvPromotionEntry& promotion) :
-		ePromotion{ (PromotionTypes)promotion.GetID() },
-		iPercent{ promotion.GetCollateralDamagePercent() },
-		iFixed{ promotion.GetCollateralDamageFixed() },
-		iPlotUnitLimit{ promotion.GetCollateralDamagePlotUnitLimit() },
-		bOnlyCity {promotion.GetCollateralOnlyCity()},
-		bOnlyUnit {promotion.GetCollateralOnlyUnit()} {}
-
-	inline void read(FDataStream& kStream) {
-		int iPromotion;
-		kStream >> iPromotion;
-		ePromotion = (PromotionTypes)iPromotion;
-		kStream >> iPercent;
-		kStream >> iFixed;
-		kStream >> iPlotUnitLimit;
-		kStream >> bOnlyUnit;
-		kStream >> bOnlyCity;
-	}
-
-	inline void write(FDataStream& kStream) const {
-		int iPromotion = (int)ePromotion;
-		kStream << iPromotion;
-		kStream << iPercent;
-		kStream << iFixed;
-		kStream << iPlotUnitLimit;
-		kStream << bOnlyUnit;
-		kStream << bOnlyCity;
-	}
-};
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-struct AutoRemoveInfo {
-	PromotionTypes m_ePromotion = NO_PROMOTION;
-
-	int m_iTurnToRemove = -1;
-	bool m_bRemoveAfterFullyHeal = false;
-	bool m_bRemoveLuaCheck = false;
-
-	AutoRemoveInfo() = default;
-
-	AutoRemoveInfo(const CvPromotionEntry& entry, int iTurnToRemove):
-		m_ePromotion((PromotionTypes)entry.GetID()),
-		m_iTurnToRemove(iTurnToRemove),
-		m_bRemoveAfterFullyHeal(entry.GetRemoveAfterFullyHeal()),
-		m_bRemoveLuaCheck(entry.GetRemoveWithLuaCheck()) {}
-};
-
-inline FDataStream& operator<<(FDataStream& os, const AutoRemoveInfo& info) {
-	os << (int)info.m_ePromotion;
-	os << info.m_iTurnToRemove;
-	os << info.m_bRemoveAfterFullyHeal;
-	os << info.m_bRemoveLuaCheck;
-
-	return os;
-}
-
-inline FDataStream& operator>>(FDataStream& is, AutoRemoveInfo& info) {
-	int iPromotion = -1;
-	is >> iPromotion;
-	info.m_ePromotion = (PromotionTypes)iPromotion;
-	is >> info.m_iTurnToRemove;
-	is >> info.m_bRemoveAfterFullyHeal;
-	is >> info.m_bRemoveLuaCheck;
-
-	return is;
-}
-#endif
-
-#ifdef MOD_PROMOTION_CITY_DESTROYER
-struct DestroyBuildingsInfo {
-	PromotionTypes ePromotion;
-
-	BuildingClassCollectionsTypes m_iDestroyBuildingCollection = NO_BUILDINGCLASS_COLLECTION;
-	int m_iDestroyBuildingProbability = 0;
-	int m_iDestroyBuildingNumLimit = 0;
-
-	DestroyBuildingsInfo() = default;
-	DestroyBuildingsInfo(const CvPromotionEntry& entry):
-		ePromotion{ (PromotionTypes)entry.GetID() },
-		m_iDestroyBuildingCollection{ entry.GetDestroyBuildingCollection() },
-		m_iDestroyBuildingProbability{ entry.GetDestroyBuildingProbability() },
-		m_iDestroyBuildingNumLimit{ entry.GetDestroyBuildingNumLimit() } {}
-};
-
-inline FDataStream& operator<<(FDataStream& os, const DestroyBuildingsInfo& info) {
-	os << (int)info.ePromotion;
-	os << (int)info.m_iDestroyBuildingCollection;
-	os << info.m_iDestroyBuildingProbability;
-	os << info.m_iDestroyBuildingNumLimit;
-
-	return os;
-}
-
-inline FDataStream& operator>>(FDataStream& is, DestroyBuildingsInfo& info) {
-	int iPromotion = -1;
-	int iBuildingClassType = -1;
-	is >> iPromotion;
-	info.ePromotion = (PromotionTypes)iPromotion;
-	is >> iBuildingClassType;
-	info.m_iDestroyBuildingCollection = (BuildingClassCollectionsTypes)iBuildingClassType;
-	is >> info.m_iDestroyBuildingProbability;
-	is >> info.m_iDestroyBuildingNumLimit;
-
-	return is;
-}
-
-#endif

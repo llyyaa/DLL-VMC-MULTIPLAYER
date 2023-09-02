@@ -87,26 +87,10 @@ public:
 #endif
 
 #if defined(MOD_ROG_CORE)
-	int GetWonderProductionModifier() const;
-
 	int GetNearbyFriendHeal() const;
 
 	int GetResourceFromImprovement() const;
 	int GetResourceQuantityFromImprovement() const;
-#endif
-
-#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
-	int GetCreateItemMod() const;
-	int GetCreatedResourceQuantity() const;
-	int GetNewImprovement() const;
-	int GetNewFeature() const;
-
-	int GetCreateResource(CvPlot* pPlot) const;
-	int* GetCreateResourceList() const;
-	int* GetCreateTerrainList() const;
-	bool* GetCreateTerrainOnlyList() const;
-	int* GetCreateFeatureList() const;
-	bool* GetCreateFeatureOnlyList() const;
 #endif
 
 #if defined(MOD_GLOBAL_RELOCATION)
@@ -228,28 +212,12 @@ public:
 	int GetRouteYieldChanges(int i, int j) const;
 	int* GetRouteYieldChangesArray(int i);				// For Moose - CvWidgetData XXX
 
-#if defined(MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
-	int GetTradeRouteYieldChanges(int i, int j) const;
-	int* GetTradeRouteYieldChangesArray(int i);				// For Moose - CvWidgetData XXX
-#endif
-
 	int  GetImprovementResourceYield(int i, int j) const;
 	bool IsImprovementResourceMakesValid(int i) const;
 	bool IsImprovementResourceTrade(int i) const;
 	int  GetImprovementResourceDiscoverRand(int i) const;
 
 	int  GetFlavorValue(int i) const;
-
-#ifdef MOD_IMPROVEMENTS_UPGRADE
-	bool GetEnableXP() const;
-
-	bool GetEnableUpgrade() const;
-	int GetUpgradeXP() const;
-	ImprovementTypes GetUpgradeImprovementType() const;
-
-	bool GetEnableDowngrade() const;
-	ImprovementTypes GetDowngradeImprovementType() const;
-#endif
 
 	//---------------------------------------PROTECTED MEMBER VARIABLES---------------------------------
 protected:
@@ -284,24 +252,10 @@ protected:
 #endif
 
 #if defined(MOD_ROG_CORE)
-	int m_iWonderProductionModifier;
 	int m_iNearbyFriendHeal;
 
 	int m_iImprovementResource;
 	int m_iImprovementResourceQuantity;
-#endif
-
-#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
-	int m_iCreateItemMod;
-	int m_iCreatedResourceQuantity;
-	int m_iSetNewImprovement;
-	int m_iSetNewFeature;
-
-	int* m_iCreateResourceList;
-	int* m_iCreateTerrainList;
-	bool* m_iCreateTerrainOnlyList;
-	int* m_iCreateFeatureList;
-	bool* m_iCreateFeatureOnlyList;
 #endif
 
 #if defined(MOD_GLOBAL_RELOCATION)
@@ -397,21 +351,6 @@ protected:
 	int** m_ppiTechNoFreshWaterYieldChanges;
 	int** m_ppiTechFreshWaterYieldChanges;
 	int** m_ppiRouteYieldChanges;
-
-#if defined(MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES)
-	int** m_ppiTradeRouteYieldChanges;
-#endif
-
-#ifdef MOD_IMPROVEMENTS_UPGRADE
-	bool m_bEnableXP = false;
-
-	bool m_bEnableUpgrade = false;
-	int m_iUpgradeXP = -1;
-	ImprovementTypes m_eUpgradeImprovementType = NO_IMPROVEMENT;
-
-	bool m_bEnableDowngrade = false;
-	ImprovementTypes m_eDowngradeImprovementType = NO_IMPROVEMENT;
-#endif
 
 	CvImprovementResourceInfo* m_paImprovementResource;
 };

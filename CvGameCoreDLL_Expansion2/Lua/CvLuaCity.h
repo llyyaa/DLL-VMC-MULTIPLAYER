@@ -189,7 +189,6 @@ protected:
 #if defined(MOD_API_LUA_EXTENSIONS)
 	LUAAPIEXTN(GetNumBuildingClass, int, iBuildingClassType);
 	LUAAPIEXTN(IsHasBuildingClass, bool, iBuildingClassType);
-	LUAAPIEXTN(SetNumRealBuildingClass, int, iBuildingClassType, iNum);
 #endif
 	static int lGetNumActiveBuilding(lua_State* L);
 	static int lGetID(lua_State* L);
@@ -625,11 +624,6 @@ protected:
 	static int lIsHasMajorBelief(lua_State* L);
 	static int lIsHasSecondaryBelief(lua_State* L);
 	static int lIsSecondaryReligionActive(lua_State* L);
-#endif
-
-#ifdef MOD_GLOBAL_CITY_SCALES
-	LUAAPIEXTN(GetScale, int);
-	LUAAPIEXTN(CanGrowNormally, bool);
 #endif
 };
 

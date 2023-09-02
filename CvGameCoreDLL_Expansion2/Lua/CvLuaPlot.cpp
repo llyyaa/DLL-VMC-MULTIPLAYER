@@ -407,16 +407,6 @@ void CvLuaPlot::PushMethods(lua_State* L, int t)
 	Method(IsAdjacentToTerrain);
 	Method(IsWithinDistanceOfTerrain);
 #endif
-#ifdef MOD_IMPROVEMENTS_UPGRADE
-	Method(GetXP);
-	Method(GetXPGrowth);
-	Method(SetXP);
-	Method(ChangeXP);
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	Method(ClearUnitPromotions);
-#endif
 }
 //------------------------------------------------------------------------------
 void CvLuaPlot::HandleMissingInstance(lua_State* L)
@@ -2200,25 +2190,6 @@ int CvLuaPlot::lSetCityPurchaseID(lua_State* L)
 	return BasicLuaMethod(L, &CvPlot::SetCityPurchaseID);
 }
 
-#ifdef MOD_IMPROVEMENTS_UPGRADE
-int CvLuaPlot::lGetXP(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlot::GetXP);
-}
-int CvLuaPlot::lGetXPGrowth(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlot::GetXPGrowth);
-}
-int CvLuaPlot::lSetXP(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlot::SetXP);
-}
-int CvLuaPlot::lChangeXP(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlot::ChangeXP);
-}
-#endif
-
 #if defined(MOD_API_LUA_EXTENSIONS)
 //------------------------------------------------------------------------------
 int CvLuaPlot::lAddMessage(lua_State* L)
@@ -2293,8 +2264,4 @@ LUAAPIIMPL(Plot, IsAdjacentToResource)
 LUAAPIIMPL(Plot, IsWithinDistanceOfResource)
 LUAAPIIMPL(Plot, IsAdjacentToTerrain)
 LUAAPIIMPL(Plot, IsWithinDistanceOfTerrain)
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-LUAAPIIMPL(Plot, ClearUnitPromotions)
 #endif

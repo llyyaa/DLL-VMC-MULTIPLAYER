@@ -262,9 +262,6 @@ protected:
 	static int lIsEnemyInMovementRange(lua_State* L);
 
 	static int lIsTrade(lua_State* L);
-
-	static int lIsCannotBeCapturedUnit(lua_State* L);
-
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_TRADEROUTES)
 	LUAAPIEXTN(GetTradeRouteIndex, int);
 	LUAAPIEXTN(IsRecalledTrader, bool);
@@ -308,7 +305,7 @@ protected:
 	static int lIsSetUpForRangedAttack(lua_State* L);
 	static int lIsRangeAttackOnlyInDomain(lua_State* L);
 	static int lIsCityAttackOnly(lua_State* L);
-	static int lIsImmueMeleeAttack(lua_State* L);
+
 	static int lImmuneToFirstStrikes(lua_State* L);
 	static int lNoDefensiveBonus(lua_State* L);
 	static int lIgnoreBuildingDefense(lua_State* L);
@@ -349,9 +346,6 @@ protected:
 #endif
 	static int lIsNeverInvisible(lua_State* L);
 	static int lIsInvisible(lua_State* L);
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-	static int lIsInvisibleInvalid(lua_State* L);
-#endif
 
 	static int lIsNukeImmune(lua_State* L);
 
@@ -399,7 +393,7 @@ protected:
 	static int lAirSweepCombatMod(lua_State* L);
 	static int lCapitalDefenseModifier(lua_State* L);
 	static int lCapitalDefenseFalloff(lua_State* L);
-	
+
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
 	static int lOtherPromotionModifier(lua_State* L);
 	static int lOtherPromotionAttackModifier(lua_State* L);
@@ -422,13 +416,8 @@ protected:
 	static int lGetHPHealedIfDefeatEnemyGlobal(lua_State* L);
 	static int lGetNumOriginalCapitalDefenseMod(lua_State* L);
 	static int lGetNumOriginalCapitalAttackMod(lua_State* L);
-	static int lGetBarbarianCombatBonus(lua_State* L);
 #endif
 
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-	static int lGetMoveLeftDefenseMod(lua_State* L);
-	static int lGetMoveUsedDefenseMod(lua_State* L);
-#endif	
 
 #if defined(MOD_ROG_CORE)
 	static int lGetNumSpyDefenseMod(lua_State* L);
@@ -439,14 +428,6 @@ protected:
 	static int lGetNumWonderAttackMod(lua_State* L);
 
 	static int lIsNoResourcePunishment(lua_State* L);
-
-	static int lGetCurrentHitPointAttackMod(lua_State* L);
-	static int lGetCurrentHitPointDefenseMod(lua_State* L);
-
-
-	static int lGetNearNumEnemyAttackMod(lua_State* L);
-	static int lGetNearNumEnemyDefenseMod(lua_State* L);
-	static int lGetNumEnemyAdjacent(lua_State* L);
 #endif
 
 
@@ -707,14 +688,6 @@ protected:
 	LUAAPIEXTN(IsOnTerrain, bool, iTerrainType);
 	LUAAPIEXTN(IsAdjacentToTerrain, bool, iTerrainType);
 	LUAAPIEXTN(IsWithinDistanceOfTerrain, bool, iTerrainType, iDistance);
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	LUAAPIEXTN(ClearSamePlotPromotions, void);
-#endif
-
-#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-	LUAAPIEXTN(IsImmuneNegtivePromotions, bool);
 #endif
 };
 

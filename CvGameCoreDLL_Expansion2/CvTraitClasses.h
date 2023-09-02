@@ -133,7 +133,6 @@ public:
 	int GetWorkerSpeedModifier() const;
 	int GetAfraidMinorPerTurnInfluence() const;
 	int GetLandTradeRouteRangeBonus() const;
-	int GetGoldenAgeMinorPerTurnInfluence() const;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int GetSeaTradeRouteRangeBonus() const;
 #endif
@@ -185,9 +184,6 @@ public:
 	int GetYieldChangePerTradePartner(int i) const;
 	int GetYieldChangeIncomingTradeRoute(int i) const;
 	int GetYieldModifier(int i) const;
-#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
-	int GetGoldenAgeYieldModifier(int i) const;
-#endif
 	int GetStrategicResourceQuantityModifier(int i) const;
 	int GetObsoleteTech() const;
 	int GetPrereqTech() const;
@@ -246,10 +242,6 @@ public:
 #endif
 
 	bool NoTrain(UnitClassTypes eUnitClassType);
-
-#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
-	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYield) const;
-#endif
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
@@ -340,7 +332,6 @@ protected:
 	int m_iWorkerSpeedModifier;
 	int m_iAfraidMinorPerTurnInfluence;
 	int m_iLandTradeRouteRangeBonus;
-	int m_iGoldenAgeMinorPerTurnInfluence;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int m_iSeaTradeRouteRangeBonus;
 #endif
@@ -397,9 +388,6 @@ protected:
 	int* m_paiYieldChangePerTradePartner;
 	int* m_paiYieldChangeIncomingTradeRoute;
 	int* m_paiYieldModifier;
-#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
-	int* m_paiGoldenAgeYieldModifier;
-#endif
 	int* m_piStrategicResourceQuantityModifier;
 	int* m_piResourceQuantityModifiers;
 	int* m_piMovesChangeUnitCombats;
@@ -434,10 +422,6 @@ protected:
 	std::multimap<int, int> m_FreePromotionUnitCombats;
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
 	std::vector<bool> m_abNoTrainUnitClass;
-
-#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
-	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
-#endif
 
 private:
 	CvTraitEntry(const CvTraitEntry&);
@@ -791,10 +775,6 @@ public:
 	{
 		return m_iLandTradeRouteRangeBonus;
 	}
-	int GetGoldenAgeMinorPerTurnInfluence() const
-	{
-		return m_iGoldenAgeMinorPerTurnInfluence;
-	}
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int GetSeaTradeRouteRangeBonus() const
 	{
@@ -933,12 +913,6 @@ public:
 	{
 		return m_iYieldRateModifier[(int)eYield];
 	};
-#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
-	int GetGoldenAgeYieldRateModifier(YieldTypes eYield) const
-	{
-		return m_iGoldenAgeYieldRateModifier[(int)eYield];
-	};
-#endif
 	int GetStrategicResourceQuantityModifier(TerrainTypes eTerrain) const
 	{
 		return m_iStrategicResourceQuantityModifier[(int)eTerrain];
@@ -1029,13 +1003,6 @@ public:
 #endif
 
 	bool NoTrain(UnitClassTypes eUnitClassType);
-
-#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
-	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType) const
-	{
-		return m_piPerMajorReligionFollowerYieldModifier[eYieldType];
-	}
-#endif
 
 	// Maya calendar routines
 	bool IsUsingMayaCalendar() const;
@@ -1151,7 +1118,6 @@ private:
 	int m_iWorkerSpeedModifier;
 	int m_iAfraidMinorPerTurnInfluence; 
 	int m_iLandTradeRouteRangeBonus;
-	int m_iGoldenAgeMinorPerTurnInfluence;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int m_iSeaTradeRouteRangeBonus;
 #endif
@@ -1209,9 +1175,6 @@ private:
 	int m_iYieldChangePerTradePartner[NUM_YIELD_TYPES];
 	int m_iYieldChangeIncomingTradeRoute[NUM_YIELD_TYPES];
 	int m_iYieldRateModifier[NUM_YIELD_TYPES];
-#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
-	int m_iGoldenAgeYieldRateModifier[NUM_YIELD_TYPES];
-#endif
 	int m_iStrategicResourceQuantityModifier[NUM_TERRAIN_TYPES];
 	std::vector<int> m_aiResourceQuantityModifier;
 	std::vector<bool> m_abNoTrain;
@@ -1258,10 +1221,6 @@ private:
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppaaiUnimprovedFeatureYieldChange;
 
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
-
-#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
-	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
-#endif
 };
 
 #endif //CIV5_TRAIT_CLASSES_H

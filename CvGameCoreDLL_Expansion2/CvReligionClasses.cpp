@@ -4119,7 +4119,7 @@ void CvCityReligions::SimulateReligiousPressure(ReligionTypes eReligion, int iPr
 		else if (it->m_eReligion > RELIGION_PANTHEON)
 		{
 			const CvReligion *pReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion, NO_PLAYER);
-			int iPressureErosion = pReligion ? pReligion->m_Beliefs.GetOtherReligionPressureErosion() : 0;  // Normally 0
+			int iPressureErosion = pReligion->m_Beliefs.GetOtherReligionPressureErosion();  // Normally 0
 			if (iPressureErosion > 0)
 			{
 				int iErosionAmount = iPressureErosion * iPressure / 100;
@@ -6485,18 +6485,6 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 			iTempValue *= 3;
 		}
 		iRtnValue += iTempValue;
-
-#if defined(MOD_BELIEF_BIRTH_INSTANT_YIELD)
-		if(MOD_BELIEF_BIRTH_INSTANT_YIELD && pEntry->AllowYieldPerBirth())
-		{
-			iTempValue = pEntry->GetYieldPerBirth(iI);
-			if(pCity->getPopulation() < 15)  // Like it more with small cities
-			{
-				iTempValue *= 2;
-			}
-			iRtnValue += iTempValue;
-		}
-#endif
 
 		// Building class yield change
 		for(int jJ = 0; jJ < GC.getNumBuildingClassInfos(); jJ++)

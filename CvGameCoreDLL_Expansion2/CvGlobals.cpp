@@ -1298,12 +1298,7 @@ CvGlobals::CvGlobals() :
 	m_iBASE_GOLDEN_AGE_UNITS(1),
 	m_iGOLDEN_AGE_UNITS_MULTIPLIER(1),
 	m_iGOLDEN_AGE_LENGTH(10),
-#if defined(MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA)
-	m_iGOLDEN_AGE_POINT_MULTIPLE_IN_GA(50),
-#endif
-#if defined(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK)
-	m_iUNIT_MOVES_AFTER_DISEMBARK(60),
-#endif
+
 
 #if defined(MOD_ROG_CORE)
 	m_iORIGINAL_CAPITAL_MODMAX(8),
@@ -2118,12 +2113,12 @@ void CvGlobals::init()
 #if defined(MOD_GLOBAL_CITY_WORKING)
 		// this is the 6 ring layout
 		//	 -5  -4  -3  -2  -1   0   1   2   3  4  5  -- in the Y direction
-		{ -1,  -1,  -1,  -1,  -1,  -1, 115, 116, 117, 118, 119, 120, 121}, // -6 hex-space x
-		{ -1,  -1,  -1,  -1,  -1, 114,  81,  82,  83,  84,  85,  86, 122}, // -5 hex-space x
-		{ -1,  -1,  -1,  -1, 113,  80,  53,  54,  55,  56,  57,  87, 123}, // -4 hex-space x
-		{ -1,  -1,  -1, 112,  79,  52,  31,  32,  33,  34,  58,  88, 124}, // -3 hex-space x
-		{ -1,  -1, 111,  78,  51,  30,  15,  16,  17,  35,  59,  89, 125}, // -2 hex-space x
-		{ -1, 110,  77,  50,  29,  14,   5,   6,  18,  36,  60,  90, 126}, // -1 hex-space x
+		{ -1,  -1,  -1,  -1,  -1,  -1, 116, 117, 118, 119, 120, 121, 122}, // -6 hex-space x
+		{ -1,  -1,  -1,  -1,  -1, 115,  81,  82,  83,  84,  85,  86, 123}, // -5 hex-space x
+		{ -1,  -1,  -1,  -1, 114,  80,  53,  54,  55,  56,  57,  87, 124}, // -4 hex-space x
+		{ -1,  -1,  -1, 113,  79,  52,  31,  32,  33,  34,  58,  88, 125}, // -3 hex-space x
+		{ -1,  -1, 112,  78,  51,  30,  15,  16,  17,  35,  59,  89, 126}, // -2 hex-space x
+		{110, 111,  77,  50,  29,  14,   5,   6,  18,  36,  60,  90, 127}, // -1 hex-space x
 		{109,  76,  49,  28,  13,   4,   0,   1,   7,  19,  37,  61,  91}, //  0 hex-space x
 		{108,  75,  48,  27,  12,   3,   2,   8,  20,  38,  62,  92,  -1}, //  1 hex-space x
 		{107,  74,  47,  26,  11,  10,   9,  21,  39,  63,  93,  -1,  -1}, //  2 hex-space x
@@ -2237,18 +2232,6 @@ void CvGlobals::init()
 	m_pAchievements = FNEW(CvAchievementXMLEntries, c_eCiv5GameplayDLL, 0);
 #endif
 
-#ifdef MOD_GLOBAL_CITY_SCALES
-	m_pCityScales = FNEW(CvCityScaleXMLEntries, c_eCiv5GameplayDLL, 0);
-#endif
-
-#ifdef MOD_PROMOTION_COLLECTIONS
-	m_pPromotionCollections = FNEW(CvPromotionCollectionEntries, c_eCiv5GameplayDLL, 0);
-#endif
-
-#ifdef MOD_BUILDINGCLASS_COLLECTIONS
-	m_pBuildingClassCollections = FNEW(CvBuildingClassCollectionsXMLEntries, c_eCiv5GameplayDLL, 0);
-#endif
-
 	auto_ptr<ICvDLLDatabaseUtility1> pkLoader(getDatabaseLoadUtility());
 
 	Database::Connection* pDB = GetGameDatabase();
@@ -2259,10 +2242,6 @@ void CvGlobals::init()
 
 	CvPlayerAI::initStatics();
 	CvTeam::initStatics();
-
-#ifdef MOD_SPECIALIST_RESOURCES
-	GC.initSpecialistResourcesDependencies();
-#endif
 
 	memcpy(m_aiPlotDirectionX, aiPlotDirectionX, sizeof(m_aiPlotDirectionX));
 	memcpy(m_aiPlotDirectionY, aiPlotDirectionY, sizeof(m_aiPlotDirectionY));
@@ -2344,18 +2323,6 @@ void CvGlobals::uninit()
 	SAFE_DELETE(m_internationalTradeRouteLandFinder);
 	SAFE_DELETE(m_internationalTradeRouteWaterFinder);
 	SAFE_DELETE(m_tacticalAnalysisMapFinder);
-
-#ifdef MOD_GLOBAL_CITY_SCALES
-	SAFE_DELETE(m_pCityScales);
-#endif
-
-#ifdef MOD_PROMOTION_COLLECTIONS
-	SAFE_DELETE(m_pPromotionCollections);
-#endif
-
-#ifdef MOD_BUILDINGCLASS_COLLECTIONS
-	SAFE_DELETE(m_pBuildingClassCollections);
-#endif
 
 	// already deleted outside of the dll, set to null for safety
 	m_pathFinder=NULL;
@@ -3249,98 +3216,6 @@ CvImprovementXMLEntries* CvGlobals::GetGameImprovements() const
 	return m_pImprovements;
 }
 
-#ifdef MOD_GLOBAL_CITY_SCALES
-int CvGlobals::getNumCityScales() { return m_pCityScales->GetNumCityScales(); }
-
-std::vector<CvCityScaleEntry*>& CvGlobals::getCityScaleInfo()
-{
-	return m_pCityScales->GetEntries();
-}
-
-_Ret_maybenull_ CvCityScaleEntry* CvGlobals::getCityScaleInfo(CityScaleTypes eCityScale)
-{
-	if (eCityScale <= NO_CITY_SCALE || eCityScale >= getNumCityScales())
-		return nullptr;
-
-	return m_pCityScales->GetEntry(eCityScale);
-}
-
-void CvGlobals::sortAndUpdateOrderedCityScale(const std::vector<CvCityScaleEntry*>& vCityScale)
-{
-	// sort by population
-	int i = vCityScale.size();
-	m_vOrderedCityScales = vCityScale;
-	// The FirePlace code will insert a nullptr element into the vector,
-	// so we need to remove it before sorting.
-	for (auto iter = m_vOrderedCityScales.begin(); iter != m_vOrderedCityScales.end();)
-	{
-		CvCityScaleEntry* val = *iter;
-		if (val == nullptr)
-			iter = m_vOrderedCityScales.erase(iter);
-		else
-			iter++;
-	}
-	std::sort(m_vOrderedCityScales.begin(), m_vOrderedCityScales.end(), [](CvCityScaleEntry* a, CvCityScaleEntry* b) {
-		return a->GetMinPopulation() < b->GetMinPopulation();
-		});
-}
-
-CvCityScaleEntry* CvGlobals::getCityScaleInfoByPopulation(int iPopulation) const
-{
-	// binary search to find the first entry with a minPopulation <= iPopulation
-	if (iPopulation < 1 || m_vOrderedCityScales.empty())
-	{
-		return nullptr;
-	}
-
-	int iMin = 0;
-	int iMax = m_vOrderedCityScales.size() - 1;
-	while (iMin <= iMax)
-	{
-		int iMid = (iMin + iMax) / 2;
-		if (m_vOrderedCityScales[iMid]->GetMinPopulation() <= iPopulation)
-		{
-			if (iMid == m_vOrderedCityScales.size() - 1 || m_vOrderedCityScales[iMid + 1]->GetMinPopulation() > iPopulation)
-				return m_vOrderedCityScales[iMid];
-			else
-				iMin = iMid + 1;
-		}
-		else
-			iMax = iMid - 1;
-	}
-
-	return nullptr;
-}
-#endif
-
-#ifdef MOD_PROMOTION_COLLECTIONS
-std::vector<CvPromotionCollectionEntry*>& CvGlobals::GetPromotionCollections() { return m_pPromotionCollections->GetEntries();}
-CvPromotionCollectionEntry* CvGlobals::GetPromotionCollection(PromotionCollectionsTypes ePromotionCollection) { return m_pPromotionCollections->GetEntry(ePromotionCollection); }
-int CvGlobals::GetNumPromotionCollections() { return m_pPromotionCollections->GetNumEntries(); }
-std::tr1::unordered_map<PromotionTypes, std::tr1::unordered_set<PromotionCollectionsTypes> >& CvGlobals::GetPromotion2CollectionsMapping() { return m_mPromotion2CollectionsMapping; }
-
-void CvGlobals::InitPromotion2CollectionMapping()
-{
-	auto& vPromotionCollections = GetPromotionCollections();
-	for (auto* pPromotionCollection : vPromotionCollections)
-	{
-		if (pPromotionCollection == nullptr) continue;
-
-		auto& vPromotions = pPromotionCollection->GetPromotions();
-		for (auto& sPromotion : vPromotions)
-		{
-			m_mPromotion2CollectionsMapping[sPromotion.m_ePromotionType].insert((PromotionCollectionsTypes)pPromotionCollection->GetID());
-		}
-	}
-}
-#endif
-
-#ifdef MOD_BUILDINGCLASS_COLLECTIONS
-std::vector<CvBuildingClassCollectionsEntry*>& CvGlobals::GetBuildingClassCollections() { return m_pBuildingClassCollections->GetEntries(); }
-CvBuildingClassCollectionsEntry* CvGlobals::GetBuildingClassCollection(BuildingClassCollectionsTypes eBuildingClassCollection) { return m_pBuildingClassCollections->GetEntry((int)eBuildingClassCollection); }
-int CvGlobals::GetNumBuildingClassCollections() {return m_pBuildingClassCollections->GetNumEntries(); }
-#endif
-
 int CvGlobals::getNumBuildInfos()
 {
 	return (int)m_paBuildInfo.size();
@@ -4209,34 +4084,6 @@ CvAchievementInfo* CvGlobals::getAchievementInfo(EAchievement eAchievementNum)
 CvAchievementXMLEntries* CvGlobals::GetGameAchievements() const
 {
 	return m_pAchievements;
-}
-#endif
-
-#ifdef MOD_SPECIALIST_RESOURCES
-std::tr1::unordered_set<PolicyTypes>& CvGlobals::getSpecialistResourcesPolicies()
-{
-	return m_vSpecialistResourcesPolicies;
-}
-void CvGlobals::initSpecialistResourcesDependencies()
-{
-	for (CvSpecialistInfo* sinfo : getSpecialistInfo())
-	{
-		for (CvSpecialistInfo::ResourceInfo& rinfo : sinfo->GetResourceInfo())
-		{
-			if (rinfo.m_eRequiredPolicy != NO_POLICY)
-			{
-				m_vSpecialistResourcesPolicies.insert(rinfo.m_eRequiredPolicy);
-			}
-			if (rinfo.m_eRequiredTech != NO_TECH)
-			{
-				m_vSpecialistResourcesTechnologies.insert(rinfo.m_eRequiredTech);
-			}
-		}
-	}
-}
-std::tr1::unordered_set<TechTypes>& CvGlobals::getSpecialistResourcesTechnologies()
-{
-	return m_vSpecialistResourcesTechnologies;
 }
 #endif
 
@@ -5641,12 +5488,6 @@ void CvGlobals::cacheGlobals()
 	m_iBASE_GOLDEN_AGE_UNITS = getDefineINT("BASE_GOLDEN_AGE_UNITS");
 	m_iGOLDEN_AGE_UNITS_MULTIPLIER = getDefineINT("GOLDEN_AGE_UNITS_MULTIPLIER");
 	m_iGOLDEN_AGE_LENGTH = getDefineINT("GOLDEN_AGE_LENGTH");
-#if defined(MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA)
-	m_iGOLDEN_AGE_POINT_MULTIPLE_IN_GA = getDefineINT("GOLDEN_AGE_POINT_MULTIPLE_IN_GA");
-#endif
-#if defined(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK)
-	m_iUNIT_MOVES_AFTER_DISEMBARK = getDefineINT("UNIT_MOVES_AFTER_DISEMBARK");
-#endif
 
 #if defined(MOD_ROG_CORE)
 	m_iORIGINAL_CAPITAL_MODMAX = getDefineINT("ORIGINAL_CAPITAL_MODMAX");
@@ -6310,15 +6151,6 @@ void CvGlobals::cacheGlobals()
 #if defined(MOD_UI_CITY_EXPANSION)
 	if (MOD_UI_CITY_EXPANSION) {
 		GD_INT_CACHE(PLOT_INFLUENCE_COST_VISIBLE_DIVISOR);
-	}
-#endif
-
-#ifdef MOD_GLOBAL_WAR_CASUALTIES
-	if (MOD_GLOBAL_WAR_CASUALTIES)
-	{
-		GD_INT_CACHE(WAR_CASUALTIES_THRESHOLD);
-		GD_INT_CACHE(WAR_CASUALTIES_DELTA_BASE);
-		GD_INT_CACHE(WAR_CASUALTIES_POPULATION_LOSS);
 	}
 #endif
 }

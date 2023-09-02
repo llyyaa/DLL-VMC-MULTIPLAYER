@@ -65,10 +65,6 @@ struct CvUnitCaptureDefinition
 	int iReligiousStrength;
 	int iSpreadsLeft;
 
-#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
-	CvUnit* pCapturingUnit = nullptr;
-#endif
-
 	CvUnitCaptureDefinition()
 		: eOriginalOwner(NO_PLAYER)
 		, eOldPlayer(NO_PLAYER)
@@ -90,11 +86,7 @@ struct CvUnitCaptureDefinition
 #endif
 		, eReligion(NO_RELIGION)
 		, iReligiousStrength(0)
-		, iSpreadsLeft(0)
-#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
-		, pCapturingUnit(nullptr)
-#endif
-		{ }
+		, iSpreadsLeft(0) { }
 
 	inline bool IsValid() const
 	{
@@ -588,10 +580,6 @@ public:
 	int experienceNeeded() const;
 	int attackXPValue() const;
 	int defenseXPValue() const;
-#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
-	int ExtraAttackXPValue() const;
-	int ExtraDefenseXPValue() const;
-#endif
 	int maxXPValue() const;
 
 	int firstStrikes() const;
@@ -631,29 +619,6 @@ public:
 	void SetNearbyImprovementBonusRange(int iBonusRange);
 	ImprovementTypes GetCombatBonusImprovement() const;
 	void SetCombatBonusImprovement(ImprovementTypes eImprovement);
-#endif
-
-#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
-	int GetAllyCityStateCombatModifier() const;
-	void SetAllyCityStateCombatModifier(int iCombatBonus);
-	int GetAllyCityStateCombatModifierMax() const;
-	void SetAllyCityStateCombatModifierMax(int iCombatBonusMax);
-	int GetStrengthModifierFromAlly() const;
-#endif
-
-#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
-	ResourceTypes GetExtraResourceType() const;
-	void SetExtraResourceType(ResourceTypes m_eResourceType);
-	int GetExtraResourceCombatModifier() const;
-	void SetExtraResourceCombatModifier(int iCombatBonus);
-	int GetExtraResourceCombatModifierMax() const;
-	void SetExtraResourceCombatModifierMax(int iCombatBonusMax);
-	int GetStrengthModifierFromExtraResource() const;
-	int GetExtraHappinessCombatModifier() const;
-	void SetExtraHappinessCombatModifier(int iCombatBonus);
-	int GetExtraHappinessCombatModifierMax() const;
-	void SetExtraHappinessCombatModifierMax(int iCombatBonusMax);
-	int GetStrengthModifierFromExtraHappiness() const;
 #endif
 
 #if defined(MOD_ROG_CORE)
@@ -931,9 +896,6 @@ public:
 	bool isBlitz() const;
 	void changeBlitzCount(int iChange);
 
-	void DoAdjacentPlotDamage(CvPlot* pWhere, int iValue);
-
-	void MoveToEnemyPlotDamage(CvPlot* pWhere);
 
 #if defined(MOD_ROG_CORE)
 	int getMeleeDefenseModifier() const;
@@ -942,6 +904,8 @@ public:
 	int attackFullyHealedModifier() const;
 	int attackAbove50HealthModifier() const;
 	int attackBelow50HealthModifier() const;
+
+	//int DoAdjacentPlotDamage(CvPlot* pWhere, int iValue, const char* chTextKey = NULL);
 
 	int getForcedDamageValue();
 	void ChangeForcedDamageValue(int iChange);
@@ -968,8 +932,6 @@ public:
 	void ChangeIsFightWellDamaged(int iChange);
 #endif
 
-	bool IsImmueMeleeAttack() const;
-	void ChangeImmueMeleeAttackCount(int iChange);
 
 #if defined(MOD_ROG_CORE)
 	int getHPHealedIfDefeatEnemyGlobal() const;
@@ -997,29 +959,7 @@ public:
 	void changeOutsideCapitalLandDefenseMod(int iValue);
 #endif
 
-	int GetAttackInflictDamageChange() const;
-	int GetAttackInflictDamageChangeMaxHPPercent() const;
-	void ChangeAttackInflictDamageChange(int iChange);
-	void ChangeAttackInflictDamageChangeMaxHPPercent(int iChange);
 
-	int GetDefenseInflictDamageChange() const;
-	int GetDefenseInflictDamageChangeMaxHPPercent() const;
-	void ChangeDefenseInflictDamageChange(int iChange);
-	void ChangeDefenseInflictDamageChangeMaxHPPercent(int iChange);
-
-	int GetSiegeInflictDamageChange() const;
-	int GetSiegeInflictDamageChangeMaxHPPercent() const;
-	void ChangeSiegeInflictDamageChange(int iChange);
-	void ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange);
-
-	int GetHeavyChargeAddMoves() const;
-	int GetHeavyChargeExtraDamage() const;
-	int GetHeavyChargeCollateralFixed() const;
-	int GetHeavyChargeCollateralPercent() const;
-	void ChangeHeavyChargeAddMoves(int iChange);
-	void ChangeHeavyChargeExtraDamage(int iChange);
-	void ChangeHeavyChargeCollateralFixed(int iChange);
-	void ChangeHeavyChargeCollateralPercent(int iChange);
 
 	int getAmphibCount() const;
 	bool isAmphib() const;
@@ -1336,11 +1276,6 @@ public:
 	bool IsCapturedAsIs() const;
 	void SetCapturedAsIs(bool bSetValue);
 
-#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
-	CvUnit* getCapturingUnit() const;
-	void setCapturingUnit(CvUnit* unit);
-#endif
-
 	const UnitTypes getUnitType() const;
 	CvUnitEntry& getUnitInfo() const;
 	UnitClassTypes getUnitClassType() const;
@@ -1353,16 +1288,6 @@ public:
 
 	const InvisibleTypes getSeeInvisibleType() const;
 	void setSeeInvisibleType(InvisibleTypes InvisibleType);
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-	const int GetFeatureInvisible() const;
-	const int GetFeatureInvisible2() const;
-	void setFeatureInvisible(int FeatureInvisible, int FeatureInvisible2);
-	bool IsInvisibleInvalid() const;
-#endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	const int GetMultipleInitExperence() const;
-	void ChangeMultipleInitExperence(int iValue);
-#endif
 
 	const CvUnit* getCombatUnit() const;
 	CvUnit* getCombatUnit();
@@ -1397,11 +1322,6 @@ public:
 #endif
 	int GetTourismBlastStrength() const;
 	void SetTourismBlastStrength(int iValue);
-
-#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
-	bool GetIsNewCapture() const;
-	void SetIsNewCapture(bool value);
-#endif
 
 	// Arbitrary Script Data
 	std::string getScriptData() const;
@@ -1640,13 +1560,6 @@ public:
 	void ChangeCapitalDefenseFalloff(int iValue);
 	int GetCapitalDefenseFalloff() const;
 
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-	void ChangeMoveLeftDefenseMod(int iValue);
-	int GetMoveLeftDefenseMod() const;
-
-	void ChangeMoveUsedDefenseMod(int iValue);
-	int GetMoveUsedDefenseMod() const;
-#endif
 
 #if defined(MOD_ROG_CORE)
 	void ChangeMoveLfetAttackMod(int iValue);
@@ -1660,25 +1573,8 @@ public:
 
 	void ChangeRangedSupportFireMod(int iValue);
 	int GetRangedSupportFireMod() const;
-
-
-	int GetDamageAoEFortified() const;
-	void ChangeDamageAoEFortified(int iChange);
-
-	int GetWorkRateMod() const;
-	void ChangeWorkRateMod(int iChange);
-
-	int getAOEDamageOnKill() const;
-	void changeAOEDamageOnKill(int iChange);
-
-	int GetBarbarianCombatBonus() const;
-	void ChangeBarbarianCombatBonus(int iValue);
 #endif
 
-	int GetCaptureDefeatedEnemyChance() const;
-	void ChangeCaptureDefeatedEnemyChance(int iValue);
-	void ChangeCannotBeCapturedCount(int iChange);
-	bool GetCannotBeCaptured();
 
 
 #if defined(MOD_ROG_CORE)
@@ -1704,39 +1600,11 @@ public:
 
 	bool IsNoResourcePunishment() const;
 	void ChangeIsNoResourcePunishment(int iChange);
-
-	void ChangeCurrentHitPointAttackMod(int iValue);
-	int GetCurrentHitPointAttackMod() const;
-
-	void ChangeCurrentHitPointDefenseMod(int iValue);
-	int GetCurrentHitPointDefenseMod() const;
-
-
-	void ChangeNearNumEnemyAttackMod(int iValue);
-	int GetNearNumEnemyAttackMod() const;
-
-	void ChangeNearNumEnemyDefenseMod(int iValue);
-	int GetNearNumEnemyDefenseMod() const;
-
-
-	int GetNumEnemyAdjacent() const;
-
 #endif
 
 
 	void ChangeCityAttackPlunderModifier(int iValue);
 	int GetCityAttackPlunderModifier() const;
-
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
-	void ChangeUnitAttackFaithBonus(int iValue);
-	void ChangeCityAttackFaithBonus(int iValue);
-	int GetUnitAttackFaithBonus() const;
-	int GetCityAttackFaithBonus() const;
-#endif
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
-	void setRemovePromotionUpgrade(int iValue);
-	int GetRemovePromotionUpgrade() const;
-#endif
 
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
 	int GetReligiousStrengthLossRivalTerritory() const;
@@ -1797,68 +1665,11 @@ public:
 	bool IsWithinDistanceOfTerrain(TerrainTypes iTerrainType, int iDistance) const;
 #endif
 
-#ifdef MOD_GLOBAL_WAR_CASUALTIES
-	int GetWarCasualtiesModifier() const;
-	void ChangeWarCasualtiesModifier(int iChange);
-	void SetWarCasualtiesModifier(int iValue);
-#endif
-
-#ifdef MOD_PROMOTION_SPLASH_DAMAGE
-	std::vector<SplashInfo>& GetSplashInfoVec();
-
-	int GetSplashImmuneRC() const;
-	void ChangeSplashImmuneRC(int iChange);
-	void SetSplashImmuneRC(int iValue);
-
-	int GetSplashXP() const;
-	void ChangeSplashXP(int iChange);
-	void SetSplashXP(int iValue);
-#endif
-
-#ifdef MOD_PROMOTION_COLLECTIONS
-	std::tr1::unordered_map<PromotionCollectionsTypes, int>& GetPromotionCollections();
-#endif
-
-#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-	int GetAddEnemyPromotionImmuneRC() const;
-	bool IsImmuneNegtivePromotions() const;
-	void ChangeAddEnemyPromotionImmuneRC(int iChange);
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	void ClearSamePlotPromotions();
-	std::tr1::unordered_set<PromotionTypes>& GetPromotionsThatCanBeActionCleared();
-	void RemoveDebuffWhenDoTurn();
-	bool CanRemoveDebuff(const AutoRemoveInfo& kAutoRemoveInfo) const;
-#endif
-
-#ifdef MOD_PROMOTION_CITY_DESTROYER
-	std::tr1::unordered_map<PromotionTypes, DestroyBuildingsInfo>& GetDestroyBuildings();
-
-	int GetSiegeKillCitizensPercent() const;
-	int GetSiegeKillCitizensFixed() const;
-	void ChangeSiegeKillCitizensPercent(int iChange);
-	void ChangeSiegeKillCitizensFixed(int iChange);
-	bool CanSiegeKillCitizens() const;
-#endif
-
-#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
-	std::vector<CollateralInfo>& GetCollateralInfoVec();
-
-	int GetCollateralImmuneRC() const;
-	void ChangeCollateralImmuneRC(int iChange);
-	void SetCollateralImmuneRC(int iValue);
-
-	int GetCollateralXP() const;
-	void ChangeCollateralXP(int iChange);
-	void SetCollateralXP(int iValue);
-#endif
-
 protected:
 	const MissionQueueNode* HeadMissionQueueNode() const;
 	MissionQueueNode* HeadMissionQueueNode();
 
-	bool getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer = NO_PLAYER, CvUnit* pCapturingUnit = nullptr);
+	bool	getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerTypes eCapturingPlayer = NO_PLAYER);
 	static CvUnit* createCaptureUnit(const CvUnitCaptureDefinition& kCaptureDef);
 
 	void	ClearPathCache();
@@ -1997,18 +1808,6 @@ protected:
 	FAutoVariable<ImprovementTypes, CvUnit> m_eCombatBonusImprovement;
 #endif
 
-#if defined(MOD_PROMOTIONS_ALLYCITYSTATE_BONUS)
-	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifier;
-	FAutoVariable<int, CvUnit> m_iAllyCityStateCombatModifierMax;
-#endif
-
-#if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
-	FAutoVariable<ResourceTypes, CvUnit> m_eExtraResourceType;
-	FAutoVariable<int, CvUnit> m_iExtraResourceCombatModifier;
-	FAutoVariable<int, CvUnit> m_iExtraResourceCombatModifierMax;
-	FAutoVariable<int, CvUnit> m_iExtraHappinessCombatModifier;
-	FAutoVariable<int, CvUnit> m_iExtraHappinessCombatModifierMax;
-#endif
 
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvUnit> m_iAoEDamageOnMove;
@@ -2054,12 +1853,6 @@ protected:
 	FAutoVariable<int, CvUnit> m_iNumWorkAttackMod;
 
 	FAutoVariable<int, CvUnit> m_iNoResourcePunishment;
-
-	FAutoVariable<int, CvUnit> m_iCurrentHitPointAttackMod;
-	FAutoVariable<int, CvUnit> m_iCurrentHitPointDefenseMod;
-
-	FAutoVariable<int, CvUnit> m_iNearNumEnemyAttackMod;
-	FAutoVariable<int, CvUnit> m_iNearNumEnemyDefenseMod;
 #endif
 
 #if defined(MOD_PROMOTIONS_CROSS_MOUNTAINS)
@@ -2109,8 +1902,6 @@ protected:
 	int m_iGreatGeneralCombatModifier;
 	int m_iIgnoreGreatGeneralBenefit;
 	int m_iIgnoreZOC;
-
-	int m_iImmueMeleeAttack;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	int m_iNoSupply;
 #endif
@@ -2145,22 +1936,10 @@ protected:
 
 	FAutoVariable<TacticalAIMoveTypes, CvUnit> m_eTacticalMove;
 	FAutoVariable<PlayerTypes, CvUnit> m_eCapturingPlayer;
-#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
-	CvUnit* m_pCapturingUnit;
-#endif
-
 	bool m_bCapturedAsIs;
 	FAutoVariable<UnitTypes, CvUnit> m_eLeaderUnitType;
 	FAutoVariable<InvisibleTypes, CvUnit> m_eInvisibleType;
 	FAutoVariable<InvisibleTypes, CvUnit> m_eSeeInvisibleType;
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-	FAutoVariable<int, CvUnit> m_eFeatureInvisible;
-	FAutoVariable<int, CvUnit> m_eFeatureInvisible2;
-#endif
-#if defined(MOD_PROMOTION_MULTIPLE_INIT_EXPERENCE)
-	FAutoVariable<int, CvUnit> m_eMultipleInitExperence;
-#endif
-
 	FAutoVariable<GreatPeopleDirectiveTypes, CvUnit> m_eGreatPeopleDirectiveType;
 	CvUnitEntry* m_pUnitInfo;
 
@@ -2217,93 +1996,27 @@ protected:
 	int m_iEmbarkedDeepWaterCount;
 #endif
 
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-	int m_iMoveLeftDefenseMod;
-	int m_iMoveUsedDefenseMod;
-#endif
-
 #if defined(MOD_ROG_CORE)
 	int m_iMoveLfetAttackMod;
 	int m_iMoveUsedAttackMod;
 	int m_iGoldenAgeMod;
 	int m_iRangedSupportFireMod;
-
-	int m_iBarbCombatBonus;
-	int m_iDamageAoEFortified;
-	int m_iWorkRateMod;
-	int m_iAOEDamageOnKill;
 #endif
 
-	int m_iCannotBeCapturedCount;
-	int m_iCaptureDefeatedEnemyChance;
 
 
-#ifdef MOD_PROMOTION_SPLASH_DAMAGE
-	std::vector<SplashInfo> m_asSplashInfoVec = {};
-
-	int m_iSplashImmuneRC = 0;
-	int m_iSplashXP = 0;
-#endif
-
-#ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
-	std::vector<CollateralInfo> m_asCollateralInfoVec = {};
-
-	int m_iCollateralImmuneRC = 0;
-	int m_iCollateralXP = 0;
-#endif
-
-#ifdef MOD_PROMOTION_COLLECTIONS
-	std::tr1::unordered_map<PromotionCollectionsTypes, int> m_sPromotionCollections;
-#endif
-
- #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-	int m_iAddEnemyPromotionImmuneRC = 0;
- #endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	std::tr1::unordered_map<PromotionTypes, AutoRemoveInfo> m_mapAutoRemovePromotions;
-	std::tr1::unordered_set<PromotionTypes> m_sPromotionsThatCanBeActionCleared;
-#endif
-
-#ifdef MOD_PROMOTION_CITY_DESTROYER
-	std::tr1::unordered_map<PromotionTypes, DestroyBuildingsInfo> m_mapDestroyBuildings;
-
-	int m_iSiegeKillCitizensPercent = 0;
-	int m_iSiegeKillCitizensFixed = 0;
-#endif
 
 	int m_iEmbarkExtraVisibility;
 	int m_iEmbarkDefensiveModifier;
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
-#if defined(MOD_PROMOTION_GET_INSTANCE_FROM_ATTACK)
-	int m_iUnitAttackFaithBonus;
-	int m_iCityAttackFaithBonus;
-#endif	
-#if defined(MOD_PROMOTION_REMOVE_PROMOTION_UPGRADE)
-	int m_iRemovePromotionUpgrade;
-#endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
 	int m_iTradeMissionGoldModifier;
 	int m_iMapLayer;		// Which layer does the unit reside on for pathing/stacking/etc.
 	int m_iNumGoodyHutsPopped;
 	int m_iLastGameTurnAtFullHealth;
-
-	int m_iAttackInflictDamageChange = 0;
-	int m_iAttackInflictDamageChangeMaxHPPercent = 0;
-
-	int m_iDefenseInflictDamageChange = 0;
-	int m_iDefenseInflictDamageChangeMaxHPPercent = 0;
-
-	int m_iSiegeInflictDamageChange = 0;
-	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
-
-	int m_iHeavyChargeAddMoves = 0;
-	int m_iHeavyChargeExtraDamage = 0;
-	int m_iHeavyChargeCollateralFixed = 0;
-	int m_iHeavyChargeCollateralPercent = 0;
 	
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	CvString m_strUnitName;
@@ -2314,10 +2027,6 @@ protected:
 #endif
 	GreatWorkType m_eGreatWork;
 	int m_iTourismBlastStrength;
-
-#ifdef MOD_BATTLE_CAPTURE_NEW_RULE
-	bool m_bIsNewCapture = false;
-#endif
 
 	mutable CvPathNodeArray m_kLastPath;
 	mutable uint m_uiLastPathCacheDest;
@@ -2332,10 +2041,6 @@ protected:
 	// these are do to a unit using Heavy Charge against you
 	bool CanFallBackFromMelee(CvUnit& pAttacker);
 	bool DoFallBackFromMelee(CvUnit& pAttacker);
-
- #ifdef MOD_GLOBAL_WAR_CASUALTIES
-	int m_iWarCasualtiesModifier = 0;
- #endif
 
 private:
 

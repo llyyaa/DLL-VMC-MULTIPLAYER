@@ -1976,6 +1976,11 @@ int CvBuilderTaskingAI::GetBuildTimeWeight(CvUnit* pUnit, CvPlot* pPlot, BuildTy
 	int iBuildTimeNormal = pPlot->getBuildTime(eBuild, m_pPlayer->GetID());
 	int iBuildTurnsLeft = pPlot->getBuildTurnsLeft(eBuild, m_pPlayer->GetID(), pUnit->workRate(true), pUnit->workRate(true));
 	int iBuildTime = min(iBuildTimeNormal, iBuildTurnsLeft);
+	if(iBuildTime <= 0)
+	{
+		iBuildTime = 1;
+	}
+
 	if(bIgnoreFeatureTime)
 	{
 		if(pPlot->getFeatureType() != NO_FEATURE)
@@ -1983,12 +1988,9 @@ int CvBuilderTaskingAI::GetBuildTimeWeight(CvUnit* pUnit, CvPlot* pPlot, BuildTy
 			iBuildTime -= GC.getBuildInfo(eBuild)->getFeatureTime(pPlot->getFeatureType());
 		}
 	}
+
 	iBuildTime += iAdditionalTime;
 
-	if(iBuildTime <= 0)
-	{
-		iBuildTime = 1;
-	}
 	return 10000 / iBuildTime;
 }
 

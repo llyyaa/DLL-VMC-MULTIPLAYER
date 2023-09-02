@@ -328,9 +328,6 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(IsEnemyInMovementRange);
 
 	Method(IsTrade);
-
-	Method(IsCannotBeCapturedUnit);
-
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_TRADEROUTES)
 	Method(GetTradeRouteIndex);
 	Method(IsRecalledTrader);
@@ -388,11 +385,6 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(ExtraFeatureDamage);
 #endif
 
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-	Method(GetMoveLeftDefenseMod);
-	Method(GetMoveUsedDefenseMod);
-#endif
-
 #if defined(MOD_ROG_CORE)
 	Method(GetZOCStatus);
 #endif
@@ -413,8 +405,6 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetOutsideCapitalLandAttackMod);
 	Method(GetOnCapitalLandDefenseMod);
 	Method(GetOutsideCapitalLandDefenseMod);
-
-	Method(GetBarbarianCombatBonus);
 #endif
 
 
@@ -448,14 +438,6 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetNumWonderAttackMod);
 
 	Method(IsNoResourcePunishment);
-
-	Method(GetCurrentHitPointAttackMod);
-	Method(GetCurrentHitPointDefenseMod);
-
-	Method(GetNearNumEnemyAttackMod);
-	Method(GetNearNumEnemyDefenseMod);
-
-	Method(GetNumEnemyAdjacent);
 #endif
 
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_PROMOTIONS_IMPROVEMENT_BONUS)
@@ -477,13 +459,10 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #endif
 	Method(IsNeverInvisible);
 	Method(IsInvisible);
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-	Method(IsInvisibleInvalid);
-#endif
 	Method(IsNukeImmune);
 	Method(IsRangeAttackOnlyInDomain);
 	Method(IsCityAttackOnly);
-	Method(IsImmueMeleeAttack);
+
 	Method(MaxInterceptionProbability);
 	Method(CurrInterceptionProbability);
 	Method(EvasionProbability);
@@ -785,13 +764,6 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(IsOnTerrain);
 	Method(IsAdjacentToTerrain);
 	Method(IsWithinDistanceOfTerrain);
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-	Method(ClearSamePlotPromotions);
-#endif
-#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-	Method(IsImmuneNegtivePromotions);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -1701,15 +1673,6 @@ int CvLuaUnit::lIsRangeAttackOnlyInDomain(lua_State* L)
 	lua_pushboolean(L, bResult);
 	return 1;
 }
-
-int CvLuaUnit::lIsImmueMeleeAttack(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const bool bResult = pkUnit->IsImmueMeleeAttack();
-	lua_pushboolean(L, bResult);
-	return 1;
-}
-
 //------------------------------------------------------------------------------
 int CvLuaUnit::lIsCityAttackOnly(lua_State* L)
 {
@@ -2622,27 +2585,6 @@ int CvLuaUnit::lIsCombatUnit(lua_State* L)
 	lua_pushboolean(L, bResult);
 	return 1;
 }
-
-int CvLuaUnit::lIsCannotBeCapturedUnit(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const bool bResult = pkUnit->GetCannotBeCaptured();
-
-	lua_pushboolean(L, bResult);
-	return 1;
-}
-
-#if defined(MOD_ROG_CORE)
-//------------------------------------------------------------------------------
-int CvLuaUnit::lGetBarbarianCombatBonus(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const int bResult = pkUnit->GetBarbarianCombatBonus();
-	lua_pushinteger(L, bResult);
-	return 1;
-}
-#endif
-
 //------------------------------------------------------------------------------
 //bool CanDefend(CyPlot* pPlot);
 int CvLuaUnit::lIsCanDefend(lua_State* L)
@@ -3414,17 +3356,6 @@ int CvLuaUnit::lIsInvisible(lua_State* L)
 }
 
 //------------------------------------------------------------------------------
-#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
-int CvLuaUnit::lIsInvisibleInvalid(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const bool bResult = pkUnit->IsInvisibleInvalid();
-	lua_pushboolean(L, bResult);
-	return 1;
-}
-#endif
-
-//------------------------------------------------------------------------------
 int CvLuaUnit::lIsEnemyCityAdjacent(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
@@ -3927,26 +3858,6 @@ int CvLuaUnit::lDomainDefense(lua_State* L)
 	return 1;
 }
 
-#if defined(MOD_DEFENSE_MOVES_BONUS)
-//------------------------------------------------------------------------------
-int CvLuaUnit::lGetMoveLeftDefenseMod(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const int bResult = pkUnit->GetMoveLeftDefenseMod();
-	lua_pushinteger(L, bResult);
-	return 1;
-}
-
-//------------------------------------------------------------------------------
-int CvLuaUnit::lGetMoveUsedDefenseMod(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const int bResult = pkUnit->GetMoveUsedDefenseMod();
-	lua_pushinteger(L, bResult);
-	return 1;
-}
-#endif
-
 
 #if defined(MOD_ROG_CORE)
 int CvLuaUnit::lGetNumSpyDefenseMod(lua_State* L)
@@ -4011,55 +3922,6 @@ int CvLuaUnit::lIsNoResourcePunishment(lua_State* L)
 	lua_pushboolean(L, bResult);
 	return 1;
 }
-
-
-
-int CvLuaUnit::lGetCurrentHitPointDefenseMod(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const int bResult = pkUnit->GetCurrentHitPointDefenseMod();
-	lua_pushinteger(L, bResult);
-	return 1;
-}
-
-//------------------------------------------------------------------------------
-int CvLuaUnit::lGetCurrentHitPointAttackMod(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const int bResult = pkUnit->GetCurrentHitPointAttackMod();
-	lua_pushinteger(L, bResult);
-	return 1;
-}
-
-
-
-int CvLuaUnit::lGetNearNumEnemyDefenseMod(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const int bResult = pkUnit->GetNearNumEnemyDefenseMod();
-	lua_pushinteger(L, bResult);
-	return 1;
-}
-
-//------------------------------------------------------------------------------
-int CvLuaUnit::lGetNearNumEnemyAttackMod(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	const int bResult = pkUnit->GetNearNumEnemyAttackMod();
-	lua_pushinteger(L, bResult);
-	return 1;
-}
-
-int CvLuaUnit::lGetNumEnemyAdjacent(lua_State* L)
-{
-	CvUnit* pkUnit = GetInstance(L);
-	//CvUnit* pkOtherUnit = CvLuaUnit::GetInstance(L, 2);
-
-	const int iResult = pkUnit->GetNumEnemyAdjacent();
-	lua_pushinteger(L, iResult);
-	return 1;
-}
-
 #endif
 
 
@@ -6063,12 +5925,4 @@ LUAAPIIMPL(Unit, IsWithinDistanceOfResource)
 LUAAPIIMPL(Unit, IsOnTerrain)
 LUAAPIIMPL(Unit, IsAdjacentToTerrain)
 LUAAPIIMPL(Unit, IsWithinDistanceOfTerrain)
-#endif
-
-#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-LUAAPIIMPL(Unit, ClearSamePlotPromotions)
-#endif
-
-#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
-LUAAPIIMPL(Unit, IsImmuneNegtivePromotions)
 #endif

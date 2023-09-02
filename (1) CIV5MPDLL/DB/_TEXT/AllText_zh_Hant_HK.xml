@@ -2,13 +2,6 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
-
-	<Row Tag="TXT_KEY_PRODMOD_WONDER_IMPROVEMENT">
-			<Text>
-				[NEWLINE][ICON_BULLET]改良設施提供奇觀建造加成: {1_Num}%。
-			</Text>
-		</Row>
-
 		<Row Tag="TXT_KEY_SPY_STATE_TERMINATED">
 			<Text>被消滅了！</Text>
 		</Row>
@@ -181,73 +174,6 @@
 	<Language_zh_Hant_HK>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_NUM_GREAT_WORK">
 			<Text>[NEWLINE][ICON_BULLET]杰作修正: {1_Num}%</Text>
-		</Row>
-	</Language_zh_Hant_HK>
-
-	<Language_zh_Hant_HK>
-		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE">
-			<Text>戰爭給你的文明帶來了巨大的傷亡！[COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]失去{2_loss}個單位的[ICON_CITIZEN]人口！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY">
-			<Text>慘重的戰爭傷亡！</Text>
-		</Row>
-
-		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE">
-			<Text>在防禦中，你的{2_UnitName}受到{1_EnUName}攻擊時的[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點濺射傷害！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_ENEMY">
-			<Text>你的{1_UnitName}攻擊時對{2_EnUName}造成了[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點濺射傷害！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_DEATH">
-			<Text>在防禦中，你的{2_UnitName}被{1_EnUName}攻擊時的濺射傷害消滅了！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_ENEMY_DEATH">
-			<Text>你的{1_UnitName}攻擊時的濺射傷害將{2_EnUName}消滅了！</Text>
-		</Row>
-
-		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE">
-			<Text>在防禦中，你的{2_UnitName}受到敵方{1_EnUName}攻擊時的[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點穿透傷害！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY">
-			<Text>你的{1_UnitName}攻擊時對敵方{2_EnUName}造成了[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點穿透傷害！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_DEATH">
-			<Text>在防禦中，你的{2_UnitName}被敵方{1_EnUName}攻擊時的穿透傷害消滅了！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY_DEATH">
-			<Text>你的{1_UnitName}攻擊時的穿透傷害將敵方{2_EnUName}消滅了！</Text>
-		</Row>
-
-		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKING">
-			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] 建築在此次襲擊中被摧毀！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKED">
-			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] 建築在你的城市中被摧毀: {2_CityName:textkey}</Text>
-		</Row>
-
-		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_KILL_POPULATION_ATTACKING">
-			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] [ICON_CITIZEN] 市民在此次襲擊中死亡！</Text>
-		</Row>
-		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_KILL_POPULATION_ATTACKED">
-			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] [ICON_CITIZEN] 市民在你的城市中被殺害：{2_CityName}</Text>
-		</Row>
-
-		<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER">
-			<Text>
-				[NEWLINE][ICON_BULLET]城市級修正(世界奇觀): {1_Num}%
-			</Text>
-		</Row>
-
-		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_TRADE_ROUTE_NUM">
-			<Text>
-				[NEWLINE][ICON_BULLET]商路數量修正(政策): {1_Num}%
-			</Text>
-		</Row>
-
-		<Row Tag="TXT_KEY_TP_HAPPINESS_FAITH">
-			<Text>
-				{1_Happiness} 來自[ICON_PEACE]信仰。
-			</Text>
 		</Row>
 	</Language_zh_Hant_HK>
 </GameData>
