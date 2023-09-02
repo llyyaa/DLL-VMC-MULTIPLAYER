@@ -70,6 +70,14 @@ CvUnitEntry::CvUnitEntry(void) :
 #endif
 	m_iXPValueAttack(0),
 	m_iXPValueDefense(0),
+#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
+	m_iExtraXPValueAttack(0),
+	m_iExtraXPValueDefense(0),
+#endif
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	m_iBoundLandImprovement(NO_IMPROVEMENT),
+	m_iBoundWaterImprovement(NO_IMPROVEMENT),
+#endif
 	m_iSpecialCargo(0),
 	m_iDomainCargo(0),
 	m_iConscriptionValue(0),
@@ -128,6 +136,9 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_pbGreatPeoples(NULL),
 	m_pbBuildings(NULL),
 	m_pbBuildingClassRequireds(NULL),
+	m_piTechCombatStrength(NULL),
+	m_piTechRangedCombatStrength(NULL),
+	m_bUnitTechUpgrade(false),
 	m_piPrereqAndTechs(NULL),
 	m_piResourceQuantityRequirements(NULL),
 	m_piProductionTraits(NULL),
@@ -171,7 +182,8 @@ CvUnitEntry::~CvUnitEntry(void)
 	SAFE_DELETE_ARRAY(m_paszMiddleArtDefineTags);
 	SAFE_DELETE_ARRAY(m_paszUnitNames);
 	SAFE_DELETE_ARRAY(m_paeGreatWorks);
-
+	SAFE_DELETE_ARRAY(m_piTechCombatStrength);
+	SAFE_DELETE_ARRAY(m_piTechRangedCombatStrength);
 #if defined(MOD_BALANCE_CORE)
 	SAFE_DELETE_ARRAY(m_piScalingFromOwnedImprovements);
 #endif
@@ -254,6 +266,10 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 #endif
 	m_iXPValueAttack = kResults.GetInt("XPValueAttack");
 	m_iXPValueDefense = kResults.GetInt("XPValueDefense");
+#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
+	m_iExtraXPValueAttack = kResults.GetInt("ExtraXPValueAttack");
+	m_iExtraXPValueDefense = kResults.GetInt("ExtraXPValueDefense");
+#endif
 	m_iConscriptionValue = kResults.GetInt("Conscription");
 	m_iExtraMaintenanceCost = kResults.GetInt("ExtraMaintenanceCost");
 	m_bNoMaintenance = kResults.GetBool("NoMaintenance");
@@ -301,6 +317,13 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	szTextVal = kResults.GetText("CombatClass");
 	m_iUnitCombatType = GC.getInfoTypeForString(szTextVal, true);
 
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	szTextVal = kResults.GetText("BoundLandImprovement");
+	m_iBoundLandImprovement = GC.getInfoTypeForString(szTextVal, true);
+	szTextVal = kResults.GetText("BoundWaterImprovement");
+	m_iBoundWaterImprovement = GC.getInfoTypeForString(szTextVal, true);
+#endif
+
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
 	szTextVal = kResults.GetText("PromotionClass");
 	m_iUnitPromotionType = GC.getInfoTypeForString(szTextVal, true);
@@ -313,7 +336,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 #if defined(MOD_EVENTS_CAN_MOVE_INTO)
 	m_bSendCanMoveIntoEvent = kResults.GetBool("SendCanMoveIntoEvent");
 #endif
-
+	m_bUnitTechUpgrade = kResults.GetBool("UnitTechUpgrade");
 	szTextVal = kResults.GetText("Domain");
 	m_iDomainType = GC.getInfoTypeForString(szTextVal, true);
 
@@ -378,6 +401,8 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	kUtility.PopulateArrayByExistence(m_pbBuildings, "Buildings", "Unit_Buildings", "BuildingType", "UnitType", szUnitType);
 	kUtility.PopulateArrayByExistence(m_pbBuildingClassRequireds, "BuildingClasses", "Unit_BuildingClassRequireds", "BuildingClassType", "UnitType", szUnitType);
 
+	kUtility.PopulateArrayByValue(m_piTechCombatStrength, "Technologies", "Unit_TechCombatStrength", "TechType", "UnitType", szUnitType, "CombatStrength");
+	kUtility.PopulateArrayByValue(m_piTechRangedCombatStrength, "Technologies", "Unit_TechRangedCombatStrength", "TechType", "UnitType", szUnitType, "RangedCombatStrength");
 #if defined(MOD_BALANCE_CORE)
     if (MOD_BALANCE_CORE)
 	{
@@ -791,6 +816,32 @@ int CvUnitEntry::GetXPValueDefense() const
 {
 	return m_iXPValueDefense;
 }
+
+#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
+/// Extra Experience point value when attacking
+int CvUnitEntry::GetExtraXPValueAttack() const
+{
+	return m_iExtraXPValueAttack;
+}
+
+/// Extra Experience point value when defending
+int CvUnitEntry::GetExtraXPValueDefense() const
+{
+	return m_iExtraXPValueDefense;
+}
+#endif
+
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+int CvUnitEntry::GetBoundLandImprovement() const
+{
+	return m_iBoundLandImprovement;
+}
+
+int CvUnitEntry::GetBoundWaterImprovement() const
+{
+	return m_iBoundWaterImprovement;
+}
+#endif
 
 /// Is there a special unit this unit carries (e.g. Nuclear Sub carries Nuclear missile)
 int CvUnitEntry::GetSpecialCargo() const
@@ -1207,6 +1258,27 @@ bool CvUnitEntry::GetBuildingClassRequireds(int i) const
 	return m_pbBuildingClassRequireds ? m_pbBuildingClassRequireds[i] : false;
 }
 
+/// Does this Unit get a new combat strength when reaching a new Era?
+int CvUnitEntry::GetTechCombatStrength(int i) const
+{
+	CvAssertMsg(i < GC.getNumTechInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piTechCombatStrength ? m_piTechCombatStrength[i] : -1;
+}
+
+int CvUnitEntry::GetTechRangedCombatStrength(int i) const
+{
+	CvAssertMsg(i < GC.getNumTechInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piTechRangedCombatStrength ? m_piTechRangedCombatStrength[i] : -1;
+}
+
+
+bool CvUnitEntry::IsUnitTechUpgrade() const
+{
+	return m_bUnitTechUpgrade;
+}
+
 /// Initial set of promotions for this unit
 bool CvUnitEntry::GetFreePromotions(int i) const
 {
@@ -1492,17 +1564,17 @@ void CvUnitEntry::DoUpdatePower()
 				}
 			}
 
-			for(iLoop = 0; iLoop < GC.getNumFeatureInfos(); iLoop++)
+			for (iLoop = 0; iLoop < GC.getNumFeatureInfos(); iLoop++)
 			{
 				// Feature Attack - add one quarter of the bonus
-				if(kPromotion->GetFeatureAttackPercent(iLoop) > 0)
+				if (kPromotion->GetFeatureAttackPercent(iLoop) > 0)
 				{
 					iTemp = (iBasePower * kPromotion->GetFeatureAttackPercent(iLoop) / 4);
 					iTemp /= 100;
 					iBonusPower += iTemp;
 				}
 				// Feature Defense - add one quarter of the bonus
-				if(kPromotion->GetFeatureDefensePercent(iLoop) > 0)
+				if (kPromotion->GetFeatureDefensePercent(iLoop) > 0)
 				{
 					iTemp = (iBasePower * kPromotion->GetFeatureDefensePercent(iLoop) / 4);
 					iTemp /= 100;
@@ -1510,54 +1582,17 @@ void CvUnitEntry::DoUpdatePower()
 				}
 			}
 
-#if defined(MOD_BUGFIX_UNITCOMBAT_BONUS_VS_DOMAIN_ONLY)
-			if (MOD_BUGFIX_UNITCOMBAT_BONUS_VS_DOMAIN_ONLY) {
-				// Only add UNITCOMBAT bonuses against the same domain, so we need to know the domain of combat classes
-				//   DOMAIN_SEA is UNITCOMBAT_NAVALRANGED and UNITCOMBAT_NAVALMELEE
-				//   DOMAIN_AIR is UNITCOMBAT_HELICOPTER, UNITCOMBAT_FIGHTER and UNITCOMBAT_BOMBER
-				//   DOMAIN_LAND is everything else
-				int iMyDomain = GetDomainType();
-				for(iLoop = 0; iLoop < GC.getNumUnitCombatClassInfos(); iLoop++)
+			for (iLoop = 0; iLoop < GC.getNumUnitCombatClassInfos(); iLoop++)
+			{
+				// Unit Combat Class (e.g. Pikemen) - add one quarter of the bonus
+				if (kPromotion->GetUnitCombatModifierPercent(iLoop) > 0)
 				{
-					int iTheirDomain = NO_DOMAIN;
-					CvBaseInfo* pkUnitCombatInfo = GC.getUnitCombatClassInfo((UnitCombatTypes)iLoop);
-					if (pkUnitCombatInfo) {
-						int iTheirUnitCombat = pkUnitCombatInfo->GetID();
-					
-						if (iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_NAVALRANGED", true) || iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_NAVALMELEE", true)) {
-							iTheirDomain = DOMAIN_SEA;
-						} else if (iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_HELICOPTER", true) || iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_FIGHTER", true) || iTheirUnitCombat == GC.getInfoTypeForString("UNITCOMBAT_BOMBER", true)) {
-							iTheirDomain = DOMAIN_AIR;
-						} else {
-							iTheirDomain = DOMAIN_LAND;
-						}
-					}
-
-					if (iMyDomain == iTheirDomain) {
-						// Unit Combat Class (e.g. Pikemen) - add one quarter of the bonus
-						if(kPromotion->GetUnitCombatModifierPercent(iLoop) > 0)
-						{
-							iTemp = (iBasePower * kPromotion->GetUnitCombatModifierPercent(iLoop) / 4);
-							iTemp /= 100;
-							iBonusPower += iTemp;
-						}
-					}
+					iTemp = (iBasePower * kPromotion->GetUnitCombatModifierPercent(iLoop) / 4);
+					iTemp /= 100;
+					iBonusPower += iTemp;
 				}
-			} else {
-#endif
-				for(iLoop = 0; iLoop < GC.getNumUnitCombatClassInfos(); iLoop++)
-				{
-					// Unit Combat Class (e.g. Pikemen) - add one quarter of the bonus
-					if(kPromotion->GetUnitCombatModifierPercent(iLoop) > 0)
-					{
-						iTemp = (iBasePower * kPromotion->GetUnitCombatModifierPercent(iLoop) / 4);
-						iTemp /= 100;
-						iBonusPower += iTemp;
-					}
-				}
-#if defined(MOD_BUGFIX_UNITCOMBAT_BONUS_VS_DOMAIN_ONLY)
 			}
-#endif
+		   
 
 			for(iLoop = 0; iLoop < GC.getNumUnitClassInfos(); iLoop++)
 			{
@@ -1591,6 +1626,21 @@ void CvUnitEntry::DoUpdatePower()
 				if(kPromotion->GetDomainModifierPercent(iLoop) > 0)
 				{
 					iTemp = (iBasePower * kPromotion->GetDomainModifierPercent(iLoop) / 4);
+					iTemp /= 100;
+					iBonusPower += iTemp;
+				}
+
+				// Domain Attack - add one sixth of the bonus
+				if (kPromotion->GetDomainAttackPercent(iLoop) > 0)
+				{
+					iTemp = (iBasePower * kPromotion->GetDomainAttackPercent(iLoop) / 6);
+					iTemp /= 100;
+					iBonusPower += iTemp;
+				}
+				// Domain Defense - add one sixth of the bonus
+				if (kPromotion->GetDomainDefensePercent(iLoop) > 0)
+				{
+					iTemp = (iBasePower * kPromotion->GetDomainDefensePercent(iLoop) / 6);
 					iTemp /= 100;
 					iBonusPower += iTemp;
 				}

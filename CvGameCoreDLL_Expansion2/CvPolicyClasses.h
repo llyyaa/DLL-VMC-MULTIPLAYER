@@ -73,6 +73,13 @@ public:
 	int GetCapitalUnhappinessMod() const;
 	int GetFreeExperience() const;
 	int GetWorkerSpeedModifier() const;
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int GetHappinessPerPolicy() const;
+	int GetNumTradeRouteBonus() const;
+	int GetWaterBuildSpeedModifier() const;
+	int GetSettlerProductionEraModifier() const;
+	int GetSettlerProductionStartEra() const;
+#endif
 	int GetAllFeatureProduction() const;
 	int GetImprovementCostModifier() const;
 	int GetImprovementUpgradeRateModifier() const;
@@ -113,6 +120,11 @@ public:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int GetConversionModifier() const;
 #endif
+
+	int GetYieldModifierFromActiveSpies(int i) const;
+	int* GetYieldModifierFromActiveSpiesArray() const;
+
+
 	int GetGoldPerUnit() const;
 	int GetGoldPerMilitaryUnit() const;
 	int GetCityStrengthMod() const;
@@ -219,13 +231,15 @@ public:
 	int GetBuildingClassHappiness(int i) const;
 	int GetBuildingClassProductionModifier(int i) const;
 	int GetBuildingClassTourismModifier(int i) const;
-	int GetNumFreeUnitsByClass(int i) const;
+	int GetNumFreeUnitsByClass() const;
+	std::pair<UnitClassTypes, int>* GetFreeUnitsByClass() const;
 	int GetTourismByUnitClassCreated(int i) const;
 	int GetImprovementCultureChanges(int i) const;
 
 	int GetHurryModifier(int i) const;
 	bool IsSpecialistValid(int i) const;
 	int GetImprovementYieldChanges(int i, int j) const;
+	int GetCityLoveKingDayYieldMod(int i) const;
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
 	int GetPlotYieldChanges(int i, int j) const;
 #endif
@@ -257,6 +271,19 @@ public:
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	bool IsDummy() const;
 #endif
+	bool IsAlwaysWeLoveKindDayInGoldenAge() const;
+	bool IsNoResistance() const;
+	bool IsUpgradeAllTerritory() const;
+	int GetDefenseBoost() const;
+	int GetCityCaptureHealGlobal() const;
+	int GetOriginalCapitalCaptureTech() const;
+	int GetOriginalCapitalCapturePolicy() const;
+	int GetOriginalCapitalCaptureGreatPerson() const;
+	int GetFreePopulation() const;
+	int GetFreePopulationCapital() const;
+	int GetExtraSpies() const;
+	int GetGreatScientistBeakerPolicyModifier() const;
+	int GetProductionBeakerMod() const;
 	bool IsOneShot() const;
 	bool IncludesOneShotFreeUnits() const;
 
@@ -265,6 +292,40 @@ public:
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 	int GetMinorsTradeRouteYieldRate(const YieldTypes eYieldType) const;
 	int GetInternalTradeRouteDestYieldRate(const YieldTypes eYieldType) const;
+#endif
+
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	int GetWarCasualtiesModifier() const;
+#endif
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int GetIdeologyPressureModifier() const;
+	int GetIdeologyUnhappinessModifier() const;
+#endif
+
+	int GetInstantFoodThresholdPercent() const;
+	LuaFormulaTypes GetCaptureCityResistanceTurnsChangeFormula() const;
+
+	std::vector<PolicyYieldInfo>& GetCityWithWorldWonderYieldModifier();
+	std::vector<PolicyYieldInfo>& GetTradeRouteCityYieldModifier();
+	std::vector<PolicyYieldInfo>& GetCityNumberCityYieldModifier();
+	std::vector<PolicyYieldInfo>& GetHappinessYieldModifier();
+
+	std::vector<PolicyResourceInfo>& GetCityResources();
+
+	int GetGlobalHappinessFromFaithPercent() const;
+	int GetHappinessInWLTKDCities() const;
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int GetResourceUnhappinessModifier() const;
+	int GetResourceCityConnectionTradeRouteGoldModifier() const;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScoreModifier() const;
+	bool GetCorruptionLevelReduceByOne() const;
+	bool IsInvolveCorruption() const;
+	int GetCorruptionLevelPolicyCostModifier(CorruptionLevelTypes level) const;
 #endif
 
 private:
@@ -311,6 +372,13 @@ private:
 	int m_iCapitalUnhappinessMod;
 	int m_iFreeExperience;
 	int m_iWorkerSpeedModifier;
+#if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int m_iHappinessPerPolicy;
+	int m_iNumTradeRouteBonus;
+	int m_iWaterBuildSpeedModifier;
+	int m_iSettlerProductionEraModifier;
+	int m_iSettlerProductionStartEra;
+#endif
 	int m_iAllFeatureProduction;
 	int m_iImprovementCostModifier;
 	int m_iImprovementUpgradeRateModifier;
@@ -422,6 +490,19 @@ private:
 #if defined(MOD_BUGFIX_DUMMY_POLICIES)
 	bool m_bDummy;
 #endif
+	bool m_bAlwaysWeLoveKindDayInGoldenAge;
+	bool m_bNoResistance;
+	bool m_bUpgradeAllTerritory;
+	int m_iDefenseBoost;
+	int m_iCityCaptureHealGlobal;
+	int m_iOriginalCapitalCaptureTech;
+	int m_iOriginalCapitalCapturePolicy;
+	int m_iOriginalCapitalCaptureGreatPerson;
+	int m_iFreePopulation;
+	int m_iFreePopulationCapital;
+	int m_iExtraSpies;
+	int m_iGreatScientistBeakerPolicyModifier;
+	int m_iProductionBeakerMod;
 	bool m_bOneShot;
 	bool m_bIncludesOneShotFreeUnits;
 
@@ -455,9 +536,11 @@ private:
 	int* m_paiBuildingClassProductionModifiers;
 	int* m_paiBuildingClassTourismModifiers;
 	int* m_paiBuildingClassHappiness;
-	int* m_paiFreeUnitClasses;
+	int m_iNumFreeUnitClass;
+	std::pair<UnitClassTypes, int>* m_pFreeUnitClasses;
 	int* m_paiTourismOnUnitCreation;
 
+	int* m_piCityLoveKingDayYieldMod;
 //	bool* m_pabHurry;
 	bool* m_pabSpecialistValid;
 	int** m_ppiImprovementYieldChanges;
@@ -480,13 +563,48 @@ private:
 	int* m_piYieldChangesNaturalWonder;
 	int* m_piYieldChangeWorldWonder;
 #endif
+	int* m_piYieldModifierFromActiveSpies;
 	int** m_ppiBuildingClassYieldModifiers;
 	int** m_ppiBuildingClassYieldChanges;
 	int* m_piFlavorValue;
 
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	int m_iWarCasualtiesModifier;
+#endif
+
+
+#ifdef MOD_POLICIY_PUBLIC_OPTION
+	int m_iIdeologyPressureModifier = 0;
+	int m_iIdeologyUnhappinessModifier = 0;
+#endif
+
+	int m_iInstantFoodThresholdPercent = 0;
+
+	LuaFormulaTypes m_eCaptureCityResistanceTurnsChangeFormula = NO_LUA_FORMULA;
+
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piMinorsTradeRouteYieldRate;
 	Firaxis::Array<int, YieldTypes::NUM_YIELD_TYPES> m_piInternalTradeRouteDestYieldRate;
+#endif
+
+	std::vector<PolicyYieldInfo> m_vCityWithWorldWonderYieldModifier;
+	std::vector<PolicyYieldInfo> m_vTradeRouteCityYieldModifier;
+	std::vector<PolicyYieldInfo> m_vCityNumberCityYieldModifier;
+	std::vector<PolicyYieldInfo> m_vHappinessYieldModifier;
+	int m_iGlobalHappinessFromFaithPercent = 0;
+	int m_iHappinessInWLTKDCities = 0;
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	int m_iResourceUnhappinessModifier = 0;
+	int m_iResourceCityConnectionTradeRouteGoldModifier = 0;
+#endif
+
+	std::vector<PolicyResourceInfo> m_vCityResources;
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCorruptionScoreModifier = 0;
+	bool m_bCorruptionLevelReduceByOne = false;
+	std::vector<int> m_paiCorruptionLevelPolicyCostModifier;
 #endif
 };
 
@@ -582,6 +700,7 @@ enum PolicyModifierType
     POLICYMOD_GREAT_GENERAL_RATE,
     POLICYMOD_DOMESTIC_GREAT_GENERAL_RATE,
     POLICYMOD_POLICY_COST_MODIFIER,
+	POLICYMOD_CITY_DEFENSE_BOOST,
     POLICYMOD_RELIGION_PRODUCTION_MODIFIER,
     POLICYMOD_WONDER_PRODUCTION_MODIFIER,
     POLICYMOD_BUILDING_PRODUCTION_MODIFIER,

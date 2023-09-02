@@ -133,18 +133,26 @@ public:
 	int GetWorkerSpeedModifier() const;
 	int GetAfraidMinorPerTurnInfluence() const;
 	int GetLandTradeRouteRangeBonus() const;
+	int GetGoldenAgeMinorPerTurnInfluence() const;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int GetSeaTradeRouteRangeBonus() const;
 #endif
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetCiviliansFreePromotion() const;
+	int GetTradeRouteLandGoldBonus() const;
+	int GetTradeRouteSeaGoldBonus() const;
+#endif
 
 	TechTypes GetFreeUnitPrereqTech() const;
 	ImprovementTypes GetCombatBonusImprovement() const;
 	BuildingTypes GetFreeBuilding() const;
 	BuildingTypes GetFreeBuildingOnConquest() const;
 
+	bool IsTrainedAll() const;
 	bool IsFightWellDamaged() const;
+	bool IsBuyOwnedTiles() const;
 	bool IsMoveFriendlyWoodsAsRoad() const;
 	bool IsFasterAlongRiver() const;
 	bool IsFasterInHills() const;
@@ -157,6 +165,8 @@ public:
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool IsAnyBelief() const;
 #endif
+	bool IsGoldenAgeOnWar() const;
+	bool IsNoResistance() const;
 	bool IsBonusReligiousBelief() const;
 	bool IsAbleToAnnexCityStates() const;
 	bool IsCrossesMountainsAfterGreatGeneral() const;
@@ -184,6 +194,9 @@ public:
 	int GetYieldChangePerTradePartner(int i) const;
 	int GetYieldChangeIncomingTradeRoute(int i) const;
 	int GetYieldModifier(int i) const;
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	int GetGoldenAgeYieldModifier(int i) const;
+#endif
 	int GetStrategicResourceQuantityModifier(int i) const;
 	int GetObsoleteTech() const;
 	int GetPrereqTech() const;
@@ -225,6 +238,9 @@ public:
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool IsFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	bool IsFreePromotionUnitClass(const int promotionID, const int unitClassID) const;
+#endif
 	bool IsObsoleteByTech(TeamTypes eTeam);
 	bool IsEnabledByTech(TeamTypes eTeam);
 #if defined(MOD_TRAITS_OTHER_PREREQS)
@@ -242,6 +258,33 @@ public:
 #endif
 
 	bool NoTrain(UnitClassTypes eUnitClassType);
+
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYield) const;
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+	int GetSpreadReligionFromKilledUnitStrengthPercent() const;
+	int GetSpreadReligionRadius() const;
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	int GetInflictDamageChangePerCapturedHolyCity() const;
+	int GetDamageChangePerCapturedHolyCity() const;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	int GetSiegeDamagePercentIfSameReligion() const;
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	int GetFaithPurchaseCostPercent() const;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	bool GetCorruptionLevelReduceByOne() const;
+	int GetMaxCorruptionLevel() const;
+#endif
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
@@ -332,18 +375,27 @@ protected:
 	int m_iWorkerSpeedModifier;
 	int m_iAfraidMinorPerTurnInfluence;
 	int m_iLandTradeRouteRangeBonus;
+	int m_iGoldenAgeMinorPerTurnInfluence;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int m_iSeaTradeRouteRangeBonus;
 #endif
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iCiviliansFreePromotion;
+	int m_iTradeRouteLandGoldBonus;
+	int m_iTradeRouteSeaGoldBonus;
+#endif
 
 	TechTypes m_eFreeUnitPrereqTech;
 	ImprovementTypes m_eCombatBonusImprovement;
 	BuildingTypes m_eFreeBuilding;
 	BuildingTypes m_eFreeBuildingOnConquest;
 
+	
+	bool m_bTrainedAll;
 	bool m_bFightWellDamaged;
+	bool m_bBuyOwnedTiles;
 	bool m_bMoveFriendlyWoodsAsRoad;
 	bool m_bFasterAlongRiver;
 	bool m_bFasterInHills;
@@ -356,6 +408,8 @@ protected:
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool m_bAnyBelief;
 #endif
+	bool m_bGoldenAgeOnWar;
+	bool m_bNoResistance;
 	bool m_bBonusReligiousBelief;
 	bool m_bAbleToAnnexCityStates;
 	bool m_bCrossesMountainsAfterGreatGeneral;
@@ -388,6 +442,9 @@ protected:
 	int* m_paiYieldChangePerTradePartner;
 	int* m_paiYieldChangeIncomingTradeRoute;
 	int* m_paiYieldModifier;
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	int* m_paiGoldenAgeYieldModifier;
+#endif
 	int* m_piStrategicResourceQuantityModifier;
 	int* m_piResourceQuantityModifiers;
 	int* m_piMovesChangeUnitCombats;
@@ -420,8 +477,38 @@ protected:
 	int** m_ppiUnimprovedFeatureYieldChanges;
 
 	std::multimap<int, int> m_FreePromotionUnitCombats;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	std::multimap<int, int> m_FreePromotionUnitClasses;
+#endif
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
 	std::vector<bool> m_abNoTrainUnitClass;
+
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+	int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
+	int m_iSpreadReligionRadius = 0;
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	int m_iInflictDamageChangePerCapturedHolyCity = 0;
+	int m_iDamageChangePerCapturedHolyCity = 0;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	int m_iSiegeDamagePercentIfSameReligion = 0;
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	int m_iFaithPurchaseCombatUnitCostPercent = 0;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	bool m_bCorruptionLevelReduceByOne = 0;
+	int m_iMaxCorruptionLevel = -1;
+#endif
 
 private:
 	CvTraitEntry(const CvTraitEntry&);
@@ -775,6 +862,10 @@ public:
 	{
 		return m_iLandTradeRouteRangeBonus;
 	}
+	int GetGoldenAgeMinorPerTurnInfluence() const
+	{
+		return m_iGoldenAgeMinorPerTurnInfluence;
+	}
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int GetSeaTradeRouteRangeBonus() const
 	{
@@ -790,9 +881,32 @@ public:
 		return m_iTradeBuildingModifier;
 	}
 
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetCiviliansFreePromotion() const
+	{
+		return m_iCiviliansFreePromotion;
+	}
+
+	int GetTradeRouteLandGoldBonus() const
+	{
+		return m_iTradeRouteLandGoldBonus;
+	}
+	int GetTradeRouteSeaGoldBonus() const
+	{
+		return m_iTradeRouteSeaGoldBonus;
+	}
+#endif
+	bool IsTrainedAll() const
+	{
+		return m_bTrainedAll;
+	};
 	bool IsFightWellDamaged() const
 	{
 		return m_bFightWellDamaged;
+	};
+	bool IsBuyOwnedTiles() const
+	{
+		return m_bBuyOwnedTiles;
 	};
 	bool IsMoveFriendlyWoodsAsRoad() const
 	{
@@ -836,6 +950,14 @@ public:
 		return m_bAnyBelief;
 	};
 #endif
+	bool IsGoldenAgeOnWar() const
+	{
+		return m_bGoldenAgeOnWar;
+	};
+	bool IsNoResistance() const
+	{
+		return m_bNoResistance;
+	};
 	bool IsBonusReligiousBelief() const
 	{
 		return m_bBonusReligiousBelief;
@@ -913,6 +1035,12 @@ public:
 	{
 		return m_iYieldRateModifier[(int)eYield];
 	};
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	int GetGoldenAgeYieldRateModifier(YieldTypes eYield) const
+	{
+		return m_iGoldenAgeYieldRateModifier[(int)eYield];
+	};
+#endif
 	int GetStrategicResourceQuantityModifier(TerrainTypes eTerrain) const
 	{
 		return m_iStrategicResourceQuantityModifier[(int)eTerrain];
@@ -970,6 +1098,9 @@ public:
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool HasFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	bool HasFreePromotionUnitClass(const int promotionID, const int unitClassID) const;
+#endif
 
 	// Public functions to make trait-based game state changes
 	void AddUniqueLuxuries(CvCity *pCity);
@@ -1004,6 +1135,31 @@ public:
 
 	bool NoTrain(UnitClassTypes eUnitClassType);
 
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType) const
+	{
+		return m_piPerMajorReligionFollowerYieldModifier[eYieldType];
+	}
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+	int GetSpreadReligionFromKilledUnitStrengthPercent() const;
+	int GetSpreadReligionRadius() const;
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	int GetInflictDamageChangePerCapturedHolyCity() const;
+	int GetDamageChangePerCapturedHolyCity() const;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	int GetSiegeDamagePercentIfSameReligion() const;
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	int GetFaithPurchaseCombatUnitCostPercent() const;
+#endif
+
 	// Maya calendar routines
 	bool IsUsingMayaCalendar() const;
 	bool IsEndOfMayaLongCount();
@@ -1021,6 +1177,11 @@ public:
 
 #ifdef MOD_TRAITS_CAN_FOUND_COAST_CITY
 	bool IsCanFoundCoastCity() const;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	bool GetCorruptionLevelReduceByOne() const;
+	int GetMaxCorruptionLevel() const;
 #endif
 
 	// Serialization
@@ -1118,14 +1279,21 @@ private:
 	int m_iWorkerSpeedModifier;
 	int m_iAfraidMinorPerTurnInfluence; 
 	int m_iLandTradeRouteRangeBonus;
+	int m_iGoldenAgeMinorPerTurnInfluence;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	int m_iSeaTradeRouteRangeBonus;
 #endif
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iCiviliansFreePromotion;
+	int m_iTradeRouteLandGoldBonus;
+	int m_iTradeRouteSeaGoldBonus;
+#endif
 	// Saved
-
+	bool m_bTrainedAll;
 	bool m_bFightWellDamaged;
+	bool m_bBuyOwnedTiles;
 	bool m_bMoveFriendlyWoodsAsRoad;
 	bool m_bFasterAlongRiver;
 	bool m_bFasterInHills;
@@ -1138,6 +1306,8 @@ private:
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool m_bAnyBelief;
 #endif
+	bool m_bGoldenAgeOnWar;
+	bool m_bNoResistance;
 	bool m_bBonusReligiousBelief;
 	bool m_bAbleToAnnexCityStates;
 	bool m_bCrossesMountainsAfterGreatGeneral;
@@ -1175,6 +1345,9 @@ private:
 	int m_iYieldChangePerTradePartner[NUM_YIELD_TYPES];
 	int m_iYieldChangeIncomingTradeRoute[NUM_YIELD_TYPES];
 	int m_iYieldRateModifier[NUM_YIELD_TYPES];
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	int m_iGoldenAgeYieldRateModifier[NUM_YIELD_TYPES];
+#endif
 	int m_iStrategicResourceQuantityModifier[NUM_TERRAIN_TYPES];
 	std::vector<int> m_aiResourceQuantityModifier;
 	std::vector<bool> m_abNoTrain;
@@ -1221,6 +1394,33 @@ private:
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppaaiUnimprovedFeatureYieldChange;
 
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
+
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+	int m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
+	int m_iSpreadReligionRadius = 0;
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	int m_iInflictDamageChangePerCapturedHolyCity = 0;
+	int m_iDamageChangePerCapturedHolyCity = 0;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	int m_iSiegeDamagePercentIfSameReligion = 0;
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	int m_iFaithPurchaseCombatUnitCostPercent = 0;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	bool m_bCorruptionLevelReduceByOne = 0;
+	int m_iMaxCorruptionLevel = -1;
+#endif
 };
 
 #endif //CIV5_TRAIT_CLASSES_H

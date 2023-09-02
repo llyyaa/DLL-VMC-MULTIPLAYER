@@ -10,3 +10,16 @@ create table Building_YieldFromOtherYield(
 	OutYieldType text not null references Yields(Type),
 	OutYieldValue integer not null
 );
+
+ALTER TABLE Buildings ADD COLUMN 'AllowInstantYield' BOOLEAN DEFAULT 0;
+ALTER TABLE Buildings ADD COLUMN 'AnyWater' BOOLEAN DEFAULT 0;
+
+CREATE TABLE Building_ClassesNeededGlobal(
+	'BuildingType' text , 
+	'BuildingClassType' text , 
+	foreign key (BuildingType) references Buildings(Type), 
+	foreign key (BuildingClassType) references BuildingClasses(Type)
+);
+
+ALTER TABLE Buildings ADD 'TradeRouteSeaGoldBonusGlobal' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'TradeRouteLandGoldBonusGlobal' INTEGER DEFAULT 0;

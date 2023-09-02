@@ -659,9 +659,19 @@ void CvTacticalAI::LaunchAttack(void* pAttacker, CvTacticalTarget* pTarget, bool
 		bool bSendAttack = pUnit->getMoves() > 0 && !pUnit->isOutOfAttacks();
 		if(bSendAttack)
 		{
+			auto x = pTarget->GetTargetX();
+			auto y = pTarget->GetTargetY();
+			auto* pPlot = GC.getMap().plot(x, y);
 			if(bRanged && pUnit->getDomainType() != DOMAIN_AIR)	// Air attack is ranged, but it goes through the 'move to' mission.
 			{
-				pUnit->PushMission(CvTypes::getMISSION_RANGE_ATTACK(), pTarget->GetTargetX(), pTarget->GetTargetY());
+				if (MOD_SP_SMART_AI && pUnit->IsCanAttackWithMove() && pPlot && pPlot->isCity() && pPlot->getPlotCity() != nullptr && pPlot->getPlotCity()->getDamage() >= pPlot->getPlotCity()->GetMaxHitPoints() - 1)
+				{
+					pUnit->PushMission(CvTypes::getMISSION_MOVE_TO(), pTarget->GetTargetX(), pTarget->GetTargetY());
+				}
+				else
+				{
+					pUnit->PushMission(CvTypes::getMISSION_RANGE_ATTACK(), pTarget->GetTargetX(), pTarget->GetTargetY());
+				}
 			}
 			//else if (pUnit->canNuke(NULL)) // NUKE tactical attack (ouch)
 			//{
@@ -4234,7 +4244,11 @@ void CvTacticalAI::PlotSingleHexOperationMoves(CvAIEscortedOperation* pOperation
 						// can move that escort can't -- like minor civ territory), then find a new path based on moving the escort
 						if(pCell->IsFriendlyTurnEndTile() || !pBlockingUnit)
 						{
+#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+							if(!pEscort->GeneratePath(pOperation->GetTargetPlot(), 0, false /*bReuse*/) && !pOperation->GetTargetPlot()->isMountain())
+#else
 							if(!pEscort->GeneratePath(pOperation->GetTargetPlot(), 0, false /*bReuse*/))
+#endif
 							{
 								pOperation->RetargetCivilian(pCivilian.pointer(), pThisArmy);
 								pCivilian->finishMoves();
@@ -4268,6 +4282,21 @@ void CvTacticalAI::PlotSingleHexOperationMoves(CvAIEscortedOperation* pOperation
 										LogTacticalMessage(strLogString);
 									}
 								}
+#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+								else if(MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && pEscortMove->isMountain())
+								{
+									ExecuteMoveToPlot(pCivilian, pEscortMove, true);
+									pEscort->finishMoves();
+									if(GC.getLogging() && GC.getAILogging())
+									{
+										CvString strLogString;
+										CvString strTemp;
+										strTemp = pCivilian->getUnitInfo().GetDescription();
+										strLogString.Format("Moving %s to target mountain, X: %d, Y: %d, Escort stand", strTemp.GetCString(), pCivilian->getX(), pCivilian->getY());
+										LogTacticalMessage(strLogString);
+									}
+								}
+#endif
 								else
 								{
 									// Didn't find an alternative, retarget operation

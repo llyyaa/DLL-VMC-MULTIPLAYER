@@ -7,6 +7,7 @@
 	------------------------------------------------------------------------------------------------------- */
 #include "CvGameCoreDLLPCH.h"
 #include "CvGameCoreDLLUtil.h"
+#include "CvTraitClasses.h"
 #include "ICvDLLUserInterface.h"
 #include "CvGameCoreUtils.h"
 #include "CvInfosSerializationHelper.h"
@@ -39,6 +40,8 @@ CvTraitEntry::CvTraitEntry() :
 	m_iSeaBarbarianConversionPercent(0),
 	m_iCapitalBuildingModifier(0),
 	m_iPlotBuyCostModifier(0),
+	m_bGoldenAgeOnWar(false),
+	m_bNoResistance(false),
 #if defined(MOD_TRAITS_CITY_WORKING)
 	m_iCityWorkingChange(0),
 #endif
@@ -108,6 +111,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iAfraidMinorPerTurnInfluence(0),
 	m_iLandTradeRouteRangeBonus(0),
 #endif
+	m_iGoldenAgeMinorPerTurnInfluence(0),
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	m_iSeaTradeRouteRangeBonus(0),
 #endif
@@ -115,12 +119,18 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeReligionModifier(0),
 	m_iTradeBuildingModifier(0),
 #endif
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iCiviliansFreePromotion(NO_PROMOTION),
+	m_iTradeRouteLandGoldBonus(0),
+	m_iTradeRouteSeaGoldBonus(0),
+#endif
 
 	m_eFreeUnitPrereqTech(NO_TECH),
 	m_eFreeBuilding(NO_BUILDING),
 	m_eFreeBuildingOnConquest(NO_BUILDING),
-
+	m_bTrainedAll(false),
 	m_bFightWellDamaged(false),
+	m_bBuyOwnedTiles(false),
 	m_bMoveFriendlyWoodsAsRoad(false),
 	m_bFasterAlongRiver(false),
 	m_bFasterInHills(false),
@@ -160,6 +170,9 @@ CvTraitEntry::CvTraitEntry() :
 	m_paiYieldChangePerTradePartner(NULL),
 	m_paiYieldChangeIncomingTradeRoute(NULL),
 	m_paiYieldModifier(NULL),
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	m_paiGoldenAgeYieldModifier(NULL),
+#endif
 	m_piStrategicResourceQuantityModifier(NULL),
 	m_piResourceQuantityModifiers(NULL),
 	m_ppiImprovementYieldChanges(NULL),
@@ -638,6 +651,11 @@ int CvTraitEntry::GetLandTradeRouteRangeBonus() const
 	return m_iLandTradeRouteRangeBonus;
 }
 
+int CvTraitEntry::GetGoldenAgeMinorPerTurnInfluence() const
+{
+	return m_iGoldenAgeMinorPerTurnInfluence;
+}
+
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 int CvTraitEntry::GetSeaTradeRouteRangeBonus() const
 {
@@ -654,6 +672,21 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 {
 	return m_iTradeBuildingModifier;
 }
+
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetCiviliansFreePromotion() const
+{
+	return m_iCiviliansFreePromotion;
+}
+int CvTraitEntry::GetTradeRouteLandGoldBonus() const
+{
+	return m_iTradeRouteLandGoldBonus;
+}
+int CvTraitEntry::GetTradeRouteSeaGoldBonus() const
+{
+	return m_iTradeRouteSeaGoldBonus;
+}
+#endif
 
 /// Accessor: tech that triggers this free unit
 TechTypes CvTraitEntry::GetFreeUnitPrereqTech() const
@@ -683,6 +716,17 @@ BuildingTypes CvTraitEntry::GetFreeBuildingOnConquest() const
 bool CvTraitEntry::IsFightWellDamaged() const
 {
 	return m_bFightWellDamaged;
+}
+
+bool CvTraitEntry::IsBuyOwnedTiles() const
+{
+	return m_bBuyOwnedTiles;
+}
+
+/// Accessor:: does this civ get combat bonuses when damaged?
+bool CvTraitEntry::IsTrainedAll() const
+{
+	return m_bTrainedAll;
 }
 
 /// Accessor:: does this civ move units through forest as if it is road?
@@ -746,6 +790,16 @@ bool CvTraitEntry::IsAnyBelief() const
 	return m_bAnyBelief;
 }
 #endif
+
+bool CvTraitEntry::IsGoldenAgeOnWar() const
+{
+	return m_bGoldenAgeOnWar;
+}
+
+bool CvTraitEntry::IsNoResistance() const
+{
+	return m_bNoResistance;
+}
 
 /// Accessor: does this civ get a bonus religious belief?
 bool CvTraitEntry::IsBonusReligiousBelief() const
@@ -870,6 +924,13 @@ int CvTraitEntry::GetYieldModifier(int i) const
 {
 	return m_paiYieldModifier ? m_paiYieldModifier[i] : -1;
 }
+
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+int CvTraitEntry::GetGoldenAgeYieldModifier(int i) const
+{
+	return m_paiGoldenAgeYieldModifier ? m_paiGoldenAgeYieldModifier[i] : -1;
+}
+#endif
 
 /// Accessor:: Additional quantity of strategic resources
 int CvTraitEntry::GetStrategicResourceQuantityModifier(int i) const
@@ -1132,7 +1193,25 @@ bool CvTraitEntry::IsFreePromotionUnitCombat(const int promotionID, const int un
 
 	return false;
 }
-
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+/// Accessor:: Does the civ get free promotions?
+bool CvTraitEntry::IsFreePromotionUnitClass(const int promotionID, const int unitClassID) const
+{
+	std::multimap<int, int>::const_iterator it = m_FreePromotionUnitClasses.find(promotionID);
+	if(it != m_FreePromotionUnitClasses.end())
+	{
+		std::multimap<int, int>::const_iterator lastElement = m_FreePromotionUnitClasses.upper_bound(promotionID);
+		for(; it != lastElement; ++it)
+		{
+			if(it->second == unitClassID)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+#endif
 /// Has this trait become obsolete?
 bool CvTraitEntry::IsObsoleteByTech(TeamTypes eTeam)
 {
@@ -1243,6 +1322,63 @@ bool CvTraitEntry::IsCanFoundCoastCity() const
 }
 #endif
 
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+int CvTraitEntry::GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYield) const
+{
+	return m_piPerMajorReligionFollowerYieldModifier[eYield];
+}
+#endif
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+int CvTraitEntry::GetSpreadReligionFromKilledUnitStrengthPercent() const
+{
+  	return m_iSpreadReligionFromKilledUnitStrengthPercent;
+}
+
+int CvTraitEntry::GetSpreadReligionRadius() const
+{
+  	return m_iSpreadReligionRadius;
+}
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+int CvTraitEntry::GetInflictDamageChangePerCapturedHolyCity() const
+{
+  	return m_iInflictDamageChangePerCapturedHolyCity;
+}
+
+int CvTraitEntry::GetDamageChangePerCapturedHolyCity() const
+{
+  	return m_iDamageChangePerCapturedHolyCity;
+}
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+int CvTraitEntry::GetSiegeDamagePercentIfSameReligion () const
+{
+	return m_iSiegeDamagePercentIfSameReligion;
+}
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+int CvTraitEntry::GetFaithPurchaseCostPercent() const
+{
+	return m_iFaithPurchaseCombatUnitCostPercent;
+}
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+bool CvTraitEntry::GetCorruptionLevelReduceByOne() const
+{
+	return m_bCorruptionLevelReduceByOne;
+}
+
+int CvTraitEntry::GetMaxCorruptionLevel() const
+{
+	return m_iMaxCorruptionLevel;
+}
+#endif
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -1271,6 +1407,8 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iSeaBarbarianConversionPercent        = kResults.GetInt("SeaBarbarianConversionPercent");
 	m_iCapitalBuildingModifier				= kResults.GetInt("CapitalBuildingModifier");
 	m_iPlotBuyCostModifier					= kResults.GetInt("PlotBuyCostModifier");
+	m_bGoldenAgeOnWar                       = kResults.GetBool("GoldenAgeOnWar");
+	m_bNoResistance                         = kResults.GetBool("NoResistance");
 #if defined(MOD_TRAITS_CITY_WORKING)
 	m_iCityWorkingChange					= kResults.GetInt("CityWorkingChange");
 #endif
@@ -1331,6 +1469,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iWorkerSpeedModifier					= kResults.GetInt("WorkerSpeedModifier");
 	m_iAfraidMinorPerTurnInfluence			= kResults.GetInt("AfraidMinorPerTurnInfluence");
 	m_iLandTradeRouteRangeBonus				= kResults.GetInt("LandTradeRouteRangeBonus");
+	m_iGoldenAgeMinorPerTurnInfluence		= kResults.GetInt("GoldenAgeMinorPerTurnInfluence");
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	if (MOD_TRAITS_TRADE_ROUTE_BONUSES) {
 		m_iSeaTradeRouteRangeBonus			= kResults.GetInt("SeaTradeRouteRangeBonus");
@@ -1369,6 +1508,15 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	{
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	szTextVal = kResults.GetText("CiviliansFreePromotion");
+	if(szTextVal)
+	{
+		m_iCiviliansFreePromotion = GC.getInfoTypeForString(szTextVal, true);
+	}
+	m_iTradeRouteLandGoldBonus = kResults.GetInt("TradeRouteLandGoldBonus");
+	m_iTradeRouteSeaGoldBonus = kResults.GetInt("TradeRouteSeaGoldBonus");
+#endif
 
 #if defined(MOD_TRAITS_OTHER_PREREQS)
 	if (MOD_TRAITS_OTHER_PREREQS) {
@@ -1409,8 +1557,9 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	{
 		m_eFreeBuildingOnConquest = (BuildingTypes)GC.getInfoTypeForString(szTextVal, true);
 	}
-
+	m_bTrainedAll = kResults.GetBool("TrainedAll");
 	m_bFightWellDamaged = kResults.GetBool("FightWellDamaged");
+	m_bBuyOwnedTiles = kResults.GetBool("BuyOwnedTiles");
 	m_bMoveFriendlyWoodsAsRoad = kResults.GetBool("MoveFriendlyWoodsAsRoad");
 	m_bFasterAlongRiver = kResults.GetBool("FasterAlongRiver");
 	m_bFasterInHills = kResults.GetBool("FasterInHills");
@@ -1466,6 +1615,9 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	kUtility.SetYields(m_paiYieldChangePerTradePartner, "Trait_YieldChangesPerTradePartner", "TraitType", szTraitType);
 	kUtility.SetYields(m_paiYieldChangeIncomingTradeRoute, "Trait_YieldChangesIncomingTradeRoute", "TraitType", szTraitType);
 	kUtility.SetYields(m_paiYieldModifier, "Trait_YieldModifiers", "TraitType", szTraitType);
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	kUtility.SetYields(m_paiGoldenAgeYieldModifier, "Trait_GoldenAgeYieldModifiers", "TraitType", szTraitType);
+#endif
 
 	const int iNumTerrains = GC.getNumTerrainInfos();
 
@@ -1520,6 +1672,32 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 
 		kUtility.PopulateArrayByValue(m_piResourceQuantityModifiers, "Resources", "Trait_ResourceQuantityModifiers", "ResourceType", "TraitType", szTraitType, "ResourceQuantityModifier");
 	}
+
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	//Populate m_FreePromotionUnitClasses
+	{
+		std::string sqlKey = "FreePromotionUnitClasses";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if(pResults == NULL)
+		{
+			const char* szSQL = "select UnitPromotions.ID, UnitClasses.ID from Trait_FreePromotionUnitClasses, UnitPromotions, UnitClasses where TraitType = ? and PromotionType = UnitPromotions.Type and UnitClassType = UnitClasses.Type";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, szTraitType);
+
+		while(pResults->Step())
+		{
+			const int unitPromotionID = pResults->GetInt(0);
+			const int unitClassID = pResults->GetInt(1);
+
+			m_FreePromotionUnitClasses.insert(std::pair<int, int>(unitPromotionID, unitClassID));
+		}
+		pResults->Reset();
+		//Trim extra memory off container since this is mostly read-only.
+		std::multimap<int,int>(m_FreePromotionUnitClasses).swap(m_FreePromotionUnitClasses);
+	}
+#endif
 
 	//Populate m_MovesChangeUnitCombats
 	{
@@ -1906,6 +2084,52 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		}
 	}
 
+	{
+		for (int i = 0; i < NUM_YIELD_TYPES; i++)
+		{
+			m_piPerMajorReligionFollowerYieldModifier[i] = 0;
+		}
+
+		std::string strKey("Trait_PerMajorReligionFollowerYieldModifier");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select t2.ID, t1.Yield from Trait_PerMajorReligionFollowerYieldModifier t1 inner join Yields t2 on t1.YieldType = t2.Type where t1.TraitType = ?");
+		}
+
+		pResults->Bind(1, szTraitType);
+
+		while (pResults->Step())
+		{
+			const int eYieldType = pResults->GetInt(0);
+			const int iModifier = pResults->GetInt(1);
+			m_piPerMajorReligionFollowerYieldModifier[eYieldType] += iModifier;
+		}
+	}
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+	m_iSpreadReligionFromKilledUnitStrengthPercent = kResults.GetInt("SpreadReligionFromKilledUnitStrengthPercent");
+	m_iSpreadReligionRadius = kResults.GetInt("SpreadReligionRadius");
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	m_iInflictDamageChangePerCapturedHolyCity = kResults.GetInt("InflictDamageChangePerCapturedHolyCity");
+	m_iDamageChangePerCapturedHolyCity = kResults.GetInt("DamageChangePerCapturedHolyCity");
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	m_iSiegeDamagePercentIfSameReligion = kResults.GetInt("SiegeDamagePercentIfSameReligion");
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	m_iFaithPurchaseCombatUnitCostPercent = kResults.GetInt("FaithPurchaseCombatUnitCostPercent");
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_bCorruptionLevelReduceByOne = kResults.GetBool("CorruptionLevelReduceByOne");
+	m_iMaxCorruptionLevel = kResults.GetInt("MaxCorruptionLevel");
+#endif
+
 	return true;
 }
 
@@ -2075,11 +2299,35 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iWorkerSpeedModifier += trait->GetWorkerSpeedModifier();
 			m_iAfraidMinorPerTurnInfluence += trait->GetAfraidMinorPerTurnInfluence();
 			m_iLandTradeRouteRangeBonus += trait->GetLandTradeRouteRangeBonus();
+			m_iGoldenAgeMinorPerTurnInfluence += trait->GetGoldenAgeMinorPerTurnInfluence();
+
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 			m_iSeaTradeRouteRangeBonus += trait->GetSeaTradeRouteRangeBonus();
 #endif
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			if(trait->GetCiviliansFreePromotion() != NO_PROMOTION)
+			{
+				m_iCiviliansFreePromotion = trait->GetCiviliansFreePromotion();
+			}
+			m_iTradeRouteLandGoldBonus += trait->GetTradeRouteLandGoldBonus();
+			m_iTradeRouteSeaGoldBonus += trait->GetTradeRouteSeaGoldBonus();
+#endif
+
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+			if (MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS)
+			{
+				for (int i = 0; i < NUM_YIELD_TYPES; i++)
+				{
+					m_piPerMajorReligionFollowerYieldModifier[i] += trait->GetPerMajorReligionFollowerYieldModifier(static_cast<YieldTypes>(i));
+				}
+			}
+#endif
+			if (trait->IsTrainedAll())
+			{
+				m_bTrainedAll = true;
+			}
 
 			if(trait->IsFightWellDamaged())
 			{
@@ -2088,6 +2336,12 @@ void CvPlayerTraits::InitPlayerTraits()
 				//int iWoundedUnitDamageMod = /*-50*/ GC.getTRAIT_WOUNDED_DAMAGE_MOD();
 				//m_pPlayer->ChangeWoundedUnitDamageMod(iWoundedUnitDamageMod);
 			}
+
+			if (trait->IsBuyOwnedTiles())
+			{
+				m_bBuyOwnedTiles = true;
+			}
+
 			if(trait->IsMoveFriendlyWoodsAsRoad())
 			{
 				m_bMoveFriendlyWoodsAsRoad = true;
@@ -2124,6 +2378,17 @@ void CvPlayerTraits::InitPlayerTraits()
 			{
 				m_bFaithFromUnimprovedForest = true;
 			}
+
+			if (trait->IsGoldenAgeOnWar())
+			{
+				m_bGoldenAgeOnWar = true;
+			}
+
+			if (trait->IsNoResistance())
+			{
+				m_bNoResistance = true;
+			}
+
 #if defined(MOD_TRAITS_ANY_BELIEF)
 			if(trait->IsAnyBelief())
 			{
@@ -2191,6 +2456,29 @@ void CvPlayerTraits::InitPlayerTraits()
 			}
 #endif
 
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+			m_iSpreadReligionFromKilledUnitStrengthPercent = trait->GetSpreadReligionFromKilledUnitStrengthPercent();
+			m_iSpreadReligionRadius = trait->GetSpreadReligionRadius();
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+			m_iInflictDamageChangePerCapturedHolyCity = trait->GetInflictDamageChangePerCapturedHolyCity();
+			m_iDamageChangePerCapturedHolyCity = trait->GetDamageChangePerCapturedHolyCity();
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+			m_iSiegeDamagePercentIfSameReligion = trait->GetSiegeDamagePercentIfSameReligion();
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+			m_iFaithPurchaseCombatUnitCostPercent = trait->GetFaithPurchaseCostPercent();
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+			m_bCorruptionLevelReduceByOne = trait->GetCorruptionLevelReduceByOne();
+			m_iMaxCorruptionLevel = trait->GetMaxCorruptionLevel();
+#endif
+
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
 				if(trait->GetExtraYieldThreshold(iYield) > m_iExtraYieldThreshold[iYield])
@@ -2203,6 +2491,9 @@ void CvPlayerTraits::InitPlayerTraits()
 				m_iYieldChangePerTradePartner[iYield] = trait->GetYieldChangePerTradePartner(iYield);
 				m_iYieldChangeIncomingTradeRoute[iYield] = trait->GetYieldChangeIncomingTradeRoute(iYield);
 				m_iYieldRateModifier[iYield] = trait->GetYieldModifier(iYield);
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+				m_iGoldenAgeYieldRateModifier[iYield] = trait->GetGoldenAgeYieldModifier(iYield);
+#endif
 
 				for(int iFeatureLoop = 0; iFeatureLoop < GC.getNumFeatureInfos(); iFeatureLoop++)
 				{
@@ -2503,13 +2794,20 @@ void CvPlayerTraits::Reset()
 	m_iWorkerSpeedModifier = 0;
 	m_iAfraidMinorPerTurnInfluence = 0;
 	m_iLandTradeRouteRangeBonus = 0;
+	m_iGoldenAgeMinorPerTurnInfluence = 0;
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	m_iSeaTradeRouteRangeBonus = 0;
 #endif
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
-
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iCiviliansFreePromotion = NO_PROMOTION;
+	m_iTradeRouteLandGoldBonus = 0;
+	m_iTradeRouteSeaGoldBonus = 0;
+#endif
+	m_bTrainedAll = false;
 	m_bFightWellDamaged = false;
+	m_bBuyOwnedTiles = false;
 	m_bMoveFriendlyWoodsAsRoad = false;
 	m_bFasterAlongRiver = false;
 	m_bFasterInHills = false;
@@ -2570,6 +2868,13 @@ void CvPlayerTraits::Reset()
 	m_ppaaiUnimprovedFeatureYieldChange.clear();
 	m_ppaaiUnimprovedFeatureYieldChange.resize(GC.getNumFeatureInfos());
 
+#ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
+	for (int i = 0; i < NUM_YIELD_TYPES; i++)
+	{
+		m_piPerMajorReligionFollowerYieldModifier[i] = 0;
+	}
+#endif
+
 	Firaxis::Array< int, NUM_YIELD_TYPES > yield;
 	for(unsigned int j = 0; j < NUM_YIELD_TYPES; ++j)
 	{
@@ -2585,6 +2890,9 @@ void CvPlayerTraits::Reset()
 		m_iYieldChangePerTradePartner[iYield] = 0;
 		m_iYieldChangeIncomingTradeRoute[iYield] = 0;
 		m_iYieldRateModifier[iYield] = 0;
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+		m_iGoldenAgeYieldRateModifier[iYield] = 0;
+#endif
 
 		for(int iImprovement = 0; iImprovement < GC.getNumImprovementInfos(); iImprovement++)
 		{
@@ -2693,6 +3001,11 @@ void CvPlayerTraits::Reset()
 		FreeResourceXCities temp;
 		m_aFreeResourceXCities.push_back(temp);
 	}
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+  m_iSpreadReligionFromKilledUnitStrengthPercent = 0;
+  m_iSpreadReligionRadius = 0;
+#endif
 }
 
 /// Does this player possess a specific trait?
@@ -2985,6 +3298,30 @@ bool CvPlayerTraits::HasFreePromotionUnitCombat(const int promotionID, const int
 
 	return false;
 }
+
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+/// Do all new units get a specific promotion?
+bool CvPlayerTraits::HasFreePromotionUnitClass(const int promotionID, const int unitClassID) const
+{
+	CvAssertMsg((promotionID >= 0), "promotionID is less than zero");
+	for(int iI = 0; iI < GC.getNumTraitInfos(); iI++)
+	{
+		const TraitTypes eTrait = static_cast<TraitTypes>(iI);
+		CvTraitEntry* pkTraitInfo = GC.getTraitInfo(eTrait);
+		if(pkTraitInfo)
+		{
+			if(HasTrait(eTrait))
+			{
+				if(pkTraitInfo->IsFreePromotionUnitClass(promotionID, unitClassID))
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+#endif
 
 /// Does each city get a free building?
 BuildingTypes CvPlayerTraits::GetFreeBuilding() const
@@ -3867,10 +4204,12 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	if (uiVersion >= 14)
 	{
 		kStream >> m_iAfraidMinorPerTurnInfluence;
+		kStream >> m_iGoldenAgeMinorPerTurnInfluence;
 	}
 	else
 	{
 		m_iAfraidMinorPerTurnInfluence = 0;
+		m_iGoldenAgeMinorPerTurnInfluence = 0;
 	}
 	
 	if (uiVersion >= 15)
@@ -3892,12 +4231,18 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	{
 		m_iTradeBuildingModifier = 0;
 	}
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iCiviliansFreePromotion;
+	kStream >> m_iTradeRouteLandGoldBonus;
+	kStream >> m_iTradeRouteSeaGoldBonus;
+#endif
 
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	MOD_SERIALIZE_READ(52, kStream, m_iSeaTradeRouteRangeBonus, 0);
 #endif
-
+	kStream >> m_bTrainedAll;
 	kStream >> m_bFightWellDamaged;
+	kStream >> m_bBuyOwnedTiles;
 	kStream >> m_bMoveFriendlyWoodsAsRoad;
 	kStream >> m_bFasterAlongRiver;
 
@@ -3917,6 +4262,8 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	MOD_SERIALIZE_READ(46, kStream, m_bAnyBelief, false);
 #endif
+	kStream >> m_bGoldenAgeOnWar;
+	kStream >> m_bNoResistance;
 	kStream >> m_bBonusReligiousBelief;
 
 	kStream >> m_bAbleToAnnexCityStates;
@@ -4001,6 +4348,11 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	ArrayWrapper<int> kYieldRateModifierWrapper(NUM_YIELD_TYPES, m_iYieldRateModifier);
 	kStream >> kYieldRateModifierWrapper;
+
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	ArrayWrapper<int> kGoldenAgeYieldRateModifierWrapper(NUM_YIELD_TYPES, m_iGoldenAgeYieldRateModifier);
+	kStream >> kGoldenAgeYieldRateModifierWrapper;
+#endif
 
 	ArrayWrapper<int> kYieldChangeNaturalWonderWrapper(NUM_YIELD_TYPES, m_iYieldChangeNaturalWonder);
 	kStream >> kYieldChangeNaturalWonderWrapper;
@@ -4135,6 +4487,31 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	{
 		m_aUniqueLuxuryAreas.clear();
 	}
+
+	kStream >> m_piPerMajorReligionFollowerYieldModifier;
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+	kStream >> m_iSpreadReligionFromKilledUnitStrengthPercent;
+	kStream >> m_iSpreadReligionRadius;
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	kStream >> m_iInflictDamageChangePerCapturedHolyCity;
+	kStream >> m_iDamageChangePerCapturedHolyCity;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	kStream >> m_iSiegeDamagePercentIfSameReligion;
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	kStream >> m_iFaithPurchaseCombatUnitCostPercent;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	kStream >> m_bCorruptionLevelReduceByOne;
+	kStream >> m_iMaxCorruptionLevel;
+#endif
 }
 
 /// Serialization write
@@ -4222,14 +4599,21 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iUniqueLuxuryCitiesPlaced;
 	kStream << m_iWorkerSpeedModifier;
 	kStream << m_iAfraidMinorPerTurnInfluence;
+	kStream << m_iGoldenAgeMinorPerTurnInfluence;
 	kStream << m_iLandTradeRouteRangeBonus;
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iCiviliansFreePromotion;
+	kStream << m_iTradeRouteLandGoldBonus;
+	kStream << m_iTradeRouteSeaGoldBonus;
+#endif
 #if defined(MOD_TRAITS_TRADE_ROUTE_BONUSES)
 	MOD_SERIALIZE_WRITE(kStream, m_iSeaTradeRouteRangeBonus);
 #endif
-
+	kStream << m_bTrainedAll;
 	kStream << m_bFightWellDamaged;
+	kStream << m_bBuyOwnedTiles;
 	kStream << m_bMoveFriendlyWoodsAsRoad;
 	kStream << m_bFasterAlongRiver;
 	kStream << m_bFasterInHills;
@@ -4242,6 +4626,8 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	MOD_SERIALIZE_WRITE(kStream, m_bAnyBelief);
 #endif
+	kStream << m_bGoldenAgeOnWar;
+	kStream << m_bNoResistance;
 	kStream << m_bBonusReligiousBelief;
 	kStream << m_bAbleToAnnexCityStates;
 	kStream << m_bCrossesMountainsAfterGreatGeneral;
@@ -4283,6 +4669,9 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iFreeCityYield);
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldChangeStrategicResources);
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldRateModifier);
+#ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
+	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iGoldenAgeYieldRateModifier);
+#endif
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldChangeNaturalWonder);
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldChangePerTradePartner);
 	kStream << ArrayWrapper<int>(NUM_YIELD_TYPES, m_iYieldChangeIncomingTradeRoute);
@@ -4348,6 +4737,31 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	{
 		kStream << m_aUniqueLuxuryAreas[iI];
 	}
+
+	kStream << m_piPerMajorReligionFollowerYieldModifier;
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+	kStream << m_iSpreadReligionFromKilledUnitStrengthPercent;
+	kStream << m_iSpreadReligionRadius;
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	kStream << m_iInflictDamageChangePerCapturedHolyCity;
+	kStream << m_iDamageChangePerCapturedHolyCity;
+#endif
+
+#ifdef MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION
+	kStream << m_iSiegeDamagePercentIfSameReligion;
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+	kStream << m_iFaithPurchaseCombatUnitCostPercent;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	kStream << m_bCorruptionLevelReduceByOne;
+	kStream << m_iMaxCorruptionLevel;
+#endif
 }
 
 // PRIVATE METHODS
@@ -4505,3 +4919,53 @@ bool CvPlayerTraits::ConvertBarbarianNavalUnit(UnitHandle pUnit)
 		return false;
 	}
 }
+
+#ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
+int CvPlayerTraits::GetSpreadReligionFromKilledUnitStrengthPercent() const
+{
+	return m_iSpreadReligionFromKilledUnitStrengthPercent;
+}
+
+int CvPlayerTraits::GetSpreadReligionRadius() const
+{
+	return m_iSpreadReligionRadius;
+}
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+int CvPlayerTraits::GetInflictDamageChangePerCapturedHolyCity() const
+{
+	return m_iInflictDamageChangePerCapturedHolyCity;
+}
+
+int CvPlayerTraits::GetDamageChangePerCapturedHolyCity() const
+{
+	return m_iDamageChangePerCapturedHolyCity;
+}
+#endif
+
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+int CvPlayerTraits::GetSiegeDamagePercentIfSameReligion() const
+{
+	return m_iSiegeDamagePercentIfSameReligion;
+}
+#endif
+
+#ifdef MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS
+int CvPlayerTraits::GetFaithPurchaseCombatUnitCostPercent() const
+{
+	return m_iFaithPurchaseCombatUnitCostPercent;
+}
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+bool CvPlayerTraits::GetCorruptionLevelReduceByOne() const
+{
+	return m_bCorruptionLevelReduceByOne ;
+}
+
+int CvPlayerTraits::GetMaxCorruptionLevel() const
+{
+	return m_iMaxCorruptionLevel;
+}
+#endif

@@ -99,6 +99,10 @@
 // Enables the Unified Yields (YIELD_GOLDEN_AGE_POINTS) extensions (v57)
 #define MOD_API_UNIFIED_YIELDS_GOLDEN_AGE           (true)
 
+// Enables the Unified Yields (YIELD_MORE) extensions 
+#define MOD_API_UNIFIED_YIELDS_MORE           (true)
+
+
 // Enables improvements to boost adjacent improvement's yield.
 #define MOD_API_VP_ADJACENT_YIELD_BOOST				gCustomMods.isAPI_VP_ADJACENT_YIELD_BOOST()
 
@@ -210,8 +214,6 @@
 #define MOD_GLOBAL_NUKES_MELT_ICE                   gCustomMods.isGLOBAL_NUKES_MELT_ICE() 
 
 
-// Ability to add new natural wonder features with graphics
-#define MOD_PSEUDO_NATURAL_WONDER					gCustomMods.isPSEUDO_NATURAL_WONDER()
 
 
 // Great Works can generate different yields than just culture (v25)
@@ -294,6 +296,12 @@
 #define MOD_PROMOTIONS_UNIT_NAMING                  gCustomMods.isPROMOTIONS_UNIT_NAMING()
 // Permits units to receive a combat bonus from being near an improvement (v46)
 #define MOD_PROMOTIONS_IMPROVEMENT_BONUS            gCustomMods.isPROMOTIONS_IMPROVEMENT_BONUS()
+// Permits units to receive a combat bonus from Ally City States
+#define MOD_PROMOTIONS_ALLYCITYSTATE_BONUS			gCustomMods.isPROMOTIONS_ALLYCITYSTATE_BONUS()
+// Permits units to receive defense bonus from Left/Used Moves
+#define MOD_DEFENSE_MOVES_BONUS						gCustomMods.isDEFENSE_MOVES_BONUS()
+// Permits units to receive a combat bonus from Extra Resourses/Hapiness
+#define MOD_PROMOTIONS_EXTRARES_BONUS				gCustomMods.isPROMOTIONS_EXTRARES_BONUS()
 
 // Permit the focus (gold/production/culture) of puppet cities to be set (but not what is being built or how specialists are allocated)
 #define MOD_UI_CITY_PRODUCTION                      gCustomMods.isUI_CITY_PRODUCTION()
@@ -782,9 +790,27 @@
 // Fixes a bug in the pathfinder code for embarking
 #define MOD_BUGFIX_EMBARKING_PATHFINDER             gCustomMods.isBUGFIX_EMBARKING_PATHFINDER()
 
-#define MOD_BALANCE_CORE                            gCustomMods.isBALANCE_CORE()
+#define MOD_BUGFIX_BUILDING_FREEBUILDING             gCustomMods.isBUGFIX_BUILDING_FREEBUILDING()
 
+#define MOD_BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY             gCustomMods.isBUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY()
+
+#define MOD_BALANCE_CORE                            gCustomMods.isBALANCE_CORE()
+#define MOD_VOLCANO_BREAK                            gCustomMods.isVOLCANO_BREAK()
 #define MOD_ERA_EFFECTS_EXTENSIONS                  gCustomMods.isERA_EFFECTS_EXTENSIONS()
+
+// Enables improvements create sources or new improvement when built (CIV5MPDLL)
+#define MOD_IMPROVEMENTS_CREATE_ITEMS            	gCustomMods.isIMPROVEMENTS_CREATE_ITEMS()
+
+#define MOD_IMPROVEMENTS_UPGRADE                    gCustomMods.isIMPROVEMENTS_UPGRADE()
+
+// Enables the Improvement Trade Route Bonus
+#define MOD_IMPROVEMENT_TRADE_ROUTE_BONUSES			gCustomMods.isIMPROVEMENT_TRADE_ROUTE_BONUSES()
+
+#define MOD_GLOBAL_WAR_CASUALTIES                   gCustomMods.isGLOBAL_WAR_CASUALTIES()
+
+#define MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS         gCustomMods.isTRAIT_RELIGION_FOLLOWER_EFFECTS()
+
+#define MOD_BATTLE_CAPTURE_NEW_RULE         gCustomMods.isBATTLE_CAPTURE_NEW_RULE()
 
 #endif // ACHIEVEMENT_HACKS
 
@@ -831,6 +857,10 @@
 //   GameEvents.CityPuppeted.Add(function(playerID, cityID) end) 
 #define MOD_EVENTS_CITY_PUPPETED                      gCustomMods.isEVENTS_CITY_PUPPETED()
 
+
+//   GameEvents.DoDenounce.Add(function(PlayerID, OtherPlayerID) end) 
+#define MOD_EVENTS_DO_DENOUNCE                      gCustomMods.isEVENTS_DO_DENOUNCE ()
+
 //  GameEvents.TileSetOwnership.Add(iPlotX, iPlotY, iOldOwner,iNewOwner) end)
 #define MOD_EVENTS_TILE_SET_OWNER                gCustomMods.isEVENTS_TILE_SET_OWNER()
 
@@ -861,9 +891,72 @@
 #define MOD_EVENTS_UNIT_DO_TURN                    gCustomMods.isEVENTS_UNIT_DO_TURN()
 
 
+// When a military unit retreats, civilians units on the same tile also retreat
+#define MOD_CIVILIANS_RETREAT_WITH_MILITARY			gCustomMods.isCIVILIANS_RETREAT_WITH_MILITARY()
 
 // SOME BASE FOUNCTION
-#define MOD_ROG_CORE             gCustomMods.isROG_CORE()
+#define MOD_TRAIN_ALL_CORE                             gCustomMods.isTRAIN_ALL_CORE()
+#define MOD_ROG_CORE                                   gCustomMods.isROG_CORE()
+#define MOD_IMPROVEMENT_FUNCTION                       gCustomMods.isIMPROVEMENT_FUNCTION()
+#define MOD_BUILDING_IMPROVEMENT_RESOURCES              gCustomMods.isBUILDING_IMPROVEMENT_RESOURCES()
+#define MOD_MORE_NATURAL_WONDER					       gCustomMods.isMORE_NATURAL_WONDER()
+
+#define MOD_GLOBAL_UNLIMITED_ONE_TURN_GROWTH             gCustomMods.isGLOBAL_UNLIMITED_ONE_TURN_GROWTH()
+#define MOD_GLOBAL_UNLIMITED_ONE_TURN_PRODUCTION             gCustomMods.isGLOBAL_UNLIMITED_ONE_TURN_PRODUCTION()
+#define MOD_GLOBAL_UNLIMITED_ONE_TURN_CULTURE             gCustomMods.isGLOBAL_UNLIMITED_ONE_TURN_CULTURE()
+
+#define MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE      gCustomMods.isGLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE()
+#define MOD_UNIT_BOUND_IMPROVEMENT      					gCustomMods.isUNIT_BOUND_IMPROVEMENT()
+#define MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA             gCustomMods.isGLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA()
+#define MOD_POLICY_NEW_EFFECT_FOR_SP            			gCustomMods.isPOLICY_NEW_EFFECT_FOR_SP()
+#define MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK             	gCustomMods.isGLOBAL_UNIT_MOVES_AFTER_DISEMBARK()
+#define MOD_GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY    gCustomMods.isGLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY()
+#define MOD_GLOBAL_BUILDING_INSTANT_YIELD             		gCustomMods.isGLOBAL_BUILDING_INSTANT_YIELD()
+#define MOD_BUILDING_NEW_EFFECT_FOR_SP           			gCustomMods.isBUILDING_NEW_EFFECT_FOR_SP()
+#define MOD_VOTING_NEW_EFFECT_FOR_SP           				gCustomMods.isVOTING_NEW_EFFECT_FOR_SP()
+#define MOD_BELIEF_NEW_EFFECT_FOR_SP             			(MOD_GLOBAL_BUILDING_INSTANT_YIELD && gCustomMods.isBELIEF_NEW_EFFECT_FOR_SP())
+#define MOD_PROMOTION_NEW_EFFECT_FOR_SP           			gCustomMods.isPROMOTION_NEW_EFFECT_FOR_SP()
+#define MOD_TRAIT_NEW_EFFECT_FOR_SP           				gCustomMods.isTRAIT_NEW_EFFECT_FOR_SP()
+#define MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION             gCustomMods.isPOLICY_FREE_PROMOTION_FOR_PROMOTION()
+#define MOD_PROMOTION_FEATURE_INVISIBLE             		gCustomMods.isPROMOTION_FEATURE_INVISIBLE()
+
+#define MOD_PROMOTION_SPLASH_DAMAGE             		gCustomMods.isPROMOTION_SPLASH_DAMAGE()
+#define MOD_PROMOTION_COLLATERAL_DAMAGE             		gCustomMods.isPROMOTION_COLLATERAL_DAMAGE()
+#define MOD_PROMOTION_ADD_ENEMY_PROMOTIONS             		gCustomMods.isPROMOTION_ADD_ENEMY_PROMOTIONS()
+#define MOD_PROMOTION_CITY_DESTROYER             		gCustomMods.isPROMOTION_CITY_DESTROYER()
+#define MOD_GLOBAL_PROMOTIONS_REMOVAL 		   		                gCustomMods.isGLOBAL_PROMOTIONS_REMOVAL()
+
+#ifdef MOD_PROMOTION_SPLASH_DAMAGE
+#define MOD_NEW_BATTLE_EFFECTS (MOD_PROMOTION_SPLASH_DAMAGE || MOD_PROMOTION_COLLATERAL_DAMAGE || MOD_PROMOTION_ADD_ENEMY_PROMOTIONS || MOD_PROMOTION_CITY_DESTROYER)
+#endif
+
+#define MOD_GLOBAL_CITY_SCALES gCustomMods.isGLOBAL_CITY_SCALES()
+#define MOD_EVENTS_CITY_SCALES gCustomMods.isEVENTS_CITY_SCALES()
+
+#define MOD_PROMOTION_COLLECTIONS
+#define MOD_BUILDINGCLASS_COLLECTIONS
+
+#define MOD_SPECIALIST_RESOURCES gCustomMods.isSPECIALIST_RESOURCES()
+
+#define MOD_POLICIY_PUBLIC_OPTION gCustomMods.isPOLICIY_PUBLIC_OPTION()
+
+#define MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER gCustomMods.isTRAITS_GOLDEN_AGE_YIELD_MODIFIER()
+
+#define MOD_BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED gCustomMods.isBUGFIX_CITY_NEGATIVE_YIELD_MODIFIED()
+
+#define MOD_RESOURCE_EXTRA_BUFF gCustomMods.isRESOURCE_EXTRA_BUFF()
+
+#define MOD_SP_SMART_AI	 gCustomMods.isSP_SMART_AI()
+
+#define MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING gCustomMods.isTRAITS_SPREAD_RELIGION_AFTER_KILLING()
+#define MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY gCustomMods.isTRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY()
+#define MOD_TRAITS_SIEGE_BONUS_IF_SAME_RELIGION gCustomMods.isTRAITS_SIEGE_BONUS_IF_SAME_RELIGION()
+#define MOD_TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS gCustomMods.isTRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS()
+
+#define MOD_IMPROVEMENTS_YIELD_CHANGE_PER_UNIT gCustomMods.isIMPROVEMENTS_YIELD_CHANGE_PER_UNIT()
+#define MOD_IMPROVEMENTS_UNIT_XP_PER_TURN gCustomMods.isIMPROVEMENTS_UNIT_XP_PER_TURN()
+
+#define MOD_GLOBAL_CORRUPTION gCustomMods.isGLOBAL_CORRUPTION()
 
 //
 // NOTHING BELOW HERE SHOULD NEED CHANGING
@@ -1021,7 +1114,7 @@ enum BattleTypeTypes
 #define GAMEEVENT_BarbariansCampCleared			"BarbariansCampCleared",		"iii"
 #define GAMEEVENT_BarbariansCampCanSpawnUnit	"BarbariansCampCanSpawnUnit",	"ii"
 #define GAMEEVENT_BarbariansCampGetSpawnUnit	"BarbariansCampGetSpawnUnit",	"iii"
-#define GAMEEVENT_BarbariansSpawnedUnit			"BarbariansSpawnedUnit",		"iii"
+#define GAMEEVENT_BarbariansSpawnedUnit			"BarbariansSpawnedUnit",		"iiiii"
 #define GAMEEVENT_BattleDamageDelta				"BattleDamageDelta",			"ii"
 // BattleCustomDamage(iBattleUnitType, iBattleType,
 //                    iAttackPlayerID, iAttackUnitOrCityID, bAttackIsCity, iAttackDamage,
@@ -1056,6 +1149,7 @@ enum BattleTypeTypes
 #define GAMEEVENT_CityPrepared					"CityPrepared",					"iiibb"
 #define GAMEEVENT_CitySoldBuilding				"CitySoldBuilding",				"iii"
 #define GAMEEVENT_CityTrained					"CityTrained",					"iiibb"
+#define GAMEEVENT_CityProjectComplete			"CityProjectComplete",			"iii"
 #define GAMEEVENT_CustomMissionCompleted		"CustomMissionCompleted",		"iiiiiii"
 #define GAMEEVENT_CustomMissionCameraTime		"CustomMissionCameraTime",		"iiiiiii"
 #define GAMEEVENT_CustomMissionDoStep			"CustomMissionDoStep",			"iiiiiii"
@@ -1184,6 +1278,7 @@ enum BattleTypeTypes
 #define GAMEEVENT_CultureBombDiscover			"CultureBombDiscover",		    "iiiib"
 #define GAMEEVENT_FaithDiscover			        "FaithDiscover",		        "iiiib"
 #define GAMEEVENT_CityPuppeted					"CityPuppeted",					"ii"
+#define GAMEEVENT_DoDenounce					"DoDenounce",					"ii"
 #define GAMEEVENT_CityBeginsWLTKD			    "CityBeginsWLTKD",              "iiii"
 #define GAMEEVENT_CityEndsWLTKD				    "CityEndsWLTKD",                "iiii"
 #define GAMEEVENT_CityRangedStrike				"CityRangedStrike",			    "iiiiii"
@@ -1193,6 +1288,19 @@ enum BattleTypeTypes
 #define GAMEEVENT_UnitMoveInto					"UnitMoveInto",					"iiiiiii"
 #define GAMEEVENT_UnitDoTurn					"UnitDoTurn",					"iiii"
 
+#define GAMEEVENT_OnImprovementUpgrade			"OnImprovementUpgrade",			"iiiiii"
+#define GAMEEVENT_OnImprovementDowngrade		"OnImprovementDowngrade",		"iiiiii"
+#define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		        "iiiiii"
+
+#define GAMEEVENT_DoWarPopulationLoss			"DoWarPopulationLoss",		        "iii"
+
+#define GAMEEVENT_OnCityScaleChange			"OnCityScaleChange",		        "iiii"
+
+#define GAMEEVENT_CanAddEnemyPromotion			"CanAddEnemyPromotion",		        "iiiiiii"
+#define GAMEEVENT_OnTriggerAddEnemyPromotion			"OnTriggerAddEnemyPromotion",		        "iiiiiiiiiii"
+#define GAMEEVENT_CanRemovePromotion "CanRemovePromotion", "iii"
+
+#define GAMEEVENT_LoyaltyStateChanged       "LoyaltyStateChanged", "iiii"
 
 // Serialization wrappers
 #define MOD_SERIALIZE
@@ -1319,7 +1427,7 @@ public:
 	MOD_OPT_DECL(GLOBAL_PARATROOPS_AA_DAMAGE);
 	MOD_OPT_DECL(GLOBAL_NUKES_MELT_ICE); 
 
-	MOD_OPT_DECL(PSEUDO_NATURAL_WONDER);
+
 
 	MOD_OPT_DECL(GLOBAL_GREATWORK_YIELDTYPES); 
 	MOD_OPT_DECL(GLOBAL_NO_LOST_GREATWORKS); 
@@ -1363,6 +1471,9 @@ public:
 	MOD_OPT_DECL(PROMOTIONS_FLAGSHIP);
 	MOD_OPT_DECL(PROMOTIONS_UNIT_NAMING);
 	MOD_OPT_DECL(PROMOTIONS_IMPROVEMENT_BONUS);
+	MOD_OPT_DECL(PROMOTIONS_ALLYCITYSTATE_BONUS);
+	MOD_OPT_DECL(DEFENSE_MOVES_BONUS);
+	MOD_OPT_DECL(PROMOTIONS_EXTRARES_BONUS);
 
 	MOD_OPT_DECL(UI_CITY_PRODUCTION);
 	MOD_OPT_DECL(UI_CITY_EXPANSION);
@@ -1509,23 +1620,92 @@ public:
 	MOD_OPT_DECL(BUGFIX_NO_HOVERING_REBELS);
 	MOD_OPT_DECL(BUGFIX_HOVERING_PATHFINDER);
 	MOD_OPT_DECL(BUGFIX_EMBARKING_PATHFINDER);
+	MOD_OPT_DECL(BUGFIX_BUILDING_FREEBUILDING);
 
 	MOD_OPT_DECL(BALANCE_CORE);
-
+	MOD_OPT_DECL(VOLCANO_BREAK);
 	MOD_OPT_DECL(ERA_EFFECTS_EXTENSIONS);
-
+	MOD_OPT_DECL(TRAIN_ALL_CORE);
 	MOD_OPT_DECL(ROG_CORE);
+	MOD_OPT_DECL(IMPROVEMENT_FUNCTION);
+	MOD_OPT_DECL(BUILDING_IMPROVEMENT_RESOURCES);
+	MOD_OPT_DECL(MORE_NATURAL_WONDER);
 
 	MOD_OPT_DECL(EVENTS_TILE_SET_OWNER);
 	MOD_OPT_DECL(EVENTS_IMPROVEMENTS_PILLAGED);
 	MOD_OPT_DECL(EVENTS_GREAT_WORK_CREATED);
 	MOD_OPT_DECL(EVENTS_GREAT_PEOPLE_BOOST);
 	MOD_OPT_DECL(EVENTS_CITY_PUPPETED);
+	MOD_OPT_DECL(EVENTS_DO_DENOUNCE);
 	MOD_OPT_DECL(EVENTS_WLKD_DAY);
 	MOD_OPT_DECL(EVENTS_CITY_RANGE_STRIKE);
 	MOD_OPT_DECL(EVENTS_UNIT_CAN_RANGEATTACK);
 	MOD_OPT_DECL(EVENTS_UNIT_MOVE);
 	MOD_OPT_DECL(EVENTS_UNIT_DO_TURN);
+	MOD_OPT_DECL(CIVILIANS_RETREAT_WITH_MILITARY);
+	MOD_OPT_DECL(IMPROVEMENTS_UPGRADE);
+	MOD_OPT_DECL(IMPROVEMENTS_CREATE_ITEMS);
+	MOD_OPT_DECL(IMPROVEMENT_TRADE_ROUTE_BONUSES);
+
+	MOD_OPT_DECL(GLOBAL_UNLIMITED_ONE_TURN_GROWTH);
+	MOD_OPT_DECL(GLOBAL_UNLIMITED_ONE_TURN_PRODUCTION);
+	MOD_OPT_DECL(GLOBAL_UNLIMITED_ONE_TURN_CULTURE);
+
+	MOD_OPT_DECL(GLOBAL_WAR_CASUALTIES);
+
+	MOD_OPT_DECL(GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE);
+	MOD_OPT_DECL(UNIT_BOUND_IMPROVEMENT);
+	MOD_OPT_DECL(PROMOTION_FEATURE_INVISIBLE);
+	MOD_OPT_DECL(PROMOTION_NEW_EFFECT_FOR_SP);
+	MOD_OPT_DECL(POLICY_FREE_PROMOTION_FOR_PROMOTION);
+	MOD_OPT_DECL(GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA);
+	MOD_OPT_DECL(POLICY_NEW_EFFECT_FOR_SP);
+	MOD_OPT_DECL(GLOBAL_UNIT_MOVES_AFTER_DISEMBARK);
+	MOD_OPT_DECL(GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY);
+	MOD_OPT_DECL(GLOBAL_BUILDING_INSTANT_YIELD);
+	MOD_OPT_DECL(BUILDING_NEW_EFFECT_FOR_SP);
+	MOD_OPT_DECL(VOTING_NEW_EFFECT_FOR_SP);
+	MOD_OPT_DECL(BELIEF_NEW_EFFECT_FOR_SP);
+	MOD_OPT_DECL(TRAIT_NEW_EFFECT_FOR_SP);
+
+	MOD_OPT_DECL(PROMOTION_SPLASH_DAMAGE);
+	MOD_OPT_DECL(PROMOTION_COLLATERAL_DAMAGE);
+	MOD_OPT_DECL(PROMOTION_ADD_ENEMY_PROMOTIONS);
+	MOD_OPT_DECL(PROMOTION_CITY_DESTROYER);
+
+	MOD_OPT_DECL(GLOBAL_PROMOTIONS_REMOVAL);
+
+	MOD_OPT_DECL(TRAIT_RELIGION_FOLLOWER_EFFECTS);
+
+	MOD_OPT_DECL(GLOBAL_CITY_SCALES);
+	MOD_OPT_DECL(EVENTS_CITY_SCALES);
+
+	MOD_OPT_DECL(SPECIALIST_RESOURCES);
+
+	MOD_OPT_DECL(POLICIY_PUBLIC_OPTION);
+
+	MOD_OPT_DECL(TRAITS_GOLDEN_AGE_YIELD_MODIFIER);
+
+	MOD_OPT_DECL(BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED);
+
+	MOD_OPT_DECL(BATTLE_CAPTURE_NEW_RULE);
+
+	MOD_OPT_DECL(BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY);
+
+	MOD_OPT_DECL(RESOURCE_EXTRA_BUFF);
+
+	MOD_OPT_DECL(SP_SMART_AI);
+
+	MOD_OPT_DECL(TRAITS_SPREAD_RELIGION_AFTER_KILLING);
+	MOD_OPT_DECL(TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY);
+	MOD_OPT_DECL(TRAITS_SIEGE_BONUS_IF_SAME_RELIGION);
+	MOD_OPT_DECL(TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS);
+
+	MOD_OPT_DECL(IMPROVEMENTS_YIELD_CHANGE_PER_UNIT);
+	MOD_OPT_DECL(IMPROVEMENTS_UNIT_XP_PER_TURN);
+
+	MOD_OPT_DECL(GLOBAL_CORRUPTION);
+
 protected:
 	bool m_bInit;
 	std::map<std::string, int> m_options;

@@ -407,6 +407,27 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	PrefetchCollection(GC.getAchievementInfo(), "Achievements");
 #endif
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+	PrefetchCollection(GC.getCityScaleInfo(), "CityScales");
+	GC.sortAndUpdateOrderedCityScale(GC.getCityScaleInfo());
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	PrefetchCollection(GC.getCorruptionLevelInfo(), "CorruptionLevels");
+	GC.initCityCorruptionLevelsByCityType();
+#endif
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+	PrefetchCollection(GC.GetPromotionCollections(), "PromotionCollections");
+	GC.InitPromotion2CollectionMapping();
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+	PrefetchCollection(GC.GetBuildingClassCollections(), "BuildingClassCollections");
+#endif
+
+	PrefetchCollection(GC.GetLuaFormulaEntries(), "LuaFormula");
+
 	//Copy flavors into string array
 	{
 		CvDatabaseUtility kUtility;

@@ -492,13 +492,15 @@ void CvBarbarians::DoCamps()
 													eBestUnit = GetRandomBarbarianUnitType(kMap.getArea(pLoopPlot->getArea()), UNITAI_DEFENSE);
 #endif
 
+													CvUnit* pNewBarbarianUnit = NULL;
+
 													if(eBestUnit != NO_UNIT)
-													{
-														GET_PLAYER(BARBARIAN_PLAYER).initUnit(eBestUnit, pLoopPlot->getX(), pLoopPlot->getY(), (UnitAITypes) GC.getUnitInfo(eBestUnit)->GetDefaultUnitAIType());
+													{												
+														pNewBarbarianUnit = GET_PLAYER(BARBARIAN_PLAYER).initUnit(eBestUnit, pLoopPlot->getX(), pLoopPlot->getY(), (UnitAITypes) GC.getUnitInfo(eBestUnit)->GetDefaultUnitAIType());
 
 #if defined(MOD_EVENTS_BARBARIANS)
 														if (MOD_EVENTS_BARBARIANS) {
-															GAMEEVENTINVOKE_HOOK(GAMEEVENT_BarbariansSpawnedUnit, pLoopPlot->getX(), pLoopPlot->getY(), eBestUnit);
+															GAMEEVENTINVOKE_HOOK(GAMEEVENT_BarbariansSpawnedUnit, pNewBarbarianUnit->getOwner(), pNewBarbarianUnit->GetID(), pLoopPlot->getX(), pLoopPlot->getY(), eBestUnit);
 														}
 #endif
 													}
@@ -758,7 +760,7 @@ void CvBarbarians::DoSpawnBarbarianUnit(CvPlot* pPlot, bool bIgnoreMaxBarbarians
 			
 #if defined(MOD_EVENTS_BARBARIANS)
 			if (MOD_EVENTS_BARBARIANS) {
-				GAMEEVENTINVOKE_HOOK(GAMEEVENT_BarbariansSpawnedUnit, pPlot->getX(), pPlot->getY(), eUnit);
+				GAMEEVENTINVOKE_HOOK(GAMEEVENT_BarbariansSpawnedUnit, pUnit->getOwner(), pUnit->GetID(), pPlot->getX(), pPlot->getY(), eUnit);
 			}
 #endif
 
@@ -875,7 +877,7 @@ void CvBarbarians::DoSpawnBarbarianUnit(CvPlot* pPlot, bool bIgnoreMaxBarbarians
 
 #if defined(MOD_EVENTS_BARBARIANS)
 				if (pUnit != NULL && MOD_EVENTS_BARBARIANS) {
-					GAMEEVENTINVOKE_HOOK(GAMEEVENT_BarbariansSpawnedUnit, pSpawnPlot->getX(), pSpawnPlot->getY(), eUnit);
+					GAMEEVENTINVOKE_HOOK(GAMEEVENT_BarbariansSpawnedUnit, pUnit->getOwner(), pUnit->GetID(), pSpawnPlot->getX(), pSpawnPlot->getY(), eUnit);
 				}
 #endif
 			}

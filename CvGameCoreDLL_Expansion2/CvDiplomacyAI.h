@@ -1045,6 +1045,8 @@ public:
 
 	bool DoPossibleMinorLiberation(PlayerTypes eMinor, int iCityID);
 
+	bool IsPlayerBadTheftTarget(PlayerTypes ePlayer,  const CvPlot* pPlot = NULL);
+
 	int GetNumOurEnemiesPlayerAtWarWith(PlayerTypes ePlayer);
 
 	bool IsGoingForWorldConquest();
@@ -1108,6 +1110,12 @@ public:
 	void LogCloseEmbassy(PlayerTypes ePlayer);
 
 private:
+	/// Helper function to return this player's ID more conveniently
+	inline PlayerTypes GetID() const
+	{
+		return m_pPlayer->GetID();
+	}
+
 	bool IsValidUIDiplomacyTarget(PlayerTypes eTargetPlayer);
 
 	bool IsAtWar(PlayerTypes eOtherPlayer);

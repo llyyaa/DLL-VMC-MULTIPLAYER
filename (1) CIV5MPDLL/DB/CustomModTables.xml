@@ -39,5 +39,10 @@
 			<Value>3</Value>
 		</Replace>
 
+		<Row>
+			<!-- Population increase notification if the city is small -->
+			<Name>MAX_POPULATION_INCREASE_NOTIOFACATION</Name>
+			<Value>5</Value>
+		</Row>
 	</Defines>
 </GameData>

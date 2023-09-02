@@ -817,6 +817,42 @@ bool CvSpecialistInfo::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	kUtility.SetFlavors(m_piFlavorValue, "SpecialistFlavors", "SpecialistType", szType);
 	kUtility.SetYields(m_piYieldChange, "SpecialistYields", "SpecialistType", szType);
 
+#ifdef MOD_SPECIALIST_RESOURCES
+	{
+		m_vResourceInfo.clear();
+		std::string strKey = "Specialist - Resources";
+		Database::Results *pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Specialist_Resources where SpecialistType = ?");
+		}
+		pResults->Bind(1, szType, strlen(szType), false);
+
+		while (pResults->Step())
+		{
+			const char* szResource = pResults->GetText("ResourceType");
+			ResourceTypes eResource = (ResourceTypes)GC.getInfoTypeForString(szResource, true);
+			if (eResource == NO_RESOURCE) continue;
+
+			ResourceInfo info;
+			info.m_eResource = eResource;
+			info.m_iQuantity = pResults->GetInt("Quantity");
+
+			const char* szRequiredPolicyType = pResults->GetText("RequiredPolicyType");
+			PolicyTypes eRequiredPolicy = (PolicyTypes)GC.getInfoTypeForString(szRequiredPolicyType, true);
+			info.m_eRequiredPolicy = eRequiredPolicy;
+
+			const char* szRequiredTechType = pResults->GetText("RequiredTechType");
+			TechTypes eRequiredTech = (TechTypes)GC.getInfoTypeForString(szRequiredTechType, true);
+			info.m_eRequiredTech = eRequiredTech;
+
+			m_vResourceInfo.push_back(info);
+		}
+
+		pResults->Reset();
+	}
+#endif
+
 	return true;
 }
 
@@ -4747,6 +4783,14 @@ int CvResourceInfo::getFlavorValue(int i) const
 	CvAssertMsg(i > -1, "index out of bounds");
 	return m_piFlavor[i];
 }
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvResourceInfo::GetCorruptionScoreChange() const
+{
+	return m_iCorruptionScoreChange;
+}
+#endif
+
 //------------------------------------------------------------------------------
 bool CvResourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -4790,6 +4834,10 @@ bool CvResourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility
 	m_iRandAppearance2 = kResults.GetInt("RandApp2");
 	m_iRandAppearance3 = kResults.GetInt("RandApp3");
 	m_iRandAppearance4 = kResults.GetInt("RandApp4");
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_iCorruptionScoreChange = kResults.GetInt("CorruptionScoreChange");
+#endif
 
 	m_eResourceUsage   = (ResourceUsageTypes)kResults.GetInt("ResourceUsage");
 
@@ -4861,8 +4909,55 @@ bool CvResourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	}
 
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	m_eUnHappinessModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("UnHappinessModifierFormula"), true));
+	m_eCityConnectionTradeRouteGoldModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("CityConnectionTradeRouteGoldModifierFormula"), true));
+	m_eGoldHurryCostModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("GoldHurryCostModifierFormula"), true));
+
+	{
+		std::string sqlKey = "Resoureces - m_vGlobalYieldModifiers";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if (pResults == NULL)
+		{
+			const char* szSQL = "select * from Resource_GlobalYieldModifiers where ResourceType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, szSQL);
+		}
+
+		pResults->Bind(1, GetType(), false);
+
+		while (pResults->Step())
+		{
+			YieldInfo info;
+			info.eFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(pResults->GetText("YieldFormula")));
+			info.eYield = static_cast<YieldTypes>(GC.getInfoTypeForString(pResults->GetText("YieldType")));
+			info.eStartEra = static_cast<EraTypes>(GC.getInfoTypeForString(pResults->GetText("StartEra")));
+			info.eEndEra = static_cast<EraTypes>(GC.getInfoTypeForString(pResults->GetText("EndEra")));
+			m_vGlobalYieldModifiers.push_back(info);
+		}
+
+		pResults->Reset();
+	}
+#endif
 
 	return true;
+}
+
+LuaFormulaTypes CvResourceInfo::GetUnHappinessModifierFormula() const
+{
+	return m_eUnHappinessModifierFormula;
+}
+LuaFormulaTypes CvResourceInfo::GetCityConnectionTradeRouteGoldModifierFormula() const
+{
+	return m_eCityConnectionTradeRouteGoldModifierFormula;
+}
+LuaFormulaTypes CvResourceInfo::GetGoldHurryCostModifierFormula() const
+{
+	return m_eGoldHurryCostModifierFormula;
+}
+
+const std::vector<CvResourceInfo::YieldInfo>& CvResourceInfo::GetGlobalYieldModifiers() const
+{
+	return m_vGlobalYieldModifiers;
 }
 
 //======================================================================================================
@@ -4901,12 +4996,15 @@ CvFeatureInfo::CvFeatureInfo() :
 	m_bNukeImmune(false),
 	m_bRough(false),
 	m_bNaturalWonder(false),
+#if defined(MOD_MORE_NATURAL_WONDER)
+	m_bVolcano(false),
+	m_bPseudoNaturalWonder(false),
+	m_iPromotionIfOwned(NO_PROMOTION),
+#endif
 	m_iWorldSoundscapeScriptId(0),
 	m_iEffectProbability(0),
 	m_piYieldChange(NULL),
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
-	m_bPseudoNaturalWonder(false),
-#endif
+
 	m_piRiverYieldChange(NULL),
 	m_piHillsYieldChange(NULL),
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -5084,22 +5182,31 @@ bool CvFeatureInfo::IsRough() const
 	return m_bRough;
 }
 //------------------------------------------------------------------------------
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
+#if defined(MOD_MORE_NATURAL_WONDER)
 bool CvFeatureInfo::IsNaturalWonder(bool orPseudoNatural) const
 #else
 bool CvFeatureInfo::IsNaturalWonder() const
 #endif
 {
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
+#if defined(MOD_MORE_NATURAL_WONDER)
 	return m_bNaturalWonder || (orPseudoNatural && IsPseudoNaturalWonder());
 #else
 	return m_bNaturalWonder;
 #endif
 }
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
+#if defined(MOD_MORE_NATURAL_WONDER)
+bool CvFeatureInfo::IsVolcano() const
+{
+	return m_bVolcano;
+}
 bool CvFeatureInfo::IsPseudoNaturalWonder() const
 {
 	return m_bPseudoNaturalWonder;
+}
+
+int CvFeatureInfo::getPromotionIfOwned() const
+{
+	return m_iPromotionIfOwned;
 }
 #endif
 //------------------------------------------------------------------------------
@@ -5257,8 +5364,12 @@ bool CvFeatureInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_bNukeImmune = kResults.GetBool("NukeImmune");
 	m_bRough = kResults.GetBool("Rough");
 	m_bNaturalWonder = kResults.GetBool("NaturalWonder");
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
+#if defined(MOD_MORE_NATURAL_WONDER)
+	m_bVolcano = kResults.GetBool("Volcano");
 	m_bPseudoNaturalWonder = kResults.GetBool("PseudoNaturalWonder");
+
+	szTextVal = kResults.GetText("FreePromotionIfOwned");
+	m_iPromotionIfOwned = GC.getInfoTypeForString(szTextVal, true);
 #endif
 	m_strEffectType = kResults.GetText("EffectType");
 	m_strEffectTypeTag = kResults.GetText("EffectTypeTag");
@@ -5419,6 +5530,11 @@ int CvYieldInfo::getGreakWorkYieldMod() const
 }
 #endif
 
+LuaFormulaTypes CvYieldInfo::GetExcessHappinessModifierFormula() const
+{
+	return m_eExcessHappinessModifierFormula;
+}
+
 //------------------------------------------------------------------------------
 bool CvYieldInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -5447,6 +5563,8 @@ bool CvYieldInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 		kResults.GetValue("GreakWorkYieldMod", m_iGreakWorkYieldMod);
 	}
 #endif
+
+	m_eExcessHappinessModifierFormula = static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("ExcessHappinessModifierFormula")));
 
 	return true;
 }

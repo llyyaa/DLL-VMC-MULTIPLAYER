@@ -86,6 +86,14 @@ public:
 #endif
 	int GetXPValueAttack() const;
 	int GetXPValueDefense() const;
+#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
+	int GetExtraXPValueAttack() const;
+	int GetExtraXPValueDefense() const;
+#endif
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	int GetBoundLandImprovement() const;
+	int GetBoundWaterImprovement() const;
+#endif
 	int GetSpecialCargo() const;
 	int GetDomainCargo() const;
 
@@ -177,6 +185,9 @@ public:
 	bool GetGreatPeoples(int i) const;
 	bool GetBuildings(int i) const;
 	bool GetBuildingClassRequireds(int i) const;
+	int GetTechCombatStrength(int i) const;
+	int GetTechRangedCombatStrength(int i) const;
+	bool IsUnitTechUpgrade() const;
 	bool GetFreePromotions(int i) const;
 
 	// Derived fields (not in XML)
@@ -250,6 +261,15 @@ private:
 #endif
 	int m_iXPValueAttack;
 	int m_iXPValueDefense;
+#ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
+	int m_iExtraXPValueAttack;
+	int m_iExtraXPValueDefense;
+#endif
+#if defined(MOD_UNIT_BOUND_IMPROVEMENT)
+	int m_iBoundLandImprovement;
+	int m_iBoundWaterImprovement;
+#endif
+
 	int m_iSpecialCargo;
 
 	int m_iDomainCargo;
@@ -339,6 +359,9 @@ private:
 	bool* m_pbGreatPeoples;
 	bool* m_pbBuildings;
 	bool* m_pbBuildingClassRequireds;
+	int* m_piTechCombatStrength;
+	int* m_piTechRangedCombatStrength;
+	bool m_bUnitTechUpgrade;
 	bool* m_pbFreePromotions;
 
 	CvString* m_paszEarlyArtDefineTags;

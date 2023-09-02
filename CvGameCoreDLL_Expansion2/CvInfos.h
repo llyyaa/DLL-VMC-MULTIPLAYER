@@ -184,6 +184,18 @@ protected:
 class CvSpecialistInfo : public CvHotKeyInfo
 {
 public:
+#ifdef MOD_SPECIALIST_RESOURCES
+	struct ResourceInfo {
+		ResourceTypes m_eResource = NO_RESOURCE;
+		int m_iQuantity = 0;
+
+		// optional:
+		PolicyTypes m_eRequiredPolicy = NO_POLICY;
+		TechTypes m_eRequiredTech = NO_TECH;
+	};
+#endif
+
+public:
 
 	CvSpecialistInfo();
 	virtual ~CvSpecialistInfo();
@@ -226,6 +238,15 @@ protected:
 
 	int* m_piYieldChange;
 	int* m_piFlavorValue;
+
+#ifdef MOD_SPECIALIST_RESOURCES
+	std::vector<ResourceInfo> m_vResourceInfo;
+#endif
+
+public:
+#ifdef MOD_SPECIALIST_RESOURCES
+	std::vector<ResourceInfo>& GetResourceInfo() { return m_vResourceInfo; }
+#endif
 
 private:
 	CvSpecialistInfo(const CvSpecialistInfo&);
@@ -1403,8 +1424,26 @@ public:
 
 	int getFlavorValue(int i) const;
 
-	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	struct YieldInfo {
+		YieldTypes eYield = NO_YIELD;
+		LuaFormulaTypes eFormula = NO_LUA_FORMULA;
+		EraTypes eStartEra = NO_ERA;
+		EraTypes eEndEra = NO_ERA;
+	};
 
+	LuaFormulaTypes GetUnHappinessModifierFormula() const;
+	LuaFormulaTypes GetCityConnectionTradeRouteGoldModifierFormula() const;
+	LuaFormulaTypes GetGoldHurryCostModifierFormula() const;
+
+	const std::vector<YieldInfo>& GetGlobalYieldModifiers() const;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScoreChange() const;
+#endif
+
+	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 protected:
 	int m_iResourceClassType;
 	int m_iChar;
@@ -1462,6 +1501,18 @@ protected:
 	bool* m_pbFeature;
 	bool* m_pbFeatureTerrain;
 
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	LuaFormulaTypes m_eUnHappinessModifierFormula = NO_LUA_FORMULA;
+	LuaFormulaTypes m_eCityConnectionTradeRouteGoldModifierFormula = NO_LUA_FORMULA;
+	LuaFormulaTypes m_eGoldHurryCostModifierFormula = NO_LUA_FORMULA;
+
+	std::vector<YieldInfo> m_vGlobalYieldModifiers;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCorruptionScoreChange = 0;
+#endif
+
 private:
 	CvResourceInfo(const CvResourceInfo&);
 	CvResourceInfo& operator=(const CvResourceInfo&);
@@ -1509,11 +1560,16 @@ public:
 	bool isNukeImmune() const;
 	bool IsRough() const;
 
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
+#if defined(MOD_MORE_NATURAL_WONDER)
 	bool IsNaturalWonder(bool orPseudoNatural = false) const;
 	bool IsPseudoNaturalWonder() const;
 #else
 	bool IsNaturalWonder() const;
+#endif
+
+#if defined(MOD_MORE_NATURAL_WONDER)
+	bool IsVolcano() const;
+	int getPromotionIfOwned() const;
 #endif
 
 	const char* getArtDefineTag() const;
@@ -1579,8 +1635,10 @@ protected:
 	bool m_bNukeImmune;
 	bool m_bRough;
 	bool m_bNaturalWonder;
-#if defined(MOD_PSEUDO_NATURAL_WONDER)
+#if defined(MOD_MORE_NATURAL_WONDER)
+	bool m_bVolcano;
 	bool m_bPseudoNaturalWonder;
+	int m_iPromotionIfOwned;
 #endif
 	// Set each time the game is started
 	bool m_bClearable;
@@ -1637,6 +1695,8 @@ public:
 	int getAIWeightPercent() const;
 	int getGreakWorkYieldMod() const;
 
+	LuaFormulaTypes GetExcessHappinessModifierFormula() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -1659,6 +1719,8 @@ protected:
 #ifdef MOD_BALANCE_CORE
 	int m_iGreakWorkYieldMod;
 #endif
+
+	LuaFormulaTypes m_eExcessHappinessModifierFormula = NO_LUA_FORMULA;
 };
 
 
@@ -2388,6 +2450,63 @@ private:
 	CvVoteSourceInfo(const CvVoteSourceInfo&);
 	CvVoteSourceInfo& operator=(const CvVoteSourceInfo&);
 };
+
+struct PolicyYieldInfo
+{
+	PolicyTypes ePolicy;
+	YieldTypes eYield;
+	int iYield;
+	LuaFormulaTypes eLuaFormula = NO_LUA_FORMULA;
+};
+
+inline FDataStream& operator<<(FDataStream& os, const PolicyYieldInfo& kYield)
+{
+	os << (int)kYield.ePolicy;
+	os << (int)kYield.eYield;
+	os << kYield.iYield;
+	os << (int)kYield.eLuaFormula;
+	return os;
+}
+
+inline FDataStream& operator>>(FDataStream& is, PolicyYieldInfo& kYield)
+{
+	is >> (int&)kYield.ePolicy;
+	is >> (int&)kYield.eYield;
+	is >> kYield.iYield;
+	is >> (int&)kYield.eLuaFormula;
+	return is;
+}
+
+struct PolicyResourceInfo
+{
+	PolicyTypes ePolicy = NO_POLICY;
+	ResourceTypes eResource = NO_RESOURCE;
+	int iQuantity = 0;
+
+	// optional conditions
+	bool bMustCoastal = false;
+	CityScaleTypes eCityScale = NO_CITY_SCALE;
+};
+
+inline FDataStream& operator<<(FDataStream& os, const PolicyResourceInfo& kResourceInfo)
+{
+	os << (int)kResourceInfo.ePolicy;
+	os << (int)kResourceInfo.eResource;
+	os << kResourceInfo.iQuantity;
+	os << kResourceInfo.bMustCoastal;
+	os << (int)kResourceInfo.eCityScale;
+	return os;
+}
+
+inline FDataStream& operator>>(FDataStream& is, PolicyResourceInfo& kResourceInfo)
+{
+	is >> (int&)kResourceInfo.ePolicy;
+	is >> (int&)kResourceInfo.eResource;
+	is >> kResourceInfo.iQuantity;
+	is >> kResourceInfo.bMustCoastal;
+	is >> (int&)kResourceInfo.eCityScale;
+	return is;
+}
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  class : CvDomainInfo

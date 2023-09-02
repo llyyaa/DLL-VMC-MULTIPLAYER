@@ -132,6 +132,8 @@ public:
 	int GetFreeBuildingClass() const;
 	int GetFreeBuildingThisCity() const;
 	int GetFreePromotion() const;
+	int GetFreePromotion2() const;
+	int GetFreePromotion3() const;
 	int GetTrainedFreePromotion() const;
 	int GetFreePromotionRemoved() const;
 	int GetProductionCost() const;
@@ -178,6 +180,12 @@ public:
 	int GetCityAutomatonWorkersChange() const;
 #endif
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	int GetInstantYield(int i) const;
+	int* GetInstantYieldArray() const;
+	bool IsAllowInstantYield() const;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	int GetGreatWorkYieldChange(int i) const;
 	int* GetGreatWorkYieldChangeArray() const;
@@ -192,32 +200,55 @@ public:
 	int GetExtraDamageHeal() const;
 	int CityRangedStrikeModifier() const;
 	int GetPopulationChange() const;
-
+	int GetMinorCivFriendship() const;
+	int GetLiberatedInfluence() const;
 	int GetGlobalCityStrengthMod() const;
 	int GetGlobalRangedStrikeModifier() const;
 
 	int GetResetDamageValue() const;
 	int GetReduceDamageValue() const;
+
+	int GetWaterTileDamage() const;
+	int GetWaterTileMovementReduce() const;
+	int GetWaterTileTurnDamage() const;
+	int GetLandTileDamage() const;
+	int GetLandTileMovementReduce() const;
+	int GetLandTileTurnDamage() const;
 #endif
 
-
-#if defined(MOD_ROG_CORE)
 	int GetResourceQuantityFromPOP(int i) const;
 	int GetYieldChangeWorldWonder(int i) const;
 	int GetYieldChangeWorldWonderGlobal(int i) const;
-#endif
-
-#if defined(MOD_ROG_CORE)
+	int GetYieldFromInternal(int i) const;
+	int* GetYieldFromInternalArray() const;
+	int GetYieldFromProcessModifier(int i) const;
+	int* GetYieldFromProcessModifierArray() const;
+	int GetYieldFromProcessModifierGlobal(int i) const;
+	int* GetYieldFromProcessModifierArrayGlobal() const;
 	int GetResourceYieldChangeGlobal(int iResource, int iYieldType) const;
 	int GetImprovementYieldChange(int i, int j) const;
 	int* GetImprovementYieldChangeArray(int i) const;
 
 	int GetImprovementYieldChangeGlobal(int i, int j) const;
 	int* GetImprovementYieldChangeGlobalArray(int i) const;
+
+	int GetFeatureYieldChangesGlobal(int i, int j) const;
+	int GetTerrainYieldChangesGlobal(int i, int j) const;
+
+	int GetYieldPerXTerrain(int i, int j) const;
+	int* GetYieldPerXTerrainArray(int i) const;
+
+	int GetYieldPerXFeature(int i, int j) const;
+	int* GetYieldPerXFeatureArray(int i) const;
+
 	int GetSpecialistYieldChangeLocal(int i, int j) const;
 	int* GetSpecialistYieldChangeLocalArray(int i) const;
 
 	int GetBuildingClassYieldModifier(int i, int j) const;
+	int GetBuildingClassLocalYieldChange(int i, int j) const;
+
+#if defined(MOD_ROG_CORE)
+	int GetSpecificGreatPersonRateModifier(int) const;
 #endif
 
 	int GetMinAreaSize() const;
@@ -280,7 +311,9 @@ public:
 #if defined(MOD_API_EXTENSIONS)
 	bool IsAddsFreshWater() const;
 	bool IsPurchaseOnly() const;
+	bool IsHumanOnly() const;
 #endif
+	bool IsMoveAfterCreated() const;
 	bool IsMountain() const;
 	bool IsHill() const;
 	bool IsFlat() const;
@@ -325,6 +358,28 @@ public:
 	int* GetYieldChangePerReligionArray() const;
 	int GetYieldModifier(int i) const;;
 	int* GetYieldModifierArray() const;
+
+#if defined(MOD_ROG_CORE)
+	int GetYieldFromConstruction(int i) const;
+	int* GetYieldFromConstructionArray() const;
+	int GetYieldFromUnitProduction(int i) const;
+	int* GetYieldFromUnitProductionArray() const;
+	int GetYieldFromBirth(int i) const;
+	int* GetYieldFromBirthArray() const;
+	int GetYieldFromBorderGrowth(int i) const;
+	int* GetYieldFromBorderGrowthArray() const;
+
+	int GetYieldFromPillage(int i) const;
+	int* GetYieldFromPillageArray() const;
+	int GetYieldFromPillageGlobal(int i) const;
+	int* GetYieldFromPillageGlobalArray() const;
+	int GetYieldFromPillageGlobalPlayer(int i) const;
+	int* GetYieldFromPillageGlobalPlayerArray() const;
+
+	int GetYieldModifierFromWonder(int i) const;;
+	int* GetYieldModifierFromWonderArray() const;
+#endif
+
 	int GetAreaYieldModifier(int i) const;
 	int* GetAreaYieldModifierArray() const;
 	int GetGlobalYieldModifier(int i) const;
@@ -345,6 +400,13 @@ public:
 	int GetUnitCombatProductionModifier(int i) const;
 	int GetDomainFreeExperience(int i) const;
 	int GetDomainFreeExperiencePerGreatWork(int i) const;
+
+#if defined(MOD_ROG_CORE)
+	int GetDomainFreeExperiencePerGreatWorkGlobal(int i) const;
+	int GetDomainFreeExperienceGlobal(int i) const;
+	int GetUnitTypePrmoteHealGlobal(int i) const;
+#endif
+
 	int GetDomainProductionModifier(int i) const;
 	int GetLockedBuildingClasses(int i) const;
 	int GetPrereqAndTechs(int i) const;
@@ -359,7 +421,15 @@ public:
 	int GetLocalResourceOr(int i) const;
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
-	int GetNumFreeUnits(int i) const;
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int GetTradeRouteSeaGoldBonusGlobal() const;
+	int GetTradeRouteLandGoldBonusGlobal() const;
+	bool IsAnyWater() const;
+	bool IsBuildingClassNeededGlobal(int i) const;
+#endif
+	int GetNumFreeUnit() const;
+	int GetNumFreeUnitTotal() const;
+	std::pair<UnitTypes, int>* GetFreeUnits() const;
 
 	int GetResourceYieldChange(int i, int j) const;
 	int* GetResourceYieldChangeArray(int i) const;
@@ -367,6 +437,8 @@ public:
 	int* GetFeatureYieldChangeArray(int i) const;
 	int GetSpecialistYieldChange(int i, int j) const;
 	int* GetSpecialistYieldChangeArray(int i) const;
+	int GetImprovementYieldModifier(int i, int j) const;
+	int* GetImprovementYieldModifierArray(int i) const;
 	int GetResourceYieldModifier(int i, int j) const;
 	int* GetResourceYieldModifierArray(int i) const;
 	int GetTerrainYieldChange(int i, int j) const;
@@ -377,6 +449,10 @@ public:
 #endif
 	int GetBuildingClassYieldChange(int i, int j) const;
 	int GetBuildingClassHappiness(int i) const;
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES) 
+	std::multimap<int, std::pair<int, int>> GetResourceFromImprovementArray() const;
+#endif
 
 	CvThemingBonusInfo *GetThemingBonusInfo(int i) const;
 	int GetNumThemingBonuses() const {return m_iNumThemingBonuses;};
@@ -390,9 +466,23 @@ public:
 	bool HasYieldFromOtherYield() const;
 #endif
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes GetEnableCityScaleGrowth() const;
+	bool GetEnableAllCityScaleGrowth() const;
+#endif
+
 #ifdef MOD_BUILDINGS_GOLDEN_AGE_EXTEND
 	int GetGoldenAgeUnitCombatModifier() const;
 	int GetGoldenAgeMeterMod() const;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int GetSiegeKillCitizensModifier() const;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScoreChange() const;
+	int GetCorruptionLevelChange() const;
 #endif
 
 private:
@@ -425,6 +515,8 @@ private:
 	int m_iFreeBuildingClass;
 	int m_iFreeBuildingThisCity;
 	int m_iFreePromotion;
+	int m_iFreePromotion2;
+	int m_iFreePromotion3;
 	int m_iTrainedFreePromotion;
 	int m_iFreePromotionRemoved;
 	int m_iProductionCost;
@@ -471,18 +563,29 @@ private:
 	int m_iCityAutomatonWorkersChange;
 #endif
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	int* m_piInstantYield;
+	bool m_bAllowInstantYield;
+#endif
+
 #if defined(MOD_ROG_CORE)
 	int* m_piGreatWorkYieldChange;
-
 	int m_iExtraDamageHeal;
 	int m_iRangedStrikeModifier;
 	int m_iPopulationChange;
-
+	int m_iMinorCivFriendship;
+	int m_iLiberatedInfluence;
 	int m_iResetDamageValue;
 	int m_iReduceDamageValue;
 
 	int m_iGlobalCityStrengthMod;
 	int m_iGlobalRangedStrikeModifier;
+	int m_iWaterTileDamage;
+	int m_iWaterTileMovementReduce;
+	int m_iWaterTileTurnDamage;
+	int m_iLandTileDamage;
+	int m_iLandTileMovementReduce;
+	int m_iLandTileTurnDamage;
 #endif
 
 	int m_iNukeInterceptionChance;
@@ -495,19 +598,26 @@ private:
 
 	int** m_ppaiImprovementYieldChange;
 	int** m_ppaiImprovementYieldChangeGlobal;
+	int** m_ppiFeatureYieldChangesGlobal;
+	int** m_ppiTerrainYieldChangesGlobal;
+	int** m_ppaiYieldPerXTerrain;
+	int** m_ppaiYieldPerXFeature;
 	int** m_ppaiSpecialistYieldChangeLocal;
 #endif
-
+	int* m_piYieldFromInternal;
+	int* m_piYieldFromProcessModifier;
+	int* m_piYieldFromProcessModifierGlobal;
 
 #if defined(MOD_ROG_CORE)
+	int* m_paiSpecificGreatPersonRateModifier;
 	int* m_piYieldChangeWorldWonder;
 	int* m_piYieldChangeWorldWonderGlobal;
-
 	int* m_piResourceQuantityFromPOP;
 #endif
 
 #if defined(MOD_ROG_CORE)
 	int** m_ppiBuildingClassYieldModifiers;
+	int** m_ppiBuildingClassLocalYieldChanges;
 #endif
 
 	int m_iMinAreaSize;
@@ -555,6 +665,10 @@ private:
 	int m_iGlobalConversionModifier;
 #endif
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int m_iSiegeKillCitizensModifier = 0;
+#endif
+
 	int m_iLandmarksTourismPercent;
 	int m_iInstantMilitaryIncrease;
 	int m_iGreatWorksTourismModifier;
@@ -579,7 +693,9 @@ private:
 #if defined(MOD_API_EXTENSIONS)
 	bool m_bAddsFreshWater;
 	bool m_bPurchaseOnly;
+	bool m_bHumanOnly;
 #endif
+	bool m_bMoveAfterCreated;
 	bool m_bMountain;
 	bool m_bHill;
 	bool m_bFlat;
@@ -630,6 +746,19 @@ private:
 	int* m_piYieldChangePerPop;
 	int* m_piYieldChangePerReligion;
 	int* m_piYieldModifier;
+
+#if defined(MOD_ROG_CORE)
+	int* m_piYieldFromConstruction;
+	int* m_piYieldFromUnitProduction;
+	int* m_piYieldFromBirth;
+	int* m_piYieldFromBorderGrowth;
+	int* m_piYieldFromPillage;
+	int* m_piYieldFromPillageGlobal;
+	int* m_piYieldFromPillageGlobalPlayer;
+	int* m_piYieldModifierFromWonder;
+#endif
+
+
 	int* m_piAreaYieldModifier;
 	int* m_piGlobalYieldModifier;
 	int* m_piTechEnhancedYieldChange;
@@ -637,6 +766,14 @@ private:
 	int* m_piUnitCombatProductionModifiers;
 	int* m_piDomainFreeExperience;
 	int* m_piDomainFreeExperiencePerGreatWork;
+
+#if defined(MOD_ROG_CORE)
+	int* m_piDomainFreeExperiencePerGreatWorkGlobal;
+	std::map<int, int> m_piDomainFreeExperienceGlobal;
+	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
+#endif
+
+
 	int* m_piDomainProductionModifier;
 	int* m_piPrereqNumOfBuildingClass;
 	int* m_piFlavorValue;
@@ -650,11 +787,20 @@ private:
 #endif 
 
 	bool* m_pbBuildingClassNeededInCity;
-	int* m_piNumFreeUnits;
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iTradeRouteSeaGoldBonusGlobal;
+	int m_iTradeRouteLandGoldBonusGlobal;
+	bool m_bAnyWater;
+	bool* m_pbBuildingClassNeededGlobal;
+#endif
+	int m_iNumFreeUnit;
+	int m_iNumFreeUnitTotal;
+	std::pair<UnitTypes, int>* m_pFreeUnits;
 
 	int** m_ppaiResourceYieldChange;
 	int** m_ppaiFeatureYieldChange;
 	int** m_ppaiSpecialistYieldChange;
+	int** m_ppaiImprovementYieldModifier;
 	int** m_ppaiResourceYieldModifier;
 	int** m_ppaiTerrainYieldChange;
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
@@ -663,12 +809,26 @@ private:
 	int** m_ppiBuildingClassYieldChanges;
 	int* m_paiBuildingClassHappiness;
 
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	std::multimap<int, std::pair<int, int>> m_piiResourceFromImprovement;
+#endif
+
 	CvThemingBonusInfo* m_paThemingBonusInfo;
 	int m_iNumThemingBonuses;
 
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	int m_ppiYieldFromOtherYield[NUM_YIELD_TYPES][NUM_YIELD_TYPES][YieldFromYield::LENGTH];
 	bool m_bHasYieldFromOtherYield = false;
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes m_eEnableCityScaleGrowth = NO_CITY_SCALE;
+	bool m_bEnableAllCityScaleGrowth = false;
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCorruptionScoreChange = 0;
+	int m_iCorruptionLevelChange = 0;
 #endif
 };
 
@@ -820,7 +980,6 @@ public:
 #if defined(MOD_ROG_CORE)
 	const std::vector<BuildingTypes>& GetAllBuildingsHere() const { return m_buildingsThatExistAtLeastOnce; }
 #endif
-
 
 private:
 	void NotifyNewBuildingStarted(BuildingTypes eIndex);

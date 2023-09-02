@@ -731,6 +731,18 @@ double CvCityStrategyAI::GetDeficientYieldValue(YieldTypes eYieldType)
 	case YIELD_GOLDEN_AGE_POINTS:
 		break;
 #endif
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	case YIELD_GREAT_GENERAL_POINTS:
+	case YIELD_GREAT_ADMIRAL_POINTS:
+	case YIELD_HEALTH:
+	case YIELD_DISEASE:
+	case YIELD_CRIME:
+	case YIELD_LOYALTY:
+	case YIELD_SOVEREIGNTY:
+		break;
+#endif
+
 	default:
 		FAssertMsg(false, "Yield type is not handled. What?");
 		return false;
@@ -3269,6 +3281,14 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_GoodGPCity(CvCity* pCity)
 				// GPP from Buildings
 				iGPPChange += pCity->GetCityCitizens()->GetBuildingGreatPeopleRateChanges(eSpecialist) * 100;
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+				// GPP from Religion
+				if(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+				{
+					iGPPChange += pCity->GetGreatPersonPointsFromReligion(GetGreatPersonFromSpecialist(eSpecialist)) * 100;
+				}
+#endif
+
 				if (iGPPChange > 0)
 				{
 					int iMod = 0;
@@ -3414,7 +3434,7 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_NeedTourismBuilding(CvCity *pCity
 #else
 	iTourismValue += pCity->GetCityCulture()->GetCultureFromImprovements();
 #endif
-	iTourismValue += pCity->GetCityCulture()->GetBaseTourism();
+	iTourismValue += pCity->GetBaseTourism();
 
 	if (iTourismValue > 10)
 	{

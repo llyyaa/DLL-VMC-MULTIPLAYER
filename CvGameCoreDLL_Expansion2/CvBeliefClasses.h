@@ -122,6 +122,20 @@ public:
 #if defined(MOD_RELIGION_PLOT_YIELDS)
 	int GetPlotYieldChange(int i, int j) const;
 #endif
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	bool IsGreatPersonPointsCapital() const;
+	bool IsGreatPersonPointsPerCity() const;
+	bool IsGreatPersonPointsHolyCity() const;
+	int GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) const;
+	int GetFreePromotionForProphet() const;
+	int GetLandmarksTourismPercent() const;
+	int GetHolyCityUnitExperence() const;
+	int GetHolyCityPressureModifier() const;
+	int GetSameReligionMinorRecoveryModifier() const;
+	int GetCityExtraMissionarySpreads() const;
+	bool AllowYieldPerBirth() const;
+	int GetYieldPerBirth(int i) const;
+#endif
 	int GetResourceHappiness(int i) const;
 	int GetYieldChangeAnySpecialist(int i) const;
 	int GetYieldChangeTradeRoute(int i) const;
@@ -175,6 +189,20 @@ protected:
 	int m_iSpyPressure;
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	bool m_bGreatPersonPointsCapital;
+	bool m_bGreatPersonPointsPerCity;
+	bool m_bGreatPersonPointsHolyCity;
+	int* m_piGreatPersonPoints;
+	int m_iFreePromotionForProphet;
+	int m_iLandmarksTourismPercent;
+	int m_iHolyCityUnitExperence;
+	int m_iHolyCityPressureModifier;
+	int m_iSameReligionMinorRecoveryModifier;
+	int m_iCityExtraMissionarySpreads;
+	bool m_bAllowYieldPerBirth;
+	int* m_piYieldPerBirth;
+#endif
 
 	bool m_bPantheon;
 	bool m_bFounder;
@@ -227,6 +255,7 @@ protected:
 #if defined(MOD_RELIGION_PLOT_YIELDS)
 	int** m_ppiPlotYieldChange;
 #endif
+
 	int* m_piResourceHappiness;
 	int* m_piYieldChangeAnySpecialist;
 	int* m_piYieldChangeTradeRoute;
@@ -387,6 +416,41 @@ public:
 		return m_iFaithBuildingTourism;
 	}
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	bool HasGreatPersonPoints() const
+	{
+		return m_bGreatPersonPoints;
+	}
+	const std::vector<int>& GetFreePromotionForProphet() const
+	{
+		return m_vFreePromotionForProphet;
+	}
+	int GetLandmarksTourismPercent() const
+	{
+		return m_iLandmarksTourismPercent;
+	}
+	int GetHolyCityUnitExperence() const
+	{
+		return m_iHolyCityUnitExperence;
+	}
+	int GetHolyCityPressureModifier() const
+	{
+		return m_iHolyCityPressureModifier;
+	}
+	int GetSameReligionMinorRecoveryModifier() const
+	{
+		return m_iSameReligionMinorRecoveryModifier;
+	}
+	int GetCityExtraMissionarySpreads() const
+	{
+		return m_iCityExtraMissionarySpreads;
+	}
+	bool AllowYieldPerBirth() const
+	{
+		return m_bAllowYieldPerBirth;
+	}
+#endif
+
 	EraTypes GetObsoleteEra() const
 	{
 		return m_eObsoleteEra;
@@ -448,6 +512,10 @@ public:
 #if defined(MOD_RELIGION_PLOT_YIELDS)
 	int GetPlotYieldChange(PlotTypes ePlot, YieldTypes eYieldType) const;
 #endif
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, bool bCapital, bool bHolyCity) const;
+	int GetYieldPerBirth(YieldTypes eYieldType) const;
+#endif
 	int GetResourceHappiness(ResourceTypes eResource) const;
 	int GetYieldChangeAnySpecialist(YieldTypes eYieldType) const;
 	int GetYieldChangeTradeRoute(YieldTypes eYieldType) const;
@@ -490,6 +558,17 @@ private:
 	int m_iSpyPressure;
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	bool m_bGreatPersonPoints;
+	std::vector<int> m_vFreePromotionForProphet;
+	int m_iLandmarksTourismPercent;
+	int m_iHolyCityUnitExperence;
+	int m_iHolyCityPressureModifier;
+	int m_iSameReligionMinorRecoveryModifier;
+	int m_iCityExtraMissionarySpreads;
+	bool m_bAllowYieldPerBirth;
+#endif
 
 	EraTypes m_eObsoleteEra;
 	ResourceTypes m_eResourceRevealed;

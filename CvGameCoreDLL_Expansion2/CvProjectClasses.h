@@ -32,6 +32,7 @@ public:
 	int GetAnyoneProjectPrereq() const;
 	void SetAnyoneProjectPrereq(int i);
 	int GetMaxGlobalInstances() const;
+	int CityMaxNum() const;
 	int GetMaxTeamInstances() const;
 	int GetProductionCost() const;
 	int GetNukeInterception() const;
@@ -42,6 +43,9 @@ public:
 	int GetFlavorValue(int i) const;
 	bool IsSpaceship() const;
 	bool IsAllowsNukes() const;
+	int CostScalerNumberOfRepeats() const;
+	int GetGoldMaintenance() const;
+	int CostScalerEra() const;
 	const char* GetMovieArtDef() const;
 
 	const char* GetCreateSound() const;
@@ -53,11 +57,17 @@ public:
 	int GetVictoryMinThreshold(int i) const;
 	int GetProjectsNeeded(int i) const;
 
+	int GetYieldChange(int i) const;
+	int* GetYieldChangeArray() const;
+	int GetYieldModifier(int i) const;;
+	int* GetYieldModifierArray() const;
+
 protected:
 	int m_iVictoryPrereq;
 	int m_iTechPrereq;
 	int m_iAnyoneProjectPrereq;
 	int m_iMaxGlobalInstances;
+	int m_iCityMaxNum;
 	int m_iMaxTeamInstances;
 	int m_iProductionCost;
 	int m_iNukeInterception;
@@ -68,7 +78,9 @@ protected:
 
 	bool m_bSpaceship;
 	bool m_bAllowsNukes;
-
+	int m_iGoldMaintenance;
+	int m_iCostScalerEra;
+	int m_iCostScalerNumRepeats;
 	CvString m_strCreateSound;
 	CvString m_strMovieArtDef;
 
@@ -78,6 +90,9 @@ protected:
 	int* m_piVictoryMinThreshold;
 	int* m_piProjectsNeeded;
 	int* m_piFlavorValue;
+
+	int* m_piYieldChange;
+	int* m_piYieldModifier;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

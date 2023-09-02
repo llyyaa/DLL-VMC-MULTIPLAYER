@@ -131,6 +131,7 @@ bool CvTechEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_bResearchAgreementTradingAllowed = kResults.GetBool("ResearchAgreementTradingAllowed");
 	m_bTradeAgreementTradingAllowed = kResults.GetBool("TradeAgreementTradingAllowed");
 	m_bPermanentAllianceTrading = kResults.GetBool("PermanentAllianceTradingAllowed");
+	m_iRazeSpeedModifier = kResults.GetInt("RazeSpeedModifier");
 #if defined(MOD_TECHS_CITY_WORKING)
 	m_iCityWorkingChange = kResults.GetInt("CityWorkingChange");
 #endif
@@ -587,6 +588,11 @@ int CvTechEntry::GetPrereqOrTechs(int i) const
 int CvTechEntry::GetPrereqAndTechs(int i) const
 {
 	return m_piPrereqAndTechs ? m_piPrereqAndTechs[i] : -1;
+}
+
+int CvTechEntry::GetRazeSpeedModifier() const
+{
+	return m_iRazeSpeedModifier;
 }
 
 #if defined(MOD_ROG_CORE)
@@ -1990,26 +1996,57 @@ void CvTeamTechs::SetHasTech(TechTypes eIndex, bool bNewValue)
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < GC.getNumTechInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
 
-	if(m_pabHasTech[eIndex] != bNewValue)
+	if (m_pabHasTech[eIndex] == bNewValue) return;
+
+	m_pabHasTech[eIndex] = bNewValue;
+
+	if(bNewValue)
+		SetLastTechAcquired(eIndex);
+
+#if defined(MOD_ROG_CORE)
+
+	if (MOD_ROG_CORE)
 	{
-		m_pabHasTech[eIndex] = bNewValue;
+		TeamTypes eTeamID = m_pTeam->GetID();
+		PlayerTypes eLeaderLoop = (PlayerTypes)GET_TEAM(eTeamID).getLeaderID();
+		CvPlayerAI& kPlayer = GET_PLAYER(eLeaderLoop);
 
-		if(bNewValue)
-			SetLastTechAcquired(eIndex);
-
-		ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
-		if(pkScriptSystem)
+		if (kPlayer.isAlive())
 		{
-			CvLuaArgsHandle args;
-			args->Push(m_pTeam->GetID());
-			args->Push(eIndex);
-			args->Push(bNewValue);
+			int iLoop = 0;
+			for (CvUnit* pLoopUnit = kPlayer.firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = kPlayer.nextUnit(&iLoop))
+			{
+				if (pLoopUnit->isUnitTechUpgrade())
+				{
+					if (GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechCombatStrength(eIndex) > 0 && GET_TEAM(eTeamID).GetTeamTechs()->HasTech(eIndex) && pLoopUnit->GetBaseCombatStrength() < GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechCombatStrength(eIndex) )
+					{
+						pLoopUnit->SetBaseCombatStrength(GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechCombatStrength(eIndex));
 
-			// Attempt to execute the game events.
-			// Will return false if there are no registered listeners.
-			bool bResult = false;
-			LuaSupport::CallHook(pkScriptSystem, "TeamSetHasTech", args.get(), bResult);
+					}
+
+					if (pLoopUnit->isRanged() && (GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechRangedCombatStrength(eIndex)) > 0 && (GET_TEAM(eTeamID)).GetTeamTechs()->HasTech(eIndex) && (pLoopUnit->GetBaseRangedCombatStrength() < GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechRangedCombatStrength(eIndex)))
+					{
+						pLoopUnit->SetBaseRangedCombatStrength(GC.getUnitInfo(pLoopUnit->getUnitType())->GetTechRangedCombatStrength(eIndex));
+					}
+
+				}
+			}
 		}
+	}
+#endif
+
+	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
+	if(pkScriptSystem)
+	{
+		CvLuaArgsHandle args;
+		args->Push(m_pTeam->GetID());
+		args->Push(eIndex);
+		args->Push(bNewValue);
+
+		// Attempt to execute the game events.
+		// Will return false if there are no registered listeners.
+		bool bResult = false;
+		LuaSupport::CallHook(pkScriptSystem, "TeamSetHasTech", args.get(), bResult);
 	}
 }
 

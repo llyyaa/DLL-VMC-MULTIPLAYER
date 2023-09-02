@@ -1109,6 +1109,13 @@ void CvGameReligions::FoundReligion(PlayerTypes ePlayer, ReligionTypes eReligion
 		}
 	}
 
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+	if (MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY)
+	{
+		kPlayer.UpdateCachedCapturedHolyCity();
+	}
+#endif
+
 #if defined(MOD_EVENTS_FOUND_RELIGION)
 	if (MOD_EVENTS_FOUND_RELIGION) {
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_ReligionFounded, ePlayer, pkHolyCity->GetID(), eReligion, eBelief, eBelief1, eBelief2, eBelief3, eBelief4);
@@ -2449,6 +2456,16 @@ int CvGameReligions::GetAdjacentCityReligiousPressure (ReligionTypes eReligion, 
 			iPressure *= (100 + iModifier);
 			iPressure /= 100;
 		}
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+		// Belief that boosts pressure from originating city?
+		int iHolyCityModifier = GC.getGame().GetGameReligions()->GetReligion(eReligion,pFromCity->getOwner())->m_Beliefs.GetHolyCityPressureModifier();
+		if(MOD_BELIEF_NEW_EFFECT_FOR_SP && iHolyCityModifier !=0 && pFromCity->GetCityReligions()->IsHolyCityForReligion(eReligion))
+		{
+			iPressure *= (100 + iHolyCityModifier);
+			iPressure /=100;
+		}
+#endif		
 	}
 
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -3702,9 +3719,11 @@ BeliefTypes CvCityReligions::GetSecondaryReligionPantheonBelief()
 			const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eSecondary, m_pCity->getOwner());
 			if(pReligion)
 			{
+				const BeliefTypes eMjBelief = GetMajorReligionPantheonBelief();
 				for(int iI = 0; iI < pReligion->m_Beliefs.GetNumBeliefs(); iI++)
 				{
 					const BeliefTypes eBelief = pReligion->m_Beliefs.GetBelief(iI);
+					if(eMjBelief == eBelief) continue;
 					CvBeliefEntry* pEntry = GC.GetGameBeliefs()->GetEntry((int)eBelief);
 					if(pEntry && pEntry->IsPantheonBelief())
 					{
@@ -4119,7 +4138,7 @@ void CvCityReligions::SimulateReligiousPressure(ReligionTypes eReligion, int iPr
 		else if (it->m_eReligion > RELIGION_PANTHEON)
 		{
 			const CvReligion *pReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion, NO_PLAYER);
-			int iPressureErosion = pReligion->m_Beliefs.GetOtherReligionPressureErosion();  // Normally 0
+			int iPressureErosion = pReligion ? pReligion->m_Beliefs.GetOtherReligionPressureErosion() : 0;  // Normally 0
 			if (iPressureErosion > 0)
 			{
 				int iErosionAmount = iPressureErosion * iPressure / 100;
@@ -6351,6 +6370,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 	int iFlavorDefense = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_DEFENSE"));
 	int iFlavorCityDefense = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_CITY_DEFENSE"));
 	int iFlavorHappiness = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_HAPPINESS"));
+	int iFlavorGP = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_GREAT_PEOPLE"));
 
 	int iHappinessNeedFactor = iFlavorOffense * 2 + iFlavorHappiness - iFlavorDefense;
 	if (iHappinessNeedFactor > 15)
@@ -6424,6 +6444,22 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 		iRtnValue += iTempValue;
 	}
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	if(MOD_BELIEF_NEW_EFFECT_FOR_SP && pEntry->IsGreatPersonPointsCapital() || pEntry->IsGreatPersonPointsPerCity())
+	{
+		// Great People
+		iTempValue = 0;
+		for (int iJ = 0; iJ < GC.getNumGreatPersonInfos(); iJ++)
+		{
+			GreatPersonTypes eGP = (GreatPersonTypes)iJ;
+			if (eGP == NO_GREATPERSON)
+				continue;
+			iTempValue += (pEntry->GetGreatPersonPoints(eGP,pCity->isCapital(),false) * iFlavorGP) / 10;
+		}
+		iRtnValue += iTempValue;
+	}
+#endif
+
 	for(int iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
 		// City yield change
@@ -6485,6 +6521,18 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 			iTempValue *= 3;
 		}
 		iRtnValue += iTempValue;
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+		if(MOD_BELIEF_NEW_EFFECT_FOR_SP && pEntry->AllowYieldPerBirth())
+		{
+			iTempValue = pEntry->GetYieldPerBirth(iI);
+			if(pCity->getPopulation() < 15)  // Like it more with small cities
+			{
+				iTempValue *= 2;
+			}
+			iRtnValue += iTempValue;
+		}
+#endif
 
 		// Building class yield change
 		for(int jJ = 0; jJ < GC.getNumBuildingClassInfos(); jJ++)
@@ -6555,6 +6603,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	int iFlavorScience = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_SCIENCE"));
 	int iFlavorDiplomacy = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_DIPLOMACY"));
 	int iFlavorExpansion = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_EXPANSION"));
+	int iFlavorReligon = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_RELIGION"));
 
 	int iNumEnhancedReligions = pGameReligions->GetNumReligionsEnhanced();
 	int iReligionsEnhancedPercent = (100 * iNumEnhancedReligions) / GC.getMap().getWorldInfo().getMaxActiveReligions();
@@ -6621,6 +6670,13 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 		}
 	}
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	iRtnValue += pEntry->GetCityExtraMissionarySpreads() * iFlavorReligon;
+	iRtnValue += pEntry->GetHolyCityPressureModifier() / 10 * iFlavorReligon;
+	iRtnValue += pEntry->GetHolyCityUnitExperence() * (iFlavorDefense + iFlavorOffense) / 2;
+	iRtnValue += pEntry->GetLandmarksTourismPercent() * iFlavorCulture;
+#endif
+
 	//----------------
 	// FOUNDER BELIEFS
 	//----------------
@@ -6639,6 +6695,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 
 	// Minimum influence with city states
 	iRtnValue += iFlavorDiplomacy * pEntry->GetCityStateMinimumInfluence() / 7;
+	iRtnValue += iFlavorDiplomacy * pEntry->GetSameReligionMinorRecoveryModifier() / 100;
 
 	// Yields for foreign followers
 	for(int iI = 0; iI < NUM_YIELD_TYPES; iI++)

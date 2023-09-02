@@ -9,6 +9,7 @@
 
 // city.h
 
+#include "CvCorruption.h"
 #ifndef CIV5_CITY_H
 #define CIV5_CITY_H
 
@@ -21,6 +22,8 @@
 #include "FAutoVector.h"
 #include "CvBuildingClasses.h"
 #include "CvPreGame.h"
+
+#include "CvSerialize.h"
 
 // 0 = center of city, 1-6 = the edge of city on points, 7-12 = one tile out
 #define NUM_CITY_BUILDING_DISPLAY_SLOTS (13)
@@ -36,6 +39,22 @@ class CvCityReligions;
 class CvCityEspionage;
 class CvCityCulture;
 class CvPlayer;
+
+
+ struct SCityExtraYields
+{
+	vector<pair<TerrainTypes, int>> forTerrain, forXTerrain, forTerrainFromBuildings, forTerrainFromReligion;
+	vector<pair<FeatureTypes, int>> forFeature, forXFeature, forFeatureFromBuildings, forFeatureFromReligion, forFeatureUnimproved;
+	vector<pair<ImprovementTypes, int>> forImprovement;
+	vector<pair<SpecialistTypes, int>> forSpecialist;
+	vector<pair<ResourceTypes, int>> forResource;
+	vector<pair<PlotTypes, int>> forPlot;
+	vector<pair<YieldTypes, int>> forYield, forActualYield;
+	vector<pair<BuildingClassTypes, int>> forLocalBuilding, forReligionBuilding;
+};
+
+
+
 
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 enum YieldFromYieldStruct {
@@ -90,7 +109,14 @@ public:
 	bool canBeSelected() const;
 	void updateSelectedCity();
 
-	void updateYield();
+	void updateYield(bool bRecalcPlotYields = true);
+
+
+	void UpdateAllNonPlotYields();
+	void UpdateCityYields(YieldTypes eYield);
+	void SetStaticYield(YieldTypes eYield, int iValue);
+	int GetStaticYield(YieldTypes eYield) const;
+
 
 	bool IsIndustrialRouteToCapital() const;
 	void SetIndustrialRouteToCapital(bool bValue);
@@ -153,6 +179,8 @@ public:
 	void SetFeatureSurrounded(bool bValue);
 	void DoUpdateFeatureSurrounded();
 
+	const SCityExtraYields& GetYieldChanges(YieldTypes eYield) const { return m_yieldChanges[eYield]; }
+
 	int GetResourceExtraYield(ResourceTypes eResource, YieldTypes eYield) const;
 	void ChangeResourceExtraYield(ResourceTypes eResource, YieldTypes eYield, int iChange);
 
@@ -162,13 +190,50 @@ public:
 	int GetTerrainExtraYield(TerrainTypes eTerrain, YieldTypes eYield) const;
 	void ChangeTerrainExtraYield(TerrainTypes eTerrain, YieldTypes eYield, int iChange);
 
-#if defined(MOD_ROG_CORE)
+
 	int GetImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield) const;
 	void ChangeImprovementExtraYield(ImprovementTypes eImprovement, YieldTypes eYield, int iChange);
 
+#if defined(MOD_ROG_CORE)
+	int GetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield) const;
+
+	int GetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield) const;
+
+	void UpdateYieldPerXTerrain(YieldTypes eYield, TerrainTypes eTerrain = NO_TERRAIN);
+
+	void ChangeNumTerrainWorked(TerrainTypes eTerrain, int iChange);
+	int GetNumTerrainWorked(TerrainTypes eTerrain);
+
+	void ChangeNumFeaturelessTerrainWorked(TerrainTypes eTerrain, int iChange);
+	int GetNumFeaturelessTerrainWorked(TerrainTypes eTerrain);
+
+	void ChangeNumFeatureWorked(FeatureTypes eFeature, int iChange);
+	int GetNumFeatureWorked(FeatureTypes eFeature);
+
+
+	void SetYieldPerXTerrain(TerrainTypes eTerrain, YieldTypes eYield, int iValue);
+
+
+	int GetYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, YieldTypes eYield) const;
+	void ChangeYieldPerXTerrainFromBuildingsTimes100(TerrainTypes eTerrain, YieldTypes eYield, int iChange);
+
+
+	int GetYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, YieldTypes eYield) const;
+	void ChangeYieldPerXFeatureFromBuildingsTimes100(FeatureTypes eFeature, YieldTypes eYield, int iChange);
+
+
+	void SetYieldPerXFeature(FeatureTypes eFeature, YieldTypes eYield, int iValue);
+	void UpdateYieldPerXFeature(YieldTypes eYield, FeatureTypes eFeature = NO_FEATURE);
+
+	void ChangeNumImprovementWorked(ImprovementTypes eImprovement, int iChange);
+	int GetNumImprovementWorked(ImprovementTypes eImprovement);
+#endif
+
+
+
 	int getSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2) const;
 	void changeSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2, int iChange);
-#endif
+
 
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
 	int GetPlotExtraYield(PlotTypes ePlot, YieldTypes eYield) const;
@@ -285,8 +350,10 @@ public:
 	bool canConscript() const;
 	void conscript();
 
+	int getImprovementYieldRateModifier(YieldTypes eIndex, ImprovementTypes eImprovement) const;
 	int getResourceYieldRateModifier(YieldTypes eIndex, ResourceTypes eResource) const;
 
+	void processImprovement(ImprovementTypes eResource, int iChange);
 	void processResource(ResourceTypes eResource, int iChange);
 	void processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, bool bObsolete = false, bool bApplyingAllCitiesBonus = false);
 	void processProcess(ProcessTypes eProcess, int iChange);
@@ -420,12 +487,12 @@ public:
 	void DoJONSCultureLevelIncrease();
 	int GetJONSCultureThreshold() const;
 
-	int getJONSCulturePerTurn() const;
+	int getJONSCulturePerTurn(bool bStatic = true) const;
 
 	int GetBaseJONSCulturePerTurn() const;
 
 	int GetJONSCulturePerTurnFromBuildings() const;
-	void ChangeJONSCulturePerTurnFromBuildings(int iChange);
+
 
 	int GetJONSCulturePerTurnFromPolicies() const;
 	void ChangeJONSCulturePerTurnFromPolicies(int iChange);
@@ -445,6 +512,10 @@ public:
 	int getCultureRateModifier() const;
 	void changeCultureRateModifier(int iChange);
 
+	void SetBaseTourism(int iValue);
+	int GetBaseTourism() const;
+	void SetBaseTourismBeforeModifiers(int iValue);
+	int GetBaseTourismBeforeModifiers() const;
 	// END Culture
 
 #if defined(MOD_API_EXTENSIONS)
@@ -452,9 +523,10 @@ public:
 	void changeTourismRateModifier(int iChange);
 #endif
 
-	int GetFaithPerTurn() const;
+
+	int GetFaithPerTurn(bool bStatic = true) const;
+
 	int GetFaithPerTurnFromBuildings() const;
-	void ChangeFaithPerTurnFromBuildings(int iChange);
 
 	int GetFaithPerTurnFromPolicies() const;
 	void ChangeFaithPerTurnFromPolicies(int iChange);
@@ -548,6 +620,20 @@ public:
 	int getFreeExperience() const;
 	void changeFreeExperience(int iChange);
 
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetGreatPersonPointsFromReligion(GreatPersonTypes eGreatPersonTypes);
+	int GetReligionExtraMissionarySpreads(ReligionTypes eReligion);
+	int GetBeliefExtraMissionarySpreads(BeliefTypes eBelief);
+#endif	
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	void doRelogionInstantYield(ReligionTypes eReligion);
+	void doBeliefInstantYield(BeliefTypes eBelief);
+#endif	
+	void doBuildingInstantYield(int* iInstantYieldArray);
+	void doInstantYield(YieldTypes iYield, int iValue);
+#endif
+
 	bool CanAirlift() const;
 
 	int GetMaxAirUnits() const;
@@ -612,6 +698,10 @@ public:
 	void SetOwedFoodBuilding(bool bNewValue);
 #endif
 
+	void ChangeNearbyMountains(int iNewValue);
+	int GetNearbyMountains() const;
+	void SetNearbyMountains(int iValue);
+
 	bool IsBlockaded() const;
 
 	int GetWeLoveTheKingDayCounter() const;
@@ -668,8 +758,9 @@ public:
 #endif
 
 	int getBaseYieldRateModifier(YieldTypes eIndex, int iExtra = 0, CvString* toolTipSink = NULL) const;
-	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade) const;
-	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const;
+	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic = true) const;
+	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bStatic = true) const;
+	CvString getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade = true) const;
 #if defined(MOD_PROCESS_STOCKPILE)
 	int getBasicYieldRateTimes100(const YieldTypes eIndex, const bool bIgnoreTrade, const bool bIgnoreFromOtherYield) const;
 #endif
@@ -681,6 +772,10 @@ public:
 	int GetBaseYieldRateFromGreatWorks(YieldTypes eIndex) const;
 #endif
 
+	int GetBaseYieldRateFromPolicy(YieldTypes eIndex) const;
+	int GetBaseYieldRateFromTrait(YieldTypes eIndex) const;
+	int GetBaseYieldRateFromReligionSpecialCase(YieldTypes eIndex) const;
+	int GetBaseYieldRateFromLeagues(YieldTypes eIndex) const;
 	int GetBaseYieldRateFromTerrain(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromTerrain(YieldTypes eIndex, int iChange);
 
@@ -689,6 +784,9 @@ public:
 
 	int GetBaseYieldRateFromSpecialists(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromSpecialists(YieldTypes eIndex, int iChange);
+
+	int GetBaseYieldRateFromProjects(YieldTypes eIndex) const;
+	void ChangeBaseYieldRateFromProjects(YieldTypes eIndex, int iChange);
 
 	int GetBaseYieldRateFromMisc(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromMisc(YieldTypes eIndex, int iChange);
@@ -709,20 +807,34 @@ public:
 	void changeNukeInterceptionChance(int iValue);
 	int getNukeInterceptionChance() const;
 
-#if defined(MOD_ROG_CORE)
+
 	int GetResourceQuantityFromPOP(ResourceTypes eResource) const;
 	void ChangeResourceQuantityFromPOP(ResourceTypes eResource, int iChange);
-	//void SetResourceQuantityFromPOP(ResourceTypes eResource, int iValue);
-#endif
+
 
 #if defined(MOD_ROG_CORE)
 	int GetYieldPerPopInEmpireTimes100(YieldTypes eIndex) const;
 	void ChangeYieldPerPopInEmpireTimes100(YieldTypes eIndex, int iChange);
 #endif
+	int GetYieldFromInternalTR(YieldTypes eIndex1) const;
+	void ChangeYieldFromInternalTR(YieldTypes eIndex, int iChange);
+	int GetYieldFromProcessModifier(YieldTypes eIndex1) const;
+	void ChangeYieldFromProcessModifier(YieldTypes eIndex, int iChange);
+
+
 
 #if defined(MOD_ROG_CORE)
+	void ChangeSpecialistRateModifier(SpecialistTypes eSpecialist, int iChange);
+	int GetSpecialistRateModifier(SpecialistTypes eSpecialist) const;
+
 	int getLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2)	const;
 	void changeLocalBuildingClassYield(BuildingClassTypes eIndex1, YieldTypes eIndex2, int iChange);
+#endif
+
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	int GetResourceFromImprovement(ResourceTypes eResource, ImprovementTypes eImprovement) const;
+	void ChangeResourceFromImprovement(ResourceTypes eResource, ImprovementTypes eImprovement, int iChange);
 #endif
 
 	int getYieldRateModifier(YieldTypes eIndex) const;
@@ -730,6 +842,9 @@ public:
 
 	int getPowerYieldRateModifier(YieldTypes eIndex) const;
 	void changePowerYieldRateModifier(YieldTypes eIndex, int iChange);
+
+	int getImprovementYieldRateModifier(YieldTypes eIndex) const;
+	void changeImprovementYieldRateModifier(YieldTypes eIndex, int iChange);
 
 	int getResourceYieldRateModifier(YieldTypes eIndex) const;
 	void changeResourceYieldRateModifier(YieldTypes eIndex, int iChange);
@@ -753,6 +868,20 @@ public:
 
 	int getDomainFreeExperienceFromGreatWorks(DomainTypes eIndex) const;
 	
+#if defined(MOD_ROG_CORE)
+	int GetYieldFromConstruction(YieldTypes eIndex) const;
+	void ChangeYieldFromConstruction(YieldTypes eIndex, int iChange);
+	int GetYieldFromUnitProduction(YieldTypes eIndex) const;
+	void ChangeYieldFromUnitProduction(YieldTypes eIndex, int iChange);
+	int GetYieldFromBirth(YieldTypes eIndex) const;
+	void ChangeYieldFromBirth(YieldTypes eIndex, int iChange);
+	int GetYieldFromBorderGrowth(YieldTypes eIndex) const;
+	void ChangeYieldFromBorderGrowth(YieldTypes eIndex, int iChange);
+	int GetYieldFromPillage(YieldTypes eIndex) const;
+	void ChangeYieldFromPillage(YieldTypes eIndex, int iChange);
+	int getDomainFreeExperienceFromGreatWorksGlobal(DomainTypes eIndex) const;
+#endif
+
 	int getDomainProductionModifier(DomainTypes eIndex) const;
 	void changeDomainProductionModifier(DomainTypes eIndex, int iChange);
 
@@ -813,6 +942,12 @@ public:
 	bool isFreePromotion(PromotionTypes eIndex) const;
 	void changeFreePromotionCount(PromotionTypes eIndex, int iChange);
 
+	int getTradeRouteDomainRangeModifier(DomainTypes eIndex) const;
+	void changeTradeRouteDomainRangeModifier(DomainTypes eIndex, int iChange);
+
+	int getTradeRouteDomainGoldBonus(DomainTypes eIndex) const;
+	void changeTradeRouteDomainGoldBonus(DomainTypes eIndex, int iChange);
+
 	int getSpecialistFreeExperience() const;
 	void changeSpecialistFreeExperience(int iChange);
 
@@ -844,6 +979,26 @@ public:
 
 	int getReduceDamageValue()const;
 	void changeReduceDamageValue(int iChange);
+
+
+
+	int getWaterTileDamage()const;
+	void changeWaterTileDamage(int iChange);
+
+	int getWaterTileMovementReduce()const;
+	void changeWaterTileMovementReduce(int iChange);
+
+	int getWaterTileTurnDamage()const;
+	void changeWaterTileTurnDamage(int iChange);
+
+	int getLandTileDamage()const;
+	void changeLandTileDamage(int iChange);
+
+	int getLandTileMovementReduce()const;
+	void changeLandTileMovementReduce(int iChange);
+
+	int getLandTileTurnDamage()const;
+	void changeLandTileTurnDamage(int iChange);
 
 #endif
 
@@ -911,6 +1066,8 @@ public:
 	int CreateUnit(UnitTypes eUnitType, UnitAITypes eAIType = NO_UNITAI, bool bUseToSatisfyOperation=true);
 	bool CreateBuilding(BuildingTypes eBuildType);
 	bool CreateProject(ProjectTypes eProjectType);
+	void changeProjectCount(ProjectTypes eProject, int iValue);
+	int getProjectCount(ProjectTypes eProject) const;
 
 	bool CanPlaceUnitHere(UnitTypes eUnitType);
 	bool IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectTypes eProjectType, YieldTypes ePurchaseYield);
@@ -929,6 +1086,9 @@ public:
 	CvCityEmphases* GetCityEmphases() const;
 	CvCityEspionage* GetCityEspionage() const;
 	CvCityCulture* GetCityCulture() const;
+
+	template<typename City, typename Visitor>
+	static void Serialize(City& city, Visitor& visitor);
 
 	void read(FDataStream& kStream);
 	void write(FDataStream& kStream) const;
@@ -1022,6 +1182,7 @@ public:
 	int CountFeature(FeatureTypes iFeatureType) const;
 	int CountWorkedFeature(FeatureTypes iFeatureType) const;
 	int CountImprovement(ImprovementTypes iImprovementType) const;
+	int CountUnPillagedImprovement(ImprovementTypes iImprovementType) const;
 	int CountWorkedImprovement(ImprovementTypes iImprovementType) const;
 	int CountPlotType(PlotTypes iPlotType) const;
 	int CountWorkedPlotType(PlotTypes iPlotType) const;
@@ -1037,7 +1198,101 @@ public:
 	//void ChangeYieldFromOtherYield(const YieldTypes eInType, const YieldTypes eOutType, const YieldFromYield eConvertType, const int iChange);
 #endif
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes GetScale() const { return m_eCityScale; }
+	CvCityScaleEntry* GetScaleInfo() const { return GC.getCityScaleInfo(m_eCityScale); }
+	void SetScale(CityScaleTypes eScale);
+	void UpdateScaleBuildings();
+	bool CanGrowNormally() const;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int GetSiegeKillCitizensModifier() const;
+	void ChangeSiegeKillCitizensModifier(int iChange);
+#endif
+
 	int iScratch; // know the scope of your validity
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	int GetCorruptionScore() const;
+	CorruptionLevelTypes GetCorruptionLevel() const;
+	void UpdateCorruption();
+
+	int CalculateTotalCorruptionScore() const;
+	int CalculateCorruptionScoreFromDistance() const;
+	int CalculateCorruptionScoreModifierFromSpy() const;
+	int CalculateCorruptionScoreFromResource() const;
+
+	CvCorruptionLevel* DecideCorruptionLevelForNormalCity(const int score) const;
+
+	int GetCorruptionScoreChangeFromBuilding() const;
+	void ChangeCorruptionScoreChangeFromBuilding(int value);
+
+	int GetCorruptionLevelChangeFromBuilding() const;
+	void ChangeCorruptionLevelChangeFromBuilding(int value);
+
+	int GetCorruptionScoreModifierFromPolicy() const;
+	int GetMaxCorruptionLevel() const;
+	bool IsCorruptionLevelReduceByOne() const;
+#endif
+
+	int GetAdditionalFood() const;
+	void SetAdditionalFood(int iValue);
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	bool IsColony() const;
+	void SetColony(bool bValue);
+
+
+	int GetOrganizedCrime() const;
+	void SetOrganizedCrime(int iValue);
+	bool HasOrganizedCrime();
+
+	void ChangeResistanceCounter(int iValue);
+	void SetResistanceCounter(int iValue);
+	int GetResistanceCounter() const;
+
+	void ChangePlagueCounter(int iValue);
+	void SetPlagueCounter(int iValue);
+	int GetPlagueCounter() const;
+
+	int GetPlagueTurns() const;
+	void ChangePlagueTurns(int iValue); //Set in city::doturn
+	void SetPlagueTurns(int iValue);
+
+;
+	int GetPlagueType() const;
+	void SetPlagueType(int iValue);
+	bool HasPlague();
+
+	void ChangeLoyaltyCounter(int iValue);
+	void SetLoyaltyCounter(int iValue);
+	int GetLoyaltyCounter() const;
+
+	void ChangeDisloyaltyCounter(int iValue);
+	void SetDisloyaltyCounter(int iValue);
+	int GetDisloyaltyCounter() const;
+
+	int GetLoyaltyState() const;
+	void SetLoyaltyState(int iLoyalty);
+
+
+	void SetYieldModifierFromHealth(YieldTypes eYield, int iValue);
+	int GetYieldModifierFromHealth(YieldTypes eYield) const;
+
+	void SetYieldModifierFromCrime(YieldTypes eYield, int iValue);
+	int GetYieldModifierFromCrime(YieldTypes eYield) const;
+
+	void SetYieldFromHappiness(YieldTypes eYield, int iValue);
+	int GetYieldFromHappiness(YieldTypes eYield) const;
+
+	void SetYieldFromHealth(YieldTypes eYield, int iValue);
+	int GetYieldFromHealth(YieldTypes eYield) const;
+
+	void SetYieldFromCrime(YieldTypes eYield, int iValue);
+	int GetYieldFromCrime(YieldTypes eYield) const;
+#endif
 
 protected:
 	FAutoArchiveClassContainer<CvCity> m_syncArchive;
@@ -1069,7 +1324,6 @@ protected:
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromPolicies;
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromSpecialists;
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromReligion;
-	int m_iFaithPerTurnFromBuildings;
 	int m_iFaithPerTurnFromPolicies;
 	int m_iFaithPerTurnFromReligion;
 	FAutoVariable<int, CvCity> m_iCultureRateModifier;
@@ -1130,6 +1384,15 @@ protected:
 
 	FAutoVariable<int, CvCity> m_iResetDamageValue;
 	FAutoVariable<int, CvCity> m_iReduceDamageValue;
+
+
+	FAutoVariable<int, CvCity> m_iWaterTileDamage;
+	FAutoVariable<int, CvCity> m_iWaterTileMovementReduce;
+
+	FAutoVariable<int, CvCity> m_iWaterTileTurnDamage;
+	FAutoVariable<int, CvCity> m_iLandTileDamage;
+	FAutoVariable<int, CvCity> m_iLandTileMovementReduce;
+	FAutoVariable<int, CvCity> m_iLandTileTurnDamage;
 #endif
 
 	int m_iNukeInterceptionChance;
@@ -1163,20 +1426,35 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromTerrain;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromBuildings;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromSpecialists;
+	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromProjects;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromMisc;
 	std::vector<int> m_aiBaseYieldRateFromReligion;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldPerPop;
 
-#if defined(MOD_ROG_CORE)
-	std::map<int, int> m_aiYieldPerPopInEmpire;
+	std::vector<int> m_aiNumProjects;
 
+
+#if defined(MOD_ROG_CORE)
+	std::vector<int> m_aiYieldFromConstruction;
+	std::vector<int> m_aiYieldFromUnitProduction;
+	std::vector<int> m_aiYieldFromBirth;
+	std::vector<int> m_aiYieldFromBorderGrowth;
+
+	std::vector<int> m_aiYieldFromPillage;
+
+	std::map<int, int> m_aiYieldPerPopInEmpire;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
+	std::vector<int> m_aiSpecialistRateModifier;
 #endif
+
+	std::vector<int> m_aiYieldFromInternalTR;
+	FAutoVariable<std::vector<int>, CvCity> m_aiYieldFromProcessModifier;
 
 
 	std::vector<int> m_aiYieldPerReligion;
 	FAutoVariable<std::vector<int>, CvCity> m_aiPowerYieldRateModifier;
+	FAutoVariable<std::vector<int>, CvCity> m_aiImprovementYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiExtraSpecialistYield;
 	FAutoVariable<std::vector<int>, CvCity> m_aiProductionToYieldModifier;
@@ -1203,6 +1481,8 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_paiUnitCombatFreeExperience;
 	FAutoVariable<std::vector<int>, CvCity> m_paiUnitCombatProductionModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_paiFreePromotionCount;
+	FAutoVariable<std::vector<int>, CvCity> m_viTradeRouteDomainRangeModifier;
+	FAutoVariable<std::vector<int>, CvCity> m_viTradeRouteDomainGoldBonus;
 
 	int m_iBaseHappinessFromBuildings;
 	int m_iUnmoddedHappinessFromBuildings;
@@ -1217,20 +1497,59 @@ protected:
 	bool m_bOwedFoodBuilding;
 #endif
 
+	int m_iNumNearbyMountains;
+
 	mutable FFastSmallFixedList< OrderData, 25, true, c_eCiv5GameplayDLL > m_orderQueue;
 
 	int** m_aaiBuildingSpecialistUpgradeProgresses;
-	int** m_ppaiResourceYieldChange;
-	int** m_ppaiFeatureYieldChange;
-	int** m_ppaiTerrainYieldChange;
-#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
-	int** m_ppaiPlotYieldChange;
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+	CityScaleTypes m_eCityScale = NO_CITY_SCALE;
 #endif
 
-#if defined(MOD_ROG_CORE)
-	int** m_ppaaiImprovementYieldChange;
-	int** m_ppiSpecialistYieldChange;
+#ifdef MOD_GLOBAL_CORRUPTION
+	int m_iCachedCorruptionScore = 0;
+	CorruptionLevelTypes m_eCachedCorruptionLevel = INVALID_CORRUPTION;
 
+	int m_iCorruptionScoreChangeFromBuilding = 0;
+	int m_iCorruptionLevelChangeFromBuilding = 0;
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	int m_iSiegeKillCitizensModifier = 0;
+#endif
+
+	std::vector<int> m_paiNumTerrainWorked;
+	std::vector<int> m_paiNumFeaturelessTerrainWorked;
+	std::vector<int> m_paiNumFeatureWorked;
+
+	std::vector<int> m_paiNumImprovementWorked;
+
+	vector<SCityExtraYields> m_yieldChanges; //[NUM_YIELD_TYPES]
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	std::map<std::pair<int, int>, short> m_ppiResourceFromImprovement;
+#endif
+	int m_iAdditionalFood;
+	int m_iBaseTourism;
+	int m_iBaseTourismBeforeModifiers;
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	bool m_bIsColony;
+	int m_iOrganizedCrime;
+	int m_iResistanceCounter;
+	int m_iPlagueCounter;
+	int m_iPlagueTurns;
+	int m_iPlagueType;
+	int m_iLoyaltyCounter;
+	int m_iDisloyaltyCounter;
+	int m_iLoyaltyStateType;
+	std::vector<int> m_aiYieldModifierFromHealth;
+	std::vector<int> m_aiYieldModifierFromCrime;
+	std::vector<int> m_aiYieldFromHappiness;
+	std::vector<int> m_aiYieldFromHealth;
+	std::vector<int> m_aiYieldFromCrime;
+	std::vector<int> m_aiStaticCityYield;
 #endif
 
 	CvCityBuildings* m_pCityBuildings;
@@ -1289,3 +1608,8 @@ void ClearCityDeltas();
 }
 
 #endif
+
+
+FDataStream& operator>>(FDataStream& loadFrom, SCityExtraYields& writeTo);
+FDataStream& operator<<(FDataStream& saveTo, const SCityExtraYields& readFrom);
+

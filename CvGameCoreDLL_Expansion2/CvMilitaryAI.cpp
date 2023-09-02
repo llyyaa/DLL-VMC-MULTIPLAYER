@@ -2095,49 +2095,50 @@ void CvMilitaryAI::UpdateBaseData()
 	for(pLoopUnit = m_pPlayer->firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = m_pPlayer->nextUnit(&iLoop))
 	{
 		// Don't count civilians or exploration units
-		if(pLoopUnit->IsCanAttack() && pLoopUnit->AI_getUnitAIType() != UNITAI_EXPLORE && pLoopUnit->AI_getUnitAIType() != UNITAI_EXPLORE_SEA)
+		if (!pLoopUnit->IsCanAttack())
+			continue;
+
+		if (pLoopUnit->getDomainType() == DOMAIN_LAND)
 		{
-			if(pLoopUnit->getDomainType() == DOMAIN_LAND)
+			m_iNumLandUnits++;
+
+			if (pLoopUnit->getArmyID() != FFreeList::INVALID_INDEX)
 			{
-				m_iNumLandUnits++;
-
-				if(pLoopUnit->getArmyID() != FFreeList::INVALID_INDEX)
-				{
-					m_iNumLandUnitsInArmies++;
-				}
-
-				if(pLoopUnit->IsCanAttackRanged())
-				{
-					m_iNumRangedLandUnits++;
-				}
-				else if(pLoopUnit->getExtraIntercept() > 0)
-				{
-					// I'm an anti-air unit
-					m_iNumAntiAirUnits++;
-				}
-				else if(pLoopUnit->getUnitInfo().GetMoves() > 2)
-				{
-					m_iNumMobileLandUnits++;
-				}
-				else
-				{
-					m_iNumMeleeLandUnits++;
-				}
+				m_iNumLandUnitsInArmies++;
 			}
-			else if(pLoopUnit->getDomainType() == DOMAIN_SEA)
-			{
-				m_iNumNavalUnits++;
 
-				if(pLoopUnit->getArmyID() != FFreeList::INVALID_INDEX)
-				{
-					m_iNumNavalUnitsInArmies++;
-				}
-			}
-			else if(pLoopUnit->getDomainType() == DOMAIN_AIR)
+			if (pLoopUnit->IsCanAttackRanged())
 			{
-				m_iNumAirUnits++;
+				m_iNumRangedLandUnits++;
+			}
+			else if (pLoopUnit->canIntercept())
+			{
+				// I'm an anti-air unit
+				m_iNumAntiAirUnits++;
+			}
+			else if (pLoopUnit->getUnitInfo().GetMoves() > 2)
+			{
+				m_iNumMobileLandUnits++;
+			}
+			else
+			{
+				m_iNumMeleeLandUnits++;
 			}
 		}
+		else if (pLoopUnit->getDomainType() == DOMAIN_SEA)
+		{
+			m_iNumNavalUnits++;
+
+			if (pLoopUnit->getArmyID() != FFreeList::INVALID_INDEX)
+			{
+				m_iNumNavalUnitsInArmies++;
+			}
+		}
+		else if (pLoopUnit->getDomainType() == DOMAIN_AIR)
+		{
+			m_iNumAirUnits++;
+		}
+		
 	}
 
 	float fMultiplier;

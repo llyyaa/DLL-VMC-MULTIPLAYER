@@ -101,7 +101,8 @@ public:
 	void ClearAllCivTradeRoutes (PlayerTypes ePlayer); // called from world congress code
 	void ClearAllCityStateTradeRoutes (void); // called from world congress code
 	void CancelTradeBetweenTeams (TeamTypes eTeam1, TeamTypes eTeam2);
-
+	void ClearTradePlayerToPlayer(PlayerTypes ePlayer, PlayerTypes eToPlayer); // called from world congress code
+	void ClearAllCityStateTradeRoutesSpecial(void); // called from world congress code
 	void DoAutoWarPlundering(TeamTypes eTeam1, TeamTypes eTeam2); // when war is declared, both sides plunder each others trade routes for cash!
 
 	int GetNumTradeRoutesInPlot (CvPlot* pPlot);
@@ -180,6 +181,8 @@ public:
 	int GetTradeConnectionExclusiveValueTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield);
 	int GetTradeConnectionPolicyValueTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield);
 	int GetTradeConnectionOtherTraitValueTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield, bool bAsOriginPlayer);
+	int GetTradeConnectionTraitValueTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield, bool bAsOriginPlayer);
+
 	int GetTradeConnectionDomainValueModifierTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield);
 	int GetTradeConnectionRiverValueModifierTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield, bool bAsOriginPlayer);
 	int GetTradeConnectionValueTimes100 (const TradeConnection& kTradeConnection, YieldTypes eYield, bool bAsOriginPlayer);

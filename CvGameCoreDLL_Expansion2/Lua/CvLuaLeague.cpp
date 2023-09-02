@@ -87,6 +87,7 @@ void CvLuaLeague::PushMethods(lua_State* L, int t)
 
 	Method(GetArtsyGreatPersonRateModifier);
 	Method(GetScienceyGreatPersonRateModifier);
+	Method(GetGreatDoctorPersonRateModifier);
 	
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_EXTENSIONS)
 	Method(IsPlayerEmbargoed);
@@ -707,6 +708,17 @@ int CvLuaLeague::lGetScienceyGreatPersonRateModifier(lua_State* L)
 	CvLeague* pLeague = GetInstance(L);
 
 	int iValue = pLeague->GetScienceyGreatPersonRateModifier();
+	lua_pushinteger(L, iValue);
+	return 1;
+}
+//------------------------------------------------------------------------------
+//--TODO:GetGreatDoctorPersonRateModifier()
+int CvLuaLeague::lGetGreatDoctorPersonRateModifier(lua_State* L)
+{
+	//CvLeague* pLeague = GetInstance(L);
+
+	//int iValue = pLeague->GetGreatDoctorPersonRateModifier();
+	int iValue = 0;
 	lua_pushinteger(L, iValue);
 	return 1;
 }

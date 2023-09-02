@@ -3898,6 +3898,7 @@ void CvMinorCivAI::DoCompletedQuestsForPlayer(PlayerTypes ePlayer, MinorCivQuest
 	CvAssertMsg(ePlayer >= 0, "ePlayer is expected to be non-negative (invalid Index)");
 	CvAssertMsg(ePlayer < MAX_MAJOR_CIVS, "ePlayer is expected to be within maximum bounds (invalid Index)");
 	if(ePlayer < 0 || ePlayer >= MAX_MAJOR_CIVS) return;
+	if(!GET_PLAYER(ePlayer).isAlive()) return;
 
 	bool bCheckAllQuests = true;
 #if defined(MOD_EVENTS_QUESTS)
@@ -6185,7 +6186,9 @@ int CvMinorCivAI::GetFriendshipChangePerTurnTimes100(PlayerTypes ePlayer)
 		int iRecoveryMod = 100;
 		iRecoveryMod += iTraitMod;
 		iRecoveryMod += iReligionMod;
-		
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+		iRecoveryMod += GetSameReligionRecoveryModifier(ePlayer);
+#endif
 		if (iRecoveryMod < 0)
 			iRecoveryMod = 0;
 
@@ -6210,6 +6213,11 @@ int CvMinorCivAI::GetFriendshipChangePerTurnTimes100(PlayerTypes ePlayer)
 			iShift += kPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_AFRAID_INFLUENCE);
 			iShift += kPlayer.GetPlayerTraits()->GetAfraidMinorPerTurnInfluence();
 		}
+
+		if (kPlayer.isGoldenAge())
+		{
+			iShift += kPlayer.GetPlayerTraits()->GetGoldenAgeMinorPerTurnInfluence();
+		}
 		
 		if (iShift != 0)
 		{
@@ -6221,6 +6229,16 @@ int CvMinorCivAI::GetFriendshipChangePerTurnTimes100(PlayerTypes ePlayer)
 	iChangeThisTurn *= GC.getGame().getGameSpeedInfo().getGoldGiftMod();
 	iChangeThisTurn /= 100;
 
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	if (iChangeThisTurn < 0 && MOD_VOTING_NEW_EFFECT_FOR_SP)
+	{
+		// Cold War fun?
+		if (IsAllies(ePlayer) && GC.getGame().GetGameLeagues()->IsColdWarActive())
+		{
+			iChangeThisTurn = 0;
+		}
+	}
+#endif
 	return iChangeThisTurn;
 }
 
@@ -8615,10 +8633,12 @@ void CvMinorCivAI::DoSpawnUnit(PlayerTypes eMajor)
 
 #if defined(MOD_GLOBAL_CS_GIFTS)
 				pSpawnUnit = pNewUnit;
+				pSpawnUnit->setOriginCity(pSpawnCity ? pSpawnCity->GetID() : -1);
 #endif
 			}
 			else
 				pNewUnit->kill(false);	// Could not find a spot!
+			    pNewUnit->setOriginCity(pSpawnCity ? pSpawnCity->GetID() : -1);
 		}
 	}
 
@@ -10695,6 +10715,27 @@ bool CvMinorCivAI::IsSameReligionAsMajor(PlayerTypes eMajor)
 	}
 	return false;
 }
+
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+int CvMinorCivAI::GetSameReligionRecoveryModifier(PlayerTypes eMajor)
+{
+	if(!MOD_BELIEF_NEW_EFFECT_FOR_SP) return 0;
+	CvPlayer* pkPlayer = GetPlayer();
+	if(pkPlayer)
+	{
+		CvCity* pkCity = pkPlayer->getCapitalCity();
+		if(pkCity)
+		{
+			ReligionTypes eMinorReligion = pkCity->GetCityReligions()->GetReligiousMajority();
+			if (eMinorReligion == NO_RELIGION) return 0;
+			ReligionTypes eMajorReligion = GC.getGame().GetGameReligions()->GetReligionCreatedByPlayer(eMajor);
+			if (eMajorReligion == NO_RELIGION) return 0;
+			return eMinorReligion == eMajorReligion ? GC.getGame().GetGameReligions()->GetReligion(eMajorReligion,eMajor)->m_Beliefs.GetSameReligionMinorRecoveryModifier() : 0;
+		}
+	}
+	return 0;
+}
+#endif
 
 CvString CvMinorCivAI::GetStatusChangeDetails(PlayerTypes ePlayer, bool bAdd, bool bFriends, bool bAllies)
 {

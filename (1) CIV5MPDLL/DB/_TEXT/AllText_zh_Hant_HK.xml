@@ -2,6 +2,92 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
+	<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
+			<Text>你的{@1_UnitName}沒有遇到抵抗，並且攻擊了敵人的空軍和地面防空單位！</Text>
+		</Row>
+			<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
+			<Text>我们的{2_Unit}被敵人的{1_Unit}擊退了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_S">
+			<Text>{1_Unit}被擊退了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_THEM">
+			<Text>我们的{1_Unit}迫使敵人的{2_Unit}撤退了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_THEM_S">
+			<Text>敵人的{1_Unit}被擊退了！</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_RESET_PLOT_COST">
+			<Text>新城市的建立重置了你所擁有的城市的地塊購買價格!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
+			<Text>昭昭天命!</Text>
+		</Row>
+        <Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
+			<Text>[NEWLINE][ICON_BULLET]來自改良設施的城市修正值: {1_Num}%</Text>
+		</Row>
+        <Row Tag="TXT_KEY_PRODMOD_SPIES">
+			<Text>[NEWLINE][ICON_BULLET]活躍間諜數的城市修正值: {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
+			<Text>[NEWLINE][ICON_BULLET]健康度的城市修正值: {1_Num}%</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
+			<Text>[NEWLINE][ICON_BULLET]犯罪率的城市修正值: {1_Num}%</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
+			<Text>戰鬥期間，一種致命的病毒通過你的{1_Unit}傳播給了敵方的{2_Unit}!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_S">
+			<Text>你的{1_Unit}傳播了病毒!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_THEM">
+			<Text>戰鬥期間，一種致命的病毒通過敵人的{2_Unit}傳播給了你的{1_Unit}!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER_THEM_S">
+			<Text>病毒傳播給了你的{1_Unit}!</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING">
+			<Text>
+				[NEWLINE][ICON_BULLET]愛領袖日修正(政策): {1_Num}%
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_YIELD_HEALTH">
+			<Text>健康</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_DISEASE">
+			<Text>疾病</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_CRIME">
+			<Text>犯罪率</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
+			<Text>权威</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_LOYALTY">
+			<Text>忠诚度</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_GREAT_GENERAL_POINTS">
+			<Text>大軍事家點數</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_GREAT_ADMIRAL_POINTS">
+			<Text>海軍統帥點數</Text>
+		</Row>
+
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL">
+			<Text>[NEWLINE][ICON_BULLET]全局城市修正(世界奇觀): {1_Num}%</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_WONDER_IMPROVEMENT">
+			<Text>[NEWLINE][ICON_BULLET]改良設施提供奇觀建造加成: {1_Num}%。</Text>
+		</Row>
+
 		<Row Tag="TXT_KEY_SPY_STATE_TERMINATED">
 			<Text>被消滅了！</Text>
 		</Row>
@@ -174,6 +260,256 @@
 	<Language_zh_Hant_HK>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_NUM_GREAT_WORK">
 			<Text>[NEWLINE][ICON_BULLET]杰作修正: {1_Num}%</Text>
+		</Row>
+	</Language_zh_Hant_HK>
+
+	<Language_zh_Hant_HK>
+		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE">
+			<Text>戰爭給你的文明帶來了巨大的傷亡！[COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]失去{2_loss}個單位的[ICON_CITIZEN]人口！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY">
+			<Text>慘重的戰爭傷亡！</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE">
+			<Text>在防禦中，你的{2_UnitName}受到{1_EnUName}攻擊時的[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點濺射傷害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_ENEMY">
+			<Text>你的{1_UnitName}攻擊時對{2_EnUName}造成了[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點濺射傷害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_DEATH">
+			<Text>在防禦中，你的{2_UnitName}被{1_EnUName}攻擊時的濺射傷害消滅了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_ENEMY_DEATH">
+			<Text>你的{1_UnitName}攻擊時的濺射傷害將{2_EnUName}消滅了！</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE">
+			<Text>在防禦中，你的{2_UnitName}受到敵方{1_EnUName}攻擊時的[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點穿透傷害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY">
+			<Text>你的{1_UnitName}攻擊時對敵方{2_EnUName}造成了[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]點穿透傷害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_DEATH">
+			<Text>在防禦中，你的{2_UnitName}被敵方{1_EnUName}攻擊時的穿透傷害消滅了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY_DEATH">
+			<Text>你的{1_UnitName}攻擊時的穿透傷害將敵方{2_EnUName}消滅了！</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKING">
+			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] 建築在此次襲擊中被摧毀！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKED">
+			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] 建築在你的城市中被摧毀: {2_CityName:textkey}</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_KILL_POPULATION_ATTACKING">
+			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] [ICON_CITIZEN] 市民在此次襲擊中死亡！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_KILL_POPULATION_ATTACKED">
+			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] [ICON_CITIZEN] 市民在你的城市中被殺害：{2_CityName}</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER">
+			<Text>
+				[NEWLINE][ICON_BULLET]城市級修正(世界奇觀): {1_Num}%
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_TRADE_ROUTE_NUM">
+			<Text>
+				[NEWLINE][ICON_BULLET]商路數量修正(政策): {1_Num}%
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_TP_HAPPINESS_FAITH">
+			<Text>
+				{1_Happiness}來自[ICON_PEACE]信仰。
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE">
+			<Text>{2_CityName:textkey}的防禦工事已經被摧毀殆盡，你的市民失去了庇護！一個單位的人口被敵方{1_UnitName}的遠程火力殺死。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CITY_POPULATION_LOST_BY_RANGEDFIRE_SHORT">
+			<Text>城市遭到轟炸！</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_POLICY_CITY_NUMBER">
+			<Text>
+				[NEWLINE][ICON_BULLET]城市數量修正(政策): {1_Num}%
+			</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_ATTACKING_CITY_LOST_MOVEMENT">
+			<Text>你的{@1_name}攻擊城市后失去所有[ICON_MOVES]移動力！</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_RESOURCE_BUFF">
+			<Text>
+				[NEWLINE][ICON_BULLET]戰略資源修正: {1_Num}%
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_HAPPINESS_GLOBAL">
+			<Text>
+				[NEWLINE][ICON_BULLET]快樂度修正(全局): {1_Num}%
+			</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_HAPPINESS_POLICY">
+			<Text>
+				[NEWLINE][ICON_BULLET]快樂度修正(政策): {1_Num}%
+			</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_EMBARGO_IDEOLOGY">
+			<Text>無法與非同一意識形態的文明以及非結盟城邦建立國際[ICON_INTERNATIONAL_TRADE]商路。已結盟的城邦[ICON_INFLUENCE]影響力不會衰退。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_COLD_WAR">
+			<Text>冷戰</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_COLD_WAR_HELP">
+			<Text>意識形態分歧已將世界推入冷戰，經濟和政治派系正在根據各自秉持的意識形態而形成。[NEWLINE][NEWLINE]如果決議通過，所有文明只能與和他們意識形態相同的文明或結盟的城邦建立[ICON_INTERNATIONAL_TRADE]國際商路。並且，與結盟城邦的[ICON_INFLUENCE]影響力不再衰退。[NEWLINE][NEWLINE]在有文明研發完成原子理論之後即可提案。</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_REPORT">
+			<Text>[COLOR_WARNING_TEXT]-管理成本報告-[ENDCOLOR]</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_DISTANCE">
+			<Text>來自離心傾向: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_BUILDING">
+			<Text>來自建築: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_RESOURCE">
+			<Text>來自資源: {1_score}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_SPY">
+			<Text>來自間諜: {1_score}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_POLICY">
+			<Text>來自政策: {1_score}%</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_REDUCE_BY_ONE_GLOBAL">
+			<Text>市政廳等級變化（文明特性或政策）：-1</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_MAX_TRAIT">
+			<Text>最高市政廳等級：{1_level}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_CHANGE_FROM_BUILDING">
+			<Text>市政廳等級變化(來自建築)：{1_level}</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE">
+			<Text>管理成本（總計）: {1_score}</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_ANNEX_PUPPET_LEVEL_PREVIEW">
+			<Text>如果你吞併該城市，預計市政廳等級為：{1_level}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TOURISM_FROM_CITY_RATE">
+			<Text>{1_Num}[ICON_TOURISM]魅力 來自建築、地形等:</Text>
+		</Row>
+		<Replace Tag="TXT_KEY_CO_CITY_TOURISM_TECH_ENHANCED">
+			<Text>{1_Num}[ICON_TOURISM]旅遊業績 來自科技對建築加成</Text>
+		</Replace>
+		<Row Tag="TXT_KEY_CITY_TOURISM_MODIFIER_FROM_WORLD_CONGRESS">
+			<Text>+{1_Num}%獎勵{2_Num}回合 來自世界議會</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITY_BASE_TOURISM_MODIFIER">
+			<Text>[COLOR_POSITIVE_TEXT]{1_Num}%{2_IconString}加成 總計[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PLAYER_TOURISM_INTERNATIONAL_MODIFIER">
+			<Text>[ICON_TOURISM]魅力國際影響如下:</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TOURISM_HELP_INFO">
+			<Text>[ICON_TOURISM]魅力由傑作、文物或建築來產生，是你將你的文化影響力擴張到其它文明的主要途徑。 </Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自產能轉換</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_GREATWORK">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自傑作額外產出</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TERRAIN">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自地形</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_UNIMPROVEMENT_FEATURES">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自無改良地貌</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_BUILDINGS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自建築</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPECIALISTS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自專家</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_MISC">
+			<Text>[NEWLINE]{1_Num}{2_IconString} 來自其它渠道</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRAITS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自領袖特質</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_RELIGION">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自宗教</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OTHER_YIELD">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自其他產出</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_ROUTE">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自城市連接</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FRESH_WATER">
+			<Text>[NEWLINE][ICON_BULLET][COLOR_POSITIVE_TEXT]{1_Num}[ENDCOLOR]{2_IconString} 來自臨近淡水</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_NO_FRESH_WATER">
+			<Text>[NEWLINE][ICON_BULLET][COLOR_WARNING_TEXT]{1_Num}[ENDCOLOR]{2_IconString} 來自缺乏淡水</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_HEALTH">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自健康度</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_HAPPINESS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自快樂度</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CRIME">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自犯罪率</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POPULATION">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自人口</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_RELOGION_POPULATION">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自宗教人口</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TOTAL_POPULATION">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自全國人口</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_TRADE_VALUE">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自商路</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POLICY">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自政策</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_LEAGUES">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自世界議會</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
+			<Text>[NEWLINE]{1_Num}{2_IconString} 來自已完成計劃</Text>
+		</Row>
+
+
+		<Row Tag="TXT_KEY_VOLCAN_EVENT_TITLE">
+			<Text>火山爆發！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_1">
+			<Text>一處火山發生了小規模噴發。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_2">
+			<Text>一處火山發生了大規模噴發。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_VOLCANO_EVENT_3">
+			<Text>一處火山發生了超大規模噴發。</Text>
 		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

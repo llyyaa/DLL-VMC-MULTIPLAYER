@@ -334,6 +334,12 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetJONSCultureEverGenerated);
 
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+	Method(GetGoldenAgePointPerTurnFromReligion);
+	Method(GetGoldenAgePointPerTurnFromTraits);
+	Method(GetGoldenAgePointPerTurnFromCitys);
+#endif	
+
 	Method(GetLastTurnLifetimeCulture);
 	Method(GetInfluenceOn);
 	Method(GetLastTurnInfluenceOn);
@@ -529,6 +535,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetAttackBonusTurns);
 	Method(GetCultureBonusTurns);
 	Method(GetTourismBonusTurns);
+	Method(GetInternationalTourismTooltip);
 
 	Method(GetGoldenAgeProgressThreshold);
 	Method(GetGoldenAgeProgressMeter);
@@ -585,6 +592,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetMaxTeamBuildingProductionModifier);
 	Method(GetMaxPlayerBuildingProductionModifier);
 	Method(GetFreeExperience);
+	Method(GetUnitCombatFreeExperiences);
+	Method(GetDomainFreeExperience);
 	Method(GetFeatureProductionModifier);
 	Method(GetWorkerSpeedModifier);
 	Method(GetImprovementUpgradeRateModifier);
@@ -663,6 +672,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 #if defined(MOD_API_LUA_EXTENSIONS)
 	Method(IsMajorCiv);
+	Method(GetCivBuilding);
+	Method(GetCivUnit);
 #endif
 	Method(IsMinorCiv);
 	Method(GetMinorCivType);
@@ -782,6 +793,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetSeaPlotYield);
 	Method(GetYieldRateModifier);
+	Method(GetCityLoveKingDayYieldMod);
 	Method(GetCapitalYieldRateModifier);
 	Method(GetExtraYieldThreshold);
 
@@ -795,6 +807,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetScienceFromHappinessTimes100);
 	Method(GetScienceFromResearchAgreementsTimes100);
 	Method(GetScienceFromBudgetDeficitTimes100);
+	Method(GetScienceFromReligion);
 
 	// END Science
 
@@ -1149,6 +1162,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetInternationalTradeRouteTheirBuildingBonus);
 	Method(GetInternationalTradeRoutePolicyBonus);
 	Method(GetInternationalTradeRouteOtherTraitBonus);
+	Method(GetInternationalTradeRouteTraitBonus);
 	Method(GetInternationalTradeRouteRiverModifier);
 	Method(GetInternationalTradeRouteDomainModifier);
 	Method(GetInternationalTradeRouteTotal);
@@ -1263,6 +1277,33 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(IsSecondReligionPantheon);
 #endif // MOD_API_RELIGION_EXTENSIONS
 
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	Method(GetWarCasualtiesCounter);
+	Method(ChangeWarCasualtiesCounter);
+	Method(SetWarCasualtiesCounter);
+	Method(CheckAndUpdateWarCasualtiesCounter);
+#endif
+
+#if defined(MOD_SPECIALIST_RESOURCES)
+	Method(GetSpecialistResources);
+#endif
+
+	Method(GetHappinessFromFaith);
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	Method(GetUnHappinessModFromResourceByIndex);
+	Method(GetCityConnectionTradeRouteGoldModifierFromResourceByIndex);
+	Method(GetGoldHurryCostModifierFromResourceByIndex);
+#endif
+
+	Method(GetYieldModifierFromHappiness);
+	Method(GetYieldModifierFromNumGreakWork);
+	Method(GetYieldModifierFromHappinessPolicy);
+
+	Method(GetGlobalYieldModifierFromResource);
+
+	Method(IsCorruptionLevelReduceByOne);
+	Method(GetCorruptionScoreModifierFromPolicy);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -2640,6 +2681,29 @@ int CvLuaPlayer::lGetJONSCultureEverGenerated(lua_State* L)
 	return BasicLuaMethod(L, &CvPlayerAI::GetJONSCultureEverGenerated);
 }
 //------------------------------------------------------------------------------
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+int CvLuaPlayer::lGetGoldenAgePointPerTurnFromReligion(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetYieldPerTurnFromReligion(YIELD_GOLDEN_AGE_POINTS);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+int CvLuaPlayer::lGetGoldenAgePointPerTurnFromTraits(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetYieldPerTurnFromTraits(YIELD_GOLDEN_AGE_POINTS);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+int CvLuaPlayer::lGetGoldenAgePointPerTurnFromCitys(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetGoldenAgePointPerTurnFromCitys();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+#endif
 //int GetLastTurnLifetimeCulture();
 int CvLuaPlayer::lGetLastTurnLifetimeCulture(lua_State* L)
 {
@@ -2773,8 +2837,7 @@ int CvLuaPlayer::lGetInfluenceSpyRankTooltip(lua_State* L)
 int CvLuaPlayer::lGetTourism(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
-	const int iResult = pkPlayer->GetCulture()->GetTourism();
-	lua_pushinteger(L, iResult);
+	lua_pushinteger(L, pkPlayer->GetCulture()->GetTourism());
 	return 1;
 }
 //------------------------------------------------------------------------------
@@ -3935,6 +3998,31 @@ int CvLuaPlayer::lGetInternationalTradeRouteOtherTraitBonus(lua_State* L)
 }
 
 //------------------------------------------------------------------------------
+int CvLuaPlayer::lGetInternationalTradeRouteTraitBonus(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	CvPlayerTrade* pPlayerTrade = pkPlayer->GetTrade();
+	CvCity* pOriginCity = CvLuaCity::GetInstance(L, 2, true);
+	CvCity* pDestCity = CvLuaCity::GetInstance(L, 3, true);
+	DomainTypes eDomain = (DomainTypes)lua_tointeger(L, 4);
+	bool bOrigin = lua_toboolean(L, 5);
+
+	TradeConnection kTradeConnection;
+	kTradeConnection.m_iOriginX = pOriginCity->getX();
+	kTradeConnection.m_iOriginY = pOriginCity->getY();
+	kTradeConnection.m_iDestX = pDestCity->getX();
+	kTradeConnection.m_iDestY = pDestCity->getY();
+	kTradeConnection.m_eOriginOwner = pOriginCity->getOwner();
+	kTradeConnection.m_eDestOwner = pDestCity->getOwner();
+	kTradeConnection.m_eDomain = eDomain;
+	kTradeConnection.m_eConnectionType = TRADE_CONNECTION_INTERNATIONAL;
+
+	int iResult = pPlayerTrade->GetTradeConnectionTraitValueTimes100(kTradeConnection, YIELD_GOLD, bOrigin);
+	lua_pushinteger(L, iResult);
+	return 1;	
+}
+
+//------------------------------------------------------------------------------
 int CvLuaPlayer::lGetInternationalTradeRouteRiverModifier(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
@@ -4382,37 +4470,10 @@ int CvLuaPlayer::lGetTradeToYouRoutesTTString(lua_State* L)
 			}
 
 			CvString strOriginYieldsStr = "";
-			//for (uint uiYield = 0; uiYield < NUM_YIELD_TYPES; uiYield++)
-			//{
-			//	YieldTypes eYield = (YieldTypes)uiYield;
-			//	int iYieldQuantity = pPlayerTrade->GetTradeConnectionValueTimes100(*pConnection, eYield, false);
-			//	if (iYieldQuantity != 0)
-			//	{
-			//		switch (eYield)
-			//		{
-			//		case YIELD_FOOD:
-			//			strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_FOOD_YIELD_TT", iYieldQuantity / 100);
-			//			break;
-			//		case YIELD_PRODUCTION:
-			//			strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_PRODUCTION_YIELD_TT", iYieldQuantity / 100);
-			//			break;
-			//		case YIELD_GOLD:
-			//			strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_GOLD_YIELD_TT", iYieldQuantity / 100);
-			//			break;
-			//		case YIELD_SCIENCE:
-			//			strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_SCIENCE_YIELD_TT", iYieldQuantity / 100);
-			//			break;
-			//		case YIELD_CULTURE:
-			//			strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_CULTURE_YIELD_TT", iYieldQuantity / 100);
-			//			break;
-			//		case YIELD_FAITH:
-			//			strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_FAITH_YIELD_TT", iYieldQuantity / 100);
-			//			break;
-			//		}
-			//	}
-			//}
+
 
 			CvString strDestYieldsStr = "";
+
 			for (uint uiYield = 0; uiYield < NUM_YIELD_TYPES; uiYield++)
 			{
 				YieldTypes eYield = (YieldTypes)uiYield;
@@ -4603,8 +4664,8 @@ int CvLuaPlayer::lGetTradeRoutes(lua_State* L)
 		lua_pushinteger(L, iFromPressure);
 		lua_setfield(L, t, "FromPressure");
 
-		int iToDelta = pFromCity->GetCityCulture()->GetBaseTourism() * pFromCity->GetCityCulture()->GetTourismMultiplier(pToPlayer->GetID(), true, true, false, true, true);
-		int iFromDelta = pToCity->GetCityCulture()->GetBaseTourism() * pToCity->GetCityCulture()->GetTourismMultiplier(pkPlayer->GetID(), true, true, false, true, true);
+		int iToDelta = pFromCity->GetBaseTourism() * pFromCity->GetCityCulture()->GetTourismMultiplier(pToPlayer->GetID(), true, true, false, true, true);
+		int iFromDelta = pToCity->GetBaseTourism() * pToCity->GetCityCulture()->GetTourismMultiplier(pkPlayer->GetID(), true, true, false, true, true);
 		lua_pushinteger(L, iFromDelta);
 		lua_setfield(L, t, "FromTourism");
 		lua_pushinteger(L, iToDelta);
@@ -4788,8 +4849,8 @@ int CvLuaPlayer::lGetTradeRoutesAvailable(lua_State* L)
 						lua_pushinteger(L, iFromPressure);
 						lua_setfield(L, t, "FromPressure");
 
-						int iToDelta = pOriginCity->GetCityCulture()->GetBaseTourism() * pOriginCity->GetCityCulture()->GetTourismMultiplier(eOtherPlayer, true, true, false, true, true);
-						int iFromDelta = pDestCity->GetCityCulture()->GetBaseTourism() * pDestCity->GetCityCulture()->GetTourismMultiplier(pkPlayer->GetID(), true, true, false, true, true);
+						int iToDelta = pOriginCity->GetBaseTourism() * pOriginCity->GetCityCulture()->GetTourismMultiplier(eOtherPlayer, true, true, false, true, true);
+						int iFromDelta = pDestCity->GetBaseTourism() * pDestCity->GetCityCulture()->GetTourismMultiplier(pkPlayer->GetID(), true, true, false, true, true);
 						lua_pushinteger(L, iFromDelta);
 						lua_setfield(L, t, "FromTourism");
 						lua_pushinteger(L, iToDelta);
@@ -4909,8 +4970,8 @@ int CvLuaPlayer::lGetTradeRoutesToYou(lua_State* L)
 		lua_pushinteger(L, iFromPressure);
 		lua_setfield(L, t, "FromPressure");
 
-		int iToDelta = pFromCity->GetCityCulture()->GetBaseTourism() * pFromCity->GetCityCulture()->GetTourismMultiplier(pToPlayer->GetID(), true, true, false, true, true);
-		int iFromDelta = pToCity->GetCityCulture()->GetBaseTourism() * pToCity->GetCityCulture()->GetTourismMultiplier(pkPlayer->GetID(), true, true, false, true, true);
+		int iToDelta = pFromCity->GetBaseTourism() * pFromCity->GetCityCulture()->GetTourismMultiplier(pToPlayer->GetID(), true, true, false, true, true);
+		int iFromDelta = pToCity->GetBaseTourism() * pToCity->GetCityCulture()->GetTourismMultiplier(pkPlayer->GetID(), true, true, false, true, true);
 		lua_pushinteger(L, iFromDelta);
 		lua_setfield(L, t, "FromTourism");
 		lua_pushinteger(L, iToDelta);
@@ -5331,7 +5392,7 @@ int CvLuaPlayer::lHasPolicy(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
-//void setHasPolicy(PolicyTypes  eIndex, bool bNewValue);
+//void setHasPolicy(PolicyTypes  eIndex, bool bNewValue, bool bFree);
 int CvLuaPlayer::lSetHasPolicy(lua_State* L)
 {
 #if defined(MOD_API_EXTENSIONS)
@@ -5705,6 +5766,17 @@ int CvLuaPlayer::lGetCultureBonusTurns(lua_State* L)
 int CvLuaPlayer::lGetTourismBonusTurns(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetTourismBonusTurns);
+}
+
+//------------------------------------------------------------------------------
+//CvString GetInternationalTourismTooltip();
+int CvLuaPlayer::lGetInternationalTourismTooltip(lua_State* L)
+{
+	CvString toolTip;
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	toolTip = pkPlayer->GetInternationalTourismTooltip();
+	lua_pushstring(L, toolTip.c_str());
+	return 1;
 }
 
 //------------------------------------------------------------------------------
@@ -6091,6 +6163,17 @@ int CvLuaPlayer::lGetFreeExperience(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::getFreeExperience);
 }
+
+int CvLuaPlayer::lGetUnitCombatFreeExperiences(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::getUnitCombatFreeExperiences);
+}
+
+int CvLuaPlayer::lGetDomainFreeExperience(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetDomainFreeExperience);
+}
+
 //------------------------------------------------------------------------------
 //int getFeatureProductionModifier();
 int CvLuaPlayer::lGetFeatureProductionModifier(lua_State* L)
@@ -6485,6 +6568,16 @@ int CvLuaPlayer::lIsGoldenAgeCultureBonusDisabled(lua_State* L)
 int CvLuaPlayer::lIsMajorCiv(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::isMajorCiv);
+}
+
+int CvLuaPlayer::lGetCivBuilding(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCivBuilding);
+}
+
+int CvLuaPlayer::lGetCivUnit(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCivUnit);
 }
 #endif
 //------------------------------------------------------------------------------
@@ -7502,6 +7595,12 @@ int CvLuaPlayer::lGetSeaPlotYield(lua_State* L)
 }
 //------------------------------------------------------------------------------
 //int getYieldRateModifier(YieldTypes eIndex);
+int CvLuaPlayer::lGetCityLoveKingDayYieldMod(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::getCityLoveKingDayYieldMod);
+}
+//------------------------------------------------------------------------------
+//int getYieldRateModifier(YieldTypes eIndex);
 int CvLuaPlayer::lGetYieldRateModifier(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::getYieldRateModifier);
@@ -7554,6 +7653,14 @@ int CvLuaPlayer::lGetScienceFromResearchAgreementsTimes100(lua_State* L)
 int CvLuaPlayer::lGetScienceFromBudgetDeficitTimes100(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetScienceFromBudgetDeficitTimes100);
+}
+//int GetScienceFromReligion();
+int CvLuaPlayer::lGetScienceFromReligion(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetYieldPerTurnFromReligion(YIELD_SCIENCE);
+	lua_pushinteger(L, iResult);
+	return 1;
 }
 //------------------------------------------------------------------------------
 //int GetProximityToPlayer(PlayerTypes  eIndex);
@@ -12096,6 +12203,13 @@ int CvLuaPlayer::lIsSecondReligionPantheon(lua_State* L)
 }
 #endif // MOD_API_RELIGION_EXTENSIONS
 
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+LUAAPIIMPL(Player, GetWarCasualtiesCounter)
+LUAAPIIMPL(Player, ChangeWarCasualtiesCounter)
+LUAAPIIMPL(Player, SetWarCasualtiesCounter)
+LUAAPIIMPL(Player, CheckAndUpdateWarCasualtiesCounter)
+#endif
+
 #if defined(MOD_API_LUA_EXTENSIONS)
 LUAAPIIMPL(Player, HasBelief)
 LUAAPIIMPL(Player, HasBuilding)
@@ -12299,3 +12413,116 @@ int CvLuaPlayer::lGetMinorAllyCount(lua_State* L)
 
 	return 1;
 }
+
+#ifdef MOD_SPECIALIST_RESOURCES
+int CvLuaPlayer::lGetSpecialistResources(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	SpecialistTypes eSpecialist = static_cast<SpecialistTypes>(lua_tointeger(L, 2));
+	CvSpecialistInfo* pkSpecialistInfo = GC.getSpecialistInfo(eSpecialist);
+	if (pkSpecialistInfo == nullptr) {
+		lua_pushnil(L);
+		return 1;
+	}
+
+	std::tr1::unordered_map<ResourceTypes, int> mapResources;
+    for (auto& info : pkSpecialistInfo->GetResourceInfo())
+    {
+        if (pkPlayer->MeetSpecialistResourceRequirement(info))
+        {
+			mapResources[info.m_eResource] += info.m_iQuantity;
+        }
+    }
+
+	lua_createtable(L, mapResources.size(), 2);
+	int index = 1;
+	for (auto& pair : mapResources)
+	{
+		lua_createtable(L, 0, 0);
+		const int t = lua_gettop(L);
+
+		lua_pushinteger(L, pair.first);
+		lua_setfield(L, t, "ResourceType");
+
+		lua_pushinteger(L, pair.second);
+		lua_setfield(L, t, "Quantity");
+
+		lua_rawseti(L, -2, index++);
+	}
+
+	return 1;
+}
+#endif
+
+LUAAPIIMPL(Player, GetHappinessFromFaith)
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+// player:GetUnHappinessModFromResourceByIndex(eResource)
+int CvLuaPlayer::lGetUnHappinessModFromResourceByIndex(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	ResourceTypes eResource = static_cast<ResourceTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->CalculateUnhappinessModFromResource(GC.getResourceInfo(eResource), pkPlayer->getNumResourceAvailable(eResource));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+// player:GetCityConnectionTradeRouteGoldModifierFromResourceByIndex(eResource)
+int CvLuaPlayer::lGetCityConnectionTradeRouteGoldModifierFromResourceByIndex(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	ResourceTypes eResource = static_cast<ResourceTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->CalculateCityConnectionTradeRouteGoldModifierFromResource(GC.getResourceInfo(eResource), pkPlayer->getNumResourceAvailable(eResource));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetGoldHurryCostModifierFromResourceByIndex(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	ResourceTypes eResource = static_cast<ResourceTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->CalculateGoldHurryModFromResource(GC.getResourceInfo(eResource), pkPlayer->getNumResourceAvailable(eResource));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+#endif
+
+int CvLuaPlayer::lGetYieldModifierFromHappiness(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromHappiness(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetYieldModifierFromNumGreakWork(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromNumGreakWork(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetYieldModifierFromHappinessPolicy(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromHappinessPolicy(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+int CvLuaPlayer::lGetGlobalYieldModifierFromResource(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetGlobalYieldModifierFromResource(eYield);
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+LUAAPIIMPL(Player, IsCorruptionLevelReduceByOne)
+LUAAPIIMPL(Player, GetCorruptionScoreModifierFromPolicy)

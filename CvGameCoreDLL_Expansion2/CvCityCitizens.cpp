@@ -483,7 +483,9 @@ int CvCityCitizens::GetPlotValue(CvPlot* pPlot, bool bUseAllowGrowthFlag)
 	int iScienceYieldValue = (/*6*/ GC.getAI_CITIZEN_VALUE_SCIENCE() * pPlot->getYield(YIELD_SCIENCE));
 	int iCultureYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlot->getYield(YIELD_CULTURE));
 	int iFaithYieldValue = (GC.getAI_CITIZEN_VALUE_FAITH() * pPlot->getYield(YIELD_FAITH));
-
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	int iHealthYieldValue = (GC.getAI_CITIZEN_VALUE_HEALTH() * pPlot->getYield(YIELD_HEALTH));
+#endif
 	// How much surplus food are we making?
 	int iExcessFoodTimes100 = m_pCity->getYieldRateTimes100(YIELD_FOOD, false) - (m_pCity->foodConsumption() * 100);
 
@@ -495,6 +497,10 @@ int CvCityCitizens::GetPlotValue(CvPlot* pPlot, bool bUseAllowGrowthFlag)
 		iFoodYieldValue *= 3;
 	else if(eFocus == CITY_AI_FOCUS_TYPE_PRODUCTION)
 		iProductionYieldValue *= 3;
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	else if (eFocus == CITY_AI_FOCUS_TYPE_HEALTH)
+		iHealthYieldValue *= 3;
+#endif
 	else if(eFocus == CITY_AI_FOCUS_TYPE_GOLD)
 		iGoldYieldValue *= 3;
 	else if(eFocus == CITY_AI_FOCUS_TYPE_SCIENCE)
@@ -566,7 +572,9 @@ int CvCityCitizens::GetPlotValue(CvPlot* pPlot, bool bUseAllowGrowthFlag)
 	iValue += iScienceYieldValue;
 	iValue += iCultureYieldValue;
 	iValue += iFaithYieldValue;
-
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	iValue += iHealthYieldValue;
+#endif
 	return iValue;
 }
 
@@ -906,6 +914,36 @@ bool CvCityCitizens::IsAIWantSpecialistRightNow()
 			}
 		}
 	}
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	else if (eFocusType == CITY_AI_FOCUS_TYPE_HEALTH)
+	{
+		// Loop through all Buildings
+		BuildingTypes eBuilding;
+		for (int iBuildingLoop = 0; iBuildingLoop < GC.getNumBuildingInfos(); iBuildingLoop++)
+		{
+			eBuilding = (BuildingTypes)iBuildingLoop;
+
+			// Have this Building in the City?
+			if (m_pCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
+			{
+				// Can't add more than the max
+				if (IsCanAddSpecialistToBuilding(eBuilding))
+				{
+					SpecialistTypes eSpecialist = (SpecialistTypes)GC.getBuildingInfo(eBuilding)->GetSpecialistType();
+					CvSpecialistInfo* pSpecialistInfo = GC.getSpecialistInfo(eSpecialist);
+					if (pSpecialistInfo && pSpecialistInfo->getYieldChange(YIELD_HEALTH) > 0)
+					{
+						iWeight *= 150;
+						iWeight /= 100;
+						break;
+					}
+				}
+			}
+		}
+	}
+#endif
+
 	else if(eFocusType == CITY_AI_FOCUS_TYPE_FOOD)
 	{
 		iWeight *= 50;
@@ -1282,6 +1320,11 @@ bool CvCityCitizens::IsBetterThanDefaultSpecialist(SpecialistTypes eSpecialist)
 	case CITY_AI_FOCUS_TYPE_FAITH:
 		eYield = YIELD_FAITH;
 		break;
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	case CITY_AI_FOCUS_TYPE_HEALTH:
+		eYield = YIELD_HEALTH;
+		break;
+#endif
 	default:
 		eYield = NO_YIELD;
 		break;
@@ -1600,12 +1643,17 @@ void CvCityCitizens::DoReallocateCitizens()
 		ChangeNumDefaultSpecialists(-1);
 	}
 
+
+
 	// Now put all of the unallocated guys back
 	int iNumToAllocate = GetNumUnassignedCitizens();
 	for(int iUnallocatedLoop = 0; iUnallocatedLoop < iNumToAllocate; iUnallocatedLoop++)
 	{
 		DoAddBestCitizenFromUnassigned();
 	}
+
+	// do a single update, but treat player happiness as constant
+	m_pCity->UpdateAllNonPlotYields();
 }
 
 
@@ -1683,30 +1731,85 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 			// Now working pPlot
 			if(IsWorkingPlot(pPlot))
 			{
-				//if (iIndex != CITY_HOME_PLOT)
-				//{
-				//	GetCity()->changeWorkingPopulation(1);
-				//}
 
 				for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 				{
 					GetCity()->ChangeBaseYieldRateFromTerrain(((YieldTypes)iI), pPlot->getYield((YieldTypes)iI));
 				}
+
+				if (iIndex != CITY_HOME_PLOT)
+				{
+					if (!pPlot->isEffectiveOwner(m_pCity))
+						pPlot->setWorkingCityOverride(m_pCity);
+
+					if (pPlot->getTerrainType() != NO_TERRAIN)
+					{
+						GetCity()->ChangeNumTerrainWorked(pPlot->getTerrainType(), 1);
+
+						if (pPlot->getFeatureType() == NO_FEATURE && !pPlot->isHills())
+						{
+							GetCity()->ChangeNumFeaturelessTerrainWorked(pPlot->getTerrainType(), 1);
+						}
+		
+					}
+					if (pPlot->getFeatureType() != NO_FEATURE)
+					{
+						GetCity()->ChangeNumFeatureWorked(pPlot->getFeatureType(), 1);
+					}
+
+#if defined(MOD_IMPROVEMENT_FUNCTION)
+					if (MOD_IMPROVEMENT_FUNCTION)
+					{
+						if (pPlot->getImprovementType() != NO_IMPROVEMENT && !pPlot->IsImprovementPillaged())
+						{
+							GetCity()->ChangeNumImprovementWorked(pPlot->getImprovementType(), 1);
+						}
+
+					}
+#endif
+				}
 			}
 			// No longer working pPlot
 			else
 			{
-				//if (iIndex != CITY_HOME_PLOT)
-				//{
-				//	GetCity()->changeWorkingPopulation(-1);
-				//}
-
+	
 				for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 				{
 					GetCity()->ChangeBaseYieldRateFromTerrain(((YieldTypes)iI), -pPlot->getYield((YieldTypes)iI));
 				}
+
+				if (iIndex != CITY_HOME_PLOT)
+				{
+					if (pPlot->getTerrainType() != NO_TERRAIN)
+					{
+						GetCity()->ChangeNumTerrainWorked(pPlot->getTerrainType(), -1);
+
+						if (pPlot->getFeatureType() == NO_FEATURE && !pPlot->isHills())
+						{
+							GetCity()->ChangeNumFeaturelessTerrainWorked(pPlot->getTerrainType(), -1);
+						}
+					}
+					if (pPlot->getFeatureType() != NO_FEATURE)
+					{
+						GetCity()->ChangeNumFeatureWorked(pPlot->getFeatureType(), -1);
+					}
+
+#if defined(MOD_IMPROVEMENT_FUNCTION)
+					if (MOD_IMPROVEMENT_FUNCTION)
+					{
+						if (pPlot->getImprovementType() != NO_IMPROVEMENT && !pPlot->IsImprovementPillaged())
+						{
+							GetCity()->ChangeNumImprovementWorked(pPlot->getImprovementType(), -1);
+						}
+
+					}
+#endif
+				}
+		
 			}
 		}
+
+		m_pCity->UpdateAllNonPlotYields();
 
 		if(GetCity()->isCitySelected())
 		{
@@ -1767,6 +1870,10 @@ void CvCityCitizens::DoAlterWorkingPlot(int iIndex)
 
 		if(pPlot != NULL)
 		{
+			if(pPlot->getWorkingCity() != m_pCity)
+			{
+				pPlot->getWorkingCity()->GetCityCitizens()->SetForcedWorkingPlot(pPlot,false);
+			}
 			if(IsCanWork(pPlot))
 			{
 //				GetCity()->setCitizensAutomated(false);
@@ -2199,6 +2306,13 @@ void CvCityCitizens::DoSpecialists()
 
 				// GPP from Buildings
 				iGPPChange += GetBuildingGreatPeopleRateChanges(eSpecialist) * 100;
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+				// GPP from Religion
+				if(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+				{
+					iGPPChange += GetCity()->GetGreatPersonPointsFromReligion(GetGreatPersonFromSpecialist(eSpecialist)) * 100;
+				}
+#endif
 
 				if(iGPPChange > 0)
 				{
@@ -2209,7 +2323,9 @@ void CvCityCitizens::DoSpecialists()
 
 					// Player mod
 					iMod += GetPlayer()->getGreatPeopleRateModifier();
-
+#if defined(MOD_ROG_CORE)
+					iMod += GetCity()->GetSpecialistRateModifier(eSpecialist);
+#endif
 					// Player and Golden Age mods to this specific class
 					if((UnitClassTypes)pkSpecialistInfo->getGreatPeopleUnitClass() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST"))
 					{
@@ -2389,6 +2505,12 @@ void CvCityCitizens::DoAddSpecialistToBuilding(BuildingTypes eBuilding, bool bFo
 		GetCity()->UpdateReligion(GetCity()->GetCityReligions()->GetReligiousMajority());
 
 		ChangeNumUnassignedCitizens(-1);
+
+		//we added the first specialist, this may have religious effects
+		if (GetTotalSpecialistCount() == 1)
+		{
+			GetCity()->UpdateAllNonPlotYields();
+		}
 
 		ICvUserInterface2* pkIFace = GC.GetEngineUserInterface();
 		pkIFace->setDirty(GameData_DIRTY_BIT, true);

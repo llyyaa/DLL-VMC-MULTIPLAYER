@@ -201,6 +201,83 @@ CvCity* getCity(IDInfo city)
 	return NULL;
 }
 
+
+
+CvPlot* iterateRingPlots(int iX, int iY, int iIndex)
+{
+	int iDeltaHexX = 0;
+	int iDeltaHexY = 0;
+
+	if (iIndex < MAX_CITY_PLOTS)
+	{
+		iDeltaHexX = GC.getCityPlotX()[iIndex]; // getCityPlotX now uses hex-space coords
+		iDeltaHexY = GC.getCityPlotY()[iIndex];
+	}
+	else
+	{
+		// loop till we find the ring this is on
+		int iThisRing = 0;
+		int iHighestValueOnThisRing = 0;
+		int iLowestValueOnThisRing = 0;
+		while (iHighestValueOnThisRing < iIndex)
+		{
+			iThisRing++;
+			iLowestValueOnThisRing = iHighestValueOnThisRing + 1;
+			iHighestValueOnThisRing += iThisRing * 6;
+		}
+		// determine what side of the hex we are on
+		int iDiff = (iIndex - iLowestValueOnThisRing);
+		int iSide = iDiff / iThisRing;
+		int iOffset = iDiff % iThisRing;
+
+		switch (iSide)
+		{
+		case 0:
+			iDeltaHexX = 0 + iOffset;
+			iDeltaHexY = iThisRing - iOffset;
+			break;
+		case 1:
+			iDeltaHexX = iThisRing;
+			iDeltaHexY = 0 - iOffset;
+			break;
+		case 2:
+			iDeltaHexX = iThisRing - iOffset;
+			iDeltaHexY = -iThisRing;
+			break;
+		case 3:
+			iDeltaHexX = 0 - iOffset;
+			iDeltaHexY = -iThisRing + iOffset;
+			break;
+		case 4:
+			iDeltaHexX = -iThisRing;
+			iDeltaHexY = 0 + iOffset;
+			break;
+		case 5:
+			iDeltaHexX = -iThisRing + iOffset;
+			iDeltaHexY = iThisRing;
+			break;
+		default:
+			return 0;
+		}
+
+	}
+	// convert the city coord to hex-space coordinates
+	int iCityHexX = xToHexspaceX(iX, iY);
+
+	int iPlotHexX = iCityHexX + iDeltaHexX;
+	int iPlotY = iY + iDeltaHexY; // Y is the same in both coordinate systems
+
+	// convert from hex-space coordinates to the storage array
+	int iPlotX = hexspaceXToX(iPlotHexX, iPlotY);
+
+	return GC.getMap().plot(iPlotX, iPlotY);
+}
+
+
+
+
+
+
 CvUnit* getUnit(const IDInfo& unit)
 {
 	if((unit.eOwner >= 0) && unit.eOwner < MAX_PLAYERS)
@@ -260,6 +337,10 @@ bool isBeforeUnitCycle(const CvUnit* pFirstUnit, const CvUnit* pSecondUnit)
 	return (pFirstUnit->GetID() < pSecondUnit->GetID());
 }
 
+
+
+
+
 /// Is this a valid Promotion for the UnitCombatType?
 bool IsPromotionValidForUnitCombatType(PromotionTypes ePromotion, UnitTypes eUnit)
 {
@@ -287,6 +368,41 @@ bool IsPromotionValidForUnitCombatType(PromotionTypes ePromotion, UnitTypes eUni
 
 	return true;
 }
+
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+bool IsPromotionValidForUnitPromotions(PromotionTypes ePromotion, CvUnit& pUnit)
+{
+	CvPromotionEntry* promotionInfo = GC.getPromotionInfo(ePromotion);
+	if(promotionInfo == NULL) return false;
+
+	const std::vector<int>& prePromotions = promotionInfo->GetPrePromotions();
+
+	for(int Ii=0; Ii < prePromotions.size(); Ii++)
+	{
+		if(prePromotions[Ii] != NO_PROMOTION && pUnit.isHasPromotion((PromotionTypes)prePromotions[Ii]))
+			return true;
+	}
+
+	return false;
+}
+#endif
+
+/// Is this a valid Promotion for the Unit Type?
+bool IsPromotionValidForUnitType(PromotionTypes ePromotion, UnitTypes eUnit)
+{
+	CvPromotionEntry* promotionInfo = GC.getPromotionInfo(ePromotion);
+
+	if (promotionInfo == NULL)
+		return false;
+
+	if (!(promotionInfo->GetUnitType((int)eUnit)))
+	{
+		return false;
+	}
+
+	return true;
+}
+
 
 /// Is this a valid Promotion for this civilian?
 bool IsPromotionValidForCivilianUnitType(PromotionTypes ePromotion, UnitTypes eUnit)
@@ -368,6 +484,13 @@ bool isPromotionValid(PromotionTypes ePromotion, UnitTypes eUnit, bool bLeader, 
 	PromotionTypes ePrereq7 = (PromotionTypes)promotionInfo->GetPrereqOrPromotion7();
 	PromotionTypes ePrereq8 = (PromotionTypes)promotionInfo->GetPrereqOrPromotion8();
 	PromotionTypes ePrereq9 = (PromotionTypes)promotionInfo->GetPrereqOrPromotion9();
+
+
+	PromotionTypes ePrereq10 = (PromotionTypes)promotionInfo->GetPrereqOrPromotion10();
+	PromotionTypes ePrereq11 = (PromotionTypes)promotionInfo->GetPrereqOrPromotion11();
+	PromotionTypes ePrereq12 = (PromotionTypes)promotionInfo->GetPrereqOrPromotion12();
+	PromotionTypes ePrereq13 = (PromotionTypes)promotionInfo->GetPrereqOrPromotion13();
+
 	if(ePrereq1 != NO_PROMOTION ||
 		ePrereq2 != NO_PROMOTION ||
 		ePrereq3 != NO_PROMOTION ||
@@ -376,7 +499,11 @@ bool isPromotionValid(PromotionTypes ePromotion, UnitTypes eUnit, bool bLeader, 
 		ePrereq6 != NO_PROMOTION ||
 		ePrereq7 != NO_PROMOTION ||
 		ePrereq8 != NO_PROMOTION ||
-		ePrereq9 != NO_PROMOTION)
+		ePrereq9 != NO_PROMOTION ||
+		ePrereq10 != NO_PROMOTION ||
+		ePrereq11 != NO_PROMOTION ||
+		ePrereq12 != NO_PROMOTION || 
+		ePrereq13 != NO_PROMOTION )
 	{
 		bool bValid = false;
 		if(!bValid)
@@ -450,6 +577,39 @@ bool isPromotionValid(PromotionTypes ePromotion, UnitTypes eUnit, bool bLeader, 
 				bValid = true;
 			}
 		}
+
+		if (!bValid)
+		{
+			if (NO_PROMOTION != ePrereq10 && isPromotionValid(ePrereq10, eUnit, bLeader, true))
+			{
+				bValid = true;
+			}
+		}
+
+		if (!bValid)
+		{
+			if (NO_PROMOTION != ePrereq11 && isPromotionValid(ePrereq11, eUnit, bLeader, true))
+			{
+				bValid = true;
+			}
+		}
+
+		if (!bValid)
+		{
+			if (NO_PROMOTION != ePrereq12 && isPromotionValid(ePrereq12, eUnit, bLeader, true))
+			{
+				bValid = true;
+			}
+		}
+
+		if (!bValid)
+		{
+			if (NO_PROMOTION != ePrereq13 && isPromotionValid(ePrereq13, eUnit, bLeader, true))
+			{
+				bValid = true;
+			}
+		}
+
 
 		if(!bValid)
 		{

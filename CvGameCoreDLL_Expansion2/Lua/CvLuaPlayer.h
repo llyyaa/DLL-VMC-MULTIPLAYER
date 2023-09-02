@@ -237,6 +237,12 @@ protected:
 
 	static int lGetJONSCultureEverGenerated(lua_State* L);
 
+#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
+	static int lGetGoldenAgePointPerTurnFromReligion(lua_State* L);
+	static int lGetGoldenAgePointPerTurnFromTraits(lua_State* L);
+	static int lGetGoldenAgePointPerTurnFromCitys(lua_State* L);
+#endif	
+
 	static int lGetLastTurnLifetimeCulture(lua_State* L);
 	static int lGetInfluenceOn(lua_State* L);
 	static int lGetLastTurnInfluenceOn(lua_State* L);
@@ -429,6 +435,7 @@ protected:
 	static int lGetAttackBonusTurns(lua_State* L);
 	static int lGetCultureBonusTurns(lua_State* L);
 	static int lGetTourismBonusTurns(lua_State* L);
+	static int lGetInternationalTourismTooltip(lua_State* L);
 
 	static int lGetGoldenAgeProgressThreshold(lua_State* L);
 	static int lGetGoldenAgeProgressMeter(lua_State* L);
@@ -486,6 +493,8 @@ protected:
 	static int lGetMaxTeamBuildingProductionModifier(lua_State* L);
 	static int lGetMaxPlayerBuildingProductionModifier(lua_State* L);
 	static int lGetFreeExperience(lua_State* L);
+	static int lGetUnitCombatFreeExperiences(lua_State* L);
+	static int lGetDomainFreeExperience(lua_State* L);
 	static int lGetFeatureProductionModifier(lua_State* L);
 	static int lGetWorkerSpeedModifier(lua_State* L);
 	static int lGetImprovementUpgradeRateModifier(lua_State* L);
@@ -565,6 +574,8 @@ protected:
 	// Minor Civ stuff
 #if defined(MOD_API_LUA_EXTENSIONS)
 	LUAAPIEXTN(IsMajorCiv, bool);
+	LUAAPIEXTN(GetCivBuilding, int);
+	LUAAPIEXTN(GetCivUnit, int);
 #endif
 	static int lIsMinorCiv(lua_State* L);
 	static int lGetMinorCivType(lua_State* L);
@@ -683,6 +694,7 @@ protected:
 	static int lGetPlayerColor(lua_State* L);
 
 	static int lGetSeaPlotYield(lua_State* L);
+	static int lGetCityLoveKingDayYieldMod(lua_State* L);
 	static int lGetYieldRateModifier(lua_State* L);
 	static int lGetCapitalYieldRateModifier(lua_State* L);
 	static int lGetExtraYieldThreshold(lua_State* L);
@@ -697,6 +709,7 @@ protected:
 	static int lGetScienceFromHappinessTimes100(lua_State* L);
 	static int lGetScienceFromResearchAgreementsTimes100(lua_State* L);
 	static int lGetScienceFromBudgetDeficitTimes100(lua_State* L);
+	static int lGetScienceFromReligion(lua_State* L);
 
 	// END Science
 
@@ -1071,6 +1084,7 @@ protected:
 	static int lGetInternationalTradeRouteTheirBuildingBonus(lua_State* L);
 	static int lGetInternationalTradeRoutePolicyBonus(lua_State* L);
 	static int lGetInternationalTradeRouteOtherTraitBonus(lua_State* L);
+	static int lGetInternationalTradeRouteTraitBonus(lua_State* L);
 	static int lGetInternationalTradeRouteRiverModifier(lua_State* L);
 	static int lGetInternationalTradeRouteDomainModifier(lua_State* L);
 	static int lGetInternationalTradeRouteTotal(lua_State* L);
@@ -1109,6 +1123,12 @@ protected:
 	static int lGetWarmongerPreviewString(lua_State* L);
 	static int lGetLiberationPreviewString(lua_State* L);
 
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	static int lGetWarCasualtiesCounter(lua_State* L);
+	static int lChangeWarCasualtiesCounter(lua_State* L);
+	static int lSetWarCasualtiesCounter(lua_State* L);
+	static int lCheckAndUpdateWarCasualtiesCounter(lua_State* L);
+#endif
 
 #if defined(MOD_API_LUA_EXTENSIONS)
 	LUAAPIEXTN(AddMessage, void, sMessage);
@@ -1182,6 +1202,29 @@ protected:
 	LUAAPIEXTN(IsActiveMilitaryStrategy, bool, iStrategy);
 	LUAAPIEXTN(ActivateMilitaryStrategy, void, iStrategy);
 	LUAAPIEXTN(DeactivateMilitaryStrategy, void, iStrategy);
+#endif
+
+#if defined(MOD_SPECIALIST_RESOURCES)
+	LUAAPIEXTN(GetSpecialistResources, table, eSpecialist);
+#endif
+
+	LUAAPIEXTN(GetHappinessFromFaith, int);
+
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	LUAAPIEXTN(GetUnHappinessModFromResourceByIndex, int, eResourceType);
+	LUAAPIEXTN(GetCityConnectionTradeRouteGoldModifierFromResourceByIndex, int, eResourceType);
+	LUAAPIEXTN(GetGoldHurryCostModifierFromResourceByIndex, int, eResourceType);
+#endif
+
+	LUAAPIEXTN(GetYieldModifierFromHappiness, int, eYieldType);
+	LUAAPIEXTN(GetYieldModifierFromNumGreakWork, int, eYieldType);
+	LUAAPIEXTN(GetYieldModifierFromHappinessPolicy, int, eYieldType);
+
+	LUAAPIEXTN(GetGlobalYieldModifierFromResource, int, eYieldType);
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	LUAAPIEXTN(IsCorruptionLevelReduceByOne, bool);
+	LUAAPIEXTN(GetCorruptionScoreModifierFromPolicy, int);
 #endif
 };
 

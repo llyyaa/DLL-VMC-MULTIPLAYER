@@ -17,7 +17,10 @@ CvProjectEntry::CvProjectEntry(void):
 	m_piVictoryThreshold(NULL),
 	m_piVictoryMinThreshold(NULL),
 	m_piProjectsNeeded(NULL),
-	m_piFlavorValue(NULL)
+	m_piFlavorValue(NULL),
+
+	m_piYieldChange(NULL),
+	m_piYieldModifier(NULL)
 {
 }
 //------------------------------------------------------------------------------
@@ -28,6 +31,8 @@ CvProjectEntry::~CvProjectEntry(void)
 	SAFE_DELETE_ARRAY(m_piVictoryMinThreshold);
 	SAFE_DELETE_ARRAY(m_piProjectsNeeded);
 	SAFE_DELETE_ARRAY(m_piFlavorValue);
+	SAFE_DELETE_ARRAY(m_piYieldChange);
+	SAFE_DELETE_ARRAY(m_piYieldModifier);
 }
 //------------------------------------------------------------------------------
 bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
@@ -36,6 +41,7 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 		return false;
 
 	m_iMaxGlobalInstances = kResults.GetInt("MaxGlobalInstances");
+	m_iCityMaxNum = kResults.GetInt("CityMaxNum");
 	m_iMaxTeamInstances = kResults.GetInt("MaxTeamInstances");
 	m_iProductionCost = kResults.GetInt("Cost");
 	m_iNukeInterception = kResults.GetInt("NukeInterception");
@@ -45,7 +51,9 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	m_bSpaceship = kResults.GetBool("Spaceship");
 	m_bAllowsNukes = kResults.GetBool("AllowsNukes");
-
+	m_iGoldMaintenance = kResults.GetInt("Maintenance");
+	m_iCostScalerEra = kResults.GetInt("CostScalerEra");
+	m_iCostScalerNumRepeats = kResults.GetInt("CostScalerNumRepeats");
 	m_strMovieArtDef = kResults.GetText("MovieDefineTag");
 
 	const char* szVictoryPrereq = kResults.GetText("VictoryPrereq");
@@ -96,6 +104,10 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 	kUtility.SetFlavors(m_piFlavorValue, "Project_Flavors", "ProjectType", szProjectType);
 	kUtility.PopulateArrayByValue(m_piProjectsNeeded, "Projects", "Project_Prereqs", "PrereqProjectType", "ProjectType", szProjectType, "AmountNeeded");
 
+
+	kUtility.SetYields(m_piYieldChange, "Project_YieldChanges", "ProjectType", szProjectType);
+	kUtility.SetYields(m_piYieldModifier, "Project_YieldModifiers", "ProjectType", szProjectType);
+
 	return true;
 }
 //------------------------------------------------------------------------------
@@ -121,6 +133,11 @@ int CvProjectEntry::GetAnyoneProjectPrereq() const
 void CvProjectEntry::SetAnyoneProjectPrereq(int i)
 {
 	m_iAnyoneProjectPrereq = i;
+}
+
+int CvProjectEntry::CityMaxNum() const
+{
+	return m_iCityMaxNum;
 }
 
 /// Is there a maximum number of these in the world?
@@ -196,6 +213,20 @@ bool CvProjectEntry::IsAllowsNukes() const
 {
 	return m_bAllowsNukes;
 }
+
+int CvProjectEntry::CostScalerEra() const
+{
+	return m_iCostScalerEra;
+}
+int CvProjectEntry::GetGoldMaintenance() const
+{
+	return m_iGoldMaintenance;
+}
+int CvProjectEntry::CostScalerNumberOfRepeats() const
+{
+	return m_iCostScalerNumRepeats;
+}
+
 
 /// Retrieve movie file name
 const char* CvProjectEntry::GetMovieArtDef() const
@@ -278,6 +309,35 @@ int CvProjectEntry::GetProjectsNeeded(int i) const
 	return 0;
 }
 
+
+/// Change to yield by type
+int CvProjectEntry::GetYieldChange(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldChange ? m_piYieldChange[i] : -1;
+}
+
+/// Array of yield changes
+int* CvProjectEntry::GetYieldChangeArray() const
+{
+	return m_piYieldChange;
+}
+
+/// Modifier to yield by type
+int CvProjectEntry::GetYieldModifier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldModifier ? m_piYieldModifier[i] : -1;
+}
+
+/// Array of yield modifiers
+int* CvProjectEntry::GetYieldModifierArray() const
+{
+	return m_piYieldModifier;
+}
+
 //=====================================
 // CvProjectXMLEntries
 //=====================================
@@ -321,3 +381,5 @@ CvProjectEntry* CvProjectXMLEntries::GetEntry(int index)
 {
 	return m_paProjectEntries[index];
 }
+
+

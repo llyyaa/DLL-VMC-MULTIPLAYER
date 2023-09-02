@@ -1596,6 +1596,34 @@ enum ActivityTypes
 	NUM_ACTIVITY_TYPES
 };
 
+#ifdef MOD_GLOBAL_CITY_SCALES
+enum CityScaleTypes {
+	NO_CITY_SCALE = -1
+};
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+enum CorruptionLevelTypes {
+	INVALID_CORRUPTION = -1
+};
+#endif
+
+enum LuaFormulaTypes {
+	NO_LUA_FORMULA = -1
+};
+
+#ifdef MOD_PROMOTION_COLLECTIONS
+enum PromotionCollectionsTypes {
+	NO_PROMOTION_COLLECTION = -1
+};
+#endif
+
+#ifdef MOD_BUILDINGCLASS_COLLECTIONS
+enum BuildingClassCollectionsTypes {
+	NO_BUILDINGCLASS_COLLECTION = -1
+};
+#endif
+
 enum AutomateTypes
 {
 	NO_AUTOMATE = -1,
@@ -2600,7 +2628,9 @@ enum CityAIFocusTypes
 	CITY_AI_FOCUS_TYPE_PROD_GROWTH,
 	CITY_AI_FOCUS_TYPE_GOLD_GROWTH,
 	CITY_AI_FOCUS_TYPE_FAITH,
-
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+	CITY_AI_FOCUS_TYPE_HEALTH,
+#endif
 	NUM_CITY_AI_FOCUS_TYPES
 };
 
@@ -3234,6 +3264,21 @@ enum DiplomacyPlayerType
 	DIPLO_ALL_PLAYERS		= -1,
 	DIPLO_AI_PLAYERS		= -2,
 	DIPLO_HUMAN_PLAYERS		= -3
+};
+#endif
+
+
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+enum LoyaltyStateTypes
+{
+	NO_LOYALTY_TYPE = -1,
+	LOYALTY_NEUTRAL = 0,
+	LOYALTY_PATRIOTIC = 1,
+	LOYALTY_ALLEGIANT = 2,
+	LOYALTY_REBELLIOUS = 3,
+	LOYALTY_SEPARATIST = 4,
+
+	NUM_LOYALTY_TYPES
 };
 #endif
 

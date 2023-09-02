@@ -5,6 +5,7 @@
 	All other marks and trademarks are the property of their respective owners.  
 	All rights reserved. 
 	------------------------------------------------------------------------------------------------------- */
+#include "CvBuildingClasses.h"
 #include "CvGameCoreDLLPCH.h"
 #include "ICvDLLUserInterface.h"
 #include "CvGameCoreUtils.h"
@@ -50,6 +51,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iFreeBuildingClass(NO_BUILDINGCLASS),
 	m_iFreeBuildingThisCity(NO_BUILDINGCLASS),
 	m_iFreePromotion(NO_PROMOTION),
+	m_iFreePromotion2(NO_PROMOTION),
+	m_iFreePromotion3(NO_PROMOTION),
 	m_iTrainedFreePromotion(NO_PROMOTION),
 	m_iFreePromotionRemoved(NO_PROMOTION),
 	m_iProductionCost(0),
@@ -141,7 +144,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 #if defined(MOD_API_EXTENSIONS)
 	m_bAddsFreshWater(false),
 	m_bPurchaseOnly(false),
+	m_bHumanOnly(false),
 #endif
+
+	m_bMoveAfterCreated(false),
 
 #if defined(MOD_ROG_CORE)
 	m_piGreatWorkYieldChange(NULL),
@@ -149,16 +155,32 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iExtraDamageHeal(0),
 	m_iRangedStrikeModifier(0),
 	m_iPopulationChange(0),
-
+	m_iMinorCivFriendship(0),
+	m_iLiberatedInfluence(0),
 	m_iResetDamageValue(0),
 	m_iReduceDamageValue(0),
 
 	m_iGlobalCityStrengthMod(0),
 	m_iGlobalRangedStrikeModifier(0),
+
+	m_iWaterTileDamage(0),
+	m_iWaterTileMovementReduce(0),
+	m_iWaterTileTurnDamage(0),
+	m_iLandTileDamage(0),
+	m_iLandTileMovementReduce(0),
+	m_iLandTileTurnDamage(0),
 #endif
 
 	m_iNukeInterceptionChance(0),
 	m_iExtraAttacks(0),
+
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	m_piInstantYield(NULL),
+	m_bAllowInstantYield(false),
+#endif
+	m_piYieldFromInternal(NULL),
+	m_piYieldFromProcessModifier(NULL),
+	m_piYieldFromProcessModifierGlobal(NULL),
 
 #if defined(MOD_ROG_CORE)
 	m_piResourceQuantityFromPOP(NULL),
@@ -167,13 +189,18 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppiResourceYieldChangeGlobal(),
 	m_ppaiImprovementYieldChange(NULL),
 	m_ppaiImprovementYieldChangeGlobal(NULL),
+	m_ppiFeatureYieldChangesGlobal(NULL),
+	m_ppiTerrainYieldChangesGlobal(NULL),
+	m_ppaiYieldPerXTerrain(NULL),
+	m_ppaiYieldPerXFeature(NULL),
+
 	m_ppaiSpecialistYieldChangeLocal(NULL),
 
 	m_piYieldChangeWorldWonder(NULL),
 	m_piYieldChangeWorldWonderGlobal(NULL),
 
 	m_ppiBuildingClassYieldModifiers(NULL),
-
+	m_ppiBuildingClassLocalYieldChanges(NULL),
 	m_piYieldChangePerPopInEmpire(),
 #endif
 
@@ -224,6 +251,25 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piUnitCombatProductionModifiers(NULL),
 	m_piDomainFreeExperience(NULL),
 	m_piDomainFreeExperiencePerGreatWork(NULL),
+
+#if defined(MOD_ROG_CORE)
+	m_piYieldFromConstruction(NULL),
+	m_piYieldFromUnitProduction(NULL),
+	m_piYieldFromBirth(NULL),
+	m_piYieldFromBorderGrowth(NULL),
+
+	m_piYieldFromPillage(NULL),
+	m_piYieldFromPillageGlobal(NULL),
+	m_piYieldFromPillageGlobalPlayer(NULL),
+
+	m_piYieldModifierFromWonder(NULL),
+	m_piDomainFreeExperiencePerGreatWorkGlobal(NULL),
+	m_piDomainFreeExperienceGlobal(),
+	m_piUnitTypePrmoteHealGlobal(),
+	m_paiSpecificGreatPersonRateModifier(NULL),
+#endif
+
+
 	m_piDomainProductionModifier(NULL),
 	m_piPrereqNumOfBuildingClass(NULL),
 	m_piFlavorValue(NULL),
@@ -231,13 +277,19 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piLocalResourceOrs(NULL),
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
-	m_piNumFreeUnits(NULL),
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iTradeRouteSeaGoldBonusGlobal(0),
+	m_iTradeRouteLandGoldBonusGlobal(0),
+	m_bAnyWater(false),
+	m_pbBuildingClassNeededGlobal(NULL),
+#endif
 	m_bArtInfoEraVariation(false),
 	m_bArtInfoCulturalVariation(false),
 	m_bArtInfoRandomVariation(false),
 	m_ppaiResourceYieldChange(NULL),
 	m_ppaiFeatureYieldChange(NULL),
 	m_ppaiSpecialistYieldChange(NULL),
+	m_ppaiImprovementYieldModifier(NULL),
 	m_ppaiResourceYieldModifier(NULL),
 	m_ppaiTerrainYieldChange(NULL),
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
@@ -247,17 +299,24 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiBuildingClassHappiness(NULL),
 	m_paThemingBonusInfo(NULL),
 
-	m_iNumThemingBonuses(0),
-
-#ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
-	m_bHasYieldFromOtherYield(false)
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	m_piiResourceFromImprovement(),
 #endif
+
+	m_iNumThemingBonuses(0),
+#ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
+	m_bHasYieldFromOtherYield(false),
+#endif
+	m_iNumFreeUnit(0),
+	m_iNumFreeUnitTotal(0),
+	m_pFreeUnits(nullptr)
+
 {
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
-		for (int i = 0; i < NUM_YIELD_TYPES; i++) {
-			m_iNumAllowPurchaseUnits[i] = 0;
-			m_piAllowPurchaseUnits[i] = nullptr;
-		}
+	for (int i = 0; i < NUM_YIELD_TYPES; i++) {
+		m_iNumAllowPurchaseUnits[i] = 0;
+		m_piAllowPurchaseUnits[i] = nullptr;
+	}
 #endif
 }
 
@@ -286,6 +345,21 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piUnitCombatProductionModifiers);
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperience);
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWork);
+
+#if defined(MOD_ROG_CORE)
+	SAFE_DELETE_ARRAY(m_piYieldFromConstruction);
+	SAFE_DELETE_ARRAY(m_piYieldFromUnitProduction);
+	SAFE_DELETE_ARRAY(m_piYieldFromBirth);
+	SAFE_DELETE_ARRAY(m_piYieldFromBorderGrowth);
+	SAFE_DELETE_ARRAY(m_piYieldFromPillage);
+	SAFE_DELETE_ARRAY(m_piYieldFromPillageGlobal);
+	SAFE_DELETE_ARRAY(m_piYieldFromPillageGlobalPlayer);
+	SAFE_DELETE_ARRAY(m_piYieldModifierFromWonder);
+	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
+	m_piDomainFreeExperienceGlobal.clear();
+	m_piUnitTypePrmoteHealGlobal.clear();
+#endif
+
 	SAFE_DELETE_ARRAY(m_piDomainProductionModifier);
 	SAFE_DELETE_ARRAY(m_piPrereqNumOfBuildingClass);
 	SAFE_DELETE_ARRAY(m_piFlavorValue);
@@ -293,20 +367,35 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piLocalResourceOrs);
 	SAFE_DELETE_ARRAY(m_paiHurryModifier);
 	SAFE_DELETE_ARRAY(m_pbBuildingClassNeededInCity);
-	SAFE_DELETE_ARRAY(m_piNumFreeUnits);
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	SAFE_DELETE_ARRAY(m_pbBuildingClassNeededGlobal);
+#endif
 	SAFE_DELETE_ARRAY(m_paiBuildingClassHappiness);
 	SAFE_DELETE_ARRAY(m_paThemingBonusInfo);
+
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	SAFE_DELETE_ARRAY(m_piInstantYield);
+#endif
+	SAFE_DELETE_ARRAY(m_piYieldFromInternal);
+	SAFE_DELETE_ARRAY(m_piYieldFromProcessModifier);
+	SAFE_DELETE_ARRAY(m_piYieldFromProcessModifierGlobal);
 
 #if defined(MOD_ROG_CORE)
 	SAFE_DELETE_ARRAY(m_piResourceQuantityFromPOP);
 	SAFE_DELETE_ARRAY(m_piGreatWorkYieldChange);
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonder);
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonderGlobal);
+	SAFE_DELETE_ARRAY(m_paiSpecificGreatPersonRateModifier);
+#endif
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	m_piiResourceFromImprovement.clear();
 #endif
 
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiFeatureYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChange);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldModifier);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldModifier);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainYieldChange);
 
@@ -315,8 +404,14 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	m_ppiResourceYieldChangeGlobal.clear();
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChangeGlobal);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppiTerrainYieldChangesGlobal);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiImprovementYieldChangeGlobal);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiYieldPerXTerrain);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiYieldPerXFeature);
+
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChangeLocal);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldModifiers);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassLocalYieldChanges);
 #endif
 
 
@@ -324,6 +419,11 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiPlotYieldChange);
 #endif
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldChanges);
+	if(m_pFreeUnits)
+	{
+		delete m_pFreeUnits;
+	}
+
 
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
 	if (MOD_API_BUILDING_ENABLE_PURCHASE_UNITS) {
@@ -352,25 +452,44 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	if (MOD_API_EXTENSIONS) {
 		m_bAddsFreshWater = kResults.GetBool("AddsFreshWater");
 		m_bPurchaseOnly = kResults.GetBool("PurchaseOnly");
+		m_bHumanOnly = kResults.GetBool("HumanOnly");
 	}
 #endif
+
+	m_bMoveAfterCreated = kResults.GetBool("MoveAfterCreated");
 
 #if defined(MOD_ROG_CORE)
 	m_iExtraDamageHeal = kResults.GetInt("ExtraDamageHeal");
 	m_iRangedStrikeModifier = kResults.GetInt("RangedStrikeModifier");
 	m_iPopulationChange = kResults.GetInt("PopulationChange");
-
+	m_iMinorCivFriendship = kResults.GetInt("MinorCivFriendship");
+	m_iLiberatedInfluence = kResults.GetInt("LiberatedInfluence");
 	m_iResetDamageValue = kResults.GetInt("ResetDamageValue");
 	m_iReduceDamageValue = kResults.GetInt("ReduceDamageValue");
 
 	m_iGlobalCityStrengthMod = kResults.GetInt("GlobalCityStrengthMod");
 	m_iGlobalRangedStrikeModifier = kResults.GetInt("GlobalRangedStrikeModifier");
+
+
+	m_iWaterTileDamage = kResults.GetInt("WaterTileDamage");
+	m_iWaterTileMovementReduce = kResults.GetInt("WaterTileMovementReduce");
+	m_iWaterTileTurnDamage = kResults.GetInt("WaterTileTurnDamage");
+	m_iLandTileDamage = kResults.GetInt("LandTileDamage");
+	m_iLandTileMovementReduce = kResults.GetInt("LandTileMovementReduce");
+	m_iLandTileTurnDamage = kResults.GetInt("LandTileTurnDamage");
 #endif
 
 	m_iNukeInterceptionChance = kResults.GetInt("NukeInterceptionChance");
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
-
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	m_bAllowInstantYield = kResults.GetBool("AllowInstantYield");
+#endif
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iTradeRouteSeaGoldBonusGlobal = kResults.GetInt("TradeRouteSeaGoldBonusGlobal");
+	m_iTradeRouteLandGoldBonusGlobal = kResults.GetInt("TradeRouteLandGoldBonusGlobal");
+	m_bAnyWater = kResults.GetBool("AnyWater");
+#endif
 	m_bMountain = kResults.GetBool("Mountain");
 	m_bHill = kResults.GetBool("Hill");
 	m_bFlat = kResults.GetBool("Flat");
@@ -500,6 +619,15 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_bArtInfoEraVariation = kResults.GetBool("ArtInfoEraVariation");
 	m_bArtInfoRandomVariation = kResults.GetBool("ArtInfoRandomVariation");
 
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+	m_iSiegeKillCitizensModifier = kResults.GetInt("SiegeKillCitizensModifier");
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_iCorruptionScoreChange = kResults.GetInt("CorruptionScoreChange");
+	m_iCorruptionLevelChange = kResults.GetInt("CorruptionLevelChange");
+#endif
+
 	//References
 	const char* szTextVal;
 	szTextVal = kResults.GetText("BuildingClass");
@@ -550,6 +678,12 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	szTextVal = kResults.GetText("FreePromotion");
 	m_iFreePromotion = GC.getInfoTypeForString(szTextVal, true);
 
+	szTextVal = kResults.GetText("FreePromotion2");
+	m_iFreePromotion2 = GC.getInfoTypeForString(szTextVal, true);
+
+	szTextVal = kResults.GetText("FreePromotion3");
+	m_iFreePromotion3 = GC.getInfoTypeForString(szTextVal, true);
+
 	szTextVal = kResults.GetText("TrainedFreePromotion");
 	m_iTrainedFreePromotion = GC.getInfoTypeForString(szTextVal, true);
 
@@ -594,6 +728,18 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldChangePerPop, "Building_YieldChangesPerPop", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangePerReligion, "Building_YieldChangesPerReligion", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifier, "Building_YieldModifiers", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromInternal, "Building_YieldFromInternalTR", "BuildingType", szBuildingType);
+#if defined(MOD_ROG_CORE)
+	kUtility.SetYields(m_piYieldFromConstruction, "Building_YieldFromConstruction", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromUnitProduction, "Building_YieldFromUnitProduction", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromBirth, "Building_YieldFromBirth", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromBorderGrowth, "Building_YieldFromBorderGrowth", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromPillage, "Building_YieldFromPillage", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromPillageGlobal, "Building_YieldFromPillageGlobal", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromPillageGlobalPlayer, "Building_YieldFromPillageGlobalPlayer", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldModifierFromWonder, "Building_CityWithWorldWonderYieldModifierGlobal", "BuildingType", szBuildingType);
+#endif
+
 	kUtility.SetYields(m_piAreaYieldModifier, "Building_AreaYieldModifiers", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piGlobalYieldModifier, "Building_GlobalYieldModifiers", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piTechEnhancedYieldChange, "Building_TechEnhancedYieldChanges", "BuildingType", szBuildingType);
@@ -613,16 +759,31 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.PopulateArrayByValue(m_piDomainFreeExperiencePerGreatWork, "Domains", "Building_DomainFreeExperiencePerGreatWork", "DomainType", "BuildingType", szBuildingType, "Experience", 0, NUM_DOMAIN_TYPES);
 	kUtility.PopulateArrayByValue(m_piDomainProductionModifier, "Domains", "Building_DomainProductionModifiers", "DomainType", "BuildingType", szBuildingType, "Modifier", 0, NUM_DOMAIN_TYPES);
 
+
+#if defined(MOD_ROG_CORE)
+	kUtility.PopulateArrayByValue(m_piDomainFreeExperiencePerGreatWorkGlobal, "Domains", "Building_DomainFreeExperiencePerGreatWorkGlobal", "DomainType", "BuildingType", szBuildingType, "Experience", 0, NUM_DOMAIN_TYPES);
+	kUtility.PopulateArrayByValue(m_paiSpecificGreatPersonRateModifier, "Specialists", "Building_SpecificGreatPersonRateModifier", "SpecialistType", "BuildingType", szBuildingType, "Modifier");
+#endif
+
+
 	kUtility.PopulateArrayByValue(m_piPrereqNumOfBuildingClass, "BuildingClasses", "Building_PrereqBuildingClasses", "BuildingClassType", "BuildingType", szBuildingType, "NumBuildingNeeded");
 	kUtility.PopulateArrayByExistence(m_pbBuildingClassNeededInCity, "BuildingClasses", "Building_ClassesNeededInCity", "BuildingClassType", "BuildingType", szBuildingType);
-	//kUtility.PopulateArrayByExistence(m_piNumFreeUnits, "Units", "Building_FreeUnits", "UnitType", "BuildingType", szBuildingType);
-	kUtility.PopulateArrayByValue(m_piNumFreeUnits, "Units", "Building_FreeUnits", "UnitType", "BuildingType", szBuildingType, "NumUnits");
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	kUtility.PopulateArrayByExistence(m_pbBuildingClassNeededGlobal, "BuildingClasses", "Building_ClassesNeededGlobal", "BuildingClassType", "BuildingType", szBuildingType);
+#endif
 	kUtility.PopulateArrayByValue(m_paiBuildingClassHappiness, "BuildingClasses", "Building_BuildingClassHappiness", "BuildingClassType", "BuildingType", szBuildingType, "Happiness");
 
 	kUtility.PopulateArrayByExistence(m_piLockedBuildingClasses, "BuildingClasses", "Building_LockedBuildingClasses", "BuildingClassType", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByExistence(m_piPrereqAndTechs, "Technologies", "Building_TechAndPrereqs", "TechType", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByExistence(m_piLocalResourceAnds, "Resources", "Building_LocalResourceAnds", "ResourceType", "BuildingType", szBuildingType);
 	kUtility.PopulateArrayByExistence(m_piLocalResourceOrs, "Resources", "Building_LocalResourceOrs", "ResourceType", "BuildingType", szBuildingType);
+
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+	kUtility.SetYields(m_piInstantYield, "Building_InstantYield", "BuildingType", szBuildingType);
+#endif
+
+	kUtility.SetYields(m_piYieldFromProcessModifier, "Building_YieldFromProcessModifier", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldFromProcessModifierGlobal, "Building_YieldFromProcessModifierGlobal", "BuildingType", szBuildingType);
 
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piGreatWorkYieldChange, "Building_GreatWorkYieldChanges", "BuildingType", szBuildingType);
@@ -676,7 +837,58 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 			m_ppaiFeatureYieldChange[FeatureID][YieldID] = yield;
 		}
 	}
+#if defined(MOD_ROG_CORE)
+	//Building_DomainFreeExperiencesGlobal
+	{
+		std::string strKey("Building_DomainFreeExperiencesGlobal");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Domains.ID as DomainID, Experience from Building_DomainFreeExperiencesGlobal inner join Domains on Domains.Type = DomainType where BuildingType = ?");
+		}
 
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int iDomain = pResults->GetInt(0);
+			const int iExperience = pResults->GetInt(1);
+
+			m_piDomainFreeExperienceGlobal[iDomain] += iExperience;
+		}
+
+		pResults->Reset();
+
+		//Trim extra memory off container since this is mostly read-only.
+		std::map<int, int>(m_piDomainFreeExperienceGlobal).swap(m_piDomainFreeExperienceGlobal);
+	}
+
+
+	//Building_UnitTypePrmoteHealGlobal
+	{
+		std::string strKey("Building_UnitTypePrmoteHealGlobal");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Units.ID as UnitID, Heal from Building_UnitTypePrmoteHealGlobal inner join Units on Units.Type = UnitType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int iUnit = pResults->GetInt(0);
+			const int iHeal = pResults->GetInt(1);
+
+			m_piUnitTypePrmoteHealGlobal[iUnit] += iHeal;
+		}
+
+		pResults->Reset();
+
+		//Trim extra memory off container since this is mostly read-only.
+		std::map<int, int>(m_piUnitTypePrmoteHealGlobal).swap(m_piUnitTypePrmoteHealGlobal);
+	}
+#endif
 
 #if defined(MOD_ROG_CORE)
 	//SpecialistYieldChangesLocal
@@ -747,6 +959,95 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 		}
 	}
 
+	{
+		kUtility.Initialize2DArray(m_ppiFeatureYieldChangesGlobal, "Features", "Yields");
+
+		std::string strKey("Building_FeatureYieldChangesGlobal");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Features.ID as FeatureID, Yields.ID as YieldID, Yield from Building_FeatureYieldChangesGlobal inner join Features on Features.Type = FeatureType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int FeatureID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppiFeatureYieldChangesGlobal[FeatureID][YieldID] = yield;
+		}
+	}
+
+	{
+		kUtility.Initialize2DArray(m_ppiTerrainYieldChangesGlobal, "Terrains", "Yields");
+
+		std::string strKey("Building_TerrainYieldChangesGlobal");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Terrains.ID as TerrainID, Yields.ID as YieldID, Yield from Building_TerrainYieldChangesGlobal inner join Terrains on Terrains.Type = TerrainType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int TerrainID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppiTerrainYieldChangesGlobal[TerrainID][YieldID] = yield;
+		}
+	}
+
+	//xTerrainYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppaiYieldPerXTerrain, "Terrains", "Yields");
+
+		std::string strKey("Building_YieldPerXTerrainTimes100");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Terrains.ID as TerrainID, Yields.ID as YieldID, Yield from Building_YieldPerXTerrainTimes100 inner join Terrains on Terrains.Type = TerrainType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int TerrainID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiYieldPerXTerrain[TerrainID][YieldID] = yield;
+		}
+	}
+	//xFeatureYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppaiYieldPerXFeature, "Features", "Yields");
+
+		std::string strKey("Building_YieldPerXFeatureTimes100");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Features.ID as FeatureID, Yields.ID as YieldID, Yield from Building_YieldPerXFeatureTimes100 inner join Features on Features.Type = FeatureType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int FeatureID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiYieldPerXFeature[FeatureID][YieldID] = yield;
+		}
+	}
+
 
 	//Building_YieldChangesPerPopInEmpire
 	{
@@ -802,6 +1103,69 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 
 #endif
+	
+	{
+		//Building Free Units
+		std::string strKey("Building_FreeUnits_MaxRow");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select count(*) from Building_FreeUnits where BuildingType = ?");
+		}
+		pResults->Bind(1, szBuildingType);
+		pResults->Step();
+		m_iNumFreeUnit = pResults->GetInt(0);
+		pResults->Reset();
+
+		//Building Free Spec Units
+		std::string strKey2("Building_FreeSpecUnits_MaxRow");
+		pResults = kUtility.GetResults(strKey2);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey2, "select count(*) from Building_FreeSpecUnits where BuildingType = ?");
+		}
+		pResults->Bind(1, szBuildingType);
+		pResults->Step();
+		m_iNumFreeUnitTotal = m_iNumFreeUnit;
+		m_iNumFreeUnitTotal += pResults->GetInt(0);
+		pResults->Reset();
+
+		m_pFreeUnits = new std::pair<UnitTypes, int>[m_iNumFreeUnitTotal];
+	}
+	{
+		std::string strKey("Building_FreeUnits");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Units.ID as UnitID, NumUnits from Building_FreeUnits inner join Units on Units.Type = UnitType where BuildingType = ?");
+		}
+		pResults->Bind(1, szBuildingType);
+		int idx = 0;
+		while (pResults->Step())
+		{
+			const int UnitID = pResults->GetInt(0);
+			const int iUnitNum = pResults->GetInt(1);
+			m_pFreeUnits[idx] = std::make_pair((UnitTypes)UnitID, iUnitNum);
+			idx++;
+		}
+		pResults->Reset();
+
+		std::string strKey2("Building_FreeSpecUnits");
+		pResults = kUtility.GetResults(strKey2);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey2, "select Units.ID as UnitID, NumUnits from Building_FreeSpecUnits inner join Units on Units.Type = UnitType where BuildingType = ?");
+		}
+		pResults->Bind(1, szBuildingType);
+		while (pResults->Step())
+		{
+			const int UnitID = pResults->GetInt(0);
+			const int iUnitNum = pResults->GetInt(1);
+			m_pFreeUnits[idx] = std::make_pair((UnitTypes)UnitID, iUnitNum);
+			idx++;
+		}
+		pResults->Reset();
+	}
 
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
 	//Buildings enable city to purchase units.
@@ -929,6 +1293,30 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 		}
 	}
 
+
+	//ResourceYieldModifiers
+	{
+		kUtility.Initialize2DArray(m_ppaiImprovementYieldModifier, "Improvements", "Yields");
+
+		std::string strKey("Building_ImprovementYieldModifiers");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Improvements.ID as ImprovementID, Yields.ID as YieldID, Yield from Building_ImprovementYieldModifiers inner join Improvements on Improvements.Type = ImprovementType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int ImprovementID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiImprovementYieldModifier[ImprovementID][YieldID] = yield;
+		}
+	}
+
 	//ResourceYieldModifiers
 	{
 		kUtility.Initialize2DArray(m_ppaiResourceYieldModifier, "Resources", "Yields");
@@ -998,6 +1386,58 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 			m_ppiBuildingClassYieldModifiers[BuildingClassID][iYieldID] = iYieldModifier;
 		}
+	}
+
+
+	//BuildingClassLocalYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppiBuildingClassLocalYieldChanges, "BuildingClasses", "Yields");
+
+		std::string strKey("Building_BuildingClassLocalYieldChanges");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select BuildingClasses.ID as BuildingClassID, Yields.ID as YieldID, YieldChange from Building_BuildingClassLocalYieldChanges inner join BuildingClasses on BuildingClasses.Type = BuildingClassType inner join Yields on Yields.Type = YieldType where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int BuildingClassID = pResults->GetInt(0);
+			const int iYieldID = pResults->GetInt(1);
+			const int iYieldChange = pResults->GetInt(2);
+
+			m_ppiBuildingClassLocalYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
+		}
+	}
+#endif
+
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+	//Building_ResourceFromImprovement
+	{
+		std::string strKey("Building_ResourceFromImprovement");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Resources.ID as ResourcesID, Improvements.ID as ImprovementsID, Value from Building_ResourceFromImprovement inner join Resources on Resources.Type = ResourceType inner join Improvements on ImprovementType = Improvements.Type where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const int iResource = pResults->GetInt(0);
+			const int iImprovement = pResults->GetInt(1);
+			const int iValue = pResults->GetInt(2);
+
+			m_piiResourceFromImprovement.insert(std::make_pair(iResource, std::make_pair(iImprovement, iValue)));
+		}
+
+		pResults->Reset();
+
+		//Trim extra memory off container since this is mostly read-only.
+		std::multimap<int, std::pair<int, int>>(m_piiResourceFromImprovement).swap(m_piiResourceFromImprovement);
 	}
 #endif
 
@@ -1090,6 +1530,30 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 			}
 		}
 		pResults->Reset();
+	}
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+	m_bEnableAllCityScaleGrowth = kResults.GetBool("EnableAllCityScaleGrowth");
+	auto* strCityScale = kResults.GetText("EnableCityScaleGrowth");
+	if (strCityScale != nullptr)
+	{
+		int len = strlen(strCityScale);
+		if (len > 0)
+		{
+			std::string strKey("Building_EnableCityScaleGrowth");
+			Database::Results* pResults = kUtility.GetResults(strKey);
+			if (pResults == NULL)
+			{
+				pResults = kUtility.PrepareResults(strKey, "select ID from CityScales where Type = ?");
+			}
+
+			pResults->Bind(1, strCityScale);
+			if (pResults->Step())
+			{
+				m_eEnableCityScaleGrowth = (CityScaleTypes)pResults->GetInt(0);
+			}
+		}
 	}
 #endif
 
@@ -1261,6 +1725,18 @@ int CvBuildingEntry::GetFreeBuildingThisCity() const
 int CvBuildingEntry::GetFreePromotion() const
 {
 	return m_iFreePromotion;
+}
+
+/// Does this building give all units a promotion for free instantly?
+int CvBuildingEntry::GetFreePromotion2() const
+{
+	return m_iFreePromotion2;
+}
+
+/// Does this building give all units a promotion for free instantly?
+int CvBuildingEntry::GetFreePromotion3() const
+{
+	return m_iFreePromotion3;
 }
 
 /// Does this building give units a promotion when trained from this city?
@@ -1560,6 +2036,16 @@ int CvBuildingEntry::GetPopulationChange() const
 	return m_iPopulationChange;
 }
 
+int CvBuildingEntry::GetMinorCivFriendship() const
+{
+	return m_iMinorCivFriendship;
+}
+
+int CvBuildingEntry::GetLiberatedInfluence() const
+{
+	return m_iLiberatedInfluence;
+}
+
 int CvBuildingEntry::GetResetDamageValue() const
 {
 	return m_iResetDamageValue;
@@ -1570,6 +2056,58 @@ int CvBuildingEntry::GetReduceDamageValue() const
 	return m_iReduceDamageValue;
 }
 
+
+
+int CvBuildingEntry::GetWaterTileDamage() const
+{
+	return m_iWaterTileDamage;
+}
+
+int CvBuildingEntry::GetWaterTileMovementReduce() const
+{
+	return m_iWaterTileMovementReduce;
+}
+
+
+
+int CvBuildingEntry::GetWaterTileTurnDamage() const
+{
+	return m_iWaterTileTurnDamage;
+}
+
+int CvBuildingEntry::GetLandTileDamage() const
+{
+	return m_iLandTileDamage;
+}
+
+int CvBuildingEntry::GetLandTileMovementReduce() const
+{
+	return m_iLandTileMovementReduce;
+}
+
+int CvBuildingEntry::GetLandTileTurnDamage() const
+{
+	return m_iLandTileTurnDamage;
+}
+#endif
+
+#ifdef MOD_PROMOTION_CITY_DESTROYER
+int CvBuildingEntry::GetSiegeKillCitizensModifier() const
+{
+	return m_iSiegeKillCitizensModifier;
+}
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvBuildingEntry::GetCorruptionScoreChange() const
+{
+	return m_iCorruptionScoreChange;
+}
+
+int CvBuildingEntry::GetCorruptionLevelChange() const
+{
+	return m_iCorruptionLevelChange;
+}
 #endif
 
 
@@ -1897,8 +2435,17 @@ bool CvBuildingEntry::IsPurchaseOnly() const
 {
 	return m_bPurchaseOnly;
 }
+
+bool CvBuildingEntry::IsHumanOnly() const
+{
+	return m_bHumanOnly;
+}
 #endif
 
+bool CvBuildingEntry::IsMoveAfterCreated() const
+{
+	return m_bMoveAfterCreated;
+}
 
 
 #if defined(MOD_ROG_CORE)
@@ -2093,6 +2640,15 @@ bool CvBuildingEntry::IsScienceBuilding() const
 		bRtnValue = true;
 	}
 
+#if defined(MOD_ROG_CORE)
+	else if (GetYieldModifierFromWonder(YIELD_SCIENCE) > 0)
+	{
+		bRtnValue = true;
+	}
+
+#endif
+	
+
 	return bRtnValue;
 }
 
@@ -2166,8 +2722,46 @@ int* CvBuildingEntry::GetYieldChangePerPopArray() const
 	return m_piYieldChangePerPop;
 }
 
+int CvBuildingEntry::GetYieldFromInternal(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromInternal[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromInternalArray() const
+{
+	return m_piYieldFromInternal;
+}
+
+/// Does this Policy grant yields from constructing buildings?
+int CvBuildingEntry::GetYieldFromProcessModifier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromProcessModifier[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromProcessModifierArray() const
+{
+	return m_piYieldFromProcessModifier;
+}
+
+int CvBuildingEntry::GetYieldFromProcessModifierGlobal(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromProcessModifierGlobal[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromProcessModifierArrayGlobal() const
+{
+	return m_piYieldFromProcessModifierGlobal;
+}
+
 
 #if defined(MOD_ROG_CORE)
+
 /// Change to yield by type
 int CvBuildingEntry::GetYieldChangePerPopInEmpire(int i) const
 {
@@ -2211,6 +2805,112 @@ int* CvBuildingEntry::GetYieldModifierArray() const
 {
 	return m_piYieldModifier;
 }
+
+
+#if defined(MOD_ROG_CORE)
+/// Does this  grant yields from constructing buildings?
+int CvBuildingEntry::GetYieldFromConstruction(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromConstruction[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromConstructionArray() const
+{
+	return m_piYieldFromConstruction;
+}
+
+int CvBuildingEntry::GetYieldFromUnitProduction(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromUnitProduction[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromUnitProductionArray() const
+{
+	return m_piYieldFromUnitProduction;
+}
+
+int CvBuildingEntry::GetYieldFromBirth(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromBirth[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromBirthArray() const
+{
+	return m_piYieldFromBirth;
+}
+
+int CvBuildingEntry::GetYieldFromBorderGrowth(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromBorderGrowth[i];
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromBorderGrowthArray() const
+{
+	return m_piYieldFromBorderGrowth;
+}
+
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillage(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillage ? m_piYieldFromPillage[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageArray() const
+{
+	return m_piYieldFromPillage;
+}
+
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillageGlobal(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillageGlobal ? m_piYieldFromPillageGlobal[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageGlobalArray() const
+{
+	return m_piYieldFromPillageGlobal;
+}
+
+/// Change to yield if pillaging
+int CvBuildingEntry::GetYieldFromPillageGlobalPlayer(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromPillageGlobalPlayer ? m_piYieldFromPillageGlobalPlayer[i] : -1;
+}
+/// Array of yield changes
+int* CvBuildingEntry::GetYieldFromPillageGlobalPlayerArray() const
+{
+	return m_piYieldFromPillageGlobalPlayer;
+}
+
+int CvBuildingEntry::GetYieldModifierFromWonder(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldModifierFromWonder ? m_piYieldModifierFromWonder[i] : -1;
+}
+
+/// Array of yield modifiers
+int* CvBuildingEntry::GetYieldModifierFromWonderArray() const
+{
+	return m_piYieldModifierFromWonder;
+}
+#endif
+
+
 
 /// Modifier to yield by type in area
 int CvBuildingEntry::GetAreaYieldModifier(int i) const
@@ -2342,6 +3042,43 @@ int CvBuildingEntry::GetDomainFreeExperiencePerGreatWork(int i) const
 	return m_piDomainFreeExperiencePerGreatWork ? m_piDomainFreeExperiencePerGreatWork[i] : -1;
 }
 
+#if defined(MOD_ROG_CORE)
+/// Free experience gained for units in this domain for each Great Work in this building
+int CvBuildingEntry::GetDomainFreeExperiencePerGreatWorkGlobal(int i) const
+{
+	CvAssertMsg(i < NUM_DOMAIN_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piDomainFreeExperiencePerGreatWorkGlobal ? m_piDomainFreeExperiencePerGreatWorkGlobal[i] : -1;
+}
+
+/// Free experience gained for units in this domain (global)
+int CvBuildingEntry::GetDomainFreeExperienceGlobal(int i) const
+{
+	CvAssertMsg(i < NUM_DOMAIN_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+
+	std::map<int, int>::const_iterator it = m_piDomainFreeExperienceGlobal.find(i);
+	if (it != m_piDomainFreeExperienceGlobal.end()) // find returns the iterator to map::end if the key i is not present in the map
+	{
+		return it->second;
+	}
+	return 0;
+}
+
+int CvBuildingEntry::GetUnitTypePrmoteHealGlobal(int i) const
+{
+	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+
+	std::map<int, int>::const_iterator it = m_piUnitTypePrmoteHealGlobal.find(i);
+	if (it != m_piUnitTypePrmoteHealGlobal.end()) // find returns the iterator to map::end if the key i is not present in the map
+	{
+		return it->second;
+	}
+	return 0;
+}
+#endif
+
 /// Production modifier in this domain
 int CvBuildingEntry::GetDomainProductionModifier(int i) const
 {
@@ -2446,8 +3183,27 @@ int CvBuildingEntry::GetHurryModifier(int i) const
 	return m_paiHurryModifier ? m_paiHurryModifier[i] : -1;
 }
 
+#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
+/// Instant yield
+int CvBuildingEntry::GetInstantYield(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piInstantYield ? m_piInstantYield[i] : 0;
+}
 
-#if defined(MOD_ROG_CORE)
+/// Array of instant yields
+int* CvBuildingEntry::GetInstantYieldArray() const
+{
+	return m_piInstantYield;
+}
+/// Array of instant yields
+bool CvBuildingEntry::IsAllowInstantYield() const
+{
+	return m_bAllowInstantYield;
+}
+#endif
+
 // Resource provided by Population
 int CvBuildingEntry::GetResourceQuantityFromPOP(int i) const
 {
@@ -2455,9 +3211,9 @@ int CvBuildingEntry::GetResourceQuantityFromPOP(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piResourceQuantityFromPOP ? m_piResourceQuantityFromPOP[i] : -1;
 }
-#endif
 
-#if defined(MOD_ROG_CORE)
+
+
 int CvBuildingEntry::GetYieldChangeWorldWonder(int i) const
 {
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
@@ -2470,10 +3226,8 @@ int CvBuildingEntry::GetYieldChangeWorldWonderGlobal(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piYieldChangeWorldWonderGlobal ? m_piYieldChangeWorldWonderGlobal[i] : 0;
 }
-#endif
 
 
-#if defined(MOD_ROG_CORE)
 /// Change to Improvement yield by type
 int CvBuildingEntry::GetImprovementYieldChange(int i, int j) const
 {
@@ -2513,6 +3267,63 @@ int* CvBuildingEntry::GetImprovementYieldChangeGlobalArray(int i) const
 	return m_ppaiImprovementYieldChangeGlobal[i];
 }
 
+
+/// Change to Improvement yield by type
+int CvBuildingEntry::GetFeatureYieldChangesGlobal(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppiFeatureYieldChangesGlobal[i][j];  
+}
+
+
+int CvBuildingEntry::GetTerrainYieldChangesGlobal(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppiTerrainYieldChangesGlobal[i][j];
+}
+
+/// Change to Terrain yield by type
+int CvBuildingEntry::GetYieldPerXTerrain(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiYieldPerXTerrain ? m_ppaiYieldPerXTerrain[i][j] : -1;
+}
+
+/// Array of changes to Feature yield
+int* CvBuildingEntry::GetYieldPerXTerrainArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiYieldPerXTerrain[i];
+}
+
+int CvBuildingEntry::GetYieldPerXFeature(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiYieldPerXFeature ? m_ppaiYieldPerXFeature[i][j] : -1;
+}
+
+/// Array of changes to Feature yield
+int* CvBuildingEntry::GetYieldPerXFeatureArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiYieldPerXFeature[i];
+}
+
+
 /// Change to specialist yield by type
 int CvBuildingEntry::GetSpecialistYieldChangeLocal(int i, int j) const
 {
@@ -2549,10 +3360,8 @@ int CvBuildingEntry::GetResourceYieldChangeGlobal(int iResource, int iYieldType)
 
 	return 0;
 }
-#endif
 
 
-#if defined(MOD_ROG_CORE)
 /// Yield change for a specific BuildingClass by yield type
 int CvBuildingEntry::GetBuildingClassYieldModifier(int i, int j) const
 {
@@ -2562,8 +3371,27 @@ int CvBuildingEntry::GetBuildingClassYieldModifier(int i, int j) const
 	CvAssertMsg(j > -1, "Index out of bounds");
 	return m_ppiBuildingClassYieldModifiers[i][j];
 }
-#endif
 
+/// Yield change for a specific BuildingClass by yield type
+int CvBuildingEntry::GetBuildingClassLocalYieldChange(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumBuildingClassInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppiBuildingClassLocalYieldChanges[i][j];
+}
+
+#if defined(MOD_ROG_CORE)
+
+int CvBuildingEntry::GetSpecificGreatPersonRateModifier(int i) const
+{
+	CvAssertMsg(i < GC.getNumSpecialistInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_paiSpecificGreatPersonRateModifier ? m_paiSpecificGreatPersonRateModifier[i] : -1;
+}
+
+#endif
 
 /// Can it only built if there is a building of this class in the city?
 bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
@@ -2573,12 +3401,42 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 	return m_pbBuildingClassNeededInCity ? m_pbBuildingClassNeededInCity[i] : false;
 }
 
-/// Free units which appear near the capital
-int CvBuildingEntry::GetNumFreeUnits(int i) const
+#if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvBuildingEntry::GetTradeRouteSeaGoldBonusGlobal() const
 {
-	CvAssertMsg(i < GC.getNumUnitInfos(), "Index out of bounds");
+	return m_iTradeRouteSeaGoldBonusGlobal;
+}
+
+int CvBuildingEntry::GetTradeRouteLandGoldBonusGlobal() const
+{
+	return m_iTradeRouteLandGoldBonusGlobal;
+}
+
+bool CvBuildingEntry::IsAnyWater() const
+{
+	return m_bAnyWater;
+}
+/// Can it only built if there is a building of this class Global?
+bool CvBuildingEntry::IsBuildingClassNeededGlobal(int i) const
+{
+	CvAssertMsg(i < GC.getNumBuildingClassInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
-	return m_piNumFreeUnits ? m_piNumFreeUnits[i] : -1;
+	return m_pbBuildingClassNeededGlobal ? m_pbBuildingClassNeededGlobal[i] : false;
+}
+#endif
+
+/// Free units which appear near city
+int CvBuildingEntry::GetNumFreeUnit() const
+{
+	return m_iNumFreeUnit;
+}
+int CvBuildingEntry::GetNumFreeUnitTotal() const
+{
+	return m_iNumFreeUnitTotal;
+}
+std::pair<UnitTypes, int>* CvBuildingEntry::GetFreeUnits() const
+{
+	return m_pFreeUnits;
 }
 
 /// Change to Resource yield by type
@@ -2633,6 +3491,25 @@ int* CvBuildingEntry::GetSpecialistYieldChangeArray(int i) const
 	CvAssertMsg(i < GC.getNumSpecialistInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_ppaiSpecialistYieldChange[i];
+}
+
+
+/// Modifier to Improvement yield
+int CvBuildingEntry::GetImprovementYieldModifier(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumImprovementInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiImprovementYieldModifier ? m_ppaiImprovementYieldModifier[i][j] : -1;
+}
+
+/// Array of modifiers to Improvement yield
+int* CvBuildingEntry::GetImprovementYieldModifierArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumImprovementInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiImprovementYieldModifier[i];
 }
 
 /// Modifier to resource yield
@@ -2713,6 +3590,13 @@ int CvBuildingEntry::GetBuildingClassHappiness(int i) const
 	return m_paiBuildingClassHappiness ? m_paiBuildingClassHappiness[i] : -1;
 }
 
+#if defined(MOD_BUILDING_IMPROVEMENT_RESOURCES)
+std::multimap<int, std::pair<int, int>> CvBuildingEntry::GetResourceFromImprovementArray() const
+{
+	return m_piiResourceFromImprovement;
+}
+#endif
+
 CvThemingBonusInfo *CvBuildingEntry::GetThemingBonusInfo(int i) const
 {
 	CvAssertMsg(i < MAX_THEMING_BONUSES, "Index out of bounds");
@@ -2753,6 +3637,17 @@ bool CvBuildingEntry::HasYieldFromOtherYield() const
 	return m_bHasYieldFromOtherYield;
 }
 
+#endif
+
+#ifdef MOD_GLOBAL_CITY_SCALES
+CityScaleTypes CvBuildingEntry::GetEnableCityScaleGrowth() const
+{
+	return m_eEnableCityScaleGrowth;
+}
+bool CvBuildingEntry::GetEnableAllCityScaleGrowth() const
+{
+	return m_bEnableAllCityScaleGrowth;
+}
 #endif
 
 std::pair<UnitClassTypes, int>* CvBuildingEntry::GetAllowPurchaseUnitsByYieldType(YieldTypes iType) {
@@ -3159,6 +4054,17 @@ int CvCityBuildings::GetTotalBaseBuildingMaintenance() const
 		}
 	}
 
+	for (int iProjectLoop = 0; iProjectLoop < GC.getNumProjectInfos(); iProjectLoop++)
+	{
+		const ProjectTypes eProject = static_cast<ProjectTypes>(iProjectLoop);
+		CvProjectEntry* pkProject = GC.getProjectInfo(eProject);
+
+		if (pkProject && pkProject->GetGoldMaintenance() > 0)
+		{
+			iTotalCost += (m_pCity->getProjectCount(eProject) * pkProject->GetGoldMaintenance());
+		}
+	}
+
 	return iTotalCost;
 }
 
@@ -3302,70 +4208,68 @@ void CvCityBuildings::SetNumRealBuildingTimed(BuildingTypes eIndex, int iNewValu
 	CvAssertMsg(eIndex < m_pBuildings->GetNumBuildings(), "eIndex expected to be < m_pBuildings->GetNumBuildings()");
 
 	int iChangeNumRealBuilding = iNewValue - GetNumRealBuilding(eIndex);
+	if (iChangeNumRealBuilding == 0)
+	{
+		return;
+	}
 
 	CvBuildingEntry* buildingEntry = GC.getBuildingInfo(eIndex);
+	if (buildingEntry == nullptr)
+	{
+		return;
+	}
+
 	const BuildingClassTypes buildingClassType = (BuildingClassTypes) buildingEntry->GetBuildingClassType();
 	const CvBuildingClassInfo& kBuildingClassInfo = buildingEntry->GetBuildingClassInfo();
 
-	if(iChangeNumRealBuilding != 0)
+	int iOldNumBuilding = GetNumRealBuilding(eIndex);
+	m_paiNumRealBuilding[eIndex] = iNewValue;
+
+	if (GetNumRealBuilding(eIndex) > 0)
 	{
-		int iOldNumBuilding = GetNumBuilding(eIndex);
+		SetBuildingOriginalOwner(eIndex, eOriginalOwner);
+		SetBuildingOriginalTime(eIndex, iOriginalTime);
+	}
+	else
+	{
+		SetBuildingOriginalOwner(eIndex, NO_PLAYER);
+		SetBuildingOriginalTime(eIndex, MIN_INT);
+	}
 
-		m_paiNumRealBuilding[eIndex] = iNewValue;
+	// Process building effects
+	m_pCity->processBuilding(eIndex, iChangeNumRealBuilding, bFirst);
 
-		if(GetNumRealBuilding(eIndex) > 0)
-		{
-			SetBuildingOriginalOwner(eIndex, eOriginalOwner);
-			SetBuildingOriginalTime(eIndex, iOriginalTime);
-		}
-		else
-		{
-			SetBuildingOriginalOwner(eIndex, NO_PLAYER);
-			SetBuildingOriginalTime(eIndex, MIN_INT);
-		}
-
-		// Process building effects
-		if(iOldNumBuilding != GetNumBuilding(eIndex))
-		{
-			m_pCity->processBuilding(eIndex, iChangeNumRealBuilding, bFirst);
-		}
-
-		// Maintenance cost
-		if(buildingEntry->GetGoldMaintenance() != 0)
-		{
-			pPlayer->GetTreasury()->ChangeBaseBuildingGoldMaintenance(buildingEntry->GetGoldMaintenance() * iChangeNumRealBuilding);
-		}
+	// Maintenance cost
+	if (buildingEntry->GetGoldMaintenance() != 0)
+	{
+		pPlayer->GetTreasury()->ChangeBaseBuildingGoldMaintenance(buildingEntry->GetGoldMaintenance() * iChangeNumRealBuilding);
+	}
 
 #if !defined(NO_ACHIEVEMENTS)
-		//Achievement for Temples
-		const char* szBuildingTypeC = buildingEntry->GetType();
-		CvString szBuildingType = szBuildingTypeC;
-		if(szBuildingType == "BUILDING_TEMPLE")
+	// Achievement for Temples
+	const char *szBuildingTypeC = buildingEntry->GetType();
+	CvString szBuildingType = szBuildingTypeC;
+	if (szBuildingType == "BUILDING_TEMPLE")
+	{
+		if (m_pCity->getOwner() == GC.getGame().getActivePlayer())
 		{
-			if(m_pCity->getOwner() == GC.getGame().getActivePlayer())
-			{
-				gDLL->IncrementSteamStatAndUnlock(ESTEAMSTAT_TEMPLES, 1000, ACHIEVEMENT_1000TEMPLES);
-			}
+			gDLL->IncrementSteamStatAndUnlock(ESTEAMSTAT_TEMPLES, 1000, ACHIEVEMENT_1000TEMPLES);
 		}
+	}
 #endif
 
-		if(buildingEntry->GetPreferredDisplayPosition() > 0)
-		{
-			auto_ptr<ICvCity1> pDllCity(new CvDllCity(m_pCity));
+	if (buildingEntry->GetPreferredDisplayPosition() > 0)
+	{
+		auto_ptr<ICvCity1> pDllCity(new CvDllCity(m_pCity));
 
-			if(iNewValue > 0)
+		if (iNewValue > 0)
+		{
+			// if this is a WW that (likely has a half-built state)
+			if (isWorldWonderClass(kBuildingClassInfo))
 			{
-				// if this is a WW that (likely has a half-built state)
-				if(isWorldWonderClass(kBuildingClassInfo))
+				if (GetBuildingProduction(eIndex))
 				{
-					if(GetBuildingProduction(eIndex))
-					{
-						GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_EDITED, pDllCity.get(), eIndex, 1);
-					}
-					else
-					{
-						GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_CREATED, pDllCity.get(), eIndex, 1);
-					}
+					GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_EDITED, pDllCity.get(), eIndex, 1);
 				}
 				else
 				{
@@ -3374,162 +4278,165 @@ void CvCityBuildings::SetNumRealBuildingTimed(BuildingTypes eIndex, int iNewValu
 			}
 			else
 			{
-				GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_REMOVED, pDllCity.get(), eIndex, 0);
+				GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_CREATED, pDllCity.get(), eIndex, 1);
 			}
 		}
-
-		if(!(kBuildingClassInfo.isNoLimit()))
+		else
 		{
-			if(isWorldWonderClass(kBuildingClassInfo))
+			GC.GetEngineUserInterface()->AddDeferredWonderCommand(WONDER_REMOVED, pDllCity.get(), eIndex, 0);
+		}
+	}
+
+	if (!(kBuildingClassInfo.isNoLimit()))
+	{
+		if (isWorldWonderClass(kBuildingClassInfo))
+		{
+			m_pCity->changeNumWorldWonders(iChangeNumRealBuilding);
+			pPlayer->ChangeNumWonders(iChangeNumRealBuilding);
+		}
+		else if (isTeamWonderClass(kBuildingClassInfo))
+		{
+			m_pCity->changeNumTeamWonders(iChangeNumRealBuilding);
+		}
+		else if (isNationalWonderClass(kBuildingClassInfo))
+		{
+			m_pCity->changeNumNationalWonders(iChangeNumRealBuilding);
+			if (m_pCity->isHuman() && !GC.getGame().isGameMultiPlayer())
 			{
-				m_pCity->changeNumWorldWonders(iChangeNumRealBuilding);
-				pPlayer->ChangeNumWonders(iChangeNumRealBuilding);
+				IncrementWonderStats(buildingClassType);
 			}
-			else if(isTeamWonderClass(kBuildingClassInfo))
+		}
+		else
+		{
+			ChangeNumBuildings(iChangeNumRealBuilding);
+		}
+	}
+
+	if (buildingEntry->IsCityWall())
+	{
+		auto_ptr<ICvPlot1> pDllPlot(new CvDllPlot(m_pCity->plot()));
+		gDLL->GameplayWallCreated(pDllPlot.get());
+	}
+
+	// Update the amount of a Resource used up by this Building
+	int iNumResources = GC.getNumResourceInfos();
+	for (int iResourceLoop = 0; iResourceLoop < iNumResources; iResourceLoop++)
+	{
+		if (buildingEntry->GetResourceQuantityRequirement(iResourceLoop) > 0)
+		{
+			pPlayer->changeNumResourceUsed((ResourceTypes)iResourceLoop, iChangeNumRealBuilding * buildingEntry->GetResourceQuantityRequirement(iResourceLoop));
+		}
+	}
+
+	if (iChangeNumRealBuilding > 0)
+	{
+		if (bFirst)
+		{
+			if (GC.getGame().isFinalInitialized() /* && !(gDLL->GetWorldBuilderMode() )*/)
 			{
-				m_pCity->changeNumTeamWonders(iChangeNumRealBuilding);
-			}
-			else if(isNationalWonderClass(kBuildingClassInfo))
-			{
-				m_pCity->changeNumNationalWonders(iChangeNumRealBuilding);
-				if(m_pCity->isHuman() && !GC.getGame().isGameMultiPlayer())
+				// World Wonder Notification
+				if (isWorldWonderClass(kBuildingClassInfo))
 				{
-					IncrementWonderStats(buildingClassType);
-				}
-			}
-			else
-			{
-				ChangeNumBuildings(iChangeNumRealBuilding);
-			}
-		}
+					Localization::String localizedText = Localization::Lookup("TXT_KEY_MISC_COMPLETES_WONDER");
+					localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
+					GC.getGame().addReplayMessage(REPLAY_MESSAGE_MAJOR_EVENT, m_pCity->getOwner(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY());
 
-		if(buildingEntry->IsCityWall())
-		{
-			auto_ptr<ICvPlot1> pDllPlot(new CvDllPlot(m_pCity->plot()));
-			gDLL->GameplayWallCreated(pDllPlot.get());
-		}
+					bool bDontShowRewardPopup = GC.GetEngineUserInterface()->IsOptionNoRewardPopups();
 
-		// Update the amount of a Resource used up by this Building
-		int iNumResources = GC.getNumResourceInfos();
-		for(int iResourceLoop = 0; iResourceLoop < iNumResources; iResourceLoop++)
-		{
-			if(buildingEntry->GetResourceQuantityRequirement(iResourceLoop) > 0)
-			{
-				pPlayer->changeNumResourceUsed((ResourceTypes) iResourceLoop, iChangeNumRealBuilding * buildingEntry->GetResourceQuantityRequirement(iResourceLoop));
-			}
-		}
-
-		if(iChangeNumRealBuilding > 0)
-		{
-			if(bFirst)
-			{
-				if(GC.getGame().isFinalInitialized()/* && !(gDLL->GetWorldBuilderMode() )*/)
-				{
-					// World Wonder Notification
-					if(isWorldWonderClass(kBuildingClassInfo))
-					{
-						Localization::String localizedText = Localization::Lookup("TXT_KEY_MISC_COMPLETES_WONDER");
-						localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
-						GC.getGame().addReplayMessage(REPLAY_MESSAGE_MAJOR_EVENT, m_pCity->getOwner(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY());
-
-						bool bDontShowRewardPopup = GC.GetEngineUserInterface()->IsOptionNoRewardPopups();
-
-						// Notification in MP games
+					// Notification in MP games
 #if defined(MOD_API_EXTENSIONS)
-						if(bDontShowRewardPopup || GC.getGame().isReallyNetworkMultiPlayer())
+					if (bDontShowRewardPopup || GC.getGame().isReallyNetworkMultiPlayer())
 #else
-						if(bDontShowRewardPopup || GC.getGame().isNetworkMultiPlayer())	// KWG: Candidate for !GC.getGame().IsOption(GAMEOPTION_SIMULTANEOUS_TURNS)
+					if (bDontShowRewardPopup || GC.getGame().isNetworkMultiPlayer()) // KWG: Candidate for !GC.getGame().IsOption(GAMEOPTION_SIMULTANEOUS_TURNS)
 #endif
+					{
+						CvNotifications *pNotifications = GET_PLAYER(m_pCity->getOwner()).GetNotifications();
+						if (pNotifications)
 						{
-							CvNotifications* pNotifications = GET_PLAYER(m_pCity->getOwner()).GetNotifications();
-							if(pNotifications)
-							{
-								localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED");
-								localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
-								pNotifications->Add(NOTIFICATION_WONDER_COMPLETED_ACTIVE_PLAYER, localizedText.toUTF8(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY(), eIndex, pPlayer->GetID());
-							}
+							localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED");
+							localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
+							pNotifications->Add(NOTIFICATION_WONDER_COMPLETED_ACTIVE_PLAYER, localizedText.toUTF8(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY(), eIndex, pPlayer->GetID());
 						}
-						// Popup in SP games
-						else
+					}
+					// Popup in SP games
+					else
+					{
+						if (m_pCity->getOwner() == GC.getGame().getActivePlayer())
 						{
-							if(m_pCity->getOwner() == GC.getGame().getActivePlayer())
-							{
-								CvPopupInfo kPopup(BUTTONPOPUP_WONDER_COMPLETED_ACTIVE_PLAYER, eIndex);
-								GC.GetEngineUserInterface()->AddPopup(kPopup);
+							CvPopupInfo kPopup(BUTTONPOPUP_WONDER_COMPLETED_ACTIVE_PLAYER, eIndex);
+							GC.GetEngineUserInterface()->AddPopup(kPopup);
 
 #if !defined(NO_ACHIEVEMENTS)
-								if(GET_PLAYER(GC.getGame().getActivePlayer()).isHuman())
-								{
-									gDLL->UnlockAchievement(ACHIEVEMENT_BUILD_WONDER);
-
-									//look to see if all wonders have been built to unlock the other one
-									IncrementWonderStats(buildingClassType);
-
-								}
-#endif
-							}
-						}
-
-						// Wonder notification for all other players
-						for(int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
-						{
-							CvPlayerAI& thisPlayer = GET_PLAYER((PlayerTypes)iI);
-							if(thisPlayer.isAlive())
+							if (GET_PLAYER(GC.getGame().getActivePlayer()).isHuman())
 							{
-								// Owner already got his messaging
-								if(iI != m_pCity->getOwner())
-								{
-									// If the builder is met, and the city is revealed
-									// Special case for DLC_06 Scenario: Always show the more informative notification
-									if((m_pCity->plot()->isRevealed(thisPlayer.getTeam()) && GET_TEAM(thisPlayer.getTeam()).isHasMet(m_pCity->getTeam())) || gDLL->IsModActivated(CIV5_DLC_06_SCENARIO_MODID))
-									{
-										CvNotifications* pNotifications = thisPlayer.GetNotifications();
-										if(pNotifications)
-										{
-											localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED");
-											localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
-											pNotifications->Add(NOTIFICATION_WONDER_COMPLETED, localizedText.toUTF8(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY(), eIndex, pPlayer->GetID());
-										}
-									}
-									else
-									{
-										CvNotifications* pNotifications = thisPlayer.GetNotifications();
-										if(pNotifications)
-										{
-											localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED_UNKNOWN");
-											localizedText <<  buildingEntry->GetTextKey();
-											pNotifications->Add(NOTIFICATION_WONDER_COMPLETED, localizedText.toUTF8(), localizedText.toUTF8(), -1, -1, eIndex, -1);
-										}
-									}
-								}
-							}
+								gDLL->UnlockAchievement(ACHIEVEMENT_BUILD_WONDER);
 
-#if !defined(NO_ACHIEVEMENTS)
-							//Achievements!
-							if(pPlayer->GetID() == GC.getGame().getActivePlayer() && strcmp(buildingEntry->GetType(), "BUILDING_GREAT_FIREWALL") == 0)
-							{
-								gDLL->UnlockAchievement(ACHIEVEMENT_XP1_16);
+								// look to see if all wonders have been built to unlock the other one
+								IncrementWonderStats(buildingClassType);
 							}
 #endif
 						}
 					}
-				}
 
-				GC.getGame().incrementBuildingClassCreatedCount(buildingClassType);
-			}
-		}
-
-		m_pCity->updateStrengthValue();
-
-		// Building might affect City Banner stats
-		auto_ptr<ICvCity1> pCity = GC.WrapCityPointer(m_pCity);
-		GC.GetEngineUserInterface()->SetSpecificCityInfoDirty(pCity.get(), CITY_UPDATE_TYPE_BANNER);
+					// Wonder notification for all other players
+					for (int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
+					{
+						CvPlayerAI &thisPlayer = GET_PLAYER((PlayerTypes)iI);
+						if (thisPlayer.isAlive())
+						{
+							// Owner already got his messaging
+							if (iI != m_pCity->getOwner())
+							{
+								// If the builder is met, and the city is revealed
+								// Special case for DLC_06 Scenario: Always show the more informative notification
+								if ((m_pCity->plot()->isRevealed(thisPlayer.getTeam()) && GET_TEAM(thisPlayer.getTeam()).isHasMet(m_pCity->getTeam())) || gDLL->IsModActivated(CIV5_DLC_06_SCENARIO_MODID))
+								{
+									CvNotifications *pNotifications = thisPlayer.GetNotifications();
+									if (pNotifications)
+									{
+										localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED");
+										localizedText << pPlayer->getNameKey() << buildingEntry->GetTextKey();
+										pNotifications->Add(NOTIFICATION_WONDER_COMPLETED, localizedText.toUTF8(), localizedText.toUTF8(), m_pCity->getX(), m_pCity->getY(), eIndex, pPlayer->GetID());
+									}
+								}
+								else
+								{
+									CvNotifications *pNotifications = thisPlayer.GetNotifications();
+									if (pNotifications)
+									{
+										localizedText = Localization::Lookup("TXT_KEY_MISC_WONDER_COMPLETED_UNKNOWN");
+										localizedText << buildingEntry->GetTextKey();
+										pNotifications->Add(NOTIFICATION_WONDER_COMPLETED, localizedText.toUTF8(), localizedText.toUTF8(), -1, -1, eIndex, -1);
+									}
+								}
+							}
+						}
 
 #if !defined(NO_ACHIEVEMENTS)
-		//Test for any achievements being unlocked.
-		pPlayer->GetPlayerAchievements().FinishedBuilding(m_pCity, eIndex);
+						// Achievements!
+						if (pPlayer->GetID() == GC.getGame().getActivePlayer() && strcmp(buildingEntry->GetType(), "BUILDING_GREAT_FIREWALL") == 0)
+						{
+							gDLL->UnlockAchievement(ACHIEVEMENT_XP1_16);
+						}
 #endif
+					}
+				}
+			}
+
+			GC.getGame().incrementBuildingClassCreatedCount(buildingClassType);
+		}
 	}
+
+	m_pCity->updateStrengthValue();
+
+	// Building might affect City Banner stats
+	auto_ptr<ICvCity1> pCity = GC.WrapCityPointer(m_pCity);
+	GC.GetEngineUserInterface()->SetSpecificCityInfoDirty(pCity.get(), CITY_UPDATE_TYPE_BANNER);
+
+#if !defined(NO_ACHIEVEMENTS)
+	// Test for any achievements being unlocked.
+	pPlayer->GetPlayerAchievements().FinishedBuilding(m_pCity, eIndex);
+#endif
 }
 
 /// Accessor: Get number of free buildings of this type in city

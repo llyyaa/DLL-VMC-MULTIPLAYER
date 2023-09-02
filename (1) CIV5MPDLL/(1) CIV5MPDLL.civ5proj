@@ -5,15 +5,15 @@
     <ProjectGuid>{0b961596-36f9-4289-a247-0e889fef1f39}</ProjectGuid>
     <Name>(1) CIV5MPDLL</Name>
     <Guid>a2969a0a-e4da-41cc-9e0b-19b29aa971d8</Guid>
-    <ModVersion>1</ModVersion>
-    <Stability>Experimental</Stability>
-    <Teaser>This mod is based on whoward69's DLL-VMC v97. It fixes multiplayer gaming bugs and provides more useful modding interface.</Teaser>
+    <ModVersion>10</ModVersion>
+    <Stability>Alpha</Stability>
+    <Teaser>Based on whoward69's DLL-VMC v97, fixes multiplayer gaming sync bugs and provides more powerful modding utilities</Teaser>
     <Description>This mod is based on whoward69's DLL-VMC v97. It fixes out-of-sync problem of
       playing with mods in multiplayer game by creating lua interface allows to broadcast arbitrary
       lua-CPP interface operations or CPP functions (in progress) on all the clients in a
       multiplayer game by providing their names and arguments.In addition, it provides more useful
       functionalities for modding.</Description>
-    <Authors>Whoward69,Apeiria,rogcore,Qinyin,catgrep</Authors>
+    <Authors>Whoward69,Apeiria,rogcore,Qingyin,catgrep</Authors>
     <SpecialThanks>
     </SpecialThanks>
     <AffectsSavedGames>true</AffectsSavedGames>
@@ -153,6 +153,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/BUILDINGS/BuildingClassCollections.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/CONFIG/AiInXml.sql</FileName>
       </Action>
       <Action>
@@ -253,6 +258,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/GLOBAL/Resolutions.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/GLOBAL/SeparateGreatAdmiral.sql</FileName>
       </Action>
       <Action>
@@ -318,6 +328,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/PromotionCollections.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/RELIGION/ConversionModifiers.sql</FileName>
       </Action>
       <Action>
@@ -329,6 +344,11 @@
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
         <FileName>DB/RELIGION/PlotYields.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/RELIGION/Belief_Table_Changes.sql</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
@@ -458,6 +478,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/BUILDINGS/Building_InstantYield.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/IMPROVEMENTS/Improvement_AdjacentImprovementYieldChanges.xml</FileName>
       </Action>
       <Action>
@@ -465,8 +490,112 @@
         <Type>UpdateDatabase</Type>
         <FileName>DB/YIELDS/NewYields_DDL.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvement_Upgrade_Downgrade.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/Corruption/Corruption.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvements_Create_Item.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/GLOBAL/WarCasualties.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/NewBattleEffects.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/CITY_SCALES/CityScales.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/AutoRemove.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/PROMOTIONS/InflictDamageChange.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/SPECIALISTS/Specialist_Resources.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvement_TradeRouteYieldChanges.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/TRAITS/TraitsGoldenAgeEffects.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/TECHS/TechQuickRazing.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/POLICIES/Policy_CityResources.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/LUA_FORMULA/LuaFormula.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/RESOURCES/ResourceExtraBuff.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/GLOBAL/ExcessHappinessEffects.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/TRAITS/CombatBonusFromReligion.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvement_YieldChangesPerUnit.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>DB/IMPROVEMENTS/Improvement_UnitXPPerTurn.sql</FileName>
+      </Action>
     </ModActions>
     <ModReferences />
+    <ModBlockers>
+      <Association xmlns="">
+        <Type>Mod</Type>
+        <Name>VMC</Name>
+        <Id>d1b6328c-ff44-4b0d-aad7-c657f83610cd</Id>
+        <MinVersion>0</MinVersion>
+        <MaxVersion>999</MaxVersion>
+      </Association>
+    </ModBlockers>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="ART\" />
@@ -474,12 +603,18 @@
     <Folder Include="DB\API" />
     <Folder Include="DB\BUGFIX" />
     <Folder Include="DB\CONFIG" />
+    <Folder Include="DB\Corruption\" />
     <Folder Include="DB\DIPLOMACY" />
     <Folder Include="DB\EVENTS" />
     <Folder Include="DB\GLOBAL" />
     <Folder Include="DB\BUILDINGS" />
     <Folder Include="DB\ERAS" />
     <Folder Include="DB\IMPROVEMENTS" />
+    <Folder Include="DB\CITY_SCALES" />
+    <Folder Include="DB\LUA_FORMULA" />
+    <Folder Include="DB\RESOURCES" />
+    <Folder Include="DB\TECHS" />
+    <Folder Include="DB\SPECIALISTS" />
     <Folder Include="DB\YIELDS" />
     <Folder Include="DB\POLICIES" />
     <Folder Include="DB\UNITS" />
@@ -512,6 +647,34 @@
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
     <Content Include="ART/YieldAtlas_128_Tourism.dds">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="ART\yieldatlas_128_admiral.dds">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="ART\yieldatlas_128_culturelocal.dds">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="ART\YieldAtlas_128_Defense.dds">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="ART\YieldAtlas_128_Development.dds">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="ART\YieldAtlas_128_Disease.dds">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="ART\yieldatlas_128_general.dds">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="ART\YieldAtlas_128_Health.dds">
       <SubType>Lua</SubType>
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
@@ -667,6 +830,10 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="DB/GLOBAL/Resolutions.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="DB/GLOBAL/SeparateGreatAdmiral.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
@@ -728,6 +895,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB/RELIGION/PlotYields.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB/RELIGION/Belief_Table_Changes.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
@@ -799,7 +970,27 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="DB\BUILDINGS\BuildingClassCollections.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="DB\BUILDINGS\Building_EnableUnitPurchase.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\BUILDINGS\Building_InstantYield.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\CITY_SCALES\CityScales.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\GLOBAL\ExcessHappinessEffects.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\GLOBAL\WarCasualties.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
@@ -807,7 +998,75 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvement_TradeRouteYieldChanges.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvement_UnitXPPerTurn.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvement_Upgrade_Downgrade.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\Corruption\Corruption.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvements_Create_Item.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\IMPROVEMENTS\Improvement_YieldChangesPerUnit.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\LUA_FORMULA\LuaFormula.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="DB\NewTableChanges.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\POLICIES\Policy_CityResources.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\AutoRemove.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\InflictDamageChange.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\NewBattleEffects.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\PROMOTIONS\PromotionCollections.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\RESOURCES\ResourceExtraBuff.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\SPECIALISTS\Specialist_Resources.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\TECHS\TechQuickRazing.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\TRAITS\CombatBonusFromReligion.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB\TRAITS\TraitsGoldenAgeEffects.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
@@ -866,6 +1125,10 @@
     <Content Include="DLL\CvGameCoreDLL_Expansion2Win32Release.pdb">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="UI\InGame\CorruptionUIUtils.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Firaxis\ModBuddy\Civ5Mod.targets" />

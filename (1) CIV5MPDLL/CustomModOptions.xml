@@ -34,6 +34,9 @@
     <!-- See also: "Global - 3 Units Per City" -->
     <Row Class="5" Name="GLOBAL_STACKING_RULES" Value="0" DbUpdates="1"/>
     
+    <!-- When a military unit retreats, civilians units on the same tile also retreat -->
+   <Row Class="4" Name="CIVILIANS_RETREAT_WITH_MILITARY" Value="0"/>
+
     <!-- This is the "No More Civilian Traffic Jams (NMCTJs) Mod" by Pazyryk - see http://forums.civfanatics.com/showthread.php?t=519754 (v45) -->
     <!-- See also: "Global - No More Civilian Traffic Jams" -->
     <Row Class="6" Name="GLOBAL_BREAK_CIVILIAN_1UPT" Value="0"/>
@@ -216,7 +219,7 @@
 	
     <!-- Units of this type will not be gifted by City States (v46) -->
     <!-- See also: "Civilization - Morindim" -->
-    <Row Class="4" Name="GLOBAL_EXCLUDE_FROM_GIFTS" Value="0" DbUpdates="1"/>
+    <Row Class="4" Name="GLOBAL_EXCLUDE_FROM_GIFTS" Value="1" DbUpdates="1"/>
 
     <!-- Units of this type may move after being upgraded (v46) -->
     <!-- See also: "Civilization - Morindim" -->
@@ -281,7 +284,7 @@
     <Row Class="6" Name="TRAITS_ANY_BELIEF" Value="0" DbUpdates="1"/>
 
     <!-- Enables additional trade route related traits (v52) -->
-    <Row Class="6" Name="TRAITS_TRADE_ROUTE_BONUSES" Value="0" DbUpdates="1"/>
+    <Row Class="6" Name="TRAITS_TRADE_ROUTE_BONUSES" Value="1" DbUpdates="1"/>
 
     <!-- Enables additional unit supply from traits (v78) -->
     <!-- See also: "Traits - Extra Supply" -->
@@ -872,6 +875,7 @@
     <!-- Some bug fixes cannot be turned on or off, those entries (*) are just here to get their entries into the CustomMod.log file -->
     <!-- * Fixes the bug where a city doesn't work its centre tile (v45) -->
     <Row Class="1" Name="BUGFIX_CITY_CENTRE_WORKING" Value="1"/>
+    <Row Class="1" Name="BUGFIX_CITY_NEGATIVE_YIELD_MODIFIED" Value="1"/>
 	<!-- * Fixes the bug of creating a capital from a puppet city, and leaving it that way (v73) -->
     <Row Class="1" Name="BUGFIX_NO_PUPPET_CAPITALS" Value="1"/>
     <!-- * Adds missing policy events when adopting an ideology (v33) -->
@@ -908,7 +912,7 @@
     <Row Class="1" Name="BUGFIX_NAVAL_FREE_UNITS" Value="1"/>
     <!-- Fixes the bug where the naval units jump to the nearest city and not the nearest available non-lake water plot (v19) -->
     <!-- See also: "Global - Naval Nearest Water" -->
-    <Row Class="1" Name="BUGFIX_NAVAL_NEAREST_WATER" Value="0"/>
+    <Row Class="1" Name="BUGFIX_NAVAL_NEAREST_WATER" Value="1"/>
     <!-- Fixes the bug where naval units in hill cities attack from the top of the hill, not the harbour (v95) -->
     <Row Class="1" Name="BUGFIX_NAVAL_TARGETING" Value="1"/>
     <!-- Fixes the bug where stacked ranged units may attack out of cities but melee units may not (v19) -->
@@ -952,9 +956,15 @@
     <!-- * Fixes a bug in the pathfinder code for hovering units at the seaside! (v19) -->  
     <Row Class="1" Name="BUGFIX_HOVERING_PATHFINDER" Value="1"/>
 
+    <Row Class="1" Name="BUGFIX_BUILDING_FREEBUILDING" Value="1"/>
+
+    <Row Class="1" Name="BUGFIX_INVISIBLE_UNIT_MOVE_ENEMY_CITY" Value="1"/>
+
     <Row Class="2" Name="API_BUILDING_ENABLE_PURCHASE_UNITS" Value="1"/>
 
 	<Row Class="2" Name="API_VP_ADJACENT_YIELD_BOOST" Value="1"/>
+
+
 
     <!-- GameEvents.TradeRouteMove.Add(function(iX, iY, iUnit, iOwner, iOriginalPlayer, iOriginalCity, iDestPlayer, iDestCity) end) -->
 	<Row Class="2" Name="EVENTS_TRADE_ROUTE_MOVE" Value="1"/>
@@ -962,7 +972,7 @@
 	<Row Class="2" Name="API_TRADE_ROUTE_YIELD_RATE" Value="1" DbUpdates="1"/>
 
 	<Row Class="6" Name="BALANCE_CORE" Value="1" DbUpdates="1"/>
-	  
+	<Row Class="6" Name="VOLCANO_BREAK" Value="1" DbUpdates="0"/>  
 	<Row Class="6" Name="BUILDINGS_YIELD_FROM_OTHER_YIELD" Value="1" DbUpdates="1"/>
 
 	<Row Class="6" Name="ERA_EFFECTS_EXTENSIONS" Value="1" DbUpdates="1"/>
@@ -976,16 +986,22 @@
     <Row Class="5" Name="API_PROMOTION_TO_PROMOTION_MODIFIERS" Value="1"/>
 
     <Row Class="2" Name="ROG_CORE" Value="1"/>
+    <Row Class="2" Name="IMPROVEMENT_FUNCTION" Value="0"/>
+ <Row Class="2" Name="BUILDING_IMPROVEMENT_RESOURCES" Value="0"/>
 
-    <Row Class="3"  Name="EVENTS_UNIT_CAN_RANGEATTACK" Value="1"/>
+<Row Class="2" Name="TRAIN_ALL_CORE" Value="0"/>
+
+    <Row Class="4" Name="MORE_NATURAL_WONDER" Value="0"/>
+
+    <Row Class="3"  Name="EVENTS_UNIT_CAN_RANGEATTACK" Value="0"/>
     <!--GameEvents.UnitCanRangeAttackPlot.Add(function(iPlayer, iUnit, iPlotX, iPlotY, bNeedWar) return true end)-->
-    <Row Class="3"  Name="EVENTS_UNIT_DO_TURN" Value="1"/>
+    <Row Class="3"  Name="EVENTS_UNIT_DO_TURN" Value="0"/>
     <!-- GameEvents.UnitDoTurn.Add(function(iPlayer, iUnit, iPlotX, iPlotY) end)-->
-    <Row Class="3"  Name="EVENTS_UNIT_MOVE" Value="1"/>
+    <Row Class="3"  Name="EVENTS_UNIT_MOVE" Value="0"/>
     <!--GameEvents.UnitMoveInto.Add(function(iPlayer, iUnit, iUsedMoves, iOldPlotX, iOldPlotY,iNewPlotX, iNewPlotY) end)-->
-    <Row Class="3" Name="EVENTS_GREAT_WORK_CREATED" Value="1"/>
+    <Row Class="3" Name="EVENTS_GREAT_WORK_CREATED" Value="0"/>
     <!--GameEvents.GreatWorkCreated.Add(function(iPlayer, iUnit, iGreatWork) end)--> 
-    <Row Class="3" Name="EVENTS_GREAT_PEOPLE_BOOST" Value="1"/> 
+    <Row Class="3" Name="EVENTS_GREAT_PEOPLE_BOOST" Value="0"/> 
     <!--GameEvents.ScienceDiscover.Add(function(iPlayer,iUnit,iX,iY,bIsGreatPerson) end)-->   
     <!--GameEvents.CultureDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->   
     <!--GameEvents.TourismDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->   
@@ -994,18 +1010,160 @@
     <!--GameEvents.GoldenAgeDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
     <!--GameEvents.CultureBombDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
     <!--GameEvents.FaithDiscover.Add(function(iPlayer, iUnit, iX, iY, bIsGreatPerson) end)-->  
-    <Row Class="3" Name="EVENTS_CITY_PUPPETED" Value="1"/>
+    <Row Class="3" Name="EVENTS_CITY_PUPPETED" Value="0"/>
     <!--GameEvents.CityPuppeted.Add(function(playerID, cityID) end)--> 
-    <Row Class="3" Name="EVENTS_CITY_RANGE_STRIKE" Value="1"/>
+    <Row Class="3" Name="EVENTS_DO_DENOUNCE" Value="0"/>
+    <!--GameEvents.DoDenounce.Add(function(PlayerID, OtherPlayerID) end)--> 
+    <Row Class="3" Name="EVENTS_CITY_RANGE_STRIKE" Value="0"/>
     <!--GameEvents.CityRangedStrike.Add(function(iPlayer,iAttCity,idefPlayer,idefUnit,iX, iY) end)--> 
-    <Row Class="3" Name="EVENTS_TILE_SET_OWNER" Value="1"/>
+    <Row Class="3" Name="EVENTS_TILE_SET_OWNER" Value="0"/>
     <!--GameEvents.TileSetOwnership.Add(iPlotX, iPlotY, iOldOwner,iNewOwner) end)--> 
-    <Row Class="3" Name="EVENTS_WLKD_DAY" Value="1"/>
+    <Row Class="3" Name="EVENTS_WLKD_DAY" Value="0"/>
     <!--GameEvents.CityBeginsWLTKD.Add(iPlayer, iPlotX, iPlotY, iChange) end)--> 
     <!--GameEvents.CityEndsWLTKD.Add(iPlayer, iPlotX, iPlotY) end)--> 
-    <Row Class="3" Name="EVENTS_IMPROVEMENTS_PILLAGED" Value="1"/>  
+    <Row Class="3" Name="EVENTS_IMPROVEMENTS_PILLAGED" Value="0"/>  
     <!--GameEvents.TileImprovementPillaged.Add(iPlotX, iPlotY, iOwner,iImprovement,bPillaged) end)-->
 
+    <!-- GameEvents.GetImprovementXPPerTurn.Add(function(iX, iY, iImprovementType, iCurrentXP, iOwner, iWorkCity) return 0 end); // notice: the iOnwer or iWorkCity may be -1 -->
+    <!-- GameEvents.OnImprovementUpgrade.Add(function(iX, iY, iOldImprovementType, iNewImprovementType, iOwner, iWorkCity) return end); -->
+    <!-- GameEvents.OnImprovementDowngrade.Add(function(iX, iY, iOldImprovementType, iNewImprovementType, iOwner, iWorkCity) return end); -->
+    <!-- function plot:GetXP() return XP; -->
+    <!-- function plot:GetXPGrowth() return XP; -->
+    <!-- function plot:ChangeXP(iChange, bDoUpdate) return iNewXP; -->
+    <!-- function plot:SetXP(iVal, bDoUpdate) return XP; -->
+    <!-- Table changes: Improvement_Upgrade_Downgrade.sql -->
+    <Row Class="5" Name="IMPROVEMENTS_UPGRADE" Value="0"/>
+
+    <!-- table changes: -->
+    <!-- see Improvements_Create_Item.sql -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'CreatedItemMod' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'CreatedResourceQuantity' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'SetNewImprovement' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE Improvements ADD COLUMN 'SetNewFeature' TEXT DEFAULT NULL; -->
+    <Row Class="5" Name="IMPROVEMENTS_CREATE_ITEMS" Value="1"/>
+
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_GROWTH" Value="0"/>
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_PRODUCTION" Value="0"/>
+    <Row Class="6" Name="GLOBAL_UNLIMITED_ONE_TURN_CULTURE" Value="0"/>
+
+    <!-- lua interfaces: -->
+    <!-- int pPlayer:GetWarCasualtiesCounter() const; -->
+	<!-- void pPlayer:ChangeWarCasualtiesCounter(const int iChange); -->
+	<!-- void pPlayer:SetWarCasualtiesCounter(const int iValue); -->
+	<!-- bool pPlayer:CheckAndUpdateWarCasualtiesCounter(); -->
+    <!-- lua events: -->
+    <!-- DoWarPopulationLoss(int iPlayer, int iCity, int iChange)-->
+    <!-- table changes: -->
+    <!-- see WarCasualties.sql -->
+    <!-- INSERT INTO Defines(Name, Value) VALUES('WAR_CASUALTIES_THRESHOLD', 200); -->
+    <!-- INSERT INTO Defines(Name, Value) VALUES('WAR_CASUALTIES_DELTA_BASE', 100); -->
+    <!-- INSERT INTO Defines(Name, Value) VALUES('WAR_CASUALTIES_POPULATION_LOSS', 1); -->
+    <!-- ALTER TABLE UnitPromotions add column WarCasualtiesModifier int not null default 0; -->
+    <!-- ALTER TABLE Policies add column WarCasualtiesModifier int not null default 0; -->
+    <Row Class="6" Name="GLOBAL_WAR_CASUALTIES" Value="0"/>
+
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
+    <!-- ALTER TABLE Units add column ExtraXPValueAttack int not null default 0; -->
+    <!-- ALTER TABLE Units add column ExtraXPValueDefense int not null default 0; -->
+    <Row Class="6" Name="GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
+    <!-- ALTER TABLE Units ADD COLUMN 'BoundLandImprovement' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE Units ADD COLUMN 'BoundWaterImprovement' TEXT DEFAULT NULL; -->
+    <Row Class="6" Name="UNIT_BOUND_IMPROVEMENT" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
+    <!-- ALTER TABLE UnitPromotions ADD 'FeatureInvisible' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'FeatureInvisible2' TEXT DEFAULT NULL; -->
+    <Row Class="6" Name="PROMOTION_FEATURE_INVISIBLE" Value="0"/>
+
+    <!-- INSERT INTO Defines(Name, Value) VALUES('GOLDEN_AGE_POINT_MULTIPLE_IN_GA', 2); -->
+    <Row Class="6" Name="GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA" Value="0"/>
+    <!-- INSERT INTO Defines(Name, Value) VALUES('UNIT_MOVES_AFTER_DISEMBARK', 60); --> 
+    <Row Class="6" Name="GLOBAL_UNIT_MOVES_AFTER_DISEMBARK" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_RANGE_ATTACK_KILL_POPULATION_OF_HEAVY" Value="0"/>
+    
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql DDL_Policies.sql -->
+    <Row Class="6" Name="POLICY_NEW_EFFECT_FOR_SP" Value="1"/>
+    <!-- table changes: -->
+    <!-- ALTER TABLE UnitPromotions ADD 'MultipleInitExperence' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'CarrierEXPGivenModifier' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'UnitAttackFaithBonus' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'CityAttackFaithBonus' INTEGER DEFAULT 0; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'RemovePromotionUpgrade' TEXT DEFAULT NULL; -->
+    <!-- ALTER TABLE UnitPromotions ADD 'LostAllMovesAttackCity'  INTEGER DEFAULT 0; -->
+    <Row Class="6" Name="PROMOTION_NEW_EFFECT_FOR_SP" Value="1"/>
+    <!-- table changes: -->
+    <!-- see Belief_Table_Changes.sql -->
+    <Row Class="6" Name="BELIEF_NEW_EFFECT_FOR_SP" Value="1"/>
+    <!-- table changes: -->
+    <!-- see DLL_Buildings.sql -->
+    <Row Class="6" Name="BUILDING_NEW_EFFECT_FOR_SP" Value="1"/>
+    <!-- table changes: -->
+    <!-- see Resolutions.sql -->
+    <Row Class="6" Name="VOTING_NEW_EFFECT_FOR_SP" Value="1"/>
+    <!-- table changes: -->
+    <!-- see DDL_Traits.sql -->
+    <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
+
+    <!-- table changes: -->
+    <!-- see Building_InstantYield.xml -->
+    <!-- ALTER TABLE Buildings ADD COLUMN 'AllowInstantYield' BOOLEAN DEFAULT 0;-->
+    <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
+
+    <Row Class="6" Name="POLICY_FREE_PROMOTION_FOR_PROMOTION" Value="1"/>
+
+    <!-- table change: NewBattleEffects.sql and PromotionCollections.sql -->
+    <Row Class="6" Name="PROMOTION_SPLASH_DAMAGE" Value="0"/>
+    <Row Class="6" Name="PROMOTION_COLLATERAL_DAMAGE" Value="0"/>
+    <Row Class="6" Name="PROMOTION_ADD_ENEMY_PROMOTIONS" Value="0"/>
+    <Row Class="6" Name="PROMOTION_CITY_DESTROYER" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_PROMOTIONS_REMOVAL" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_CITY_SCALES" Value="0"/>
+    <Row Class="6" Name="EVENTS_CITY_SCALES" Value="0"/>
+
+    <!-- Permits units to receive a combat bonus from Ally City States-->
+    <!-- table change: NewTableChanges.sql -->
+    <Row Class="4" Name="PROMOTIONS_ALLYCITYSTATE_BONUS" Value="0"/>
+
+    <Row Class="6" Name="SPECIALIST_RESOURCES" Value="0"/>
+    <!-- Permits units to receive defense bonus from Left/Used Moves-->
+    <!-- table change: NewTableChanges.sql -->
+    <Row Class="4" Name="DEFENSE_MOVES_BONUS" Value="0"/>
+
+    <!-- Improvement_TradeRouteYieldChanges -->
+    <!-- table change: Improvement_TradeRouteYieldChanges.sql -->
+    <Row Class="4" Name="IMPROVEMENT_TRADE_ROUTE_BONUSES" Value="0"/>
+
+    <Row Class="6" Name="TRAITS_GOLDEN_AGE_YIELD_MODIFIER" Value="0"/>
+
+    <Row Class="6" Name="POLICIY_PUBLIC_OPTION" Value="0"/>
+
+    <Row Class="6" Name="BATTLE_CAPTURE_NEW_RULE" Value="0"/>
+    <!-- Permits units to receive a combat bonus from Extra Resourses/Hapiness-->
+    <!-- table change: NewTableChanges.sql -->
+    <Row Class="4" Name="PROMOTIONS_EXTRARES_BONUS" Value="0"/>
+
+    <Row Class="6" Name="RESOURCE_EXTRA_BUFF" Value="0"/>
+
+    <Row Class="6" Name="SP_SMART_AI" Value="0"/>
+
+    <Row Class="6" Name="TRAITS_SPREAD_RELIGION_AFTER_KILLING" Value="0"/>
+    <Row Class="6" Name="TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY" Value="0"/>
+    <Row Class="6" Name="TRAITS_SIEGE_BONUS_IF_SAME_RELIGION" Value="0"/>
+    <Row Class="6" Name="TRAITS_ENABLE_FAITH_PURCHASE_ALL_COMBAT_UNITS" Value="0"/>
+
+    <Row Class="6" Name="IMPROVEMENTS_YIELD_CHANGE_PER_UNIT" Value="0"/>
+    <Row Class="6" Name="IMPROVEMENTS_UNIT_XP_PER_TURN" Value="0"/>
+
+    <Row Class="6" Name="GLOBAL_CORRUPTION" Value="0"/>
   </CustomModOptions>
 
   <CustomModPostDefines>

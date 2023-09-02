@@ -2280,14 +2280,28 @@ void CvDiplomacyAI::DoCounters()
 					if (pNotifications){
 						CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_FRIENDSHIP_EXPIRED", GET_PLAYER(GetPlayer()->GetID()).getCivilizationShortDescriptionKey());
 						CvString strSummary = GetLocalizedText("TXT_KEY_NOTIFICATION_FRIENDSHIP_EXPIRED_S");
-						pNotifications->Add(NOTIFICATION_FRIENDSHIP_EXPIRED, strBuffer, strSummary, -1, -1, GetPlayer()->GetID(), eLoopPlayer);				
+						strSummary = GetLocalizedText("[COLOR_NEGATIVE_TEXT]") + strSummary + GetLocalizedText("[ENDCOLOR]");
+						strBuffer = GetLocalizedText("[COLOR_NEGATIVE_TEXT]") + strBuffer + GetLocalizedText("[ENDCOLOR]");
+						pNotifications->Add(NOTIFICATION_FRIENDSHIP_EXPIRED, strBuffer, strSummary, -1, -1, GetPlayer()->GetID(), eLoopPlayer);
+						if (eLoopPlayer == GC.getGame().getActivePlayer())
+						{
+							ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+							pkDLLInterface->AddMessage(0, eLoopPlayer, true, GC.getEVENT_MESSAGE_TIME(), strBuffer);
+						}
 					}
 
 					pNotifications = GET_PLAYER(GetPlayer()->GetID()).GetNotifications();
 					if (pNotifications){
 						CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_FRIENDSHIP_EXPIRED", GET_PLAYER(eLoopPlayer).getCivilizationShortDescriptionKey());
 						CvString strSummary = GetLocalizedText("TXT_KEY_NOTIFICATION_FRIENDSHIP_EXPIRED_S");
+						strSummary = GetLocalizedText("[COLOR_NEGATIVE_TEXT]") + strSummary + GetLocalizedText("[ENDCOLOR]");
+						strBuffer = GetLocalizedText("[COLOR_NEGATIVE_TEXT]") + strBuffer + GetLocalizedText("[ENDCOLOR]");
 						pNotifications->Add(NOTIFICATION_FRIENDSHIP_EXPIRED, strBuffer, strSummary, -1, -1, eLoopPlayer, GetPlayer()->GetID());				
+						if (GetPlayer()->GetID() == GC.getGame().getActivePlayer())
+						{
+							ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+							pkDLLInterface->AddMessage(0, GetPlayer()->GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer);
+						}
 					}
 				}
 			}
@@ -21417,6 +21431,14 @@ void CvDiplomacyAI::DoDenouncePlayer(PlayerTypes ePlayer)
 
 	SetDenouncedPlayerCounter(ePlayer, 0);
 
+
+#if defined(MOD_EVENTS_DO_DENOUNCE)
+	if (MOD_EVENTS_DO_DENOUNCE && eMyPlayer !=NULL) 
+	{
+		GAMEEVENTINVOKE_HOOK(GAMEEVENT_DoDenounce, eMyPlayer, ePlayer);
+	}
+#endif
+
 	// close both embassies
 	GET_TEAM(eMyTeam).CloseEmbassyAtTeam(eTheirTeam);
 	GET_TEAM(eTheirTeam).CloseEmbassyAtTeam(eMyTeam);
@@ -24323,6 +24345,60 @@ bool CvDiplomacyAI::DoPossibleMinorLiberation(PlayerTypes eMinor, int iCityID)
 
 	return bLiberate;
 }
+
+
+
+/// Is this a bad target to steal from?
+bool CvDiplomacyAI::IsPlayerBadTheftTarget(PlayerTypes ePlayer,const CvPlot* pPlot /* = NULL */)
+{
+	// Failsafe
+	if (!pPlot)
+		return true;
+
+	if (ePlayer == NO_PLAYER || ePlayer == BARBARIAN_PLAYER || ePlayer == GetID() || !GET_PLAYER(ePlayer).isAlive())
+		return false;
+
+	if (IsAtWar(ePlayer))
+		return false;
+
+	// Handle minors here (only citadels and plots are applicable)
+	if (GET_PLAYER(ePlayer).isMinorCiv())
+	{
+			// Steal Natural Wonders and other teams' embassies, the City-State's feelings be damned!
+			if (pPlot->IsNaturalWonder())
+			{
+				return false;
+			}
+
+			if (GetMinorCivApproach(ePlayer) == MAJOR_CIV_APPROACH_FRIENDLY || GET_PLAYER(ePlayer).GetMinorCivAI()->GetAlly() == GetID())
+			{
+				return true;
+			}
+
+		return false;
+	}
+
+	// If any of the below conditions are true, never steal from this player
+	if (GetTeam() == GET_PLAYER(ePlayer).getTeam())
+		return true;
+
+	if (IsDoFAccepted(ePlayer))
+		return true;
+
+	if (GET_TEAM(GetTeam()).IsHasDefensivePact(GET_PLAYER(ePlayer).getTeam()))
+	return true;
+
+	// Additional conditions depend on the type of theft we'd be doing
+	if (GET_PLAYER(ePlayer).GetDiplomacyAI()->IsPlayerMadeExpansionPromise(GetID()))
+	return true;
+
+	if (GET_PLAYER(ePlayer).GetDiplomacyAI()->IsPlayerMadeBorderPromise(GetID()))
+	return true;
+
+	return false;
+}
+
+
 
 /// How many players that we're Competitive or more with is ePlayer at war with?
 int CvDiplomacyAI::GetNumOurEnemiesPlayerAtWarWith(PlayerTypes ePlayer)

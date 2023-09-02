@@ -348,6 +348,8 @@ inline DirectionTypes hexspaceSpikeDirection(const int iXOffset, const int iYOff
 
 CvPlot* plotCity(int iX, int iY, int iIndex);
 
+CvPlot* iterateRingPlots(int iX, int iY, int iIndex);
+
 int plotCityXY(const CvCity* pCity, const CvPlot* pPlot);
 
 DirectionTypes estimateDirection(int iDX, int iDY);
@@ -381,6 +383,13 @@ inline const CvUnit* GetPlayerUnit(const IDInfo& unit)
 bool isBeforeUnitCycle(const CvUnit* pFirstUnit, const CvUnit* pSecondUnit);
 bool IsPromotionValidForUnitCombatType(PromotionTypes ePromotion, UnitTypes eUnit);
 bool IsPromotionValidForCivilianUnitType(PromotionTypes ePromotion, UnitTypes eUnit);
+
+
+bool IsPromotionValidForUnitType(PromotionTypes ePromotion, UnitTypes eUnit);
+#if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
+bool IsPromotionValidForUnitPromotions(PromotionTypes ePromotion, CvUnit& pUnit);
+#endif
+
 bool isPromotionValid(PromotionTypes ePromotion, UnitTypes eUnit, bool bLeader, bool bTestingPrereq=false);
 
 int getPopulationAsset(int iPopulation);

@@ -11,4 +11,17 @@ ALTER TABLE Building_ThemingBonuses
 ALTER TABLE Improvements
   ADD AddsFreshWater INTEGER DEFAULT 0;
 
+
+
+
+
+
+ALTER TABLE Projects ADD COLUMN 'Maintenance' INTEGER DEFAULT 0;
+ALTER TABLE Projects ADD COLUMN 'CostScalerEra' INTEGER DEFAULT 0;
+ALTER TABLE Projects ADD COLUMN 'CostScalerNumRepeats' INTEGER DEFAULT 0;
+ALTER TABLE Projects ADD COLUMN 'CityMaxNum' INTEGER DEFAULT 0;
+
+ALTER TABLE Buildings ADD 'HumanOnly' INTEGER DEFAULT 0;
+
+
 INSERT INTO CustomModDbUpdates(Name, Value) VALUES('API_EXTENSIONS', 1);

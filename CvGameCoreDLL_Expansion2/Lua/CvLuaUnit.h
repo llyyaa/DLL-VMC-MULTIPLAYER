@@ -262,6 +262,9 @@ protected:
 	static int lIsEnemyInMovementRange(lua_State* L);
 
 	static int lIsTrade(lua_State* L);
+
+	static int lIsCannotBeCapturedUnit(lua_State* L);
+
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_TRADEROUTES)
 	LUAAPIEXTN(GetTradeRouteIndex, int);
 	LUAAPIEXTN(IsRecalledTrader, bool);
@@ -305,7 +308,7 @@ protected:
 	static int lIsSetUpForRangedAttack(lua_State* L);
 	static int lIsRangeAttackOnlyInDomain(lua_State* L);
 	static int lIsCityAttackOnly(lua_State* L);
-
+	static int lIsImmueMeleeAttack(lua_State* L);
 	static int lImmuneToFirstStrikes(lua_State* L);
 	static int lNoDefensiveBonus(lua_State* L);
 	static int lIgnoreBuildingDefense(lua_State* L);
@@ -346,9 +349,12 @@ protected:
 #endif
 	static int lIsNeverInvisible(lua_State* L);
 	static int lIsInvisible(lua_State* L);
+#if defined(MOD_PROMOTION_FEATURE_INVISIBLE)
+	static int lIsInvisibleInvalid(lua_State* L);
+#endif
 
 	static int lIsNukeImmune(lua_State* L);
-
+	static int lIsImmuePlague(lua_State* L);
 	static int lMaxInterceptionProbability(lua_State* L);
 	static int lCurrInterceptionProbability(lua_State* L);
 	static int lEvasionProbability(lua_State* L);
@@ -393,7 +399,7 @@ protected:
 	static int lAirSweepCombatMod(lua_State* L);
 	static int lCapitalDefenseModifier(lua_State* L);
 	static int lCapitalDefenseFalloff(lua_State* L);
-
+	
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
 	static int lOtherPromotionModifier(lua_State* L);
 	static int lOtherPromotionAttackModifier(lua_State* L);
@@ -416,18 +422,33 @@ protected:
 	static int lGetHPHealedIfDefeatEnemyGlobal(lua_State* L);
 	static int lGetNumOriginalCapitalDefenseMod(lua_State* L);
 	static int lGetNumOriginalCapitalAttackMod(lua_State* L);
+	static int lGetBarbarianCombatBonus(lua_State* L);
 #endif
 
+#if defined(MOD_DEFENSE_MOVES_BONUS)
+	static int lGetMoveLeftDefenseMod(lua_State* L);
+	static int lGetMoveUsedDefenseMod(lua_State* L);
+#endif	
 
 #if defined(MOD_ROG_CORE)
 	static int lGetNumSpyDefenseMod(lua_State* L);
 	static int lGetNumSpyAttackMod(lua_State* L);
 	static int lGetNumWorkDefenseMod(lua_State* L);
 	static int lGetNumWorkAttackMod(lua_State* L);
+	static int lGetNumSpyStayDefenseMod(lua_State* L);
+	static int lGetNumSpyStayAttackMod(lua_State* L);
 	static int lGetNumWonderDefenseMod(lua_State* L);
 	static int lGetNumWonderAttackMod(lua_State* L);
 
 	static int lIsNoResourcePunishment(lua_State* L);
+
+	static int lGetCurrentHitPointAttackMod(lua_State* L);
+	static int lGetCurrentHitPointDefenseMod(lua_State* L);
+
+
+	static int lGetNearNumEnemyAttackMod(lua_State* L);
+	static int lGetNearNumEnemyDefenseMod(lua_State* L);
+	static int lGetNumEnemyAdjacent(lua_State* L);
 #endif
 
 
@@ -676,6 +697,17 @@ protected:
 	LUAAPIEXTN(IsOnFeature, bool, iFeatureType);
 	LUAAPIEXTN(IsAdjacentToFeature, bool, iFeatureType);
 	LUAAPIEXTN(IsWithinDistanceOfFeature, bool, iFeatureType, iDistance);
+
+	LUAAPIEXTN(IsWithinDistanceOfUnit, iUnitType, iDistance, bool, bool);
+	LUAAPIEXTN(IsWithinDistanceOfUnitClass, iUnitClassType, iDistance, bool, bool);
+	LUAAPIEXTN(IsWithinDistanceOfUnitCombatType, iUnitCombatType, iDistance, bool, bool);
+	LUAAPIEXTN(IsWithinDistanceOfUnitPromotion, iPromotionType, iDistance, bool, bool);
+	LUAAPIEXTN(IsAdjacentToUnit, iUnitType, bool, bool);
+	LUAAPIEXTN(IsAdjacentToUnitClass, iUnitClassType, bool, bool);
+	LUAAPIEXTN(IsAdjacentToUnitCombatType, iUnitCombatType, bool, bool);
+	LUAAPIEXTN(IsAdjacentToUnitPromotion, iPromotionType, bool, bool);
+	LUAAPIEXTN(IsWithinDistanceOfCity, iDistance, bool, bool);
+
 	LUAAPIEXTN(IsOnImprovement, bool, iImprovementType);
 	LUAAPIEXTN(IsAdjacentToImprovement, bool, iImprovementType);
 	LUAAPIEXTN(IsWithinDistanceOfImprovement, bool, iImprovementType, iDistance);
@@ -688,6 +720,14 @@ protected:
 	LUAAPIEXTN(IsOnTerrain, bool, iTerrainType);
 	LUAAPIEXTN(IsAdjacentToTerrain, bool, iTerrainType);
 	LUAAPIEXTN(IsWithinDistanceOfTerrain, bool, iTerrainType, iDistance);
+#endif
+
+#ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
+	LUAAPIEXTN(ClearSamePlotPromotions, void);
+#endif
+
+#ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
+	LUAAPIEXTN(IsImmuneNegtivePromotions, bool);
 #endif
 };
 
