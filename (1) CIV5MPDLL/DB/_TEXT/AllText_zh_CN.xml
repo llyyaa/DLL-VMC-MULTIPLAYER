@@ -5,7 +5,7 @@
 		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
 			<Text>你的{@1_UnitName}没有遇到抵抗，并且攻击了敌人的空军和地面防空单位！</Text>
 		</Row>
-<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
 			<Text>我们的{2_Unit}被敌人的{1_Unit}击退了！</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_S">
@@ -514,6 +514,9 @@
 
 		<Row Tag="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
       		<Text>你征服了{1_city}，对所有已见面文明传播了+{2_num}[ICON_TOURISM]魅力影响。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
+      		<Text>+{1_Num}%奖励 由于政策对不同意识形态加成[NEWLINE]</Text>
 		</Row>
 	</Language_zh_CN>
 

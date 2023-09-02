@@ -282,7 +282,9 @@ CvPlayer::CvPlayer() :
 	, m_iFreeExperienceFromMinors("CvPlayer::m_iFreeExperienceFromMinors", m_syncArchive)
 	, m_iFeatureProductionModifier("CvPlayer::m_iFeatureProductionModifier", m_syncArchive)
 	, m_iWorkerSpeedModifier("CvPlayer::m_iWorkerSpeedModifier", m_syncArchive)
+	, m_iSharedIdeologyTourismModifier("CvPlayer::m_iSharedIdeologyTourismModifier", m_syncArchive)
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	, m_iDifferentIdeologyTourismModifier("CvPlayer::m_iDifferentIdeologyTourismModifier", m_syncArchive)
 	, m_iHappinessPerPolicy("CvPlayer::m_iHappinessPerPolicy", m_syncArchive)
 	, m_iWaterBuildSpeedModifier("CvPlayer::m_iWaterBuildSpeedModifier", m_syncArchive)
 	, m_iSettlerProductionEraModifier("CvPlayer::m_iSettlerProductionEraModifier", m_syncArchive)
@@ -1051,7 +1053,9 @@ void CvPlayer::uninit()
 	m_iFreeExperienceFromMinors = 0;
 	m_iFeatureProductionModifier = 0;
 	m_iWorkerSpeedModifier = 0;
+	m_iSharedIdeologyTourismModifier = 0;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iDifferentIdeologyTourismModifier = 0;
 	m_iHappinessPerPolicy = 0;
 	m_iWaterBuildSpeedModifier = 0;
 	m_iSettlerProductionEraModifier = 0;
@@ -14453,7 +14457,7 @@ CvString CvPlayer::GetInternationalTourismTooltip()
 	// Get policy bonuses
 	int iLessHappyMod = GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_LESS_HAPPY);
 	int iCommonFoeMod = GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_COMMON_FOE);
-	int iSharedIdeologyMod = GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_SHARED_IDEOLOGY);
+	int iSharedIdeologyMod = getSharedIdeologyTourismModifier();
 	for (int iLoopPlayer = 0; iLoopPlayer < MAX_MAJOR_CIVS; iLoopPlayer++)
 	{
 		CvPlayer &kPlayer = GET_PLAYER((PlayerTypes)iLoopPlayer);
@@ -14590,7 +14594,7 @@ CvString CvPlayer::GetInternationalTourismTooltip()
 	if (differentIdeologyCivs.length() > 0)
 	{
 		szRtnValue += "[NEWLINE][ICON_BULLET]";
-		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_DIFFERENT_IDEOLOGY_PENALTY", GC.getTOURISM_MODIFIER_DIFFERENT_IDEOLOGIES());
+		szTemp = GetLocalizedText("TXT_KEY_CO_CITY_TOURISM_DIFFERENT_IDEOLOGY_PENALTY", GC.getTOURISM_MODIFIER_DIFFERENT_IDEOLOGIES() + getDifferentIdeologyTourismModifier());
 		szRtnValue += szTemp + differentIdeologyCivs;
 	}
 	if(szRtnValue.length() > 0)
@@ -16676,7 +16680,29 @@ void CvPlayer::changeWorkerSpeedModifier(int iChange)
 
 
 //	--------------------------------------------------------------------------------
+int CvPlayer::getSharedIdeologyTourismModifier() const
+{
+	return m_iSharedIdeologyTourismModifier;
+}
+void CvPlayer::changeSharedIdeologyTourismModifier(int iChange)
+{
+	m_iSharedIdeologyTourismModifier += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+int CvPlayer::getDifferentIdeologyTourismModifier() const
+{
+	return m_iDifferentIdeologyTourismModifier;
+}
+void CvPlayer::changeDifferentIdeologyTourismModifier(int iChange)
+{
+	m_iDifferentIdeologyTourismModifier += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
 int CvPlayer::getHappinessPerPolicy() const
 {
 	return m_iHappinessPerPolicy;
@@ -25782,7 +25808,9 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeGoldenAgeMeterMod(pPolicy->GetGoldenAgeMeterMod() * iChange);
 	changeGoldenAgeModifier(pPolicy->GetGoldenAgeDurationMod() * iChange);
 	changeWorkerSpeedModifier(pPolicy->GetWorkerSpeedModifier() * iChange);
+	changeSharedIdeologyTourismModifier(pPolicy->GetSharedIdeologyTourismModifier() * iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	changeDifferentIdeologyTourismModifier(pPolicy->GetDifferentIdeologyTourismModifier() * iChange);
 	changeHappinessPerPolicy(pPolicy->GetHappinessPerPolicy() * iChange);
 	changeNumTradeRouteBonus(pPolicy->GetNumTradeRouteBonus() * iChange);
 	changeWaterBuildSpeedModifier(pPolicy->GetWaterBuildSpeedModifier() * iChange);
@@ -27286,7 +27314,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iFreeExperienceFromMinors;
 	kStream >> m_iFeatureProductionModifier;
 	kStream >> m_iWorkerSpeedModifier;
+	kStream >> m_iSharedIdeologyTourismModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	kStream >> m_iDifferentIdeologyTourismModifier;
 	kStream >> m_iHappinessPerPolicy;
 	kStream >> m_iWaterBuildSpeedModifier;
 	kStream >> m_iSettlerProductionEraModifier;
@@ -27992,7 +28022,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iFreeExperienceFromMinors;
 	kStream << m_iFeatureProductionModifier;
 	kStream << m_iWorkerSpeedModifier;
+	kStream << m_iSharedIdeologyTourismModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	kStream << m_iDifferentIdeologyTourismModifier;
 	kStream << m_iHappinessPerPolicy;
 	kStream << m_iWaterBuildSpeedModifier;
 	kStream << m_iSettlerProductionEraModifier;

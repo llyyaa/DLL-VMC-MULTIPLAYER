@@ -64,6 +64,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iFreeExperience(0),
 	m_iWorkerSpeedModifier(0),
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iDifferentIdeologyTourismModifier(0),
 	m_iHappinessPerPolicy(0),
 	m_iNumTradeRouteBonus(0),
 	m_iWaterBuildSpeedModifier(0),
@@ -353,6 +354,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iFreeExperience = kResults.GetInt("FreeExperience");
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iDifferentIdeologyTourismModifier = kResults.GetInt("DifferentIdeologyTourismModifier");
 	m_iHappinessPerPolicy = kResults.GetInt("HappinessPerPolicy");
 	m_iNumTradeRouteBonus = kResults.GetInt("NumTradeRouteBonus");
 	m_iWaterBuildSpeedModifier = kResults.GetInt("WaterBuildSpeedModifier");
@@ -1534,6 +1536,11 @@ int CvPolicyEntry::GetWorkerSpeedModifier() const
 	return m_iWorkerSpeedModifier;
 }
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+///Different Ideology Tourism Modifier
+int CvPolicyEntry::GetDifferentIdeologyTourismModifier() const
+{
+	return m_iDifferentIdeologyTourismModifier;
+}
 /// Happiness Per Policies
 int CvPolicyEntry::GetHappinessPerPolicy() const
 {
@@ -3690,9 +3697,6 @@ int CvPlayerPolicies::GetNumericModifier(PolicyModifierType eType)
 				break;
 			case POLICYMOD_TOURISM_MOD_LESS_HAPPY:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetLessHappyTourismModifier();
-				break;
-			case POLICYMOD_TOURISM_MOD_SHARED_IDEOLOGY:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetSharedIdeologyTourismModifier();
 				break;
 			case POLICYMOD_TRADE_MISSION_GOLD_MODIFIER:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetTradeMissionGoldModifier();

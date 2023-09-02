@@ -2,7 +2,7 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
-<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
+		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
 			<Text>Your {@1_UnitName} met no resistance and attacked enemy air and ground air defense units!</Text>
 		</Row>
 
@@ -19,7 +19,7 @@
 			<Text>Enemy {1_Unit} has been knocked back!</Text>
 		</Row>
 
-	<Row Tag="TXT_KEY_NOTIFICATION_RESET_PLOT_COST">
+		<Row Tag="TXT_KEY_NOTIFICATION_RESET_PLOT_COST">
 			<Text>Founding a new City has reset the cost increase of Tile purchases in all owned cities!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
@@ -509,6 +509,9 @@
 
 		<Row tag="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
 			<Text>You have conquered {1_city} and spread +{2_num}[ICON_TOURISM] tourism influence to all civilizations you have met. </Text>
+		</Row>
+		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
+      		<Text>+{1_Num}% Bonus for different ideologies from policies[NEWLINE]</Text>
 		</Row>
 	</Language_en_US>
 

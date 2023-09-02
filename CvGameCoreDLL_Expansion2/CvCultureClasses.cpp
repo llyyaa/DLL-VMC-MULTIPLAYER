@@ -3265,6 +3265,7 @@ int CvPlayerCulture::GetTourismModifierWith(PlayerTypes ePlayer) const
 	if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology != eTheirIdeology)
 	{
 		iMultiplier += GC.getTOURISM_MODIFIER_DIFFERENT_IDEOLOGIES();
+		iMultiplier += m_pPlayer->getDifferentIdeologyTourismModifier();
 
 		if (m_pPlayer->GetEspionage()->IsMyDiplomatVisitingThem(ePlayer))
 		{
@@ -3298,7 +3299,7 @@ int CvPlayerCulture::GetTourismModifierWith(PlayerTypes ePlayer) const
 			}
 		}
 	}
-	int iSharedIdeologyMod = m_pPlayer->GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_SHARED_IDEOLOGY);
+	int iSharedIdeologyMod = m_pPlayer->getSharedIdeologyTourismModifier();
 	if (iSharedIdeologyMod > 0)
 	{
 		if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology == eTheirIdeology)
@@ -3321,7 +3322,7 @@ int CvPlayerCulture::GetTourismModifierWith(PlayerTypes ePlayer) const
 	return iMultiplier;
 }
 
-/// Tooltip for GetTourismModifierWith()
+/// Tooltip for GetTourismModifierWith() only for lua interface
 CvString CvPlayerCulture::GetTourismModifierWithTooltip(PlayerTypes ePlayer) const
 {
 	CvString szRtnValue = "";
@@ -3355,9 +3356,14 @@ CvString CvPlayerCulture::GetTourismModifierWithTooltip(PlayerTypes ePlayer) con
 		{
 			szRtnValue += "[COLOR_POSITIVE_TEXT]" + GetLocalizedText("TXT_KEY_CO_PLAYER_TOURISM_PROPAGANDA", GC.getTOURISM_MODIFIER_DIPLOMAT()) + "[ENDCOLOR]";
 		}
+		int iDifferentSharedIdeologyMod = m_pPlayer->getDifferentIdeologyTourismModifier();
+		if (iDifferentSharedIdeologyMod > 0)
+		{
+			szRtnValue += "[COLOR_POSITIVE_TEXT]" + GetLocalizedText("TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY", iDifferentSharedIdeologyMod) + "[ENDCOLOR]";
+		}
 	}
 
-	int iSharedIdeologyMod = m_pPlayer->GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_SHARED_IDEOLOGY);
+	int iSharedIdeologyMod = m_pPlayer->getSharedIdeologyTourismModifier();
 	if (iSharedIdeologyMod > 0)
 	{
 		if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology == eTheirIdeology)
@@ -4818,7 +4824,7 @@ int CvCityCulture::GetTourismMultiplier(PlayerTypes ePlayer, bool bIgnoreReligio
 		if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology != eTheirIdeology)
 		{
 			iMultiplier += GC.getTOURISM_MODIFIER_DIFFERENT_IDEOLOGIES();
-
+			iMultiplier += kCityPlayer.getDifferentIdeologyTourismModifier();
 			if (kCityPlayer.GetEspionage()->IsMyDiplomatVisitingThem(ePlayer))
 			{
 				iMultiplier += GC.getTOURISM_MODIFIER_DIPLOMAT();
@@ -4854,7 +4860,7 @@ int CvCityCulture::GetTourismMultiplier(PlayerTypes ePlayer, bool bIgnoreReligio
 				}
 			}
 		}
-		int iSharedIdeologyMod = kCityPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_SHARED_IDEOLOGY);
+		int iSharedIdeologyMod = kCityPlayer.getSharedIdeologyTourismModifier();
 		if (iSharedIdeologyMod > 0)
 		{
 			if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology == eTheirIdeology)

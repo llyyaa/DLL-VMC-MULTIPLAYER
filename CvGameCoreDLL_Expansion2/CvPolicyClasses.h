@@ -74,6 +74,7 @@ public:
 	int GetFreeExperience() const;
 	int GetWorkerSpeedModifier() const;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int GetDifferentIdeologyTourismModifier() const;
 	int GetHappinessPerPolicy() const;
 	int GetNumTradeRouteBonus() const;
 	int GetWaterBuildSpeedModifier() const;
@@ -373,6 +374,7 @@ private:
 	int m_iFreeExperience;
 	int m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int m_iDifferentIdeologyTourismModifier;
 	int m_iHappinessPerPolicy;
 	int m_iNumTradeRouteBonus;
 	int m_iWaterBuildSpeedModifier;
@@ -725,7 +727,6 @@ enum PolicyModifierType
 	POLICYMOD_GREAT_SCIENTIST_RATE,
 	POLICYMOD_TOURISM_MOD_COMMON_FOE,
 	POLICYMOD_TOURISM_MOD_LESS_HAPPY,
-	POLICYMOD_TOURISM_MOD_SHARED_IDEOLOGY,
 	POLICYMOD_BUILDING_PURCHASE_COST_MODIFIER,
 	POLICYMOD_LAND_TRADE_GOLD_CHANGE,
 	POLICYMOD_SEA_TRADE_GOLD_CHANGE,
