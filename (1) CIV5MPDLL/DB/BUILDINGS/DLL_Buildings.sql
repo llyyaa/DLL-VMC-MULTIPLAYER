@@ -23,3 +23,5 @@ CREATE TABLE Building_ClassesNeededGlobal(
 
 ALTER TABLE Buildings ADD 'TradeRouteSeaGoldBonusGlobal' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'TradeRouteLandGoldBonusGlobal' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'LandmarksTourismPercentGlobal' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'GreatWorksTourismModifierGlobal' INTEGER DEFAULT 0;

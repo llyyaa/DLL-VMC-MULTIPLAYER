@@ -422,6 +422,8 @@ public:
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int GetLandmarksTourismPercentGlobal() const;
+	int GetGreatWorksTourismModifierGlobal() const;
 	int GetTradeRouteSeaGoldBonusGlobal() const;
 	int GetTradeRouteLandGoldBonusGlobal() const;
 	bool IsAnyWater() const;
@@ -788,6 +790,8 @@ private:
 
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iLandmarksTourismPercentGlobal;
+	int m_iGreatWorksTourismModifierGlobal;
 	int m_iTradeRouteSeaGoldBonusGlobal;
 	int m_iTradeRouteLandGoldBonusGlobal;
 	bool m_bAnyWater;

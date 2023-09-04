@@ -971,7 +971,7 @@ void CvCityStrategyAI::ChooseProduction(bool bUseAsyncRandom, BuildingTypes eIgn
 					bool bRequireHolyCity = pkBuildingInfo->IsRequiresHolyCity();
 
 					// Hermitage, Tourist Center
-					bool bIsCultureRelatedBuilding = (pkBuildingInfo->GetCultureRateModifier() > 0) || ((pkBuildingInfo->GetLandmarksTourismPercent() + pkBuildingInfo->GetGreatWorksTourismModifier()) > 0);
+					bool bIsCultureRelatedBuilding = (pkBuildingInfo->GetCultureRateModifier() > 0) || ((pkBuildingInfo->GetLandmarksTourismPercent() + pkBuildingInfo->GetGreatWorksTourismModifier() + pkBuildingInfo->GetLandmarksTourismPercentGlobal() + pkBuildingInfo->GetGreatWorksTourismModifierGlobal()) > 0);
 
 					// National college, Oxford University
 					bool bIsScienceBoostBuilding = (pkBuildingInfo->GetYieldModifier(YIELD_SCIENCE) > 0) || (pkBuildingInfo->GetYieldChange(YIELD_SCIENCE) > 1);

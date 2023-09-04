@@ -4513,13 +4513,16 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 		return;
 	}
 
+	CvPlayer& kPlayer = GET_PLAYER(m_pCity->getOwner());
+
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	// Ignore those Great Works in storage (ie not generating a yield)
 	int iBase = GetNumGreatWorks(false) * GC.getBASE_TOURISM_PER_GREAT_WORK();
 #else
 	int iBase = GetNumGreatWorks() * GC.getBASE_TOURISM_PER_GREAT_WORK();
 #endif
-	int iBonus = (m_pCity->GetCityBuildings()->GetGreatWorksTourismModifier() * iBase / 100);
+	int iBonus = m_pCity->GetCityBuildings()->GetGreatWorksTourismModifier() + kPlayer.getGreatWorksTourismModifierGlobal();
+	iBonus = (iBonus * iBase / 100);
 	iBase += iBonus;
 	if(bShouldBuildTip && iBase != 0)
 	{
@@ -4543,7 +4546,7 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 	// Add in all the tourism from yields
 	int iYieldRate = m_pCity->getYieldRate(YIELD_TOURISM, false);
 	//getYieldRate() multiplied BaseYieldRateModifier()
-	iYieldRate -= GET_PLAYER(m_pCity->getOwner()).GetTrade()->GetTradeValuesAtCityTimes100(m_pCity, YIELD_TOURISM);
+	iYieldRate -= kPlayer.GetTrade()->GetTradeValuesAtCityTimes100(m_pCity, YIELD_TOURISM);
 	iYieldRate *= 100;
 	iYieldRate += 50;
 	iYieldRate /= m_pCity->getBaseYieldRateModifier(YIELD_TOURISM);
@@ -4554,13 +4557,13 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 	iBase += iYieldRate;
 #endif
 
-	int iPercent = m_pCity->GetCityBuildings()->GetLandmarksTourismPercent();
+	int iPercent = m_pCity->GetCityBuildings()->GetLandmarksTourismPercent() + kPlayer.getLandmarksTourismPercentGlobal();
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	ReligionTypes eCityReligion = m_pCity->GetCityReligions()->GetReligiousMajority();
 	if(MOD_BELIEF_NEW_EFFECT_FOR_SP && eCityReligion != NO_RELIGION)
 	{
 		int iReligionPercent = GC.getGame().GetGameReligions()->GetReligion(eCityReligion,m_pCity->getOwner())->m_Beliefs.GetLandmarksTourismPercent();
-		if(iReligionPercent != 0 && GET_PLAYER(m_pCity->getOwner()).HasReligion(eCityReligion))
+		if(iReligionPercent != 0 && kPlayer.HasReligion(eCityReligion))
 		{
 			iPercent += iReligionPercent;
 		}
@@ -4612,7 +4615,7 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 				continue;
 			}
 
-			CvCivilizationInfo& playerCivilizationInfo = GET_PLAYER(m_pCity->getOwner()).getCivilizationInfo();
+			CvCivilizationInfo& playerCivilizationInfo = kPlayer.getCivilizationInfo();
 			BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
 
 			if(eBuilding != NO_BUILDING)
@@ -4647,7 +4650,7 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 			continue;
 		}
 
-		CvCivilizationInfo& playerCivilizationInfo = GET_PLAYER(m_pCity->getOwner()).getCivilizationInfo();
+		CvCivilizationInfo& playerCivilizationInfo = kPlayer.getCivilizationInfo();
 		BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
 
 		if(eBuilding != NO_BUILDING)
