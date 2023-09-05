@@ -523,57 +523,62 @@ int CvTreasury::CalculateUnitCost(int& iFreeUnits, int& iPaidUnits, int& iBaseUn
 	}
 
 	int iSupport = 0;
+	iBaseUnitCost = 0;
 
 	CvHandicapInfo& playerHandicap = m_pPlayer->getHandicapInfo();
-	iFreeUnits = playerHandicap.getGoldFreeUnits();
-
-	// Defined in XML by unit info type
-	iFreeUnits += m_pPlayer->GetNumMaintenanceFreeUnits();
-	iFreeUnits += m_pPlayer->getBaseFreeUnits();
-
-	iPaidUnits = max(0, m_pPlayer->getNumUnits() - iFreeUnits);
-
-	iBaseUnitCost = iPaidUnits * m_pPlayer->getGoldPerUnitTimes100();
-
-	// Discount on land unit maintenance?
-	int iLandUnitMod = m_pPlayer->GetPlayerTraits()->GetLandUnitMaintenanceModifier();
-	if(iLandUnitMod != 0)
+	if(m_pPlayer->getGoldPerUnitTimes100() != 0)
 	{
-		int iLandUnits = m_pPlayer->GetNumUnitsWithDomain(DOMAIN_LAND, true /*bMilitaryOnly*/);
-		int iFreeLandUnits = m_pPlayer->GetNumMaintenanceFreeUnits(DOMAIN_LAND, true);
-		int iPaidLandUnits = iLandUnits - iFreeLandUnits;
-		iBaseUnitCost += (iLandUnitMod * iPaidLandUnits * m_pPlayer->getGoldPerUnitTimes100()) / 100;
-	}
+		iFreeUnits = playerHandicap.getGoldFreeUnits();
 
-	// Discount on naval unit maintenance?
-	int iNavalUnitMod = m_pPlayer->GetPlayerTraits()->GetNavalUnitMaintenanceModifier();
-	if(iNavalUnitMod != 0)
-	{
-		int iNavalUnits = m_pPlayer->GetNumUnitsWithDomain(DOMAIN_SEA, true /*bMilitaryOnly*/);
-		int iFreeNavalUnits = m_pPlayer->GetNumMaintenanceFreeUnits(DOMAIN_SEA, true);
-		int iPaidNavalUnits = iNavalUnits - iFreeNavalUnits;
-		iBaseUnitCost += (iNavalUnitMod * iPaidNavalUnits * m_pPlayer->getGoldPerUnitTimes100()) / 100;
-	}
+		// Defined in XML by unit info type
+		iFreeUnits += m_pPlayer->GetNumMaintenanceFreeUnits();
+		iFreeUnits += m_pPlayer->getBaseFreeUnits();
 
-	// Discounts for units of certain UnitCombat classes
-	for(int iI = 0; iI < GC.getNumUnitCombatClassInfos(); iI++)
-	{
-		const UnitCombatTypes eUnitCombatClass = static_cast<UnitCombatTypes>(iI);
-		CvBaseInfo* pkUnitCombatClassInfo = GC.getUnitCombatClassInfo(eUnitCombatClass);
-		if(pkUnitCombatClassInfo)
+		iPaidUnits = max(0, m_pPlayer->getNumUnits() - iFreeUnits);
+
+		iBaseUnitCost = iPaidUnits * m_pPlayer->getGoldPerUnitTimes100();
+
+		// Discount on land unit maintenance?
+		int iLandUnitMod = m_pPlayer->GetPlayerTraits()->GetLandUnitMaintenanceModifier();
+		if(iLandUnitMod != 0)
 		{
-			int iModifier = m_pPlayer->GetPlayerTraits()->GetMaintenanceModifierUnitCombat(eUnitCombatClass);
-			if (iModifier != 0)
+			int iLandUnits = m_pPlayer->GetNumUnitsWithDomain(DOMAIN_LAND, true /*bMilitaryOnly*/);
+			int iFreeLandUnits = m_pPlayer->GetNumMaintenanceFreeUnits(DOMAIN_LAND, true);
+			int iPaidLandUnits = iLandUnits - iFreeLandUnits;
+			iBaseUnitCost += (iLandUnitMod * iPaidLandUnits * m_pPlayer->getGoldPerUnitTimes100()) / 100;
+		}
+
+		// Discount on naval unit maintenance?
+		int iNavalUnitMod = m_pPlayer->GetPlayerTraits()->GetNavalUnitMaintenanceModifier();
+		if(iNavalUnitMod != 0)
+		{
+			int iNavalUnits = m_pPlayer->GetNumUnitsWithDomain(DOMAIN_SEA, true /*bMilitaryOnly*/);
+			int iFreeNavalUnits = m_pPlayer->GetNumMaintenanceFreeUnits(DOMAIN_SEA, true);
+			int iPaidNavalUnits = iNavalUnits - iFreeNavalUnits;
+			iBaseUnitCost += (iNavalUnitMod * iPaidNavalUnits * m_pPlayer->getGoldPerUnitTimes100()) / 100;
+		}
+
+		// Discounts for units of certain UnitCombat classes
+		for(int iI = 0; iI < GC.getNumUnitCombatClassInfos(); iI++)
+		{
+			const UnitCombatTypes eUnitCombatClass = static_cast<UnitCombatTypes>(iI);
+			CvBaseInfo* pkUnitCombatClassInfo = GC.getUnitCombatClassInfo(eUnitCombatClass);
+			if(pkUnitCombatClassInfo)
 			{
-				int iNumUnits = m_pPlayer->GetNumUnitsWithUnitCombat(eUnitCombatClass);
-				int iCost = iNumUnits * m_pPlayer->getGoldPerUnitTimes100(); 
-				int iModifiedCost = iNumUnits * m_pPlayer->getGoldPerUnitTimes100() * (100 + iModifier) / 100; 
-				
-				// Reduce cost based on difference
-				iBaseUnitCost += (iModifiedCost - iCost);
+				int iModifier = m_pPlayer->GetPlayerTraits()->GetMaintenanceModifierUnitCombat(eUnitCombatClass);
+				if (iModifier != 0)
+				{
+					int iNumUnits = m_pPlayer->GetNumUnitsWithUnitCombat(eUnitCombatClass);
+					int iCost = iNumUnits * m_pPlayer->getGoldPerUnitTimes100(); 
+					int iModifiedCost = iNumUnits * m_pPlayer->getGoldPerUnitTimes100() * (100 + iModifier) / 100; 
+					
+					// Reduce cost based on difference
+					iBaseUnitCost += (iModifiedCost - iCost);
+				}
 			}
 		}
 	}
+	
 
 	iExtraCost = m_pPlayer->getExtraUnitCost() * 100;	// In hundreds to avoid rounding errors
 
