@@ -1076,6 +1076,8 @@ public:
 	void ChangeUnitTypePrmoteHealGlobal(UnitTypes eUnit, int iChange);
 	int GetUnitTypePrmoteHealGlobal(UnitTypes) const;
 #endif
+	int getPolicyModifiers(PolicyModifierType eIndex) const;
+	void changePolicyModifiers(PolicyModifierType eIndex, int iChange);
 
 	int getMilitaryFoodProductionCount() const;
 	bool isMilitaryFoodProduction() const;
@@ -2534,6 +2536,7 @@ protected:
 	std::map<int, int> m_piDomainFreeExperience;
 	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
 #endif
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiPolicyModifiers;
 	std::vector<int> m_aiYieldModifierFromActiveSpies;
 
 	std::vector<FeatureTypes> m_ownedNaturalWonders;

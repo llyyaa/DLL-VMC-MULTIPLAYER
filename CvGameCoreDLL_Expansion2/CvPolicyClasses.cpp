@@ -46,6 +46,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iStrategicResourceMod(0),
 	m_iWonderProductionModifier(0),
 	m_iBuildingProductionModifier(0),
+	m_iReligionProductionModifier(0),
 	m_iGreatPeopleRateModifier(0),
 	m_iGreatGeneralRateModifier(0),
 	m_iGreatAdmiralRateModifier(0),
@@ -336,6 +337,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iStrategicResourceMod = kResults.GetInt("StrategicResourceMod");
 	m_iWonderProductionModifier = kResults.GetInt("WonderProductionModifier");
 	m_iBuildingProductionModifier = kResults.GetInt("BuildingProductionModifier");
+	m_iReligionProductionModifier = kResults.GetInt("ReligionProductionModifier");
 	m_iGreatPeopleRateModifier = kResults.GetInt("GreatPeopleRateModifier");
 	m_iGreatGeneralRateModifier = kResults.GetInt("GreatGeneralRateModifier");
 	m_iGreatAdmiralRateModifier = kResults.GetInt("GreatAdmiralRateModifier");
@@ -1432,6 +1434,12 @@ int CvPolicyEntry::GetWonderProductionModifier() const
 int CvPolicyEntry::GetBuildingProductionModifier() const
 {
 	return m_iBuildingProductionModifier;
+}
+
+/// Production bonus when working on a Religion Building
+int CvPolicyEntry::GetReligionProductionModifier() const
+{
+	return m_iReligionProductionModifier;
 }
 
 ///  Change in spawn rate for great people
@@ -3610,169 +3618,7 @@ CvPolicyXMLEntries* CvPlayerPolicies::GetPolicies() const
 /// Get numeric modifier by adding up its value from all purchased policies
 int CvPlayerPolicies::GetNumericModifier(PolicyModifierType eType)
 {
-	int rtnValue = 0;
-
-	int iNumPolicies = m_pPolicies->GetNumPolicies();
-	for(int i = 0; i < iNumPolicies; i++)
-	{
-		// Do we have this policy?
-		if(m_pabHasPolicy[i] && !IsPolicyBlocked((PolicyTypes)i))
-		{
-			// Yes, so add it to our counts
-			switch(eType)
-			{
-			case POLICYMOD_EXTRA_HAPPINESS:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetExtraHappiness();
-				break;
-			case POLICYMOD_EXTRA_HAPPINESS_PER_CITY:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetExtraHappinessPerCity();
-				break;
-			case POLICYMOD_GREAT_PERSON_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGreatPeopleRateModifier();
-				break;
-			case POLICYMOD_GREAT_GENERAL_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGreatGeneralRateModifier();
-				break;
-			case POLICYMOD_GREAT_ADMIRAL_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGreatAdmiralRateModifier();
-				break;
-			case POLICYMOD_GREAT_WRITER_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGreatWriterRateModifier();
-				break;
-			case POLICYMOD_GREAT_ARTIST_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGreatArtistRateModifier();
-				break;
-			case POLICYMOD_GREAT_MUSICIAN_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGreatMusicianRateModifier();
-				break;
-			case POLICYMOD_GREAT_MERCHANT_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGreatMerchantRateModifier();
-				break;
-			case POLICYMOD_GREAT_SCIENTIST_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGreatScientistRateModifier();
-				break;
-			case POLICYMOD_DOMESTIC_GREAT_GENERAL_RATE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetDomesticGreatGeneralRateModifier();
-				break;
-			case POLICYMOD_POLICY_COST_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetPolicyCostModifier();
-				break;
-
-			case POLICYMOD_CITY_DEFENSE_BOOST:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetDefenseBoost();
-				break;
-
-			case POLICYMOD_WONDER_PRODUCTION_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetWonderProductionModifier();
-				break;
-			case POLICYMOD_BUILDING_PRODUCTION_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetBuildingProductionModifier();
-				break;
-			case POLICYMOD_FREE_EXPERIENCE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetFreeExperience();
-				break;
-			case POLICYMOD_EXTRA_CULTURE_FROM_IMPROVEMENTS:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCultureImprovementChange();
-				break;
-			case POLICYMOD_CULTURE_FROM_KILLS:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCultureFromKills();
-				break;
-			case POLICYMOD_EMBARKED_EXTRA_MOVES:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetEmbarkedExtraMoves();
-				break;
-			case POLICYMOD_CULTURE_FROM_BARBARIAN_KILLS:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCultureFromBarbarianKills();
-				break;
-			case POLICYMOD_GOLD_FROM_KILLS:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGoldFromKills();
-				break;
-			case POLICYMOD_CULTURE_FROM_GARRISON:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCulturePerGarrisonedUnit();
-				break;
-			case POLICYMOD_UNIT_FREQUENCY_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCityStateUnitFrequencyModifier();
-				break;
-			case POLICYMOD_TOURISM_MOD_COMMON_FOE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCommonFoeTourismModifier();
-				break;
-			case POLICYMOD_TOURISM_MOD_LESS_HAPPY:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetLessHappyTourismModifier();
-				break;
-			case POLICYMOD_TRADE_MISSION_GOLD_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetTradeMissionGoldModifier();
-				break;
-			case POLICYMOD_FAITH_COST_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetFaithCostModifier();
-				break;
-			case POLICYMOD_CULTURAL_PLUNDER_MULTIPLIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCulturalPlunderMultiplier();
-				break;
-			case POLICYMOD_STEAL_TECH_SLOWER_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetStealTechSlowerModifier();
-				break;
-			case POLICYMOD_STEAL_TECH_FASTER_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetStealTechFasterModifier();
-				break;
-			case POLICYMOD_CATCH_SPIES_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCatchSpiesModifier();
-				break;
-			case POLICYMOD_BUILDING_PURCHASE_COST_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetBuildingPurchaseCostModifier();
-				break;
-			case POLICYMOD_LAND_TRADE_GOLD_CHANGE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetLandTradeRouteGoldChange();
-				break;
-			case POLICYMOD_SEA_TRADE_GOLD_CHANGE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetSeaTradeRouteGoldChange();
-				break;
-			case POLICYMOD_SHARED_IDEOLOGY_TRADE_CHANGE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetSharedIdeologyTradeGoldChange();
-				break;
-			case POLICYMOD_RIGGING_ELECTION_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetRiggingElectionModifier();
-				break;
-			case POLICYMOD_MILITARY_UNIT_GIFT_INFLUENCE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetMilitaryUnitGiftExtraInfluence();
-				break;
-			case POLICYMOD_PROTECTED_MINOR_INFLUENCE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetProtectedMinorPerTurnInfluence();
-				break;
-			case POLICYMOD_AFRAID_INFLUENCE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetAfraidMinorPerTurnInfluence();
-				break;
-			case POLICYMOD_MINOR_BULLY_SCORE_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetMinorBullyScoreModifier();
-				break;
-			case POLICYMOD_MINOR_BULLY_INFLUENCE_LOSS_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetMinorBullyInfluenceLossModifier();
-				break;
-			case POLICYMOD_THEMING_BONUS:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetThemingBonusMultiplier();
-				break;
-			case POLICYMOD_CITY_STATE_TRADE_CHANGE:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCityStateTradeChange();
-				break;
-			case POLICYMOD_INTERNAL_TRADE_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetInternalTradeRouteYieldModifier();
-				break;
-			case POLICYMOD_SHARED_RELIGION_TOURISM_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetSharedReligionTourismModifier();
-				break;
-			case POLICYMOD_TRADE_ROUTE_TOURISM_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetTradeRouteTourismModifier();
-				break;
-			case POLICYMOD_OPEN_BORDERS_TOURISM_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetOpenBordersTourismModifier();
-#if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
-			case POLICYMOD_CONVERSION_MODIFIER:
-				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetConversionModifier();
-				break;
-#endif
-			}
-		}
-	}
-
-	return rtnValue;
+	return m_pPlayer->getPolicyModifiers(eType);
 }
 
 /// Get overall modifier from policies for a type of yield

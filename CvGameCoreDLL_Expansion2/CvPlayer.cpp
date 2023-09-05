@@ -448,6 +448,8 @@ CvPlayer::CvPlayer() :
 	, m_piDomainFreeExperience()
 	, m_piUnitTypePrmoteHealGlobal()
 #endif
+	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
+
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
 	, m_aiCapitalYieldChange("CvPlayer::m_aiCapitalYieldChange", m_syncArchive)
 	, m_aiCapitalYieldPerPopChange("CvPlayer::m_aiCapitalYieldPerPopChange", m_syncArchive)
@@ -1279,6 +1281,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiYieldFromPillage.clear();
 	m_aiYieldFromPillage.resize(NUM_YIELD_TYPES, 0);
 #endif
+	m_aiPolicyModifiers.clear();
+	m_aiPolicyModifiers.resize(NUM_POLICY_MODIFIER_TYPE, 0);
+
 	m_aiYieldModifierFromActiveSpies.clear();
 	m_aiYieldModifierFromActiveSpies.resize(NUM_YIELD_TYPES, 0);
 
@@ -17571,6 +17576,26 @@ void CvPlayer::changeWorldWonderCityYieldRateModifier(YieldTypes eIndex, int iCh
 
 
 //	--------------------------------------------------------------------------------
+int CvPlayer::getPolicyModifiers(PolicyModifierType eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_POLICY_MODIFIER_TYPE, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	return m_aiPolicyModifiers[eIndex];
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changePolicyModifiers(PolicyModifierType eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_POLICY_MODIFIER_TYPE, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiPolicyModifiers.setAt(eIndex, m_aiPolicyModifiers[eIndex] + iChange);
+}
+
+
+//	--------------------------------------------------------------------------------
 int CvPlayer::getMilitaryFoodProductionCount() const
 {
 	return m_iMilitaryFoodProductionCount;
@@ -25849,6 +25874,59 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeGoldenAgeMeterMod(pPolicy->GetGoldenAgeMeterMod() * iChange);
 	changeGoldenAgeModifier(pPolicy->GetGoldenAgeDurationMod() * iChange);
 	changeWorkerSpeedModifier(pPolicy->GetWorkerSpeedModifier() * iChange);
+
+	changePolicyModifiers(POLICYMOD_EXTRA_HAPPINESS, pPolicy->GetExtraHappiness() * iChange);
+	changePolicyModifiers(POLICYMOD_EXTRA_HAPPINESS_PER_CITY, pPolicy->GetExtraHappinessPerCity() * iChange);
+	changePolicyModifiers(POLICYMOD_GREAT_PERSON_RATE, pPolicy->GetGreatPeopleRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_GREAT_GENERAL_RATE, pPolicy->GetGreatGeneralRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_DOMESTIC_GREAT_GENERAL_RATE, pPolicy->GetDomesticGreatGeneralRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_POLICY_COST_MODIFIER, pPolicy->GetPolicyCostModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_CITY_DEFENSE_BOOST, pPolicy->GetDefenseBoost() * iChange);
+	changePolicyModifiers(POLICYMOD_RELIGION_PRODUCTION_MODIFIER, pPolicy->GetReligionProductionModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_WONDER_PRODUCTION_MODIFIER, pPolicy->GetWonderProductionModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_BUILDING_PRODUCTION_MODIFIER, pPolicy->GetBuildingProductionModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_FREE_EXPERIENCE, pPolicy->GetFreeExperience() * iChange);
+	changePolicyModifiers(POLICYMOD_EXTRA_CULTURE_FROM_IMPROVEMENTS, pPolicy->GetCultureImprovementChange() * iChange);
+	changePolicyModifiers(POLICYMOD_CULTURE_FROM_KILLS, pPolicy->GetCultureFromKills() * iChange);
+	changePolicyModifiers(POLICYMOD_EMBARKED_EXTRA_MOVES, pPolicy->GetEmbarkedExtraMoves() * iChange);
+	changePolicyModifiers(POLICYMOD_CULTURE_FROM_BARBARIAN_KILLS, pPolicy->GetCultureFromBarbarianKills() * iChange);
+	changePolicyModifiers(POLICYMOD_GOLD_FROM_KILLS, pPolicy->GetGoldFromKills() * iChange);
+	changePolicyModifiers(POLICYMOD_CULTURE_FROM_GARRISON, pPolicy->GetCulturePerGarrisonedUnit() * iChange);
+	changePolicyModifiers(POLICYMOD_UNIT_FREQUENCY_MODIFIER, pPolicy->GetCityStateUnitFrequencyModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_TRADE_MISSION_GOLD_MODIFIER, pPolicy->GetTradeMissionGoldModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_FAITH_COST_MODIFIER, pPolicy->GetFaithCostModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_CULTURAL_PLUNDER_MULTIPLIER, pPolicy->GetCulturalPlunderMultiplier() * iChange);
+	changePolicyModifiers(POLICYMOD_STEAL_TECH_SLOWER_MODIFIER, pPolicy->GetStealTechSlowerModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_CATCH_SPIES_MODIFIER, pPolicy->GetCatchSpiesModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_GREAT_ADMIRAL_RATE, pPolicy->GetGreatAdmiralRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_GREAT_WRITER_RATE, pPolicy->GetGreatWriterRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_GREAT_ARTIST_RATE, pPolicy->GetGreatArtistRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_GREAT_MUSICIAN_RATE, pPolicy->GetGreatMusicianRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_GREAT_MERCHANT_RATE, pPolicy->GetGreatMerchantRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_GREAT_SCIENTIST_RATE, pPolicy->GetGreatScientistRateModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_TOURISM_MOD_COMMON_FOE, pPolicy->GetCommonFoeTourismModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_TOURISM_MOD_LESS_HAPPY, pPolicy->GetLessHappyTourismModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_BUILDING_PURCHASE_COST_MODIFIER, pPolicy->GetBuildingPurchaseCostModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_LAND_TRADE_GOLD_CHANGE, pPolicy->GetLandTradeRouteGoldChange() * iChange);
+	changePolicyModifiers(POLICYMOD_SEA_TRADE_GOLD_CHANGE, pPolicy->GetSeaTradeRouteGoldChange() * iChange);
+	changePolicyModifiers(POLICYMOD_SHARED_IDEOLOGY_TRADE_CHANGE, pPolicy->GetSharedIdeologyTradeGoldChange() * iChange);
+	changePolicyModifiers(POLICYMOD_RIGGING_ELECTION_MODIFIER, pPolicy->GetRiggingElectionModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_MILITARY_UNIT_GIFT_INFLUENCE, pPolicy->GetMilitaryUnitGiftExtraInfluence() * iChange);
+	changePolicyModifiers(POLICYMOD_PROTECTED_MINOR_INFLUENCE, pPolicy->GetProtectedMinorPerTurnInfluence() * iChange);
+	changePolicyModifiers(POLICYMOD_AFRAID_INFLUENCE, pPolicy->GetAfraidMinorPerTurnInfluence() * iChange);
+	changePolicyModifiers(POLICYMOD_MINOR_BULLY_SCORE_MODIFIER, pPolicy->GetMinorBullyScoreModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_MINOR_BULLY_INFLUENCE_LOSS_MODIFIER, pPolicy->GetMinorBullyInfluenceLossModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_STEAL_TECH_FASTER_MODIFIER, pPolicy->GetStealTechFasterModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_THEMING_BONUS, pPolicy->GetThemingBonusMultiplier() * iChange);
+	changePolicyModifiers(POLICYMOD_CITY_STATE_TRADE_CHANGE, pPolicy->GetCityStateTradeChange() * iChange);
+	changePolicyModifiers(POLICYMOD_INTERNAL_TRADE_MODIFIER, pPolicy->GetInternalTradeRouteYieldModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_SHARED_RELIGION_TOURISM_MODIFIER, pPolicy->GetSharedReligionTourismModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_TRADE_ROUTE_TOURISM_MODIFIER, pPolicy->GetTradeRouteTourismModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_OPEN_BORDERS_TOURISM_MODIFIER, pPolicy->GetOpenBordersTourismModifier() * iChange);
+#if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
+	changePolicyModifiers(POLICYMOD_CONVERSION_MODIFIER, pPolicy->GetConversionModifier() * iChange);
+#endif
+
 	changeSharedIdeologyTourismModifier(pPolicy->GetSharedIdeologyTourismModifier() * iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	changeDifferentIdeologyTourismModifier(pPolicy->GetDifferentIdeologyTourismModifier() * iChange);
@@ -27585,6 +27663,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiYieldFromPillageGlobal;
 	kStream >> m_aiYieldFromPillage;
 #endif
+	kStream >> m_aiPolicyModifiers;
 
 	kStream >> m_aiYieldModifierFromActiveSpies;
 	kStream >> m_aiCoastalCityYieldChange;
@@ -28249,6 +28328,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiYieldFromPillageGlobal;
 	kStream << m_aiYieldFromPillage;
 #endif
+	kStream << m_aiPolicyModifiers;
+
 	kStream << m_aiYieldModifierFromActiveSpies;
 	kStream << m_aiCoastalCityYieldChange;
 	kStream << m_aiCapitalYieldChange;

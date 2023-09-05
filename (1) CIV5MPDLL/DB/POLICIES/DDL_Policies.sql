@@ -58,3 +58,4 @@ ALTER TABLE Policies ADD 'SettlerProductionStartEra' TEXT DEFAULT NULL REFERENCE
 ALTER TABLE Policies ADD 'NumTradeRouteBonus' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'HappinessPerPolicy' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'DifferentIdeologyTourismModifier' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD 'ReligionProductionModifier' INTEGER DEFAULT 0;
