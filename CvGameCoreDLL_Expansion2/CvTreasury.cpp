@@ -584,6 +584,29 @@ int CvTreasury::CalculateUnitCost(int& iFreeUnits, int& iPaidUnits, int& iBaseUn
 
 	iSupport = iBaseUnitCost + iExtraCost;
 
+#if defined(MOD_UNIT_COST_DONOT_INCTEASE_WITH_TURN)
+	double dFinalCost = 0.00f;
+	if(MOD_UNIT_COST_DONOT_INCTEASE_WITH_TURN)
+	{
+		dFinalCost += iSupport;
+		dFinalCost /= 100;
+	}
+	else
+	{
+		// Game progress factor ranges from 0.0 to 1.0 based on how far into the game we are
+		double fGameProgressFactor = double(GC.getGame().getElapsedGameTurns()) / GC.getGame().getDefaultEstimateEndTurn();
+
+		// Multiplicative increase - helps scale costs as game goes on - the HIGHER this number the more is paid
+		double fMultiplyFactor = 1.0 + (fGameProgressFactor* /*8*/ GC.getUNIT_MAINTENANCE_GAME_MULTIPLIER());
+		// Exponential increase - this one really punishes those with a HUGE military - the LOWER this number the more is paid
+		double fExponentialFactor = 1.0 + (fGameProgressFactor / /*7*/ GC.getUNIT_MAINTENANCE_GAME_EXPONENT_DIVISOR());
+
+		double fTempCost = fMultiplyFactor * iSupport;
+		fTempCost /= 100;	// Take this out of hundreds now
+
+		dFinalCost += pow(fTempCost, fExponentialFactor);
+	}
+#else
 	// Game progress factor ranges from 0.0 to 1.0 based on how far into the game we are
 	double fGameProgressFactor = double(GC.getGame().getElapsedGameTurns()) / GC.getGame().getDefaultEstimateEndTurn();
 
@@ -596,6 +619,7 @@ int CvTreasury::CalculateUnitCost(int& iFreeUnits, int& iPaidUnits, int& iBaseUn
 	fTempCost /= 100;	// Take this out of hundreds now
 
 	double dFinalCost = pow(fTempCost, fExponentialFactor);
+#endif
 
 	// A mod at the player level? (Policies, etc.)
 	if(m_pPlayer->GetUnitGoldMaintenanceMod() != 0)
@@ -625,6 +649,7 @@ int CvTreasury::CalculateUnitCost(int& iFreeUnits, int& iPaidUnits, int& iBaseUn
 /// Compute unit supply for the turn (returns component info)
 int CvTreasury::CalculateUnitSupply(int& iPaidUnits, int& iBaseSupplyCost)
 {
+	if(GC.getINITIAL_OUTSIDE_UNIT_GOLD_PERCENT() == 0) return 0;
 	int iSupply;
 
 	iPaidUnits = std::max(0, (m_pPlayer->getNumOutsideUnits() - /*3*/ GC.getINITIAL_FREE_OUTSIDE_UNITS()));
@@ -648,6 +673,26 @@ int CvTreasury::CalculateUnitSupply(int& iPaidUnits, int& iBaseSupplyCost)
 		iSupply /= 100;
 	}
 
+#if defined(MOD_UNIT_COST_DONOT_INCTEASE_WITH_TURN)
+	int iFinalCost;
+	if(MOD_UNIT_COST_DONOT_INCTEASE_WITH_TURN)
+	{
+		iFinalCost = iSupply;
+	}
+	else
+	{
+		// Game progress factor ranges from 0.0 to 1.0 based on how far into the game we are
+		double fGameProgressFactor = float(GC.getGame().getElapsedGameTurns()) / GC.getGame().getEstimateEndTurn();
+
+		// Multiplicative increase - helps scale costs as game goes on - the HIGHER this number the more is paid
+		double fMultiplyFactor = 1.0 + (fGameProgressFactor* /*8*/ GC.getUNIT_MAINTENANCE_GAME_MULTIPLIER());
+		// Exponential increase - this one really punishes those with a HUGE military - the LOWER this number the more is paid
+		double fExponentialFactor = 1.0 + (fGameProgressFactor / /*7*/ GC.getUNIT_MAINTENANCE_GAME_EXPONENT_DIVISOR());
+
+		double fTempCost = fMultiplyFactor * iSupply;
+		iFinalCost = (int) pow(fTempCost, fExponentialFactor);
+	}
+#else
 	// Game progress factor ranges from 0.0 to 1.0 based on how far into the game we are
 	double fGameProgressFactor = float(GC.getGame().getElapsedGameTurns()) / GC.getGame().getEstimateEndTurn();
 
@@ -658,6 +703,8 @@ int CvTreasury::CalculateUnitSupply(int& iPaidUnits, int& iBaseSupplyCost)
 
 	double fTempCost = fMultiplyFactor * iSupply;
 	int iFinalCost = (int) pow(fTempCost, fExponentialFactor);
+#endif
+	
 
 	// A mod at the player level? (Policies, etc.)
 	if(m_pPlayer->GetUnitSupplyMod() != 0)

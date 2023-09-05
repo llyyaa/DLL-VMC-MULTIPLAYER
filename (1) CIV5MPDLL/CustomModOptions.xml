@@ -1111,6 +1111,8 @@
     <!-- see DDL_Traits.sql -->
     <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
 
+    <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="1"/> 
+
     <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
     <!-- ALTER TABLE Buildings ADD COLUMN 'AllowInstantYield' BOOLEAN DEFAULT 0;-->
