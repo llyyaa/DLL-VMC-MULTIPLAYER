@@ -239,7 +239,7 @@
 
     <!-- Displays the opinion weight in the tooltip when meeting a leader (v80) -->
     <!-- See also: "Diplomacy - By Numbers" -->
-    <Row Class="4" Name="DIPLOMACY_BY_NUMBERS" Value="0"/>
+    <Row Class="4" Name="DIPLOMACY_BY_NUMBERS" Value="1"/>
 
     <!-- Tech bonuses from other teams require an embassy or spy in their capital and not from just having met them (v30) -->
     <!-- See also: "Diplomacy - Tech Bonuses" -->
