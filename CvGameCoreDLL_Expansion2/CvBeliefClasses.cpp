@@ -58,6 +58,8 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iInquisitorPressureRetention(0),
 	m_iFaithBuildingTourism(0),
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iGoldenAgeModifier(0),
+	m_iExtraSpies(0),
 	m_bGreatPersonPointsCapital(false),
 	m_bGreatPersonPointsPerCity(false),
 	m_bGreatPersonPointsHolyCity(false),
@@ -681,6 +683,14 @@ int CvBeliefEntry::GetPlotYieldChange(int i, int j) const
 }
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+int CvBeliefEntry::GetGoldenAgeModifier() const
+{
+	return m_iGoldenAgeModifier;
+}
+int CvBeliefEntry::GetExtraSpies() const
+{
+	return m_iExtraSpies;
+}
 //Great Person Points
 bool CvBeliefEntry::IsGreatPersonPointsCapital() const
 {
@@ -869,6 +879,8 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iInquisitorPressureRetention    = kResults.GetInt("InquisitorPressureRetention");
 	m_iFaithBuildingTourism           = kResults.GetInt("FaithBuildingTourism");
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iGoldenAgeModifier	  		  = kResults.GetInt("GoldenAgeModifier");
+	m_iExtraSpies	  	  			  = kResults.GetInt("ExtraSpies");
 	m_iLandmarksTourismPercent	  	  = kResults.GetInt("LandmarksTourismPercent");
 	m_iHolyCityUnitExperence	  	  = kResults.GetInt("HolyCityUnitExperence");
 	m_iCityExtraMissionarySpreads	  = kResults.GetInt("CityExtraMissionarySpreads");
@@ -1291,6 +1303,8 @@ CvReligionBeliefs::CvReligionBeliefs(const CvReligionBeliefs& source)
 	m_iFaithBuildingTourism = source.m_iFaithBuildingTourism;
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iGoldenAgeModifier = source.m_iGoldenAgeModifier;
+	m_iExtraSpies = source.m_iExtraSpies;
 	m_bGreatPersonPoints = source.m_bGreatPersonPoints;
 	m_vFreePromotionForProphet = source.m_vFreePromotionForProphet;
 	m_iLandmarksTourismPercent = source.m_iLandmarksTourismPercent;
@@ -1354,6 +1368,8 @@ void CvReligionBeliefs::Reset()
 	m_iFaithBuildingTourism = 0;
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	m_iGoldenAgeModifier = 0;
+	m_iExtraSpies = 0;
 	m_bGreatPersonPoints = false;
 	m_vFreePromotionForProphet.clear();
 	m_iLandmarksTourismPercent = 0;
@@ -1384,7 +1400,7 @@ void CvReligionBeliefs::Reset()
 }
 
 /// Store off data on bonuses from beliefs
-void CvReligionBeliefs::AddBelief(BeliefTypes eBelief)
+void CvReligionBeliefs::AddBelief(BeliefTypes eBelief, PlayerTypes ePlayer)
 {
 	CvAssert(eBelief != NO_BELIEF);
 	if(eBelief == NO_BELIEF)
@@ -1420,6 +1436,29 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief)
 	m_iFaithBuildingTourism += belief->GetFaithBuildingTourism();
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	//Attention !!! in CanFoundReligion(), ePlayer is NO_PLAYER(to avoid adding Repeated value)
+	if(belief->GetGoldenAgeModifier() && ePlayer != NO_PLAYER)
+	{
+		m_iGoldenAgeModifier += belief->GetGoldenAgeModifier();
+		GET_PLAYER(ePlayer).changeGoldenAgeModifier(belief->GetGoldenAgeModifier());
+	}
+
+	if (belief->GetExtraSpies() > 0 && ePlayer != NO_PLAYER)
+	{
+		m_iExtraSpies += belief->GetExtraSpies();
+		CvPlayerEspionage* pEspionage = GET_PLAYER(ePlayer).GetEspionage();
+		CvAssertMsg(pEspionage, "pEspionage is null! What's up with that?!");
+		if (pEspionage)
+		{
+			int iNumSpies = belief->GetExtraSpies();
+
+			for (int i = 0; i < iNumSpies; i++)
+			{
+				pEspionage->CreateSpy();
+			}
+		}
+	}
+	
 	m_bGreatPersonPoints = m_bGreatPersonPoints || belief->IsGreatPersonPointsCapital() || belief->IsGreatPersonPointsPerCity() || belief->IsGreatPersonPointsHolyCity();	
 	if(belief->GetFreePromotionForProphet() != NO_PROMOTION)
 	{
@@ -2295,6 +2334,8 @@ void CvReligionBeliefs::Read(FDataStream& kStream)
 	}
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	kStream >> m_iGoldenAgeModifier;
+	kStream >> m_iExtraSpies;
 	kStream >> m_bGreatPersonPoints;
 	kStream >> m_vFreePromotionForProphet;
 	kStream >> m_iLandmarksTourismPercent;
@@ -2354,6 +2395,8 @@ void CvReligionBeliefs::Write(FDataStream& kStream) const
 	kStream << m_iFaithBuildingTourism;
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	kStream << m_iGoldenAgeModifier;
+	kStream << m_iExtraSpies;
 	kStream << m_bGreatPersonPoints;
 	kStream << m_vFreePromotionForProphet;
 	kStream << m_iLandmarksTourismPercent;

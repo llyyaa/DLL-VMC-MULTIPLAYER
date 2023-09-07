@@ -123,6 +123,8 @@ public:
 	int GetPlotYieldChange(int i, int j) const;
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetGoldenAgeModifier() const;
+	int GetExtraSpies() const;
 	bool IsGreatPersonPointsCapital() const;
 	bool IsGreatPersonPointsPerCity() const;
 	bool IsGreatPersonPointsHolyCity() const;
@@ -190,6 +192,8 @@ protected:
 	int m_iInquisitorPressureRetention;
 	int m_iFaithBuildingTourism;
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int m_iGoldenAgeModifier;
+	int m_iExtraSpies;
 	bool m_bGreatPersonPointsCapital;
 	bool m_bGreatPersonPointsPerCity;
 	bool m_bGreatPersonPointsHolyCity;
@@ -316,7 +320,7 @@ public:
 	CvReligionBeliefs(const CvReligionBeliefs& source);
 	void Uninit();
 	void Reset();
-	void AddBelief(BeliefTypes eBelief);
+	void AddBelief(BeliefTypes eBelief, PlayerTypes ePlayer);
 
 	// Accessor functions
 	bool HasBelief(BeliefTypes eBelief) const;
@@ -417,6 +421,14 @@ public:
 	}
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int GetGoldenAgeModifier() const
+	{
+		return m_iGoldenAgeModifier;
+	}
+	int GetExtraSpies() const
+	{
+		return m_iExtraSpies;
+	}
 	bool HasGreatPersonPoints() const
 	{
 		return m_bGreatPersonPoints;
@@ -560,6 +572,8 @@ private:
 	int m_iFaithBuildingTourism;
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+	int m_iGoldenAgeModifier;
+	int m_iExtraSpies;
 	bool m_bGreatPersonPoints;
 	std::vector<int> m_vFreePromotionForProphet;
 	int m_iLandmarksTourismPercent;
