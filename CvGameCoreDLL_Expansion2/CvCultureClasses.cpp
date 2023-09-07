@@ -4517,9 +4517,9 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	// Ignore those Great Works in storage (ie not generating a yield)
-	int iBase = GetNumGreatWorks(false) * GC.getBASE_TOURISM_PER_GREAT_WORK();
+	int iBase = GetNumGreatWorks(false) * (GC.getBASE_TOURISM_PER_GREAT_WORK() + kPlayer.GetPlayerTraits()->GetGreatWorksTourism());
 #else
-	int iBase = GetNumGreatWorks() * GC.getBASE_TOURISM_PER_GREAT_WORK();
+	int iBase = GetNumGreatWorks() * (GC.getBASE_TOURISM_PER_GREAT_WORK() + kPlayer.GetPlayerTraits()->GetGreatWorksTourism());
 #endif
 	int iBonus = m_pCity->GetCityBuildings()->GetGreatWorksTourismModifier() + kPlayer.getGreatWorksTourismModifierGlobal();
 	iBonus = (iBonus * iBase / 100);

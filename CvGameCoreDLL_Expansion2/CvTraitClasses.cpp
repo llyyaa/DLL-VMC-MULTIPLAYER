@@ -120,6 +120,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iGreatWorksTourism(0),
 	m_iCiviliansFreePromotion(NO_PROMOTION),
 	m_iTradeRouteLandGoldBonus(0),
 	m_iTradeRouteSeaGoldBonus(0),
@@ -674,6 +675,10 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetGreatWorksTourism() const
+{
+	return m_iGreatWorksTourism;
+}
 int CvTraitEntry::GetCiviliansFreePromotion() const
 {
 	return m_iCiviliansFreePromotion;
@@ -1530,6 +1535,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iGreatWorksTourism = kResults.GetInt("GreatWorksTourism");
 	szTextVal = kResults.GetText("CiviliansFreePromotion");
 	if(szTextVal)
 	{
@@ -2334,6 +2340,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			m_iGreatWorksTourism += trait->GetGreatWorksTourism();
 			if(trait->GetCiviliansFreePromotion() != NO_PROMOTION)
 			{
 				m_iCiviliansFreePromotion = trait->GetCiviliansFreePromotion();
@@ -2823,6 +2830,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iGreatWorksTourism = 0;
 	m_iCiviliansFreePromotion = NO_PROMOTION;
 	m_iTradeRouteLandGoldBonus = 0;
 	m_iTradeRouteSeaGoldBonus = 0;
@@ -4254,6 +4262,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iGreatWorksTourism;
 	kStream >> m_iCiviliansFreePromotion;
 	kStream >> m_iTradeRouteLandGoldBonus;
 	kStream >> m_iTradeRouteSeaGoldBonus;
@@ -4632,6 +4641,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iGreatWorksTourism;
 	kStream << m_iCiviliansFreePromotion;
 	kStream << m_iTradeRouteLandGoldBonus;
 	kStream << m_iTradeRouteSeaGoldBonus;
