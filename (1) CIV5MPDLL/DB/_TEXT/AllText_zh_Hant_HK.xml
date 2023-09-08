@@ -385,6 +385,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_RESOURCE">
 			<Text>來自資源: {1_score}</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_TRAIT">
+			<Text>來自領袖特性: {1_score}</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_SPY">
 			<Text>來自間諜: {1_score}%</Text>
 		</Row>

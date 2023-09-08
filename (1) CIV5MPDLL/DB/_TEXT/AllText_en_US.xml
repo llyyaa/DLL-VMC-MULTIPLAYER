@@ -381,6 +381,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_RESOURCE">
 			<Text>From resource: {1_score}</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_TRAIT">
+			<Text>From Leader Trait: {1_score}</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_SPY">
 			<Text>From Spy: {1_score}%</Text>
 		</Row>

@@ -21470,6 +21470,17 @@ int CvCity::CalculateCorruptionScoreFromResource() const
 	return resourceInfo != nullptr ? resourceInfo->GetCorruptionScoreChange() : 0;
 }
 
+int CvCity::CalculateCorruptionScoreFromTrait() const
+{
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+	int TraitBounsTotal = 0;
+	if(plot())
+	{
+		TraitBounsTotal += plot()->isRiver() ? owner.GetPlayerTraits()->GetRiverCorruptionScoreChange() : 0;
+	}
+	return TraitBounsTotal;
+}
+
 int CvCity::CalculateTotalCorruptionScore() const
 {
 	CvPlayerAI& owner = GET_PLAYER(getOwner());
@@ -21479,6 +21490,7 @@ int CvCity::CalculateTotalCorruptionScore() const
 	score += CalculateCorruptionScoreFromDistance();
 	score += CalculateCorruptionScoreFromResource();
 	score += GetCorruptionScoreChangeFromBuilding();
+	score += CalculateCorruptionScoreFromTrait();
 	score = std::max(0, score);
 
 	// Score Modifier

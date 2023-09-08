@@ -706,6 +706,7 @@ protected:
 	LUAAPIEXTN(GetCorruptionScoreChangeFromBuilding, int);
 	LUAAPIEXTN(GetCorruptionLevelChangeFromBuilding, int);
 	LUAAPIEXTN(CalculateCorruptionScoreFromResource, int);
+	LUAAPIEXTN(CalculateCorruptionScoreFromTrait, int);
 	LUAAPIEXTN(DecideCorruptionLevelForNormalCity, CorruptionLevelTypes, int);
 	LUAAPIEXTN(GetCorruptionScoreModifierFromPolicy, int);
 	LUAAPIEXTN(GetMaxCorruptionLevel, int);

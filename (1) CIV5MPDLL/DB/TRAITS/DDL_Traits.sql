@@ -31,3 +31,4 @@ alter table Traits add column `UnitMaxHitPointChangePerRazedCityPop` int not nul
 alter table Traits add column `UnitMaxHitPointChangePerRazedCityPopLimit` int not null default 0;
 
 alter table Traits add column `GreatWorksTourism` int not null default 0;
+alter table Traits add column `RiverCorruptionScoreChange` int not null default 0;
