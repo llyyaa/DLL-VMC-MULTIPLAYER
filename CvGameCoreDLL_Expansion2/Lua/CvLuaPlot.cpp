@@ -18,6 +18,7 @@
 #include "CvLuaCity.h"
 #include "CvLuaPlot.h"
 #include "CvLuaUnit.h"
+#include "CvLuaTeam.h"
 #include "../CvGameCoreUtils.h"
 
 #include "NetworkMessageUtil.h"
