@@ -239,7 +239,17 @@ protected:
 	LUAAPIEXTN(GetMaxHitPointsBase, int);
 	LUAAPIEXTN(SetMaxHitPointsBase, void, int);
 	LUAAPIEXTN(ChangeMaxHitPointsBase, void, int);
+	LUAAPIEXTN(GetMaxHitPointsChangeFromRazedCityPop, int);
+	LUAAPIEXTN(SetMaxHitPointsChangeFromRazedCityPop, void, int);
 #endif
+
+	static int lGetCombatStrengthChangeFromKilledUnits(lua_State* L);
+	static int lChangeCombatStrengthChangeFromKilledUnits(lua_State* L);
+	static int lSetCombatStrengthChangeFromKilledUnits(lua_State* L);
+	static int lGetRangedCombatStrengthChangeFromKilledUnits(lua_State* L);
+	static int lChangeRangedCombatStrengthChangeFromKilledUnits(lua_State* L);
+	static int lSetRangedCombatStrengthChangeFromKilledUnits(lua_State* L);
+
 	static int lGetMaxHitPoints(lua_State* L);
 	static int lGetCurrHitPoints(lua_State* L);
 	static int lIsHurt(lua_State* L);

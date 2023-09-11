@@ -991,6 +991,7 @@ protected:
 	static int lGetTraitCityStateFriendshipModifier(lua_State* L);
 	static int lGetTraitGreatGeneralExtraBonus(lua_State* L);
 	static int lGetTraitGreatScientistRateModifier(lua_State* L);
+	static int lGetTraitUnitMaxHitPointChangePerRazedCityPopLimit(lua_State* L);
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_TRAITS_ANY_BELIEF)
 	LUAAPIEXTN(IsTraitAnyBelief, bool);
 #endif

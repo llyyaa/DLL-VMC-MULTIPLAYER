@@ -1074,6 +1074,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetTraitCityStateFriendshipModifier);
 	Method(GetTraitGreatGeneralExtraBonus);
 	Method(GetTraitGreatScientistRateModifier);
+	Method(GetTraitUnitMaxHitPointChangePerRazedCityPopLimit);
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_TRAITS_ANY_BELIEF)
 	Method(IsTraitAnyBelief);
 #endif
@@ -10225,6 +10226,16 @@ int CvLuaPlayer::lGetTraitGreatScientistRateModifier(lua_State* L)
 	if(pkPlayer)
 	{
 		lua_pushinteger(L, pkPlayer->GetPlayerTraits()->GetGreatScientistRateModifier());
+	}
+	return 1;
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetTraitUnitMaxHitPointChangePerRazedCityPopLimit(lua_State* L)
+{
+	CvPlayer* pkPlayer = GetInstance(L);
+	if(pkPlayer)
+	{
+		lua_pushinteger(L, pkPlayer->GetPlayerTraits()->GetUnitMaxHitPointChangePerRazedCityPopLimit());
 	}
 	return 1;
 }

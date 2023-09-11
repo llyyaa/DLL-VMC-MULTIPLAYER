@@ -305,7 +305,15 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetMaxHitPointsBase);
 	Method(SetMaxHitPointsBase);
 	Method(ChangeMaxHitPointsBase);
+	Method(GetMaxHitPointsChangeFromRazedCityPop);
+	Method(SetMaxHitPointsChangeFromRazedCityPop);
 #endif
+	Method(GetCombatStrengthChangeFromKilledUnits);
+	Method(ChangeCombatStrengthChangeFromKilledUnits);
+	Method(SetCombatStrengthChangeFromKilledUnits);
+	Method(GetRangedCombatStrengthChangeFromKilledUnits);
+	Method(ChangeRangedCombatStrengthChangeFromKilledUnits);
+	Method(SetRangedCombatStrengthChangeFromKilledUnits);
 	Method(GetMaxHitPoints);
 	Method(GetCurrHitPoints);
 	Method(IsHurt);
@@ -2555,7 +2563,73 @@ int CvLuaUnit::lChangeMaxHitPointsBase(lua_State* L)
 	pkUnit->changeMaxHitPointsBase(iValue);
 	return 0;
 }
+//------------------------------------------------------------------------------
+int CvLuaUnit::lGetMaxHitPointsChangeFromRazedCityPop(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	lua_pushinteger(L, pkUnit->getMaxHitPointsChangeFromRazedCityPop());
+	return 1;
+}
+//------------------------------------------------------------------------------
+int CvLuaUnit::lSetMaxHitPointsChangeFromRazedCityPop(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+
+	pkUnit->setMaxHitPointsChangeFromRazedCityPop(iValue);
+	return 0;
+}
 #endif
+//------------------------------------------------------------------------------
+int CvLuaUnit::lGetCombatStrengthChangeFromKilledUnits(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	lua_pushinteger(L, pkUnit->GetCombatStrengthChangeFromKilledUnits());
+	return 1;
+}
+//------------------------------------------------------------------------------
+int CvLuaUnit::lChangeCombatStrengthChangeFromKilledUnits(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+
+	pkUnit->ChangeCombatStrengthChangeFromKilledUnits(iValue);
+	return 0;
+}
+//------------------------------------------------------------------------------
+int CvLuaUnit::lSetCombatStrengthChangeFromKilledUnits(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+
+	pkUnit->SetCombatStrengthChangeFromKilledUnits(iValue);
+	return 0;
+}
+//------------------------------------------------------------------------------
+int CvLuaUnit::lGetRangedCombatStrengthChangeFromKilledUnits(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	lua_pushinteger(L, pkUnit->GetRangedCombatStrengthChangeFromKilledUnits());
+	return 1;
+}
+//------------------------------------------------------------------------------
+int CvLuaUnit::lChangeRangedCombatStrengthChangeFromKilledUnits(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+
+	pkUnit->ChangeRangedCombatStrengthChangeFromKilledUnits(iValue);
+	return 0;
+}
+//------------------------------------------------------------------------------
+int CvLuaUnit::lSetRangedCombatStrengthChangeFromKilledUnits(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+
+	pkUnit->SetRangedCombatStrengthChangeFromKilledUnits(iValue);
+	return 0;
+}
 //------------------------------------------------------------------------------
 //int maxHitPoints();
 int CvLuaUnit::lGetMaxHitPoints(lua_State* L)
