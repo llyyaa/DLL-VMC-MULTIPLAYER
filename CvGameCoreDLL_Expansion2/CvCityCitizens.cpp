@@ -1873,6 +1873,18 @@ void CvCityCitizens::DoAlterWorkingPlot(int iIndex)
 			if(pPlot->getWorkingCity() != m_pCity)
 			{
 				pPlot->getWorkingCity()->GetCityCitizens()->SetForcedWorkingPlot(pPlot,false);
+#if defined(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT)
+				if(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT && pPlot->getResourceType() != NO_RESOURCE)
+				{
+					pPlot->SetResourceLinkedCity(NULL);
+					pPlot->SetResourceLinkedCity(m_pCity);
+					// Already have a valid improvement here?
+					if(pPlot->getImprovementType() != NO_IMPROVEMENT && GC.getImprovementInfo(pPlot->getImprovementType())->IsImprovementResourceTrade(pPlot->getResourceType()))
+					{
+						pPlot->SetResourceLinkedCityActive(true);
+					}
+				}
+#endif
 			}
 			if(IsCanWork(pPlot))
 			{
