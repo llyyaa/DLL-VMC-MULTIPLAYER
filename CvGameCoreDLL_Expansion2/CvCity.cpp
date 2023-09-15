@@ -4505,6 +4505,10 @@ void CvCity::addProductionExperience(CvUnit* pUnit, bool bConscript)
 				{
 					pUnit->setHasPromotion(ePromotion, true);
 				}
+				else if(::IsPromotionValidForUnitPromotions(ePromotion, *pUnit))
+				{
+					pUnit->setHasPromotion(ePromotion, true);
+				}
 			}
 		}
 	}
