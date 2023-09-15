@@ -8810,6 +8810,7 @@ void CvPlot::updateWorkingCity()
 			{
 				// Remove citizen
 				pOldWorkingCity->GetCityCitizens()->SetWorkingPlot(this, false);
+				pOldWorkingCity->GetCityCitizens()->SetForcedWorkingPlot(this, false);
 			}
 
 			CvAssertMsg(isOwned(), "isOwned is expected to be true");
