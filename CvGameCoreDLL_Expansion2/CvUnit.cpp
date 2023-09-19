@@ -19198,7 +19198,9 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 											DLLUI->AddUnitMessage(0, GetIDInfo(), getOwner(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer/*, GC.getEraInfo(GC.getGame().getCurrentEra())->getAudioUnitVictoryScript(), MESSAGE_TYPE_INFO, NULL, (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
 											MILITARYLOG(getOwner(), strBuffer.c_str(), plot(), pLoopUnit->getOwner());
 
-											kPlayer.DoCombatStrengthChangeFromKill(this, pLoopUnit, iX, iY, 0);
+											//kill or capture a noncombat unit should not trigger it
+											if(pLoopUnit->IsCombatUnit())
+												kPlayer.DoCombatStrengthChangeFromKill(this, pLoopUnit, iX, iY, 0);
 #if defined(MOD_API_UNIFIED_YIELDS)
 											kPlayer.DoYieldsFromKill(this, pLoopUnit, iX, iY, 0);
 #else
