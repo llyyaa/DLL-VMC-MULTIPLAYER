@@ -197,6 +197,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iExtraMoveTimesXX(0),
 	m_iOriginalCapitalDamageFix(0),
 	m_iMultipleInitExperence(0),
 	m_iLostAllMovesAttackCity(0),
@@ -684,6 +685,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iExtraMoveTimesXX = kResults.GetInt("ExtraMoveTimesXX");
 	m_iOriginalCapitalDamageFix = kResults.GetInt("OriginalCapitalDamageFix");
 	m_iMultipleInitExperence = kResults.GetInt("MultipleInitExperence");
 	m_iLostAllMovesAttackCity = kResults.GetInt("LostAllMovesAttackCity");
@@ -2286,6 +2288,11 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 }
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvPromotionEntry::GetExtraMoveTimesXX() const
+{
+	return m_iExtraMoveTimesXX;
+}
+
 int CvPromotionEntry::GetOriginalCapitalDamageFix() const
 {
 	return m_iOriginalCapitalDamageFix;

@@ -467,6 +467,7 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	, m_iExtraMoveTimesXX(0)
 	, m_iOriginalCapitalDamageFix(0)
 	, m_iMultipleInitExperence(0)
 	, m_iLostAllMovesAttackCity(0)
@@ -920,6 +921,10 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	}
 
 	setMoves(maxMoves());
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	if(!isEmbarked())
+		changeMoves(GetExtraMoveTimesXX());
+#endif
 
 	// Religious unit? If so takes religion from city
 	if (getUnitInfo().IsSpreadReligion() || getUnitInfo().IsRemoveHeresy())
@@ -1416,6 +1421,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iExtraMoveTimesXX = 0;
 	m_iOriginalCapitalDamageFix = 0;
 	m_iMultipleInitExperence = 0;
 	m_iLostAllMovesAttackCity = 0;
@@ -2790,6 +2796,11 @@ void CvUnit::doTurn()
 			iTotalMovePenalty = min(getMoves() - 1, iTotalMovePenalty);
 			changeMoves(-iTotalMovePenalty);
 		}
+#endif
+
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	if(!isEmbarked())
+		changeMoves(GetExtraMoveTimesXX());
 #endif
 
 #if defined(MOD_API_PLOT_BASED_DAMAGE)
@@ -6555,6 +6566,15 @@ int CvUnit::GetCityAttackPlunderModifier() const
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeExtraMoveTimesXX(int iValue)
+{
+	m_iExtraMoveTimesXX += iValue;
+}
+const int CvUnit::GetExtraMoveTimesXX() const
+{
+	return m_iExtraMoveTimesXX;
+}
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeOriginalCapitalDamageFix(int iValue)
 {
@@ -25182,6 +25202,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		ChangeExtraMoveTimesXX((thisPromotion.GetExtraMoveTimesXX()) * iChange);
 		ChangeOriginalCapitalDamageFix((thisPromotion.GetOriginalCapitalDamageFix()) * iChange);
 		ChangeMultipleInitExperence((thisPromotion.GetMultipleInitExperence()) * iChange);
 		ChangeLostAllMovesAttackCity((thisPromotion.GetLostAllMovesAttackCity()) * iChange);
@@ -25732,6 +25753,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream >> m_iExtraMoveTimesXX;
 	kStream >> m_iOriginalCapitalDamageFix;
 	kStream >> m_iMultipleInitExperence;
 	kStream >> m_iLostAllMovesAttackCity;
@@ -26110,6 +26132,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_iExtraMoveTimesXX;
 	kStream << m_iOriginalCapitalDamageFix;
 	kStream << m_iMultipleInitExperence;
 	kStream << m_iLostAllMovesAttackCity;
