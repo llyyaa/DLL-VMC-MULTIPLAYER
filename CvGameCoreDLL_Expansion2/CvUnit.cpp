@@ -921,10 +921,6 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	}
 
 	setMoves(maxMoves());
-#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	if(!isEmbarked())
-		changeMoves(GetExtraMoveTimesXX());
-#endif
 
 	// Religious unit? If so takes religion from city
 	if (getUnitInfo().IsSpreadReligion() || getUnitInfo().IsRemoveHeresy())
@@ -2796,11 +2792,6 @@ void CvUnit::doTurn()
 			iTotalMovePenalty = min(getMoves() - 1, iTotalMovePenalty);
 			changeMoves(-iTotalMovePenalty);
 		}
-#endif
-
-#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	if(!isEmbarked())
-		changeMoves(GetExtraMoveTimesXX());
 #endif
 
 #if defined(MOD_API_PLOT_BASED_DAMAGE)
@@ -13382,18 +13373,22 @@ int CvUnit::baseMoves(DomainTypes eIntoDomain /* = NO_DOMAIN */) const
 int CvUnit::maxMoves() const
 {
 	VALIDATE_OBJECT
+	int resMoves = 0;
 #if defined(MOD_PROMOTIONS_FLAGSHIP)
 	if(IsGreatGeneral() || (MOD_PROMOTIONS_FLAGSHIP && IsGreatAdmiral()))
 #else
 	if(IsGreatGeneral())
 #endif
 	{
-		return GetGreatGeneralStackMovement();
+		resMoves = GetGreatGeneralStackMovement();
 	}
 	else
 	{
-		return (baseMoves() * GC.getMOVE_DENOMINATOR());	// WARNING: Uses the current embark state of the unit!
+		resMoves = baseMoves() * GC.getMOVE_DENOMINATOR();	// WARNING: Uses the current embark state of the unit!
 	}
+	if (!isEmbarked())
+		resMoves += GetExtraMoveTimesXX();
+	return resMoves;
 }
 
 
