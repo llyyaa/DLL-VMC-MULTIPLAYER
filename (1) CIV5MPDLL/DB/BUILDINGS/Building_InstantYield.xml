@@ -60,7 +60,7 @@
 	</Table>
 
 
-<Table name="Building_TerrainYieldChangesGlobal">
+	<Table name="Building_TerrainYieldChangesGlobal">
 		<Column name="BuildingType" type="text" reference="Buildings(Type)"/>
 		<Column name="TerrainType" type="text" reference="Terrains(Type)"/>
 		<Column name="YieldType" type="text" reference="Yields(Type)"/>
