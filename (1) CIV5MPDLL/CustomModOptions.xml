@@ -1111,7 +1111,7 @@
     <!-- see DDL_Traits.sql -->
     <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
 
-    <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="1"/> 
+    <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="0"/> 
 
     <Row Class="6" Name="CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT" Value="1"/>
 
