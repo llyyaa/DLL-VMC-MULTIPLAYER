@@ -3876,20 +3876,23 @@ int CvPlayerPolicies::GetNextPolicyCost()
 	// Base cost that doesn't get exponent-ed
 	iCost += /*25*/ GC.getBASE_POLICY_COST();
 
-	// Mod for City Count
 	int iMod = GC.getMap().getWorldInfo().GetNumCitiesPolicyCostMod();	// Default is 40, gets smaller on larger maps
-	int iPolicyModDiscount = m_pPlayer->GetNumCitiesPolicyCostDiscount();
-	if(iPolicyModDiscount != 0)
+	if(iMod != 0)
 	{
-		iMod = iMod * (100 + iPolicyModDiscount);
+		// Mod for City Count
+		int iPolicyModDiscount = m_pPlayer->GetNumCitiesPolicyCostDiscount();
+		if(iPolicyModDiscount != 0)
+		{
+			iMod = iMod * (100 + iPolicyModDiscount);
+			iMod /= 100;
+		}
+
+		int iNumCities = m_pPlayer->GetMaxEffectiveCities();
+
+		iMod = (iCost * (iNumCities - 1) * iMod);
 		iMod /= 100;
+		iCost += iMod;
 	}
-
-	int iNumCities = m_pPlayer->GetMaxEffectiveCities();
-
-	iMod = (iCost * (iNumCities - 1) * iMod);
-	iMod /= 100;
-	iCost += iMod;
 
 	// Policy Cost Mod
 	iCost *= (100 + m_pPlayer->getPolicyCostModifier());
