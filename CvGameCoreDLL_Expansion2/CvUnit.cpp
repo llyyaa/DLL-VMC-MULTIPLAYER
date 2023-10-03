@@ -15031,7 +15031,7 @@ int CvUnit::GetBaseRangedCombatStrength() const
 #endif
 
 #if defined(MOD_API_EXTENSIONS)
-	return m_iBaseRangedCombat + m_iCombatStrengthChangeFromKilledUnits;
+	return m_iBaseRangedCombat + m_iRangedCombatStrengthChangeFromKilledUnits;
 #else
 	return m_pUnitInfo->GetRangedCombat();
 #endif
