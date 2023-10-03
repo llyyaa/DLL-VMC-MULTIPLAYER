@@ -1820,6 +1820,12 @@ public:
 	int GetCityAttackPlunderModifier() const;
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	const int GetHeightModPerX() const;
+	void ChangeHeightModPerX(int iValue);
+	const int GetHeightModLimited() const;
+	void ChangeHeightModLimited(int iValue);
+	const int GetTotalHeightMod(CvPlot& TargetPlot) const;
+
 	const int GetExtraMoveTimesXX() const;
 	void ChangeExtraMoveTimesXX(int iValue);
 
@@ -2434,6 +2440,8 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iHeightModPerX;
+	int m_iHeightModLimited;
 	int m_iExtraMoveTimesXX;
 	int m_iOriginalCapitalDamageFix;
 	int m_iMultipleInitExperence;

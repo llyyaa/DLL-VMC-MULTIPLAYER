@@ -566,6 +566,10 @@ protected:
 	static int lGetSameTileHeal(lua_State* L);
 	static int lGetAdjacentTileHeal(lua_State* L);
 
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	static int lGetTotalHeightMod(lua_State* L);
+#endif
+
 	static int lGetExtraCombatPercent(lua_State* L);
 	static int lGetFriendlyLandsModifier(lua_State* L);
 	static int lGetFriendlyLandsAttackModifier(lua_State* L);

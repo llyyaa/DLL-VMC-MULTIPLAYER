@@ -467,6 +467,8 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	, m_iHeightModPerX(0)
+	, m_iHeightModLimited(0)
 	, m_iExtraMoveTimesXX(0)
 	, m_iOriginalCapitalDamageFix(0)
 	, m_iMultipleInitExperence(0)
@@ -1417,6 +1419,8 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iHeightModPerX = 0;
+	m_iHeightModLimited = 0;
 	m_iExtraMoveTimesXX = 0;
 	m_iOriginalCapitalDamageFix = 0;
 	m_iMultipleInitExperence = 0;
@@ -6557,6 +6561,40 @@ int CvUnit::GetCityAttackPlunderModifier() const
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeHeightModPerX(int iValue)
+{
+	m_iHeightModPerX += iValue;
+}
+const int CvUnit::GetHeightModPerX() const
+{
+	return m_iHeightModPerX;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeHeightModLimited(int iValue)
+{
+	m_iHeightModLimited += iValue;
+}
+const int CvUnit::GetHeightModLimited() const
+{
+	return m_iHeightModLimited;
+}
+//	--------------------------------------------------------------------------------
+const int CvUnit::GetTotalHeightMod(CvPlot& TargetPlot) const
+{
+	if(m_iHeightModPerX > 0 && plot())
+	{
+		int res = 0;
+		res = plot()->seeFromLevel(NO_TEAM) - TargetPlot.seeFromLevel(NO_TEAM);
+		if(res <= 0) return 0;
+		else
+		{
+			res = res > m_iHeightModLimited ? m_iHeightModLimited : res;
+			return res * m_iHeightModPerX;
+		}
+	}
+	return 0;
+}
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeExtraMoveTimesXX(int iValue)
 {
@@ -14537,6 +14575,9 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 					iModifier += iTempModifier;
 				}
 			//}
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+			iModifier += GetTotalHeightMod(*const_cast<CvPlot*>(pToPlot));
+#endif
 		}
 
 		// Bonus for attacking in one's lands
@@ -15267,99 +15308,108 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 				iModifier += 50;
 			}
 
+			if(pTargetPlot != NULL)
+			{
+
+			
 /////new range effect
-			// Attacking into Hills
-			if (pTargetPlot->isHills())
-			{
-				iTempModifier = hillsAttackModifier();
-				iModifier += iTempModifier;
-			}
+				// Attacking into Hills
+				if (pTargetPlot->isHills())
+				{
+					iTempModifier = hillsAttackModifier();
+					iModifier += iTempModifier;
+				}
 
-			// Attacking into Open Ground
-			if (pTargetPlot->isOpenGround())
-			{
-				iTempModifier = openAttackModifier();
-				iModifier += iTempModifier;
-			}
+				// Attacking into Open Ground
+				if (pTargetPlot->isOpenGround())
+				{
+					iTempModifier = openAttackModifier();
+					iModifier += iTempModifier;
+				}
 
-			// Attacking into Rough Ground
-			if (pTargetPlot->isRoughGround())
-			{
-				iTempModifier = roughAttackModifier();
-				iModifier += iTempModifier;
-			}
+				// Attacking into Rough Ground
+				if (pTargetPlot->isRoughGround())
+				{
+					iTempModifier = roughAttackModifier();
+					iModifier += iTempModifier;
+				}
 
-			// Attacking into a Feature
-			if (pTargetPlot->getFeatureType() != NO_FEATURE)
-			{
-				iTempModifier = featureAttackModifier(pTargetPlot->getFeatureType());
+				// Attacking into a Feature
+				if (pTargetPlot->getFeatureType() != NO_FEATURE)
+				{
+					iTempModifier = featureAttackModifier(pTargetPlot->getFeatureType());
+					iModifier += iTempModifier;
+				}
+				// No Feature - Use Terrain Attack Mod
+				//else
+				//{
+				iTempModifier = terrainAttackModifier(pTargetPlot->getTerrainType());
 				iModifier += iTempModifier;
-			}
-			// No Feature - Use Terrain Attack Mod
-			//else
-			//{
-			iTempModifier = terrainAttackModifier(pTargetPlot->getTerrainType());
-			iModifier += iTempModifier;
 
-			// Tack on Hills Attack Mod
-			if (pTargetPlot->isHills())
-			{
-				iTempModifier = terrainAttackModifier(TERRAIN_HILL);
-				iModifier += iTempModifier;
-			}
+				// Tack on Hills Attack Mod
+				if (pTargetPlot->isHills())
+				{
+					iTempModifier = terrainAttackModifier(TERRAIN_HILL);
+					iModifier += iTempModifier;
+				}
 /////end
 
-			// Open Ground
-			if(pTargetPlot->isOpenGround())
-				iModifier += openRangedAttackModifier();
+				// Open Ground
+				if(pTargetPlot->isOpenGround())
+					iModifier += openRangedAttackModifier();
 
-			// Rough Ground
-			if(pTargetPlot->isRoughGround())
-				iModifier += roughRangedAttackModifier();
+				// Rough Ground
+				if(pTargetPlot->isRoughGround())
+					iModifier += roughRangedAttackModifier();
 
-			// Bonus for fighting in one's lands
-			if(pTargetPlot->IsFriendlyTerritory(getOwner()))
-			{
-				iTempModifier = getFriendlyLandsModifier();
-				iModifier += iTempModifier;
+	#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+				iModifier += GetTotalHeightMod(*pTargetPlot);
+	#endif
 
-				// Founder Belief bonus
-				CvCity* pPlotCity = pTargetPlot->getWorkingCity();
-				if(pPlotCity)
+				// Bonus for fighting in one's lands
+				if(pTargetPlot->IsFriendlyTerritory(getOwner()))
 				{
-					ReligionTypes eReligion = pPlotCity->GetCityReligions()->GetReligiousMajority();
-					if(eReligion != NO_RELIGION && eReligion == eFoundedReligion)
-					{
-						const CvReligion* pCityReligion = pReligions->GetReligion(eReligion, pPlotCity->getOwner());
-						if(pCityReligion)
-						{
-							iTempModifier = pCityReligion->m_Beliefs.GetCombatModifierFriendlyCities();
-							iModifier += iTempModifier;
-						}
-					}
-				}
-			}
+					iTempModifier = getFriendlyLandsModifier();
+					iModifier += iTempModifier;
 
-			// Bonus for fighting outside one's lands
-			else
-			{
-				iTempModifier = getOutsideFriendlyLandsModifier();
-				iModifier += iTempModifier;
-
-				// Founder Belief bonus (this must be a city controlled by an enemy)
-				CvCity* pPlotCity = pTargetPlot->getWorkingCity();
-				if(pPlotCity)
-				{
-					if(atWar(getTeam(), pPlotCity->getTeam()))
+					// Founder Belief bonus
+					CvCity* pPlotCity = pTargetPlot->getWorkingCity();
+					if(pPlotCity)
 					{
 						ReligionTypes eReligion = pPlotCity->GetCityReligions()->GetReligiousMajority();
 						if(eReligion != NO_RELIGION && eReligion == eFoundedReligion)
 						{
-							const CvReligion* pCityReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion, pPlotCity->getOwner());
+							const CvReligion* pCityReligion = pReligions->GetReligion(eReligion, pPlotCity->getOwner());
 							if(pCityReligion)
 							{
-								iTempModifier = pCityReligion->m_Beliefs.GetCombatModifierEnemyCities();
+								iTempModifier = pCityReligion->m_Beliefs.GetCombatModifierFriendlyCities();
 								iModifier += iTempModifier;
+							}
+						}
+					}
+				}
+
+				// Bonus for fighting outside one's lands
+				else
+				{
+					iTempModifier = getOutsideFriendlyLandsModifier();
+					iModifier += iTempModifier;
+
+					// Founder Belief bonus (this must be a city controlled by an enemy)
+					CvCity* pPlotCity = pTargetPlot->getWorkingCity();
+					if(pPlotCity)
+					{
+						if(atWar(getTeam(), pPlotCity->getTeam()))
+						{
+							ReligionTypes eReligion = pPlotCity->GetCityReligions()->GetReligiousMajority();
+							if(eReligion != NO_RELIGION && eReligion == eFoundedReligion)
+							{
+								const CvReligion* pCityReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion, pPlotCity->getOwner());
+								if(pCityReligion)
+								{
+									iTempModifier = pCityReligion->m_Beliefs.GetCombatModifierEnemyCities();
+									iModifier += iTempModifier;
+								}
 							}
 						}
 					}
@@ -25197,6 +25247,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		ChangeHeightModPerX((thisPromotion.GetHeightModPerX()) * iChange);
+		ChangeHeightModLimited((thisPromotion.GetHeightModLimited()) * iChange);
 		ChangeExtraMoveTimesXX((thisPromotion.GetExtraMoveTimesXX()) * iChange);
 		ChangeOriginalCapitalDamageFix((thisPromotion.GetOriginalCapitalDamageFix()) * iChange);
 		ChangeMultipleInitExperence((thisPromotion.GetMultipleInitExperence()) * iChange);
@@ -25748,6 +25800,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream >> m_iHeightModPerX;
+	kStream >> m_iHeightModLimited;
 	kStream >> m_iExtraMoveTimesXX;
 	kStream >> m_iOriginalCapitalDamageFix;
 	kStream >> m_iMultipleInitExperence;
@@ -26127,6 +26181,8 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_iHeightModPerX;
+	kStream << m_iHeightModLimited;
 	kStream << m_iExtraMoveTimesXX;
 	kStream << m_iOriginalCapitalDamageFix;
 	kStream << m_iMultipleInitExperence;

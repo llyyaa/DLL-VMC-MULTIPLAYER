@@ -639,6 +639,10 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetSameTileHeal);
 	Method(GetAdjacentTileHeal);
 
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	Method(GetTotalHeightMod);
+#endif
+
 	Method(GetExtraCombatPercent);
 	Method(GetFriendlyLandsModifier);
 	Method(GetFriendlyLandsAttackModifier);
@@ -5072,6 +5076,19 @@ int CvLuaUnit::lGetAdjacentTileHeal(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+//------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvLuaUnit::lGetTotalHeightMod(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	CvPlot* TargetPlot = CvLuaPlot::GetInstance(L, 2, false);
+	int iResult = 0;
+	if(TargetPlot != NULL)
+		iResult = pkUnit->GetTotalHeightMod(*TargetPlot);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+#endif
 //------------------------------------------------------------------------------
 //int getExtraCombatPercent();
 int CvLuaUnit::lGetExtraCombatPercent(lua_State* L)
