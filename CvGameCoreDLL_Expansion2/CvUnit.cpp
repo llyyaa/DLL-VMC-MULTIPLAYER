@@ -4365,10 +4365,10 @@ void CvUnit::move(CvPlot& targetPlot, bool bShow)
 	if(bShouldDeductCost)
 		changeMoves(-iMoveCost);
 #if defined(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK)
-		if(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK && !canMove() && bIsDisembark)
-		{
-			setMoves(GC.getUNIT_MOVES_AFTER_DISEMBARK());
-		}
+	if(MOD_GLOBAL_UNIT_MOVES_AFTER_DISEMBARK && !canMove() && bIsDisembark)
+	{
+		setMoves(GC.getUNIT_MOVES_AFTER_DISEMBARK());
+	}
 #endif
 	setXY(targetPlot.getX(), targetPlot.getY(), true, true, bShow && targetPlot.isVisibleToWatchingHuman(), bShow);
 }

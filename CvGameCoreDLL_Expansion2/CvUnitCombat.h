@@ -73,7 +73,7 @@ public:
 	static uint			ApplyNuclearExplosionDamage(CvPlot* pkTargetPlot, int iDamageLevel, CvUnit* pkAttacker = NULL);
 
 #ifdef MOD_NEW_BATTLE_EFFECTS
-	static void DoNewBattleEffects(const CvCombatInfo& kInfo);
+	static void DoNewBattleEffects(const CvCombatInfo& kInfo, int iAttackDamage = 0);
 	static bool ShouldDoNewBattleEffects(const CvCombatInfo& kInfo);
 
 	static void DoSplashDamage(const CvCombatInfo& kInfo);
@@ -87,8 +87,8 @@ public:
 
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-	static void DoBounsFromCombatDamage(const CvCombatInfo& kCombatInfo);
-	static void DoBounsFromCombatDamageWhenFinish(const CvCombatInfo& kCombatInfo);
+	static void DoBounsFromCombatDamage(const CvCombatInfo& kCombatInfo, int iAttackDamage);
+	static void DoBounsFromCombatDamageWhenFinish(const CvCombatInfo& kCombatInfo, int iAttackDamage);
 	static void DoInstantYieldFromCombat(const CvUnit* pAttackerUnit,const CvCombatInfo & kCombatInfo,int iAttackDamage);
 	static void DoGiveEXPToCarrier(const CvCombatInfo& kCombatInfo);
 #endif
