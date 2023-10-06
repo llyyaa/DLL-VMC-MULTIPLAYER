@@ -4407,14 +4407,14 @@ void CvCityBuildings::SetNumRealBuildingTimed(BuildingTypes eIndex, int iNewValu
 					for (int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
 					{
 						CvPlayerAI &thisPlayer = GET_PLAYER((PlayerTypes)iI);
-						if (thisPlayer.isAlive())
+						if (thisPlayer.isAlive() || thisPlayer.isObserver())
 						{
 							// Owner already got his messaging
 							if (iI != m_pCity->getOwner())
 							{
 								// If the builder is met, and the city is revealed
 								// Special case for DLC_06 Scenario: Always show the more informative notification
-								if ((m_pCity->plot()->isRevealed(thisPlayer.getTeam()) && GET_TEAM(thisPlayer.getTeam()).isHasMet(m_pCity->getTeam())) || gDLL->IsModActivated(CIV5_DLC_06_SCENARIO_MODID))
+								if ((m_pCity->plot()->isRevealed(thisPlayer.getTeam()) && GET_TEAM(thisPlayer.getTeam()).isHasMet(m_pCity->getTeam())) || gDLL->IsModActivated(CIV5_DLC_06_SCENARIO_MODID) || thisPlayer.isObserver())
 								{
 									CvNotifications *pNotifications = thisPlayer.GetNotifications();
 									if (pNotifications)

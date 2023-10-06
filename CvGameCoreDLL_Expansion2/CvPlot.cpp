@@ -3894,12 +3894,18 @@ bool CvPlot::HasBarbarianCamp()
 //	--------------------------------------------------------------------------------
 bool CvPlot::isActiveVisible(bool bDebug) const
 {
+	if (GET_PLAYER(GC.getGame().getActivePlayer()).isObserver())
+		//this is relevant for animations etc, do not show them in observer mode, makes everything faster
+		return false;
 	return isVisible(GC.getGame().getActiveTeam(), bDebug);
 }
 
 //	--------------------------------------------------------------------------------
 bool CvPlot::isActiveVisible() const
 {
+	if (GET_PLAYER(GC.getGame().getActivePlayer()).isObserver())
+		//this is relevant for animations etc, do not show them in observer mode, makes everything faster
+		return false;
 	return isVisible(GC.getGame().getActiveTeam());
 }
 
@@ -6184,9 +6190,11 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 #endif
 			pUnitNode = headUnitNode();
 
+			TeamTypes ObserverTeam = NO_TEAM;
+			if(GET_PLAYER(GC.getGame().getActivePlayer()).isObserver()) ObserverTeam = GC.getGame().getActiveTeam();
 			for(iI = 0; iI < MAX_TEAMS; ++iI)
 			{
-				if(GET_TEAM((TeamTypes)iI).isAlive())
+				if(GET_TEAM((TeamTypes)iI).isAlive() || (ObserverTeam != NO_TEAM && ObserverTeam == (TeamTypes)iI))
 				{
 					updateRevealedOwner((TeamTypes)iI);
 				}
@@ -6991,7 +6999,7 @@ ResourceTypes CvPlot::getResourceType(TeamTypes eTeam) const
 		if(m_eResourceType != NO_RESOURCE)
 		{
 			CvGame& Game = GC.getGame();
-			bool bDebug = Game.isDebugMode();
+			bool bDebug = Game.isDebugMode() || GET_PLAYER(Game.getActivePlayer()).isObserver();
 
 			int iPolicyReveal = GC.getResourceInfo((ResourceTypes)m_eResourceType)->getPolicyReveal();
 			if (!bDebug && iPolicyReveal != NO_POLICY)
@@ -7755,9 +7763,11 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue, PlayerTypes eBuilder
 		SetImprovementPillaged(false);
 #endif
 
+		TeamTypes ObserverTeam = NO_TEAM;
+		if(GET_PLAYER(GC.getGame().getActivePlayer()).isObserver()) ObserverTeam = GC.getGame().getActiveTeam();
 		for(iI = 0; iI < MAX_TEAMS; ++iI)
 		{
-			if(GET_TEAM((TeamTypes)iI).isAlive())
+			if(GET_TEAM((TeamTypes)iI).isAlive() || (ObserverTeam != NO_TEAM && ObserverTeam == (TeamTypes)iI))
 			{
 				if(isVisible((TeamTypes)iI))
 				{
@@ -8025,7 +8035,7 @@ void CvPlot::setImprovementType(ImprovementTypes eNewValue, PlayerTypes eBuilder
 
 		SetImprovedByGiftFromMajor(bGiftFromMajor); // Assumes that only one tile improvement can be on this plot at a time
 
-		if(GC.getGame().isDebugMode())
+		if(GC.getGame().isDebugMode() || GET_PLAYER(GC.getGame().getActivePlayer()).isObserver())
 		{
 			setLayoutDirty(true);
 		}
@@ -8375,9 +8385,11 @@ void CvPlot::setRouteType(RouteTypes eNewValue)
 		SetRoutePillaged(false);
 #endif
 
+		TeamTypes ObserverTeam = NO_TEAM;
+		if(GET_PLAYER(GC.getGame().getActivePlayer()).isObserver()) ObserverTeam = GC.getGame().getActiveTeam();
 		for(iI = 0; iI < MAX_TEAMS; ++iI)
 		{
-			if(GET_TEAM((TeamTypes)iI).isAlive())
+			if(GET_TEAM((TeamTypes)iI).isAlive() || (ObserverTeam != NO_TEAM && ObserverTeam == (TeamTypes)iI))
 			{
 				if(isVisible((TeamTypes)iI))
 				{
@@ -8411,9 +8423,11 @@ void CvPlot::SetRoutePillaged(bool bPillaged)
 {
 	if(m_bRoutePillaged != bPillaged)
 	{
+		TeamTypes ObserverTeam = NO_TEAM;
+		if(GET_PLAYER(GC.getGame().getActivePlayer()).isObserver()) ObserverTeam = GC.getGame().getActiveTeam();
 		for(int iI = 0; iI < MAX_TEAMS; ++iI)
 		{
-			if(GET_TEAM((TeamTypes)iI).isAlive() && GC.getGame().getActiveTeam() == (TeamTypes)iI)
+			if((GET_TEAM((TeamTypes)iI).isAlive() && GC.getGame().getActiveTeam() == (TeamTypes)iI) || (ObserverTeam != NO_TEAM && ObserverTeam == (TeamTypes)iI))
 			{
 				if(isVisible((TeamTypes)iI))
 				{
@@ -10684,6 +10698,9 @@ bool CvPlot::setRevealed(TeamTypes eTeam, bool bNewValue, bool bTerrainOnly, Tea
 					if(eTeam == eActiveTeam)
 					{
 						bool bDontShowRewardPopup = GC.GetEngineUserInterface()->IsOptionNoRewardPopups();
+
+						if (GET_PLAYER(GC.getGame().getActivePlayer()).isObserver())
+							bDontShowRewardPopup = true;
 
 						// Popup (no MP)
 #if defined(MOD_API_EXTENSIONS)

@@ -1365,7 +1365,7 @@ void CvTeam::DoDeclareWar(TeamTypes eTeam, bool bDefensivePact, bool bMinorAllyP
 				{
 					ePlayer = (PlayerTypes) iI;
 
-					if(GET_PLAYER(ePlayer).isAlive() && GET_PLAYER(ePlayer).GetNotifications())
+					if((GET_PLAYER(ePlayer).isAlive() || GET_PLAYER(ePlayer).isObserver()) && GET_PLAYER(ePlayer).GetNotifications())
 					{
 						// If this declaration is a minor following a major's declaration, don't send out these individual notifications
 						if(!bMinorAllyPact)
@@ -1388,7 +1388,7 @@ void CvTeam::DoDeclareWar(TeamTypes eTeam, bool bDefensivePact, bool bMinorAllyP
 								GET_PLAYER(ePlayer).GetNotifications()->Add(NOTIFICATION_WAR_ACTIVE_PLAYER, locString.toUTF8(), locString.toUTF8(), -1, -1, this->getLeaderID());
 							}
 							// Players that are on neither team, but know both parties
-							else if(GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(GetID()) && GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(eTeam))
+							else if(GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(GetID()) && GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(eTeam) || GET_PLAYER(ePlayer).isObserver())
 							{
 								locString = Localization::Lookup("TXT_KEY_MISC_SOMEONE_DECLARED_WAR");
 								locString << getName().GetCString() << GET_TEAM(eTeam).getName().GetCString();
@@ -1827,7 +1827,7 @@ void CvTeam::DoMakePeace(TeamTypes eTeam, bool bBumpUnits, bool bSuppressNotific
 			{
 				ePlayer = (PlayerTypes) iI;
 
-				if(GET_PLAYER(ePlayer).isAlive())
+				if(GET_PLAYER(ePlayer).isAlive() || GET_PLAYER(ePlayer).isObserver())
 				{
 					if(GET_PLAYER(ePlayer).getTeam() == GetID())
 					{
@@ -1847,7 +1847,7 @@ void CvTeam::DoMakePeace(TeamTypes eTeam, bool bBumpUnits, bool bSuppressNotific
 							GET_PLAYER(ePlayer).GetNotifications()->Add(NOTIFICATION_PEACE_ACTIVE_PLAYER, locString.toUTF8(), locString.toUTF8(), -1, -1, this->getLeaderID());
 						}
 					}
-					else if(GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(GetID()) && GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(eTeam))
+					else if(GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(GetID()) && GET_TEAM(GET_PLAYER(ePlayer).getTeam()).isHasMet(eTeam) || GET_PLAYER(ePlayer).isObserver())
 					{
 						if(GET_PLAYER(ePlayer).GetNotifications())
 						{

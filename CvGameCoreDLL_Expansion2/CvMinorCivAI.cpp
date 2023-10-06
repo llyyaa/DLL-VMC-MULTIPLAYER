@@ -8881,12 +8881,28 @@ void CvMinorCivAI::DoBuyout(PlayerTypes eMajor)
 	strSummary << GET_PLAYER(eMajor).getCivilizationShortDescriptionKey();
 	strSummary << GetPlayer()->getCivilizationShortDescriptionKey();
 
+	TeamTypes eBuyerTeam = GET_PLAYER(eMajor).getTeam();
 	for (int iMajorLoop = 0; iMajorLoop < MAX_MAJOR_CIVS; iMajorLoop++)
 	{
 		PlayerTypes eMajorLoop = (PlayerTypes) iMajorLoop;
-		if (IsHasMetPlayer(eMajorLoop))
+		CvNotifications* pNotifications = GET_PLAYER(eMajorLoop).GetNotifications();
+		if (!pNotifications)
+			continue;
+
+		if (GET_PLAYER(eMajorLoop).isObserver())
 		{
-			AddBuyoutNotification(strMessage.toUTF8(), strSummary.toUTF8(), eMajorLoop, iCapitalX, iCapitalY);
+			pNotifications->Add(NOTIFICATION_MINOR_BUYOUT, strMessage.toUTF8(), strSummary.toUTF8(), iCapitalX, iCapitalY, GetPlayer()->GetID());
+			continue;
+		}
+
+		if (!GET_PLAYER(eMajorLoop).isAlive() || !GET_PLAYER(eMajorLoop).isMajorCiv())
+			continue;
+
+		TeamTypes eLoopTeam = GET_PLAYER(eMajorLoop).getTeam();
+
+		if (IsHasMetPlayer(eMajorLoop) && (eLoopTeam == eBuyerTeam || GET_TEAM(eLoopTeam).isHasMet(eBuyerTeam)))
+		{
+			pNotifications->Add(NOTIFICATION_MINOR_BUYOUT, strMessage.toUTF8(), strSummary.toUTF8(), iCapitalX, iCapitalY, GetPlayer()->GetID());
 		}
 	}
 

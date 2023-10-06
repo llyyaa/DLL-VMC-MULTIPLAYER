@@ -4999,51 +4999,44 @@ void CvPlayer::doTurn()
 	DoUpdateUprisings();
 	DoUpdateCityRevolts();
 
-	if(GetPlayerTraits()->IsEndOfMayaLongCount())
-	{
-		ChangeNumMayaBoosts(1);
-	}
-
 	bool bHasActiveDiploRequest = false;
-	if(isAlive())
+	if(isAlive() && isMajorCiv())
 	{
-		if(!isBarbarian())
+		GetTrade()->DoTurn();
+		GetMilitaryAI()->ResetCounters();
+		GetGrandStrategyAI()->DoTurn();
+#if defined(MOD_AI_MP_DIPLOMACY)
+		if (MOD_AI_MP_DIPLOMACY) {
+			// We only do AI to AI diplomacy here.
+			// See CvDiplomacyRequests::DoAIDiplomacyWithHumans() for AI to human diplomacy
+			GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_AI_PLAYERS);
+		} else {
+#endif
+		if(GC.getGame().isHotSeat() && !isHuman())
 		{
-			if(!isMinorCiv())
-			{
-				GetTrade()->DoTurn();
-				GetMilitaryAI()->ResetCounters();
-				GetGrandStrategyAI()->DoTurn();
+			// In Hotseat, AIs only do their diplomacy pass for other AIs on their turn
+			// Diplomacy toward a human is done at the beginning of the humans turn.
 #if defined(MOD_AI_MP_DIPLOMACY)
-				if (MOD_AI_MP_DIPLOMACY) {
-					// We only do AI to AI diplomacy here.
-					// See CvDiplomacyRequests::DoAIDiplomacyWithHumans() for AI to human diplomacy
-					GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_AI_PLAYERS);
-				} else {
-#endif
-				if(GC.getGame().isHotSeat() && !isHuman())
-				{
-					// In Hotseat, AIs only do their diplomacy pass for other AIs on their turn
-					// Diplomacy toward a human is done at the beginning of the humans turn.
-#if defined(MOD_AI_MP_DIPLOMACY)
-					GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_AI_PLAYERS);		// Do diplomacy for toward everyone
+			GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_AI_PLAYERS);		// Do diplomacy for toward everyone
 #else
-					GetDiplomacyAI()->DoTurn((PlayerTypes)CvDiplomacyAI::DIPLO_AI_PLAYERS);		// Do diplomacy for toward everyone
+			GetDiplomacyAI()->DoTurn((PlayerTypes)CvDiplomacyAI::DIPLO_AI_PLAYERS);		// Do diplomacy for toward everyone
 #endif
-				}
-				else
+		}
+		else
 #if defined(MOD_AI_MP_DIPLOMACY)
-					GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_ALL_PLAYERS);	// Do diplomacy for toward everyone
+			GetDiplomacyAI()->DoTurn(NO_PLAYER, DIPLO_ALL_PLAYERS);	// Do diplomacy for toward everyone
 #else
-					GetDiplomacyAI()->DoTurn((PlayerTypes)CvDiplomacyAI::DIPLO_ALL_PLAYERS);	// Do diplomacy for toward everyone
+			GetDiplomacyAI()->DoTurn((PlayerTypes)CvDiplomacyAI::DIPLO_ALL_PLAYERS);	// Do diplomacy for toward everyone
 #endif
 
-				if (!isHuman())
-					bHasActiveDiploRequest = CvDiplomacyRequests::HasActiveDiploRequestWithHuman(GetID());
+		if (!isHuman())
+			bHasActiveDiploRequest = CvDiplomacyRequests::HasActiveDiploRequestWithHuman(GetID());
 #if defined(MOD_AI_MP_DIPLOMACY)
-				}
+		}
 #endif
-			}
+		if(GetPlayerTraits()->IsEndOfMayaLongCount())
+		{
+			ChangeNumMayaBoosts(1);
 		}
 	}
 
