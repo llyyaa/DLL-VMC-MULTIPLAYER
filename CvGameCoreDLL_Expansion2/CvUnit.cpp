@@ -9547,8 +9547,8 @@ bool CvUnit::found()
 
 	if(pPlot->isActiveVisible(false))
 	{
-		auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(this));
-		gDLL->GameplayUnitActivate(pDllUnit.get());
+		//auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(this));
+		//gDLL->GameplayUnitActivate(pDllUnit.get());
 
 #if !defined(NO_ACHIEVEMENTS)
 		//Achievement
