@@ -44,5 +44,14 @@
 			<Name>MAX_POPULATION_INCREASE_NOTIOFACATION</Name>
 			<Value>5</Value>
 		</Row>
+		<Row>
+			<!-- reduce max work tile distance for Minor -->
+			<Name>MAXIMUM_WORK_PLOT_DISTANCE_MINOR_REDUCE</Name>
+			<Value>0</Value>
+		</Row>
+		<Row>
+			<Name>UNIT_MOVES_AFTER_DISEMBARK</Name>
+			<Value>0</Value>
+		</Row>
 	</Defines>
 </GameData>

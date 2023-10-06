@@ -3681,6 +3681,9 @@ int CvPlayer::getBuyPlotDistance() const
 int CvPlayer::getWorkPlotDistance() const
 {
 	int iDistance = GC.getMAXIMUM_WORK_PLOT_DISTANCE();
+
+	if(isMinorCiv())
+		iDistance -= GC.getMAXIMUM_WORK_PLOT_DISTANCE_MINOR_REDUCE();
 	
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING)
 	// Change distance based on traits, policies, wonders, etc
