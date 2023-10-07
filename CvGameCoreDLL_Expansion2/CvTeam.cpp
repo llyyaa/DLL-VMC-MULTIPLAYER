@@ -246,6 +246,7 @@ void CvTeam::uninit()
 		m_abOpenBorders[i] = false;
 		m_abDefensivePact[i] = false;
 		m_abResearchAgreement[i] = false;
+		m_aiResearchAgreementStartTurn[i] = -1;
 		m_abTradeAgreement[i] = false;
 		m_abForcePeace[i] = false;
 	}
@@ -4403,6 +4404,7 @@ void CvTeam::SetHasResearchAgreement(TeamTypes eIndex, bool bNewValue)
 	if(IsHasResearchAgreement(eIndex) != bNewValue)
 	{
 		m_abResearchAgreement[eIndex] = bNewValue;
+		m_aiResearchAgreementStartTurn[eIndex] = GC.getGame().getGameTurn();
 
 		if((GetID() == GC.getGame().getActiveTeam()) || (eIndex == GC.getGame().getActiveTeam()))
 		{
@@ -4421,6 +4423,13 @@ void CvTeam::SetHasResearchAgreement(TeamTypes eIndex, bool bNewValue)
 }
 
 
+//	--------------------------------------------------------------------------------
+int CvTeam::GetResearchAgreementStartTurn(TeamTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < MAX_TEAMS, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiResearchAgreementStartTurn[eIndex];
+}
 //	--------------------------------------------------------------------------------
 bool CvTeam::IsHasTradeAgreement(TeamTypes eIndex) const
 {
@@ -7556,6 +7565,9 @@ void CvTeam::Read(FDataStream& kStream)
 	ArrayWrapper<bool> kResearchAgreementWrapper(MAX_TEAMS, &m_abResearchAgreement[0]);
 	kStream >> kResearchAgreementWrapper;
 
+	ArrayWrapper<int> kResearchAgreementStartTurn(MAX_TEAMS, &m_aiResearchAgreementStartTurn[0]);
+	kStream >> kResearchAgreementStartTurn;
+
 	ArrayWrapper<bool> kTradeAgreementWrapper(MAX_TEAMS, &m_abTradeAgreement[0]);
 	kStream >> kTradeAgreementWrapper;
 
@@ -7717,6 +7729,7 @@ void CvTeam::Write(FDataStream& kStream) const
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abOpenBorders[0]);
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abDefensivePact[0]);
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abResearchAgreement[0]);
+	kStream << ArrayWrapperConst<int>(MAX_TEAMS, &m_aiResearchAgreementStartTurn[0]);
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abTradeAgreement[0]);
 	kStream << ArrayWrapperConst<bool>(MAX_TEAMS, &m_abForcePeace[0]);
 

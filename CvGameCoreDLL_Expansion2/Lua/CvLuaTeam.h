@@ -206,6 +206,7 @@ protected:
 	static int lIsObsoleteBuilding(lua_State* L);
 
 	static int lIsHasResearchAgreement(lua_State* L);
+	static int lGetResearchAgreementStartTurn(lua_State* L);
 	static int lIsHasTradeAgreement(lua_State* L);
 
 	static int lIsHasTech(lua_State* L);

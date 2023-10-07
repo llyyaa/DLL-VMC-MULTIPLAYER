@@ -230,6 +230,7 @@ void CvLuaTeam::PushMethods(lua_State* L, int t)
 	Method(IsObsoleteBuilding);
 
 	Method(IsHasResearchAgreement);
+	Method(GetResearchAgreementStartTurn);
 	Method(IsHasTradeAgreement);
 
 	Method(IsHasTech);
@@ -1271,6 +1272,12 @@ int CvLuaTeam::lIsHasResearchAgreement(lua_State* L)
 	return BasicLuaMethod(L, &CvTeam::IsHasResearchAgreement);
 }
 
+//------------------------------------------------------------------------------
+//int GetResearchAgreementStartTurn(TeamTypes eTeam);
+int CvLuaTeam::lGetResearchAgreementStartTurn(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvTeam::GetResearchAgreementStartTurn);
+}
 //------------------------------------------------------------------------------
 //bool IsHasTradeAgreement(TeamTypes eTeam);
 int CvLuaTeam::lIsHasTradeAgreement(lua_State* L)
