@@ -76,7 +76,7 @@ void CvUnitMovement::GetCostsForMove(const CvUnit* pUnit, const CvPlot* pFromPlo
 #endif
 	}
 
-	iRegularCost = std::min(iRegularCost, (iBaseMoves * iMoveDenominator));
+	iRegularCost = std::min(iRegularCost, (iBaseMoves * iMoveDenominator + pUnit->GetExtraMoveTimesXX()));
 
 	if(pFromPlot->isValidRoute(pUnit) && pToPlot->isValidRoute(pUnit) && ((kUnitTeam.isBridgeBuilding() || !(pFromPlot->isRiverCrossing(directionXY(pFromPlot, pToPlot))))))
 	{
