@@ -271,6 +271,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_piDomainTroops(NULL),
+	m_iNumCrops(0),
+	m_iNumArmee(0),
 #endif
 
 
@@ -626,6 +628,11 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraLeagueVotes = kResults.GetInt("ExtraLeagueVotes");
 	m_iPreferredDisplayPosition = kResults.GetInt("DisplayPosition");
 	m_iPortraitIndex = kResults.GetInt("PortraitIndex");
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_iNumCrops = kResults.GetInt("NumCrops");
+	m_iNumArmee = kResults.GetInt("NumArmee");
+#endif
 
 	m_bArtInfoCulturalVariation = kResults.GetBool("ArtInfoCulturalVariation");
 	m_bArtInfoEraVariation = kResults.GetBool("ArtInfoEraVariation");
@@ -2424,6 +2431,17 @@ int CvBuildingEntry::GetPortraitIndex() const
 {
 	return m_iPortraitIndex;
 }
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+int CvBuildingEntry::GetNumCrops() const
+{
+	return m_iPortraitIndex;
+}
+int CvBuildingEntry::GetNumArmee() const
+{
+	return m_iNumArmee;
+}
+#endif
 
 /// Is the presence of this building shared with team allies?
 bool CvBuildingEntry::IsTeamShare() const

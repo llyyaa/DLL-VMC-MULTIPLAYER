@@ -272,6 +272,10 @@ public:
 	int GetMovementFromAttackDamageFormula() const;
 	int GetHealPercentFromAttackDamageFormula() const;
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool IsCrops() const;
+	bool IsArmee() const;
+#endif
 	int GetReligiousStrengthLossRivalTerritory() const;
 	
 	int GetTradeMissionInfluenceModifier() const;
@@ -611,6 +615,10 @@ protected:
 	int m_eAttackChanceFromAttackDamageFormula;
 	int m_eMovementFromAttackDamageFormula;
 	int m_eHealPercentFromAttackDamageFormula;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool m_bCrops;
+	bool m_bArmee;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;

@@ -481,6 +481,10 @@ CvUnit::CvUnit() :
 	, m_eMovementFromAttackDamageFormula(NO_LUA_FORMULA)
 	, m_eHealPercentFromAttackDamageFormula(NO_LUA_FORMULA)
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	, m_iCrops(0)
+	, m_iArmee(0)
+#endif
 	, m_iReligiousStrengthLossRivalTerritory(0)
 	, m_iTradeMissionInfluenceModifier(0)
 	, m_iTradeMissionGoldModifier(0)
@@ -1440,6 +1444,10 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_eMovementFromAttackDamageFormula = NO_LUA_FORMULA;
 	m_eHealPercentFromAttackDamageFormula = NO_LUA_FORMULA;
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_iCrops = 0;
+	m_iArmee = 0;
+#endif
 	m_iReligiousStrengthLossRivalTerritory = 0;
 	m_iTradeMissionInfluenceModifier = 0;
 	m_iTradeMissionGoldModifier = 0;
@@ -2310,6 +2318,14 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 	if(!IsNoTroops())
 	{
 		GET_PLAYER(getOwner()).ChangeDomainTroopsUsed(-1);
+	}
+	if(IsCrops())
+	{
+		GET_PLAYER(getOwner()).ChangeNumCropsUsed(-1);
+	}
+	if(IsArmee())
+	{
+		GET_PLAYER(getOwner()).ChangeNumArmeeUsed(-1);
 	}
 #endif
 
@@ -6685,8 +6701,6 @@ void CvUnit::setRemovePromotionUpgrade(int iValue)
 		m_iRemovePromotionUpgrade = iValue;
 	}
 }
-
-//	--------------------------------------------------------------------------------
 const int CvUnit::GetRemovePromotionUpgrade() const
 {
 	return m_iRemovePromotionUpgrade;
@@ -6699,8 +6713,6 @@ void CvUnit::setAttackChanceFromAttackDamageFormula(int iValue)
 		m_eAttackChanceFromAttackDamageFormula = iValue;
 	}
 }
-
-//	--------------------------------------------------------------------------------
 const int CvUnit::GetAttackChanceFromAttackDamageFormula() const
 {
 	return m_eAttackChanceFromAttackDamageFormula;
@@ -6714,7 +6726,6 @@ void CvUnit::setMovementFromAttackDamageFormula(int iValue)
 	}
 }
 
-//	--------------------------------------------------------------------------------
 const int CvUnit::GetMovementFromAttackDamageFormula() const
 {
 	return m_eMovementFromAttackDamageFormula;
@@ -6727,12 +6738,57 @@ void CvUnit::setHealPercentFromAttackDamageFormula(int iValue)
 		m_eHealPercentFromAttackDamageFormula = iValue;
 	}
 }
-
-//	--------------------------------------------------------------------------------
 const int CvUnit::GetHealPercentFromAttackDamageFormula() const
 {
 	return m_eHealPercentFromAttackDamageFormula;
 }
+#endif
+//	--------------------------------------------------------------------------------
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+const int CvUnit::GetCrops() const
+{
+	return m_iCrops;
+}
+void CvUnit::ChangeCrops(int iValue)
+{
+	int oldValue = m_iCrops;
+	m_iCrops += iValue;
+	if(oldValue <= 0 && m_iCrops > 0)
+	{
+		GET_PLAYER(getOwner()).ChangeNumCropsUsed(1);
+	}
+	else if(oldValue > 0 && m_iCrops <=0)
+	{
+		GET_PLAYER(getOwner()).ChangeNumCropsUsed(-1);
+	}
+}
+const bool CvUnit::IsCrops() const
+{
+	return m_iCrops > 0;
+}
+//	--------------------------------------------------------------------------------
+const int CvUnit::GetArmee() const
+{
+	return m_iArmee;
+}
+void CvUnit::ChangeArmee(int iValue)
+{
+	int oldValue = m_iArmee;
+	m_iArmee += iValue;
+	if(oldValue <= 0 && m_iArmee > 0)
+	{
+		GET_PLAYER(getOwner()).ChangeNumArmeeUsed(1);
+	}
+	else if(oldValue > 0 && m_iArmee <=0)
+	{
+		GET_PLAYER(getOwner()).ChangeNumArmeeUsed(-1);
+	}
+}
+const bool CvUnit::IsArmee() const
+{
+	return m_iArmee > 0;
+}
+
 #endif
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeReligiousStrengthLossRivalTerritory(int iValue)
@@ -25285,6 +25341,10 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		setMovementFromAttackDamageFormula(thisPromotion.GetMovementFromAttackDamageFormula() ? thisPromotion.GetMovementFromAttackDamageFormula() : NO_LUA_FORMULA);
 		setHealPercentFromAttackDamageFormula(thisPromotion.GetHealPercentFromAttackDamageFormula() ? thisPromotion.GetHealPercentFromAttackDamageFormula() : NO_LUA_FORMULA);
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+		if(thisPromotion.IsCrops()) ChangeCrops(iChange);
+		if(thisPromotion.IsArmee()) ChangeArmee(iChange);
+#endif
 		ChangeReligiousStrengthLossRivalTerritory((thisPromotion.GetReligiousStrengthLossRivalTerritory()) *  iChange);
 		ChangeTradeMissionInfluenceModifier((thisPromotion.GetTradeMissionInfluenceModifier()) * iChange);
 		ChangeTradeMissionGoldModifier((thisPromotion.GetTradeMissionGoldModifier()) * iChange);
@@ -25838,6 +25898,10 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_eMovementFromAttackDamageFormula;
 	kStream >> m_eHealPercentFromAttackDamageFormula;
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kStream >> m_iCrops;
+	kStream >> m_iArmee;
+#endif
 	kStream >> m_iReligiousStrengthLossRivalTerritory;
 	kStream >> m_iTradeMissionInfluenceModifier;
 	kStream >> m_iTradeMissionGoldModifier;
@@ -26218,6 +26282,10 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_eAttackChanceFromAttackDamageFormula;
 	kStream << m_eMovementFromAttackDamageFormula;
 	kStream << m_eHealPercentFromAttackDamageFormula;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kStream << m_iCrops;
+	kStream << m_iArmee;
 #endif
 	kStream << m_iReligiousStrengthLossRivalTerritory;
 	kStream << m_iTradeMissionInfluenceModifier;

@@ -1864,6 +1864,15 @@ public:
 	void setHealPercentFromAttackDamageFormula(int iValue);
 	const int GetHealPercentFromAttackDamageFormula() const;
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	const int GetCrops() const;
+	void ChangeCrops(int iValue);
+	const bool IsCrops() const;
+
+	const int GetArmee() const;
+	void ChangeArmee(int iValue);
+	const bool IsArmee() const;
+#endif
 
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
 	int GetReligiousStrengthLossRivalTerritory() const;
@@ -2458,6 +2467,10 @@ protected:
 	int m_eAttackChanceFromAttackDamageFormula;
 	int m_eMovementFromAttackDamageFormula;
 	int m_eHealPercentFromAttackDamageFormula;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int m_iCrops;
+	int m_iArmee;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;

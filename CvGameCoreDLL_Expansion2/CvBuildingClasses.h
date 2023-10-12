@@ -409,6 +409,8 @@ public:
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	int GetDomainTroops(int i) const;
+	int GetNumCrops() const;
+	int GetNumArmee() const;
 #endif
 
 	int GetDomainProductionModifier(int i) const;
@@ -785,6 +787,8 @@ private:
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	int* m_piDomainTroops;
+	int  m_iNumCrops;
+	int  m_iNumArmee;
 #endif
 
 

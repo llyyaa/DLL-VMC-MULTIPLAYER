@@ -2149,18 +2149,32 @@ public:
 	void ChangeProductionNeededProjectModifier(int change);
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	int GetDomainTroopsTotal(DomainTypes eDomain = DOMAIN_SEA) const;
-	void ChangeDomainTroopsTotal(int iChange, DomainTypes eDomain = DOMAIN_SEA);
-	void SetDomainTroopsTotal(int iValue, DomainTypes eDomain = DOMAIN_SEA);
+	int GetDomainTroopsTotalTimes100(DomainTypes eDomain = DOMAIN_SEA) const;
+	void ChangeDomainTroopsTotalTimes100(int iChange, DomainTypes eDomain = DOMAIN_SEA);
+	void SetDomainTroopsTotalTimes100(int iValue, DomainTypes eDomain = DOMAIN_SEA);
 
 	int GetDomainTroopsUsed(DomainTypes eDomain = DOMAIN_SEA) const;
 	void ChangeDomainTroopsUsed(int iChange, DomainTypes eDomain = DOMAIN_SEA);
 	void SetDomainTroopsUsed(int iValue, DomainTypes eDomain = DOMAIN_SEA);
 
 	int GetTroopsRateTimes100() const;
-	int GetDomainTroopsTotalAfterRate(DomainTypes eDomain = DOMAIN_SEA) const;
+	int GetDomainTroopsTotal(DomainTypes eDomain = DOMAIN_SEA) const;
 	bool IsLackingTroops(DomainTypes eDomain = DOMAIN_SEA) const;
 	int GetDomainTroopsActive(DomainTypes eDomain = DOMAIN_SEA) const;
+
+	int GetNumCropsTotalTimes100() const;
+	void ChangeNumCropsTotalTimes100(int change);
+	int GetNumCropsUsed() const;
+	void ChangeNumCropsUsed(int change);
+	int GetNumCropsTotal() const;
+	bool IsCanEstablishCrops() const;
+
+	int GetNumArmeeTotalTimes100() const;
+	void ChangeNumArmeeTotalTimes100(int change);
+	int GetNumArmeeUsed() const;
+	void ChangeNumArmeeUsed(int change);
+	int GetNumArmeeTotal() const;
+	bool IsCanEstablishArmee() const;
 #endif
 
 protected:
@@ -2821,6 +2835,11 @@ protected:
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsTotal;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsUsed;
+
+	int m_iNumCropsTotal;
+	int m_iNumCropsUsed;
+	int m_iNumArmeeTotal;
+	int m_iNumArmeeUsed;
 #endif
 };
 

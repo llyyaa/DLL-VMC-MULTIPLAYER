@@ -211,6 +211,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_eMovementFromAttackDamageFormula(NO_LUA_FORMULA),
 	m_eHealPercentFromAttackDamageFormula(NO_LUA_FORMULA),
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_bCrops(false),
+	m_bArmee(false),
+#endif
 
 	m_iReligiousStrengthLossRivalTerritory(0),
 	m_iTradeMissionInfluenceModifier(0),
@@ -701,6 +705,10 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_eAttackChanceFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("AttackChanceFromAttackDamage")));
 	m_eMovementFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("MovementFromAttackDamage")));
 	m_eHealPercentFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("HealPercentFromAttackDamage")));
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_bCrops = kResults.GetBool("IsCrops");
+	m_bArmee = kResults.GetBool("IsArmee");
 #endif
 	m_iReligiousStrengthLossRivalTerritory = kResults.GetInt("ReligiousStrengthLossRivalTerritory");
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
@@ -2355,6 +2363,16 @@ int CvPromotionEntry::GetMovementFromAttackDamageFormula() const
 int CvPromotionEntry::GetHealPercentFromAttackDamageFormula() const
 {
 	return m_eHealPercentFromAttackDamageFormula;
+}
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+bool CvPromotionEntry::IsCrops() const
+{
+	return m_bCrops;
+}
+bool CvPromotionEntry::IsArmee() const
+{
+	return m_bArmee;
 }
 #endif
 
