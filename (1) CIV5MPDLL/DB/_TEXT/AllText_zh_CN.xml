@@ -521,6 +521,10 @@
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
       		<Text>+{1_Num}%奖励 由于政策对不同意识形态加成[NEWLINE]</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
+      		<Text>[NEWLINE]兵力不足</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

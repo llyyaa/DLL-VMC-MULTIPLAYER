@@ -407,6 +407,10 @@ public:
 	int GetUnitTypePrmoteHealGlobal(int i) const;
 #endif
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int GetDomainTroops(int i) const;
+#endif
+
 	int GetDomainProductionModifier(int i) const;
 	int GetLockedBuildingClasses(int i) const;
 	int GetPrereqAndTechs(int i) const;
@@ -777,6 +781,10 @@ private:
 	int* m_piDomainFreeExperiencePerGreatWorkGlobal;
 	std::map<int, int> m_piDomainFreeExperienceGlobal;
 	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int* m_piDomainTroops;
 #endif
 
 

@@ -94,6 +94,11 @@ public:
 	int GetBoundLandImprovement() const;
 	int GetBoundWaterImprovement() const;
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool IsNoTroops() const;
+#endif
+
 	int GetSpecialCargo() const;
 	int GetDomainCargo() const;
 
@@ -271,6 +276,10 @@ private:
 #if defined(MOD_UNIT_BOUND_IMPROVEMENT)
 	int m_iBoundLandImprovement;
 	int m_iBoundWaterImprovement;
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool m_bNoTroops;
 #endif
 
 	int m_iSpecialCargo;

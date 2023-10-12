@@ -1086,6 +1086,13 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		}
 	}
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	if(!IsNoTroops())
+	{
+		kPlayer.ChangeDomainTroopsUsed(1);
+	}
+#endif
 		
 #if defined(MOD_EVENTS_UNIT_CREATED)
 	if (MOD_EVENTS_UNIT_CREATED) {
@@ -2296,6 +2303,13 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 		}
 		if(!hasBoundUnit)
 			pPlot->setImprovementType(NO_IMPROVEMENT);
+	}
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	if(!IsNoTroops())
+	{
+		GET_PLAYER(getOwner()).ChangeDomainTroopsUsed(-1);
 	}
 #endif
 
@@ -16828,6 +16842,8 @@ int CvUnit::ExtraDefenseXPValue() const
 }
 #endif
 
+
+//	--------------------------------------------------------------------------------
 #if defined(MOD_UNIT_BOUND_IMPROVEMENT)
 int CvUnit::GetBoundLandImprovement() const
 {
@@ -16845,6 +16861,14 @@ int CvUnit::GetBoundWaterImprovement() const
 #endif
 
 
+//	--------------------------------------------------------------------------------
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+bool CvUnit::IsNoTroops() const
+{
+	VALIDATE_OBJECT
+	return m_pUnitInfo->IsNoTroops() || IsCombatUnit();
+}
+#endif
 //	--------------------------------------------------------------------------------
 int CvUnit::maxXPValue() const
 {

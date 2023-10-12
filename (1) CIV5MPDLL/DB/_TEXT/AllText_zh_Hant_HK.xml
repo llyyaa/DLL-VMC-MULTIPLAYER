@@ -521,5 +521,9 @@
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
       		<Text>政策對不同意識形態加成，+{1_Num}%旅遊業績[NEWLINE]</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
+      		<Text>[NEWLINE]兵力不足</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

@@ -448,6 +448,11 @@ CvPlayer::CvPlayer() :
 	, m_piDomainFreeExperience()
 	, m_piUnitTypePrmoteHealGlobal()
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	, m_aiDomainTroopsTotal("CvPlayer::m_aiDomainTroopsTotal", m_syncArchive)
+	, m_aiDomainTroopsUsed("CvPlayer::m_aiDomainTroopsUsed", m_syncArchive)
+#endif
 	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
 
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
@@ -1269,6 +1274,13 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	m_piDomainFreeExperience.clear();
 	m_piUnitTypePrmoteHealGlobal.clear();
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_aiDomainTroopsTotal.clear();
+	m_aiDomainTroopsTotal.resize(NUM_DOMAIN_TYPES, 0);
+	m_aiDomainTroopsUsed.clear();
+	m_aiDomainTroopsUsed.resize(NUM_DOMAIN_TYPES, 0);
 #endif
 
 	m_ownedNaturalWonders.clear();
@@ -9774,6 +9786,17 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	ChangeLiberatedInfluence(pBuildingInfo->GetLiberatedInfluence()* iChange);
 #endif
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	for (int iDomains = 0; iDomains < NUM_DOMAIN_TYPES; iDomains++)
+	{
+		DomainTypes eDomain = (DomainTypes)iDomains;
+		if (eDomain != NO_DOMAIN && pBuildingInfo->GetDomainTroops(iDomains) != 0)
+		{
+			ChangeDomainTroopsTotal(pBuildingInfo->GetDomainTroops(iDomains));
+		}
+	}
+#endif
+
 	if(pBuildingInfo->GetFreeBuildingClass() != NO_BUILDINGCLASS)
 	{
 		BuildingTypes eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(pBuildingInfo->GetFreeBuildingClass());
@@ -17551,6 +17574,81 @@ void CvPlayer::ChangeUnitTypePrmoteHealGlobal(UnitTypes eIndex, int iChange)
 }
 #endif
 
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetDomainTroopsTotal(DomainTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	return m_aiDomainTroopsTotal[eIndex];
+}
+void CvPlayer::ChangeDomainTroopsTotal(int iChange, DomainTypes eIndex)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiDomainTroopsTotal.setAt(eIndex, m_aiDomainTroopsTotal[eIndex] + iChange);
+}
+void CvPlayer::SetDomainTroopsTotal(int iValue, DomainTypes eIndex)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiDomainTroopsTotal.setAt(eIndex, iValue);
+}
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetDomainTroopsUsed(DomainTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	return m_aiDomainTroopsUsed[eIndex];
+}
+void CvPlayer::ChangeDomainTroopsUsed(int iChange, DomainTypes eIndex)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiDomainTroopsUsed.setAt(eIndex, m_aiDomainTroopsUsed[eIndex] + iChange);
+}
+void CvPlayer::SetDomainTroopsUsed(int iValue, DomainTypes eIndex)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	m_aiDomainTroopsUsed.setAt(eIndex, iValue);
+}
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetTroopsRateTimes100() const
+{
+	if(GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_HIGH))
+		return GC.getTROOP_RATE_TIMES100_HIGH();
+	if(GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_LOW))
+		return GC.getTROOP_RATE_TIMES100_LOW();
+	return GC.getTROOP_RATE_TIMES100_DEFAULT();
+}
+int CvPlayer::GetDomainTroopsTotalAfterRate(DomainTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
+	int temp = 0;
+	temp = m_aiDomainTroopsTotal[eIndex] * GetTroopsRateTimes100();
+	return temp/100;
+}
+bool CvPlayer::IsLackingTroops(DomainTypes eIndex) const
+{
+	if(!MOD_TROOPS_AND_CROPS_FOR_SP || GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_DISABLE)) return false;
+	return GetDomainTroopsTotalAfterRate(eIndex) - GetDomainTroopsUsed(eIndex) <= 0;
+}
+int CvPlayer::GetDomainTroopsActive(DomainTypes eIndex) const
+{
+	return GetDomainTroopsTotalAfterRate(eIndex) - GetDomainTroopsUsed(eIndex);
+}
+//	--------------------------------------------------------------------------------
+#endif
 
 
 #if defined(MOD_ROG_CORE)
@@ -27999,6 +28097,11 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iProductionNeededBuildingModifier;
 	kStream >> m_iProductionNeededProjectModifier;
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kStream >> m_aiDomainTroopsTotal;
+	kStream >> m_aiDomainTroopsUsed;
+#endif
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -28615,6 +28718,11 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iProductionNeededUnitModifier;
 	kStream << m_iProductionNeededBuildingModifier;
 	kStream << m_iProductionNeededProjectModifier;
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kStream << m_aiDomainTroopsTotal;
+	kStream << m_aiDomainTroopsUsed;
+#endif
 }
 
 //	--------------------------------------------------------------------------------

@@ -611,6 +611,11 @@ public:
 	int GetBoundLandImprovement() const;
 	int GetBoundWaterImprovement() const;
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool IsNoTroops() const;
+#endif
+
 	int maxXPValue() const;
 
 	int firstStrikes() const;

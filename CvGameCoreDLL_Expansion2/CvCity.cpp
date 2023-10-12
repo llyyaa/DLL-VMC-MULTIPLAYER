@@ -3139,6 +3139,15 @@ bool CvCity::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool b
 					return false;
 			}
 		}
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+		if(GET_PLAYER(getOwner()).IsLackingTroops() && pkUnitEntry->GetCombat() > 0 && !pkUnitEntry->IsNoTroops())
+		{
+			GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_LACKING_TROOPS");
+			if(toolTipSink == NULL)
+					return false;
+		}
+#endif
 	}
 
 	if(!plot()->canTrain(eUnit, bContinue, bTestVisible))

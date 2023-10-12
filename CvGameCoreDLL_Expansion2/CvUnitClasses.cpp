@@ -78,6 +78,10 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_iBoundLandImprovement(NO_IMPROVEMENT),
 	m_iBoundWaterImprovement(NO_IMPROVEMENT),
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_bNoTroops(false),
+#endif
 	m_iSpecialCargo(0),
 	m_iDomainCargo(0),
 	m_iConscriptionValue(0),
@@ -325,6 +329,10 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_iBoundLandImprovement = GC.getInfoTypeForString(szTextVal, true);
 	szTextVal = kResults.GetText("BoundWaterImprovement");
 	m_iBoundWaterImprovement = GC.getInfoTypeForString(szTextVal, true);
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_bNoTroops = kResults.GetBool("NoTroops");
 #endif
 
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
@@ -843,6 +851,13 @@ int CvUnitEntry::GetBoundLandImprovement() const
 int CvUnitEntry::GetBoundWaterImprovement() const
 {
 	return m_iBoundWaterImprovement;
+}
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+bool CvUnitEntry::IsNoTroops() const
+{
+	return m_bNoTroops;
 }
 #endif
 

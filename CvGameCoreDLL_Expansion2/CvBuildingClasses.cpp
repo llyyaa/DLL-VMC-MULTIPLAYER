@@ -269,6 +269,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiSpecificGreatPersonRateModifier(NULL),
 #endif
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_piDomainTroops(NULL),
+#endif
+
 
 	m_piDomainProductionModifier(NULL),
 	m_piPrereqNumOfBuildingClass(NULL),
@@ -360,6 +364,10 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piDomainFreeExperiencePerGreatWorkGlobal);
 	m_piDomainFreeExperienceGlobal.clear();
 	m_piUnitTypePrmoteHealGlobal.clear();
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	SAFE_DELETE_ARRAY(m_piDomainTroops);
 #endif
 
 	SAFE_DELETE_ARRAY(m_piDomainProductionModifier);
@@ -773,6 +781,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.PopulateArrayByValue(m_paiSpecificGreatPersonRateModifier, "Specialists", "Building_SpecificGreatPersonRateModifier", "SpecialistType", "BuildingType", szBuildingType, "Modifier");
 #endif
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kUtility.PopulateArrayByValue(m_piDomainTroops, "Domains", "Building_DomainTroops", "DomainType", "BuildingType", szBuildingType, "NumTroop", 0, NUM_DOMAIN_TYPES);
+#endif
 
 	kUtility.PopulateArrayByValue(m_piPrereqNumOfBuildingClass, "BuildingClasses", "Building_PrereqBuildingClasses", "BuildingClassType", "BuildingType", szBuildingType, "NumBuildingNeeded");
 	kUtility.PopulateArrayByExistence(m_pbBuildingClassNeededInCity, "BuildingClasses", "Building_ClassesNeededInCity", "BuildingClassType", "BuildingType", szBuildingType);
@@ -3091,6 +3102,15 @@ int CvBuildingEntry::GetUnitTypePrmoteHealGlobal(int i) const
 		return it->second;
 	}
 	return 0;
+}
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+int CvBuildingEntry::GetDomainTroops(int i) const
+{
+	CvAssertMsg(i < NUM_DOMAIN_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piDomainTroops ? m_piDomainTroops[i] : -1;
 }
 #endif
 

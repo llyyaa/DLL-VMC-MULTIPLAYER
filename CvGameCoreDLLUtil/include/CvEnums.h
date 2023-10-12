@@ -1086,7 +1086,11 @@ enum GameOptionTypes
 	GAMEOPTION_NO_HAPPINESS,
 	GAMEOPTION_NO_TUTORIAL,
 	GAMEOPTION_NO_RELIGION,
-
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	GAMEOPTION_SP_CORPS_MODE_DISABLE,
+	GAMEOPTION_SP_CORPS_MODE_HIGH,
+	GAMEOPTION_SP_CORPS_MODE_LOW,
+#endif
 	// KWG: Please do add anymore enums.  Use the CvPreGame::GetGameOption which uses a text key.
 	//      These enums are shared between DLLs and would diverge if each added their own.
 	NUM_GAMEOPTION_TYPES

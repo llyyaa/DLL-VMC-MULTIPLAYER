@@ -1106,6 +1106,10 @@
     <!-- see DDL_Traits.sql -->
     <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
 
+    <!-- table changes: -->
+    <!-- see TroopsAndCrops.sql -->
+    <Row Class="6" Name="TROOPS_AND_CROPS_FOR_SP" Value="0"/>
+
     <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="0"/> 
 
     <Row Class="6" Name="CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT" Value="1"/>

@@ -516,6 +516,10 @@
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
       		<Text>+{1_Num}% Bonus for different ideologies from policies[NEWLINE]</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
+      		<Text>[NEWLINE]Lacking Troops</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

@@ -252,6 +252,11 @@ int CvLuaEnums::pRegister(lua_State* L)
 	RegisterEnum(GAMEOPTION_NO_HAPPINESS);
 	RegisterEnum(GAMEOPTION_NO_TUTORIAL);
 	RegisterEnum(GAMEOPTION_NO_RELIGION);
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	RegisterEnum(GAMEOPTION_SP_CORPS_MODE_DISABLE);
+	RegisterEnum(GAMEOPTION_SP_CORPS_MODE_HIGH);
+	RegisterEnum(GAMEOPTION_SP_CORPS_MODE_LOW);
+#endif
 	RegisterEnum(NUM_GAMEOPTION_TYPES);
 
 

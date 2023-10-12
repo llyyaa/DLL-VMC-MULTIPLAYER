@@ -2148,6 +2148,21 @@ public:
 	int GetProductionNeededProjectModifier() const;
 	void ChangeProductionNeededProjectModifier(int change);
 
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int GetDomainTroopsTotal(DomainTypes eDomain = DOMAIN_SEA) const;
+	void ChangeDomainTroopsTotal(int iChange, DomainTypes eDomain = DOMAIN_SEA);
+	void SetDomainTroopsTotal(int iValue, DomainTypes eDomain = DOMAIN_SEA);
+
+	int GetDomainTroopsUsed(DomainTypes eDomain = DOMAIN_SEA) const;
+	void ChangeDomainTroopsUsed(int iChange, DomainTypes eDomain = DOMAIN_SEA);
+	void SetDomainTroopsUsed(int iValue, DomainTypes eDomain = DOMAIN_SEA);
+
+	int GetTroopsRateTimes100() const;
+	int GetDomainTroopsTotalAfterRate(DomainTypes eDomain = DOMAIN_SEA) const;
+	bool IsLackingTroops(DomainTypes eDomain = DOMAIN_SEA) const;
+	int GetDomainTroopsActive(DomainTypes eDomain = DOMAIN_SEA) const;
+#endif
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2802,6 +2817,11 @@ protected:
 	int m_iProductionNeededUnitModifier = 0;
 	int m_iProductionNeededBuildingModifier = 0;
 	int m_iProductionNeededProjectModifier = 0;
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsTotal;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsUsed;
+#endif
 };
 
 extern bool CancelActivePlayerEndTurn();
