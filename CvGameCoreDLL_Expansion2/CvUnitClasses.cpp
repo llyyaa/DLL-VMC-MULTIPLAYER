@@ -332,7 +332,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 #endif
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	m_bNoTroops = kResults.GetBool("NoTroops");
+	m_bNoTroops = kResults.GetBool("NoTroopConsume");
 #endif
 
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
