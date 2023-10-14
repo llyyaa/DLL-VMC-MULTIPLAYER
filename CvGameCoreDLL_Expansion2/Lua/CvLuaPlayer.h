@@ -1227,6 +1227,35 @@ protected:
 	LUAAPIEXTN(IsCorruptionLevelReduceByOne, bool);
 	LUAAPIEXTN(GetCorruptionScoreModifierFromPolicy, int);
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	static int lGetDomainTroopsTotalTimes100(lua_State* L);
+	static int lChangeDomainTroopsTotalTimes100(lua_State* L);
+	static int lSetDomainTroopsTotalTimes100(lua_State* L);
+
+	static int lGetDomainTroopsUsed(lua_State* L);
+	static int lChangeDomainTroopsUsed(lua_State* L);
+	static int lSetDomainTroopsUsed(lua_State* L);
+
+	LUAAPIEXTN(GetTroopsRateTimes100, int);
+	static int lGetDomainTroopsTotal(lua_State* L);
+	static int lIsLackingTroops(lua_State* L);
+	static int lGetDomainTroopsActive(lua_State* L);
+
+	LUAAPIEXTN(GetNumCropsTotalTimes100, int);
+	LUAAPIEXTN(ChangeNumCropsTotalTimes100, void, iChange);
+	LUAAPIEXTN(GetNumCropsUsed, int);
+	LUAAPIEXTN(ChangeNumCropsUsed, void, iChange);
+	LUAAPIEXTN(GetNumCropsTotal, int);
+	LUAAPIEXTN(IsCanEstablishCrops, bool);
+
+	LUAAPIEXTN(GetNumArmeeTotalTimes100, int);
+	LUAAPIEXTN(ChangeNumArmeeTotalTimes100, void, iChange);
+	LUAAPIEXTN(GetNumArmeeUsed, int);
+	LUAAPIEXTN(ChangeNumArmeeUsed, void, iChange);
+	LUAAPIEXTN(GetNumArmeeTotal, int);
+	LUAAPIEXTN(IsCanEstablishArmee, bool);
+#endif
 };
 
 #endif //CVLUAPLAYER_H

@@ -5539,6 +5539,10 @@ public:
 	{
 		return m_iTROOP_RATE_TIMES100_HIGH;
 	}
+	inline int getTROOP_NUM_BASE()
+	{
+		return m_iTROOP_NUM_BASE;
+	}
 #endif
 
 	inline int getMAX_POPULATION_INCREASE_NOTIOFACATION()
@@ -9193,6 +9197,7 @@ protected:
 	int m_iTROOP_RATE_TIMES100_LOW;
 	int m_iTROOP_RATE_TIMES100_DEFAULT;
 	int m_iTROOP_RATE_TIMES100_HIGH;
+	int m_iTROOP_NUM_BASE;
 #endif
 
 #if defined(MOD_ROG_CORE)

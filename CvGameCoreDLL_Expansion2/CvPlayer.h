@@ -2836,10 +2836,10 @@ protected:
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsTotal;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsUsed;
 
-	int m_iNumCropsTotal;
-	int m_iNumCropsUsed;
-	int m_iNumArmeeTotal;
-	int m_iNumArmeeUsed;
+	int m_iNumCropsTotal = 0;
+	int m_iNumCropsUsed = 0;
+	int m_iNumArmeeTotal = 0;
+	int m_iNumArmeeUsed = 0;
 #endif
 };
 

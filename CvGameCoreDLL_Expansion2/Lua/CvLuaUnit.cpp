@@ -819,6 +819,10 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 	Method(IsImmuneNegtivePromotions);
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	Method(IsNoTroops);
+#endif
 }
 //------------------------------------------------------------------------------
 const char* CvLuaUnit::GetTypeName()
@@ -6216,4 +6220,8 @@ LUAAPIIMPL(Unit, ClearSamePlotPromotions)
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 LUAAPIIMPL(Unit, IsImmuneNegtivePromotions)
+#endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+LUAAPIIMPL(Unit, IsNoTroops)
 #endif

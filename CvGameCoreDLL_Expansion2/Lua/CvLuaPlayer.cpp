@@ -1305,6 +1305,35 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(IsCorruptionLevelReduceByOne);
 	Method(GetCorruptionScoreModifierFromPolicy);
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	Method(GetDomainTroopsTotalTimes100);
+	Method(ChangeDomainTroopsTotalTimes100);
+	Method(SetDomainTroopsTotalTimes100);
+
+	Method(GetDomainTroopsUsed);
+	Method(ChangeDomainTroopsUsed);
+	Method(SetDomainTroopsUsed);
+
+	Method(GetTroopsRateTimes100);
+	Method(GetDomainTroopsTotal);
+	Method(IsLackingTroops);
+	Method(GetDomainTroopsActive);
+
+	Method(GetNumCropsTotalTimes100);
+	Method(ChangeNumCropsTotalTimes100);
+	Method(GetNumCropsUsed);
+	Method(ChangeNumCropsUsed);
+	Method(GetNumCropsTotal);
+	Method(IsCanEstablishCrops);
+
+	Method(GetNumArmeeTotalTimes100);
+	Method(ChangeNumArmeeTotalTimes100);
+	Method(GetNumArmeeUsed);
+	Method(ChangeNumArmeeUsed);
+	Method(GetNumArmeeTotal);
+	Method(IsCanEstablishArmee);
+#endif
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12537,3 +12566,91 @@ int CvLuaPlayer::lGetGlobalYieldModifierFromResource(lua_State* L)
 
 LUAAPIIMPL(Player, IsCorruptionLevelReduceByOne)
 LUAAPIIMPL(Player, GetCorruptionScoreModifierFromPolicy)
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+int CvLuaPlayer::lGetDomainTroopsTotalTimes100(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 2, int(DOMAIN_SEA));
+	lua_pushinteger(L, pkPlayer->GetDomainTroopsTotalTimes100(eDomain));
+	return 1;
+}
+int CvLuaPlayer::lChangeDomainTroopsTotalTimes100(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iChange = lua_tointeger(L, 2);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 3, int(DOMAIN_SEA));
+	pkPlayer->ChangeDomainTroopsTotalTimes100(iChange, eDomain);
+	return 1;
+}
+int CvLuaPlayer::lSetDomainTroopsTotalTimes100(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 3, int(DOMAIN_SEA));
+	pkPlayer->SetDomainTroopsTotalTimes100(iValue, eDomain);
+	return 1;
+}
+
+int CvLuaPlayer::lGetDomainTroopsUsed(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 2, int(DOMAIN_SEA));
+	lua_pushinteger(L, pkPlayer->GetDomainTroopsUsed(eDomain));
+	return 1;
+}
+int CvLuaPlayer::lChangeDomainTroopsUsed(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iChange = lua_tointeger(L, 2);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 3, int(DOMAIN_SEA));
+	pkPlayer->ChangeDomainTroopsUsed(iChange, eDomain);
+	return 1;
+}
+int CvLuaPlayer::lSetDomainTroopsUsed(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iValue = lua_tointeger(L, 2);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 3, int(DOMAIN_SEA));
+	pkPlayer->SetDomainTroopsUsed(iValue, eDomain);
+	return 1;
+}
+
+LUAAPIIMPL(Player, GetTroopsRateTimes100)
+
+int CvLuaPlayer::lGetDomainTroopsTotal(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 2, int(DOMAIN_SEA));
+	lua_pushinteger(L, pkPlayer->GetDomainTroopsTotal(eDomain));
+	return 1;
+}
+int CvLuaPlayer::lIsLackingTroops(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 2, int(DOMAIN_SEA));
+	lua_pushboolean(L, pkPlayer->IsLackingTroops(eDomain));
+	return 1;
+}
+int CvLuaPlayer::lGetDomainTroopsActive(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 2, int(DOMAIN_SEA));
+	lua_pushinteger(L, pkPlayer->GetDomainTroopsActive(eDomain));
+	return 1;
+}
+
+LUAAPIIMPL(Player, GetNumCropsTotalTimes100)
+LUAAPIIMPL(Player, ChangeNumCropsTotalTimes100)
+LUAAPIIMPL(Player, GetNumCropsUsed)
+LUAAPIIMPL(Player, ChangeNumCropsUsed)
+LUAAPIIMPL(Player, GetNumCropsTotal)
+LUAAPIIMPL(Player, IsCanEstablishCrops)
+
+LUAAPIIMPL(Player, GetNumArmeeTotalTimes100)
+LUAAPIIMPL(Player, ChangeNumArmeeTotalTimes100)
+LUAAPIIMPL(Player, GetNumArmeeUsed)
+LUAAPIIMPL(Player, ChangeNumArmeeUsed)
+LUAAPIIMPL(Player, GetNumArmeeTotal)
+LUAAPIIMPL(Player, IsCanEstablishArmee)
+#endif

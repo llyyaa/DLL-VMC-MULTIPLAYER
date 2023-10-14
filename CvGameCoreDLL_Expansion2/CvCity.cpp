@@ -3141,7 +3141,8 @@ bool CvCity::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool b
 		}
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-		if(GET_PLAYER(getOwner()).IsLackingTroops() && pkUnitEntry->GetCombat() > 0 && !pkUnitEntry->IsNoTroops())
+		//when lacking Troops, can't built combat unit
+		if(GET_PLAYER(getOwner()).IsLackingTroops() && (pkUnitEntry->GetCombat() > 0 || pkUnitEntry->GetRangedCombat() > 0) && !pkUnitEntry->IsNoTroops())
 		{
 			GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_LACKING_TROOPS");
 			if(toolTipSink == NULL)

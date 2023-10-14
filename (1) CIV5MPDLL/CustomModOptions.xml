@@ -1108,7 +1108,7 @@
 
     <!-- table changes: -->
     <!-- see TroopsAndCrops.sql -->
-    <Row Class="6" Name="TROOPS_AND_CROPS_FOR_SP" Value="0"/>
+    <Row Class="6" Name="TROOPS_AND_CROPS_FOR_SP" Value="1"/>
 
     <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="0"/> 
 

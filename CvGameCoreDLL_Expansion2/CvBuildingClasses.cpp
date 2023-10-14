@@ -2435,7 +2435,7 @@ int CvBuildingEntry::GetPortraitIndex() const
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 int CvBuildingEntry::GetNumCrops() const
 {
-	return m_iPortraitIndex;
+	return m_iNumCrops;
 }
 int CvBuildingEntry::GetNumArmee() const
 {

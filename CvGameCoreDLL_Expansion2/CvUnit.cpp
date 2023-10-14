@@ -16922,7 +16922,7 @@ int CvUnit::GetBoundWaterImprovement() const
 bool CvUnit::IsNoTroops() const
 {
 	VALIDATE_OBJECT
-	return m_pUnitInfo->IsNoTroops() || IsCombatUnit();
+	return m_pUnitInfo->IsNoTroops() || !IsCombatUnit();
 }
 #endif
 //	--------------------------------------------------------------------------------

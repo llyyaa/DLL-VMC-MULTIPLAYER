@@ -743,6 +743,10 @@ protected:
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS
 	LUAAPIEXTN(IsImmuneNegtivePromotions, bool);
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	LUAAPIEXTN(IsNoTroops, bool);
+#endif
 };
 
 

@@ -452,10 +452,6 @@ CvPlayer::CvPlayer() :
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	, m_aiDomainTroopsTotal("CvPlayer::m_aiDomainTroopsTotal", m_syncArchive)
 	, m_aiDomainTroopsUsed("CvPlayer::m_aiDomainTroopsUsed", m_syncArchive)
-	, m_iNumCropsTotal(0)
-	, m_iNumCropsUsed(0)
-	, m_iNumArmeeTotal(0)
-	, m_iNumArmeeUsed(0)
 #endif
 	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
 
@@ -1221,6 +1217,7 @@ void CvPlayer::uninit()
 	m_iMaxEffectiveCities = 1;
 	m_iLastSliceMoved = 0;
 
+	
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iNumCropsTotal = 0;
 	m_iNumCropsUsed = 0;
@@ -9812,7 +9809,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	}
 	if(pBuildingInfo->GetNumArmee() != 0)
 	{
-		ChangeNumArmeeTotalTimes100(pBuildingInfo->GetNumCrops() * GetTroopsRateTimes100() * iChange);
+		ChangeNumArmeeTotalTimes100(pBuildingInfo->GetNumArmee() * GetTroopsRateTimes100() * iChange);
 	}
 #endif
 
@@ -17601,7 +17598,7 @@ int CvPlayer::GetDomainTroopsTotalTimes100(DomainTypes eIndex) const
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	return m_aiDomainTroopsTotal[eIndex];
+	return m_aiDomainTroopsTotal[eIndex] + GC.getTROOP_NUM_BASE() * GetTroopsRateTimes100();
 }
 void CvPlayer::ChangeDomainTroopsTotalTimes100(int iChange, DomainTypes eIndex)
 {
@@ -17650,10 +17647,7 @@ int CvPlayer::GetTroopsRateTimes100() const
 }
 int CvPlayer::GetDomainTroopsTotal(DomainTypes eIndex) const
 {
-	VALIDATE_OBJECT
-	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
-	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	return  m_aiDomainTroopsTotal[eIndex] / 100;
+	return  GetDomainTroopsTotalTimes100(eIndex) / 100;
 }
 bool CvPlayer::IsLackingTroops(DomainTypes eIndex) const
 {
