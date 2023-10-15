@@ -453,6 +453,9 @@ CvPlayer::CvPlayer() :
 	, m_aiDomainTroopsTotal("CvPlayer::m_aiDomainTroopsTotal", m_syncArchive)
 	, m_aiDomainTroopsUsed("CvPlayer::m_aiDomainTroopsUsed", m_syncArchive)
 #endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	, m_aiImmigrationCounter("CvPlayer::m_aiImmigrationCounter", m_syncArchive)
+#endif
 	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
 
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
@@ -1289,6 +1292,10 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiDomainTroopsTotal.resize(NUM_DOMAIN_TYPES, 0);
 	m_aiDomainTroopsUsed.clear();
 	m_aiDomainTroopsUsed.resize(NUM_DOMAIN_TYPES, 0);
+#endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	m_aiImmigrationCounter.clear();
+	m_aiImmigrationCounter.resize(MAX_MAJOR_CIVS, 0);
 #endif
 
 	m_ownedNaturalWonders.clear();
@@ -17714,6 +17721,29 @@ bool CvPlayer::IsCanEstablishArmee() const
 //	--------------------------------------------------------------------------------
 #endif
 
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+int CvPlayer::GetImmigrationCounter(int iIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
+	return m_aiImmigrationCounter[iIndex];
+}
+void CvPlayer::ChangeImmigrationCounter(int iIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
+	m_aiImmigrationCounter.setAt(iIndex, m_aiImmigrationCounter[iIndex] + iChange);
+}
+void CvPlayer::SetImmigrationCounter(int iIndex, int iValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
+	m_aiImmigrationCounter.setAt(iIndex, iValue);
+}
+#endif
 
 #if defined(MOD_ROG_CORE)
 int CvPlayer::getWorldWonderCityYieldRateModifier(YieldTypes eIndex) const
@@ -28202,6 +28232,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iNumArmeeTotal;
 	kStream >> m_iNumArmeeUsed;
 #endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	kStream >> m_aiImmigrationCounter;
+#endif
 
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
@@ -28827,6 +28860,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iNumCropsUsed;
 	kStream << m_iNumArmeeTotal;
 	kStream << m_iNumArmeeUsed;
+#endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	kStream << m_aiImmigrationCounter;
 #endif
 }
 

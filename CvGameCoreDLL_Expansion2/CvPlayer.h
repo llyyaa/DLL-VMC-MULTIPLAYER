@@ -2178,6 +2178,12 @@ public:
 	bool IsCanEstablishArmee() const;
 #endif
 
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	int GetImmigrationCounter(int iIndex) const;
+	void ChangeImmigrationCounter(int iIndex, int iChange);
+	void SetImmigrationCounter(int iIndex, int iValue);
+#endif
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2841,6 +2847,10 @@ protected:
 	int m_iNumCropsUsed = 0;
 	int m_iNumArmeeTotal = 0;
 	int m_iNumArmeeUsed = 0;
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiImmigrationCounter;
 #endif
 };
 
