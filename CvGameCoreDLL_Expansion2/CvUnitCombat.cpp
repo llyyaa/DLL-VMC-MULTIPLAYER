@@ -1058,6 +1058,11 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 
 				if(pkAttacker)
 				{
+					if(pkAttacker->isSuicide())
+					{
+						pkAttacker->setCombatUnit(NULL);	// Must clear this if doing a delayed kill, should this be part of the kill method?
+						pkAttacker->kill(true);
+					}
 					// Defender died
 #if defined(MOD_UNITS_MAX_HP)
 					if(iDamage + pkDefender->getDamage() >= pkDefender->GetMaxHitPoints())
@@ -1206,6 +1211,11 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 			{
 				if(pkAttacker)
 				{
+					if(pkAttacker->isSuicide())
+					{
+						pkAttacker->setCombatUnit(NULL);	// Must clear this if doing a delayed kill, should this be part of the kill method?
+						pkAttacker->kill(true);
+					}
 					bBarbarian = pCity->isBarbarian();
 					pCity->changeDamage(iDamage);
 
