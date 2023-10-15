@@ -520,6 +520,18 @@
 		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
       		<Text>[NEWLINE]Lacking Troops</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1">
+      		<Text>You are currently using more {1_Resource:textkey} than you have!, you are affected by the following:</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_COMBAT">
+      		<Text>[NEWLINE][ICON_BULLET]All units which require it will [COLOR_NEGATIVE_TEXT]fight much less effectively[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_DEBUFF">
+      		<Text>[NEWLINE][ICON_BULLET][COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR] {1_IconString} {2_Description} across the country</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS">
+      		<Text>[NEWLINE][ICON_BULLET][COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR] [ICON_HAPPINESS_4] Unhappiness across the country</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

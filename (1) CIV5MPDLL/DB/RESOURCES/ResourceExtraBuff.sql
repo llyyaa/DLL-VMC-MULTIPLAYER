@@ -12,3 +12,6 @@ create table Resource_GlobalYieldModifiers (
     StartEra text references Eras(Type),
     EndEra text references Eras(Type)
 );
+
+alter table Resources add column NotificationTurn integer not null default 0;
+alter table Resources add column NoDefaultNotification boolean not null default 0;

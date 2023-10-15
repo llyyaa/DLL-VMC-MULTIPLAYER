@@ -1452,7 +1452,8 @@ public:
 	
 	void UpdateResourcesSiphoned();
 
-	void DoTestOverResourceNotification(ResourceTypes eIndex);
+	void DoTestOverResourceNotification(ResourceTypes eIndex, bool bIsDoTurn = false);
+	void DoTestOverResourceNotificationAll();
 
 	int GetStrategicResourceMod() const;
 	void ChangeStrategicResourceMod(int iChange);

@@ -4938,6 +4938,8 @@ bool CvResourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility
 		pResults->Reset();
 	}
 #endif
+	m_iNotificationTurn = kResults.GetInt("NotificationTurn");
+	m_bNoDefaultNotification = kResults.GetBool("NoDefaultNotification");
 
 	return true;
 }
@@ -4953,6 +4955,16 @@ LuaFormulaTypes CvResourceInfo::GetCityConnectionTradeRouteGoldModifierFormula()
 LuaFormulaTypes CvResourceInfo::GetGoldHurryCostModifierFormula() const
 {
 	return m_eGoldHurryCostModifierFormula;
+}
+
+int CvResourceInfo::getNotificationTurn() const
+{
+	return m_iNotificationTurn;
+}
+
+bool CvResourceInfo::isNoDefaultNotification() const
+{
+	return m_bNoDefaultNotification;
 }
 
 const std::vector<CvResourceInfo::YieldInfo>& CvResourceInfo::GetGlobalYieldModifiers() const

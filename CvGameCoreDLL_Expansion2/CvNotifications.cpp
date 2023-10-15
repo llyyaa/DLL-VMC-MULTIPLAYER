@@ -1854,6 +1854,7 @@ bool CvNotifications::IsNotificationExpired(int iIndex)
 			}
 		}
 	}
+	break;
 
 	case NOTIFICATION_FOUND_PANTHEON:
 	{
@@ -1869,6 +1870,7 @@ bool CvNotifications::IsNotificationExpired(int iIndex)
 		CvGameReligions* pkReligions(kGame.GetGameReligions());
 		return pkReligions->HasAddedReformationBelief(m_ePlayer);
 	}
+	break;
 
 	case NOTIFICATION_FOUND_RELIGION:
 	{

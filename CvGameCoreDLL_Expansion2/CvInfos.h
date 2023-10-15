@@ -1438,6 +1438,8 @@ public:
 
 	const std::vector<YieldInfo>& GetGlobalYieldModifiers() const;
 #endif
+	int getNotificationTurn() const;
+	bool isNoDefaultNotification() const;
 
 #ifdef MOD_GLOBAL_CORRUPTION
 	int GetCorruptionScoreChange() const;
@@ -1508,6 +1510,8 @@ protected:
 
 	std::vector<YieldInfo> m_vGlobalYieldModifiers;
 #endif
+	int m_iNotificationTurn = 0;
+	bool m_bNoDefaultNotification = false;
 
 #ifdef MOD_GLOBAL_CORRUPTION
 	int m_iCorruptionScoreChange = 0;

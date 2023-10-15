@@ -525,5 +525,17 @@
 		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
       		<Text>[NEWLINE]兵力不足</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1">
+      		<Text>由於{1_Resource:textkey}[COLOR_NEGATIVE_TEXT]不足[ENDCOLOR]，你受到以下影響:</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_COMBAT">
+      		<Text>[NEWLINE][ICON_BULLET]所有需要該資源的單位[COLOR_NEGATIVE_TEXT]戰鬥力將大大下降[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_DEBUFF">
+      		<Text>[NEWLINE][ICON_BULLET]全國{1_IconString}{2_Description}[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS">
+      		<Text>[NEWLINE][ICON_BULLET]全國[ICON_HAPPINESS_4]不滿[COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR]</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

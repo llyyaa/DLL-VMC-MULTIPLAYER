@@ -5081,6 +5081,7 @@ void CvPlayer::doTurn()
 		bool bResult;
 		LuaSupport::CallHook(pkScriptSystem, "PlayerDoTurn", args.get(), bResult);
 	}
+	DoTestOverResourceNotificationAll();
 
 	m_kPlayerAchievements.StartTurn();
 }
@@ -22279,26 +22280,59 @@ void CvPlayer::UpdateResourcesSiphoned()
 
 //	--------------------------------------------------------------------------------
 /// Are we over our resource limit? If so, give out a notification
-void CvPlayer::DoTestOverResourceNotification(ResourceTypes eIndex)
+void CvPlayer::DoTestOverResourceNotification(ResourceTypes eIndex, bool bIsDoTurn)
 {
-	if(getNumResourceAvailable(eIndex, true) < 0)
+	if(!isHuman()) return;
+	int iNumResource = getNumResourceAvailable(eIndex, true);
+	if(iNumResource < 0)
 	{
-		const CvResourceInfo* pkResourceInfo = GC.getResourceInfo(eIndex);
-		if(pkResourceInfo != NULL && pkResourceInfo->getResourceUsage() == RESOURCEUSAGE_STRATEGIC)
+		CvResourceInfo* pkResourceInfo = GC.getResourceInfo(eIndex);
+		int iNotificationTurn = pkResourceInfo->getNotificationTurn();
+		if(pkResourceInfo != NULL && (pkResourceInfo->getResourceUsage() == RESOURCEUSAGE_STRATEGIC || iNotificationTurn > 0))
 		{
-			CvNotifications* pNotifications = GetNotifications();
-			if(pNotifications)
+			//Special for SP: Block the Manpower, Consumer & Electricity Notification at StartTurn
+			if (GC.getGame().getGameTurn() < iNotificationTurn || (pkResourceInfo->isNoDefaultNotification() && !bIsDoTurn)) return;
+			CvString strText;
+			for (uint uiYield = 0; uiYield < NUM_YIELD_TYPES; uiYield++)
 			{
-				Localization::String strText = Localization::Lookup("TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT");
-				strText << pkResourceInfo->GetTextKey();
+				YieldTypes eYield = (YieldTypes)uiYield;
+				int iYieldModifier =  CalculateGlobalYieldModifierFromResource(pkResourceInfo, iNumResource, eYield);
+				if(iYieldModifier != 0)
+				{
+					strText += GetLocalizedText("TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_DEBUFF", GC.getYieldInfo(eYield)->getIconString(), GC.getYieldInfo(eYield)->GetDescription(), iYieldModifier);
+				}
+			}
+			int iUnhappinessMod = CalculateUnhappinessModFromResource(pkResourceInfo, iNumResource);
+			if(iUnhappinessMod > 0)
+			{
+				strText += GetLocalizedText("TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS", iUnhappinessMod);
+			}
+			if(!pkResourceInfo->isNoDefaultNotification())
+				strText += GetLocalizedText("TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_COMBAT");
+			CvNotifications* pNotifications = GetNotifications();
+			if(pNotifications && strText.length() > 0)
+			{
+				strText = GetLocalizedText("TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1",pkResourceInfo->GetTextKey()) + strText;
 				Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OVER_RESOURCE_LIMIT");
+				strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OVER_RESOURCE_LIMIT");
 				strSummary << pkResourceInfo->GetTextKey();
-				pNotifications->Add(NOTIFICATION_DEMAND_RESOURCE, strText.toUTF8(), strSummary.toUTF8(), -1, -1, eIndex);
+				pNotifications->Add(NOTIFICATION_DEMAND_RESOURCE, strText, strSummary.toUTF8(), -1, -1, eIndex);
 			}
 		}
 	}
 }
 
+//	--------------------------------------------------------------------------------
+// Test All Resources to create turn Notification
+void CvPlayer::DoTestOverResourceNotificationAll()
+{
+	if(!isHuman()) return;
+	for(int i = 0; i < GC.getNumResourceInfos(); i++)
+	{
+		ResourceTypes eResource = (ResourceTypes)i;
+		DoTestOverResourceNotification(eResource, true);
+	}
+}
 //	--------------------------------------------------------------------------------
 /// Is our collection of Strategic Resources modified?
 int CvPlayer::GetStrategicResourceMod() const
