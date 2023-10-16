@@ -291,6 +291,7 @@ CvPlayer::CvPlayer() :
 	, m_iSettlerProductionEraModifier("CvPlayer::m_iSettlerProductionEraModifier", m_syncArchive)
 	, m_iSettlerProductionStartEra("CvPlayer::m_iSettlerProductionStartEra", m_syncArchive)
 #endif
+	, m_iNullifyInfluenceModifier("CvPlayer::m_iNullifyInfluenceModifier", m_syncArchive)
 	, m_iNumTradeRouteBonus("CvPlayer::m_iNumTradeRouteBonus", m_syncArchive)
 	, m_viTradeRouteDomainExtraRange("CvPlayer::m_viTradeRouteDomainExtraRange", m_syncArchive)
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -1074,6 +1075,7 @@ void CvPlayer::uninit()
 	m_iSettlerProductionEraModifier = 0;
 	m_iSettlerProductionStartEra = NO_ERA;
 #endif
+	m_iNullifyInfluenceModifier = 0;
 	m_iNumTradeRouteBonus = 0;
 	m_viTradeRouteDomainExtraRange.clear();
 	m_viTradeRouteDomainExtraRange.resize(NUM_DOMAIN_TYPES, 0);
@@ -9905,6 +9907,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeSpaceProductionModifier(pBuildingInfo->GetGlobalSpaceProductionModifier() * iChange);
 
 	changeNumTradeRouteBonus(pBuildingInfo->GetNumTradeRouteBonus() * iChange);
+	changeNullifyInfluenceModifier(pBuildingInfo->NullifyInfluenceModifier() ? iChange : 0);
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	changeLandmarksTourismPercentGlobal(pBuildingInfo->GetLandmarksTourismPercentGlobal() * iChange);
@@ -16838,6 +16841,15 @@ void CvPlayer::setSettlerProductionStartEra(int iChange)
 
 
 #endif
+//	--------------------------------------------------------------------------------
+bool CvPlayer::isNullifyInfluenceModifier() const
+{
+	return m_iNullifyInfluenceModifier > 0;
+}
+void CvPlayer::changeNullifyInfluenceModifier(int iChange)
+{
+	m_iNullifyInfluenceModifier += iChange;
+}
 //	--------------------------------------------------------------------------------
 int CvPlayer::getNumTradeRouteBonus() const
 {
@@ -26160,6 +26172,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 	changeSharedIdeologyTourismModifier(pPolicy->GetSharedIdeologyTourismModifier() * iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	changeNullifyInfluenceModifier(pPolicy->IsNullifyInfluenceModifier() ? iChange : 0);
 	changeDifferentIdeologyTourismModifier(pPolicy->GetDifferentIdeologyTourismModifier() * iChange);
 	changeHappinessPerPolicy(pPolicy->GetHappinessPerPolicy() * iChange);
 	changeNumTradeRouteBonus(pPolicy->GetNumTradeRouteBonus() * iChange);
@@ -27672,6 +27685,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iSettlerProductionEraModifier;
 	kStream >> m_iSettlerProductionStartEra;
 #endif
+	kStream >> m_iNullifyInfluenceModifier;
 	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
@@ -28399,6 +28413,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iSettlerProductionEraModifier;
 	kStream << m_iSettlerProductionStartEra;
 #endif
+	kStream << m_iNullifyInfluenceModifier;
 	kStream << m_iNumTradeRouteBonus;
 	kStream << m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)

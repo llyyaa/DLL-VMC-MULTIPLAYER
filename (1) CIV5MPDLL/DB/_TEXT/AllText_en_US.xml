@@ -532,6 +532,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS">
       		<Text>[NEWLINE][ICON_BULLET][COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR] [ICON_HAPPINESS_4] Unhappiness across the country</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_IGNOR_TECH_BONUS">
+			<Text>Ignoring Tech bouns[NEWLINE]</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

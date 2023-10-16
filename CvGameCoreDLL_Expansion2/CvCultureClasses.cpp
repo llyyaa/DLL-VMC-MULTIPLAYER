@@ -2753,48 +2753,14 @@ int CvPlayerCulture::GetInfluencePerTurn(PlayerTypes ePlayer) const
 
 	if ((int)ePlayer != m_pPlayer->GetID() && kOtherPlayer.isAlive() && !kOtherPlayer.isMinorCiv() && kOtherTeam.isHasMet(m_pPlayer->getTeam()))
 	{
-		// check to see if the other player has the Great Firewall
-		bool bTargetHasGreatFirewall = false;
+		// check to see if the other player is Nullify InfluenceModifier
+		bool bTargetIsNullifyInfluenceModifier = GET_PLAYER(ePlayer).isNullifyInfluenceModifier();
 
 		int iLoopCity;
 		CvCity *pLoopCity;
 
 		// only check for firewall if the internet influence spread modifier is > 0
 		int iTechSpreadModifier = m_pPlayer->GetInfluenceSpreadModifier();
-		if (iTechSpreadModifier > 0) 
-		{
-			for (pLoopCity = GET_PLAYER(ePlayer).firstCity(&iLoopCity); pLoopCity != NULL; pLoopCity = GET_PLAYER(ePlayer).nextCity(&iLoopCity))
-			{
-				// Buildings
-				for(int jJ = 0; jJ < GC.getNumBuildingClassInfos(); jJ++)
-				{
-					BuildingClassTypes eBuildingClass = (BuildingClassTypes)jJ;
-
-					CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
-					if(!pkBuildingClassInfo)
-					{
-						continue;
-					}
-
-					CvCivilizationInfo& playerCivilizationInfo = GET_PLAYER(pLoopCity->getOwner()).getCivilizationInfo();
-					BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
-					if(eBuilding != NO_BUILDING)
-					{
-
-						CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(eBuilding);
-						if (!pBuildingEntry || !pBuildingEntry->NullifyInfluenceModifier())
-						{
-							continue;
-						}
-
-						if(pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
-						{
-							bTargetHasGreatFirewall = true;				
-						}
-					}
-				}
-			}
-		}
 
 		// Loop through each of our cities
 		for (pLoopCity = m_pPlayer->firstCity(&iLoopCity); pLoopCity != NULL; pLoopCity = m_pPlayer->nextCity(&iLoopCity))
@@ -2809,7 +2775,7 @@ int CvPlayerCulture::GetInfluencePerTurn(PlayerTypes ePlayer) const
 
 			// if we have the internet online, check to see if the opponent has the firewall
 			// if they have the firewall, deduct the internet bonus from them
-			if (iTechSpreadModifier > 0 && bTargetHasGreatFirewall)
+			if (iTechSpreadModifier > 0 && bTargetIsNullifyInfluenceModifier)
 			{
 				int iInfluenceWithoutModifier = pLoopCity->GetBaseTourismBeforeModifiers();
 				int iInfluenceWithTechModifier = iInfluenceWithoutModifier * iTechSpreadModifier;
@@ -2832,7 +2798,7 @@ int CvPlayerCulture::GetInfluencePerTurn(PlayerTypes ePlayer) const
 		{
 			// if we have the internet online, check to see if the opponent has the firewall
 			// if they have the firewall, deduct the internet bonus from them
-			if (iTechSpreadModifier > 0 && bTargetHasGreatFirewall)
+			if (iTechSpreadModifier > 0 && bTargetIsNullifyInfluenceModifier)
 			{
 				iExtraInfluenceToAdd -= ((iExtraInfluenceToAdd * iTechSpreadModifier) / 100);
 			}
@@ -3430,6 +3396,11 @@ CvString CvPlayerCulture::GetTourismModifierWithTooltip(PlayerTypes ePlayer) con
 	if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology != eTheirIdeology)
 	{
 		szRtnValue += "[COLOR_NEGATIVE_TEXT]" + GetLocalizedText("TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGIES", GC.getTOURISM_MODIFIER_DIFFERENT_IDEOLOGIES()) + "[ENDCOLOR]";
+	}
+	int iTechSpreadModifier = m_pPlayer->GetInfluenceSpreadModifier();
+	if(iTechSpreadModifier > 0 && kPlayer.isNullifyInfluenceModifier())
+	{
+		szRtnValue += "[COLOR_NEGATIVE_TEXT]" + GetLocalizedText("TXT_KEY_CO_PLAYER_TOURISM_IGNOR_TECH_BONUS") + "[ENDCOLOR]";
 	}
 
 	return szRtnValue;

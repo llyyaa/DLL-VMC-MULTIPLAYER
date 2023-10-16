@@ -59,3 +59,5 @@ ALTER TABLE Policies ADD 'NumTradeRouteBonus' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'HappinessPerPolicy' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'DifferentIdeologyTourismModifier' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'ReligionProductionModifier' INTEGER DEFAULT 0;
+
+ALTER TABLE Policies ADD 'NullifyInfluenceModifier' BOOLEAN DEFAULT 0;

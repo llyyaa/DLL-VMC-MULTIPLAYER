@@ -65,6 +65,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iFreeExperience(0),
 	m_iWorkerSpeedModifier(0),
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_bNullifyInfluenceModifier(false),
 	m_iDifferentIdeologyTourismModifier(0),
 	m_iHappinessPerPolicy(0),
 	m_iNumTradeRouteBonus(0),
@@ -356,6 +357,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iFreeExperience = kResults.GetInt("FreeExperience");
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_bNullifyInfluenceModifier = kResults.GetBool("NullifyInfluenceModifier");
 	m_iDifferentIdeologyTourismModifier = kResults.GetInt("DifferentIdeologyTourismModifier");
 	m_iHappinessPerPolicy = kResults.GetInt("HappinessPerPolicy");
 	m_iNumTradeRouteBonus = kResults.GetInt("NumTradeRouteBonus");
@@ -1544,6 +1546,11 @@ int CvPolicyEntry::GetWorkerSpeedModifier() const
 	return m_iWorkerSpeedModifier;
 }
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+///
+bool CvPolicyEntry::IsNullifyInfluenceModifier() const
+{
+	return m_bNullifyInfluenceModifier;
+}
 ///Different Ideology Tourism Modifier
 int CvPolicyEntry::GetDifferentIdeologyTourismModifier() const
 {

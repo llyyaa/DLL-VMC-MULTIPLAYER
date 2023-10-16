@@ -537,6 +537,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS">
       		<Text>[NEWLINE][ICON_BULLET]全国[ICON_HAPPINESS_4]不满[COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR]</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_IGNOR_TECH_BONUS">
+			<Text>无视科技加成[NEWLINE]</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

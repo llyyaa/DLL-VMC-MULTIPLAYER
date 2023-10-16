@@ -943,6 +943,9 @@ public:
 	int getSettlerProductionStartEra() const;
 	void setSettlerProductionStartEra(int iChange);
 #endif
+	bool isNullifyInfluenceModifier() const;
+	void changeNullifyInfluenceModifier(int iChange);
+
 	int getNumTradeRouteBonus() const;
 	void changeNumTradeRouteBonus(int iChange);
 
@@ -2374,6 +2377,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionEraModifier;
 	FAutoVariable<int, CvPlayer> m_iSettlerProductionStartEra;
 #endif
+	FAutoVariable<int, CvPlayer> m_iNullifyInfluenceModifier;
 	FAutoVariable<int, CvPlayer> m_iNumTradeRouteBonus;
 	FAutoVariable<std::vector<int>, CvPlayer> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
