@@ -17664,6 +17664,7 @@ bool CvPlayer::IsLackingTroops(DomainTypes eIndex) const
 }
 int CvPlayer::GetDomainTroopsActive(DomainTypes eIndex) const
 {
+	if(!MOD_TROOPS_AND_CROPS_FOR_SP || GC.getGame().isOption(GAMEOPTION_SP_CORPS_MODE_DISABLE)) return 0;
 	return GetDomainTroopsTotal(eIndex) - GetDomainTroopsUsed(eIndex);
 }
 //	--------------------------------------------------------------------------------
