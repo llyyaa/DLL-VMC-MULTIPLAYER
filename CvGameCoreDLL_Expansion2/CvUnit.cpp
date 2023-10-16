@@ -7412,7 +7412,22 @@ void CvUnit::DoAttrition()
 
 #if defined(MOD_API_PLOT_BASED_DAMAGE)
 	if (MOD_API_PLOT_BASED_DAMAGE) {
-		int iDamage = plot()->getTurnDamage(ignoreTerrainDamage(), ignoreFeatureDamage(), extraTerrainDamage(), extraFeatureDamage());
+		int iDamage = 0;
+		if(pPlot->isCity())
+		{
+			// Do nothing
+		}
+#ifdef MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY
+		else if (MOD_TRAITS_CAN_FOUND_MOUNTAIN_CITY && GET_MY_PLAYER().GetCanFoundMountainCity() && pPlot->isMountain() && AI_getUnitAIType() == UNITAI_SETTLE)
+		{
+			// Do nothing, Inca's Settle should not get mountains damage taken at the end of the turn
+		}
+#endif
+		else
+		{
+			iDamage = plot()->getTurnDamage(ignoreTerrainDamage(), ignoreFeatureDamage(), extraTerrainDamage(), extraFeatureDamage());
+		}
+
 		if (0 != iDamage) {
 			if (iDamage > 0) {
 				// CUSTOMLOG("Applying terrain/feature damage (of %i) for player/unit %i/%i at (%i, %i)", iDamage, getOwner(), GetID(), plot()->getX(), plot()->getY());
