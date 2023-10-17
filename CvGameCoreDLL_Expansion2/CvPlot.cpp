@@ -1778,7 +1778,7 @@ int CvPlot::seeFromLevel(TeamTypes eTeam) const
 	{
 		iLevel += GC.getSEAWATER_SEE_FROM_CHANGE();
 
-		if(GET_TEAM(eTeam).isExtraWaterSeeFrom())
+		if(eTeam != NO_TEAM && GET_TEAM(eTeam).isExtraWaterSeeFrom())
 		{
 			iLevel++;
 		}
@@ -2215,7 +2215,7 @@ bool CvPlot::canSeePlot(const CvPlot* pPlot, TeamTypes eTeam, int iRange, Direct
 				iLevel = GC.getTerrainInfo(TERRAIN_COAST)->getSeeFromLevel();
 				iLevel += GC.getSEAWATER_SEE_FROM_CHANGE();
 
-				if (GET_TEAM(eTeam).isExtraWaterSeeFrom())
+				if (eTeam != NO_TEAM && GET_TEAM(eTeam).isExtraWaterSeeFrom())
 				{
 					iLevel++;
 				}
