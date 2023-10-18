@@ -4700,6 +4700,7 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo, int iAtta
 	DoStackingFightBack(kCombatInfo);
 	DoStopAttacker(kCombatInfo);
 	DoBounsFromCombatDamageWhenFinish(kCombatInfo, iAttackDamage);
+	DoInsightEnemyDamage(kCombatInfo);
 }
 
 bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
@@ -5344,6 +5345,46 @@ void CvUnitCombat::DoHeavyChargeEffects(CvUnit* attacker, CvUnit* defender, CvPl
 #endif
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+void CvUnitCombat::DoInsightEnemyDamage(const CvCombatInfo & kCombatInfo)
+{
+	if (!MOD_PROMOTION_NEW_EFFECT_FOR_SP) return;
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	// Only work when unit vs unit
+	if (pAttackerUnit == nullptr || pDefenderUnit == nullptr) return;
+	int iModifier = pAttackerUnit->GetInsightEnemyDamageModifier();
+	if (iModifier <= 0) return;
+
+	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
+	CvPlayerAI& kDefenderPlayer = getDefenderPlayer(kCombatInfo);
+
+	TeamTypes pTeam = kAttackPlayer.getTeam();
+
+	CvUnit* pLoopUnit;
+	int iUnitLoop;
+	for(pLoopUnit = kDefenderPlayer.firstUnit(&iUnitLoop); pLoopUnit != NULL; pLoopUnit = kDefenderPlayer.nextUnit(&iUnitLoop))
+	{
+		CvPlot* pPlot = pLoopUnit->plot();
+		if(pLoopUnit != NULL && pPlot != NULL && pLoopUnit != pDefenderUnit && !pLoopUnit->IsCivilianUnit() && pPlot->isVisible(pTeam))
+		{
+			int iDamageBase = calcDamage(pAttackerUnit, pAttackerUnit->plot(), pLoopUnit, pPlot, kCombatInfo.getAttackIsRanged());
+			int iDamage = (int64)iDamageBase * (int64)iModifier / 100;
+			pLoopUnit->changeDamage(iDamage, pAttackerUnit->getOwner(), pAttackerUnit->GetID());
+		}
+	}
+	ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+	if (kAttackPlayer.isHuman())
+	{
+		CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_CHAIN_REACTION_ATTACKER", pAttackerUnit->getName(), iModifier);
+		pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+	}
+	if (kDefenderPlayer.isHuman())
+	{
+		CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_CHAIN_REACTION_DEFENDER", pAttackerUnit->getName(), iModifier);
+		pkDLLInterface->AddMessage(0, kDefenderPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+	}
+}
+
 void CvUnitCombat::DoBounsFromCombatDamage(const CvCombatInfo & kCombatInfo, int iAttackDamage)
 {
 	if (!MOD_PROMOTION_NEW_EFFECT_FOR_SP || iAttackDamage <= 0) return;

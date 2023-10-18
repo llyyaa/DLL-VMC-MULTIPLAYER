@@ -197,6 +197,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iInsightEnemyDamageModifier(0),
 	m_iHeightModPerX(0),
 	m_iHeightModLimited(0),
 	m_iExtraMoveTimesXX(0),
@@ -691,6 +692,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iInsightEnemyDamageModifier = kResults.GetInt("InsightEnemyDamageModifier");
 	m_iHeightModPerX = kResults.GetInt("HeightModPerX");
 	m_iHeightModLimited = kResults.GetInt("HeightModLimited");
 	m_iExtraMoveTimesXX = kResults.GetInt("ExtraMoveTimesXX");
@@ -2300,6 +2302,10 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 }
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvPromotionEntry::GetInsightEnemyDamageModifier() const
+{
+	return m_iInsightEnemyDamageModifier;
+}
 int CvPromotionEntry::GetHeightModPerX() const
 {
 	return m_iHeightModPerX;

@@ -1825,6 +1825,9 @@ public:
 	int GetCityAttackPlunderModifier() const;
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	const int GetInsightEnemyDamageModifier() const;
+	void ChangeInsightEnemyDamageModifier(int iValue);
+
 	const int GetHeightModPerX() const;
 	void ChangeHeightModPerX(int iValue);
 	const int GetHeightModLimited() const;
@@ -2454,6 +2457,7 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iInsightEnemyDamageModifier;
 	int m_iHeightModPerX;
 	int m_iHeightModLimited;
 	int m_iExtraMoveTimesXX;

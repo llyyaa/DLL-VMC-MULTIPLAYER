@@ -87,6 +87,7 @@ public:
 
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	static void DoInsightEnemyDamage(const CvCombatInfo& kCombatInfo);
 	static void DoBounsFromCombatDamage(const CvCombatInfo& kCombatInfo, int iAttackDamage);
 	static void DoBounsFromCombatDamageWhenFinish(const CvCombatInfo& kCombatInfo, int iAttackDamage);
 	static void DoInstantYieldFromCombat(const CvUnit* pAttackerUnit,const CvCombatInfo & kCombatInfo,int iAttackDamage);

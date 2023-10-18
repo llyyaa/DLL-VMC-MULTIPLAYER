@@ -5,8 +5,7 @@
 		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
 			<Text>Your {@1_UnitName} met no resistance and attacked enemy air and ground air defense units!</Text>
 		</Row>
-
-			<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
 			<Text>Our {2_Unit} was knocked back by the enemy's {1_Unit}!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_S">
@@ -534,6 +533,12 @@
 		</Row>
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_IGNOR_TECH_BONUS">
 			<Text>Ignoring Tech bouns[NEWLINE]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CHAIN_REACTION_ATTACKER">
+			<Text>Your {1_UnitName} Cause [COLOR_POSITIVE_TEXT] {2_Percent}% [ENDCOLOR] Damage to all enemy milltary units within your sight regardless of distance</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CHAIN_REACTION_DEFENDER">
+			<Text>Enemy {1_UnitName} Cause [COLOR_NEGATIVE_TEXT] {2_Percent}% [ENDCOLOR] Damage to all your milltary units within their sight regardless of distance</Text>
 		</Row>
 	</Language_en_US>
 

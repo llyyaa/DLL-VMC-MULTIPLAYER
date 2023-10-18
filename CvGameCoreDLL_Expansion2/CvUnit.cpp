@@ -467,6 +467,7 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	, m_iInsightEnemyDamageModifier(0)
 	, m_iHeightModPerX(0)
 	, m_iHeightModLimited(0)
 	, m_iExtraMoveTimesXX(0)
@@ -1430,6 +1431,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iInsightEnemyDamageModifier = 0;
 	m_iHeightModPerX = 0;
 	m_iHeightModLimited = 0;
 	m_iExtraMoveTimesXX = 0;
@@ -6591,6 +6593,15 @@ int CvUnit::GetCityAttackPlunderModifier() const
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeInsightEnemyDamageModifier(int iValue)
+{
+	m_iInsightEnemyDamageModifier += iValue;
+}
+const int CvUnit::GetInsightEnemyDamageModifier() const
+{
+	return m_iInsightEnemyDamageModifier;
+}
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeHeightModPerX(int iValue)
 {
@@ -25342,6 +25353,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		ChangeInsightEnemyDamageModifier((thisPromotion.GetInsightEnemyDamageModifier()) * iChange);
 		ChangeHeightModPerX((thisPromotion.GetHeightModPerX()) * iChange);
 		ChangeHeightModLimited((thisPromotion.GetHeightModLimited()) * iChange);
 		ChangeExtraMoveTimesXX((thisPromotion.GetExtraMoveTimesXX()) * iChange);
@@ -25899,6 +25911,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream >> m_iInsightEnemyDamageModifier;
 	kStream >> m_iHeightModPerX;
 	kStream >> m_iHeightModLimited;
 	kStream >> m_iExtraMoveTimesXX;
@@ -26284,6 +26297,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_iInsightEnemyDamageModifier;
 	kStream << m_iHeightModPerX;
 	kStream << m_iHeightModLimited;
 	kStream << m_iExtraMoveTimesXX;
