@@ -3106,7 +3106,10 @@ void CvAIOperationFoundCity::Init(int iID, PlayerTypes eOwner, PlayerTypes /*eEn
 /// If at target, found city; if at muster point, merge settler and escort and move out
 bool CvAIOperationFoundCity::ArmyInPosition(CvArmyAI* pArmy)
 {
-	int iUnitID = 0;
+	if (pArmy == NULL) return false;
+	int iUnitID = pArmy->GetFirstUnitID();
+	if(iUnitID ==-1 || GET_PLAYER(m_eOwner).getUnit(iUnitID) == NULL) return false;
+
 	bool bStateChanged = false;
 	CvUnit* pSettler = 0, *pEscort = 0;
 	CvString strMsg;

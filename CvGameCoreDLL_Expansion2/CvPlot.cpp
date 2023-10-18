@@ -11842,6 +11842,7 @@ void CvPlot::setScriptData(const char* szNewValue)
 #if defined(SHOW_PLOT_POPUP)
 void CvPlot::showPopupText(PlayerTypes ePlayer, const char* szMessage)
 {
+	if(GET_PLAYER(GC.getGame().getActivePlayer()).isObserver()) return;
 	if (ePlayer == NO_PLAYER || isVisible(GET_PLAYER(ePlayer).getTeam()))
 	{
 		DLLUI->AddPopupText(getX(), getY(), szMessage, m_fPopupDelay);

@@ -2366,13 +2366,13 @@ bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerT
 
     // If this is a GP with need to keep their details
 	if (IsGreatPerson()) {
-		kCaptureDef.sName = getName();
 #if defined(MOD_GLOBAL_NO_LOST_GREATWORKS)
 		kCaptureDef.sGreatName = getGreatName();
 #endif
 		kCaptureDef.eGreatWork = m_eGreatWork;
 		kCaptureDef.iTourismBlastStrength = m_iTourismBlastStrength;
 	}
+	kCaptureDef.sName = getNameNoDesc();
 #endif
 
 	if (GetReligionData())
