@@ -13367,6 +13367,7 @@ void CvPlayer::ChangeUnhappinessFromUnits(int iChange)
 /// How much of our Happiness is being used up? (Population + Units)
 int CvPlayer::GetUnhappiness(CvCity* pAssumeCityAnnexed, CvCity* pAssumeCityPuppeted) const
 {
+	if(isObserver() || isBarbarian()) return 0;
 	int iUnhappiness = 0;
 
 	// City Count Unhappiness
