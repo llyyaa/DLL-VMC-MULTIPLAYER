@@ -7865,6 +7865,11 @@ UnitTypes CvGame::GetRandomSpawnUnitType(PlayerTypes ePlayer, bool bIncludeUUs, 
 			if(!bValid)
 				continue;
 
+#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
+			// Exclude if this unit is invalid for Minor Gifts
+			if(MOD_GLOBAL_EXCLUDE_FROM_GIFTS && pkUnitInfo->IsNoMinorGifts()) continue;
+#endif
+
 			// Avoid Recon units
 			if(pkUnitInfo->GetDefaultUnitAIType() == UNITAI_EXPLORE)
 				continue;
@@ -7998,6 +8003,11 @@ UnitTypes CvGame::GetCompetitiveSpawnUnitType(PlayerTypes ePlayer, bool bInclude
 			}
 		}
 
+#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
+		// Exclude if this unit is invalid for Minor Gifts
+		if(MOD_GLOBAL_EXCLUDE_FROM_GIFTS && pkUnitInfo->IsNoMinorGifts()) continue;
+#endif
+
 		// Avoid Recon units
 		if(pkUnitInfo->GetDefaultUnitAIType() == UNITAI_EXPLORE)
 			continue;
@@ -8125,14 +8135,6 @@ UnitTypes CvGame::GetRandomUniqueUnitType(bool bIncludeCivsInGame, bool bInclude
 			continue;
 		}
 
-#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
-		if (MOD_GLOBAL_EXCLUDE_FROM_GIFTS) {
-			if (pkUnitInfo->IsNoMinorGifts()) {
-				continue;
-			}
-		}
-#endif
-
 		bool bValid = (pkUnitInfo->GetCombat() > 0);
 
 		// Unit has combat strength, make sure it isn't only defensive (and with no ranged combat ability)
@@ -8170,6 +8172,11 @@ UnitTypes CvGame::GetRandomUniqueUnitType(bool bIncludeCivsInGame, bool bInclude
 		// We only want unique units
 		if(eLoopUnit == pkUnitClassInfo->getDefaultUnitIndex())
 			continue;
+		
+#if defined(MOD_GLOBAL_EXCLUDE_FROM_GIFTS)
+		// Exclude if this unit is invalid for Minor Gifts
+		if(MOD_GLOBAL_EXCLUDE_FROM_GIFTS && pkUnitInfo->IsNoMinorGifts()) continue;
+#endif
 
 		// Is it a unique unit from a civ that is in our game?
 		if (!bIncludeCivsInGame)
