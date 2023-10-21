@@ -22587,7 +22587,9 @@ void CvDiplomacyAI::SetPlayerMadeBorderPromise(PlayerTypes ePlayer, bool bValue)
 	}
 	else
 	{
-		m_paiPlayerMadeBorderPromiseTurn[ePlayer] = GC.getGame().getGameTurn();
+		//when bValue == false, the promise penalty of breaking a promise has expired, we should set new value = -1
+		//Otherwise, the ai will just think we're making a new promise
+		m_paiPlayerMadeBorderPromiseTurn[ePlayer] = -1;
 		SetPlayerBorderPromiseData(ePlayer, NO_AGGRESSIVE_POSTURE_TYPE);
 	}
 }
@@ -23637,9 +23639,6 @@ int CvDiplomacyAI::GetBrokenBorderPromiseScore(PlayerTypes ePlayer)
 {
 	int iOpinionWeight = 0;
 	// Broken Border promise with us?
-	//if(IsPlayerBrokenBorderPromise(ePlayer))
-	//	iOpinionWeight += /*20*/ GC.getOPINION_WEIGHT_BROKEN_BORDER_PROMISE();
-
 	if (GetBrokenBorderPromiseValue(ePlayer) > 0)
 	{
 		int iWeightChange = GetBrokenBorderPromiseValue(ePlayer) / (GC.getBROKEN_BORDER_PROMISE_PER_OPINION_WEIGHT() * GC.getGame().getGameSpeedInfo().getOpinionDurationPercent());
@@ -23657,17 +23656,10 @@ int CvDiplomacyAI::GetIgnoredBorderPromiseScore(PlayerTypes ePlayer)
 {
 	int iOpinionWeight = 0;
 	// Broken Border promise with us?
-	//if(IsPlayerBrokenBorderPromise(ePlayer))
-	//{
-	//}
-	//// Ignored our request for them to make a Border promise?
-	//else if(IsPlayerIgnoredBorderPromise(ePlayer))
-	//{
-	//	iOpinionWeight += /*15*/ GC.getOPINION_WEIGHT_IGNORED_BORDER_PROMISE();
-	//}
 	if (GetBrokenBorderPromiseValue(ePlayer) > 0)
 	{
 	}
+	// Ignored our request for them to make a Border promise?
 	else if (GetIgnoredBorderPromiseValue(ePlayer) > 0)
 	{
 		int iWeightChange = GetIgnoredBorderPromiseValue(ePlayer) / (GC.getIGNORED_BORDER_PROMISE_PER_OPINION_WEIGHT() * GC.getGame().getGameSpeedInfo().getOpinionDurationPercent());
