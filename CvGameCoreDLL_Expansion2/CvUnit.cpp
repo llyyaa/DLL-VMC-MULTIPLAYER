@@ -31154,7 +31154,26 @@ CvString CvUnit::GetPlotCorruptionScoreReport() const
 		iTotalScore = iTotalScore * modifier / 100;
 		iTotalScore = std::max(0, iTotalScore);
 
+		int resultLevel = -1;
+		for (int index = 0; index < GC.getOrderedNormalCityCorruptionLevels().size(); index++)
+		{
+			auto* level = GC.getOrderedNormalCityCorruptionLevels()[index];
+			if (level->GetScoreLowerBound(GC.getMap().getGridWidth(), GC.getMap().getGridHeight()) > iTotalScore)
+			{
+				break;
+			}
+			resultLevel = index;
+		}
+
 		bool bHasLevelChange = false;
+		if(kOwner.IsCorruptionLevelReduceByOne() || kOwner.GetPlayerTraits()->GetCorruptionLevelReduceByOne())
+		{
+			if(!bHasLevelChange) szRtnValue += "[NEWLINE]";
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_REDUCE_BY_ONE_GLOBAL");
+			bHasLevelChange = true;
+			if (resultLevel > 1) resultLevel--;
+		}
 		tmp = kOwner.GetPlayerTraits()->GetMaxCorruptionLevel();
 		if(tmp > 0)
 		{
@@ -31162,15 +31181,9 @@ CvString CvUnit::GetPlotCorruptionScoreReport() const
 			szRtnValue += "[NEWLINE][ICON_BULLET]";
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_MAX_TRAIT", tmp);
 			bHasLevelChange = true;
+			if (resultLevel > tmp) resultLevel = tmp;
 		}
-		if(kOwner.IsCorruptionLevelReduceByOne() || kOwner.GetPlayerTraits()->GetCorruptionLevelReduceByOne())
-		{
-			if(!bHasLevelChange) szRtnValue += "[NEWLINE]";
-			szRtnValue += "[NEWLINE][ICON_BULLET]";
-			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_REDUCE_BY_ONE_GLOBAL");
-			bHasLevelChange = true;
-		}
-		szRtnValue = GetLocalizedText("TXT_KEY_FOUNDED_CITY_LEVEL_PREVIEW", iTotalScore) + szRtnValue;
+		szRtnValue = GetLocalizedText("TXT_KEY_FOUNDED_CITY_LEVEL_PREVIEW", iTotalScore, resultLevel) + szRtnValue;
 	}
 	return szRtnValue;
 }
