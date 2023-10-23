@@ -412,6 +412,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_ANNEX_PUPPET_LEVEL_PREVIEW">
 			<Text>如果你吞併該城市，預計市政廳等級為：{1_level}</Text>
 		</Row>
+		<Row Tag="TXT_KEY_FOUNDED_CITY_LEVEL_PREVIEW">
+			<Text>如果你在此建立城市，預計腐敗分數為：{1_score}</Text>
+		</Row>
 		<Row Tag="TXT_KEY_TOURISM_FROM_CITY_RATE">
 			<Text>{1_Num}[ICON_TOURISM]魅力 來自建築、地形等:</Text>
 		</Row>

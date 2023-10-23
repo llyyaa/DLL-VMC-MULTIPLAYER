@@ -2006,6 +2006,10 @@ public:
 	void SetCollateralXP(int iValue);
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	CvString GetPlotCorruptionScoreReport() const;
+#endif
+
 protected:
 	const MissionQueueNode* HeadMissionQueueNode() const;
 	MissionQueueNode* HeadMissionQueueNode();

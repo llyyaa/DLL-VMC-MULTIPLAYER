@@ -902,6 +902,11 @@ public:
 	void ClearUnitPromotions(bool bOnlyFriendUnit = false);
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+	int CalculateCorruptionScoreFromDistance(const CvCity& capitalCity) const;
+	int CalculateCorruptionScoreFromResource() const;
+	int CalculateCorruptionScoreFromTrait(PlayerTypes ePlayer) const;
+#endif
 protected:
 	class PlotBoolField
 	{

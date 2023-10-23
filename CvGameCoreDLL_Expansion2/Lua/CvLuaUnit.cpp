@@ -823,6 +823,9 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	Method(IsNoTroops);
 #endif
+#ifdef MOD_GLOBAL_CORRUPTION
+	Method(GetPlotCorruptionScoreReport);
+#endif
 }
 //------------------------------------------------------------------------------
 const char* CvLuaUnit::GetTypeName()
@@ -6224,4 +6227,14 @@ LUAAPIIMPL(Unit, IsImmuneNegtivePromotions)
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 LUAAPIIMPL(Unit, IsNoTroops)
+#endif
+
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvLuaUnit::lGetPlotCorruptionScoreReport(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	CvString corruptionScoreReport = pkUnit->GetPlotCorruptionScoreReport();
+	lua_pushstring(L, corruptionScoreReport.c_str());
+	return 1;
+}
 #endif

@@ -31104,3 +31104,74 @@ void CvUnit::ChangeHeavyChargeCollateralPercent(int iChange)
 {
 	m_iHeavyChargeCollateralPercent += iChange;
 }
+
+
+#ifdef MOD_GLOBAL_CORRUPTION
+CvString CvUnit::GetPlotCorruptionScoreReport() const
+{
+	CvString szRtnValue = "";
+	CvPlot* pPlot = plot();
+	PlayerTypes ePlayer = getOwner();
+	CvPlayerAI& kOwner = GET_PLAYER(ePlayer);
+	CvCity* capitalCity = kOwner.getCapitalCity();
+	int iTotalScore = 0;
+	
+	if(pPlot && capitalCity && ePlayer != NO_PLAYER)
+	{
+		int tmp = 0;
+		tmp = pPlot->CalculateCorruptionScoreFromDistance(*capitalCity);
+		if(tmp != 0)
+		{
+			iTotalScore += tmp;
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_DISTANCE", tmp);
+		}
+		tmp = pPlot->CalculateCorruptionScoreFromResource();
+		if(tmp != 0)
+		{
+			iTotalScore += tmp;
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_RESOURCE", tmp);
+		}
+		tmp = pPlot->CalculateCorruptionScoreFromTrait(ePlayer);
+		if(tmp != 0)
+		{
+			iTotalScore += tmp;
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_TRAIT", tmp);
+		}
+
+		int modifier = 100;
+		tmp = kOwner.GetCorruptionScoreModifierFromPolicy();
+		if(tmp != 0)
+		{
+			modifier += tmp;
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_POLICY", tmp);
+		}
+		
+		modifier = std::max(0, modifier);
+		iTotalScore = iTotalScore * modifier / 100;
+		iTotalScore = std::max(0, iTotalScore);
+
+		bool bHasLevelChange = false;
+		tmp = kOwner.GetPlayerTraits()->GetMaxCorruptionLevel();
+		if(tmp > 0)
+		{
+			if(!bHasLevelChange) szRtnValue += "[NEWLINE]";
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_MAX_TRAIT", tmp);
+			bHasLevelChange = true;
+		}
+		if(kOwner.IsCorruptionLevelReduceByOne() || kOwner.GetPlayerTraits()->GetCorruptionLevelReduceByOne())
+		{
+			if(!bHasLevelChange) szRtnValue += "[NEWLINE]";
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_REDUCE_BY_ONE_GLOBAL");
+			bHasLevelChange = true;
+		}
+		szRtnValue = GetLocalizedText("TXT_KEY_FOUNDED_CITY_LEVEL_PREVIEW", iTotalScore) + szRtnValue;
+	}
+	return szRtnValue;
+}
+#endif

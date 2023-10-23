@@ -747,6 +747,9 @@ protected:
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	LUAAPIEXTN(IsNoTroops, bool);
 #endif
+#ifdef MOD_GLOBAL_CORRUPTION
+	static int lGetPlotCorruptionScoreReport(lua_State* L);
+#endif
 };
 
 

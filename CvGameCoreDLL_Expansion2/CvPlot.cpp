@@ -13783,6 +13783,27 @@ void CvPlot::ClearUnitPromotions(bool bOnlyFriendUnit)
 }
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+int CvPlot::CalculateCorruptionScoreFromDistance(const CvCity& capitalCity) const
+{
+	int capX = capitalCity.plot()->getX();
+	int capY = capitalCity.plot()->getY();
+	return plotDistance(capX, capY, getX(), getY()) * GC.getCORRUPTION_SCORE_PER_DISTANCE();
+}
+int CvPlot::CalculateCorruptionScoreFromResource() const
+{
+	auto* resourceInfo = GC.getResourceInfo(getResourceType());
+	return resourceInfo != nullptr ? resourceInfo->GetCorruptionScoreChange() : 0;
+}
+int CvPlot::CalculateCorruptionScoreFromTrait(PlayerTypes ePlayer) const
+{
+	CvPlayerAI& owner = GET_PLAYER(ePlayer);
+	int TraitBounsTotal = 0;
+	TraitBounsTotal += isRiver() ? owner.GetPlayerTraits()->GetRiverCorruptionScoreChange() : 0;
+	return TraitBounsTotal;
+}
+#endif
+
 
 
 #if defined(MOD_API_EXTENSIONS)
