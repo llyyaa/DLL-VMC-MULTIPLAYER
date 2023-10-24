@@ -12586,7 +12586,7 @@ int CvLuaPlayer::lChangeDomainTroopsTotalTimes100(lua_State* L)
 	const int iChange = lua_tointeger(L, 2);
 	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 3, int(DOMAIN_SEA));
 	pkPlayer->ChangeDomainTroopsTotalTimes100(iChange, eDomain);
-	return 1;
+	return 0;
 }
 int CvLuaPlayer::lSetDomainTroopsTotalTimes100(lua_State* L)
 {
@@ -12594,7 +12594,7 @@ int CvLuaPlayer::lSetDomainTroopsTotalTimes100(lua_State* L)
 	const int iValue = lua_tointeger(L, 2);
 	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 3, int(DOMAIN_SEA));
 	pkPlayer->SetDomainTroopsTotalTimes100(iValue, eDomain);
-	return 1;
+	return 0;
 }
 
 int CvLuaPlayer::lGetDomainTroopsUsed(lua_State* L)
@@ -12610,7 +12610,7 @@ int CvLuaPlayer::lChangeDomainTroopsUsed(lua_State* L)
 	const int iChange = lua_tointeger(L, 2);
 	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 3, int(DOMAIN_SEA));
 	pkPlayer->ChangeDomainTroopsUsed(iChange, eDomain);
-	return 1;
+	return 0;
 }
 int CvLuaPlayer::lSetDomainTroopsUsed(lua_State* L)
 {
@@ -12618,7 +12618,7 @@ int CvLuaPlayer::lSetDomainTroopsUsed(lua_State* L)
 	const int iValue = lua_tointeger(L, 2);
 	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 3, int(DOMAIN_SEA));
 	pkPlayer->SetDomainTroopsUsed(iValue, eDomain);
-	return 1;
+	return 0;
 }
 
 LUAAPIIMPL(Player, GetTroopsRateTimes100)
