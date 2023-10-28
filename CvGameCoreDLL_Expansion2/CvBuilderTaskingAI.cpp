@@ -633,14 +633,7 @@ void CvBuilderTaskingAI::UpdateRoutePlots(void)
 
 int CorrectWeight(int iWeight)
 {
-	if(iWeight < -1000)
-	{
-		return MAX_INT;
-	}
-	else
-	{
-		return iWeight;
-	}
+	return min(iWeight,0x7FFF);
 }
 
 /// Use the flavor settings to determine what the worker should do
@@ -988,7 +981,7 @@ void CvBuilderTaskingAI::AddImprovingResourcesDirectives(CvUnit* pUnit, CvPlot* 
 		iWeight = CorrectWeight(iWeight);
 
 		UpdateProjectedPlotYields(pPlot, eBuild);
-		int iScore = ScorePlot();
+		int iScore = ScorePlot(eImprovement);
 		if(iScore > 0)
 		{
 			iWeight *= iScore;
@@ -1226,7 +1219,7 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 		}
 
 		UpdateProjectedPlotYields(pPlot, eBuild);
-		int iScore = ScorePlot();
+		int iScore = ScorePlot(eImprovement);
 
 		// if we're going backward, bail out!
 		if (iScore <= 0)
@@ -1277,28 +1270,6 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 			}
 		}
 #endif
-		if (eBuild != m_eRepairBuild) {
-#if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
-
-			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
-			{
-				YieldTypes eYield = (YieldTypes)iI;
-				if (pImprovement->GetYieldChange(iI) > 0)
-				{
-					for (int iJ = 0; iJ < GC.getNumImprovementInfos(); iJ++)
-					{
-						ImprovementTypes eThisImprovement = (ImprovementTypes)iJ;
-
-						if (eThisImprovement != NO_IMPROVEMENT)
-						{
-							iScore *= (1 + pPlot->ComputeYieldFromOtherAdjacentImprovement(*pImprovement, eYield));
-						}
-					}
-				}
-			}
-			
-#endif
-		}
 		min(iScore, 0x7FFF);
 
 		iWeight = GetBuildCostWeight(iWeight, pPlot, eBuild);
@@ -2251,31 +2222,26 @@ bool CvBuilderTaskingAI::DoesBuildHelpRush(CvUnit* pUnit, CvPlot* pPlot, BuildTy
 	return true;
 }
 
-int CvBuilderTaskingAI::ScorePlot()
+int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement)
 {
-	if(!m_pTargetPlot)
-	{
-		return -1;
-	}
+	if(!m_pTargetPlot) return -1;
 
 	CvCity* pCity = m_pTargetPlot->getWorkingCity();
-	if(!pCity)
-	{
-		return -1;
-	}
+	if(!pCity) return -1;
 
 	CvCityStrategyAI* pCityStrategy = pCity->GetCityStrategyAI();
-	if(!pCityStrategy)
-	{
-		return -1;
-	}
+	if(!pCityStrategy) return -1;
+
+	CvImprovementEntry* pImprovement = GC.getImprovementInfo(eImprovement);
+	if(!pImprovement) return -1;
 
 	int iScore = 0;
 	bool bAnyNegativeMultiplier = false;
 	YieldTypes eFocusYield = pCityStrategy->GetFocusYield();
 	for(uint ui = 0; ui < NUM_YIELD_TYPES; ui++)
 	{
-		int iMultiplier = pCityStrategy->GetYieldDeltaTimes100((YieldTypes)ui);
+		YieldTypes eYield = (YieldTypes) ui;
+		int iMultiplier = pCityStrategy->GetYieldDeltaTimes100(eYield);
 		int iAbsMultiplier = abs(iMultiplier);
 		int iYieldDelta = m_aiProjectedPlotYields[ui] - m_aiCurrentPlotYields[ui];
 
@@ -2303,6 +2269,11 @@ int CvBuilderTaskingAI::ScorePlot()
 				iScore += iYieldDelta * iAbsMultiplier;
 			}
 		}
+
+		iScore += (100 * m_pTargetPlot->ComputeYieldFromOtherAdjacentImprovement(*pImprovement, eYield));
+		iScore += (100 * m_pTargetPlot->ComputeYieldFromAdjacentTerrain(*pImprovement, eYield));
+		iScore += (100 * m_pTargetPlot->ComputeYieldFromAdjacentResource(*pImprovement, eYield, m_pPlayer->getTeam()));
+		iScore += (100 * m_pTargetPlot->ComputeYieldFromAdjacentFeature(*pImprovement, eYield));
 	}
 
 	if(!bAnyNegativeMultiplier && eFocusYield != NO_YIELD)

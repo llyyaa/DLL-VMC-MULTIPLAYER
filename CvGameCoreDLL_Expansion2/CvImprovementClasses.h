@@ -195,8 +195,6 @@ public:
 	int* GetFreshWaterYieldChangeArray();				// For Moose - CvWidgetData XXX
 	int GetAdjacentCityYieldChange(int i) const;
 	int* GetAdjacentCityYieldChangeArray();
-	int GetAdjacentMountainYieldChange(int i) const;
-	int* GetAdjacentMountainYieldChangeArray();
 
 	bool GetTerrainMakesValid(int i) const;
 	bool GetFeatureMakesValid(int i) const;
@@ -210,20 +208,19 @@ public:
 	int GetAdjacentImprovementYieldChanges(int i, int j) const;
 #endif
 
-#if defined(MOD_ROG_CORE)
+	bool IsAdjacentResourceYieldChanges() const;
 	int GetAdjacentResourceYieldChanges(int i, int j) const;
-	int* GetAdjacentResourceYieldChangesArray(int i);
 
+	bool IsAdjacentTerrainYieldChanges() const;
 	int GetAdjacentTerrainYieldChanges(int i, int j) const;
-	int* GetAdjacentTerrainYieldChangesArray(int i);
+	int GetAdjacentTerrainYieldChanges(const CvPlot& pPlot, YieldTypes eYield) const;
 
+	bool IsAdjacentFeatureYieldChanges() const;	
 	int GetAdjacentFeatureYieldChanges(int i, int j) const;
-	int* GetAdjacentFeatureYieldChangesArray(int i);
 
+#if defined(MOD_ROG_CORE)
 	int GetFeatureYieldChanges(int i, int j) const;
-	int* GetFeatureYieldChangesArray(int i);
 #endif
-
 	int GetTechYieldChanges(int i, int j) const;
 	int* GetTechYieldChangesArray(int i);
 	int GetTechNoFreshWaterYieldChanges(int i, int j) const;
@@ -402,7 +399,6 @@ protected:
 	int* m_piHillsYieldChange;
 	int* m_piFreshWaterChange;
 	int* m_piAdjacentCityYieldChange;
-	int* m_piAdjacentMountainYieldChange;
 	int* m_piFlavorValue;
 
 	bool* m_pbTerrainMakesValid;
@@ -417,10 +413,13 @@ protected:
 	int** m_ppiAdjacentImprovementYieldChanges;
 #endif
 
-#if defined(MOD_ROG_CORE)
+	int m_iAdjacentTerrainYieldChangesCount;
+	int m_iAdjacentResourceYieldChangesCount;
+	int m_iAdjacentFeatureYieldChangesCount;
 	int** m_ppiAdjacentTerrainYieldChanges;
 	int** m_ppiAdjacentResourceYieldChanges;
 	int** m_ppiAdjacentFeatureYieldChanges;
+#if defined(MOD_ROG_CORE)
 	int** m_ppiFeatureYieldChanges;
 #endif
 
