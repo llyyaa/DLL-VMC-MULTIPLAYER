@@ -1118,7 +1118,6 @@
 
     <!-- table changes: -->
     <!-- see Building_InstantYield.xml -->
-    <!-- ALTER TABLE Buildings ADD COLUMN 'AllowInstantYield' BOOLEAN DEFAULT 0;-->
     <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
 
     <Row Class="6" Name="POLICY_FREE_PROMOTION_FOR_PROMOTION" Value="1"/>

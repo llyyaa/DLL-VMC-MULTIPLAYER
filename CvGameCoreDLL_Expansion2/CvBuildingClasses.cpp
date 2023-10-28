@@ -176,7 +176,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	m_piInstantYield(NULL),
-	m_bAllowInstantYield(false),
+	m_iInstantYieldCount(0),
 #endif
 	m_piYieldFromInternal(NULL),
 	m_piYieldFromProcessModifier(NULL),
@@ -494,9 +494,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iNukeInterceptionChance = kResults.GetInt("NukeInterceptionChance");
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
-#if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-	m_bAllowInstantYield = kResults.GetBool("AllowInstantYield");
-#endif
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	m_iLandmarksTourismPercentGlobal = kResults.GetInt("LandmarksTourismPercentGlobal");
 	m_iGreatWorksTourismModifierGlobal = kResults.GetInt("GreatWorksTourismModifierGlobal");
@@ -806,6 +803,18 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	kUtility.SetYields(m_piInstantYield, "Building_InstantYield", "BuildingType", szBuildingType);
+	{
+		//Building has InstantYield ?
+		std::string strKey("Building_InstantYield_MaxRow");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select count(*) from Building_InstantYield where BuildingType = ?");
+		}
+		pResults->Bind(1, szBuildingType);
+		pResults->Step();
+		m_iInstantYieldCount = pResults->GetInt(0);
+	}
 #endif
 
 	kUtility.SetYields(m_piYieldFromProcessModifier, "Building_YieldFromProcessModifier", "BuildingType", szBuildingType);
@@ -3253,7 +3262,7 @@ int* CvBuildingEntry::GetInstantYieldArray() const
 /// Array of instant yields
 bool CvBuildingEntry::IsAllowInstantYield() const
 {
-	return m_bAllowInstantYield;
+	return m_iInstantYieldCount > 0;
 }
 #endif
 

@@ -577,7 +577,7 @@ private:
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 	int* m_piInstantYield;
-	bool m_bAllowInstantYield;
+	int m_iInstantYieldCount;
 #endif
 
 #if defined(MOD_ROG_CORE)

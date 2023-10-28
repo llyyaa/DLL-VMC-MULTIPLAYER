@@ -7164,7 +7164,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		changeTradeRouteDomainGoldBonus(DOMAIN_SEA, pBuildingInfo->GetTradeRouteSeaGoldBonus() * iChange);
 
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
-		if (MOD_GLOBAL_BUILDING_INSTANT_YIELD && (iChange > 0) && pBuildingInfo->IsAllowInstantYield())
+		if (iChange > 0 && pBuildingInfo->IsAllowInstantYield())
 		{
 			doBuildingInstantYield(pBuildingInfo->GetInstantYieldArray());
 		}
