@@ -981,7 +981,7 @@ void CvBuilderTaskingAI::AddImprovingResourcesDirectives(CvUnit* pUnit, CvPlot* 
 		iWeight = CorrectWeight(iWeight);
 
 		UpdateProjectedPlotYields(pPlot, eBuild);
-		int iScore = ScorePlot(eImprovement);
+		int iScore = ScorePlot(eImprovement, eExistingPlotImprovement);
 		if(iScore > 0)
 		{
 			iWeight *= iScore;
@@ -1004,6 +1004,7 @@ void CvBuilderTaskingAI::AddImprovingResourcesDirectives(CvUnit* pUnit, CvPlot* 
 			}
 		}
 
+		// if we're going backward, bail out!
 		if(iWeight <= 0)
 		{
 			continue;
@@ -1219,7 +1220,7 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 		}
 
 		UpdateProjectedPlotYields(pPlot, eBuild);
-		int iScore = ScorePlot(eImprovement);
+		int iScore = ScorePlot(eImprovement, eExistingImprovement);
 
 		// if we're going backward, bail out!
 		if (iScore <= 0)
@@ -2192,7 +2193,7 @@ bool CvBuilderTaskingAI::DoesBuildHelpRush(CvUnit* pUnit, CvPlot* pPlot, BuildTy
 	return true;
 }
 
-int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement)
+int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement, ImprovementTypes eExistingImprovement)
 {
 	if(!m_pTargetPlot) return -1;
 
@@ -2254,7 +2255,14 @@ int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement)
 			iScore += m_aiProjectedPlotYields[eFocusYield] * 100;
 		}
 	}
+
+	//special define in XML
 	iScore += pImprovement->GetExtraScore();
+	if(eExistingImprovement != NO_IMPROVEMENT && GC.getImprovementInfo(eExistingImprovement))
+	{
+		iScore -= GC.getImprovementInfo(eExistingImprovement)->GetExtraScore();
+		iScore -= 25;
+	}
 
 	if (pCity->isCapital()) // this is our capital and needs emphasis
 	{
