@@ -97,12 +97,8 @@ public:
 	int GetNewFeature() const;
 
 	int GetCreateResource(CvPlot* pPlot) const;
-	int* GetCreateResourceList() const;
-	int* GetCreateTerrainList() const;
-	bool* GetCreateTerrainOnlyList() const;
-	int* GetCreateFeatureList() const;
-	bool* GetCreateFeatureOnlyList() const;
 #endif
+	int GetExtraScore() const;
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
 	bool IsClearNegativePromotions() const;
@@ -320,6 +316,7 @@ protected:
 	int* m_iCreateFeatureList;
 	bool* m_iCreateFeatureOnlyList;
 #endif
+	int m_iExtraScore;
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
 	bool m_bClearNegativePromotions;

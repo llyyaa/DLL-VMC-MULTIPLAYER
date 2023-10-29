@@ -106,6 +106,7 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_iCreateFeatureList(NULL),
 	m_iCreateFeatureOnlyList(NULL),
 #endif
+	m_iExtraScore(0),
 
 	m_iPillageGold(0),
 	m_iResourceExtractionMod(0),
@@ -490,6 +491,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	const char* szSetNewFeature = kResults.GetText("SetNewFeature");
 	m_iSetNewFeature = GC.getInfoTypeForString(szSetNewFeature, true);
 #endif
+	m_iExtraScore = kResults.GetInt("ExtraScore");
 
 	m_iPillageGold = kResults.GetInt("PillageGold");
 
@@ -1237,27 +1239,11 @@ int CvImprovementEntry::GetCreateResource(CvPlot* pPlot) const
 	}
 	return -1;
 }
-int* CvImprovementEntry::GetCreateResourceList() const
-{
-	return m_iCreateResourceList;
-}
-int* CvImprovementEntry::GetCreateTerrainList() const
-{
-	return m_iCreateTerrainList;
-}
-bool* CvImprovementEntry::GetCreateTerrainOnlyList() const
-{
-	return m_iCreateTerrainOnlyList;
-}
-int* CvImprovementEntry::GetCreateFeatureList() const
-{
-	return m_iCreateFeatureList;
-}
-bool* CvImprovementEntry::GetCreateFeatureOnlyList() const
-{
-	return m_iCreateFeatureOnlyList;
-}
 #endif
+int CvImprovementEntry::GetExtraScore() const
+{
+	return m_iExtraScore;
+}
 
 /// Damage done to nearby enemy units
 int CvImprovementEntry::GetNearbyEnemyDamage() const

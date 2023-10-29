@@ -2254,6 +2254,7 @@ int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement)
 			iScore += m_aiProjectedPlotYields[eFocusYield] * 100;
 		}
 	}
+	iScore += pImprovement->GetExtraScore();
 
 	if (pCity->isCapital()) // this is our capital and needs emphasis
 	{
