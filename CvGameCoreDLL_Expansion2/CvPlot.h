@@ -877,6 +877,7 @@ public:
 #endif
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 	int CvPlot::ComputeYieldFromOtherAdjacentImprovement(CvImprovementEntry& kImprovement, YieldTypes eYield) const;
+	int CvPlot::ComputeYieldToOtherAdjacentImprovement(CvImprovementEntry& kImprovement, YieldTypes eYield) const;
 #endif
 
 #if defined(MOD_ROG_CORE)

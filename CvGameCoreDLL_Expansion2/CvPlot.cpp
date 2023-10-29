@@ -9027,7 +9027,7 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 		}
 	}
 
-	if (getOwner() == ePlayer)
+	if (ePlayer != NO_PLAYER && getOwner() == ePlayer)
 	{
 		TeamTypes eTeam = GET_PLAYER(ePlayer).getTeam();
 		iYield += ComputeYieldFromAdjacentResource(*pImprovement, eYield, eTeam);
@@ -13154,6 +13154,23 @@ int CvPlot::ComputeYieldFromOtherAdjacentImprovement(CvImprovementEntry& kImprov
 		}
 	}
 
+	return iRtnValue;
+}
+
+int CvPlot::ComputeYieldToOtherAdjacentImprovement(CvImprovementEntry& kImprovement, YieldTypes eYield) const
+{
+	if (!MOD_API_VP_ADJACENT_YIELD_BOOST) return 0;
+	CvPlot* pAdjacentPlot;
+	int iRtnValue = 0;
+
+	for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+	{
+		pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+		if (pAdjacentPlot && pAdjacentPlot->getImprovementType() != NO_IMPROVEMENT)
+		{
+			iRtnValue += kImprovement.GetAdjacentImprovementYieldChanges(pAdjacentPlot->getImprovementType(), eYield);
+		}
+	}
 	return iRtnValue;
 }
 #endif

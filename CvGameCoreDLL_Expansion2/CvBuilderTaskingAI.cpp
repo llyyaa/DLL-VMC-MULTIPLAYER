@@ -2241,10 +2241,9 @@ int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement, ImprovementType
 			}
 		}
 
-		iScore += (100 * m_pTargetPlot->ComputeYieldFromOtherAdjacentImprovement(*pImprovement, eYield));
-		iScore += (100 * m_pTargetPlot->ComputeYieldFromAdjacentTerrain(*pImprovement, eYield));
-		iScore += (100 * m_pTargetPlot->ComputeYieldFromAdjacentResource(*pImprovement, eYield, m_pPlayer->getTeam()));
-		iScore += (100 * m_pTargetPlot->ComputeYieldFromAdjacentFeature(*pImprovement, eYield));
+#if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
+		iScore += (100 * m_pTargetPlot->ComputeYieldToOtherAdjacentImprovement(*pImprovement, eYield));
+#endif
 	}
 
 	if(!bAnyNegativeMultiplier && eFocusYield != NO_YIELD)
