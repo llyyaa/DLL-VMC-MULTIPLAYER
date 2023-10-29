@@ -5159,25 +5159,6 @@ int CvCityCulture::GetCultureFromImprovements() const
 						if (eImprovement != NO_IMPROVEMENT)
 						{
 							iRtnValue += pLoopPlot->calculateYield(eYield);
-
-							//The following lines of code will Double count Yield From Adjacent!
-							/*CvImprovementEntry* pImprovement = GC.getImprovementInfo(eImprovement);
-							if(pImprovement && pImprovement->GetYieldChange(eYield) > 0)
-							{
-#if defined(MOD_API_UNIFIED_YIELDS)
-								int iAdjacentCulture = pImprovement->GetYieldAdjacentSameType(eYield);
-#else
-								int iAdjacentCulture = pImprovement->GetCultureAdjacentSameType();
-#endif
-								if(iAdjacentCulture > 0)
-								{
-#if defined(MOD_API_UNIFIED_YIELDS)
-									iRtnValue += pLoopPlot->ComputeYieldFromAdjacentImprovement(*pImprovement, eImprovement, eYield);
-#else
-									iRtnValue += pLoopPlot->ComputeCultureFromAdjacentImprovement(*pImprovement, eImprovement);
-#endif
-								}
-							}*/
 						}
 					}
 				}

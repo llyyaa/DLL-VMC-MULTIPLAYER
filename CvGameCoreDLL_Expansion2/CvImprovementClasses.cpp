@@ -75,7 +75,6 @@ CvImprovementEntry::CvImprovementEntry(void):
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	m_iAdditionalUnits(0),
 #endif
-	m_iCultureAdjacentSameType(0),
 	m_iTilesPerGoody(0),
 	m_iGoodyUniqueRange(0),
 	m_iFeatureGrowthProbability(0),
@@ -183,9 +182,6 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_pbTerrainMakesValid(NULL),
 	m_pbFeatureMakesValid(NULL),
 	m_pbImprovementMakesValid(NULL),
-#if defined(MOD_API_UNIFIED_YIELDS)
-	m_piAdjacentSameTypeYield(NULL),
-#endif
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 	m_ppiAdjacentImprovementYieldChanges(NULL),
 #endif
@@ -229,9 +225,6 @@ CvImprovementEntry::~CvImprovementEntry(void)
 	SAFE_DELETE_ARRAY(m_pbTerrainMakesValid);
 	SAFE_DELETE_ARRAY(m_pbFeatureMakesValid);
 	SAFE_DELETE_ARRAY(m_pbImprovementMakesValid);
-#if defined(MOD_API_UNIFIED_YIELDS)
-	SAFE_DELETE_ARRAY(m_piAdjacentSameTypeYield);
-#endif
 
 #if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
 	SAFE_DELETE_ARRAY(m_iCreateResourceList);
@@ -320,7 +313,6 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	m_iAdditionalUnits = kResults.GetInt("AdditionalUnits");
 #endif
-	m_iCultureAdjacentSameType = kResults.GetInt("CultureAdjacentSameType");
 #if defined(MOD_GLOBAL_RELOCATION)
 	m_bAllowsRebaseTo = kResults.GetBool("AllowsRebaseTo");
 	m_bAllowsAirliftFrom = kResults.GetBool("AllowsAirliftFrom");
@@ -558,10 +550,6 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 									  "ImprovementType",
 							          szImprovementType);
 
-#if defined(MOD_API_UNIFIED_YIELDS)
-	kUtility.PopulateArrayByValue(m_piAdjacentSameTypeYield, "Yields", "Improvement_YieldAdjacentSameType", "YieldType", "ImprovementType", szImprovementType, "Yield");
-#endif
-
 	kUtility.SetYields(m_piYieldChange, "Improvement_Yields", "ImprovementType", szImprovementType);
 	kUtility.SetYields(m_piYieldPerEra, "Improvement_YieldPerEra", "ImprovementType", szImprovementType);
 	kUtility.SetYields(m_piAdjacentCityYieldChange, "Improvement_AdjacentCityYields", "ImprovementType", szImprovementType);
@@ -645,9 +633,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 			{
 				pResults = kUtility.PrepareResults(strKey, "select Yields.ID as YieldID, Improvements.ID as ImprovementID, Yield from Improvement_AdjacentImprovementYieldChanges inner join Yields on YieldType = Yields.Type inner join Improvements on OtherImprovementType = Improvements.Type where ImprovementType = ?");
 			}
-
 			pResults->Bind(1, szImprovementType, lenImprovementType, false);
-
 			while (pResults->Step())
 			{
 				const int yield_idx = pResults->GetInt(0);
@@ -660,7 +646,45 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 				m_ppiAdjacentImprovementYieldChanges[improvement_idx][yield_idx] = yield;
 			}
+			pResults->Reset();
 
+			//Improvement_YieldAdjacentSameType >> m_ppiAdjacentImprovementYieldChanges
+			strKey = "Improvements - YieldAdjacentSameType";
+			pResults = kUtility.GetResults(strKey);
+			if (pResults == NULL)
+			{
+				pResults = kUtility.PrepareResults(strKey, "select Yields.ID as YieldID, Improvements.ID as ImprovementID, Yield from Improvement_YieldAdjacentSameType inner join Yields on YieldType = Yields.Type inner join Improvements on ImprovementType = Improvements.Type where ImprovementType = ?");
+			}
+			pResults->Bind(1, szImprovementType, lenImprovementType, false);
+			while (pResults->Step())
+			{
+				const int yield_idx = pResults->GetInt(0);
+				CvAssert(yield_idx > -1);
+
+				const int improvement_idx = pResults->GetInt(1);
+				CvAssert(improvement_idx > -1);
+
+				const int yield = pResults->GetInt(2);
+
+				m_ppiAdjacentImprovementYieldChanges[improvement_idx][yield_idx] = yield;
+			}
+			pResults->Reset();
+
+			//CultureAdjacentSameType >> m_ppiAdjacentImprovementYieldChanges
+			strKey = "Improvements - CultureAdjacentSameType";
+			pResults = kUtility.GetResults(strKey);
+			if (pResults == NULL)
+			{
+				pResults = kUtility.PrepareResults(strKey, "select ID, CultureAdjacentSameType from Improvements where CultureAdjacentSameType > 0 and Type = ?");
+			}
+			pResults->Bind(1, szImprovementType, lenImprovementType, false);
+			while (pResults->Step())
+			{
+				const int improvement_idx = pResults->GetInt(0);
+				CvAssert(improvement_idx > -1);
+				const int yield = pResults->GetInt(1);
+				m_ppiAdjacentImprovementYieldChanges[improvement_idx][YIELD_CULTURE] = yield;
+			}
 			pResults->Reset();
 		}
 #endif
@@ -1077,27 +1101,6 @@ int CvImprovementEntry::GetRequiresXAdjacentWater() const
 int CvImprovementEntry::GetAdditionalUnits() const
 {
 	return m_iAdditionalUnits;
-}
-#endif
-
-#if defined(MOD_API_UNIFIED_YIELDS)
-/// Bonus yield if another Improvement of same type is adjacent
-int CvImprovementEntry::GetYieldAdjacentSameType(YieldTypes eYield) const
-{
-	int iYield = GetAdjacentSameTypeYield(eYield);
-	
-	// Special case for culture
-	if (eYield == YIELD_CULTURE) {
-		iYield += m_iCultureAdjacentSameType;
-	}
-	
-	return iYield;
-}
-#else
-/// Bonus culture if another Improvement of same type is adjacent
-int CvImprovementEntry::GetCultureAdjacentSameType() const
-{
-	return m_iCultureAdjacentSameType;
 }
 #endif
 
@@ -1701,16 +1704,6 @@ bool CvImprovementEntry::GetImprovementMakesValid(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_pbImprovementMakesValid ? m_pbImprovementMakesValid[i] : false;
 }
-
-#if defined(MOD_API_UNIFIED_YIELDS)
-/// If this improvement requires a terrain type to be valid
-int CvImprovementEntry::GetAdjacentSameTypeYield(int i) const
-{
-	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
-	CvAssertMsg(i > -1, "Index out of bounds");
-	return m_piAdjacentSameTypeYield ? m_piAdjacentSameTypeYield[i] : false;
-}
-#endif
 
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 int CvImprovementEntry::GetAdjacentImprovementYieldChanges(int i, int j) const

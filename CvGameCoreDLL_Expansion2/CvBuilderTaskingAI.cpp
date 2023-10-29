@@ -1240,36 +1240,6 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 			iWeight = GC.getBUILDER_TASKING_BASELINE_REPAIR();
 		}
 
-#if defined(MOD_API_UNIFIED_YIELDS)
-		else
-		{
-			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
-			{
-				YieldTypes eYield = (YieldTypes)iI;
-				if (pImprovement->GetYieldChange(iI) > 0)
-				{
-					iWeight = GC.getBUILDER_TASKING_BASELINE_ADDS_CULTURE() * GC.getImprovementInfo(eImprovement)->GetYieldChange(iI);
-					int iAdjacentCulture = pImprovement->GetYieldAdjacentSameType(eYield);
-
-					if (iAdjacentCulture > 0)
-					{
-						iScore *= (1 + pPlot->ComputeYieldFromAdjacentImprovement(*pImprovement, eImprovement, eYield));
-					}
-				}
-			}
-		}
-#else
-		else if (pImprovement->GetYieldChange(YIELD_CULTURE) > 0)
-		{
-			iWeight = GC.getBUILDER_TASKING_BASELINE_ADDS_CULTURE() * GC.getImprovementInfo(eImprovement)->GetYieldChange(YIELD_CULTURE);
-			int iAdjacentCulture = pImprovement->GetCultureAdjacentSameType();
-
-			if (iAdjacentCulture > 0)
-			{
-				iScore *= (1 + pPlot->ComputeCultureFromAdjacentImprovement(*pImprovement, eImprovement));
-			}
-		}
-#endif
 		min(iScore, 0x7FFF);
 
 		iWeight = GetBuildCostWeight(iWeight, pPlot, eBuild);

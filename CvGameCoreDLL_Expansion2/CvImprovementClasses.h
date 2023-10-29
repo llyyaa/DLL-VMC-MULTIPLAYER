@@ -56,11 +56,6 @@ public:
 
 	int GetGoldMaintenance() const;
 	int GetCultureBombRadius() const;
-#if defined(MOD_API_UNIFIED_YIELDS)
-	int GetYieldAdjacentSameType(YieldTypes eYield) const;
-#else
-	int GetCultureAdjacentSameType() const;
-#endif
 
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	int GetAdditionalUnits() const;
@@ -280,7 +275,6 @@ protected:
 
 	int m_iGoldMaintenance;
 	int m_iCultureBombRadius;
-	int m_iCultureAdjacentSameType;
 
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	int m_iAdditionalUnits;
@@ -404,10 +398,6 @@ protected:
 	bool* m_pbTerrainMakesValid;
 	bool* m_pbFeatureMakesValid;
 	bool* m_pbImprovementMakesValid;
-
-#if defined(MOD_API_UNIFIED_YIELDS)
-	int* m_piAdjacentSameTypeYield;
-#endif
 
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 	int** m_ppiAdjacentImprovementYieldChanges;
