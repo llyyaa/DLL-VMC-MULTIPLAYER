@@ -1,6 +1,6 @@
 create table Policy_CityResources (
-    PolicyType text not null references Policies(Type),
-    ResourceType text not null references Resources(Type),
+    PolicyType text references Policies(Type),
+    ResourceType text references Resources(Type),
     Quantity integer not null default 0,
     
     -- optional conditions

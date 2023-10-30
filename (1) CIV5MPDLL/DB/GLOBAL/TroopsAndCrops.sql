@@ -1,6 +1,6 @@
 CREATE TABLE Building_DomainTroops(
-    'BuildingType' TEXT NOT NULL REFERENCES Buildings(Type),
-    'DomainType' TEXT NOT NULL REFERENCES Domains(Type),
+    'BuildingType' TEXT REFERENCES Buildings(Type),
+    'DomainType' TEXT REFERENCES Domains(Type),
     'NumTroop' INTEGER NOT NULL DEFAULT 0
 );
 

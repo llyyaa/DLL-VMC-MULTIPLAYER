@@ -1,6 +1,6 @@
 CREATE TABLE Belief_YieldPerBirth (
-    BeliefType TEXT NOT NULL REFERENCES Beliefs(Type),
-    YieldType TEXT NOT NULL REFERENCES Yields(Type),
+    BeliefType TEXT REFERENCES Beliefs(Type),
+    YieldType TEXT REFERENCES Yields(Type),
     Yield NOT NULL DEFAULT 0
 );
 
@@ -12,8 +12,8 @@ ALTER TABLE Beliefs ADD COLUMN 'LandmarksTourismPercent' INTEGER DEFAULT 0;
 ALTER TABLE Beliefs ADD COLUMN 'FreePromotionForProphet' TEXT DEFAULT NULL;
 
 CREATE TABLE Belief_GreatPersonPoints (
-    BeliefType TEXT NOT NULL REFERENCES Beliefs(Type),
-    GreatPersonType TEXT NOT NULL REFERENCES GreatPersons(Type),
+    BeliefType TEXT REFERENCES Beliefs(Type),
+    GreatPersonType TEXT REFERENCES GreatPersons(Type),
     Value INTEGER DEFAULT 0
 );
 ALTER TABLE Beliefs ADD COLUMN 'GreatPersonPointsPerCity' BOOLEAN DEFAULT 0;

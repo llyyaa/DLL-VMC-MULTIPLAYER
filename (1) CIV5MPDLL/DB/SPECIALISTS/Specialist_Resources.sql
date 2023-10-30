@@ -1,6 +1,6 @@
 create table Specialist_Resources (
-    SpecialistType		text not null references Specialists(Type),
-    ResourceType		text not null references Resources(Type),
+    SpecialistType		text references Specialists(Type),
+    ResourceType		text references Resources(Type),
     Quantity			integer not null default 0,
 
     RequiredPolicyType text null, -- references Policies(Type)

@@ -1,11 +1,11 @@
 create table PromotionCollections (
     ID integer primary key autoincrement not null,
-    Type text not null unique
+    Type text unique
 );
 
 create table PromotionCollections_Entries (
-    CollectionType text not null references PromotionCollections(Type),
-    PromotionType text not null references UnitPromotions(Type),
+    CollectionType text references PromotionCollections(Type),
+    PromotionType text references UnitPromotions(Type),
     PromotionIndex int not null default 0,
     
     TriggerMeleeAttack  boolean not null default 0,

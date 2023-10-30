@@ -14,13 +14,13 @@ ALTER TABLE UnitPromotions ADD COLUMN CollateralOnlyCity boolean not null defaul
 ALTER TABLE UnitPromotions ADD COLUMN CollateralOnlyUnit boolean not null default 1;
 
 create table PromotionCollections_AddEnemyPromotions (
-    CollectionType text not null references PromotionCollections(Type),
-    OtherCollectionType text not null references PromotionCollections(Type)
+    CollectionType text references PromotionCollections(Type),
+    OtherCollectionType text references PromotionCollections(Type)
 );
 
 alter table UnitPromotions add column AddEnemyPromotionImmune boolean not null default 0;
 
-alter table UnitPromotions add column 'DestroyBuildingCollection' text default '' not null;
+alter table UnitPromotions add column 'DestroyBuildingCollection' text;
 alter table UnitPromotions add column 'DestroyBuildingProbability' int default 0 not null;
 alter table UnitPromotions add column 'DestroyBuildingNumLimit' int default 0 not null;
 

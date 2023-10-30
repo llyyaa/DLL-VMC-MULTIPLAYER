@@ -87,11 +87,11 @@ INSERT INTO Defines(Name, Value) VALUES('VERY_UNHAPPY_MAX_CRIME_PENALTY', 100);
 INSERT INTO Defines(Name, Value) VALUES('AI_CITIZEN_VALUE_HEALTH', 7);
 
 CREATE TABLE IF NOT EXISTS UnitPromotions_PromotionModifiers (
-    `PromotionType` TEXT NOT NULL,
-    `OtherPromotionType` TEXT NOT NULL,
-    `Modifier` integer default 0 NOT NULL,
-    `Attack` integer default 0 NOT NULL,
-    `Defense` integer default 0 NOT NULL
+    `PromotionType` TEXT,
+    `OtherPromotionType` TEXT,
+    `Modifier` INTEGER DEFAULT 0 NOT NULL,
+    `Attack` INTEGER DEFAULT 0 NOT NULL,
+    `Defense` INTEGER DEFAULT 0 NOT NULL
 );
 
 ALTER TABLE UnitPromotions ADD 'NumSpyDefenseMod' INTEGER DEFAULT 0;
