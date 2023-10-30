@@ -22335,7 +22335,7 @@ void CvPlayer::DoTestOverResourceNotification(ResourceTypes eIndex, bool bIsDoTu
 		if(pkResourceInfo != NULL && (pkResourceInfo->getResourceUsage() == RESOURCEUSAGE_STRATEGIC || iNotificationTurn > 0))
 		{
 			//Special for SP: Block the Manpower, Consumer & Electricity Notification at StartTurn
-			if (GC.getGame().getGameTurn() < iNotificationTurn || (pkResourceInfo->isNoDefaultNotification() && !bIsDoTurn)) return;
+			if (GC.getGame().getElapsedGameTurns() < iNotificationTurn || (pkResourceInfo->isNoDefaultNotification() && !bIsDoTurn)) return;
 			CvString strText;
 			for (uint uiYield = 0; uiYield < NUM_YIELD_TYPES; uiYield++)
 			{
