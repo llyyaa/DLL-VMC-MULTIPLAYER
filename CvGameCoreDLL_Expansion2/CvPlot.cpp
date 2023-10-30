@@ -7869,7 +7869,7 @@ void CvPlot::SetImprovementPillaged(bool bPillaged)
 
 #if defined(MOD_ROG_CORE)
 		// Quantified Resource changes for improvements
-		if (getImprovementType() != NO_IMPROVEMENT)
+		if (getImprovementType() != NO_IMPROVEMENT && getOwner() != NO_PLAYER)
 		{
 			//Resource from improvement - change ownership if needed.
 			ResourceTypes eResourceFromImprovement = (ResourceTypes)GC.getImprovementInfo(getImprovementType())->GetResourceFromImprovement();
@@ -7892,7 +7892,7 @@ void CvPlot::SetImprovementPillaged(bool bPillaged)
 		if (MOD_BUILDING_IMPROVEMENT_RESOURCES)
 		{
 			// Quantified Resource changes for improvements
-			if (getImprovementType() != NO_IMPROVEMENT && getWorkingCity() != NULL)
+			if (getImprovementType() != NO_IMPROVEMENT && getOwner() != NO_PLAYER && getWorkingCity() != NULL)
 			{
 				ResourceTypes eResource;
 				for (int iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
