@@ -4817,10 +4817,11 @@ void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange, bool bIsCaptur
 				{
 					const PlayerTypes ePlayer = static_cast<PlayerTypes>(iI);
 					CvPlayerAI& kPlayer = GET_PLAYER(ePlayer);
+					TeamTypes eTeam = kPlayer.getTeam();
 
-					if(kPlayer.isAlive())
+					if(eTeam != NO_TEAM && (kPlayer.isAlive() || kPlayer.isObserver()))
 					{
-						if(isHasMet(kPlayer.getTeam()))
+						if(GET_TEAM(eTeam).isHasMet(GetID()))
 						{
 							if(bIsCapture) strSomeoneCompletedProject =  GetLocalizedText("TXT_KEY_MISC_CAPTURE_PROJECT", getName().GetCString(), pkProject->GetTextKey());
 							if(ePlayer == GC.getGame().getActivePlayer())
