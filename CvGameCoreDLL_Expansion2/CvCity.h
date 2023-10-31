@@ -1065,7 +1065,7 @@ public:
 
 	int CreateUnit(UnitTypes eUnitType, UnitAITypes eAIType = NO_UNITAI, bool bUseToSatisfyOperation=true);
 	bool CreateBuilding(BuildingTypes eBuildType);
-	bool CreateProject(ProjectTypes eProjectType);
+	bool CreateProject(ProjectTypes eProjectType, bool bIsCapture = false);
 	void changeProjectCount(ProjectTypes eProject, int iValue);
 	int getProjectCount(ProjectTypes eProject) const;
 

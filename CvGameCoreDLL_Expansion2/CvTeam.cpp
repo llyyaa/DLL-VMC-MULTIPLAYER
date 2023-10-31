@@ -4699,7 +4699,7 @@ void CvTeam::finalizeProjectArtTypes()
 
 
 //	--------------------------------------------------------------------------------
-void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange)
+void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange, bool bIsCapture)
 {
 	bool bChangeProduction;
 	int iOldProjectCount;
@@ -4806,6 +4806,7 @@ void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange)
 				CvString strUnknownCompletesProject = GetLocalizedText("TXT_KEY_MISC_WONDER_COMPLETED_UNKNOWN", pkProject->GetTextKey());
 
 				const PlayerTypes eTeamLeader = getLeaderID();
+				if(bIsCapture) strSomeoneCompletesProject = GetLocalizedText("TXT_KEY_MISC_CAPTURE_PROJECT", getName().GetCString(), pkProject->GetTextKey());
 				GC.getGame().addReplayMessage(REPLAY_MESSAGE_MAJOR_EVENT, eTeamLeader, strSomeoneCompletesProject);
 
 				CvPlayerAI& playerWhoLeadsTeam = GET_PLAYER(eTeamLeader);
@@ -4821,6 +4822,7 @@ void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange)
 					{
 						if(isHasMet(kPlayer.getTeam()))
 						{
+							if(bIsCapture) strSomeoneCompletedProject =  GetLocalizedText("TXT_KEY_MISC_CAPTURE_PROJECT", getName().GetCString(), pkProject->GetTextKey());
 							if(ePlayer == GC.getGame().getActivePlayer())
 							{
 								DLLUI->AddCityMessage(0, pLeadersCapital->GetIDInfo(), ePlayer, false, GC.getEVENT_MESSAGE_TIME(), strSomeoneCompletedProject);
@@ -4828,7 +4830,7 @@ void CvTeam::changeProjectCount(ProjectTypes eIndex, int iChange)
 							CvNotifications* pNotifications = kPlayer.GetNotifications();
 							pNotifications->Add(NOTIFICATION_PROJECT_COMPLETED, strSomeoneCompletedProject, strSomeoneCompletedProject, pLeadersCapital->getX(), pLeadersCapital->getY(), eIndex, playerWhoLeadsTeam.GetID());
 						}
-						else
+						else if(!bIsCapture)
 						{
 							if(ePlayer == GC.getGame().getActivePlayer())
 							{

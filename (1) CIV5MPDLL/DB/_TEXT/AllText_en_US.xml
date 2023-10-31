@@ -543,6 +543,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_CHAIN_REACTION_DEFENDER">
 			<Text>Enemy {1_UnitName} Cause [COLOR_NEGATIVE_TEXT] {2_Percent}% [ENDCOLOR] Damage to all your milltary units within their sight regardless of distance</Text>
 		</Row>
+		<Row Tag="TXT_KEY_MISC_CAPTURE_PROJECT">
+			<Text>{1_PlyrName} already knew the secrets of {@2_PrjctName}!</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

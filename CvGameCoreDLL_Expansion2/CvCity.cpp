@@ -16192,13 +16192,13 @@ bool CvCity::CreateBuilding(BuildingTypes eBuildingType)
 
 
 //	--------------------------------------------------------------------------------
-bool CvCity::CreateProject(ProjectTypes eProjectType)
+bool CvCity::CreateProject(ProjectTypes eProjectType, bool bIsCapture)
 {
 	VALIDATE_OBJECT
 
 	CvPlayer& thisPlayer = GET_PLAYER(getOwner());
 	CvTeam& thisTeam = GET_TEAM(getTeam());
-	thisTeam.changeProjectCount(eProjectType, 1);
+	thisTeam.changeProjectCount(eProjectType, 1, bIsCapture);
 
 	changeProjectCount(eProjectType, 1);
 

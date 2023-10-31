@@ -549,5 +549,8 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_CHAIN_REACTION_DEFENDER">
 			<Text>敵方的{1_UnitName}對你所有其可見地塊上的軍事單位造成[COLOR_NEGATIVE_TEXT]{2_Percent}%[ENDCOLOR]鏈式反應傷害</Text>
 		</Row>
+		<Row Tag="TXT_KEY_MISC_CAPTURE_PROJECT">
+			<Text>{1_PlyrName}已知悉{@2_PrjctName}的秘密!</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

@@ -353,7 +353,7 @@ public:
 	void setProjectArtType(ProjectTypes eIndex, int number, int value);
 	bool isProjectMaxedOut(ProjectTypes eIndex, int iExtra = 0) const;
 	bool isProjectAndArtMaxedOut(ProjectTypes eIndex) const;
-	void changeProjectCount(ProjectTypes eIndex, int iChange);
+	void changeProjectCount(ProjectTypes eIndex, int iChange, bool bIsCapture = false);
 	void finalizeProjectArtTypes();
 
 	int getProjectMaking(ProjectTypes eIndex) const;
