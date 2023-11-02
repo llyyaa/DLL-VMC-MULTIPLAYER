@@ -377,7 +377,7 @@ void CvTacticalAI::CommandeerUnits()
 		}
 
 		// We want ALL the barbarians and air units (that are combat ready)
-		else if(pLoopUnit->isBarbarian() || (pLoopUnit->getDomainType() == DOMAIN_AIR && pLoopUnit->getDamage() < 50 && !m_pPlayer->GetMilitaryAI()->WillAirUnitRebase(pLoopUnit.pointer())))
+		else if(pLoopUnit->isBarbarian() || (pLoopUnit->getDomainType() == DOMAIN_AIR && pLoopUnit->getDamage() < (pLoopUnit->GetMaxHitPoints() -50) && !m_pPlayer->GetMilitaryAI()->WillAirUnitRebase(pLoopUnit.pointer())))
 		{
 			pLoopUnit->setTacticalMove((TacticalAIMoveTypes)m_CachedInfoTypes[eTACTICAL_UNASSIGNED]);
 			m_CurrentTurnUnits.push_back(pLoopUnit->GetID());
@@ -664,7 +664,21 @@ void CvTacticalAI::LaunchAttack(void* pAttacker, CvTacticalTarget* pTarget, bool
 			auto* pPlot = GC.getMap().plot(x, y);
 			if(bRanged && pUnit->getDomainType() != DOMAIN_AIR)	// Air attack is ranged, but it goes through the 'move to' mission.
 			{
-				if (MOD_SP_SMART_AI && pUnit->IsCanAttackWithMove() && pPlot && pPlot->isCity() && pPlot->getPlotCity() != nullptr && pPlot->getPlotCity()->getDamage() >= pPlot->getPlotCity()->GetMaxHitPoints() - 1)
+				bool bRangedUnitShouldMeleeAttack = false;
+				if(MOD_SP_SMART_AI && pPlot && !pUnit->isOnlyDefensive())
+				{
+					//if we can capture this city
+					if (pPlot->isCity() && pPlot->getPlotCity() != nullptr)
+					{
+						CvCity* dCity = pPlot->getPlotCity();
+						//the city is already very weak(simplified calculation)
+						if(dCity != nullptr && (1 + dCity->getDamage() >= dCity->GetMaxHitPoints()))
+						{
+							bRangedUnitShouldMeleeAttack = true;
+						}
+					}
+				}
+				if (bRangedUnitShouldMeleeAttack)
 				{
 					pUnit->PushMission(CvTypes::getMISSION_MOVE_TO(), pTarget->GetTargetX(), pTarget->GetTargetY());
 				}
@@ -2043,108 +2057,65 @@ bool CvTacticalAI::PlotCaptureCityMoves()
 			m_CurrentMoveCities.clear();
 
 #if defined(MOD_AI_SMART_V3)
-			if (MOD_AI_SMART_V3)
+#endif
+			CvCity* pCity = pPlot->getPlotCity();
+		
+			if(pCity != NULL)
 			{
-				CvCity* pCity = pPlot->getPlotCity();
-			
-				if(pCity != NULL)
+				//If don't have units to actually conquer, get out.
+				if(!FindUnitsWithinStrikingDistance(pPlot, 1, 0, true /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
 				{
-					//If don't have units to actually conquer, get out.
-					if(!FindUnitsWithinStrikingDistance(pPlot, 1, 0, true /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
-					{
-						if(bLog)
-						{
-							CvString strLogString;
-							strLogString = "PlotCaptureCityMoves: Not attacking city because are no units able to take city near."; 
-							LogTacticalMessage(strLogString);
-						}
-						return bAttackMade;
-					}
-
-					// Do we have enough firepower to destroy it?
-					iRequiredDamage = pCity->GetMaxHitPoints() - pCity->getDamage();
-					pTarget->SetAuxIntData(iRequiredDamage);
-					//AMS: If we have the city already down to minimum, don't use ranged... Only try to capture.
-					bool bSelectNoRanged = (iRequiredDamage <= 1);
-
-					if(bLog && bSelectNoRanged)
+					if(bLog)
 					{
 						CvString strLogString;
-						strLogString.Format("City is at 1HP at X: %d, Y: %d", pPlot->getX(), pPlot->getY());
+						strLogString = "PlotCaptureCityMoves: Not attacking city because are no units able to take city near."; 
 						LogTacticalMessage(strLogString);
 					}
-
-					if(FindUnitsWithinStrikingDistance(pPlot, 1, 0, bSelectNoRanged /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
-					{
-						if(ComputeTotalExpectedDamage(pTarget, pPlot) >= (iRequiredDamage / 2)) // risky
-						{
-							// Log result
-							if(bLog)
-							{
-								CvString strPlayerName, strCityName, strLogString, strTemp;
-								strPlayerName = GET_PLAYER(pCity->getOwner()).getCivilizationShortDescription();
-								strCityName = pCity->getName();
-								strLogString.Format("Attacking city of ");
-								strLogString += strCityName;
-								strTemp.Format(" to capture, X: %d, Y: %d,", pCity->getX(), pCity->getY());
-								strLogString += strTemp + strPlayerName;
-								LogTacticalMessage(strLogString);
-							}
-
-							// If so, execute enough moves to take it
-							ExecuteAttack(pTarget, pPlot, false, false);
-							bAttackMade = true;
-
-							// Did it work?  If so, don't need a temporary dominance zone if had one here
-							if(pPlot->getOwner() == m_pPlayer->GetID())
-							{
-								DeleteTemporaryZone(pPlot);
-							}
-						}
-					}
+					return bAttackMade;
 				}
-			}
-			else
-			{
-#endif
-				if(FindUnitsWithinStrikingDistance(pPlot, 1, 0, false /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
+
+				// Do we have enough firepower to destroy it?
+				iRequiredDamage = pCity->GetMaxHitPoints() - pCity->getDamage();
+				pTarget->SetAuxIntData(iRequiredDamage);
+				//AMS: If we have the city already down to minimum, don't use ranged... Only try to capture.
+				bool bSelectNoRanged = (iRequiredDamage <= 1);	
+
+				if(bLog && bSelectNoRanged)
 				{
-					// Do we have enough firepower to destroy it?
-					CvCity* pCity = pPlot->getPlotCity();
-					if(pCity != NULL)
+					CvString strLogString;
+					strLogString.Format("City is at 1HP at X: %d, Y: %d", pPlot->getX(), pPlot->getY());
+					LogTacticalMessage(strLogString);
+				}
+
+				if(FindUnitsWithinStrikingDistance(pPlot, 1, 0, bSelectNoRanged /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
+				{
+					if(ComputeTotalExpectedDamage(pTarget, pPlot) >= (iRequiredDamage / 2)) // risky
 					{
-						iRequiredDamage = pCity->GetMaxHitPoints() - pCity->getDamage();
-						pTarget->SetAuxIntData(iRequiredDamage);
-						if(ComputeTotalExpectedDamage(pTarget, pPlot) >= (iRequiredDamage / 2)) // risky
+						// Log result
+						if(bLog)
 						{
-							// Log result
-							if(bLog)
-							{
-								CvString strPlayerName, strCityName, strLogString, strTemp;
-								strPlayerName = GET_PLAYER(pCity->getOwner()).getCivilizationShortDescription();
-								strCityName = pCity->getName();
-								strLogString.Format("Attacking city of ");
-								strLogString += strCityName;
-								strTemp.Format(" to capture, X: %d, Y: %d,", pCity->getX(), pCity->getY());
-								strLogString += strTemp + strPlayerName;
-								LogTacticalMessage(strLogString);
-							}
+							CvString strPlayerName, strCityName, strLogString, strTemp;
+							strPlayerName = GET_PLAYER(pCity->getOwner()).getCivilizationShortDescription();
+							strCityName = pCity->getName();
+							strLogString.Format("Attacking city of ");
+							strLogString += strCityName;
+							strTemp.Format(" to capture, X: %d, Y: %d,", pCity->getX(), pCity->getY());
+							strLogString += strTemp + strPlayerName;
+							LogTacticalMessage(strLogString);
+						}
 
-							// If so, execute enough moves to take it
-							ExecuteAttack(pTarget, pPlot, false, false);
-							bAttackMade = true;
+						// If so, execute enough moves to take it
+						ExecuteAttack(pTarget, pPlot, false, false);
+						bAttackMade = true;
 
-							// Did it work?  If so, don't need a temporary dominance zone if had one here
-							if(pPlot->getOwner() == m_pPlayer->GetID())
-							{
-								DeleteTemporaryZone(pPlot);
-							}
+						// Did it work?  If so, don't need a temporary dominance zone if had one here
+						if(pPlot->getOwner() == m_pPlayer->GetID())
+						{
+							DeleteTemporaryZone(pPlot);
 						}
 					}
 				}
-#if defined(MOD_AI_SMART_V3)
 			}
-#endif
 		}
 		pTarget = GetNextZoneTarget();
 	}
@@ -2170,109 +2141,71 @@ bool CvTacticalAI::PlotDamageCityMoves()
 			m_CurrentMoveCities.clear();
 
 #if defined(MOD_AI_SMART_V3)
-			if (MOD_AI_SMART_V3)
-			{
-				CvCity* pCity = pPlot->getPlotCity();
+#endif
+			CvCity* pCity = pPlot->getPlotCity();
 
-				if(pCity != NULL)
+			if(pCity != NULL)
+			{
+				//If don't have units nearby to actually conquer, and bad dominance flag, get out.
+				if(!FindUnitsWithinStrikingDistance(pPlot, 2, 0, true /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
 				{
-					//If don't have units nearby to actually conquer, and bad dominance flag, get out.
-					if(!FindUnitsWithinStrikingDistance(pPlot, 2, 0, true /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
+					CvTacticalDominanceZone* pZone;
+					pZone = m_pMap->GetZoneByCity(pCity, false);
+					if (pZone != NULL)
 					{
-						CvTacticalDominanceZone* pZone;
-						pZone = m_pMap->GetZoneByCity(pCity, false);
-						if (pZone != NULL)
-						{
-							if (pZone->GetDominanceFlag() == TACTICAL_DOMINANCE_ENEMY)
-							{
-								return bAttackMade;
-							}
-							if(bLog)
-							{
-								CvString strLogString;
-								strLogString = "PlotDamageCityMoves: Not damaging city because Bad dominance and no units able to take city near."; 
-								LogTacticalMessage(strLogString);
-							}
-						}
-						else
+						if (pZone->GetDominanceFlag() == TACTICAL_DOMINANCE_ENEMY)
 						{
 							return bAttackMade;
 						}
-					}
-
-					iRequiredDamage = pCity->GetMaxHitPoints() - pCity->getDamage();
-					pTarget->SetAuxIntData(iRequiredDamage);
-					//AMS: If we have the city already down to minimum, don't use ranged... Only try to capture.
-					bool bSelectNoRanged = (iRequiredDamage <= 1);
-
-					if(bLog)
-					{
-						CvString strLogString;
-						strLogString.Format("City is at 1HP at X: %d, Y: %d", pPlot->getX(), pPlot->getY());
-						LogTacticalMessage(strLogString);
-					}
-
-					if(FindUnitsWithinStrikingDistance(pPlot, 1, 0, bSelectNoRanged /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
-					{
-						// Don't want to hammer away to try and take down a city for more than 8 turns
-						if(ComputeTotalExpectedDamage(pTarget, pPlot) > (iRequiredDamage / 8))
+						if(bLog)
 						{
-							// Log result
-							if(bLog)
-							{
-								CvString strPlayerName, strCityName, strLogString, strTemp;
-								strPlayerName = GET_PLAYER(pCity->getOwner()).getCivilizationShortDescription();
-								strCityName = pCity->getName();
-								strLogString.Format("Attacking city of ");
-								strLogString += strCityName;
-								strTemp.Format(" to damage, X: %d, Y: %d,", pCity->getX(), pCity->getY());
-								strLogString += strTemp + strPlayerName;
-								LogTacticalMessage(strLogString);
-							}
-
-							// If so, execute enough moves to take it
-							ExecuteAttack(pTarget, pPlot, false, true);
-							bAttackMade = true;
+							CvString strLogString;
+							strLogString = "PlotDamageCityMoves: Not damaging city because Bad dominance and no units able to take city near."; 
+							LogTacticalMessage(strLogString);
 						}
 					}
+					else
+					{
+						return bAttackMade;
+					}
 				}
-			}
-			else
-			{
-#endif
-				if(FindUnitsWithinStrikingDistance(pPlot, 1, 0, false /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
+
+				iRequiredDamage = pCity->GetMaxHitPoints() - pCity->getDamage();
+				pTarget->SetAuxIntData(iRequiredDamage);
+				//AMS: If we have the city already down to minimum, don't use ranged... Only try to capture.
+				bool bSelectNoRanged = (iRequiredDamage <= 1);
+
+				if(bLog)
 				{
-					CvCity* pCity = pPlot->getPlotCity();
-					if(pCity != NULL)
+					CvString strLogString;
+					strLogString.Format("City is at 1HP at X: %d, Y: %d", pPlot->getX(), pPlot->getY());
+					LogTacticalMessage(strLogString);
+				}
+
+				if(FindUnitsWithinStrikingDistance(pPlot, 1, 0, bSelectNoRanged /*bNoRangedUnits*/, false /*bNavalOnly*/, false /*bMustMoveThrough*/, true /*bIncludeBlockedUnits*/))
+				{
+					// Don't want to hammer away to try and take down a city for more than 8 turns
+					if(ComputeTotalExpectedDamage(pTarget, pPlot) > (iRequiredDamage / 8))
 					{
-						iRequiredDamage = pCity->GetMaxHitPoints() - pCity->getDamage();
-						pTarget->SetAuxIntData(iRequiredDamage);
-
-						// Don't want to hammer away to try and take down a city for more than 8 turns
-						if(ComputeTotalExpectedDamage(pTarget, pPlot) > (iRequiredDamage / 8))
+						// Log result
+						if(bLog)
 						{
-							// Log result
-							if(bLog)
-							{
-								CvString strPlayerName, strCityName, strLogString, strTemp;
-								strPlayerName = GET_PLAYER(pCity->getOwner()).getCivilizationShortDescription();
-								strCityName = pCity->getName();
-								strLogString.Format("Attacking city of ");
-								strLogString += strCityName;
-								strTemp.Format(" to damage, X: %d, Y: %d,", pCity->getX(), pCity->getY());
-								strLogString += strTemp + strPlayerName;
-								LogTacticalMessage(strLogString);
-							}
-
-							// If so, execute enough moves to take it
-							ExecuteAttack(pTarget, pPlot, false, true);
-							bAttackMade = true;
+							CvString strPlayerName, strCityName, strLogString, strTemp;
+							strPlayerName = GET_PLAYER(pCity->getOwner()).getCivilizationShortDescription();
+							strCityName = pCity->getName();
+							strLogString.Format("Attacking city of ");
+							strLogString += strCityName;
+							strTemp.Format(" to damage, X: %d, Y: %d,", pCity->getX(), pCity->getY());
+							strLogString += strTemp + strPlayerName;
+							LogTacticalMessage(strLogString);
 						}
+
+						// If so, execute enough moves to take it
+						ExecuteAttack(pTarget, pPlot, false, true);
+						bAttackMade = true;
 					}
 				}
-#if defined(MOD_AI_SMART_V3)
 			}
-#endif
 		}
 		pTarget = GetNextZoneTarget();
 	}
@@ -6678,7 +6611,7 @@ void CvTacticalAI::ExecuteAttack(CvTacticalTarget* pTarget, CvPlot* pTargetPlot,
 				if(pUnit->getMoves() > 0 && (!bMustSurviveAttack || ((m_CurrentMoveUnits[iI].GetExpectedSelfDamage() + pUnit->getDamage()) < pUnit->GetMaxHitPoints())))
 				{
 					// Are we a melee unit
-					if(!pUnit->IsCanAttackRanged())
+					if(!(pUnit->IsCanAttackRanged() && pUnit->isOnlyDefensive()))
 					{
 #if defined(MOD_AI_SMART_V3)
 						if (MOD_AI_SMART_V3)
@@ -9131,7 +9064,8 @@ bool CvTacticalAI::FindUnitsWithinStrikingDistance(CvPlot* pTarget, int iNumTurn
 				}
 
 				//AMS: To effectively skip all ranged units...
-				if (MOD_AI_SMART_V3 && bNoRangedUnits && pLoopUnit->IsCanAttackRanged())
+				//QY: don't skip unit can do melee attack
+				if (MOD_AI_SMART_V3 && bNoRangedUnits && pLoopUnit->IsCanAttackRanged() && pLoopUnit->isOnlyDefensive())
 				{
 					continue;
 				}
