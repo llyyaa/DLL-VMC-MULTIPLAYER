@@ -262,6 +262,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE">
 			<Text>Casualties in the battle has caused {2_loss} [ICON_CITIZEN] Citizen lost in your city: [COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]!</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE2">
+			<Text>Casualties in the battle has caused a Blackout and all current stacked [ICON_FOOD] Food lost in your city: [COLOR_NEGATIVE_TEXT]{@1_CityName}[ENDCOLOR]!</Text>
+		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY">
 			<Text>Casualties in Battle!</Text>
 		</Row>

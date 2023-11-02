@@ -31983,18 +31983,33 @@ bool CvPlayer::CheckAndUpdateWarCasualtiesCounter()
 	if (iChange != 0)
 	{
 		pCity->changePopulation(iChange);
-	}
-
-	if (this->isHuman())
-	{
-		CvNotifications *pNotifications = this->GetNotifications();
-		if (pNotifications)
+		if (this->isHuman())
 		{
-			Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE");
-			strMessage << pCity->getNameKey();
-			strMessage << -iChange;
-			Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY");
-			pNotifications->Add(NOTIFICATION_STARVING, strMessage.toUTF8(), strSummary.toUTF8(), pCity->getX(), pCity->getY(), -1);
+			CvNotifications *pNotifications = this->GetNotifications();
+			if (pNotifications)
+			{
+				Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE");
+				strMessage << pCity->getNameKey();
+				strMessage << -iChange;
+				Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY");
+				pNotifications->Add(NOTIFICATION_STARVING, strMessage.toUTF8(), strSummary.toUTF8(), pCity->getX(), pCity->getY(), -1);
+			}
+		}
+	}
+	else
+	{
+		pCity->setFood(0);
+		pCity->ChangeResistanceTurns(2);
+		if (this->isHuman())
+		{
+			CvNotifications *pNotifications = this->GetNotifications();
+			if (pNotifications)
+			{
+				Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_MESSAGE2");
+				strMessage << pCity->getNameKey();
+				Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_WAR_CASUALTIES_SUMMARY");
+				pNotifications->Add(NOTIFICATION_STARVING, strMessage.toUTF8(), strSummary.toUTF8(), pCity->getX(), pCity->getY(), -1);
+			}
 		}
 	}
 
