@@ -1471,10 +1471,9 @@ int CvPlayerTechs::GetResearchTurnsLeft(TechTypes eTech, bool bOverflow) const
 int CvPlayerTechs::GetResearchTurnsLeftTimes100(TechTypes eTech, bool bOverflow) const
 {
 #if defined(MOD_BUGFIX_RESEARCH_NAN)
-	long long iResearchRate;
-#else
-	int iResearchRate;
 #endif
+	long long iResearchRate;
+
 	int iOverflow;
 	int iTurnsLeft;
 	int iI;
@@ -1509,11 +1508,7 @@ int CvPlayerTechs::GetResearchTurnsLeftTimes100(TechTypes eTech, bool bOverflow)
 	// Get the team progress
 	int iResearchProgress = GET_TEAM(m_pPlayer->getTeam()).GetTeamTechs()->GetResearchProgress(eTech);
 	// Get the raw amount left
-#if defined(MOD_BUGFIX_RESEARCH_NAN)
 	long long iResearchLeft = std::max(0, (iResearchCost - iResearchProgress));
-#else
-	int iResearchLeft = std::max(0, (iResearchCost - iResearchProgress));
-#endif
 
 	// Removed any current overflow if requested.
 	if(bOverflow)
@@ -1523,11 +1518,7 @@ int CvPlayerTechs::GetResearchTurnsLeftTimes100(TechTypes eTech, bool bOverflow)
 
 	iResearchLeft *= 10000;
 
-#if defined(MOD_BUGFIX_RESEARCH_NAN)
 	iTurnsLeft = (int) (iResearchLeft / iResearchRate);
-#else
-	iTurnsLeft = (iResearchLeft / iResearchRate);
-#endif
 
 	if(iTurnsLeft * iResearchRate < iResearchLeft)
 	{
@@ -1566,11 +1557,10 @@ long long CvPlayerTechs::GetResearchCost(TechTypes eTech) const
 {
 	// Get the research cost for the team
 #if defined(MOD_BUGFIX_RESEARCH_NAN)
+#endif
 	// For late game eras with many cities, *10000 and *(100+iMod) in the code below can overflow a 32-bit int
 	long long iResearchCost = GET_TEAM(m_pPlayer->getTeam()).GetTeamTechs()->GetResearchCost(eTech);
-#else
-	int iResearchCost = GET_TEAM(m_pPlayer->getTeam()).GetTeamTechs()->GetResearchCost(eTech);
-#endif
+
 	
 	// Adjust to the player's research modifier
 	int iResearchMod = std::max(1, m_pPlayer->calculateResearchModifier(eTech));
@@ -1594,11 +1584,7 @@ long long CvPlayerTechs::GetResearchCost(TechTypes eTech) const
 	else
 		iResearchCost = (iResearchCost / 100);
 
-#if defined(MOD_BUGFIX_RESEARCH_NAN)
 	return iResearchCost;
-#else
-	return iResearchCost;
-#endif
 }
 
 //	----------------------------------------------------------------------------
@@ -2159,11 +2145,7 @@ void CvTeamTechs::SetResearchProgress(TechTypes eIndex, int iNewValue, PlayerTyp
 }
 
 /// Accessor: set research done on one tech (in hundredths)
-#if defined(MOD_BUGFIX_RESEARCH_OVERFLOW)
-void CvTeamTechs::SetResearchProgressTimes100(TechTypes eIndex, int iNewValue, PlayerTypes ePlayer, int iPlayerOverflow, int iPlayerOverflowDivisorTimes100)
-#else
-void CvTeamTechs::SetResearchProgressTimes100(TechTypes eIndex, int iNewValue, PlayerTypes ePlayer)
-#endif
+void CvTeamTechs::SetResearchProgressTimes100(TechTypes eIndex, int iNewValue, PlayerTypes ePlayer, long long iPlayerOverflow, int iPlayerOverflowDivisorTimes100)
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eIndex < GC.getNumTechInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
@@ -2181,38 +2163,16 @@ void CvTeamTechs::SetResearchProgressTimes100(TechTypes eIndex, int iNewValue, P
 			GC.GetEngineUserInterface()->setDirty(Score_DIRTY_BIT, true);
 		}
 
-#if defined(MOD_BUGFIX_RESEARCH_NAN)
 		long long iResearchProgress = GetResearchProgressTimes100(eIndex);
 		long long iResearchCost = GET_PLAYER(ePlayer).GetPlayerTechs()->GetResearchCost(eIndex) * 100;
-#else
-		int iResearchProgress = GetResearchProgressTimes100(eIndex);
-		int iResearchCost = GetResearchCost(eIndex) * 100;
-#endif
-
-#if defined(MOD_BUGFIX_RESEARCH_NAN)
-		int iOverflow = (int) (iResearchProgress - iResearchCost);
-#else
-		int iOverflow = iResearchProgress - iResearchCost;
-#endif
-
-#if defined(MOD_BUGFIX_RESEARCH_OVERFLOW)
-		if (!MOD_BUGFIX_RESEARCH_OVERFLOW) {
-#endif
-		// April 2014 Balance Patch change - EFB
-		//    Don't allow the overflow to get out of hand
-		int iMaxOverflow = GetMaxResearchOverflow(eIndex, ePlayer);
-		if (iOverflow > iMaxOverflow)
-		{
-			iOverflow = iMaxOverflow;
-		}
-#if defined(MOD_BUGFIX_RESEARCH_OVERFLOW)
-		}
-#endif
+		long long iOverflow = iResearchProgress - iResearchCost;
 
 		if(iOverflow >= 0)
 		{
 #if defined(MOD_BUGFIX_RESEARCH_OVERFLOW)
-			if (MOD_BUGFIX_RESEARCH_OVERFLOW) {
+#endif
+			if (MOD_BUGFIX_RESEARCH_OVERFLOW)
+			{
 				// iNewValue = iPlayerBeakersThisTurn + ((iPlayerOverflow * iPlayerOverflowDivisorTimes100) / 100)
 				if (iOverflow > iPlayerOverflow) {
 					// If we completed the tech using only iBeakersThisTurn, we need to hand back the remaining iPlayerBeakersThisTurn and the scaled down iPlayerOverflow
@@ -2222,7 +2182,11 @@ void CvTeamTechs::SetResearchProgressTimes100(TechTypes eIndex, int iNewValue, P
 					iOverflow = iOverflow / iPlayerOverflowDivisorTimes100 * 100;
 				}
 			}
-#endif
+			else
+			{
+				int iMaxOverflow = GetMaxResearchOverflow(eIndex, ePlayer);
+				iOverflow = iOverflow > iMaxOverflow ? iMaxOverflow : iOverflow;
+			}
 			GET_PLAYER(ePlayer).changeOverflowResearchTimes100(iOverflow);
 			m_pTeam->setHasTech(eIndex, true, ePlayer, true, true);
 			SetNoTradeTech(eIndex, true);
@@ -2338,16 +2302,12 @@ void CvTeamTechs::ChangeResearchProgress(TechTypes eIndex, int iChange, PlayerTy
 
 /// Add an increment of research to a tech (in hundredths)
 #if defined(MOD_BUGFIX_RESEARCH_OVERFLOW)
-void CvTeamTechs::ChangeResearchProgressTimes100(TechTypes eIndex, int iChange, PlayerTypes ePlayer, int iPlayerOverflow, int iPlayerOverflowDivisorTimes100)
-#else
-void CvTeamTechs::ChangeResearchProgressTimes100(TechTypes eIndex, int iChange, PlayerTypes ePlayer)
 #endif
+void CvTeamTechs::ChangeResearchProgressTimes100(TechTypes eIndex, long long iChange, PlayerTypes ePlayer, long long iPlayerOverflow, int iPlayerOverflowDivisorTimes100)
 {
-#if defined(MOD_BUGFIX_RESEARCH_OVERFLOW)
-	SetResearchProgressTimes100(eIndex, (GetResearchProgressTimes100(eIndex) + iChange), ePlayer, iPlayerOverflow, iPlayerOverflowDivisorTimes100);
-#else
-	SetResearchProgressTimes100(eIndex, (GetResearchProgressTimes100(eIndex) + iChange), ePlayer);
-#endif
+	long long llNewValue = GetResearchProgressTimes100(eIndex);
+	llNewValue += iChange;	
+	SetResearchProgressTimes100(eIndex, (int)std::min((long long)MAX_INT, llNewValue), ePlayer, iPlayerOverflow, iPlayerOverflowDivisorTimes100);
 }
 
 /// Add research for a tech to a specified percent complete

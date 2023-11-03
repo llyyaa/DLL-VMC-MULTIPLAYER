@@ -1117,7 +1117,7 @@ public:
 	void changeOverflowResearch(int iChange);
 	int getOverflowResearchTimes100() const;
 	void setOverflowResearchTimes100(int iNewValue);
-	void changeOverflowResearchTimes100(int iChange);
+	void changeOverflowResearchTimes100(long long iChange);
 
 	int getExpModifier() const;
 	void changeExpModifier(int iChange);

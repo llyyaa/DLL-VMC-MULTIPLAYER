@@ -18031,9 +18031,13 @@ void CvPlayer::setOverflowResearchTimes100(int iNewValue)
 
 
 //	--------------------------------------------------------------------------------
-void CvPlayer::changeOverflowResearchTimes100(int iChange)
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeOverflowResearchTimes100(long long iChange)
 {
-	setOverflowResearchTimes100(getOverflowResearchTimes100() + iChange);
+	// Don't allow the overflow to get out of hand
+	long long llOverflowResearch = getOverflowResearchTimes100();
+	llOverflowResearch += iChange;
+	setOverflowResearchTimes100((int)std::min((long long)MAX_INT, llOverflowResearch));
 }
 
 //	--------------------------------------------------------------------------------
@@ -24716,7 +24720,6 @@ void CvPlayer::doResearch()
 
 	AI_PERF_FORMAT("AI-perf.csv", ("CvPlayer::doResearch, Turn %03d, %s", GC.getGame().getElapsedGameTurns(), getCivilizationShortDescription()) );
 	bool bForceResearchChoice;
-	int iOverflowResearch;
 
 	if(GetPlayerTechs()->IsResearch())
 	{
@@ -24739,24 +24742,25 @@ void CvPlayer::doResearch()
 		}
 
 		TechTypes eCurrentTech = GetPlayerTechs()->GetCurrentResearch();
+		int iScienceTimes100 = GetScienceTimes100();
+		// iResearchModifier >= 100
+		int iResearchModifier = calculateResearchModifier(eCurrentTech);
 		if(eCurrentTech == NO_TECH)
 		{
-			int iOverflow = (GetScienceTimes100()) / std::max(1, calculateResearchModifier(eCurrentTech));
-			changeOverflowResearchTimes100(iOverflow);
+			int iOverflow = iScienceTimes100 / std::max(1, iResearchModifier);
+			changeOverflowResearch(iOverflow);
 		}
 		else
 		{
-			iOverflowResearch = (getOverflowResearchTimes100()/100) * calculateResearchModifier(eCurrentTech);
+			long long iOverflowResearch = getOverflowResearchTimes100();
+			iOverflowResearch = iOverflowResearch * iResearchModifier / 100;
 			setOverflowResearch(0);
 			if(GET_TEAM(getTeam()).GetTeamTechs())
 			{
-				int iBeakersTowardsTechTimes100 = GetScienceTimes100() + iOverflowResearch;
-#if defined(MOD_BUGFIX_RESEARCH_OVERFLOW)
-				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgressTimes100(eCurrentTech, iBeakersTowardsTechTimes100, GetID(), iOverflowResearch, calculateResearchModifier(eCurrentTech));
-#else
-				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgressTimes100(eCurrentTech, iBeakersTowardsTechTimes100, GetID());
-#endif
-				UpdateResearchAgreements(GetScienceTimes100() / 100);
+				long long iBeakersTowardsTechTimes100 = iScienceTimes100;
+				iBeakersTowardsTechTimes100 += iOverflowResearch;
+				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgressTimes100(eCurrentTech, iBeakersTowardsTechTimes100, GetID(), iOverflowResearch, iResearchModifier);
+				UpdateResearchAgreements(iScienceTimes100 / 100);
 			}
 		}
 
