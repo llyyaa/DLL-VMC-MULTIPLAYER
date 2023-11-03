@@ -1,6 +1,6 @@
 create table BuildingClassCollections (
     ID integer primary key autoincrement not null,
-    Type text
+    Type text default ''
 );
 
 create table BuildingClassCollections_Entries (

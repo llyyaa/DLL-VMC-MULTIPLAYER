@@ -20,7 +20,7 @@ create table PromotionCollections_AddEnemyPromotions (
 
 alter table UnitPromotions add column AddEnemyPromotionImmune boolean not null default 0;
 
-alter table UnitPromotions add column 'DestroyBuildingCollection' text;
+alter table UnitPromotions add column 'DestroyBuildingCollection' text default '';
 alter table UnitPromotions add column 'DestroyBuildingProbability' int default 0 not null;
 alter table UnitPromotions add column 'DestroyBuildingNumLimit' int default 0 not null;
 

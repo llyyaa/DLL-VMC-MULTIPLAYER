@@ -1,14 +1,14 @@
 alter table Policies add column `MinorBullyInfluenceLossModifier` int not null default 0;
 
 create table Policy_MinorsTradeRouteYieldRate (
-    PolicyType text,
-    YieldType text,
+    PolicyType text default '',
+    YieldType text default '',
     Rate integer not null
 );
 
 create table Policy_InternalTradeRouteDestYieldRate (
-    PolicyType text,
-    YieldType text,
+    PolicyType text default '',
+    YieldType text default '',
     Rate integer not null
 );
 

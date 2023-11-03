@@ -1,8 +1,8 @@
 create table Improvement_UnitXPPerTurn (
-  ImprovementType text,
+  ImprovementType text default '',
   Value integer not null default 0,
 
   -- conditional
-  UnitType text,
-  PromotionType text
+  UnitType text default '',
+  PromotionType text default ''
 );

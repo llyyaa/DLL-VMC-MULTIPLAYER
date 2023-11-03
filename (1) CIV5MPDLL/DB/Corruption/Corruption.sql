@@ -2,7 +2,7 @@ create table CorruptionLevels (
     ID integer primary key autoincrement not null,
     Type text unique,
 
-    IconString text,
+    IconString text default '',
 
     ScoreLowerBoundBase integer not null default 0,
     MapWidthModifier integer not null default 0,
@@ -25,8 +25,8 @@ alter table Traits add column MaxCorruptionLevel integer not null default -1;
 alter table Buildings add column CorruptionLevelChange integer not null default 0;
 
 create table Policy_CorruptionLevelPolicyCostModifier (
-    PolicyType text,
-    CorruptionLevelType text,
+    PolicyType text default '',
+    CorruptionLevelType text default '',
     Modifier integer not null default 0
 );
 

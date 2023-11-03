@@ -1,9 +1,9 @@
 create table Improvement_YieldChangesPerUnit (
-  ImprovementType text,
-  YieldType text,
+  ImprovementType text default '',
+  YieldType text default '',
   Yield integer not null default 0,
 
   -- conditional
-  UnitType text,
-  PromotionType text
+  UnitType text default '',
+  PromotionType text default ''
 );
