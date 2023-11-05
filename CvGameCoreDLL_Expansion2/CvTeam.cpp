@@ -5849,7 +5849,8 @@ void CvTeam::setHasTech(TechTypes eIndex, bool bNewValue, PlayerTypes ePlayer, b
 						}
 						if (kPlayer.GetPlayerTechs()->GetCurrentResearch() != NO_TECH) {
 							int iResearchModifier = kPlayer.calculateResearchModifier(kPlayer.GetPlayerTechs()->GetCurrentResearch());
-							long long iOverflowResearch = kPlayer.getOverflowResearchTimes100() * iResearchModifier / 100;
+							long long iOverflowResearch = kPlayer.getOverflowResearchTimes100();
+							iOverflowResearch = iOverflowResearch * iResearchModifier / 100;
 							kPlayer.setOverflowResearchTimes100(0);
 							GetTeamTechs()->ChangeResearchProgressTimes100(kPlayer.GetPlayerTechs()->GetCurrentResearch(), iOverflowResearch , eLoopPlayer);
 						}

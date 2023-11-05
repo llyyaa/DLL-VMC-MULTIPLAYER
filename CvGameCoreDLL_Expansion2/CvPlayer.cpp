@@ -29364,10 +29364,10 @@ int CvPlayer::getGrowthThreshold(int iPopulation) const
 
 	if(!isHuman() && !IsAITeammateOfHuman() && !isBarbarian())
 	{
-		iThreshold *= GC.getGame().getHandicapInfo().getAIGrowthPercent();
+		iThreshold *= std::max(10, GC.getGame().getHandicapInfo().getAIGrowthPercent());
 		iThreshold /= 100;
 
-		iThreshold *= std::max(0, ((GC.getGame().getHandicapInfo().getAIPerEraModifier() * GetCurrentEra()) + 100));
+		iThreshold *= std::max(10, ((GC.getGame().getHandicapInfo().getAIPerEraModifier() * GetCurrentEra()) + 100));
 		iThreshold /= 100;
 	}
 

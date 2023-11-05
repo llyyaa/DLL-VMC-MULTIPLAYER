@@ -17167,21 +17167,23 @@ void CvCity::doGrowth()
 	changeFoodTimes100(iDiff);
 	changeFoodKept(iDiff/100);
 
-	setFoodKept(range(getFoodKept(), 0, ((growthThreshold() * getMaxFoodKeptPercent()) / 100)));
+	int iGrowthThreshold = growthThreshold();
+	setFoodKept(range(getFoodKept(), 0, ((iGrowthThreshold * getMaxFoodKeptPercent()) / 100)));
 
 #ifdef MOD_GLOBAL_UNLIMITED_ONE_TURN_GROWTH
 	if (MOD_GLOBAL_UNLIMITED_ONE_TURN_GROWTH)
-	{
-		while (getFood() >= growthThreshold())
+	{	
+		while (getFood() >= iGrowthThreshold)
 		{
 			if (GetCityCitizens()->IsForcedAvoidGrowth())  // don't grow a city if we are at avoid growth
 			{
-				setFood(growthThreshold());
+				setFood(iGrowthThreshold);
 				break;
 			}
 
-			changeFood(-(std::max(0, (growthThreshold() - getFoodKept()))));
+			changeFood(-(std::max(0, (iGrowthThreshold - getFoodKept()))));
 			changePopulation(1);
+			iGrowthThreshold = growthThreshold();
 
 			// Only show notification if the city is small
 			if(getPopulation() <= GC.getMAX_POPULATION_INCREASE_NOTIOFACATION())
@@ -17210,15 +17212,15 @@ void CvCity::doGrowth()
 	}
 	else // old rule
 	{
-		if(getFood() >= growthThreshold())
+		if(getFood() >= iGrowthThreshold)
 		{
 			if(GetCityCitizens()->IsForcedAvoidGrowth())  // don't grow a city if we are at avoid growth
 			{
-				setFood(growthThreshold());
+				setFood(iGrowthThreshold);
 			}
 			else
 			{
-				changeFood(-(std::max(0, (growthThreshold() - getFoodKept()))));
+				changeFood(-(std::max(0, (iGrowthThreshold - getFoodKept()))));
 				changePopulation(1);
 
 				// Only show notification if the city is small
@@ -17247,15 +17249,15 @@ void CvCity::doGrowth()
 		}
 	}
 #else
-	if(getFood() >= growthThreshold())
+	if(getFood() >= iGrowthThreshold)
 	{
 		if(GetCityCitizens()->IsForcedAvoidGrowth())  // don't grow a city if we are at avoid growth
 		{
-			setFood(growthThreshold());
+			setFood(iGrowthThreshold);
 		}
 		else
 		{
-			changeFood(-(std::max(0, (growthThreshold() - getFoodKept()))));
+			changeFood(-(std::max(0, (iGrowthThreshold - getFoodKept()))));
 			changePopulation(1);
 
 			// Only show notification if the city is small
