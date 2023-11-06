@@ -129,13 +129,8 @@ public:
 	bool IsRouteToCapitalConnected(void);
 #endif
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 	void createGreatGeneral(UnitTypes eGreatPersonUnit, bool bIsFree);
 	void createGreatAdmiral(UnitTypes eGreatPersonUnit, bool bIsFree);
-#else
-	void createGreatGeneral(UnitTypes eGreatPersonUnit);
-	void createGreatAdmiral(UnitTypes eGreatPersonUnit);
-#endif
 
 	CityTaskResult doTask(TaskTypes eTask, int iData1 = -1, int iData2 = -1, bool bOption = false, bool bAlt = false, bool bShift = false, bool bCtrl = false);
 
@@ -358,6 +353,8 @@ public:
 	void processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, bool bObsolete = false, bool bApplyingAllCitiesBonus = false);
 	void processProcess(ProcessTypes eProcess, int iChange);
 	void processSpecialist(SpecialistTypes eSpecialist, int iChange);
+
+	void initFreeUnit(CvPlayer& owningPlayer, UnitTypes eUnit, int iCount, bool bToCivType);
 
 	void UpdateReligion(ReligionTypes eNewMajority);
 

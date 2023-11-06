@@ -3621,11 +3621,7 @@ FreeResourceXCities CvPlayerTraits::GetFreeResourceXCities(ResourceTypes eResour
 /// Is this civ currently able to cross mountains with combat units?
 bool CvPlayerTraits::IsAbleToCrossMountains() const
 {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 	return (m_bCrossesMountainsAfterGreatGeneral && m_pPlayer->getGreatGeneralsCreated(false) > 0);
-#else
-	return (m_bCrossesMountainsAfterGreatGeneral && m_pPlayer->getGreatGeneralsCreated() > 0);
-#endif
 }
 
 #if defined(MOD_TRAITS_CROSSES_ICE)
@@ -3957,11 +3953,7 @@ void CvPlayerTraits::ChooseMayaBoost()
 		CvCity* pCity = m_pPlayer->GetGreatPersonSpawnCity(eDesiredGreatPerson);
 		if(pCity)
 		{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-			pCity->GetCityCitizens()->DoSpawnGreatPerson(eDesiredGreatPerson, true, false, MOD_GLOBAL_TRULY_FREE_GP);
-#else
 			pCity->GetCityCitizens()->DoSpawnGreatPerson(eDesiredGreatPerson, true, false);
-#endif
 			SetUnitBaktun(eDesiredGreatPerson);
 		}
 		m_pPlayer->ChangeNumMayaBoosts(-1);

@@ -3267,11 +3267,7 @@ int CvLuaPlayer::lGetMinimumFaithNextGreatProphet(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-	int iFaith = pkPlayer->GetReligions()->GetCostNextProphet(true /*bIncludeBeliefDiscounts*/, true /*bAdjustForSpeedDifficulty*/, MOD_GLOBAL_TRULY_FREE_GP);
-#else
 	int iFaith = pkPlayer->GetReligions()->GetCostNextProphet(true /*bIncludeBeliefDiscounts*/, true /*bAdjustForSpeedDifficulty*/);
-#endif
 	lua_pushinteger(L, iFaith);
 
 	return 1;
@@ -5951,12 +5947,8 @@ int CvLuaPlayer::lCreateGreatGeneral(lua_State* L)
 	const int x = lua_tointeger(L, 3);
 	const int y = lua_tointeger(L, 4);
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 	const bool bIsFree = luaL_optint(L, 5, 0);
 	pkPlayer->createGreatGeneral(eGreatPersonUnit, x, y, bIsFree);
-#else
-	pkPlayer->createGreatGeneral(eGreatPersonUnit, x, y);
-#endif
 	return 0;
 }
 //------------------------------------------------------------------------------
@@ -7677,12 +7669,18 @@ int CvLuaPlayer::lGetScienceFromOtherPlayersTimes100(lua_State* L)
 //int GetScienceFromHappinessTimes100();
 int CvLuaPlayer::lGetScienceFromHappinessTimes100(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvPlayerAI::GetScienceFromHappinessTimes100);
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetScienceFromHappinessTimes100(pkPlayer->GetScienceFromCitiesTimes100(false));
+	lua_pushinteger(L, iResult);
+	return 1;
 }
 //int GetScienceFromResearchAgreementsTimes100();
 int CvLuaPlayer::lGetScienceFromResearchAgreementsTimes100(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvPlayerAI::GetScienceFromResearchAgreementsTimes100);
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const int iResult = pkPlayer->GetScienceFromResearchAgreementsTimes100(pkPlayer->GetScienceFromCitiesTimes100(false));
+	lua_pushinteger(L, iResult);
+	return 1;
 }
 //int GetScienceFromBudgetDeficitTimes100();
 int CvLuaPlayer::lGetScienceFromBudgetDeficitTimes100(lua_State* L)

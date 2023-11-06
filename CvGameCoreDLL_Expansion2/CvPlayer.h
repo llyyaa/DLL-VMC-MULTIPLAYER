@@ -737,59 +737,30 @@ public:
 #endif
 
 	// Great People Stuff
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 	void createGreatGeneral(UnitTypes eGreatPersonUnit, int iX, int iY, bool bIsFree);
 	void createGreatAdmiral(UnitTypes eGreatPersonUnit, int iX, int iY, bool bIsFree);
-#else
-	void createGreatGeneral(UnitTypes eGreatPersonUnit, int iX, int iY);
-	void createGreatAdmiral(UnitTypes eGreatPersonUnit, int iX, int iY);
-#endif
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-	int getGreatPeopleCreated(bool bExcludeFree) const;
-	void incrementGreatPeopleCreated(bool bIsFree);
+	int getGreatPeopleCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatPeopleCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
 
-	int getGreatGeneralsCreated(bool bExcludeFree) const;
-	void incrementGreatGeneralsCreated(bool bIsFree);
-	int getGreatAdmiralsCreated(bool bExcludeFree) const;
-	void incrementGreatAdmiralsCreated(bool bIsFree);
+	int getGreatGeneralsCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatGeneralsCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
+	int getGreatAdmiralsCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatAdmiralsCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
 #if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
-	int getGreatMerchantsCreated(bool bExcludeFree) const;
-	void incrementGreatMerchantsCreated(bool bIsFree);
-	int getGreatScientistsCreated(bool bExcludeFree) const;
-	void incrementGreatScientistsCreated(bool bIsFree);
-	int getGreatEngineersCreated(bool bExcludeFree) const;
-	void incrementGreatEngineersCreated(bool bIsFree);
+	int getGreatMerchantsCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatMerchantsCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
+	int getGreatScientistsCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatScientistsCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
+	int getGreatEngineersCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatEngineersCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
 #endif
-	int getGreatWritersCreated(bool bExcludeFree) const;
-	void incrementGreatWritersCreated(bool bIsFree);
-	int getGreatArtistsCreated(bool bExcludeFree) const;
-	void incrementGreatArtistsCreated(bool bIsFree);
-	int getGreatMusiciansCreated(bool bExcludeFree) const;
-	void incrementGreatMusiciansCreated(bool bIsFree);
-#else
-	int getGreatPeopleCreated() const;
-	void incrementGreatPeopleCreated();
-
-	int getGreatGeneralsCreated() const;
-	void incrementGreatGeneralsCreated();
-	int getGreatAdmiralsCreated() const;
-	void incrementGreatAdmiralsCreated();
-#if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
-	int getGreatMerchantsCreated() const;
-	void incrementGreatMerchantsCreated();
-	int getGreatScientistsCreated() const;
-	void incrementGreatScientistsCreated();
-	int getGreatEngineersCreated() const;
-	void incrementGreatEngineersCreated();
-#endif
-	int getGreatWritersCreated() const;
-	void incrementGreatWritersCreated();
-	int getGreatArtistsCreated() const;
-	void incrementGreatArtistsCreated();
-	int getGreatMusiciansCreated() const;
-	void incrementGreatMusiciansCreated();
-#endif
+	int getGreatWritersCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatWritersCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
+	int getGreatArtistsCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatArtistsCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
+	int getGreatMusiciansCreated(bool bExcludeFree = MOD_GLOBAL_TRULY_FREE_GP) const;
+	void incrementGreatMusiciansCreated(bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
 
 	int getMerchantsFromFaith() const;
 	void incrementMerchantsFromFaith();
@@ -893,11 +864,7 @@ public:
 	void SetGreatPeopleSpawnCounter(int iValue);
 	void ChangeGreatPeopleSpawnCounter(int iChange);
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-	void DoSpawnGreatPerson(PlayerTypes eMinor, bool bIsFree);
-#else
-	void DoSpawnGreatPerson(PlayerTypes eMinor);
-#endif
+	void DoSpawnGreatPerson(PlayerTypes eMinor, bool bIsFree = MOD_GLOBAL_TRULY_FREE_GP);
 	void DoGreatPeopleSpawnTurn();
 	CvCity* GetGreatPersonSpawnCity(UnitTypes eUnit);
 
@@ -1399,8 +1366,8 @@ public:
 
 	int GetScienceFromCitiesTimes100(bool bIgnoreTrade) const;
 	int GetScienceFromOtherPlayersTimes100() const;
-	int GetScienceFromHappinessTimes100() const;
-	int GetScienceFromResearchAgreementsTimes100() const;
+	int GetScienceFromHappinessTimes100(int iScienceFromCities) const;
+	int GetScienceFromResearchAgreementsTimes100(int iScienceFromCities) const;
 	int GetScienceFromBudgetDeficitTimes100() const;
 
 	int GetScienceYieldFromPreviousTurns(int iGameTurn, int iNumPreviousTurnsToCount);
@@ -2299,7 +2266,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iNumUnitGoldenAges;
 	FAutoVariable<int, CvPlayer> m_iStrikeTurns;
 	FAutoVariable<int, CvPlayer> m_iGoldenAgeModifier;
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+
 	int m_iFreeGreatPeopleCreated;
 	int m_iFreeGreatGeneralsCreated;
 	int m_iFreeGreatAdmiralsCreated;
@@ -2311,7 +2278,7 @@ protected:
 	int m_iFreeGreatWritersCreated;
 	int m_iFreeGreatArtistsCreated;
 	int m_iFreeGreatMusiciansCreated;
-#endif
+
 	FAutoVariable<int, CvPlayer> m_iGreatPeopleCreated;
 	FAutoVariable<int, CvPlayer> m_iGreatGeneralsCreated;
 	int m_iGreatAdmiralsCreated;

@@ -5881,11 +5881,7 @@ void CvTeam::setHasTech(TechTypes eIndex, bool bNewValue, PlayerTypes ePlayer, b
 
 						if (pCapitalCity != NULL)
 						{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-							pCapitalCity->GetCityCitizens()->DoSpawnGreatPerson(eFreeUnit, true, false, MOD_GLOBAL_TRULY_FREE_GP);
-#else
 							pCapitalCity->GetCityCitizens()->DoSpawnGreatPerson(eFreeUnit, true, false);
-#endif
 						}
 					}
 				}

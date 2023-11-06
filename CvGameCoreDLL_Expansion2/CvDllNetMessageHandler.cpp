@@ -759,11 +759,7 @@ void CvDllNetMessageHandler::ResponseGreatPersonChoice(PlayerTypes ePlayer, Unit
 	CvCity* pCity = kPlayer.GetGreatPersonSpawnCity(eGreatPersonUnit);
 	if(pCity)
 	{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-		pCity->GetCityCitizens()->DoSpawnGreatPerson(eGreatPersonUnit, true, false, MOD_GLOBAL_TRULY_FREE_GP);
-#else
 		pCity->GetCityCitizens()->DoSpawnGreatPerson(eGreatPersonUnit, true, false);
-#endif
 	}
 	kPlayer.ChangeNumFreeGreatPeople(-1);
 }
@@ -774,11 +770,7 @@ void CvDllNetMessageHandler::ResponseMayaBonusChoice(PlayerTypes ePlayer, UnitTy
 	CvCity* pCity = kPlayer.GetGreatPersonSpawnCity(eGreatPersonUnit);
 	if(pCity)
 	{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-		pCity->GetCityCitizens()->DoSpawnGreatPerson(eGreatPersonUnit, true, false, MOD_GLOBAL_TRULY_FREE_GP);
-#else
 		pCity->GetCityCitizens()->DoSpawnGreatPerson(eGreatPersonUnit, true, false);
-#endif
 	}
 	kPlayer.ChangeNumMayaBoosts(-1);
 	kPlayer.GetPlayerTraits()->SetUnitBaktun(eGreatPersonUnit);
@@ -790,11 +782,7 @@ void CvDllNetMessageHandler::ResponseFaithGreatPersonChoice(PlayerTypes ePlayer,
 	CvCity* pCity = kPlayer.GetGreatPersonSpawnCity(eGreatPersonUnit);
 	if(pCity)
 	{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 		pCity->GetCityCitizens()->DoSpawnGreatPerson(eGreatPersonUnit, true, true, false);
-#else
-		pCity->GetCityCitizens()->DoSpawnGreatPerson(eGreatPersonUnit, true, true);
-#endif
 	}
 	kPlayer.ChangeNumFaithGreatPeople(-1);
 }

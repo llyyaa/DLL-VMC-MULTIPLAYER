@@ -220,7 +220,7 @@ CvPlayer::CvPlayer() :
 	, m_iNumUnitGoldenAges("CvPlayer::m_iNumUnitGoldenAges", m_syncArchive)
 	, m_iStrikeTurns("CvPlayer::m_iStrikeTurns", m_syncArchive)
 	, m_iGoldenAgeModifier("CvPlayer::m_iGoldenAgeModifier", m_syncArchive)
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+
 	, m_iFreeGreatPeopleCreated(0)
 	, m_iFreeGreatGeneralsCreated(0)
 	, m_iFreeGreatAdmiralsCreated(0)
@@ -232,7 +232,7 @@ CvPlayer::CvPlayer() :
 	, m_iFreeGreatWritersCreated(0)
 	, m_iFreeGreatArtistsCreated(0)
 	, m_iFreeGreatMusiciansCreated(0)
-#endif
+
 	, m_iGreatPeopleCreated("CvPlayer::m_iGreatPeopleCreated", m_syncArchive)
 	, m_iGreatGeneralsCreated("CvPlayer::m_iGreatGeneralsCreated", m_syncArchive)
 	, m_iGreatAdmiralsCreated(0)
@@ -997,7 +997,7 @@ void CvPlayer::uninit()
 	m_iNumUnitGoldenAges = 0;
 	m_iStrikeTurns = 0;
 	m_iGoldenAgeModifier = 0;
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+
 	m_iFreeGreatPeopleCreated = 0;
 	m_iFreeGreatGeneralsCreated = 0;
 	m_iFreeGreatAdmiralsCreated = 0;
@@ -1009,7 +1009,7 @@ void CvPlayer::uninit()
 	m_iFreeGreatWritersCreated = 0;
 	m_iFreeGreatArtistsCreated = 0;
 	m_iFreeGreatMusiciansCreated = 0;
-#endif
+
 	m_iGreatPeopleCreated = 0;
 	m_iGreatGeneralsCreated = 0;
 	m_iGreatAdmiralsCreated = 0;
@@ -7282,11 +7282,7 @@ void CvPlayer::receiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit)
 	int iProphetPercent = kGoodyInfo.getProphetPercent();
 	if(iProphetPercent > 0)
 	{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-		iFaith = GetReligions()->GetCostNextProphet(false /*bIncludeBeliefDiscounts*/, true /*bAdjustForSpeedDifficulty*/, MOD_GLOBAL_TRULY_FREE_GP) * iProphetPercent / 100;
-#else
 		iFaith = GetReligions()->GetCostNextProphet(false /*bIncludeBeliefDiscounts*/, true /*bAdjustForSpeedDifficulty*/) * iProphetPercent / 100;
-#endif
 		int iDivisor = /*10*/ GC.getGOLD_PURCHASE_VISIBLE_DIVISOR();
 		iFaith /= iDivisor;
 		iFaith *= iDivisor;
@@ -15268,7 +15264,6 @@ void CvPlayer::changeGoldenAgeModifier(int iChange)
 	m_iGoldenAgeModifier += iChange;
 }
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 //	--------------------------------------------------------------------------------
 int CvPlayer::getGreatPeopleCreated(bool bExcludeFree) const
 {
@@ -15406,118 +15401,6 @@ void CvPlayer::incrementGreatMusiciansCreated(bool bIsFree)
 	if (bIsFree) m_iFreeGreatMusiciansCreated++;
 }
 
-#else
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatPeopleCreated() const
-{
-	return m_iGreatPeopleCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatPeopleCreated()
-{
-	m_iGreatPeopleCreated++;
-}
-
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatGeneralsCreated() const
-{
-	return m_iGreatGeneralsCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatGeneralsCreated()
-{
-	m_iGreatGeneralsCreated++;
-}
-
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatAdmiralsCreated() const
-{
-	return m_iGreatAdmiralsCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatAdmiralsCreated()
-{
-	m_iGreatAdmiralsCreated++;
-}
-
-#if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatMerchantsCreated() const
-{
-	return m_iGreatMerchantsCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatMerchantsCreated()
-{
-	m_iGreatMerchantsCreated++;
-}
-
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatScientistsCreated() const
-{
-	return m_iGreatScientistsCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatScientistsCreated()
-{
-	m_iGreatScientistsCreated++;
-}
-
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatEngineersCreated() const
-{
-	return m_iGreatEngineersCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatEngineersCreated()
-{
-	m_iGreatEngineersCreated++;
-}
-#endif
-
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatWritersCreated() const
-{
-	return m_iGreatWritersCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatWritersCreated()
-{
-	m_iGreatWritersCreated++;
-}
-
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatArtistsCreated() const
-{
-	return m_iGreatArtistsCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatArtistsCreated()
-{
-	m_iGreatArtistsCreated++;
-}
-
-//	--------------------------------------------------------------------------------
-int CvPlayer::getGreatMusiciansCreated() const
-{
-	return m_iGreatMusiciansCreated;
-}
-
-//	--------------------------------------------------------------------------------
-void CvPlayer::incrementGreatMusiciansCreated()
-{
-	m_iGreatMusiciansCreated++;
-}
-
-#endif
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::getMerchantsFromFaith() const
@@ -16418,11 +16301,7 @@ void CvPlayer::ChangeGreatPeopleSpawnCounter(int iChange)
 
 //	--------------------------------------------------------------------------------
 /// Create a GreatPeople
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 void CvPlayer::DoSpawnGreatPerson(PlayerTypes eMinor, bool bIsFree)
-#else
-void CvPlayer::DoSpawnGreatPerson(PlayerTypes eMinor)
-#endif
 {
 	CvAssertMsg(eMinor >= MAX_MAJOR_CIVS, "eMinor is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eMinor < MAX_CIV_PLAYERS, "eMinor is expected to be within maximum bounds (invalid Index)");
@@ -16491,74 +16370,48 @@ void CvPlayer::DoSpawnGreatPerson(PlayerTypes eMinor)
 			// Bump up the count
 			if(pNewGreatPeople->IsGreatGeneral())
 			{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 				incrementGreatGeneralsCreated(bIsFree);
-#else
-				incrementGreatGeneralsCreated();
-#endif
 			}
 			else if(pNewGreatPeople->IsGreatAdmiral())
 			{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 				incrementGreatAdmiralsCreated(bIsFree);
-#else
-				incrementGreatAdmiralsCreated();
-#endif
 			}
 			else if (pNewGreatPeople->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_WRITER"))
 			{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 				incrementGreatWritersCreated(bIsFree);
-#else
-				incrementGreatWritersCreated();
-#endif
 			}							
 			else if (pNewGreatPeople->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_ARTIST"))
 			{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 				incrementGreatArtistsCreated(bIsFree);
-#else
-				incrementGreatArtistsCreated();
-#endif
 			}							
 			else if (pNewGreatPeople->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MUSICIAN"))
 			{
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 				incrementGreatMusiciansCreated(bIsFree);
-#else
-				incrementGreatMusiciansCreated();
-#endif
 			}
 			else
 			{
 #if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
-				if (MOD_GLOBAL_SEPARATE_GP_COUNTERS) {
-					if (pNewGreatPeople->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MERCHANT")) {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+				if (MOD_GLOBAL_SEPARATE_GP_COUNTERS) 
+				{
+					if (pNewGreatPeople->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MERCHANT"))
+					{
 						incrementGreatMerchantsCreated(bIsFree);
-#else
-						incrementGreatMerchantsCreated();
-#endif
-					} else if (pNewGreatPeople->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST")) {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+					} 
+					else if (pNewGreatPeople->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST"))
+					{
 						incrementGreatScientistsCreated(bIsFree);
-#else
-						incrementGreatScientistsCreated();
-#endif
-					} else {
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+					}
+					else if (pNewGreatPeople->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_ENGINEER"))
+					{
 						incrementGreatEngineersCreated(bIsFree);
-#else
-						incrementGreatEngineersCreated();
-#endif
+					}
+					else
+					{
+						incrementGreatPeopleCreated(bIsFree);
 					}
 				} else
 #endif
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 				incrementGreatPeopleCreated(bIsFree);
-#else
-				incrementGreatPeopleCreated();
-#endif
 			}
 
 			if (pNewGreatPeople->IsGreatAdmiral())
@@ -16629,12 +16482,7 @@ void CvPlayer::DoGreatPeopleSpawnTurn()
 			}
 
 			if(eBestMinor != NO_PLAYER)
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-				DoSpawnGreatPerson(eBestMinor, MOD_GLOBAL_TRULY_FREE_GP);
-#else
 				DoSpawnGreatPerson(eBestMinor);
-#endif
-
 			// Reseed counter
 			DoSeedGreatPeopleSpawnCounter();
 		}
@@ -19301,20 +19149,12 @@ void CvPlayer::setCombatExperience(int iExperience)
 										if(pFromUnit)
 										{
 											CUSTOMLOG("Create Great General at (%d, %d) from unit %s", pFromUnit->plot()->getX(), pFromUnit->plot()->getY(), pFromUnit->getName().GetCString());
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 											createGreatGeneral(eUnit, pFromUnit->plot()->getX(), pFromUnit->plot()->getY(), false);
-#else
-											createGreatGeneral(eUnit, pFromUnit->plot()->getX(), pFromUnit->plot()->getY());
-#endif
 										}
 										else
 										{
 #endif
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 											pBestCity->createGreatGeneral(eUnit, false);
-#else
-											pBestCity->createGreatGeneral(eUnit);
-#endif
 #if defined(MOD_GLOBAL_LOCAL_GENERALS)
 										}
 #endif
@@ -19521,11 +19361,7 @@ void CvPlayer::setNavalCombatExperience(int iExperience)
 										if(pFromUnit)
 										{
 											CUSTOMLOG("Create Great Admiral at (%d, %d) from unit %s", pFromUnit->plot()->getX(), pFromUnit->plot()->getY(), pFromUnit->getName().GetCString());
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 											createGreatAdmiral(eUnit, pFromUnit->plot()->getX(), pFromUnit->plot()->getY(), false);
-#else
-											createGreatAdmiral(eUnit, pFromUnit->plot()->getX(), pFromUnit->plot()->getY());
-#endif
 
 #if defined(MOD_PROMOTIONS_FLAGSHIP)
 											if (MOD_PROMOTIONS_FLAGSHIP) {
@@ -19536,11 +19372,7 @@ void CvPlayer::setNavalCombatExperience(int iExperience)
 										else
 										{
 #endif
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 											pBestCity->createGreatAdmiral(eUnit, false);
-#else
-											pBestCity->createGreatAdmiral(eUnit);
-#endif
 #if defined(MOD_GLOBAL_LOCAL_GENERALS)
 										}
 #endif
@@ -21052,8 +20884,9 @@ int CvPlayer::GetScienceTimes100() const
 
 	int iValue = 0;
 
+	int iScienceFromCitiesTimes100 = GetScienceFromCitiesTimes100(false);
 	// Science from our Cities
-	iValue += GetScienceFromCitiesTimes100(false);
+	iValue += iScienceFromCitiesTimes100;
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 	// Science from religion
@@ -21069,10 +20902,10 @@ int CvPlayer::GetScienceTimes100() const
 	iValue += GetScienceFromOtherPlayersTimes100();
 
 	// Happiness converted to Science? (Policies, etc.)
-	iValue += GetScienceFromHappinessTimes100();
+	iValue += GetScienceFromHappinessTimes100(iScienceFromCitiesTimes100);
 
 	// Research Agreement bonuses
-	iValue += GetScienceFromResearchAgreementsTimes100();
+	iValue += GetScienceFromResearchAgreementsTimes100(iScienceFromCitiesTimes100);
 
 	// If we have a negative Treasury + GPT then it gets removed from Science
 	iValue += GetScienceFromBudgetDeficitTimes100();
@@ -21125,24 +20958,17 @@ int CvPlayer::GetScienceFromOtherPlayersTimes100() const
 
 //	--------------------------------------------------------------------------------
 /// Where is our Science coming from?
-int CvPlayer::GetScienceFromHappinessTimes100() const
+int CvPlayer::GetScienceFromHappinessTimes100(int iScienceFromCities) const
 {
-	if(GC.getGame().isOption(GAMEOPTION_NO_HAPPINESS))
-	{
-		return 0;
-	}
+	if(GC.getGame().isOption(GAMEOPTION_NO_HAPPINESS)) return 0;
 
 	int iScience = 0;
-
-	if(getHappinessToScience() != 0)
+	if(getHappinessToScience() != 0 && GetExcessHappiness() >= 0)
 	{
-		if(GetExcessHappiness() >= 0)
-		{
-			int iFreeScience = GetScienceFromCitiesTimes100(false) * getHappinessToScience();
-			iFreeScience /= 100;
+		int iFreeScience = iScienceFromCities * getHappinessToScience();
+		iFreeScience /= 100;
 
-			iScience += iFreeScience;
-		}
+		iScience += iFreeScience;
 	}
 
 	return iScience;
@@ -21150,10 +20976,11 @@ int CvPlayer::GetScienceFromHappinessTimes100() const
 
 //	--------------------------------------------------------------------------------
 /// Where is our Science coming from?
-int CvPlayer::GetScienceFromResearchAgreementsTimes100() const
+int CvPlayer::GetScienceFromResearchAgreementsTimes100(int iScienceFromCities) const
 {
-	int iScience = GetScienceFromCitiesTimes100(false);
+	if (GC.getRESEARCH_AGREEMENT_MOD() == 0) return 0;
 
+	int iScience = iScienceFromCities;
 	int iResearchAgreementBonus = /*0*/ GC.getRESEARCH_AGREEMENT_MOD() * GET_TEAM(getTeam()).GetTotalNumResearchAgreements(); // RAs currently do not have this effect
 	iScience *= iResearchAgreementBonus;	// Apply to the % to the current value
 	iScience /= 100;
@@ -27001,9 +26828,6 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 			if(getCapitalCity() != NULL)
 			{
-				int iX = getCapitalCity()->getX();
-				int iY = getCapitalCity()->getY();
-
 				int iNumFreeUnitClass = pPolicy->GetNumFreeUnitsByClass();
 				if(iNumFreeUnitClass > 0)
 				{
@@ -27019,154 +26843,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 							{
 								const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);
 								CvUnitEntry* pUnitEntry = GC.getUnitInfo(eUnit);
-								if(GC.getGame().isOption(GAMEOPTION_ONE_CITY_CHALLENGE) && isHuman() && pUnitEntry != NULL && pUnitEntry->IsFound())
-								{
-									continue;
-								}
-
-								for(int iUnitLoop = 0; iUnitLoop < iNumFreeUnits; iUnitLoop++)
-								{
-									CvUnit* pNewUnit = NULL;
-
-									// slewis
-									// for venice
-									if (pUnitEntry->IsFound() && GetPlayerTraits()->IsNoAnnexing())
-									{
-										// drop a merchant of venice instead
-										// find the eUnit replacement that's the merchant of venice
-										for(int iVeniceSearch = 0; iVeniceSearch < GC.getNumUnitClassInfos(); iVeniceSearch++)
-										{
-											const UnitClassTypes eVeniceUnitClass = static_cast<UnitClassTypes>(iVeniceSearch);
-											CvUnitClassInfo* pkVeniceUnitClassInfo = GC.getUnitClassInfo(eVeniceUnitClass);
-											if(pkVeniceUnitClassInfo)
-											{
-												const UnitTypes eMerchantOfVeniceUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eVeniceUnitClass);
-												if (eMerchantOfVeniceUnit != NO_UNIT)
-												{
-													CvUnitEntry* pVeniceUnitEntry = GC.getUnitInfo(eMerchantOfVeniceUnit);
-													if (pVeniceUnitEntry->IsCanBuyCityState())
-													{
-														pNewUnit = initUnit(eMerchantOfVeniceUnit, iX, iY);				
-														break;
-													}
-												}
-											}
-										}
-									}
-									else
-									{
-										pNewUnit = initUnit(eUnit, iX, iY);
-									}
-
-									CvAssert(pNewUnit);
-
-									if (pNewUnit)
-									{
-										if(pNewUnit->IsGreatGeneral())
-										{
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-											incrementGreatGeneralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-											incrementGreatGeneralsCreated();
-	#endif
-											pNewUnit->jumpToNearestValidPlot();
-										}
-										else if(pNewUnit->IsGreatAdmiral())
-										{
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-											incrementGreatAdmiralsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-											incrementGreatAdmiralsCreated();
-	#endif
-											CvPlot *pSpawnPlot = GetGreatAdmiralSpawnPlot(pNewUnit);
-											if (pNewUnit->plot() != pSpawnPlot)
-											{
-												pNewUnit->setXY(pSpawnPlot->getX(), pSpawnPlot->getY());
-											}
-										}
-										else if(pNewUnit->getUnitInfo().IsFoundReligion())
-										{
-											ReligionTypes eReligion = GetReligions()->GetReligionCreatedByPlayer();
-											int iReligionSpreads = pNewUnit->getUnitInfo().GetReligionSpreads();
-											int iReligiousStrength = pNewUnit->getUnitInfo().GetReligiousStrength();
-											if(iReligionSpreads > 0 && eReligion > RELIGION_PANTHEON)
-											{
-												pNewUnit->GetReligionData()->SetSpreadsLeft(iReligionSpreads);
-												pNewUnit->GetReligionData()->SetReligiousStrength(iReligiousStrength);
-												pNewUnit->GetReligionData()->SetReligion(eReligion);
-											}
-										}
-										else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_WRITER"))
-										{
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-											incrementGreatWritersCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-											incrementGreatWritersCreated();
-	#endif
-
-											if (pNewUnit->getUnitInfo().GetOneShotTourism() > 0)
-											{
-												pNewUnit->SetTourismBlastStrength(GetCulture()->GetTourismBlastStrength(pNewUnit->getUnitInfo().GetOneShotTourism()));
-											}
-
-											pNewUnit->jumpToNearestValidPlot();
-										}							
-										else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_ARTIST"))
-										{
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-											incrementGreatArtistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-											incrementGreatArtistsCreated();
-	#endif
-											pNewUnit->jumpToNearestValidPlot();
-										}							
-										else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MUSICIAN"))
-										{
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-											incrementGreatMusiciansCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-											incrementGreatMusiciansCreated();
-	#endif
-											pNewUnit->jumpToNearestValidPlot();
-										}
-										else if(pNewUnit->IsGreatPerson())
-										{
-	#if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
-											if (MOD_GLOBAL_SEPARATE_GP_COUNTERS) {
-												if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_MERCHANT")) {
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-													incrementGreatMerchantsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-													incrementGreatMerchantsCreated();
-	#endif
-												} else if (pNewUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST")) {
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-													incrementGreatScientistsCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-													incrementGreatScientistsCreated();
-	#endif
-												} else {
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-													incrementGreatEngineersCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-													incrementGreatEngineersCreated();
-	#endif
-												}
-											} else
-	#endif
-	#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-											incrementGreatPeopleCreated(MOD_GLOBAL_TRULY_FREE_GP);
-	#else
-											incrementGreatPeopleCreated();
-	#endif
-											pNewUnit->jumpToNearestValidPlot();
-										}
-										else
-										{
-											pNewUnit->jumpToNearestValidPlot();
-										}
-									}
-								}
+								getCapitalCity()->initFreeUnit(*this, eUnit, iNumFreeUnits, false);
 							}
 						}
 					}
@@ -27612,7 +27289,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iNumUnitGoldenAges;
 	kStream >> m_iStrikeTurns;
 	kStream >> m_iGoldenAgeModifier;
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+
 	MOD_SERIALIZE_READ(61, kStream, m_iFreeGreatPeopleCreated, 0);
 	MOD_SERIALIZE_READ(61, kStream, m_iFreeGreatGeneralsCreated, 0);
 	MOD_SERIALIZE_READ(61, kStream, m_iFreeGreatAdmiralsCreated, 0);
@@ -27624,7 +27301,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	MOD_SERIALIZE_READ(61, kStream, m_iFreeGreatWritersCreated, 0);
 	MOD_SERIALIZE_READ(61, kStream, m_iFreeGreatArtistsCreated, 0);
 	MOD_SERIALIZE_READ(61, kStream, m_iFreeGreatMusiciansCreated, 0);
-#endif
+
 	kStream >> m_iGreatPeopleCreated;
 	kStream >> m_iGreatGeneralsCreated;
 	kStream >> m_iGreatAdmiralsCreated;
@@ -28355,7 +28032,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iNumUnitGoldenAges;
 	kStream << m_iStrikeTurns;
 	kStream << m_iGoldenAgeModifier;
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
+
 	MOD_SERIALIZE_WRITE(kStream, m_iFreeGreatPeopleCreated);
 	MOD_SERIALIZE_WRITE(kStream, m_iFreeGreatGeneralsCreated);
 	MOD_SERIALIZE_WRITE(kStream, m_iFreeGreatAdmiralsCreated);
@@ -28367,7 +28044,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	MOD_SERIALIZE_WRITE(kStream, m_iFreeGreatWritersCreated);
 	MOD_SERIALIZE_WRITE(kStream, m_iFreeGreatArtistsCreated);
 	MOD_SERIALIZE_WRITE(kStream, m_iFreeGreatMusiciansCreated);
-#endif
+
 	kStream << m_iGreatPeopleCreated;
 	kStream << m_iGreatGeneralsCreated;
 	kStream << m_iGreatAdmiralsCreated;
@@ -28903,11 +28580,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 }
 
 //	--------------------------------------------------------------------------------
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 void CvPlayer::createGreatGeneral(UnitTypes eGreatPersonUnit, int iX, int iY, bool bIsFree)
-#else
-void CvPlayer::createGreatGeneral(UnitTypes eGreatPersonUnit, int iX, int iY)
-#endif
 {
 	CvUnit* pGreatPeopleUnit = initUnit(eGreatPersonUnit, iX, iY);
 	if(NULL == pGreatPeopleUnit)
@@ -28925,35 +28598,15 @@ void CvPlayer::createGreatGeneral(UnitTypes eGreatPersonUnit, int iX, int iY)
 
 	ChangeNumGreatPeople(1);
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 	incrementGreatGeneralsCreated(bIsFree);
-#else
-	incrementGreatGeneralsCreated();
-#endif
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 	changeGreatGeneralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE() * ((getGreatGeneralsCreated(bIsFree) / 10) + 1));
-#else
-	changeGreatGeneralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE() * ((getGreatGeneralsCreated() / 10) + 1));
-#endif
 
 	for(int iI = 0; iI < MAX_PLAYERS; iI++)
 	{
 		if(GET_PLAYER((PlayerTypes)iI).getTeam() == getTeam())
 		{
-#if defined(MOD_BUGFIX_MINOR)
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 			GET_PLAYER((PlayerTypes)iI).changeGreatGeneralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE_TEAM() * ((getGreatGeneralsCreated(bIsFree) / 10) + 1));
-#else
-			GET_PLAYER((PlayerTypes)iI).changeGreatGeneralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE_TEAM() * ((getGreatGeneralsCreated() / 10) + 1));
-#endif
-#else
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-			GET_PLAYER((PlayerTypes)iI).changeGreatGeneralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE_TEAM() * ((getGreatPeopleCreated(bIsFree) / 10) + 1));
-#else
-			GET_PLAYER((PlayerTypes)iI).changeGreatGeneralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE_TEAM() * ((getGreatPeopleCreated() / 10) + 1));
-#endif
-#endif
 		}
 	}
 
@@ -28994,11 +28647,7 @@ void CvPlayer::createGreatGeneral(UnitTypes eGreatPersonUnit, int iX, int iY)
 }
 
 //	--------------------------------------------------------------------------------
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 void CvPlayer::createGreatAdmiral(UnitTypes eGreatPersonUnit, int iX, int iY, bool bIsFree)
-#else
-void CvPlayer::createGreatAdmiral(UnitTypes eGreatPersonUnit, int iX, int iY)
-#endif
 {
 	CvUnit* pGreatPeopleUnit = initUnit(eGreatPersonUnit, iX, iY);
 	if(NULL == pGreatPeopleUnit)
@@ -29016,34 +28665,14 @@ void CvPlayer::createGreatAdmiral(UnitTypes eGreatPersonUnit, int iX, int iY)
 	}
 #endif
 
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 	incrementGreatAdmiralsCreated(bIsFree);
-#else
-	incrementGreatAdmiralsCreated();
-#endif
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 	changeGreatAdmiralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE() * ((getGreatAdmiralsCreated(bIsFree) / 10) + 1));
-#else
-	changeGreatAdmiralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE() * ((getGreatAdmiralsCreated() / 10) + 1));
-#endif
 
 	for(int iI = 0; iI < MAX_PLAYERS; iI++)
 	{
 		if(GET_PLAYER((PlayerTypes)iI).getTeam() == getTeam())
 		{
-#if defined(MOD_BUGFIX_MINOR)
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
 			GET_PLAYER((PlayerTypes)iI).changeGreatAdmiralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE_TEAM() * ((getGreatAdmiralsCreated(bIsFree) / 10) + 1));
-#else
-			GET_PLAYER((PlayerTypes)iI).changeGreatAdmiralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE_TEAM() * ((getGreatAdmiralsCreated() / 10) + 1));
-#endif
-#else
-#if defined(MOD_GLOBAL_TRULY_FREE_GP)
-			GET_PLAYER((PlayerTypes)iI).changeGreatAdmiralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE_TEAM() * ((getGreatPeopleCreated(bIsFree) / 10) + 1));
-#else
-			GET_PLAYER((PlayerTypes)iI).changeGreatAdmiralsThresholdModifier(/*50*/ GC.getGREAT_GENERALS_THRESHOLD_INCREASE_TEAM() * ((getGreatPeopleCreated() / 10) + 1));
-#endif
-#endif
 		}
 	}
 
