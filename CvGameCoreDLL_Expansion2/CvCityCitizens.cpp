@@ -2509,13 +2509,13 @@ void CvCityCitizens::DoAddSpecialistToBuilding(BuildingTypes eBuilding, bool bFo
 		}
 
 		GetCity()->processSpecialist(eSpecialist, 1);
-		GetCity()->UpdateReligion(GetCity()->GetCityReligions()->GetReligiousMajority());
 
 		ChangeNumUnassignedCitizens(-1);
 
 		//we added the first specialist, this may have religious effects
 		if (GetTotalSpecialistCount() == 1)
 		{
+			GetCity()->UpdateReligiousYieldFromSpecialist(true);
 			GetCity()->UpdateAllNonPlotYields();
 		}
 
@@ -2562,7 +2562,9 @@ void CvCityCitizens::DoRemoveSpecialistFromBuilding(BuildingTypes eBuilding, boo
 		}
 
 		GetCity()->processSpecialist(eSpecialist, -1);
-		GetCity()->UpdateReligion(GetCity()->GetCityReligions()->GetReligiousMajority());
+
+		if (GetTotalSpecialistCount() == 0)
+			GetCity()->UpdateReligiousYieldFromSpecialist(false);
 
 		// Do we kill this population or reassign him?
 		if(bEliminatePopulation)
@@ -2632,6 +2634,10 @@ void CvCityCitizens::DoRemoveAllSpecialistsFromBuilding(BuildingTypes eBuilding,
 		auto_ptr<ICvCity1> pCity = GC.WrapCityPointer(GetCity());
 		GC.GetEngineUserInterface()->SetSpecificCityInfoDirty(pCity.get(), CITY_UPDATE_TYPE_SPECIALISTS);
 	}
+
+	//we removed the last specialist, this may have religious effects
+	if (iNumSpecialists>0 && GetTotalSpecialistCount() == 0)
+		GetCity()->UpdateReligiousYieldFromSpecialist(false);
 }
 
 

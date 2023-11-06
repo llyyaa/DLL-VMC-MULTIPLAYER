@@ -362,6 +362,7 @@ public:
 	void initFreeUnit(CvPlayer& owningPlayer, UnitTypes eUnit, int iCount, bool bToCivType);
 
 	void UpdateReligion(ReligionTypes eNewMajority);
+	void UpdateReligiousYieldFromSpecialist(bool bFirstOneAdded);
 
 	int GetCultureFromSpecialist(SpecialistTypes eSpecialist) const;
 

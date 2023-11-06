@@ -8135,6 +8135,32 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 }
 
 //	--------------------------------------------------------------------------------
+//very reduced version of UpdateReligion() which assumes only the number of specialists changed
+void CvCity::UpdateReligiousYieldFromSpecialist(bool bFirstOneAdded)
+{
+	const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(GetCityReligions()->GetReligiousMajority(), getOwner());
+	if (pReligion)
+	{
+		for (int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
+		{
+			int iChange = pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield);
+			iChange *= bFirstOneAdded ? 1 : -1;
+			switch(iYield)
+			{
+			case YIELD_CULTURE:
+				ChangeJONSCulturePerTurnFromReligion(iChange);
+				break;
+			case YIELD_FAITH:
+				ChangeFaithPerTurnFromReligion(iChange);
+				break;
+			default:
+				ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iChange);
+				break;
+			}
+		}
+	}
+}
+//	--------------------------------------------------------------------------------
 /// Culture from eSpecialist
 int CvCity::GetCultureFromSpecialist(SpecialistTypes eSpecialist) const
 {
