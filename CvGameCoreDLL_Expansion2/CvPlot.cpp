@@ -9497,11 +9497,7 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 		iYield = std::max(iYield, kYield.getMinCity());
 
 		// Mod for Player; used for Policies and such
-#if defined(MOD_BUGFIX_MINOR)
 		int iTemp = GET_PLAYER(getOwner()).GetCityYieldChangeTimes100(eYield);	// In hundreds - will be added to capitalYieldChange below
-#else
-		int iTemp = GET_PLAYER(getOwner()).GetCityYieldChange(eYield);	// In hundreds - will be added to capitalYieldChange below
-#endif
 #if defined(MOD_API_UNIFIED_YIELDS)
 		iYield += GET_PLAYER(getOwner()).GetPlayerTraits()->GetCityYieldChanges(eYield);
 #endif
@@ -12446,11 +12442,7 @@ int CvPlot::getYieldWithBuild(BuildTypes eBuild, YieldTypes eYield, bool bWithUp
 		iYield = std::max(iYield, kYield.getMinCity());
 
 		// Mod for Player; used for Policies and such
-#if defined(MOD_BUGFIX_MINOR)
 		int iTemp = GET_PLAYER(getOwner()).GetCityYieldChangeTimes100(eYield);	// In hundreds - will be added to capitalYieldChange below
-#else
-		int iTemp = GET_PLAYER(getOwner()).GetCityYieldChange(eYield);	// In hundreds - will be added to capitalYieldChange below
-#endif
 #if defined(MOD_API_UNIFIED_YIELDS)
 		iTemp += GET_PLAYER(getOwner()).GetPlayerTraits()->GetCityYieldChanges(eYield);
 #endif

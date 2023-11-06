@@ -352,24 +352,14 @@ public:
 
 	int specialistYield(SpecialistTypes eSpecialist, YieldTypes eYield) const;
 
-#if defined(MOD_BUGFIX_MINOR)
 	int GetCityYieldChangeTimes100(YieldTypes eYield) const;
 	void ChangeCityYieldChangeTimes100(YieldTypes eYield, int iChange);
-#else
-	int GetCityYieldChange(YieldTypes eYield) const;
-	void ChangeCityYieldChange(YieldTypes eYield, int iChange);
-#endif
 
 	int GetCoastalCityYieldChange(YieldTypes eYield) const;
 	void ChangeCoastalCityYieldChange(YieldTypes eYield, int iChange);
 
-#if defined(MOD_BUGFIX_MINOR)
 	int GetCapitalYieldChangeTimes100(YieldTypes eYield) const;
 	void ChangeCapitalYieldChangeTimes100(YieldTypes eYield, int iChange);
-#else
-	int GetCapitalYieldChange(YieldTypes eYield) const;
-	void ChangeCapitalYieldChange(YieldTypes eYield, int iChange);
-#endif
 
 	int GetCapitalYieldPerPopChange(YieldTypes eYield) const;
 	void ChangeCapitalYieldPerPopChange(YieldTypes eYield, int iChange);
@@ -504,6 +494,7 @@ public:
 	int GetCachedTotalFaithPerTurn() const;
 	void SetCachedTotalFaithPerTurn(int iValue);
 
+	void DoUpdateAllCityYields();
 
 	// Happiness
 

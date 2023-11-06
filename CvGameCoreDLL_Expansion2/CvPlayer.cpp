@@ -748,11 +748,8 @@ void CvPlayer::init(PlayerTypes eID)
 
 		for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
 		{
-#if defined(MOD_BUGFIX_MINOR)
 			ChangeCityYieldChangeTimes100((YieldTypes)iJ, 100 * GetPlayerTraits()->GetFreeCityYield((YieldTypes)iJ));
-#else
-			ChangeCityYieldChange((YieldTypes)iJ, 100 * GetPlayerTraits()->GetFreeCityYield((YieldTypes)iJ));
-#endif
+
 			changeYieldRateModifier((YieldTypes)iJ, GetPlayerTraits()->GetYieldRateModifier((YieldTypes)iJ));
 #ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
 			changeGoldenAgeYieldRateModifier((YieldTypes)iJ, GetPlayerTraits()->GetGoldenAgeYieldRateModifier((YieldTypes)iJ));
@@ -10838,11 +10835,7 @@ int CvPlayer::specialistYield(SpecialistTypes eSpecialist, YieldTypes eYield) co
 
 //	--------------------------------------------------------------------------------
 /// How much additional Yield does every City produce?
-#if defined(MOD_BUGFIX_MINOR)
 int CvPlayer::GetCityYieldChangeTimes100(YieldTypes eYield) const
-#else
-int CvPlayer::GetCityYieldChange(YieldTypes eYield) const
-#endif
 {
 	CvAssertMsg(eYield >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
@@ -10851,11 +10844,7 @@ int CvPlayer::GetCityYieldChange(YieldTypes eYield) const
 
 //	--------------------------------------------------------------------------------
 /// Changes how much additional Yield every City produces
-#if defined(MOD_BUGFIX_MINOR)
 void CvPlayer::ChangeCityYieldChangeTimes100(YieldTypes eYield, int iChange)
-#else
-void CvPlayer::ChangeCityYieldChange(YieldTypes eYield, int iChange)
-#endif
 {
 	CvAssertMsg(eYield >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
@@ -10863,7 +10852,6 @@ void CvPlayer::ChangeCityYieldChange(YieldTypes eYield, int iChange)
 	if(iChange != 0)
 	{
 		m_aiCityYieldChange.setAt(eYield, m_aiCityYieldChange[eYield] + iChange);
-
 		updateYield();
 	}
 }
@@ -10894,11 +10882,7 @@ void CvPlayer::ChangeCoastalCityYieldChange(YieldTypes eYield, int iChange)
 
 //	--------------------------------------------------------------------------------
 /// How much additional Yield does the Capital produce?
-#if defined(MOD_BUGFIX_MINOR)
 int CvPlayer::GetCapitalYieldChangeTimes100(YieldTypes eYield) const
-#else
-int CvPlayer::GetCapitalYieldChange(YieldTypes eYield) const
-#endif
 {
 	CvAssertMsg(eYield >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
@@ -10907,11 +10891,7 @@ int CvPlayer::GetCapitalYieldChange(YieldTypes eYield) const
 
 //	--------------------------------------------------------------------------------
 /// Changes how much additional Yield the Capital produces
-#if defined(MOD_BUGFIX_MINOR)
 void CvPlayer::ChangeCapitalYieldChangeTimes100(YieldTypes eYield, int iChange)
-#else
-void CvPlayer::ChangeCapitalYieldChange(YieldTypes eYield, int iChange)
-#endif
 {
 	CvAssertMsg(eYield >= 0, "eIndex is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
@@ -12332,6 +12312,22 @@ int CvPlayer::GetCachedTotalFaithPerTurn() const
 void CvPlayer::SetCachedTotalFaithPerTurn(int iValue)
 {
 	m_iCachedTotalFaithPerTurn = iValue;
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::DoUpdateAllCityYields()
+{
+	int iLoop = 0, iJ = 0;
+	CvCity* pLoopCity = NULL;
+	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	{
+		//There is no need to update all
+		pLoopCity->UpdateCityYields(YIELD_GOLD);
+		pLoopCity->UpdateCityYields(YIELD_SCIENCE);
+		pLoopCity->UpdateCityYields(YIELD_CULTURE);
+		pLoopCity->UpdateCityYields(YIELD_FAITH);
+	}
+
 }
 
 //	--------------------------------------------------------------------------------
@@ -14737,27 +14733,7 @@ void CvPlayer::DoChangeGreatGeneralRate()
 		}
 	}
 	//Check for policies that add Great General points.
-	for (int iPolicyLoop = 0; iPolicyLoop < GC.getNumPolicyInfos(); iPolicyLoop++)
-	{
-		PolicyTypes pPolicy = (PolicyTypes)iPolicyLoop;
-		CvPolicyEntry* pkPolicyInfo = GC.getPolicyInfo(pPolicy);
-		if (pkPolicyInfo)
-		{
-			if (GetPlayerPolicies()->HasPolicy(pPolicy) && !GetPlayerPolicies()->IsPolicyBlocked(pPolicy))
-			{
-				if (pkPolicyInfo->GetCityYieldChange(YIELD_GREAT_GENERAL_POINTS) > 0)
-				{
-					for (CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
-					{
-						if (pLoopCity != NULL)
-						{
-							iGreatGeneralPoints += pkPolicyInfo->GetCityYieldChange(YIELD_GREAT_GENERAL_POINTS);
-						}
-					}
-				}
-			}
-		}
-	}
+	iGreatGeneralPoints += GetCityYieldChangeTimes100(YIELD_GREAT_GENERAL_POINTS) * getNumCities() / 100;			
 
 	changeCombatExperienceTimes100(iGreatGeneralPoints * 100);
 }
@@ -14803,27 +14779,7 @@ void CvPlayer::DoChangeGreatAdmiralRate()
 		}
 	}
 	//Check for policies that add Great Admiral points.
-	for (int iPolicyLoop = 0; iPolicyLoop < GC.getNumPolicyInfos(); iPolicyLoop++)
-	{
-		PolicyTypes pPolicy = (PolicyTypes)iPolicyLoop;
-		CvPolicyEntry* pkPolicyInfo = GC.getPolicyInfo(pPolicy);
-		if (pkPolicyInfo)
-		{
-			if (GetPlayerPolicies()->HasPolicy(pPolicy) && !GetPlayerPolicies()->IsPolicyBlocked(pPolicy))
-			{
-				if (pkPolicyInfo->GetCityYieldChange(YIELD_GREAT_ADMIRAL_POINTS) > 0)
-				{
-					for (CvCity* pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
-					{
-						if (pLoopCity != NULL)
-						{
-							iGreatAdmiralPoints += pkPolicyInfo->GetCityYieldChange(YIELD_GREAT_ADMIRAL_POINTS);
-						}
-					}
-				}
-			}
-		}
-	}
+	iGreatAdmiralPoints += GetCityYieldChangeTimes100(YIELD_GREAT_ADMIRAL_POINTS) * getNumCities() / 100;
 
 	changeNavalCombatExperienceTimes100(iGreatAdmiralPoints * 100);
 }
@@ -26194,12 +26150,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 		iMod = pPolicy->GetCityYieldChange(iI) * iChange;
 		if(iMod != 0)
-#if defined(MOD_BUGFIX_MINOR)
 			ChangeCityYieldChangeTimes100(eYield, iMod * 100);
-#else
-			ChangeCityYieldChange(eYield, iMod * 100);
-#endif
-
 
 		iMod = pPolicy->GetCoastalCityYieldChange(iI) * iChange;
 		if(iMod != 0)
@@ -26207,11 +26158,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 		iMod = pPolicy->GetCapitalYieldChange(iI) * iChange;
 		if(iMod != 0)
-#if defined(MOD_BUGFIX_MINOR)
 			ChangeCapitalYieldChangeTimes100(eYield, iMod * 100);
-#else
-			ChangeCapitalYieldChange(eYield, iMod * 100);
-#endif
 
 		iMod = pPolicy->GetCapitalYieldPerPopChange(iI) * iChange;
 		if(iMod != 0)
@@ -26923,6 +26870,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	recomputeGreatPeopleModifiers();
 	recomputePolicyCostModifier();
 	recomputeFreeExperience();
+	DoUpdateAllCityYields();
 
 	doUpdateBarbarianCampVisibility();
 

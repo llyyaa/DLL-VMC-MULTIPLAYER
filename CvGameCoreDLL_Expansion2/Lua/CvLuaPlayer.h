@@ -713,6 +713,8 @@ protected:
 
 	// END Science
 
+	static int lGetAllTradeValue(lua_State* L);
+
 	static int lGetProximityToPlayer(lua_State* L);
 	static int lDoUpdateProximityToPlayer(lua_State* L);
 
