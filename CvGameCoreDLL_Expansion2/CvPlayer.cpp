@@ -181,6 +181,7 @@ CvPlayer::CvPlayer() :
 	, m_iFaith(0)
 	, m_iFaithEverGenerated(0)
 	, m_iHappiness("CvPlayer::m_iHappiness", m_syncArchive)
+	, m_iUnhappiness("CvPlayer::m_iUnhappiness", m_syncArchive)
 	, m_iUprisingCounter("CvPlayer::m_iUprisingCounter", m_syncArchive)
 	, m_iExtraHappinessPerLuxury("CvPlayer::m_iExtraHappinessPerLuxury", m_syncArchive)
 	, m_iUnhappinessFromUnits("CvPlayer::m_iUnhappinessFromUnits", m_syncArchive)
@@ -947,6 +948,7 @@ void CvPlayer::uninit()
 	m_iFaith = 0;
 	m_iFaithEverGenerated = 0;
 	m_iHappiness = 0;
+	m_iUnhappiness = 0;
 	m_iUprisingCounter = 0;
 	m_iExtraHappinessPerLuxury = 0;
 	m_iUnhappinessFromUnits = 0;
@@ -12334,6 +12336,49 @@ void CvPlayer::DoUpdateAllCityYields()
 /// Updates how much Happiness we have
 void CvPlayer::DoUpdateHappiness()
 {
+	if (isObserver() || isBarbarian()) return;
+
+	DoUpdateTotalHappiness();
+	DoUpdateTotalUnhappiness();
+
+	int iHappiness = GetHappiness();
+	int iUnhappiness = GetUnhappiness();
+
+	int iDiff = iHappiness - iUnhappiness;
+	if (iDiff != GetCachedExcessHappiness())
+	{
+		SetCachedExcessHappiness(iDiff);
+		GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
+	}
+
+#if !defined(NO_ACHIEVEMENTS)
+	if(isLocalPlayer() && GetExcessHappiness() >= 100)
+	{
+		gDLL->UnlockAchievement(ACHIEVEMENT_XP2_45);
+	}
+#endif
+}
+
+//	--------------------------------------------------------------------------------
+/// How much Happiness we have
+int CvPlayer::GetHappiness() const
+{
+	return m_iHappiness;
+}
+
+//	--------------------------------------------------------------------------------
+/// Sets how much Happiness we have
+void CvPlayer::SetHappiness(int iNewValue)
+{
+	if(GetHappiness() != iNewValue)
+	{
+		m_iHappiness = iNewValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::DoUpdateTotalHappiness()
+{
 	// Start level
 	m_iHappiness = getHandicapInfo().getHappinessDefault();
 
@@ -12369,42 +12414,19 @@ void CvPlayer::DoUpdateHappiness()
 	DoUpdateCityConnectionHappiness();
 	m_iHappiness += GetHappinessFromTradeRoutes();
 
-#if !defined(NO_ACHIEVEMENTS)
-	if(isLocalPlayer() && GetExcessHappiness() >= 100)
-	{
-		gDLL->UnlockAchievement(ACHIEVEMENT_XP2_45);
-	}
-#endif
-
+	// Increase from Faith
 	m_iHappiness += GetHappinessFromFaith();
 
 	GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
 }
-
-//	--------------------------------------------------------------------------------
-/// How much Happiness we have
-int CvPlayer::GetHappiness() const
-{
-	return m_iHappiness;
-}
-
-//	--------------------------------------------------------------------------------
-/// Sets how much Happiness we have
-void CvPlayer::SetHappiness(int iNewValue)
-{
-	if(GetHappiness() != iNewValue)
-	{
-		m_iHappiness = iNewValue;
-	}
-}
-
 //	--------------------------------------------------------------------------------
 /// How much over our Happiness limit are we?
 int CvPlayer::GetExcessHappiness() const
 {
-	int result = GetHappiness() - GetUnhappiness();
+	/*int result = GetHappiness() - GetUnhappiness();
 	const_cast<CvPlayer*>(this)->SetCachedExcessHappiness(result);
-	return result;
+	return result;*/
+	return m_iCachedExcessHappiness;
 }
 
 int CvPlayer::GetCachedExcessHappiness() const
@@ -13352,15 +13374,29 @@ int CvPlayer::GetUnhappinessFromUnits() const
 void CvPlayer::ChangeUnhappinessFromUnits(int iChange)
 {
 	m_iUnhappinessFromUnits += iChange;
+	DoUpdateHappiness();
 }
 
 //	--------------------------------------------------------------------------------
-/// How much of our Happiness is being used up? (Population + Units)
-int CvPlayer::GetUnhappiness(CvCity* pAssumeCityAnnexed, CvCity* pAssumeCityPuppeted) const
+/// How much Unhappiness we have
+int CvPlayer::GetUnhappiness() const
 {
-	if(isObserver() || isBarbarian()) return 0;
+	return m_iUnhappiness;
+}
+//	--------------------------------------------------------------------------------
+/// Sets how much Unhappiness we have
+void CvPlayer::SetUnhappiness(int iNewValue)
+{
+	if(m_iUnhappiness != iNewValue)
+	{
+		m_iUnhappiness = iNewValue;
+	}
+}
+//	--------------------------------------------------------------------------------
+/// How much of our Happiness is being used up? (Population + Units)
+int CvPlayer::DoUpdateTotalUnhappiness(CvCity* pAssumeCityAnnexed, CvCity* pAssumeCityPuppeted)
+{
 	int iUnhappiness = 0;
-
 	// City Count Unhappiness
 	iUnhappiness += GetUnhappinessFromCityCount(pAssumeCityAnnexed, pAssumeCityPuppeted);
 
@@ -13386,7 +13422,7 @@ int CvPlayer::GetUnhappiness(CvCity* pAssumeCityAnnexed, CvCity* pAssumeCityPupp
 		iUnhappiness *= GC.getGame().getHandicapInfo().getAIUnhappinessPercent();
 		iUnhappiness /= 100;
 	}
-
+	SetUnhappiness(iUnhappiness);
 	return iUnhappiness;
 }
 
@@ -26436,7 +26472,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 				{
 					if(bCulturePerGarrisonedUnit)
 					{
-						iCityCultureChange += (pPolicy->GetCulturePerGarrisonedUnit() * iChange);
+						iCityCultureChange += (bCulturePerGarrisonedUnit * iChange);
 					}
 					if(bGarrisonFreeMaintenance)
 					{
@@ -27159,6 +27195,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iFaithEverGenerated;
 	kStream >> m_iCachedTotalFaithPerTurn;
 	kStream >> m_iHappiness;
+	kStream >> m_iUnhappiness;
 	kStream >> m_iCachedExcessHappiness;
 	kStream >> m_iUprisingCounter;
 	kStream >> m_iExtraHappinessPerLuxury;
@@ -27924,6 +27961,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iFaithEverGenerated;
 	kStream << m_iCachedTotalFaithPerTurn;
 	kStream << m_iHappiness;
+	kStream << m_iUnhappiness;
 	kStream << m_iCachedExcessHappiness;
 	kStream << m_iUprisingCounter;
 	kStream << m_iExtraHappinessPerLuxury;

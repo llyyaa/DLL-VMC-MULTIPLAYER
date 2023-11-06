@@ -20049,7 +20049,7 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 	}
 
 	// Units moving into and out of cities change garrison happiness
-	if((pNewPlot && pNewPlot->isCity()) || (pOldPlot && pOldPlot->isCity()))
+	if(kPlayer.GetHappinessPerGarrisonedUnit() != 0 && ((pNewPlot && pNewPlot->isCity()) || (pOldPlot && pOldPlot->isCity())))
 	{
 		GET_PLAYER(getOwner()).DoUpdateHappiness();
 	}

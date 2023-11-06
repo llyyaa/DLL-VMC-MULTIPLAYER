@@ -3432,7 +3432,7 @@ int CvLuaPlayer::lGetUnhappinessForecast(lua_State* L)
 	CvCity* pkAssumeCityAnnexed = CvLuaCity::GetInstance(L, 2, false);
 	CvCity* pkAssumeCityPuppeted = CvLuaCity::GetInstance(L, 3, false);
 
-	const int iUnhappiness = pkPlayer->GetUnhappiness(pkAssumeCityAnnexed, pkAssumeCityPuppeted);
+	int iUnhappiness = pkPlayer->DoUpdateTotalUnhappiness(pkAssumeCityAnnexed, pkAssumeCityPuppeted);
 	lua_pushinteger(L, iUnhappiness);
 	return 1;
 }

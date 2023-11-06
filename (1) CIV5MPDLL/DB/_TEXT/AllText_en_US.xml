@@ -2,10 +2,10 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
-<Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+		<Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
 			<Text>[NEWLINE]Need domestic ownership{1_FeatureName:textkey}。</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+        <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
 			<Text>[NEWLINE]Need to be near the city{1_FeatureName:textkey}。</Text>
 		</Row>
 		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">

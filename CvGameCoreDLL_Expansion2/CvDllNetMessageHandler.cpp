@@ -1101,7 +1101,6 @@ void CvDllNetMessageHandler::ResponseUpdatePolicies(PlayerTypes ePlayer, bool bN
 		else
 		{
 			kPlayer.setHasPolicy(ePolicy, bValue);
-			kPlayer.DoUpdateHappiness();
 		}
 	}
 	// Policy Branch Update

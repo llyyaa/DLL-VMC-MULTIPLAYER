@@ -2,10 +2,10 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
-                                 <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+        <Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
 			<Text>[NEWLINE]需要国內拥有{1_FeatureName:textkey}。</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+        <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
 			<Text>[NEWLINE]需要城市附近有{1_FeatureName:textkey}。</Text>
 		</Row>
 		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">

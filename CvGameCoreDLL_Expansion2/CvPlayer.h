@@ -502,6 +502,7 @@ public:
 	int GetHappiness() const;
 	void SetHappiness(int iNewValue);
 
+	void DoUpdateTotalHappiness();
 	int GetExcessHappiness() const;
 	int GetCachedExcessHappiness() const;
 	void SetCachedExcessHappiness(int value);
@@ -548,8 +549,9 @@ public:
 	int GetAdequateLuxuryKindCount(int threshold) const;
 	int GetStrengthModifierFromAlly() const;
 
-	int GetUnhappiness(CvCity* pAssumeCityAnnexed = NULL, CvCity* pAssumeCityPuppeted = NULL) const;
-
+	int GetUnhappiness() const;
+	void SetUnhappiness(int iNewValue);
+	int DoUpdateTotalUnhappiness(CvCity* pAssumeCityAnnexed = NULL, CvCity* pAssumeCityPuppeted = NULL);
 	int GetUnhappinessFromCityForUI(CvCity* pCity) const;
 
 	int GetUnhappinessFromCityCount(CvCity* pAssumeCityAnnexed = NULL, CvCity* pAssumeCityPuppeted = NULL) const;
@@ -2217,6 +2219,7 @@ protected:
 	int m_iFaithEverGenerated;
 	int m_iCachedTotalFaithPerTurn;
 	FAutoVariable<int, CvPlayer> m_iHappiness;
+	FAutoVariable<int, CvPlayer> m_iUnhappiness;
 	int m_iCachedExcessHappiness = 0;
 	FAutoVariable<int, CvPlayer> m_iUprisingCounter;
 	FAutoVariable<int, CvPlayer> m_iExtraHappinessPerLuxury;

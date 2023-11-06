@@ -2,13 +2,13 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
-<Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+		<Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
 			<Text>[NEWLINE]需要國內拥有{1_FeatureName:textkey}。</Text>
 		</Row>
-                <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+        <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
 			<Text>[NEWLINE]需要城市附近有{1_FeatureName:textkey}。</Text>
 		</Row>
-	<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
+		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
 			<Text>你的{@1_UnitName}沒有遇到抵抗，並且攻擊了敵人的空軍和地面防空單位！</Text>
 		</Row>
 			<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
