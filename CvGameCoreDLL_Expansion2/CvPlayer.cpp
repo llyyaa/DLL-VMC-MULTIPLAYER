@@ -22599,6 +22599,8 @@ void CvPlayer::ChangeFreePromotionCount(PromotionTypes ePromotion, int iChange)
 			int iLoop;
 			for(pLoopUnit = firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = nextUnit(&iLoop))
 			{
+				if(pLoopUnit->isHasPromotion(ePromotion)) continue;
+
 				// Valid Promotion for this Unit?
 				if(::IsPromotionValidForUnitCombatType(ePromotion, pLoopUnit->getUnitType()))
 				{

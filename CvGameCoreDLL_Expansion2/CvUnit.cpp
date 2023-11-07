@@ -818,7 +818,7 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	{
 		ePromotion = (PromotionTypes) iI;
 
-		if(kPlayer.IsFreePromotion(ePromotion))
+		if(kPlayer.IsFreePromotion(ePromotion) && !isHasPromotion(ePromotion))
 		{
 			// Valid Promotion for this Unit?
 			if(::IsPromotionValidForUnitCombatType(ePromotion, getUnitType()))
