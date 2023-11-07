@@ -22604,18 +22604,14 @@ void CvPlayer::ChangeFreePromotionCount(PromotionTypes ePromotion, int iChange)
 				{
 					pLoopUnit->setHasPromotion(ePromotion, true);
 				}
-
 				else if(::IsPromotionValidForCivilianUnitType(ePromotion, pLoopUnit->getUnitType()))
 				{
 					pLoopUnit->setHasPromotion(ePromotion, true);
 				}
-
-
 				else if (::IsPromotionValidForUnitType(ePromotion, pLoopUnit->getUnitType()))
 				{
 					pLoopUnit->setHasPromotion(ePromotion, true);
 				}
-
 #if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 				else if (::IsPromotionValidForUnitPromotions(ePromotion, *pLoopUnit))
 				{

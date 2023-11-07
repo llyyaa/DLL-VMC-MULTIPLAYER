@@ -825,17 +825,14 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 			{
 				setHasPromotion(ePromotion, true);
 			}
-
 			else if(::IsPromotionValidForCivilianUnitType(ePromotion, getUnitType()))
 			{
 				setHasPromotion(ePromotion, true);
 			}
-
 			else if (::IsPromotionValidForUnitType(ePromotion, getUnitType()))
 			{
 				setHasPromotion(ePromotion, true);
 			}
-
 #if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 			else if (::IsPromotionValidForUnitPromotions(ePromotion, *this))
 			{
@@ -1825,8 +1822,11 @@ void CvUnit::convert(CvUnit* pUnit, bool bIsUpgrade)
 				// if we get this due to a policy or wonder
 
 
-				else if (GET_PLAYER(getOwner()).IsFreePromotion(ePromotion) && (
-					::IsPromotionValidForUnitCombatType(ePromotion, getUnitType()) || ::IsPromotionValidForCivilianUnitType(ePromotion, getUnitType()) || ::IsPromotionValidForUnitType(ePromotion, getUnitType())))
+				else if (GET_PLAYER(getOwner()).IsFreePromotion(ePromotion) &&( 
+					::IsPromotionValidForUnitCombatType(ePromotion, getUnitType()) || 
+					::IsPromotionValidForCivilianUnitType(ePromotion, getUnitType()) || 
+					::IsPromotionValidForUnitType(ePromotion, getUnitType()) ||
+					::IsPromotionValidForUnitPromotions(ePromotion, *pUnit) ))
 				{
 					bGivePromotion = true;
 				}
