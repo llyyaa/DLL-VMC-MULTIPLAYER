@@ -488,7 +488,7 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/IMPROVEMENTS/Improvement_AdjacentImprovementYieldChanges.xml</FileName>
+        <FileName>DB/IMPROVEMENTS/Improvement_AdjacentYieldChanges.xml</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
@@ -1003,7 +1003,7 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="DB\IMPROVEMENTS\Improvement_AdjacentImprovementYieldChanges.xml">
+    <Content Include="DB\IMPROVEMENTS\Improvement_AdjacentYieldChanges.xml">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

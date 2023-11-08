@@ -1444,6 +1444,11 @@ public:
 	void UpdateResourceFromSpecialists();
 	bool MeetSpecialistResourceRequirement(const CvSpecialistInfo::ResourceInfo& info) const;
 #endif
+	//the following func can only get a Fuzzy value, To help AI's resource strategies
+	int getNumResourceTotalCache(ResourceTypes eIndex) const;
+	void changeNumResourceTotalCache(ResourceTypes eIndex, int iChange);
+	void setNumResourceTotalCache(ResourceTypes eIndex, int iValue);
+	void updateNumResourceTotalCache();
 
 	int getResourceInOwnedPlots(ResourceTypes eIndex);
 
@@ -2569,6 +2574,7 @@ protected:
 #ifdef MOD_SPECIALIST_RESOURCES
 	std::vector<int> m_paiResourcesFromSpecialists;
 #endif
+	std::vector<int> m_paiNumResourceTotalCache;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiImprovementCount;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiFreeBuildingCount;
 	FAutoVariable<std::vector<int>, CvPlayer> m_paiFreePromotionCount;

@@ -7581,7 +7581,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			int iTraitBuildingClassBonus = owningPlayer.GetPlayerTraits()->GetBuildingClassYieldChange(eBuildingClass, eYield);
 			if(iTraitBuildingClassBonus > 0)
 			{
-					ChangeBaseYieldRateFromBuildings(eYield, iTraitBuildingClassBonus * iChange);
+				ChangeBaseYieldRateFromBuildings(eYield, iTraitBuildingClassBonus * iChange);
 			}
 #endif
 
@@ -8942,6 +8942,7 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 
 	if(iOldPopulation != iNewValue)
 	{
+		CvPlayerAI& kPlayer = GET_PLAYER(getOwner());
 		// If we are reducing population, remove the workers first
 		if(bReassignPop)
 		{
@@ -8968,7 +8969,7 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 
 		CvAssert(getPopulation() >= 0);
 
-		GET_PLAYER(getOwner()).invalidatePopulationRankCache();
+		kPlayer.invalidatePopulationRankCache();
 
 		if(getPopulation() > getHighestPopulation())
 		{
@@ -8993,11 +8994,20 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 				}
 			}
 #endif
-
+#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
+			if (MOD_BELIEF_NEW_EFFECT_FOR_SP && !IsResistance())
+			{
+				doRelogionInstantYield(GetCityReligions()->GetReligiousMajority());
+				if(GetCityReligions()->IsSecondaryReligionActive())
+				{
+					doBeliefInstantYield(GetCityReligions()->GetSecondaryReligionPantheonBelief());
+				}
+			}
+#endif
 		}
 
 		area()->changePopulationPerPlayer(getOwner(), (getPopulation() - iOldPopulation));
-		GET_PLAYER(getOwner()).changeTotalPopulation(getPopulation() - iOldPopulation);
+		kPlayer.changeTotalPopulation(getPopulation() - iOldPopulation);
 		GET_TEAM(getTeam()).changeTotalPopulation(getPopulation() - iOldPopulation);
 		GC.getGame().changeTotalPopulation(getPopulation() - iOldPopulation);
 
@@ -9020,16 +9030,6 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 					GetCityCitizens()->DoAddBestCitizenFromUnassigned();
 				}
 			}
-#if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-			if (MOD_BELIEF_NEW_EFFECT_FOR_SP && !IsResistance())
-			{
-				doRelogionInstantYield(GetCityReligions()->GetReligiousMajority());
-				if(GetCityReligions()->IsSecondaryReligionActive())
-				{
-					doBeliefInstantYield(GetCityReligions()->GetSecondaryReligionPantheonBelief());
-				}
-			}
-#endif
 		}
 
 		setLayoutDirty(true);
@@ -9047,9 +9047,9 @@ void CvCity::setPopulation(int iNewValue, bool bReassignPop /* = true */)
 		}
 
 		// Update Unit Maintenance for the player
-		GET_PLAYER(getOwner()).UpdateUnitProductionMaintenanceMod();
+		kPlayer.UpdateUnitProductionMaintenanceMod();
 
-		GET_PLAYER(getOwner()).DoUpdateHappiness();
+		kPlayer.DoUpdateHappiness();
 
 		//updateGenericBuildings();
 		updateStrengthValue();
@@ -12438,7 +12438,6 @@ void CvCity::ChangeResourceQuantityFromPOP(ResourceTypes eResource, int iChange)
 	if (iChange != 0)
 	{
 		m_aiResourceQuantityFromPOP.setAt(eResource, m_aiResourceQuantityFromPOP[eResource] + iChange);
-		CvAssert(GetResourceQuantityFromPOP(eResource) >= 0);
 	}
 }
 

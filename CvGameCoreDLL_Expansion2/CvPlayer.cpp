@@ -826,6 +826,7 @@ void CvPlayer::uninit()
 #ifdef MOD_SPECIALIST_RESOURCES
 	m_paiResourcesFromSpecialists.clear();
 #endif
+	m_paiNumResourceTotalCache.clear();
 
 	m_pabLoyalMember.clear();
 	m_pabGetsScienceFromPlayer.clear();
@@ -1419,6 +1420,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 		m_paiResourcesFromSpecialists.clear();
 		m_paiResourcesFromSpecialists.resize(GC.getNumResourceInfos(), 0);
 #endif
+		m_paiNumResourceTotalCache.clear();
+		m_paiNumResourceTotalCache.resize(GC.getNumResourceInfos(), 0);
 
 		CvAssertMsg(0 < GC.getNumImprovementInfos(), "GC.getNumImprovementInfos() is not greater than zero but it is used to allocate memory in CvPlayer::reset");
 		m_paiImprovementCount.clear();
@@ -21962,7 +21965,7 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 		iTotalNumResource += iCityResourceFromPolicy;
 
 
-	if(GetStrategicResourceMod() != 0)
+		if(GetStrategicResourceMod() != 0)
 		{
 			iTotalNumResource *= GetStrategicResourceMod();
 			iTotalNumResource /= 100;
@@ -21983,6 +21986,8 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 		iTotalNumResource += getResourceFromSpecialists(eIndex);
 	}
 
+	if(bIncludeImport) const_cast<CvPlayer*>(this)->setNumResourceTotalCache(eIndex, iTotalNumResource);
+
 	return iTotalNumResource;
 }
 
@@ -21995,7 +22000,7 @@ void CvPlayer::changeNumResourceTotal(ResourceTypes eIndex, int iChange, bool bI
 	if(iChange != 0)
 	{
 		m_paiNumResourceTotal.setAt(eIndex, m_paiNumResourceTotal[eIndex] + iChange);
-
+		changeNumResourceTotalCache(eIndex, iChange);
 		// Minors with an Ally give their Resources to their friend (awww)
 		if(isMinorCiv())
 		{
@@ -22270,6 +22275,7 @@ void CvPlayer::changeResourceExport(ResourceTypes eIndex, int iChange)
 	if(iChange != 0)
 	{
 		m_paiResourceExport.setAt(eIndex, m_paiResourceExport[eIndex] + iChange);
+		changeNumResourceTotalCache(eIndex, -iChange);
 		CvAssert(getResourceExport(eIndex) >= 0);
 
 		DoUpdateHappiness();
@@ -22293,6 +22299,7 @@ void CvPlayer::changeResourceImport(ResourceTypes eIndex, int iChange)
 	if(iChange != 0)
 	{
 		m_paiResourceImport.setAt(eIndex, m_paiResourceImport[eIndex] + iChange);
+		changeNumResourceTotalCache(eIndex, iChange);
 		CvAssert(getResourceImport(eIndex) >= 0);
 
 		DoUpdateHappiness();
@@ -22326,6 +22333,7 @@ void CvPlayer::changeResourceFromMinors(ResourceTypes eIndex, int iChange)
 	if(iChange != 0)
 	{
 		m_paiResourceFromMinors.setAt(eIndex, m_paiResourceFromMinors[eIndex] + iChange);
+		changeNumResourceTotalCache(eIndex, iChange);
 		CvAssert(getResourceFromMinors(eIndex) >= 0);
 
 		DoUpdateHappiness();
@@ -22352,6 +22360,7 @@ void CvPlayer::changeResourceSiphoned(ResourceTypes eIndex, int iChange)
 	if (iChange != 0)
 	{
 		m_paiResourcesSiphoned.setAt(eIndex, m_paiResourcesSiphoned[eIndex] + iChange);
+		changeNumResourceTotalCache(eIndex, iChange);
 		CvAssert(getResourceSiphoned(eIndex) >= 0);
 
 		DoUpdateHappiness();
@@ -22375,6 +22384,7 @@ void CvPlayer::changeResourceFromSpecialists(ResourceTypes eIndex, int iChange)
 	if (iChange != 0)
 	{
 		m_paiResourcesFromSpecialists[eIndex] += iChange;
+		changeNumResourceTotalCache(eIndex, iChange);
 		CvAssert(getResourceFromSpecialists(eIndex) >= 0);
 
 		DoUpdateHappiness();
@@ -22422,6 +22432,37 @@ bool CvPlayer::MeetSpecialistResourceRequirement(const CvSpecialistInfo::Resourc
 
 #endif
 
+//	--------------------------------------------------------------------------------
+int CvPlayer::getNumResourceTotalCache(ResourceTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumResourceInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_paiNumResourceTotalCache[eIndex];
+}
+void CvPlayer::changeNumResourceTotalCache(ResourceTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumResourceInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_paiNumResourceTotalCache[eIndex] += iChange;
+	}
+}
+void CvPlayer::setNumResourceTotalCache(ResourceTypes eIndex, int iValue)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumResourceInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	m_paiNumResourceTotalCache[eIndex] = iValue;
+}
+void CvPlayer::updateNumResourceTotalCache()
+{
+	for(int iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
+	{
+		ResourceTypes eResource = (ResourceTypes) iResourceLoop;
+		getNumResourceTotal(eResource);
+	}
+}
 //	--------------------------------------------------------------------------------
 int CvPlayer::getResourceInOwnedPlots(ResourceTypes eIndex)
 {
@@ -27885,6 +27926,7 @@ void CvPlayer::Read(FDataStream& kStream)
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream >> m_paiResourcesFromSpecialists;
 #endif
+	kStream >> m_paiNumResourceTotalCache;
 
 	kStream >> m_iGlobalHappinessFromFaithPercent;
 	kStream >> m_iHappinessInWLTKDCities;
@@ -28516,6 +28558,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 #ifdef MOD_SPECIALIST_RESOURCES
 	kStream << m_paiResourcesFromSpecialists;
 #endif
+	kStream << m_paiNumResourceTotalCache;
 
 	kStream << m_iGlobalHappinessFromFaithPercent;
 	kStream << m_iHappinessInWLTKDCities;
