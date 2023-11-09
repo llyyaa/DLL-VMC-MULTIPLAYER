@@ -9199,7 +9199,7 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 			}
 		}
 	}
-	else
+	else if(ePlayer != NO_PLAYER)
 	{
 		CvPlayerAI& kPlayer = GET_PLAYER(ePlayer);
 		CvTeam& kTeam = GET_TEAM(kPlayer.getTeam());
@@ -9250,7 +9250,7 @@ int CvPlot::calculateImprovementYieldChange(ImprovementTypes eImprovement, Yield
 		
 		// Extra yield for improvements
 		iYield += pWorkingCity->GetImprovementExtraYield(eImprovement, eYield);
-		iYield += GET_PLAYER(ePlayer).GetImprovementExtraYield(eImprovement, eYield);
+		if(ePlayer != NO_PLAYER) iYield += GET_PLAYER(ePlayer).GetImprovementExtraYield(eImprovement, eYield);
 	}
 
 	return iYield;
