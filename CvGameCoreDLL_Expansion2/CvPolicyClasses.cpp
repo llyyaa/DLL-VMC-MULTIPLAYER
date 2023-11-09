@@ -113,6 +113,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	m_iConversionModifier(0),
 #endif
+	m_iSettlerPopConsume(0),
 	m_iGoldPerUnit(0),
 	m_iGoldPerMilitaryUnit(0),
 	m_iCityStrengthMod(0),
@@ -406,6 +407,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	m_iConversionModifier = kResults.GetInt("ConversionModifier");
 #endif
+	m_iSettlerPopConsume = kResults.GetInt("SettlerPopConsume");
 	m_iGoldPerUnit = kResults.GetInt("GoldPerUnit");
 	m_iGoldPerMilitaryUnit = kResults.GetInt("GoldPerMilitaryUnit");
 	m_iCityStrengthMod = kResults.GetInt("CityStrengthMod");
@@ -1790,6 +1792,10 @@ int CvPolicyEntry::GetConversionModifier() const
 	return m_iConversionModifier;
 }
 #endif
+int CvPolicyEntry::GetSettlerPopConsume() const
+{
+	return m_iSettlerPopConsume;
+}
 
 /// Upkeep cost
 int CvPolicyEntry::GetGoldPerUnit() const

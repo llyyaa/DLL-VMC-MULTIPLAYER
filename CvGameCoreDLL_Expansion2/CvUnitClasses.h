@@ -94,6 +94,7 @@ public:
 	int GetBoundLandImprovement() const;
 	int GetBoundWaterImprovement() const;
 #endif
+	int GetTrainPopulationConsume() const;
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool IsNoTroops() const;
@@ -277,6 +278,7 @@ private:
 	int m_iBoundLandImprovement;
 	int m_iBoundWaterImprovement;
 #endif
+	int m_iTrainPopulationConsume;
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool m_bNoTroops;

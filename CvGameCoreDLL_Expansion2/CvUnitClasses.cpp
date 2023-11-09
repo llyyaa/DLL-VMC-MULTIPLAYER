@@ -78,6 +78,7 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_iBoundLandImprovement(NO_IMPROVEMENT),
 	m_iBoundWaterImprovement(NO_IMPROVEMENT),
 #endif
+	m_iTrainPopulationConsume(0),
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bNoTroops(false),
@@ -330,6 +331,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	szTextVal = kResults.GetText("BoundWaterImprovement");
 	m_iBoundWaterImprovement = GC.getInfoTypeForString(szTextVal, true);
 #endif
+	m_iTrainPopulationConsume = kResults.GetInt("TrainPopulationConsume");
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bNoTroops = kResults.GetBool("NoTroopConsume");
@@ -853,6 +855,11 @@ int CvUnitEntry::GetBoundWaterImprovement() const
 	return m_iBoundWaterImprovement;
 }
 #endif
+
+int CvUnitEntry::GetTrainPopulationConsume() const
+{
+	return m_iTrainPopulationConsume;
+}
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 bool CvUnitEntry::IsNoTroops() const

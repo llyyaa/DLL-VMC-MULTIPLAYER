@@ -118,12 +118,6 @@ ALTER TABLE UnitPromotions ADD 'CurrentHitPointDefenseMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'NearNumEnemyAttackMod' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD 'NearNumEnemyDefenseMod' INTEGER DEFAULT 0;
 
-ALTER TABLE Units ADD 'ExtraXPValueAttack' INTEGER DEFAULT 0;
-ALTER TABLE Units ADD 'ExtraXPValueDefense' INTEGER DEFAULT 0;
-
-ALTER TABLE Units ADD 'BoundLandImprovement' TEXT DEFAULT NULL ;
-ALTER TABLE Units ADD 'BoundWaterImprovement' TEXT DEFAULT NULL;
-
 ALTER TABLE UnitPromotions ADD 'FeatureInvisible' TEXT DEFAULT NULL;
 ALTER TABLE UnitPromotions ADD 'FeatureInvisible2' TEXT DEFAULT NULL;
 

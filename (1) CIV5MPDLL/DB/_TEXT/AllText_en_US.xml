@@ -567,6 +567,12 @@
 		<Row Tag="TXT_KEY_MISC_CAPTURE_PROJECT">
 			<Text>{1_PlyrName} already knew the secrets of {@2_PrjctName}!</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY">
+			<Text>{1_Num} [ICON_CITIZEN] Citizen in your city: {2_CityName:textkey} leaves the city!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY_SHORT">
+			<Text>Citizen Left the city!</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

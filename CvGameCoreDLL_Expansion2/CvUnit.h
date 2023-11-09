@@ -1820,10 +1820,11 @@ public:
 
 #endif
 
-
 	void ChangeCityAttackPlunderModifier(int iValue);
 	int GetCityAttackPlunderModifier() const;
 
+	void SetExtraPopConsume(int iValue);
+	int GetExtraPopConsume() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	const int GetInsightEnemyDamageModifier() const;
 	void ChangeInsightEnemyDamageModifier(int iValue);
@@ -2460,6 +2461,7 @@ protected:
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
+	int m_iExtraPopConsume;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int m_iInsightEnemyDamageModifier;
 	int m_iHeightModPerX;

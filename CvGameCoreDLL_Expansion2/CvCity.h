@@ -1066,7 +1066,7 @@ public:
 	const OrderData* tailOrderQueueNode() const;
 	bool CleanUpQueue(void);  // remove items in the queue that are no longer valid
 
-	int CreateUnit(UnitTypes eUnitType, UnitAITypes eAIType = NO_UNITAI, bool bUseToSatisfyOperation=true);
+	int CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith,  UnitAITypes eAIType = NO_UNITAI, bool bUseToSatisfyOperation=true);
 	bool CreateBuilding(BuildingTypes eBuildType);
 	bool CreateProject(ProjectTypes eProjectType, bool bIsCapture = false);
 	void changeProjectCount(ProjectTypes eProject, int iValue);

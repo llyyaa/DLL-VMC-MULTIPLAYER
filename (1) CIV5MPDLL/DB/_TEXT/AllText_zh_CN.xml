@@ -573,6 +573,12 @@
 		<Row Tag="TXT_KEY_MISC_CAPTURE_PROJECT">
 			<Text>{1_PlyrName}已知悉{@2_PrjctName}的秘密!</Text>
 		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY">
+			<Text>{2_CityName:textkey}的{1_Num}单位[ICON_CITIZEN]人口离开了这座城市。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY_SHORT">
+			<Text>一批公民离开了城市！</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

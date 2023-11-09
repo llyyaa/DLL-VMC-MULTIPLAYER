@@ -123,6 +123,7 @@ public:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int GetConversionModifier() const;
 #endif
+	int GetSettlerPopConsume() const;
 
 	int GetYieldModifierFromActiveSpies(int i) const;
 	int* GetYieldModifierFromActiveSpiesArray() const;
@@ -425,6 +426,7 @@ private:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int m_iConversionModifier;
 #endif
+	int m_iSettlerPopConsume;
 	int m_iGoldPerUnit;
 	int m_iGoldPerMilitaryUnit;
 	int m_iCityStrengthMod;

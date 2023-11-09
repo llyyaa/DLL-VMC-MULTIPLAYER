@@ -15604,7 +15604,7 @@ void CvCity::popOrder(int iNum, bool bFinish, bool bChoose)
 
 		if(bFinish)
 		{
-			int iResult = CreateUnit(eTrainUnit, eTrainAIUnit);
+			int iResult = CreateUnit(eTrainUnit, false, false, eTrainAIUnit);
 			if(iResult != FFreeList::INVALID_INDEX)
 			{
 
@@ -16183,7 +16183,7 @@ bool CvCity::CleanUpQueue(void)
 }
 
 //	--------------------------------------------------------------------------------
-int CvCity::CreateUnit(UnitTypes eUnitType, UnitAITypes eAIType, bool bUseToSatisfyOperation)
+int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAITypes eAIType, bool bUseToSatisfyOperation)
 {
 	VALIDATE_OBJECT
 	CvPlayer& thisPlayer = GET_PLAYER(getOwner());
@@ -16261,6 +16261,32 @@ int CvCity::CreateUnit(UnitTypes eUnitType, UnitAITypes eAIType, bool bUseToSati
 					CvString strLogString;
 					strLogString.Format("Assigning explore sea unit AI to %s, X: %d, Y: %d", pUnit->getName().GetCString(), pUnit->getX(), pUnit->getY());
 					thisPlayer.GetHomelandAI()->LogHomelandMessage(strLogString);
+				}
+			}
+		}
+	}
+	int iPopConsume = pUnit->getUnitInfo().GetTrainPopulationConsume();
+	if(iPopConsume > 0 && !bIsFaith)
+	{
+		if(pUnit->getUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SETTLER"))
+		{
+			iPopConsume += thisPlayer.getPolicyModifiers(POLICYMOD_SETTLER_POPULATION_CONSUME);
+		}
+		iPopConsume = std::min(getPopulation() -1, iPopConsume);
+		if(iPopConsume != 0)
+		{
+			pUnit->SetExtraPopConsume(iPopConsume);
+			changePopulation(-iPopConsume);
+			if (thisPlayer.isHuman())
+			{
+				CvNotifications *pNotifications = thisPlayer.GetNotifications();
+				if (pNotifications)
+				{
+					Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY");
+					strMessage << iPopConsume;
+					strMessage << getNameKey();
+					Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY_SHORT");
+					pNotifications->Add(NOTIFICATION_STARVING, strMessage.toUTF8(), strSummary.toUTF8(), getX(), getY(), -1);
 				}
 			}
 		}
@@ -16966,7 +16992,7 @@ void CvCity::Purchase(UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectT
 		bool bResult = false;
 		if(eUnitType >= 0)
 		{
-			int iResult = CreateUnit(eUnitType);
+			int iResult = CreateUnit(eUnitType, true, false);
 			CvAssertMsg(iResult != FFreeList::INVALID_INDEX, "Unable to create unit");
 			if (iResult != FFreeList::INVALID_INDEX)
 			{
@@ -17074,7 +17100,7 @@ void CvCity::Purchase(UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectT
 
 		if(eUnitType >= 0)
 		{
-			int iResult = CreateUnit(eUnitType);
+			int iResult = CreateUnit(eUnitType, false, true);
 			CvAssertMsg(iResult != FFreeList::INVALID_INDEX, "Unable to create unit");
 			if (iResult == FFreeList::INVALID_INDEX)
 				return;	// Can't create the unit, most likely we have no place for it.  We have not deducted the cost yet so just exit.

@@ -466,6 +466,7 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseModifier(0)
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
+	, m_iExtraPopConsume(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	, m_iInsightEnemyDamageModifier(0)
 	, m_iHeightModPerX(0)
@@ -1427,6 +1428,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseModifier = 0;
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
+	m_iExtraPopConsume = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iInsightEnemyDamageModifier = 0;
 	m_iHeightModPerX = 0;
@@ -6584,13 +6586,20 @@ void CvUnit::ChangeCityAttackPlunderModifier(int iValue)
 {
 	m_iCityAttackPlunderModifier += iValue;
 }
-
-//	--------------------------------------------------------------------------------
 int CvUnit::GetCityAttackPlunderModifier() const
 {
 	return m_iCityAttackPlunderModifier;
 }
 
+//	--------------------------------------------------------------------------------
+void CvUnit::SetExtraPopConsume(int iValue)
+{
+	m_iExtraPopConsume = iValue;
+}
+int CvUnit::GetExtraPopConsume() const
+{
+	return m_iExtraPopConsume;
+}
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 //	--------------------------------------------------------------------------------
@@ -25910,6 +25919,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseModifier;
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
+	kStream >> m_iExtraPopConsume;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream >> m_iInsightEnemyDamageModifier;
 	kStream >> m_iHeightModPerX;
@@ -26296,6 +26306,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseModifier;
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
+	kStream << m_iExtraPopConsume;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream << m_iInsightEnemyDamageModifier;
 	kStream << m_iHeightModPerX;

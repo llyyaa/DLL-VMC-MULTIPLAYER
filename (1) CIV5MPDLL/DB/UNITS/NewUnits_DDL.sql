@@ -7,3 +7,11 @@ create table UnitPromotions_Promotions (
 
 ALTER TABLE Units ADD 'CombatStrengthChangeAfterKilling' INTEGER DEFAULT 0;
 ALTER TABLE Units ADD 'RangedCombatStrengthChangeAfterKilling' INTEGER DEFAULT 0;
+
+ALTER TABLE Units ADD 'ExtraXPValueAttack' INTEGER DEFAULT 0;
+ALTER TABLE Units ADD 'ExtraXPValueDefense' INTEGER DEFAULT 0;
+
+ALTER TABLE Units ADD 'BoundLandImprovement' TEXT DEFAULT NULL ;
+ALTER TABLE Units ADD 'BoundWaterImprovement' TEXT DEFAULT NULL;
+
+ALTER TABLE Units ADD 'TrainPopulationConsume' INTEGER DEFAULT 0;

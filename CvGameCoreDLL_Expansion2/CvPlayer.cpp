@@ -26057,6 +26057,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	changePolicyModifiers(POLICYMOD_CONVERSION_MODIFIER, pPolicy->GetConversionModifier() * iChange);
 #endif
+	changePolicyModifiers(POLICYMOD_SETTLER_POPULATION_CONSUME, pPolicy->GetSettlerPopConsume() * iChange);
 
 	changeSharedIdeologyTourismModifier(pPolicy->GetSharedIdeologyTourismModifier() * iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)

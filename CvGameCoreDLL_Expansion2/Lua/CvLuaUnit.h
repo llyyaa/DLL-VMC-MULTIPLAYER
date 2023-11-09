@@ -744,6 +744,8 @@ protected:
 	LUAAPIEXTN(IsImmuneNegtivePromotions, bool);
 #endif
 
+	LUAAPIEXTN(SetExtraPopConsume, void);
+	LUAAPIEXTN(GetExtraPopConsume, int);
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	LUAAPIEXTN(IsNoTroops, bool);
 #endif

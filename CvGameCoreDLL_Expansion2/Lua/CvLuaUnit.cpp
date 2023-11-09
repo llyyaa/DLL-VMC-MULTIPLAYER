@@ -820,6 +820,8 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(IsImmuneNegtivePromotions);
 #endif
 
+	Method(SetExtraPopConsume);
+	Method(GetExtraPopConsume);
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	Method(IsNoTroops);
 #endif
@@ -6225,6 +6227,8 @@ LUAAPIIMPL(Unit, ClearSamePlotPromotions)
 LUAAPIIMPL(Unit, IsImmuneNegtivePromotions)
 #endif
 
+LUAAPIIMPL(Unit, SetExtraPopConsume)
+LUAAPIIMPL(Unit, GetExtraPopConsume)
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 LUAAPIIMPL(Unit, IsNoTroops)
 #endif

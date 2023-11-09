@@ -871,7 +871,7 @@ CvUnit* CvMilitaryAI::BuyEmergencyUnit(UnitAITypes eUnitType, CvCity* pCity)
 				if(pCity->getOwner() == m_pPlayer->GetID())		// Player must own the city or this will create a unit for another player
 				{
 					// This is an EXTRA build for the operation beyond any that are already assigned to this city, so pass in the right flag to CreateUnit()
-					int iResult = pCity->CreateUnit(eType, NO_UNITAI, false /*bUseToSatisfyOperation*/);
+					int iResult = pCity->CreateUnit(eType, true, false, NO_UNITAI, false /*bUseToSatisfyOperation*/);
 
 					CvAssertMsg(iResult != FFreeList::INVALID_INDEX, "Unable to create unit");
 
@@ -915,7 +915,7 @@ CvUnit* CvMilitaryAI::BuyEmergencyUnit(UnitAITypes eUnitType, CvCity* pCity)
 				m_pPlayer->ChangeFaith(-iFaithCost);
 
 				// This is an EXTRA build for the operation beyond any that are already assigned to this city, so pass in the right flag to CreateUnit()
-				int iResult = pCity->CreateUnit(eType, NO_UNITAI, false /*bUseToSatisfyOperation*/);
+				int iResult = pCity->CreateUnit(eType, false, true, NO_UNITAI, false /*bUseToSatisfyOperation*/);
 
 				CvAssertMsg(iResult != FFreeList::INVALID_INDEX, "Unable to create unit");
 				CvUnit* pUnit = m_pPlayer->getUnit(iResult);
