@@ -203,6 +203,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/GOODHUTS/GoodyHuts.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/GLOBAL/AlpinePasses.sql</FileName>
       </Action>
       <Action>
@@ -428,21 +433,6 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/_TEXT/AllText_de_DE.xml</FileName>
-      </Action>
-      <Action>
-        <Set>OnModActivated</Set>
-        <Type>UpdateDatabase</Type>
-        <FileName>DB/_TEXT/AllText_ja_JP.xml</FileName>
-      </Action>
-      <Action>
-        <Set>OnModActivated</Set>
-        <Type>UpdateDatabase</Type>
-        <FileName>DB/_TEXT/AllText_ru_RU.xml</FileName>
-      </Action>
-      <Action>
-        <Set>OnModActivated</Set>
-        <Type>UpdateDatabase</Type>
         <FileName>DB/_TEXT/AllText_zh_CN.xml</FileName>
       </Action>
       <Action>
@@ -617,6 +607,7 @@
     <Folder Include="DB\IMPROVEMENTS" />
     <Folder Include="DB\CITY_SCALES" />
     <Folder Include="DB\LUA_FORMULA" />
+    <Folder Include="DB\GOODHUTS" />
     <Folder Include="DB\RESOURCES" />
     <Folder Include="DB\TECHS" />
     <Folder Include="DB\SPECIALISTS" />
@@ -791,6 +782,10 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="DB/GOODHUTS/GoodyHuts.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="DB/GLOBAL/AlpinePasses.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
@@ -955,19 +950,7 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="DB/_TEXT/AllText_de_DE.xml">
-      <SubType>Lua</SubType>
-      <ImportIntoVFS>False</ImportIntoVFS>
-    </Content>
     <Content Include="DB/_TEXT/AllText_en_US.xml">
-      <SubType>Lua</SubType>
-      <ImportIntoVFS>False</ImportIntoVFS>
-    </Content>
-    <Content Include="DB/_TEXT/AllText_ja_JP.xml">
-      <SubType>Lua</SubType>
-      <ImportIntoVFS>False</ImportIntoVFS>
-    </Content>
-    <Content Include="DB/_TEXT/AllText_ru_RU.xml">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

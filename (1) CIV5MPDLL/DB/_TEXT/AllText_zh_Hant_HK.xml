@@ -114,6 +114,12 @@
 			</Set>
 		</Update>
 		<Update>
+			<Where Tag="TXT_KEY_GOODY_CHOOSE_PROPHET_FAITH"/>
+			<Set>
+				<Text>讓傳教士預言大先知的降臨。</Text>
+			</Set>
+		</Update>
+		<Update>
 			<Where Tag="TXT_KEY_GOODY_FAITH"/>
 			<Set>
 				<Text>您發現了一座古老的祭司神殿。祭司向您揭示了神的啟示，賜予您祝福。</Text>
@@ -136,6 +142,12 @@
 		</Row>
 		<Row Tag="TXT_KEY_MISC_RECEIVED_FAITH">
 			<Text>[SPACE]您獲得了{1_Num}[ICON_PEACE]信仰值！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_MISC_RECEIVED_SCIENCE">
+			<Text>[SPACE]您獲得了{1_Num}[ICON_RESEARCH]科研！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_MISC_RECEIVED_PRODUCITON">
+			<Text>[SPACE]您的城市{1_Name}獲得了{2_Num}[ICON_PRODUCTION]產能！</Text>
 		</Row>
 	</Language_zh_Hant_HK>
 

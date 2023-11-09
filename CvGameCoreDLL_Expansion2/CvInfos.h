@@ -1241,6 +1241,9 @@ public:
 	int getRevealNearbyBarbariansRange() const;
 	int getBarbarianUnitProb() const;
 	int getMinBarbarians() const;
+	int getMinGameTurns() const;
+	int getScience() const;
+	int getProduction() const;
 	int getUnitClassType() const;
 	int getBarbarianUnitClass() const;
 
@@ -1275,6 +1278,9 @@ protected:
 	int m_iRevealNearbyBarbariansRange;
 	int m_iBarbarianUnitProb;
 	int m_iMinBarbarians;
+	int m_iMinGameTurns;
+	int m_iScience;
+	int m_iProduction;
 	int m_iUnitClassType;
 	int m_iBarbarianUnitClass;
 

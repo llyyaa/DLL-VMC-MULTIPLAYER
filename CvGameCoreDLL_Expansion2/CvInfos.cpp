@@ -4118,6 +4118,9 @@ CvGoodyInfo::CvGoodyInfo() : CvBaseInfo()
 	, m_iRevealNearbyBarbariansRange(0)
 	, m_iBarbarianUnitProb(0)
 	, m_iMinBarbarians(0)
+	, m_iMinGameTurns(0)
+	, m_iScience(0)
+	, m_iProduction(0)
 	, m_iUnitClassType(NO_UNITCLASS)
 	, m_iBarbarianUnitClass(NO_UNITCLASS)
 	, m_bTech(false)
@@ -4208,6 +4211,21 @@ int CvGoodyInfo::getMinBarbarians() const
 	return m_iMinBarbarians;
 }
 
+int CvGoodyInfo::getMinGameTurns() const
+{
+	return m_iMinGameTurns;
+}
+
+int CvGoodyInfo::getScience() const
+{
+	return m_iScience;
+}
+
+int CvGoodyInfo::getProduction() const
+{
+	return m_iProduction;
+}
+
 int CvGoodyInfo::getUnitClassType() const
 {
 	return m_iUnitClassType;
@@ -4294,6 +4312,9 @@ bool CvGoodyInfo::CacheResults(Database::Results& results, CvDatabaseUtility& kU
 	m_iRevealNearbyBarbariansRange = results.GetInt("RevealNearbyBarbariansRange");
 	m_iBarbarianUnitProb = results.GetInt("BarbarianUnitProb");
 	m_iMinBarbarians = results.GetInt("MinBarbarians");
+	m_iMinGameTurns = results.GetInt("MinGameTurns");
+	m_iScience = results.GetInt("Science");
+	m_iProduction = results.GetInt("Production");
 	m_bTech = results.GetBool("Tech");
 	m_bBad = results.GetBool("Bad");
 	m_bRevealUnknownResource = results.GetBool("RevealUnknownResource");

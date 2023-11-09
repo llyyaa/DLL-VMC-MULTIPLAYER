@@ -6814,6 +6814,9 @@ bool CvPlayer::canReceiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit) 
 	CvAssertMsg(bResult, "Cannot find goody info.");
 	kGoodyInfo.CacheResult(kResult);
 
+	int iMinGameTurns = kGoodyInfo.getMinGameTurns();
+	if(iMinGameTurns < 0 || pPlot == NULL) return false;
+
 #if defined(MOD_EVENTS_GOODY_CHOICE)
 	if (MOD_EVENTS_GOODY_CHOICE) {
 		bool bPick = (pUnit && pUnit->isHasPromotion((PromotionTypes)GC.getPROMOTION_GOODY_HUT_PICKER()));
@@ -6832,7 +6835,7 @@ bool CvPlayer::canReceiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit) 
 	// No XP in first 10 turns
 	if(kGoodyInfo.getExperience() > 0)
 	{
-		if((pUnit == NULL) || !(pUnit->canAcquirePromotionAny()) || (GC.getGame().getElapsedGameTurns() < 10))
+		if((pUnit == NULL) || !(pUnit->canAcquirePromotionAny()) || (GC.getGame().getElapsedGameTurns() < iMinGameTurns))
 		{
 			return false;
 		}
@@ -6850,7 +6853,7 @@ bool CvPlayer::canReceiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit) 
 	// Early pantheon
 	if(kGoodyInfo.isPantheonFaith())
 	{
-		if(GC.getGame().getElapsedGameTurns() < 20)
+		if(GC.getGame().getElapsedGameTurns() < iMinGameTurns)
 		{
 			return false;
 		}
@@ -6863,7 +6866,7 @@ bool CvPlayer::canReceiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit) 
 	// Faith toward Great Prophet
 	if(kGoodyInfo.getProphetPercent() > 0)
 	{
-		if(GC.getGame().getElapsedGameTurns() < 20)
+		if(GC.getGame().getElapsedGameTurns() < iMinGameTurns)
 		{
 			return false;
 		}
@@ -6883,6 +6886,15 @@ bool CvPlayer::canReceiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit) 
 
 		// Don't give more Population if we're already over our Pop limit
 		if(IsEmpireUnhappy())
+		{
+			return false;
+		}
+	}
+
+	//Produciton
+	if(kGoodyInfo.getProduction() > 0)
+	{
+		if(getNumCities() == 0)
 		{
 			return false;
 		}
@@ -7068,7 +7080,7 @@ bool CvPlayer::canReceiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit) 
 		// No combat units in MP in the first 20 turns
 		if(pUnitInfo->GetCombat() > 0)
 		{
-			if(GC.getGame().isGameMultiPlayer() || (GC.getGame().getElapsedGameTurns() < 20))
+			if(GC.getGame().isGameMultiPlayer() || (GC.getGame().getElapsedGameTurns() < iMinGameTurns))
 			{
 				return false;
 			}
@@ -7210,27 +7222,26 @@ void CvPlayer::receiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit)
 	// Population
 	if(kGoodyInfo.getPopulation() > 0)
 	{
-		int iDistance;
-		int iBestCityDistance = -1;
-		CvCity* pBestCity = NULL;
-
-		CvCity* pLoopCity;
-		int iLoop;
-		// Find the closest City to us to add a Pop point to
-		for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
-		{
-			iDistance = plotDistance(pPlot->getX(), pPlot->getY(), pLoopCity->getX(), pLoopCity->getY());
-
-			if(iBestCityDistance == -1 || iDistance < iBestCityDistance)
-			{
-				iBestCityDistance = iDistance;
-				pBestCity = pLoopCity;
-			}
-		}
-
+		CvCity* pBestCity = findClosestCity(*pPlot);
 		if(pBestCity != NULL)
 		{
 			pBestCity->changePopulation(kGoodyInfo.getPopulation());
+		}
+	}
+
+	// Production
+	int iProduction = kGoodyInfo.getProduction();
+	if(iProduction > 0)
+	{
+		CvCity* pBestCity = findClosestCity(*pPlot);
+		if(pBestCity != NULL)
+		{
+			// Game Speed Mod
+			iProduction *= GC.getGame().getGameSpeedInfo().getConstructPercent();
+			iProduction /= 100;
+
+			pBestCity->changeOverflowProduction(kGoodyInfo.getProduction());
+			strBuffer += GetLocalizedText("TXT_KEY_MISC_RECEIVED_PRODUCITON",pBestCity->getName(), iProduction);
 		}
 	}
 
@@ -7243,10 +7254,19 @@ void CvPlayer::receiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit)
 		iCulture /= 100;
 
 		changeJONSCulture(iCulture);
-
-#if defined(MOD_BUGFIX_GOODY_HUT_MESSAGES)
 		strBuffer += GetLocalizedText("TXT_KEY_MISC_RECEIVED_CULTURE", iCulture);
-#endif
+	}
+
+	// Science
+	int iScience = kGoodyInfo.getScience();
+	if(iScience > 0)
+	{
+		// Game Speed Mod
+		iScience *= GC.getGame().getGameSpeedInfo().getResearchPercent();
+		iScience /= 100;
+
+		changeOverflowResearch(iScience);
+		strBuffer += GetLocalizedText("TXT_KEY_MISC_RECEIVED_SCIENCE", iScience);
 	}
 
 	// Faith
@@ -7258,10 +7278,7 @@ void CvPlayer::receiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit)
 		iFaith /= 100;
 
 		ChangeFaith(iFaith);
-
-#if defined(MOD_BUGFIX_GOODY_HUT_MESSAGES)
 		strBuffer += GetLocalizedText("TXT_KEY_MISC_RECEIVED_FAITH", iFaith);
-#endif
 	}
 
 	// Faith for pantheon
@@ -7274,10 +7291,7 @@ void CvPlayer::receiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit)
 		iFaith /= iDivisor;
 		iFaith *= iDivisor;
 		ChangeFaith(iFaith);
-
-#if defined(MOD_BUGFIX_GOODY_HUT_MESSAGES)
 		strBuffer += GetLocalizedText("TXT_KEY_MISC_RECEIVED_FAITH", iFaith);
-#endif
 	}
 
 	// Faith for percent of great prophet
@@ -7289,10 +7303,7 @@ void CvPlayer::receiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit)
 		iFaith /= iDivisor;
 		iFaith *= iDivisor;
 		ChangeFaith(iFaith);
-
-#if defined(MOD_BUGFIX_GOODY_HUT_MESSAGES)
 		strBuffer += GetLocalizedText("TXT_KEY_MISC_RECEIVED_FAITH", iFaith);
-#endif
 	}
 
 	// Reveal Nearby Barbs
@@ -7889,15 +7900,8 @@ void CvPlayer::doGoody(CvPlot* pPlot, CvUnit* pUnit)
 			// Any valid Goodies?
 			if(avValidGoodies.size() > 0)
 			{
-#if defined(MOD_BUGFIX_MINOR)
-				// Fix the bug where the AI won't get anything for Goody Hut pickers!!!
 				if (pUnit && pUnit->isHasPromotion((PromotionTypes)GC.getPROMOTION_GOODY_HUT_PICKER()) && GC.getGame().getActivePlayer() == GetID())
 				{
-#else
-				if (pUnit && pUnit->isHasPromotion((PromotionTypes)GC.getPROMOTION_GOODY_HUT_PICKER()))
-				{
-					if(GC.getGame().getActivePlayer() == GetID())
-#endif
 					{
 						CvPopupInfo kPopupInfo(BUTTONPOPUP_CHOOSE_GOODY_HUT_REWARD, GetID(), pUnit->GetID());
 						GC.GetEngineUserInterface()->AddPopup(kPopupInfo);
@@ -7930,6 +7934,28 @@ void CvPlayer::doGoody(CvPlot* pPlot, CvUnit* pUnit)
 }
 
 
+//	--------------------------------------------------------------------------------
+CvCity* CvPlayer::findClosestCity(CvPlot& pPlot)
+{
+	CvCity* pBestCity = NULL;
+
+	CvCity* pLoopCity;
+	int iLoop;
+	int iDistance;
+	int iBestCityDistance = MAX_INT;
+	// Find the closest City to us to add a Pop point to
+	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	{
+		iDistance = plotDistance(pPlot.getX(), pPlot.getY(), pLoopCity->getX(), pLoopCity->getY());
+
+		if(iDistance < iBestCityDistance)
+		{
+			iBestCityDistance = iDistance;
+			pBestCity = pLoopCity;
+		}
+	}
+	return pBestCity;
+}
 //	--------------------------------------------------------------------------------
 void CvPlayer::AwardFreeBuildings(CvCity* pCity)
 {
