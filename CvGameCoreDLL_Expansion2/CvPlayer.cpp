@@ -8173,21 +8173,11 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 			}
 			if (eThisPlayersUnitType != eUnit && GetPlayerTraits()->IsTrainedAll())
 			{
+				// filter barbarians's UU
 				CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(GET_PLAYER(BARBARIAN_PLAYER).getCivilizationType());
-				if (pkInfo)
+				if (pkInfo && pkInfo->isCivilizationUnitOverridden(eUnitClass))
 				{
-					// Loop through all units
-					for (int iI = 0; iI < GC.getNumUnitClassInfos(); iI++)
-					{
-						if (pkInfo->isCivilizationUnitOverridden(iI))
-						{
-							UnitTypes eCivilizationUnit = static_cast<UnitTypes>(pkInfo->getCivilizationUnits(iI));
-							if (eCivilizationUnit != NO_UNIT && eCivilizationUnit == eUnit)
-							{
-								return false;
-							}
-						}
-					}
+					return false;
 				}
 
 			}
