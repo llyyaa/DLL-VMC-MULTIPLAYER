@@ -37,7 +37,7 @@
 //GameOptionTypes enumeration usage vs the newer system that uses strings.
 const char* ConvertGameOptionTypeToString(GameOptionTypes eOption)
 {
-	switch(eOption)
+	switch (eOption)
 	{
 	case GAMEOPTION_NO_CITY_RAZING:
 		return "GAMEOPTION_NO_CITY_RAZING";
@@ -89,9 +89,13 @@ const char* ConvertGameOptionTypeToString(GameOptionTypes eOption)
 	case GAMEOPTION_SP_CORPS_MODE_LOW:
 		return "GAMEOPTION_SP_CORPS_MODE_LOW";
 #endif
+	case GAMEOPTION_CIV_CONQUER:
+		return "GAMEOPTION_CIV_CONQUER";
+	case GAMEOPTION_HUMAN_ALL_UC:
+		return "GAMEOPTION_HUMAN_ALL_UC";
+	default:
+		return NULL;
 	}
-
-	return NULL;
 }
 
 namespace CvPreGame

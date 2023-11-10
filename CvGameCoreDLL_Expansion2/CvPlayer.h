@@ -2147,6 +2147,15 @@ public:
 	void SetImmigrationCounter(int iIndex, int iValue);
 #endif
 
+	void UpdateUCsFromCapturedOriginalCapitals();
+	std::tr1::unordered_set<UnitTypes>& GetCanTrainUnitsFromCapturedOriginalCapitals();
+	std::tr1::unordered_set<BuildingTypes>& GetCanConstructBuildingsFromCapturedOriginalCapitals();
+	std::tr1::unordered_set<ImprovementTypes>& GetCanBuildImprovementsFromCapturedOriginalCapitals();
+
+	bool CanAllUc() const {
+		return isHuman() && GC.getGame().isOption(GAMEOPTION_HUMAN_ALL_UC);
+	}
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2817,6 +2826,10 @@ protected:
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiImmigrationCounter;
 #endif
+
+	std::tr1::unordered_set<UnitTypes> m_sCanTrainUnitsFromCapturedOriginalCapitals;
+	std::tr1::unordered_set<BuildingTypes> m_sCanConstructBuildingsFromCapturedOriginalCapitals;
+	std::tr1::unordered_set<ImprovementTypes> m_sCanBuildImprovementsFromCapturedOriginalCapitals;
 };
 
 extern bool CancelActivePlayerEndTurn();

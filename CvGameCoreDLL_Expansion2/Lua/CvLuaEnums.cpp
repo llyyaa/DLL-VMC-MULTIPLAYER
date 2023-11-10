@@ -257,6 +257,8 @@ int CvLuaEnums::pRegister(lua_State* L)
 	RegisterEnum(GAMEOPTION_SP_CORPS_MODE_HIGH);
 	RegisterEnum(GAMEOPTION_SP_CORPS_MODE_LOW);
 #endif
+	RegisterEnum(GAMEOPTION_CIV_CONQUER);
+	RegisterEnum(GAMEOPTION_HUMAN_ALL_UC);
 	RegisterEnum(NUM_GAMEOPTION_TYPES);
 
 

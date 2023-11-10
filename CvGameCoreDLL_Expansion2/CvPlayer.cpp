@@ -3435,6 +3435,11 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	}
 #endif
 
+	if (pNewCity && pNewCity->IsOriginalCapital() && GC.getGame().isOption(GAMEOPTION_CIV_CONQUER)) {
+		kOldCityPlayer.UpdateUCsFromCapturedOriginalCapitals();
+		this->UpdateUCsFromCapturedOriginalCapitals();
+	}
+
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
 	if(pkScriptSystem && pNewCity != NULL)
 	{
@@ -8164,28 +8169,17 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 		UnitTypes eThisPlayersUnitType = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);	
 
 #if defined(MOD_TRAIN_ALL_CORE)
-		if (MOD_TRAIN_ALL_CORE)
-		{
-			// If the player isn't allowed to train this Unit (via XML) then return false
-			if (eThisPlayersUnitType != eUnit && !GetPlayerTraits()->IsTrainedAll())
+		if (eThisPlayersUnitType != eUnit) {
+			bool bCivFilter = (MOD_TRAIN_ALL_CORE && GetPlayerTraits()->IsTrainedAll())
+				|| const_cast<CvPlayer*>(this)->GetCanTrainUnitsFromCapturedOriginalCapitals().count(eUnit) > 0
+				|| this->CanAllUc();
+			if (!bCivFilter) return false;
+
+			CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(GET_PLAYER(BARBARIAN_PLAYER).getCivilizationType());
+			if (pkInfo && pkInfo->isCivilizationUnitOverridden(eUnitClass))
 			{
 				return false;
 			}
-			if (eThisPlayersUnitType != eUnit && GetPlayerTraits()->IsTrainedAll())
-			{
-				// filter barbarians's UU
-				CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(GET_PLAYER(BARBARIAN_PLAYER).getCivilizationType());
-				if (pkInfo && pkInfo->isCivilizationUnitOverridden(eUnitClass))
-				{
-					return false;
-				}
-
-			}
-			
-		}
-		else if (eThisPlayersUnitType != eUnit)
-		{
-			return false;
 		}
 #else
 		if (eThisPlayersUnitType != eUnit)
@@ -8490,7 +8484,8 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 	// Checks to make sure civilization doesn't have an override that prevents construction of this building
 	if(getCivilizationInfo().getCivilizationBuildings(eBuildingClass) != eBuilding)
 	{
-		return false;
+		if (const_cast<CvPlayer*>(this)->GetCanConstructBuildingsFromCapturedOriginalCapitals().count(eBuilding) == 0 && !this->CanAllUc())
+			return false;
 	}
 
 	if(!bIgnoreCost)
@@ -10239,7 +10234,8 @@ bool CvPlayer::canBuild(const CvPlot* pPlot, BuildTypes eBuild, bool bTestEra, b
 			CivilizationTypes eCiv = pkEntry->GetRequiredCivilization();
 			if(eCiv != getCivilizationType())
 			{
-				return false;
+				if (const_cast<CvPlayer*>(this)->GetCanBuildImprovementsFromCapturedOriginalCapitals().count(eImprovement) == 0 && !CanAllUc())
+					return false;
 			}
 		}
 	}
@@ -27905,6 +27901,10 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiImmigrationCounter;
 #endif
 
+	kStream >> m_sCanTrainUnitsFromCapturedOriginalCapitals;
+	kStream >> m_sCanConstructBuildingsFromCapturedOriginalCapitals;
+	kStream >> m_sCanBuildImprovementsFromCapturedOriginalCapitals;
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -28535,6 +28535,10 @@ void CvPlayer::Write(FDataStream& kStream) const
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream << m_aiImmigrationCounter;
 #endif
+
+	kStream << m_sCanTrainUnitsFromCapturedOriginalCapitals;
+	kStream << m_sCanConstructBuildingsFromCapturedOriginalCapitals;
+	kStream << m_sCanBuildImprovementsFromCapturedOriginalCapitals;
 }
 
 //	--------------------------------------------------------------------------------
@@ -31988,7 +31992,7 @@ void CvPlayer::UpdateCachedCapturedHolyCity()
 	{
 		if (pLoopCity && pLoopCity->GetCityReligions()->IsHolyCityAnyReligion())
 		{
-		result++;
+			result++;
 		}
 	}
 
@@ -32099,4 +32103,71 @@ int CvPlayer::GetProductionNeededProjectModifier() const {
 
 void CvPlayer::ChangeProductionNeededProjectModifier(int change) {
 	m_iProductionNeededProjectModifier += change;
+}
+
+void CvPlayer::UpdateUCsFromCapturedOriginalCapitals() {
+	m_sCanTrainUnitsFromCapturedOriginalCapitals.clear();
+	m_sCanConstructBuildingsFromCapturedOriginalCapitals.clear();
+	m_sCanBuildImprovementsFromCapturedOriginalCapitals.clear();
+
+	int iLoop = 0;
+	for (CvCity *pLoopCity = firstCity(&iLoop); pLoopCity != NULL;
+		pLoopCity = nextCity(&iLoop)) {
+		PlayerTypes eOriginalOwner = pLoopCity->getOriginalOwner();
+		if (!pLoopCity->IsOriginalCapital() || eOriginalOwner == GetID())
+			continue;
+
+		CvPlayerAI& kOriginalOwner = GET_PLAYER(eOriginalOwner);
+		if (!kOriginalOwner.isMajorCiv())
+			continue;
+
+		CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(kOriginalOwner.getCivilizationType());
+		if (!pkInfo)
+			continue;
+
+		for (size_t i = 0; i < GC.getNumUnitClassInfos(); ++i) {
+			if (!pkInfo->isCivilizationUnitOverridden(i))
+				continue;
+			UnitTypes eUnit = static_cast<UnitTypes>(pkInfo->getCivilizationUnits(i));
+			if (eUnit == NO_UNIT)
+				continue;
+
+			m_sCanTrainUnitsFromCapturedOriginalCapitals.insert(eUnit);
+		}
+
+		for (size_t i = 0; i < GC.getNumBuildingClassInfos(); ++i) {
+			if (!pkInfo->isCivilizationBuildingOverridden(i))
+				continue;
+
+			BuildingTypes eBuilding = static_cast<BuildingTypes>(pkInfo->getCivilizationBuildings(i));
+			if (eBuilding == NO_BUILDING)
+				continue;
+
+			m_sCanConstructBuildingsFromCapturedOriginalCapitals.insert(eBuilding);
+		}
+
+		for (size_t i = 0; i < GC.getNumImprovementInfos(); ++i) {
+			ImprovementTypes eImprovement = (ImprovementTypes)i;
+			CvImprovementEntry* pkEntry = GC.getImprovementInfo(eImprovement);
+			if (pkEntry && pkEntry->IsSpecificCivRequired())
+			{
+				CivilizationTypes eCiv = pkEntry->GetRequiredCivilization();
+				if (eCiv == pkInfo->GetID()) {
+					m_sCanBuildImprovementsFromCapturedOriginalCapitals.insert(eImprovement);
+				}
+			}
+		}
+	}
+}
+
+std::tr1::unordered_set<UnitTypes>& CvPlayer::GetCanTrainUnitsFromCapturedOriginalCapitals() {
+	return m_sCanTrainUnitsFromCapturedOriginalCapitals;
+}
+
+std::tr1::unordered_set<BuildingTypes>& CvPlayer::GetCanConstructBuildingsFromCapturedOriginalCapitals() {
+	return m_sCanConstructBuildingsFromCapturedOriginalCapitals;
+}
+
+std::tr1::unordered_set<ImprovementTypes>& CvPlayer::GetCanBuildImprovementsFromCapturedOriginalCapitals() {
+	return m_sCanBuildImprovementsFromCapturedOriginalCapitals;
 }

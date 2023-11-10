@@ -1091,6 +1091,8 @@ enum GameOptionTypes
 	GAMEOPTION_SP_CORPS_MODE_HIGH,
 	GAMEOPTION_SP_CORPS_MODE_LOW,
 #endif
+	GAMEOPTION_CIV_CONQUER,
+	GAMEOPTION_HUMAN_ALL_UC,
 	// KWG: Please do add anymore enums.  Use the CvPreGame::GetGameOption which uses a text key.
 	//      These enums are shared between DLLs and would diverge if each added their own.
 	NUM_GAMEOPTION_TYPES
