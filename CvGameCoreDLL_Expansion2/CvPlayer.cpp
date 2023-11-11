@@ -2485,7 +2485,7 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 		}
 	}
 #if defined(MOD_GLOBAL_UNIQUE_PROJECT_CAPTURE)
-	if(MOD_GLOBAL_UNIQUE_PROJECT_CAPTURE && getTeam() != NO_TEAM && getCapitalCity())
+	if((MOD_GLOBAL_UNIQUE_PROJECT_CAPTURE || GC.getGame().isOption(GAMEOPTION_PROJECT_CAPTURE)) && getTeam() != NO_TEAM && getCapitalCity())
 	{
 		for(int iJ = 0; iJ < GC.getNumProjectInfos(); iJ++)
 		{
