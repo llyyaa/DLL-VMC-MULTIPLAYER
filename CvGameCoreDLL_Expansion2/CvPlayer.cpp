@@ -296,6 +296,7 @@ CvPlayer::CvPlayer() :
 	, m_iNumTradeRouteBonus("CvPlayer::m_iNumTradeRouteBonus", m_syncArchive)
 	, m_viTradeRouteDomainExtraRange("CvPlayer::m_viTradeRouteDomainExtraRange", m_syncArchive)
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	, m_iCityStateTradeRouteProductionModifierGlobal("CvPlayer::m_iCityStateTradeRouteProductionModifierGlobal", m_syncArchive)
 	, m_iLandmarksTourismPercentGlobal("CvPlayer::m_iLandmarksTourismPercentGlobal", m_syncArchive)
 	, m_iGreatWorksTourismModifierGlobal("CvPlayer::m_iGreatWorksTourismModifierGlobal", m_syncArchive)
 	, m_iTradeRouteSeaGoldBonusGlobal("CvPlayer::m_iTradeRouteSeaGoldBonusGlobal", m_syncArchive)
@@ -9934,6 +9935,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeNullifyInfluenceModifier(pBuildingInfo->NullifyInfluenceModifier() ? iChange : 0);
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	changeCityStateTradeRouteProductionModifierGlobal(pBuildingInfo->GetCityStateTradeRouteProductionModifierGlobal() * iChange);
 	changeLandmarksTourismPercentGlobal(pBuildingInfo->GetLandmarksTourismPercentGlobal() * iChange);
 	changeGreatWorksTourismModifierGlobal(pBuildingInfo->GetGreatWorksTourismModifierGlobal() * iChange);
 	changeTradeRouteSeaGoldBonusGlobal(pBuildingInfo->GetTradeRouteSeaGoldBonusGlobal() * iChange);
@@ -16735,6 +16737,23 @@ void CvPlayer::changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange)
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+
+int CvPlayer::getCityStateTradeRouteProductionModifierGlobal() const
+{
+	if(m_iCityStateTradeRouteProductionModifierGlobal != 0)
+	{
+		int iCityStates = GetTrade()->GetNumberOfCityStateTradeRoutes();
+		return m_iCityStateTradeRouteProductionModifierGlobal * iCityStates;
+	}
+	return 0;
+}
+void CvPlayer::changeCityStateTradeRouteProductionModifierGlobal(int iChange)
+{
+	m_iCityStateTradeRouteProductionModifierGlobal += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
 int CvPlayer::getLandmarksTourismPercentGlobal() const
 {
 	return m_iLandmarksTourismPercentGlobal;
@@ -27407,6 +27426,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	kStream >> m_iCityStateTradeRouteProductionModifierGlobal;
 	kStream >> m_iLandmarksTourismPercentGlobal;
 	kStream >> m_iGreatWorksTourismModifierGlobal;
 	kStream >> m_iTradeRouteSeaGoldBonusGlobal;
@@ -28141,6 +28161,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iNumTradeRouteBonus;
 	kStream << m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	kStream << m_iCityStateTradeRouteProductionModifierGlobal;
 	kStream << m_iLandmarksTourismPercentGlobal;
 	kStream << m_iGreatWorksTourismModifierGlobal;
 	kStream << m_iTradeRouteSeaGoldBonusGlobal;

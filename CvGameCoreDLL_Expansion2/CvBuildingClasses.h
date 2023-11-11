@@ -432,6 +432,7 @@ public:
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int GetCityStateTradeRouteProductionModifierGlobal() const;
 	int GetLandmarksTourismPercentGlobal() const;
 	int GetGreatWorksTourismModifierGlobal() const;
 	int GetTradeRouteSeaGoldBonusGlobal() const;
@@ -814,6 +815,7 @@ private:
 
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iCityStateTradeRouteProductionModifierGlobal;
 	int m_iLandmarksTourismPercentGlobal;
 	int m_iGreatWorksTourismModifierGlobal;
 	int m_iTradeRouteSeaGoldBonusGlobal;
@@ -991,8 +993,10 @@ public:
 	int GetThemingBonuses() const;
 #endif
 	int GetNumBuildingsFromFaith() const;
+	void ChangeNumBuildingsFromFaith(int iChange);
 
 	int GetCityStateTradeRouteProductionModifier() const;
+	void ChangeCityStateTradeRouteProductionModifier(int iChange);
 
 	int GetBuildingProductionModifier() const;
 	void ChangeBuildingProductionModifier(int iChange);
@@ -1023,6 +1027,9 @@ private:
 	int m_iMissionaryExtraSpreads;
 	int m_iLandmarksTourismPercent;
 	int m_iGreatWorksTourismModifier;
+
+	int m_iNumBuildingsFromFaith;
+	int m_iCityStateTradeRouteProductionModifier;
 
 	bool m_bSoldBuildingThisTurn;
 

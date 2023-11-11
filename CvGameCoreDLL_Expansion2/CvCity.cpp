@@ -7294,6 +7294,8 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		m_pCityBuildings->ChangeMissionaryExtraSpreads(pBuildingInfo->GetExtraMissionarySpreads() * iChange);
 		m_pCityBuildings->ChangeLandmarksTourismPercent(pBuildingInfo->GetLandmarksTourismPercent() * iChange);
 		m_pCityBuildings->ChangeGreatWorksTourismModifier(pBuildingInfo->GetGreatWorksTourismModifier() * iChange);
+		m_pCityBuildings->ChangeNumBuildingsFromFaith((pBuildingInfo->GetFaithCost() > 0 && pBuildingInfo->IsUnlockedByBelief() && pBuildingInfo->GetProductionCost() == -1) ? iChange : 0);
+		m_pCityBuildings->ChangeCityStateTradeRouteProductionModifier(pBuildingInfo->GetCityStateTradeRouteProductionModifier() * iChange);
 		ChangeWonderProductionModifier(pBuildingInfo->GetWonderProductionModifier() * iChange);
 		changeCapturePlunderModifier(pBuildingInfo->GetCapturePlunderModifier() * iChange);
 		ChangeEspionageModifier(pBuildingInfo->GetEspionageModifier() * iChange);
@@ -11947,9 +11949,9 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 
 
-	if (GET_PLAYER(getOwner()).getYieldModifierFromActiveSpies(eIndex) != 0)
+	if (owner.getYieldModifierFromActiveSpies(eIndex) != 0)
 	{
-		iTempMod = min(100, (GET_PLAYER(getOwner()).getYieldModifierFromActiveSpies(eIndex) * GET_PLAYER(getOwner()).GetEspionage()->GetNumAssignedSpies()));
+		iTempMod = min(100, (owner.getYieldModifierFromActiveSpies(eIndex) * owner.GetEspionage()->GetNumAssignedSpies()));
 		iModifier += iTempMod;
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_SPIES", iTempMod);
 	}
@@ -11991,7 +11993,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 
 	// Player Yield Rate Modifier
-	iTempMod = GET_PLAYER(getOwner()).getYieldRateModifier(eIndex);
+	iTempMod = owner.getYieldRateModifier(eIndex);
 	iModifier += iTempMod;
 	if(iTempMod != 0 && toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_PLAYER", iTempMod);
@@ -11999,7 +12001,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	// Player Capital Yield Rate Modifier
 	if(isCapital())
 	{
-		iTempMod = GET_PLAYER(getOwner()).getCapitalYieldRateModifier(eIndex);
+		iTempMod = owner.getCapitalYieldRateModifier(eIndex);
 		iModifier += iTempMod;
 		if(iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_CAPITAL", iTempMod);
@@ -12008,14 +12010,14 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	if (GetWeLoveTheKingDayCounter() > 0)
 	{
 		iTempMod = 0;
-		iTempMod += GET_PLAYER(getOwner()).getCityLoveKingDayYieldMod(eIndex);
+		iTempMod += owner.getCityLoveKingDayYieldMod(eIndex);
 		iModifier += iTempMod;
 		if (iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_POLICY_CITY_LOVE_KING", iTempMod);
 	}
 
 	// Golden Age Yield Modifier
-	if (GET_PLAYER(getOwner()).isGoldenAge())
+	if (owner.isGoldenAge())
 	{
 		if (pYield)
 		{
@@ -12023,7 +12025,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 #ifdef MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER
 			if (MOD_TRAITS_GOLDEN_AGE_YIELD_MODIFIER)
 			{
-				iTempMod += GET_PLAYER(getOwner()).getGoldenAgeYieldRateModifier(eIndex);
+				iTempMod += owner.getGoldenAgeYieldRateModifier(eIndex);
 			}
 #endif
 			iModifier += iTempMod;
@@ -12067,7 +12069,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 #ifdef MOD_ROG_CORE
 		if (MOD_ROG_CORE)
 		{
-			iTempMod = GET_PLAYER(getOwner()).getWorldWonderCityYieldRateModifier(eIndex);
+			iTempMod = owner.getWorldWonderCityYieldRateModifier(eIndex);
 			if (iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_LOCAL_CITY_WONDER_GLOBAL", iTempMod);
 			iModifier += iTempMod;
@@ -12149,7 +12151,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		if (MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS)
 		{
 			// From traits
-			iTempMod += iFollowers * GET_PLAYER(getOwner()).GetPerMajorReligionFollowerYieldModifier(eIndex);
+			iTempMod += iFollowers * owner.GetPerMajorReligionFollowerYieldModifier(eIndex);
 		}
 #endif
 
@@ -12159,12 +12161,22 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 
 	// Production Yield Rate Modifier from City States
-	if(eIndex == YIELD_PRODUCTION && GetCityBuildings()->GetCityStateTradeRouteProductionModifier() > 0 )
+	iTempMod = GetCityBuildings()->GetCityStateTradeRouteProductionModifier();
+	if(eIndex == YIELD_PRODUCTION && iTempMod > 0)
 	{	
-		iTempMod = GetCityBuildings()->GetCityStateTradeRouteProductionModifier();
 		iModifier += iTempMod;
 		if(iTempMod != 0 && toolTipSink){
-			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_HANSE", iTempMod);
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_LOCAL", iTempMod);
+		}
+	}
+
+	// Production Yield Rate Modifier Global from City States
+	iTempMod = owner.getCityStateTradeRouteProductionModifierGlobal();
+	if(eIndex == YIELD_PRODUCTION && iTempMod > 0)
+	{	
+		iModifier += iTempMod;
+		if(iTempMod != 0 && toolTipSink){
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_GLOBAL", iTempMod);
 		}
 	}
 

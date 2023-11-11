@@ -579,5 +579,11 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY_SHORT">
 			<Text>一批公民離開了城市！</Text>
 		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_LOCAL">
+			<Text>[NEWLINE][ICON_BULLET]城邦商路本地修正: {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_GLOBAL">
+			<Text>[NEWLINE][ICON_BULLET]城邦商路全局修正: {1_Num}%</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

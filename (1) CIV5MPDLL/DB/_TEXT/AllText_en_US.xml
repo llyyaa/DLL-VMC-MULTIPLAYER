@@ -573,6 +573,12 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY_SHORT">
 			<Text>Citizen Left the city!</Text>
 		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_LOCAL">
+			<Text>[NEWLINE][ICON_BULLET]Modifier for Minor Trade local: {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_GLOBAL">
+			<Text>[NEWLINE][ICON_BULLET]Modifier for Minor Trade global: {1_Num}%</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

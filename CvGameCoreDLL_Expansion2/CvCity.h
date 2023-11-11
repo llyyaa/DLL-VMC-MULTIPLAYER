@@ -1265,7 +1265,6 @@ public:
 	void ChangePlagueTurns(int iValue); //Set in city::doturn
 	void SetPlagueTurns(int iValue);
 
-;
 	int GetPlagueType() const;
 	void SetPlagueType(int iValue);
 	bool HasPlague();

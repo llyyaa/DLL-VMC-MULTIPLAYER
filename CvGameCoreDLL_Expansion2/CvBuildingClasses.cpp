@@ -290,6 +290,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iCityStateTradeRouteProductionModifierGlobal(0),
 	m_iLandmarksTourismPercentGlobal(0),
 	m_iGreatWorksTourismModifierGlobal(0),
 	m_iTradeRouteSeaGoldBonusGlobal(0),
@@ -507,6 +508,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iCityStateTradeRouteProductionModifierGlobal = kResults.GetInt("CityStateTradeRouteProductionModifierGlobal");
 	m_iLandmarksTourismPercentGlobal = kResults.GetInt("LandmarksTourismPercentGlobal");
 	m_iGreatWorksTourismModifierGlobal = kResults.GetInt("GreatWorksTourismModifierGlobal");
 	m_iTradeRouteSeaGoldBonusGlobal = kResults.GetInt("TradeRouteSeaGoldBonusGlobal");
@@ -3516,6 +3518,11 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvBuildingEntry::GetCityStateTradeRouteProductionModifierGlobal() const
+{
+	return m_iCityStateTradeRouteProductionModifierGlobal;
+}
+
 int CvBuildingEntry::GetLandmarksTourismPercentGlobal() const
 {
 	return m_iLandmarksTourismPercentGlobal;
@@ -3854,6 +3861,8 @@ CvCityBuildings::CvCityBuildings():
 	m_iMissionaryExtraSpreads(0),
 	m_iLandmarksTourismPercent(0),
 	m_iGreatWorksTourismModifier(0),
+	m_iNumBuildingsFromFaith(0),
+	m_iCityStateTradeRouteProductionModifier(0),
 	m_bSoldBuildingThisTurn(false),
 	m_pBuildings(NULL),
 	m_pCity(NULL)
@@ -3926,6 +3935,8 @@ void CvCityBuildings::Reset()
 	m_iMissionaryExtraSpreads = 0;
 	m_iLandmarksTourismPercent = 0;
 	m_iGreatWorksTourismModifier = 0;
+	m_iNumBuildingsFromFaith = 0;
+	m_iCityStateTradeRouteProductionModifier = 0;
 
 	m_bSoldBuildingThisTurn = false;
 
@@ -3957,6 +3968,8 @@ void CvCityBuildings::Read(FDataStream& kStream)
 	kStream >> m_iMissionaryExtraSpreads;
 	kStream >> m_iLandmarksTourismPercent;
 	kStream >> m_iGreatWorksTourismModifier;
+	kStream >> m_iNumBuildingsFromFaith;
+	kStream >> m_iCityStateTradeRouteProductionModifier;
 
 	kStream >> m_bSoldBuildingThisTurn;
 
@@ -3988,6 +4001,8 @@ void CvCityBuildings::Write(FDataStream& kStream)
 	kStream << m_iMissionaryExtraSpreads;
 	kStream << m_iLandmarksTourismPercent;
 	kStream << m_iGreatWorksTourismModifier;
+	kStream << m_iNumBuildingsFromFaith;
+	kStream << m_iCityStateTradeRouteProductionModifier;
 	kStream << m_bSoldBuildingThisTurn;
 
 #ifdef _MSC_VER
@@ -4579,7 +4594,6 @@ void CvCityBuildings::SetNumFreeBuilding(BuildingTypes eIndex, int iNewValue)
 
 	if(GetNumFreeBuilding(eIndex) != iNewValue)
 	{
-#if defined(MOD_BUGFIX_MINOR)
 		// This condensed logic comes from SetNumRealBuilding()
 		int iChangeNumFreeBuilding = iNewValue - GetNumFreeBuilding(eIndex);
 		
@@ -4587,28 +4601,7 @@ void CvCityBuildings::SetNumFreeBuilding(BuildingTypes eIndex, int iNewValue)
 
 		// Process building effects
 		m_pCity->processBuilding(eIndex, iChangeNumFreeBuilding, true);
-#else
-		int iOldNumBuilding = GetNumBuilding(eIndex);
 
-		if (iOldNumBuilding > 0 && iNewValue > 0)
-		{
-			DoSellBuilding(eIndex);
-			m_paiNumFreeBuilding[eIndex] = iNewValue;
-			m_pCity->processBuilding(eIndex, iNewValue, true);			
-		}
-		
-		else
-		{
-			m_paiNumFreeBuilding[eIndex] = iNewValue;
-
-			if (iOldNumBuilding != GetNumBuilding(eIndex))
-			{
-				m_pCity->processBuilding(eIndex, iNewValue - iOldNumBuilding, true);
-			}
-		}
-#endif
-
-#if defined(MOD_BUGFIX_MINOR)
 		CvBuildingEntry* buildingEntry = GC.getBuildingInfo(eIndex);
 		if(buildingEntry->IsCityWall())
 		{
@@ -4621,7 +4614,6 @@ void CvCityBuildings::SetNumFreeBuilding(BuildingTypes eIndex, int iNewValue)
 		// Building might affect City Banner stats
 		auto_ptr<ICvCity1> pCity = GC.WrapCityPointer(m_pCity);
 		GC.GetEngineUserInterface()->SetSpecificCityInfoDirty(pCity.get(), CITY_UPDATE_TYPE_BANNER);
-#endif
 	}
 }
 /// Accessor: Get yield boost for a specific building by yield type
@@ -5102,7 +5094,38 @@ void CvCityBuildings::ChangeGreatWorksTourismModifier(int iChange)
 	if(iChange != 0)
 	{
 		m_iGreatWorksTourismModifier = (m_iGreatWorksTourismModifier + iChange);
-		CvAssert(m_iGreatWorksTourismModifier >= 0);
+	}
+}
+
+/// Accessor: How many buildings in this city are ones that are built through Faith?
+int CvCityBuildings::GetNumBuildingsFromFaith() const
+{
+	return m_iNumBuildingsFromFaith;
+}
+void CvCityBuildings::ChangeNumBuildingsFromFaith(int iChange)
+{
+	if(iChange != 0)
+	{
+		m_iNumBuildingsFromFaith = (m_iNumBuildingsFromFaith + iChange);
+	}
+}
+
+/// Accessor: What is the production modifier for each city state trade route?
+int CvCityBuildings::GetCityStateTradeRouteProductionModifier() const
+{
+	if(m_iCityStateTradeRouteProductionModifier != 0)
+	{
+		int iCityStates = GET_PLAYER(m_pCity->getOwner()).GetTrade()->GetNumberOfCityStateTradeRoutes();
+		return m_iCityStateTradeRouteProductionModifier * iCityStates;
+	}
+	
+	return 0;
+}
+void CvCityBuildings::ChangeCityStateTradeRouteProductionModifier(int iChange)
+{
+	if(iChange != 0)
+	{
+		m_iCityStateTradeRouteProductionModifier = (m_iCityStateTradeRouteProductionModifier + iChange);
 	}
 }
 
@@ -5145,77 +5168,6 @@ int CvCityBuildings::GetThemingBonuses() const
 
 	return iBonus;
 }
-
-/// Accessor: How many buildings in this city are ones that are built through Faith?
-int CvCityBuildings::GetNumBuildingsFromFaith() const
-{
-	int iRtnValue = 0;
-
-	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
-	{
-		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-		CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
-		if (pkCivInfo)
-		{
-			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eLoopBuildingClass);
-			if (NO_BUILDING != eBuilding)
-			{
-				if (GetNumBuilding(eBuilding) > 0)
-				{
-					CvBuildingEntry *pkEntry = GC.getBuildingInfo(eBuilding);
-					if (pkEntry)
-					{
-						if (pkEntry->GetFaithCost() > 0 && pkEntry->IsUnlockedByBelief() && pkEntry->GetProductionCost() == -1)
-						{
-							iRtnValue++;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return iRtnValue;
-}
-
-/// Accessor: What is the production modifier for each city state trade route?
-int CvCityBuildings::GetCityStateTradeRouteProductionModifier() const
-{
-	int iRtnValue = 0;
-
-	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
-	{
-		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-		CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
-		if (pkCivInfo)
-		{
-			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eLoopBuildingClass);
-			if (NO_BUILDING != eBuilding)
-			{
-				if (GetNumBuilding(eBuilding) > 0)
-				{
-					CvBuildingEntry *pkEntry = GC.getBuildingInfo(eBuilding);
-					if (pkEntry)
-					{
-						int iProductionModifier = pkEntry->GetCityStateTradeRouteProductionModifier();
-						int iCityStates = GET_PLAYER(m_pCity->getOwner()).GetTrade()->GetNumberOfCityStateTradeRoutes();
-						if (iProductionModifier > 0  && iCityStates > 0)
-						{
-#if defined(MOD_BUGFIX_MINOR)
-							iRtnValue = iProductionModifier * iCityStates * GetNumBuilding(eBuilding);
-#else
-							iRtnValue = iProductionModifier * iCityStates;
-#endif
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return iRtnValue;
-}
-
 
 /// Accessor: Get current production modifier from buildings
 int CvCityBuildings::GetBuildingProductionModifier() const
