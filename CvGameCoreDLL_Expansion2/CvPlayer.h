@@ -2166,6 +2166,10 @@ public:
 		return isHuman() && GC.getGame().isOption(GAMEOPTION_HUMAN_ALL_UC);
 	}
 
+	unsigned long long GetScienceTimes100FromFriendships() const;
+	unsigned long long GetScienceTimes100FromOneFriend(PlayerTypes ePlayer) const;
+	void UpdateScienceTimes100FromFriendships();
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2842,6 +2846,8 @@ protected:
 	std::tr1::unordered_set<UnitTypes> m_sCanTrainUnitsFromCapturedOriginalCapitals;
 	std::tr1::unordered_set<BuildingTypes> m_sCanConstructBuildingsFromCapturedOriginalCapitals;
 	std::tr1::unordered_set<ImprovementTypes> m_sCanBuildImprovementsFromCapturedOriginalCapitals;
+
+	std::tr1::array<unsigned long long, MAX_MAJOR_CIVS> m_aScienceTimes100FromMajorFriends; // length = MAX_MAJOR_CIVS
 };
 
 extern bool CancelActivePlayerEndTurn();

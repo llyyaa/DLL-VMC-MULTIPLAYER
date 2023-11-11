@@ -1263,6 +1263,8 @@ protected:
 	LUAAPIEXTN(ChangeImmigrationCounter, int, iIndex, iChange);
 	LUAAPIEXTN(SetImmigrationCounter, int, iIndex, iValue);
 #endif
+
+	LUAAPIEXTN(GetScienceTimes100FromFriendsTable);
 };
 
 #endif //CVLUAPLAYER_H

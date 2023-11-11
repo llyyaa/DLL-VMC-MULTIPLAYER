@@ -1423,6 +1423,11 @@ int CvTraitEntry::GetGoldenAgeGrowThresholdModifier() const
 	return m_iGoldenAgeGrowThresholdModifier;
 }
 
+int CvTraitEntry::GetShareAllyResearchPercent() const
+{
+	return m_iShareAllyResearchPercent;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2185,6 +2190,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iGoldenAgeResearchTotalCostModifier = kResults.GetInt("GoldenAgeResearchTotalCostModifier");
 	m_iGoldenAgeResearchCityCountCostModifier = kResults.GetInt("GoldenAgeResearchCityCountCostModifier");
 	m_iGoldenAgeGrowThresholdModifier = kResults.GetInt("GoldenAgeGrowThresholdModifier");
+	m_iShareAllyResearchPercent = kResults.GetInt("ShareAllyResearchPercent");
 
 	return true;
 }
@@ -2535,6 +2541,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iGoldenAgeResearchTotalCostModifier = trait->GetGoldenAgeResearchTotalCostModifier();
 			m_iGoldenAgeResearchCityCountCostModifier = trait->GetGoldenAgeResearchCityCountCostModifier();
 			m_iGoldenAgeGrowThresholdModifier = trait->GetGoldenAgeGrowThresholdModifier();
+			m_iShareAllyResearchPercent = trait->GetShareAllyResearchPercent();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -4575,6 +4582,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_iGoldenAgeResearchTotalCostModifier;
 	kStream >> m_iGoldenAgeResearchCityCountCostModifier;
 	kStream >> m_iGoldenAgeGrowThresholdModifier;
+	kStream >> m_iShareAllyResearchPercent;
 }
 
 /// Serialization write
@@ -4837,6 +4845,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iGoldenAgeResearchTotalCostModifier;
 	kStream << m_iGoldenAgeResearchCityCountCostModifier;
 	kStream << m_iGoldenAgeGrowThresholdModifier;
+	kStream << m_iShareAllyResearchPercent;
 }
 
 // PRIVATE METHODS
@@ -5076,4 +5085,8 @@ int CvPlayerTraits::GetGoldenAgeResearchCityCountCostModifier() const
 int CvPlayerTraits::GetGoldenAgeGrowThresholdModifier() const
 {
 	return m_iGoldenAgeGrowThresholdModifier;
+}
+int CvPlayerTraits::GetShareAllyResearchPercent() const
+{
+	return m_iShareAllyResearchPercent;
 }

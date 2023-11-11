@@ -1341,6 +1341,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(ChangeImmigrationCounter);
 	Method(SetImmigrationCounter);
 #endif
+
+	Method(GetScienceTimes100FromFriendsTable);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12653,6 +12655,24 @@ int CvLuaPlayer::lGetDomainTroopsActive(lua_State* L)
 	DomainTypes eDomain = (DomainTypes)luaL_optint(L, 2, int(DOMAIN_SEA));
 	lua_pushinteger(L, pkPlayer->GetDomainTroopsActive(eDomain));
 	return 1;
+}
+
+int CvLuaPlayer::lGetScienceTimes100FromFriendsTable(lua_State* L)
+{
+    CvPlayerAI* pkPlayer = GetInstance(L);
+    lua_newtable(L); // Create a new table on the Lua stack
+
+    for (int i = 0; i < MAX_MAJOR_CIVS; ++i) {
+        unsigned long long value = pkPlayer->GetScienceTimes100FromOneFriend((PlayerTypes)i);
+        if (value != 0) {
+            lua_pushinteger(L, i); // Push the index
+            lua_pushinteger(L, value); // Push the value
+            lua_settable(L, -3); // Sets the table at index -3 with key at index -2 and value at index -1
+        }
+    }
+
+    // The table is now at the top of the stack. When the function returns, Lua will take it.
+    return 1; // Number of return values
 }
 
 LUAAPIIMPL(Player, GetNumCropsTotalTimes100)

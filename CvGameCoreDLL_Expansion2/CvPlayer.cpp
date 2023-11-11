@@ -1697,6 +1697,10 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	{
 		m_paiCorruptionLevelPolicyCostModifier[i] = 0;
 	}
+
+	for (size_t i = 0; i < m_aScienceTimes100FromMajorFriends.size(); ++i) {
+		m_aScienceTimes100FromMajorFriends[i] = 0;
+	}
 }
 
 //	--------------------------------------------------------------------------------
@@ -20920,9 +20924,58 @@ int CvPlayer::GetScienceTimes100() const
 	// If we have a negative Treasury + GPT then it gets removed from Science
 	iValue += GetScienceFromBudgetDeficitTimes100();
 
+	iValue += GetScienceTimes100FromFriendships();
+
 	return max(iValue, 0);
 }
 
+unsigned long long CvPlayer::GetScienceTimes100FromFriendships() const
+{
+	unsigned long long result = 0;
+	for (int iPlayerLoop = 0; iPlayerLoop < m_aScienceTimes100FromMajorFriends.size(); iPlayerLoop++)
+	{
+		result += m_aScienceTimes100FromMajorFriends[iPlayerLoop];
+	}
+	return result;
+}
+
+unsigned long long CvPlayer::GetScienceTimes100FromOneFriend(PlayerTypes ePlayer) const
+{
+	if (ePlayer <= -1 || ePlayer == GetID() || ePlayer >= MAX_MAJOR_CIVS)
+	{
+		return 0;
+	}
+
+	return m_aScienceTimes100FromMajorFriends[ePlayer];
+}
+
+void CvPlayer::UpdateScienceTimes100FromFriendships()
+{
+	PlayerTypes eLoopPlayer;
+	for (int iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
+	{
+		eLoopPlayer = (PlayerTypes) iPlayerLoop;
+
+		if (eLoopPlayer == GetID() ||
+				!GetDiplomacyAI()->IsPlayerValid(eLoopPlayer) ||
+				!GetDiplomacyAI()->IsDoFAccepted(eLoopPlayer) ||
+				!GET_PLAYER(eLoopPlayer).isAlive())
+		{
+			m_aScienceTimes100FromMajorFriends[eLoopPlayer] = 0;
+			continue;
+		}
+
+		int iTraitMod = GET_PLAYER(eLoopPlayer).GetPlayerTraits()->GetShareAllyResearchPercent()
+			+ GetPlayerTraits()->GetShareAllyResearchPercent();
+		if (iTraitMod == 0)
+		{
+			m_aScienceTimes100FromMajorFriends[eLoopPlayer] = 0;
+			continue;
+		}
+
+		m_aScienceTimes100FromMajorFriends[eLoopPlayer] = GET_PLAYER(eLoopPlayer).GetScienceTimes100() /100  * iTraitMod;
+	}
+}
 
 //	--------------------------------------------------------------------------------
 /// Where is our Science coming from?
@@ -24594,6 +24647,8 @@ void CvPlayer::doResearch()
 	AI_PERF_FORMAT("AI-perf.csv", ("CvPlayer::doResearch, Turn %03d, %s", GC.getGame().getElapsedGameTurns(), getCivilizationShortDescription()) );
 	bool bForceResearchChoice;
 
+	UpdateScienceTimes100FromFriendships();
+
 	if(GetPlayerTechs()->IsResearch())
 	{
 		bForceResearchChoice = false;
@@ -27994,6 +28049,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_sCanConstructBuildingsFromCapturedOriginalCapitals;
 	kStream >> m_sCanBuildImprovementsFromCapturedOriginalCapitals;
 
+	kStream >> m_aScienceTimes100FromMajorFriends;
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -28630,6 +28687,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_sCanTrainUnitsFromCapturedOriginalCapitals;
 	kStream << m_sCanConstructBuildingsFromCapturedOriginalCapitals;
 	kStream << m_sCanBuildImprovementsFromCapturedOriginalCapitals;
+
+	kStream << m_aScienceTimes100FromMajorFriends;
 }
 
 //	--------------------------------------------------------------------------------

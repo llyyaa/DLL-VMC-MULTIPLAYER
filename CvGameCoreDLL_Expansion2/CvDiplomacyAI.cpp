@@ -21251,6 +21251,13 @@ void CvDiplomacyAI::SetDoFAccepted(PlayerTypes ePlayer, bool bValue)
 
 		m_pPlayer->recomputeGreatPeopleModifiers();
 
+		auto& kPlayer = GET_PLAYER(ePlayer);
+		if (m_pPlayer->GetPlayerTraits()->GetShareAllyResearchPercent() > 0
+				|| kPlayer.GetPlayerTraits()->GetShareAllyResearchPercent() > 0) {
+			m_pPlayer->UpdateScienceTimes100FromFriendships();
+			kPlayer.UpdateScienceTimes100FromFriendships();
+		}
+
 		if(bValue){
 			// Someone made a DoF, send out notifications to everyone
 			Localization::String strText = Localization::Lookup("TXT_KEY_NOTIFICATION_DOF");

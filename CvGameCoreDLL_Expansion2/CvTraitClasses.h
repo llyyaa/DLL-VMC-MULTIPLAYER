@@ -299,6 +299,8 @@ public:
 
 	int GetGoldenAgeGrowThresholdModifier() const;
 
+	int GetShareAllyResearchPercent() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -535,6 +537,8 @@ protected:
 	int m_iGoldenAgeResearchCityCountCostModifier = 0;
 
 	int m_iGoldenAgeGrowThresholdModifier = 0;
+
+	int m_iShareAllyResearchPercent = 0;
 private:
 	CvTraitEntry(const CvTraitEntry&);
 	CvTraitEntry& operator=(const CvTraitEntry&);
@@ -1229,6 +1233,8 @@ public:
 
 	int GetGoldenAgeGrowThresholdModifier() const;
 
+	int GetShareAllyResearchPercent() const;
+
 	// Serialization
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
@@ -1479,6 +1485,8 @@ private:
 	int m_iGoldenAgeResearchCityCountCostModifier = 0;
 
 	int m_iGoldenAgeGrowThresholdModifier = 0;
+
+	int m_iShareAllyResearchPercent = 0;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H
