@@ -477,13 +477,10 @@ int CvCityCitizens::GetPlotValue(CvPlot* pPlot, bool bUseAllowGrowthFlag)
 	int iValue = 0;
 
 	// Yield Values
-	CvFlavorManager* pFlavorManager = m_pCity->GetPlayer()->GetFlavorManager();
-	int iFlavorGrowth = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_GROWTH"));
-	int iFoodYieldValue = ((GC.getAI_CITIZEN_VALUE_FOOD()+iFlavorGrowth) * pPlot->getYield(YIELD_FOOD)) * 2;
-	iFoodYieldValue /= 3;
-	int iProductionYieldValue = (GC.getAI_CITIZEN_VALUE_PRODUCTION() * pPlot->getYield(YIELD_PRODUCTION));
-	int iGoldYieldValue = (GC.getAI_CITIZEN_VALUE_GOLD() * pPlot->getYield(YIELD_GOLD));
-	int iScienceYieldValue = (GC.getAI_CITIZEN_VALUE_SCIENCE() * pPlot->getYield(YIELD_SCIENCE));
+	int iFoodYieldValue = (/*12*/ GC.getAI_CITIZEN_VALUE_FOOD() * pPlot->getYield(YIELD_FOOD));
+	int iProductionYieldValue = (/*8*/ GC.getAI_CITIZEN_VALUE_PRODUCTION() * pPlot->getYield(YIELD_PRODUCTION));
+	int iGoldYieldValue = (/*10*/ GC.getAI_CITIZEN_VALUE_GOLD() * pPlot->getYield(YIELD_GOLD));
+	int iScienceYieldValue = (/*6*/ GC.getAI_CITIZEN_VALUE_SCIENCE() * pPlot->getYield(YIELD_SCIENCE));
 	int iCultureYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlot->getYield(YIELD_CULTURE));
 	int iFaithYieldValue = (GC.getAI_CITIZEN_VALUE_FAITH() * pPlot->getYield(YIELD_FAITH));
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
@@ -546,46 +543,23 @@ int CvCityCitizens::GetPlotValue(CvPlot* pPlot, bool bUseAllowGrowthFlag)
 				iFoodYieldValue /= 2;
 			}
 		}
+		// If our surplus is not at least 2, really emphasize food plots
 		else if(!bAvoidGrowth)
 		{
-			//If we didn't have any unemployed people
-			if(GetSpecialistCount((SpecialistTypes)GC.getInfoTypeForString("SPECIALIST_CITIZEN")) <= 0)
+			if(iExcessFoodTimes100 < 200)
 			{
-				int iGrowthThreshold = m_pCity->growthThreshold();
-				if(iExcessFoodTimes100 < 200)
-				{
-					// If our surplus is not at least 2, really emphasize food plots
-					iFoodYieldValue *= 8;
-				}
-				else if(iExcessFoodTimes100 < iGrowthThreshold/10)
-				{
-					iFoodYieldValue *= 4;
-				}
-				//food may be enough
-				else if(iExcessFoodTimes100 > iGrowthThreshold/4)
-				{
-					iFoodYieldValue /= 2;
-				}
+				iFoodYieldValue *= 8;
 			}
 			else if (eFocus != CITY_AI_FOCUS_TYPE_FOOD)
 			{
-				//Try not to starve, even if we have unemployed people
-				if(iExcessFoodTimes100 < 0)
-				{
-					iFoodYieldValue *= 8;
-				}
-				else
-				{
-					iFoodYieldValue /= 3;
-				}
-
+				iFoodYieldValue /= 2;
 			}
 		}
 	}
 
-	if((eFocus == NO_CITY_AI_FOCUS_TYPE || eFocus == CITY_AI_FOCUS_TYPE_PROD_GROWTH || eFocus == CITY_AI_FOCUS_TYPE_GOLD_GROWTH) && !bAvoidGrowth && m_pCity->getPopulation() < 6)
+	if((eFocus == NO_CITY_AI_FOCUS_TYPE || eFocus == CITY_AI_FOCUS_TYPE_PROD_GROWTH || eFocus == CITY_AI_FOCUS_TYPE_GOLD_GROWTH) && !bAvoidGrowth && m_pCity->getPopulation() < 5)
 	{
-		iFoodYieldValue *= 6;
+		iFoodYieldValue *= 4;
 	}
 
 	iValue += iFoodYieldValue;
@@ -1175,23 +1149,13 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 	int iFoodConsumptionBonus = (pPlayer->isHalfSpecialistFood()) ? 1 : 0;
 
 	// Yield Values
-	CvFlavorManager* pFlavorManager = pPlayer->GetFlavorManager();
-	int iFlavorScience = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_SCIENCE"));
-	int iFlavorCulture = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_CULTURE"));
-	int iFlavorGP = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_GREAT_PEOPLE"));
-	/*int iFlavorGold = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_GOLD"));
-	int iFlavorHappiness = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_HAPPINESS"));
-	int iFlavorProduction = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_PRODUCTION"));*/
-
 	int iFoodYieldValue = (GC.getAI_CITIZEN_VALUE_FOOD() * (pPlayer->specialistYield(eSpecialist, YIELD_FOOD) + iFoodConsumptionBonus));
 	int iProductionYieldValue = (GC.getAI_CITIZEN_VALUE_PRODUCTION() * pPlayer->specialistYield(eSpecialist, YIELD_PRODUCTION));
 	int iGoldYieldValue = (GC.getAI_CITIZEN_VALUE_GOLD() * pPlayer->specialistYield(eSpecialist, YIELD_GOLD));
-	//Don't worry about extra cost for specialist, it's worth
-	iGoldYieldValue = iGoldYieldValue < 0 ? 0 : iGoldYieldValue;
-	int iScienceYieldValue = ((GC.getAI_CITIZEN_VALUE_SCIENCE()+iFlavorScience+1)/2 * pPlayer->specialistYield(eSpecialist, YIELD_SCIENCE));
-	int iCultureYieldValue = ((GC.getAI_CITIZEN_VALUE_CULTURE()+iFlavorCulture+1)/2 * (m_pCity->GetCultureFromSpecialist(eSpecialist))); 
+	int iScienceYieldValue = (GC.getAI_CITIZEN_VALUE_SCIENCE() * pPlayer->specialistYield(eSpecialist, YIELD_SCIENCE));
+	int iCultureYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * m_pCity->GetCultureFromSpecialist(eSpecialist)); 
 #if defined(MOD_API_UNIFIED_YIELDS)
-	iCultureYieldValue += ((GC.getAI_CITIZEN_VALUE_CULTURE()+iFlavorCulture+1)/2 * pPlayer->specialistYield(eSpecialist, YIELD_CULTURE));
+	iCultureYieldValue += (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlayer->specialistYield(eSpecialist, YIELD_CULTURE));
 #endif
 	int iFaithYieldValue = (GC.getAI_CITIZEN_VALUE_FAITH() * pPlayer->specialistYield(eSpecialist, YIELD_FAITH));
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
@@ -1200,7 +1164,7 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 #if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	int iGoldenAgeYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlayer->specialistYield(eSpecialist, YIELD_GOLDEN_AGE_POINTS));
 #endif
-	int iGPPYieldValue = pSpecialistInfo->getGreatPeopleRateChange() * (iFlavorGP/2); // TODO: un-hardcode this
+	int iGPPYieldValue = pSpecialistInfo->getGreatPeopleRateChange() * 3; // TODO: un-hardcode this
 	int iHappinessYieldValue = (m_pCity->GetPlayer()->isHalfSpecialistUnhappiness()) ? 5 : 0; // TODO: un-hardcode this
 	iHappinessYieldValue = m_pCity->GetPlayer()->IsEmpireUnhappy() ? iHappinessYieldValue * 2 : iHappinessYieldValue; // TODO: un-hardcode this
 
@@ -1211,6 +1175,7 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 		{
 			//if lacking this resource(Fuzzy), multiply it
 			int iNumResource = pPlayer->getNumResourceTotalCache(rinfo.m_eResource);
+			iNumResource -= rinfo.m_iQuantity;
 			if(iNumResource < 0) iResourceValue -= iNumResource * rinfo.m_iQuantity;
 		}
 	}
