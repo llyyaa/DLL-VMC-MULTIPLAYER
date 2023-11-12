@@ -402,6 +402,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 #if defined(MOD_API_UNIFIED_YIELDS)
 	kUtility.PopulateArrayByValue(m_piYieldFromBarbarianKills, "Yields", "Unit_YieldFromBarbarianKills", "YieldType", "UnitType", szUnitType, "Yield");
 #endif
+	kUtility.PopulateArrayByValue(m_piInstantYieldFromTrainings, "Yields", "Unit_InstantYieldFromTrainings", "YieldType", "UnitType", szUnitType, "Yield");
 	kUtility.PopulateArrayByExistence(m_pbFreePromotions, "UnitPromotions", "Unit_FreePromotions", "PromotionType", "UnitType", szUnitType);
 
 	kUtility.PopulateArrayByExistence(m_pbUpgradeUnitClass, "UnitClasses", "Unit_ClassUpgrades", "UnitClassType", "UnitType", szUnitType);
@@ -1203,6 +1204,13 @@ int CvUnitEntry::GetYieldFromBarbarianKills(YieldTypes eYield) const
 	return m_piYieldFromBarbarianKills[(int)eYield];
 }
 #endif
+
+int CvUnitEntry::GetInstantYieldFromTrainings(YieldTypes eYield) const
+{
+	CvAssertMsg((int)eYield < NUM_YIELD_TYPES, "Yield type out of bounds");
+	CvAssertMsg((int)eYield > -1, "Index out of bounds");
+	return m_piInstantYieldFromTrainings[(int)eYield];
+}
 
 /// Boost in production for leader with this trait
 int CvUnitEntry::GetProductionTraits(int i) const

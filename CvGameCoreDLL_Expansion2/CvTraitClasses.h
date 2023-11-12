@@ -140,6 +140,7 @@ public:
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetCultureBonusUnitStrengthModify() const;
 	int GetRiverCorruptionScoreChange() const;
 	int GetGreatWorksTourism() const;
 	int GetCiviliansFreePromotion() const;
@@ -397,6 +398,7 @@ protected:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iCultureBonusUnitStrengthModify;
 	int m_iRiverCorruptionScoreChange;
 	int m_iGreatWorksTourism;
 	int m_iCiviliansFreePromotion;
@@ -911,6 +913,10 @@ public:
 	}
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetCultureBonusUnitStrengthModify() const
+	{
+		return m_iCultureBonusUnitStrengthModify;
+	}
 	int GetRiverCorruptionScoreChange() const
 	{
 		return m_iRiverCorruptionScoreChange;
@@ -1337,6 +1343,7 @@ private:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iCultureBonusUnitStrengthModify;
 	int m_iRiverCorruptionScoreChange;
 	int m_iGreatWorksTourism;
 	int m_iCiviliansFreePromotion;

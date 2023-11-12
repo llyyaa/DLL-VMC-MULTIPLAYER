@@ -585,6 +585,12 @@
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_GLOBAL">
 			<Text>[NEWLINE][ICON_BULLET]城邦商路全局修正: {1_Num}%</Text>
 		</Row>
+		<Row Tag="TXT_KEY_TRAIT_CULTURE_FROM_UNIT">
+			<Text>板载!{2_name}训练完成，获得{1_num}[ICON_CULTURE]文化！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_POLICY_CULTURE_FROM_UNIT">
+			<Text>{2_name}训练完成，获得{1_num}[ICON_CULTURE]文化！</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

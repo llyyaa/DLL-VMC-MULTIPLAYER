@@ -181,6 +181,7 @@ public:
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int GetYieldFromBarbarianKills(YieldTypes eYield) const;
 #endif
+	int GetInstantYieldFromTrainings(YieldTypes eYield) const;
 	int GetProductionTraits(int i) const;
 	int GetFlavorValue(int i) const;
 	int GetUnitGroupRequired(int i) const;
@@ -365,6 +366,7 @@ private:
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int* m_piYieldFromBarbarianKills;
 #endif
+	int* m_piInstantYieldFromTrainings;
 
 	bool* m_pbUpgradeUnitClass;
 	bool* m_pbUnitAIType;

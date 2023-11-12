@@ -120,6 +120,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iCultureBonusUnitStrengthModify(0),
 	m_iRiverCorruptionScoreChange(0),
 	m_iGreatWorksTourism(0),
 	m_iCiviliansFreePromotion(NO_PROMOTION),
@@ -676,6 +677,10 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetCultureBonusUnitStrengthModify() const
+{
+	return m_iCultureBonusUnitStrengthModify;
+}
 int CvTraitEntry::GetRiverCorruptionScoreChange() const
 {
 	return m_iRiverCorruptionScoreChange;
@@ -1558,6 +1563,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iCultureBonusUnitStrengthModify = kResults.GetInt("CultureBonusUnitStrengthModify");
 	m_iRiverCorruptionScoreChange = kResults.GetInt("RiverCorruptionScoreChange");
 	m_iGreatWorksTourism = kResults.GetInt("GreatWorksTourism");
 	szTextVal = kResults.GetText("CiviliansFreePromotion");
@@ -2369,6 +2375,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			m_iCultureBonusUnitStrengthModify += trait->GetCultureBonusUnitStrengthModify();
 			m_iRiverCorruptionScoreChange += trait->GetRiverCorruptionScoreChange();
 			m_iGreatWorksTourism += trait->GetGreatWorksTourism();
 			if(trait->GetCiviliansFreePromotion() != NO_PROMOTION)
@@ -2865,6 +2872,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iCultureBonusUnitStrengthModify = 0;
 	m_iRiverCorruptionScoreChange = 0;
 	m_iGreatWorksTourism = 0;
 	m_iCiviliansFreePromotion = NO_PROMOTION;
@@ -4290,6 +4298,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iCultureBonusUnitStrengthModify;
 	kStream >> m_iRiverCorruptionScoreChange;
 	kStream >> m_iGreatWorksTourism;
 	kStream >> m_iCiviliansFreePromotion;
@@ -4675,6 +4684,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iCultureBonusUnitStrengthModify;
 	kStream << m_iRiverCorruptionScoreChange;
 	kStream << m_iGreatWorksTourism;
 	kStream << m_iCiviliansFreePromotion;

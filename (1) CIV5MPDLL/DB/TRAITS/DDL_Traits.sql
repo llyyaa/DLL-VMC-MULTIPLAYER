@@ -38,3 +38,5 @@ alter table Traits add column `GoldenAgeResearchCityCountCostModifier` int not n
 alter table Traits add column `GoldenAgeGrowThresholdModifier` int not null default 0;
 
 alter table Traits add column `ShareAllyResearchPercent` int not null default 0;
+
+alter table Traits add column `CultureBonusUnitStrengthModify` int not null default 0;

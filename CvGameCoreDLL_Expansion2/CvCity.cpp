@@ -15617,28 +15617,9 @@ void CvCity::popOrder(int iNum, bool bFinish, bool bChoose)
 		if(bFinish)
 		{
 			int iResult = CreateUnit(eTrainUnit, false, false, eTrainAIUnit);
+			
 			if(iResult != FFreeList::INVALID_INDEX)
 			{
-
-#if defined(MOD_ROG_CORE)
-				if (MOD_ROG_CORE) {
-					YieldTypes eYield;
-					for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
-					{
-						eYield = (YieldTypes)iI;
-						CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eTrainUnit);
-						int iCost = pkUnitInfo->GetProductionCost();
-						iCost *= GC.getGame().getGameSpeedInfo().getConstructPercent();
-						iCost /= 100;
-						if (GetYieldFromUnitProduction(eYield) > 0 && iCost > 0)
-						{
-							iCost *= GetYieldFromUnitProduction(eYield)/100;
-							doInstantYield(eYield, iCost);
-						}
-					}
-				}
-#endif
-
 #if defined(MOD_EVENTS_CITY)
 				if (MOD_EVENTS_CITY) {
 					GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityTrained, getOwner(), GetID(), iResult, false, false);
@@ -16212,7 +16193,7 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 		pUnit->kill(false);
 		return FFreeList::INVALID_INDEX;
 	}
-
+	CvUnitEntry & pkUnitInfo = pUnit->getUnitInfo();
 	addProductionExperience(pUnit);
 
 	CvPlot* pRallyPlot = getRallyPlot();
@@ -16233,7 +16214,7 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 		EconomicAIStrategyTypes eStrategy = (EconomicAIStrategyTypes) GC.getInfoTypeForString("ECONOMICAISTRATEGY_NEED_RECON");
 		if(thisPlayer.GetEconomicAI()->IsUsingStrategy(eStrategy))
 		{
-			if(pUnit->getUnitInfo().GetUnitAIType(UNITAI_EXPLORE) && pUnit->AI_getUnitAIType() != UNITAI_EXPLORE)
+			if(pkUnitInfo.GetUnitAIType(UNITAI_EXPLORE) && pUnit->AI_getUnitAIType() != UNITAI_EXPLORE)
 			{
 
 				// Now make sure there isn't a critical military threat
@@ -16265,7 +16246,7 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 		EconomicAIStrategyTypes eOtherStrategy = (EconomicAIStrategyTypes) GC.getInfoTypeForString("ECONOMICAISTRATEGY_REALLY_NEED_RECON_SEA");
 		if(thisPlayer.GetEconomicAI()->IsUsingStrategy(eStrategy) || thisPlayer.GetEconomicAI()->IsUsingStrategy(eOtherStrategy))
 		{
-			if(pUnit->getUnitInfo().GetUnitAIType(UNITAI_EXPLORE_SEA))
+			if(pkUnitInfo.GetUnitAIType(UNITAI_EXPLORE_SEA))
 			{
 				pUnit->AI_setUnitAIType(UNITAI_EXPLORE_SEA);
 				if(GC.getLogging() && GC.getAILogging())
@@ -16277,7 +16258,7 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 			}
 		}
 	}
-	int iPopConsume = pUnit->getUnitInfo().GetTrainPopulationConsume();
+	int iPopConsume = pkUnitInfo.GetTrainPopulationConsume();
 	if(iPopConsume > 0 && !bIsFaith)
 	{
 		if(pUnit->getUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SETTLER"))
@@ -16309,6 +16290,60 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 		IncrementUnitStatCount(pUnit);
 	}
 
+	YieldTypes eYield;
+	int iCost = pkUnitInfo.GetProductionCost();
+	iCost *= GC.getGame().getGameSpeedInfo().getConstructPercent();
+	iCost /= 100;
+	int iStrength = std::max(pUnit->GetBaseCombatStrength(), pUnit->GetBaseRangedCombatStrength());
+	PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
+	int iTempValue = 0;
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		eYield = (YieldTypes)iI;
+		iTempValue = GetYieldFromUnitProduction(eYield);
+		if (iTempValue > 0 && !bIsGold && !bIsFaith)
+		{
+			iTempValue *= iCost;
+			iTempValue /= 100;
+			doInstantYield(eYield, iTempValue);
+		}
+		iTempValue = pkUnitInfo.GetInstantYieldFromTrainings(eYield);
+		if (iTempValue > 0)
+		{
+			doInstantYield(eYield, iTempValue);
+		}
+		if(eYield == YIELD_CULTURE)
+		{
+			iTempValue = thisPlayer.GetPlayerTraits()->GetCultureBonusUnitStrengthModify();
+			if(iTempValue > 0)
+			{
+				iTempValue *= iStrength;
+				iTempValue /= 100;
+				doInstantYield(eYield, iTempValue);
+				if (thisPlayer.isHuman())
+				{
+					ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+					CvString strBuffer = GetLocalizedText("TXT_KEY_TRAIT_CULTURE_FROM_UNIT", iTempValue, pUnit->getName());
+					pkDLLInterface->AddMessage(0, thisPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+				}
+			}
+			iTempValue = thisPlayer.getPolicyModifiers(POLICYMOD_DEEP_WATER_NAVAL_CULTURE_STRENGTH_MODIFIER);
+			if(iTempValue > 0 && pUnit->getDomainType() == DOMAIN_SEA && !pUnit->isHasPromotion(ePromotionOceanImpassable))
+			{
+				iTempValue *= iStrength;
+				iTempValue /= 100;
+				doInstantYield(eYield, iTempValue);
+				if (thisPlayer.isHuman())
+				{
+					ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+					CvString strBuffer = GetLocalizedText("TXT_KEY_POLICY_CULTURE_FROM_UNIT", iTempValue, pUnit->getName());
+					pkDLLInterface->AddMessage(0, thisPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
+				}
+			}
+			
+		}
+		
+	}
 	return pUnit->GetID();
 }
 

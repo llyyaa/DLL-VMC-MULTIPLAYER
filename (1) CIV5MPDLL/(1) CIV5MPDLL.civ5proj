@@ -473,7 +473,7 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>DB/BUILDINGS/Building_InstantYield.xml</FileName>
+        <FileName>DB/BUILDINGS/Building_NewTable.xml</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
@@ -970,7 +970,7 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="DB\BUILDINGS\Building_InstantYield.xml">
+    <Content Include="DB\BUILDINGS\Building_NewTable.xml">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

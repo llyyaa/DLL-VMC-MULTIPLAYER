@@ -113,6 +113,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	m_iConversionModifier(0),
 #endif
+	m_iDeepWaterNavalStrengthCultureModifier(0),
 	m_iSettlerPopConsume(0),
 	m_iGoldPerUnit(0),
 	m_iGoldPerMilitaryUnit(0),
@@ -407,6 +408,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	m_iConversionModifier = kResults.GetInt("ConversionModifier");
 #endif
+	m_iDeepWaterNavalStrengthCultureModifier = kResults.GetInt("DeepWaterNavalStrengthCultureModifier");
 	m_iSettlerPopConsume = kResults.GetInt("SettlerPopConsume");
 	m_iGoldPerUnit = kResults.GetInt("GoldPerUnit");
 	m_iGoldPerMilitaryUnit = kResults.GetInt("GoldPerMilitaryUnit");
@@ -1792,6 +1794,11 @@ int CvPolicyEntry::GetConversionModifier() const
 	return m_iConversionModifier;
 }
 #endif
+int CvPolicyEntry::GetDeepWaterNavalStrengthCultureModifier() const
+{
+	return m_iDeepWaterNavalStrengthCultureModifier;
+}
+
 int CvPolicyEntry::GetSettlerPopConsume() const
 {
 	return m_iSettlerPopConsume;
