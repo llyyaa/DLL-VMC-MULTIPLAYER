@@ -22676,7 +22676,7 @@ void CvPlayer::changeFreeBuildingCount(BuildingTypes eIndex, int iChange)
 			{
 				pLoopCity->GetCityBuildings()->SetNumFreeBuilding(eIndex, 0);
 #ifdef MOD_BUGFIX_BUILDING_FREEBUILDING
-				if (MOD_BUGFIX_BUILDING_FREEBUILDING)
+				if (MOD_BUGFIX_BUILDING_FREEBUILDING && !GC.getBuildingInfo(eIndex)->IsDummyBuilding())
 					pLoopCity->GetCityBuildings()->SetNumRealBuilding(eIndex, 1);
 #endif
 			}
@@ -26119,6 +26119,12 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 #endif
 	changePolicyModifiers(POLICYMOD_SETTLER_POPULATION_CONSUME, pPolicy->GetSettlerPopConsume() * iChange);
 	changePolicyModifiers(POLICYMOD_DEEP_WATER_NAVAL_CULTURE_STRENGTH_MODIFIER, pPolicy->GetDeepWaterNavalStrengthCultureModifier() * iChange);
+
+	if(pPolicy->GetFreeBuildingClass() != NO_BUILDINGCLASS)
+	{
+		BuildingTypes eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(pPolicy->GetFreeBuildingClass());
+		changeFreeBuildingCount(eFreeBuilding, iChange);
+	}
 
 	changeSharedIdeologyTourismModifier(pPolicy->GetSharedIdeologyTourismModifier() * iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)

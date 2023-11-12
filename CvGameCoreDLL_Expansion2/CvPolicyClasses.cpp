@@ -113,6 +113,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	m_iConversionModifier(0),
 #endif
+	m_iFreeBuildingClass(0),
 	m_iDeepWaterNavalStrengthCultureModifier(0),
 	m_iSettlerPopConsume(0),
 	m_iGoldPerUnit(0),
@@ -408,6 +409,8 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	m_iConversionModifier = kResults.GetInt("ConversionModifier");
 #endif
+	const char* szTextVal = kResults.GetText("FreeBuildingClass");
+	m_iFreeBuildingClass = GC.getInfoTypeForString(szTextVal, true);
 	m_iDeepWaterNavalStrengthCultureModifier = kResults.GetInt("DeepWaterNavalStrengthCultureModifier");
 	m_iSettlerPopConsume = kResults.GetInt("SettlerPopConsume");
 	m_iGoldPerUnit = kResults.GetInt("GoldPerUnit");
@@ -1794,6 +1797,11 @@ int CvPolicyEntry::GetConversionModifier() const
 	return m_iConversionModifier;
 }
 #endif
+int CvPolicyEntry::GetFreeBuildingClass() const
+{
+	return m_iFreeBuildingClass;
+}
+
 int CvPolicyEntry::GetDeepWaterNavalStrengthCultureModifier() const
 {
 	return m_iDeepWaterNavalStrengthCultureModifier;

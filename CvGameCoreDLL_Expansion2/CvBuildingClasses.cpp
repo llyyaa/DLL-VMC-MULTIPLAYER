@@ -661,6 +661,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iGlobalProductionNeededUnitModifier = kResults.GetInt("GlobalProductionNeededUnitModifier");
 	m_iGlobalProductionNeededBuildingModifier = kResults.GetInt("GlobalProductionNeededBuildingModifier");
 	m_iGlobalProductionNeededProjectModifier = kResults.GetInt("GlobalProductionNeededProjectModifier");
+	m_bDummyBuilding = kResults.GetBool("DummyBuilding");
 
 	//References
 	const char* szTextVal;
@@ -2171,6 +2172,10 @@ int CvBuildingEntry::GetGlobalProductionNeededBuildingModifier() const {
 }
 int CvBuildingEntry::GetGlobalProductionNeededProjectModifier() const {
 	return m_iGlobalProductionNeededProjectModifier;
+}
+
+bool CvBuildingEntry::IsDummyBuilding() const {
+	return m_bDummyBuilding;
 }
 
 int CvBuildingEntry::GetExtraAttacks() const

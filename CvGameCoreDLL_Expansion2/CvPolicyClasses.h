@@ -123,6 +123,7 @@ public:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int GetConversionModifier() const;
 #endif
+	int GetFreeBuildingClass() const;
 	int GetDeepWaterNavalStrengthCultureModifier() const;
 	int GetSettlerPopConsume() const;
 
@@ -427,6 +428,7 @@ private:
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int m_iConversionModifier;
 #endif
+	int m_iFreeBuildingClass;
 	int m_iDeepWaterNavalStrengthCultureModifier;
 	int m_iSettlerPopConsume;
 	int m_iGoldPerUnit;

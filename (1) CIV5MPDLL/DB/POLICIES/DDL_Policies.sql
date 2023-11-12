@@ -64,3 +64,4 @@ ALTER TABLE Policies ADD 'NullifyInfluenceModifier' BOOLEAN DEFAULT 0;
 ALTER TABLE Policies ADD 'SettlerPopConsume' BOOLEAN DEFAULT 0;
 
 ALTER TABLE Policies ADD 'DeepWaterNavalStrengthCultureModifier' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD 'FreeBuildingClass' text default null references BuildingClasses(Type);

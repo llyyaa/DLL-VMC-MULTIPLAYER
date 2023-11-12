@@ -30,3 +30,5 @@ ALTER TABLE Buildings ADD 'CityStateTradeRouteProductionModifierGlobal' INTEGER 
 ALTER TABLE Buildings ADD 'GlobalProductionNeededUnitModifier' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'GlobalProductionNeededBuildingModifier' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'GlobalProductionNeededProjectModifier' INTEGER DEFAULT 0;
+
+ALTER TABLE Buildings ADD 'DummyBuilding' BOOLEAN DEFAULT 0;

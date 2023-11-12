@@ -501,6 +501,7 @@ public:
 	int GetGlobalProductionNeededUnitModifier() const;
 	int GetGlobalProductionNeededBuildingModifier() const;
 	int GetGlobalProductionNeededProjectModifier() const;
+	bool IsDummyBuilding() const;
 
 private:
 	int m_iBuildingClassType;
@@ -864,6 +865,7 @@ private:
 	int m_iGlobalProductionNeededUnitModifier = 0;
 	int m_iGlobalProductionNeededBuildingModifier = 0;
 	int m_iGlobalProductionNeededProjectModifier = 0;
+	bool m_bDummyBuilding = false;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
