@@ -21231,18 +21231,11 @@ void CvPlayer::changeSpecialistExtraYield(YieldTypes eIndex, int iChange)
 			for(int iSpecialistLoop = 0; iSpecialistLoop < GC.getNumSpecialistInfos(); iSpecialistLoop++)
 			{
 				iNumTotalSpecialists = pLoopCity->GetCityCitizens()->GetSpecialistCount((SpecialistTypes) iSpecialistLoop);
-//				iNumTotalSpecialists = pLoopCity->getSpecialistCount((SpecialistTypes) iSpecialistLoop) + pLoopCity->getFreeSpecialistCount((SpecialistTypes) iSpecialistLoop);
-
-				for(int iTempLoop = 0; iTempLoop < iNumTotalSpecialists; iTempLoop++)
-				{
-					pLoopCity->processSpecialist((SpecialistTypes) iSpecialistLoop, -1);
-				}
+				pLoopCity->processSpecialist((SpecialistTypes) iSpecialistLoop, -iNumTotalSpecialists);
 			}
 		}
 
 		m_aiSpecialistExtraYield.setAt(eIndex ,m_aiSpecialistExtraYield[eIndex] + iChange);
-		CvAssert(getSpecialistExtraYield(eIndex) >= 0);
-
 		updateYield();
 
 		// Reprocess Specialist AFTER yield change
@@ -21251,12 +21244,7 @@ void CvPlayer::changeSpecialistExtraYield(YieldTypes eIndex, int iChange)
 			for(int iSpecialistLoop = 0; iSpecialistLoop < GC.getNumSpecialistInfos(); iSpecialistLoop++)
 			{
 				iNumTotalSpecialists = pLoopCity->GetCityCitizens()->GetSpecialistCount((SpecialistTypes) iSpecialistLoop);
-//				iNumTotalSpecialists = pLoopCity->getSpecialistCount((SpecialistTypes) iSpecialistLoop) + pLoopCity->getFreeSpecialistCount((SpecialistTypes) iSpecialistLoop);
-
-				for(int iTempLoop = 0; iTempLoop < iNumTotalSpecialists; iTempLoop++)
-				{
-					pLoopCity->processSpecialist((SpecialistTypes) iSpecialistLoop, 1);
-				}
+				pLoopCity->processSpecialist((SpecialistTypes) iSpecialistLoop, iNumTotalSpecialists);
 			}
 		}
 	}
@@ -23304,7 +23292,6 @@ void CvPlayer::changeSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eI
 		Firaxis::Array<int, NUM_YIELD_TYPES> yields = m_ppaaiSpecialistExtraYield[eIndex1];
 		yields[eIndex2] = (m_ppaaiSpecialistExtraYield[eIndex1][eIndex2] + iChange);
 		m_ppaaiSpecialistExtraYield.setAt(eIndex1, yields);
-		CvAssert(getSpecialistExtraYield(eIndex1, eIndex2) >= 0);
 
 		updateExtraSpecialistYield();
 	}

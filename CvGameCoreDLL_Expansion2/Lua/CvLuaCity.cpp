@@ -4991,14 +4991,7 @@ int CvLuaCity::lGetSpecialistYield(lua_State* L)
 	const SpecialistTypes eSpecialist = (SpecialistTypes) lua_tointeger(L, 2);
 	const YieldTypes eYield = (YieldTypes) lua_tointeger(L, 3);
 
-	const PlayerTypes ePlayer = pkCity->getOwner();
-
-#if defined(MOD_ROG_CORE) && defined(MOD_ROG_CORE)
-	const int iValue = (GET_PLAYER(ePlayer).specialistYield(eSpecialist, eYield) + pkCity->getSpecialistExtraYield(eSpecialist, eYield));
-#else
-	const int iValue = GET_PLAYER(ePlayer).specialistYield(eSpecialist, eYield);
-#endif
-
+	const int iValue = pkCity->getSpecialistYield(eYield, eSpecialist);
 	lua_pushinteger(L, iValue);
 
 	return 1;

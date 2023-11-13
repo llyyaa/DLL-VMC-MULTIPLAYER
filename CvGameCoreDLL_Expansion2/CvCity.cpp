@@ -13404,15 +13404,21 @@ int CvCity::getExtraSpecialistYield(YieldTypes eIndex, SpecialistTypes eSpeciali
 	CvAssertMsg(eSpecialist >= 0, "eSpecialist expected to be >= 0");
 	CvAssertMsg(eSpecialist < GC.getNumSpecialistInfos(), "GC.getNumSpecialistInfos expected to be >= 0");
 
-	if (eSpecialist == GC.getDEFAULT_SPECIALIST())
-	{
-		return 0;
-	}
+	return GetCityCitizens()->GetSpecialistCount(eSpecialist) * getExtraYieldPerSpecialist(eIndex, eSpecialist);
+}
 
+
+//	--------------------------------------------------------------------------------
+int CvCity::getExtraYieldPerSpecialist(YieldTypes eIndex, SpecialistTypes eSpecialist) const
+{
 	int iYieldMultiplier = GET_PLAYER(getOwner()).getSpecialistExtraYield(eSpecialist, eIndex) +
-	                       GET_PLAYER(getOwner()).getSpecialistExtraYield(eIndex) +
 	                       GET_PLAYER(getOwner()).GetPlayerTraits()->GetSpecialistYieldChange(eSpecialist, eIndex);
-
+	
+	if (eSpecialist != GC.getDEFAULT_SPECIALIST())
+	{
+		iYieldMultiplier += GET_PLAYER(getOwner()).getSpecialistExtraYield(eIndex);
+	}
+	
 #if defined(MOD_ROG_CORE)
 	iYieldMultiplier += getSpecialistExtraYield(eSpecialist, eIndex);
 #endif
@@ -13435,12 +13441,27 @@ int CvCity::getExtraSpecialistYield(YieldTypes eIndex, SpecialistTypes eSpeciali
 		}
 	}
 #endif
-	int iExtraYield = GetCityCitizens()->GetSpecialistCount(eSpecialist) * iYieldMultiplier;
-
-	return iExtraYield;
+	return iYieldMultiplier;
 }
 
 
+//	--------------------------------------------------------------------------------
+int CvCity::getSpecialistYield(YieldTypes eIndex, SpecialistTypes eSpecialist) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	CvSpecialistInfo* pkSpecialistInfo = GC.getSpecialistInfo(eSpecialist);
+	if(pkSpecialistInfo == NULL)
+	{
+		//This function REQUIRES a valid specialist info.
+		CvAssert(pkSpecialistInfo);
+		return 0;
+	}
+	int iRtnValue = pkSpecialistInfo->getYieldChange(eIndex);
+	iRtnValue += getExtraYieldPerSpecialist(eIndex, eSpecialist);
+	return iRtnValue;
+}
 //	--------------------------------------------------------------------------------
 void CvCity::updateExtraSpecialistYield(YieldTypes eYield)
 {
@@ -13464,8 +13485,6 @@ void CvCity::updateExtraSpecialistYield(YieldTypes eYield)
 	if(iOldYield != iNewYield)
 	{
 		m_aiExtraSpecialistYield.setAt(eYield, iNewYield);
-		CvAssert(getExtraSpecialistYield(eYield) >= 0);
-
 		ChangeBaseYieldRateFromSpecialists(eYield, (iNewYield - iOldYield));
 	}
 }

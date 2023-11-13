@@ -856,6 +856,8 @@ public:
 
 	int getExtraSpecialistYield(YieldTypes eIndex) const;
 	int getExtraSpecialistYield(YieldTypes eIndex, SpecialistTypes eSpecialist) const;
+	int getExtraYieldPerSpecialist(YieldTypes eIndex, SpecialistTypes eSpecialist) const;
+	int getSpecialistYield(YieldTypes eIndex, SpecialistTypes eSpecialist) const;
 	void updateExtraSpecialistYield(YieldTypes eYield);
 	void updateExtraSpecialistYield();
 

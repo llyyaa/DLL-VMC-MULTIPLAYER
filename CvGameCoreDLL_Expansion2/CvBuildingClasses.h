@@ -395,7 +395,6 @@ public:
 	int GetSeaResourceYieldChange(int i) const;
 	int* GetSeaResourceYieldChangeArray() const;
 	int GetSpecialistCount(int i) const;
-	int GetFreeSpecialistCount(int i) const;
 	int GetUnitCombatFreeExperience(int i) const;
 	int GetUnitCombatProductionModifier(int i) const;
 	int GetDomainFreeExperience(int i) const;
