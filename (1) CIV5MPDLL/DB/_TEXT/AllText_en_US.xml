@@ -579,12 +579,29 @@
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_GLOBAL">
 			<Text>[NEWLINE][ICON_BULLET]Modifier for Minor Trade global: {1_Num}%</Text>
 		</Row>
+
 		<Row Tag="TXT_KEY_TRAIT_CULTURE_FROM_UNIT">
 			<Text>Banzai! You received {1_num} [ICON_CULTURE] Culture from building a {2_name}!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_POLICY_CULTURE_FROM_UNIT">
 			<Text>You received {1_num} [ICON_CULTURE] Culture from building a {2_name}!</Text>
 		</Row>
+
+        <Row Tag="TXT_KEY_NOBEL_PRIZE_PHYSICS">
+            <Text>Nobel Prize in Physics</Text>
+        </Row>
+        <Row Tag="TXT_KEY_NOBEL_PRIZE_CHEMICAL">
+            <Text>Nobel Prize in Chemistry</Text>
+        </Row>
+        <Row Tag="TXT_KEY_NOBEL_PRIZE_MEDICINE">
+            <Text>Nobel Prize in Medicine or Physiology</Text>
+        </Row>
+        <Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_MESSAGE">
+            <Text>{1_civ}'s great scientist [COLOR_BLUE]{2_person_name}[ENDCOLOR] won the new {4_prizeType}, and you won +[COLOR_BLUE]{3_research}[ENDCOLOR][ICON_RESEARCH] scientific research! </Text>
+        </Row>
+        <Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_SUMMARY">
+            <Text>Nobel Prize winner! </Text>
+        </Row>
 	</Language_en_US>
 
 </GameData>

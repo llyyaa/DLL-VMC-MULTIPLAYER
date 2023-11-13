@@ -503,6 +503,8 @@ public:
 	int GetGlobalProductionNeededProjectModifier() const;
 	bool IsDummyBuilding() const;
 
+	int GetInstantResearchFromFriendlyGreatScientist() const;
+
 private:
 	int m_iBuildingClassType;
 	const CvBuildingClassInfo* m_pkBuildingClassInfo;
@@ -866,6 +868,8 @@ private:
 	int m_iGlobalProductionNeededBuildingModifier = 0;
 	int m_iGlobalProductionNeededProjectModifier = 0;
 	bool m_bDummyBuilding = false;
+
+	int m_iInstantResearchFromFriendlyGreatScientist = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

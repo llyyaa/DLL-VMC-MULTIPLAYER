@@ -591,5 +591,21 @@
 		<Row Tag="TXT_KEY_POLICY_CULTURE_FROM_UNIT">
 			<Text>{2_name}訓練完成，獲得{1_num}[ICON_CULTURE]文化！</Text>
 		</Row>
+
+        <Row Tag="TXT_KEY_NOBEL_PRIZE_PHYSICS">
+            <Text>諾貝爾物理學獎</Text>
+        </Row>
+        <Row Tag="TXT_KEY_NOBEL_PRIZE_CHEMICAL">
+            <Text>諾貝爾化學獎</Text>
+        </Row>
+        <Row Tag="TXT_KEY_NOBEL_PRIZE_MEDICINE">
+            <Text>諾貝爾醫學或生理學獎</Text>
+        </Row>
+        <Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_MESSAGE">
+            <Text>{1_civ}的大科學家[COLOR_BLUE]{2_person_name}[ENDCOLOR]榮獲新一屆{4_prizeType}，你獲得了+[COLOR_BLUE]{3_research}[ENDCOLOR][ICON_RESEARCH]科學研究！ </Text>
+        </Row>
+        <Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_SUMMARY">
+            <Text>諾貝爾獎得主！ </Text>
+        </Row>
 	</Language_zh_Hant_HK>
 </GameData>

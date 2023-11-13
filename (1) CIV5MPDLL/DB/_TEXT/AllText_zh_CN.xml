@@ -585,11 +585,28 @@
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_GLOBAL">
 			<Text>[NEWLINE][ICON_BULLET]城邦商路全局修正: {1_Num}%</Text>
 		</Row>
+
 		<Row Tag="TXT_KEY_TRAIT_CULTURE_FROM_UNIT">
 			<Text>板载!{2_name}训练完成，获得{1_num}[ICON_CULTURE]文化！</Text>
 		</Row>
 		<Row Tag="TXT_KEY_POLICY_CULTURE_FROM_UNIT">
 			<Text>{2_name}训练完成，获得{1_num}[ICON_CULTURE]文化！</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOBEL_PRIZE_PHYSICS">
+            <Text>诺贝尔物理学奖</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOBEL_PRIZE_CHEMICAL">
+            <Text>诺贝尔化学奖</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOBEL_PRIZE_MEDICINE">
+            <Text>诺贝尔医学或生理学奖</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_MESSAGE">
+            <Text>{1_civ}的大科学家[COLOR_BLUE]{2_person_name}[ENDCOLOR]荣获新一届{4_prizeType}，你获得了+[COLOR_BLUE]{3_research}[ENDCOLOR][ICON_RESEARCH]科研！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_SUMMARY">
+			<Text>诺贝尔奖得主！</Text>
 		</Row>
 	</Language_zh_CN>
 

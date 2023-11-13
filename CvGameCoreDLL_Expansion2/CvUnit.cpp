@@ -1096,6 +1096,8 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		kPlayer.ChangeDomainTroopsUsed(1);
 	}
 #endif
+
+	kPlayer.DoInstantResearchFromFriendlyGreatScientist(this, getX(), getY());
 		
 #if defined(MOD_EVENTS_UNIT_CREATED)
 	if (MOD_EVENTS_UNIT_CREATED) {

@@ -2170,6 +2170,12 @@ public:
 	unsigned long long GetScienceTimes100FromOneFriend(PlayerTypes ePlayer) const;
 	void UpdateScienceTimes100FromFriendships();
 
+	void SetInstantResearchFromFriendlyGreatScientist(int value);
+	void ChangeInstantResearchFromFriendlyGreatScientist(int change);
+	int GetInstantResearchFromFriendlyGreatScientist() const;
+
+	void DoInstantResearchFromFriendlyGreatScientist(CvUnit* pUnit, int iX, int iY);
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2848,6 +2854,8 @@ protected:
 	std::tr1::unordered_set<ImprovementTypes> m_sCanBuildImprovementsFromCapturedOriginalCapitals;
 
 	std::tr1::array<unsigned long long, MAX_MAJOR_CIVS> m_aScienceTimes100FromMajorFriends; // length = MAX_MAJOR_CIVS
+
+	int m_iInstantResearchFromFriendlyGreatScientist = 0;
 };
 
 extern bool CancelActivePlayerEndTurn();

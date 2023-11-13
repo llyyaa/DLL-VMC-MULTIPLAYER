@@ -10043,6 +10043,8 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 	ChangeExtraLeagueVotes(pBuildingInfo->GetExtraLeagueVotes() * iChange);
 
+	ChangeInstantResearchFromFriendlyGreatScientist(pBuildingInfo->GetInstantResearchFromFriendlyGreatScientist() * iChange);
+
 	// Loop through Cities
 	int iLoop = 0;
 	int iBuildingCount = 0;
@@ -28058,6 +28060,8 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_aScienceTimes100FromMajorFriends;
 
+	kStream >> m_iInstantResearchFromFriendlyGreatScientist;
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -28696,6 +28700,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_sCanBuildImprovementsFromCapturedOriginalCapitals;
 
 	kStream << m_aScienceTimes100FromMajorFriends;
+
+	kStream << m_iInstantResearchFromFriendlyGreatScientist;
 }
 
 //	--------------------------------------------------------------------------------
@@ -32327,4 +32333,110 @@ std::tr1::unordered_set<BuildingTypes>& CvPlayer::GetCanConstructBuildingsFromCa
 
 std::tr1::unordered_set<ImprovementTypes>& CvPlayer::GetCanBuildImprovementsFromCapturedOriginalCapitals() {
 	return m_sCanBuildImprovementsFromCapturedOriginalCapitals;
+}
+
+void CvPlayer::SetInstantResearchFromFriendlyGreatScientist(int value) {
+	m_iInstantResearchFromFriendlyGreatScientist = value;
+}
+
+void CvPlayer::ChangeInstantResearchFromFriendlyGreatScientist(int change) {
+	m_iInstantResearchFromFriendlyGreatScientist += change;
+}
+
+int CvPlayer::GetInstantResearchFromFriendlyGreatScientist() const {
+	return m_iInstantResearchFromFriendlyGreatScientist;
+}
+
+static void DoInstantResearchFromFriendlyGreatScientistHelp(CvPlayer* pPlayer, CvUnit* pUnit, CvTeam* pTeam, unsigned long long value, int iChosenPrizeType)
+{
+	TechTypes eCurrentTech = pPlayer->GetPlayerTechs()->GetCurrentResearch();
+	if (eCurrentTech == NO_TECH)
+	{
+		pPlayer->changeOverflowResearchTimes100(value);
+	}
+	else
+	{
+		pTeam->GetTeamTechs()->ChangeResearchProgressTimes100(eCurrentTech, value, pPlayer->GetID());
+	}
+
+	CvNotifications* pNotifications = pPlayer->GetNotifications();
+	if (pNotifications)
+	{
+		const char* cPrizeTextKey = "";
+		switch (iChosenPrizeType) {
+		case 0:
+			cPrizeTextKey = "TXT_KEY_NOBEL_PRIZE_PHYSICS";
+			break;
+		case 1:
+			cPrizeTextKey = "TXT_KEY_NOBEL_PRIZE_CHEMICAL";
+			break;
+		case 2:
+			cPrizeTextKey = "TXT_KEY_NOBEL_PRIZE_MEDICINE";
+			break;
+		default:
+			cPrizeTextKey = "TXT_KEY_NOBEL_PRIZE_PHYSICS";
+			break;
+		}
+		Localization::String strPrizeType = Localization::Lookup(cPrizeTextKey);
+
+		CvString strMessage = GetLocalizedText("TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_MESSAGE",
+			GET_PLAYER(pUnit->getOwner()).getCivilizationShortDescriptionKey(),
+			pUnit->getGreatName().c_str(),
+			static_cast<int>(value / 100),
+			strPrizeType.toUTF8());
+		Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_SUMMARY");
+		pNotifications->Add(NOTIFICATION_GENERIC, strMessage, strSummary.toUTF8(), pUnit->getX(), pUnit->getY(), pPlayer->GetID());
+	}
+}
+
+void CvPlayer::DoInstantResearchFromFriendlyGreatScientist(CvUnit* pUnit, int iX, int iY) {
+	// gain instant research yield when a friendly great scientist is born
+	if (!pUnit || !(pUnit->getUnitInfo().GetUnitClassType() == GC.getInfoTypeForString("UNITCLASS_SCIENTIST")))
+	{
+		return;
+	}
+
+	PlayerTypes eLoopPlayer;
+	int iChosenPrizeType = GC.getGame().getJonRandNum(3, "Select one prize type");
+	bool bHasBoostThisPlayer = false;
+	for (int iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
+	{
+		eLoopPlayer = (PlayerTypes) iPlayerLoop;
+
+		if (eLoopPlayer != GetID() && 
+			(
+				!GetDiplomacyAI()->IsPlayerValid(eLoopPlayer) ||
+				!GetDiplomacyAI()->IsDoFAccepted(eLoopPlayer) ||
+				!GET_PLAYER(eLoopPlayer).isAlive())
+			)
+		{
+			continue;
+		}
+
+		int iMod = eLoopPlayer == GetID() ? GetInstantResearchFromFriendlyGreatScientist() : 
+			GET_PLAYER(eLoopPlayer).GetInstantResearchFromFriendlyGreatScientist() + GetInstantResearchFromFriendlyGreatScientist();
+		if (iMod == 0)
+		{
+			continue;
+		}
+
+		unsigned long long value = static_cast<unsigned long long>(pUnit->getDiscoverAmount())
+				* iMod;
+		if (value <= 0)
+		{
+			continue;
+		}
+
+		CvPlayer& kLoopPlayer = GET_PLAYER(eLoopPlayer);
+		CvTeam* pTeam = &GET_TEAM(kLoopPlayer.getTeam());
+		DoInstantResearchFromFriendlyGreatScientistHelp(&kLoopPlayer, pUnit, pTeam, value, iChosenPrizeType);
+		if (GetID() != eLoopPlayer && !bHasBoostThisPlayer)
+		{
+			DoInstantResearchFromFriendlyGreatScientistHelp(this, pUnit, &GET_TEAM(this->getTeam()), value, iChosenPrizeType);
+			bHasBoostThisPlayer = true;
+		}
+
+		if (GetID() == this->GetID())
+			bHasBoostThisPlayer = true;
+	}
 }

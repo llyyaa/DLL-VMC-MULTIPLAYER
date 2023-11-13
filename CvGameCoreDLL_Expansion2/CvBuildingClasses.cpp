@@ -663,6 +663,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iGlobalProductionNeededProjectModifier = kResults.GetInt("GlobalProductionNeededProjectModifier");
 	m_bDummyBuilding = kResults.GetBool("DummyBuilding");
 
+	m_iInstantResearchFromFriendlyGreatScientist = kResults.GetInt("InstantResearchFromFriendlyGreatScientist");
+
 	//References
 	const char* szTextVal;
 	szTextVal = kResults.GetText("BuildingClass");
@@ -2176,6 +2178,10 @@ int CvBuildingEntry::GetGlobalProductionNeededProjectModifier() const {
 
 bool CvBuildingEntry::IsDummyBuilding() const {
 	return m_bDummyBuilding;
+}
+
+int CvBuildingEntry::GetInstantResearchFromFriendlyGreatScientist() const {
+	return m_iInstantResearchFromFriendlyGreatScientist;
 }
 
 int CvBuildingEntry::GetExtraAttacks() const
