@@ -811,7 +811,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	// END Science
 
-	Method(GetAllTradeValue);
+	Method(GetAllTradeValueTimes100);
 
 	Method(GetProximityToPlayer);
 	Method(DoUpdateProximityToPlayer);
@@ -7701,12 +7701,12 @@ int CvLuaPlayer::lGetScienceFromReligion(lua_State* L)
 }
 
 //------------------------------------------------------------------------------
-int CvLuaPlayer::lGetAllTradeValue(lua_State* L)
+int CvLuaPlayer::lGetAllTradeValueTimes100(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	const YieldTypes eIndex = (YieldTypes)lua_tointeger(L, 2);
 	const int iResult = pkPlayer->GetTrade()->GetAllTradeValueTimes100(eIndex);
-	lua_pushinteger(L, iResult/100);
+	lua_pushinteger(L, iResult);
 	return 1;
 }
 //------------------------------------------------------------------------------
