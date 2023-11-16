@@ -21746,6 +21746,7 @@ int CvCity::CalculateTotalCorruptionScore() const
 	// Score Modifier
 	int modifier = 100;
 	modifier += CalculateCorruptionScoreModifierFromSpy();
+	modifier += CalculateCorruptionScoreModifierFromTrait();
 	modifier += owner.GetCorruptionScoreModifierFromPolicy();
 	modifier = std::max(0, modifier);
 
@@ -21803,6 +21804,15 @@ int CvCity::CalculateCorruptionScoreModifierFromSpy() const
 		return -67;
 	}
 	return -100;
+}
+
+int CvCity::CalculateCorruptionScoreModifierFromTrait()  const
+{
+	if(plot() != NULL)
+	{
+		return plot()->CalculateCorruptionScoreModifierFromTrait(getOwner());
+	}
+	return 0;
 }
 
 bool CvCity::IsCorruptionLevelReduceByOne() const

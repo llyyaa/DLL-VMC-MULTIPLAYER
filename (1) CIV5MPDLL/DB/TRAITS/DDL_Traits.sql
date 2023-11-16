@@ -40,3 +40,6 @@ alter table Traits add column `GoldenAgeGrowThresholdModifier` int not null defa
 alter table Traits add column `ShareAllyResearchPercent` int not null default 0;
 
 alter table Traits add column `CultureBonusUnitStrengthModify` int not null default 0;
+
+alter table Traits add column `NaturalWonderCorruptionScoreChange` int not null default 0;
+alter table Traits add column `NaturalWonderCorruptionRadius` int not null default 0;

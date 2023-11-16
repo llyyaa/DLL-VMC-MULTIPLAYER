@@ -412,6 +412,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_POLICY">
 			<Text>来自政策: {1_score}%</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_TRAIT">
+			<Text>來自领袖特性: {1_score}%</Text>
+		</Row>
 
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_REDUCE_BY_ONE_GLOBAL">
 			<Text>市政厅等级变化（文明特性或政策）：-1</Text>

@@ -31162,6 +31162,13 @@ CvString CvUnit::GetPlotCorruptionScoreReport() const
 			szRtnValue += "[NEWLINE][ICON_BULLET]";
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_POLICY", tmp);
 		}
+		tmp = pPlot->CalculateCorruptionScoreModifierFromTrait(ePlayer);
+		if(tmp != 0)
+		{
+			modifier += tmp;
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_TRAIT", tmp);
+		}
 		
 		modifier = std::max(0, modifier);
 		iTotalScore = iTotalScore * modifier / 100;

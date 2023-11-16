@@ -703,6 +703,7 @@ protected:
 	LUAAPIEXTN(CalculateTotalCorruptionScore, int);
 	LUAAPIEXTN(CalculateCorruptionScoreFromDistance, int);
 	LUAAPIEXTN(CalculateCorruptionScoreModifierFromSpy, int);
+	LUAAPIEXTN(CalculateCorruptionScoreModifierFromTrait, int);
 	LUAAPIEXTN(GetCorruptionScoreChangeFromBuilding, int);
 	LUAAPIEXTN(GetCorruptionLevelChangeFromBuilding, int);
 	LUAAPIEXTN(CalculateCorruptionScoreFromResource, int);

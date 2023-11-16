@@ -901,6 +901,7 @@ public:
 	int CalculateCorruptionScoreFromDistance(const CvCity& capitalCity) const;
 	int CalculateCorruptionScoreFromResource() const;
 	int CalculateCorruptionScoreFromTrait(PlayerTypes ePlayer) const;
+	int CalculateCorruptionScoreModifierFromTrait(PlayerTypes ePlayer) const;
 #endif
 protected:
 	class PlotBoolField

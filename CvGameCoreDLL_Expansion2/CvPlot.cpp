@@ -13351,9 +13351,30 @@ int CvPlot::CalculateCorruptionScoreFromResource() const
 int CvPlot::CalculateCorruptionScoreFromTrait(PlayerTypes ePlayer) const
 {
 	CvPlayerAI& owner = GET_PLAYER(ePlayer);
-	int TraitBounsTotal = 0;
-	TraitBounsTotal += isRiver() ? owner.GetPlayerTraits()->GetRiverCorruptionScoreChange() : 0;
-	return TraitBounsTotal;
+	int iTraitBounsTotal = 0;
+	iTraitBounsTotal += isRiver() ? owner.GetPlayerTraits()->GetRiverCorruptionScoreChange() : 0;
+	return iTraitBounsTotal;
+}
+int CvPlot::CalculateCorruptionScoreModifierFromTrait(PlayerTypes ePlayer) const
+{
+	CvPlayerAI& owner = GET_PLAYER(ePlayer);
+	int iTraitBounsTotal = owner.GetPlayerTraits()->GetNaturalWonderCorruptionScoreChange();
+	if(iTraitBounsTotal != 0)
+	{
+		int iRange = owner.GetPlayerTraits()->GetNaturalWonderCorruptionRadius();
+		for (int iDX = -iRange; iDX <= iRange; iDX++)
+		{
+			for (int iDY = -iRange; iDY <= iRange; iDY++)
+			{
+				CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iRange);
+				if (pLoopPlot != NULL && pLoopPlot->IsNaturalWonder())
+				{
+					return iTraitBounsTotal;
+				}
+			}
+		}
+	}
+	return 0;
 }
 #endif
 

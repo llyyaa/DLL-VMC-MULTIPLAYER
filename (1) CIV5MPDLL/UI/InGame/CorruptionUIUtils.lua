@@ -40,6 +40,10 @@ function getCorruptionScoreReport(player, city)
 	if tmp ~= 0 then
 		result = result .. "[ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_SPY", tmp) .. "[NEWLINE]";
 	end
+	tmp = city:CalculateCorruptionScoreModifierFromTrait();
+	if tmp ~= 0 then
+		result = result .. "[ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_TRAIT", tmp) .. "[NEWLINE]";
+	end
 	tmp = city:GetCorruptionScoreModifierFromPolicy();
 	if tmp ~= 0 then
 		result = result .. "[ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_POLICY", tmp) .. "[NEWLINE]";

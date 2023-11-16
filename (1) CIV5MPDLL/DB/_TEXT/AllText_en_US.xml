@@ -410,6 +410,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_POLICY">
 			<Text>From Policy: {1_score}%</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_MOD_FROM_TRAIT">
+			<Text>From Leader Trait: {1_score}%</Text>
+		</Row>
 
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_LEVEL_REDUCE_BY_ONE_GLOBAL">
 			<Text>City hall level change (civ trait or policy): -1</Text>

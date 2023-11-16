@@ -1225,9 +1225,10 @@ public:
 
 	int CalculateTotalCorruptionScore() const;
 	int CalculateCorruptionScoreFromDistance() const;
-	int CalculateCorruptionScoreModifierFromSpy() const;
 	int CalculateCorruptionScoreFromResource() const;
 	int CalculateCorruptionScoreFromTrait() const;
+	int CalculateCorruptionScoreModifierFromSpy() const;
+	int CalculateCorruptionScoreModifierFromTrait() const;
 
 	CvCorruptionLevel* DecideCorruptionLevelForNormalCity(const int score) const;
 
