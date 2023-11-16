@@ -1360,7 +1360,7 @@ public:
 	// Science
 
 	int GetScience() const;
-	int GetScienceTimes100() const;
+	int GetScienceTimes100(bool bIgnoreFriendships = false) const;
 
 	int GetScienceFromCitiesTimes100(bool bIgnoreTrade) const;
 	int GetScienceFromOtherPlayersTimes100() const;

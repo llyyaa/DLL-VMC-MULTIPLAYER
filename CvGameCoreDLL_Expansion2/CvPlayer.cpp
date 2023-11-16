@@ -20892,7 +20892,7 @@ int CvPlayer::GetScience() const
 }
 
 //	--------------------------------------------------------------------------------
-int CvPlayer::GetScienceTimes100() const
+int CvPlayer::GetScienceTimes100(bool bIgnoreFriendships) const
 {
 	// If we're in anarchy, then no Research is done!
 	if(IsAnarchy())
@@ -20926,7 +20926,7 @@ int CvPlayer::GetScienceTimes100() const
 	// If we have a negative Treasury + GPT then it gets removed from Science
 	iValue += GetScienceFromBudgetDeficitTimes100();
 
-	iValue += GetScienceTimes100FromFriendships();
+	if(!bIgnoreFriendships) iValue += GetScienceTimes100FromFriendships();
 
 	return max(iValue, 0);
 }
@@ -20975,7 +20975,7 @@ void CvPlayer::UpdateScienceTimes100FromFriendships()
 			continue;
 		}
 
-		m_aScienceTimes100FromMajorFriends[eLoopPlayer] = GET_PLAYER(eLoopPlayer).GetScienceTimes100() /100  * iTraitMod;
+		m_aScienceTimes100FromMajorFriends[eLoopPlayer] = GET_PLAYER(eLoopPlayer).GetScienceTimes100(true) /100  * iTraitMod;
 	}
 }
 
