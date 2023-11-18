@@ -27020,33 +27020,17 @@ bool CvUnit::attemptGroundAttacks(const CvPlot& pPlot)
 		return bFoundSomething;
 
 	int iAirSweepDamage = getGroundAttackDamage();
-	int iRange = getGroundAttackRange();
-	int iRangeFinal = 1;
+	int iRange = getGroundAttackRange() + 1;
 
 	CvString strAppendText = GetLocalizedText("TXT_KEY_PROMOTION_AIR_SWEEP");
 
-	if (iRange >= 0)
+	if (iRange > 0)
 	{
-		if (iRange == 1)
-		{
-			iRange = 2;
-			iRangeFinal = 2;
-		}
-		else if (iRange == 0)
-		{
-			iRange = 2;
-			iRangeFinal = 1;
-		}
-		else
-		{
-			iRange = getGroundAttackRange() + 1;
-			iRangeFinal = getGroundAttackRange() + 1;
-		}
 		for (int i = -iRange; i <= iRange; ++i)
 		{
 			for (int j = -iRange; j <= iRange; ++j)
 			{
-				CvPlot* pLoopPlot = ::plotXYWithRangeCheck(pPlot.getX(), pPlot.getY(), i, j, iRangeFinal);
+				CvPlot* pLoopPlot = ::plotXYWithRangeCheck(pPlot.getX(), pPlot.getY(), i, j, iRange);
 				if (NULL != pLoopPlot)
 				{
 					pLoopPlot->changeVisibilityCount(getTeam(), 1, NO_INVISIBLE, false, false, this);
@@ -27085,6 +27069,13 @@ bool CvUnit::attemptGroundAttacks(const CvPlot& pPlot)
 			    }
 		    }
 	    }
+		if(bFoundSomething)
+		{
+			int iExperience = /*5*/ GD_INT_GET(EXPERIENCE_ATTACKING_AIR_SWEEP);
+			changeExperienceTimes100(100 * iExperience, -1, true, pPlot.getOwner() == getOwner(), true);
+			testPromotionReady();
+			if(iAirSweepDamage <= 0) bFoundSomething = false;
+		}
 	}
 	return bFoundSomething;
 }

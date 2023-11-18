@@ -35,7 +35,9 @@
     <Row Class="5" Name="GLOBAL_STACKING_RULES" Value="0" DbUpdates="1"/>
     
     <!-- When a military unit retreats, civilians units on the same tile also retreat -->
-   <Row Class="4" Name="CIVILIANS_RETREAT_WITH_MILITARY" Value="0"/>
+    <Row Class="4" Name="CIVILIANS_RETREAT_WITH_MILITARY" Value="0"/>
+
+    <Row Class="4" Name="AIR_SWEEP_FOUND_SOMETHING" Value="0"/>
 
     <!-- This is the "No More Civilian Traffic Jams (NMCTJs) Mod" by Pazyryk - see http://forums.civfanatics.com/showthread.php?t=519754 (v45) -->
     <!-- See also: "Global - No More Civilian Traffic Jams" -->

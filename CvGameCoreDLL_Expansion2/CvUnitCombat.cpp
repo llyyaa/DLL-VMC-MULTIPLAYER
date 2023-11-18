@@ -2311,7 +2311,7 @@ void CvUnitCombat::GenerateAirSweepCombatInfo(CvUnit& kAttacker, CvUnit* pkDefen
 
 		//iExperience = ((iExperience * iDefenderEffectiveStrength) / iAttackerEffectiveStrength);
 		//iExperience = range(iExperience, GC.getMIN_EXPERIENCE_PER_COMBAT(), GC.getMAX_EXPERIENCE_PER_COMBAT());
-		int iExperience = /*6*/ GC.getEXPERIENCE_ATTACKING_AIR_SWEEP();
+		int iExperience = /*5*/ GC.getEXPERIENCE_ATTACKING_AIR_SWEEP();
 #ifdef MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE
 		if (MOD_GLOBAL_UNIT_EXTRA_ATTACK_DEFENSE_EXPERENCE)
 		{
@@ -4033,16 +4033,11 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::AttackAirSweep(CvUnit& kAttacker, CvPl
 	else
 	{
 		bool bFallbackAttack = false;
-		if (MOD_ROG_CORE)
+		if (MOD_AIR_SWEEP_FOUND_SOMETHING)
 			bFallbackAttack = kAttacker.attemptGroundAttacks(targetPlot);
 
 		if (bFallbackAttack)
 		{
-			int iExperience = /*5*/ GD_INT_GET(EXPERIENCE_ATTACKING_AIR_SWEEP);
-			kAttacker.changeExperienceTimes100(100 * iExperience, -1, true, targetPlot.getOwner() == kAttacker.getOwner(), true);
-			kAttacker.testPromotionReady();
-			// attempted to do a sweep in a plot that had no interceptors
-			// consume the movement and finish its moves
 			if (kAttacker.getOwner() == GC.getGame().getActivePlayer())
 			{
 				Localization::String localizedText = Localization::Lookup("TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS");
@@ -4050,7 +4045,6 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::AttackAirSweep(CvUnit& kAttacker, CvPl
 				GC.GetEngineUserInterface()->AddMessage(0, kAttacker.getOwner(), false, /*10*/ GD_INT_GET(EVENT_MESSAGE_TIME), localizedText.toUTF8());
 			}
 		}
-
 		else
 		{
 			if (kAttacker.getOwner() == GC.getGame().getActivePlayer())
@@ -4061,6 +4055,9 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::AttackAirSweep(CvUnit& kAttacker, CvPl
 				MILITARYLOG(kAttacker.getOwner(), localizedText.toUTF8(), kAttacker.plot(), kAttacker.getOwner());
 			}
 		}
+
+		// attempted to do a sweep in a plot that had no interceptors
+		// consume the movement and finish its moves
 
 		// Spend a move for this attack
 		kAttacker.changeMoves(-GC.getMOVE_DENOMINATOR());
