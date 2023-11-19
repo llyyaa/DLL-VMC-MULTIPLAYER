@@ -3947,7 +3947,7 @@ bool CvUnit::canMoveInto(const CvPlot& plot, byte bMoveFlags) const
 		{
 			if(getDomainType() == DOMAIN_AIR)
 				return false;
-			if(isHasPromotion((PromotionTypes)GC.getPROMOTION_ONLY_DEFENSIVE()))
+			if(isHasPromotion((PromotionTypes)GC.getPROMOTION_ONLY_DEFENSIVE()) || isOnlyDefensive())
 				return false;	// Can't advance into an enemy city
 		}
 	}
