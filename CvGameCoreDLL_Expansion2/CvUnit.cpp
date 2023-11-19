@@ -1795,6 +1795,8 @@ void CvUnit::convert(CvUnit* pUnit, bool bIsUpgrade)
 	pPlot = plot();
 
 	// Transfer Promotions over
+	std::vector<PromotionTypes> NewPromotions;
+	NewPromotions.clear();
 	for(int iI = 0; iI < GC.getNumPromotionInfos(); iI++)
 	{
 		const PromotionTypes ePromotion = static_cast<PromotionTypes>(iI);
@@ -1814,7 +1816,23 @@ void CvUnit::convert(CvUnit* pUnit, bool bIsUpgrade)
 				// Old unit has the promotion
 				if (pUnit->isHasPromotion(ePromotion) && !pkPromotionInfo->IsLostWithUpgrade())
 				{
-					bGivePromotion = true;
+					bool bIsLostOld = false;
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+					int iNumPromotionUpgrade = pkPromotionInfo->GetNumUpgradePromotions();
+					if(iNumPromotionUpgrade > 0)
+					{
+						std::pair<PromotionTypes, PromotionTypes>* pPromotionUpgrade = pkPromotionInfo->GetUpgradePromotions();
+						for(int i=0; i<iNumPromotionUpgrade; i++)
+						{
+							if(isHasPromotion(pPromotionUpgrade[i].first))
+							{
+								bIsLostOld = true;
+								NewPromotions.push_back(pPromotionUpgrade[i].second);
+							}
+						}
+					}
+#endif
+					bGivePromotion = !bIsLostOld;
 				}
 
 				// New unit gets promotion for free (as per XML)
@@ -1841,6 +1859,17 @@ void CvUnit::convert(CvUnit* pUnit, bool bIsUpgrade)
 			setHasPromotion(ePromotion, bGivePromotion);
 		}
 	}
+
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	if(!NewPromotions.empty())
+	{
+		int iNumNewPromotions = NewPromotions.size();
+		for(int i=0; i<iNumNewPromotions; i++)
+		{
+			setHasPromotion(NewPromotions[i], true);
+		}
+	}
+#endif
 
 	setGameTurnCreated(pUnit->getGameTurnCreated());
 	setLastMoveTurn(pUnit->getLastMoveTurn());

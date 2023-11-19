@@ -258,6 +258,8 @@ public:
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int GetNumUpgradePromotions() const;
+	std::pair<PromotionTypes, PromotionTypes>* GetUpgradePromotions() const;
 	int GetInsightEnemyDamageModifier() const;
 	int GetHeightModPerX() const;
 	int GetHeightModLimited() const;
@@ -603,6 +605,8 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iNumUpgradePromotions;
+	std::pair<PromotionTypes, PromotionTypes>* m_pUpgradePromotions;
 	int m_iInsightEnemyDamageModifier;
 	int m_iHeightModPerX;
 	int m_iHeightModLimited;

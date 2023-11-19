@@ -197,6 +197,8 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iNumUpgradePromotions(0),
+	m_pUpgradePromotions(nullptr),
 	m_iInsightEnemyDamageModifier(0),
 	m_iHeightModPerX(0),
 	m_iHeightModLimited(0),
@@ -391,6 +393,12 @@ CvPromotionEntry::~CvPromotionEntry(void)
 	SAFE_DELETE_ARRAY(m_pbPostCombatRandomPromotion);
 #if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 	m_vPrePromotions.clear();
+#endif
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	if(m_pUpgradePromotions)
+	{
+		delete m_pUpgradePromotions;
+	}
 #endif
 }
 //------------------------------------------------------------------------------
@@ -867,6 +875,43 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	const int iNumUnitPromotions = kUtility.MaxRows("UnitPromotions");
 
 	const char* szPromotionType = GetType();
+
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	{
+		std::string strKey("UnitPromotions_PromotionUpgrade_MaxRow");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select count(*) from UnitPromotions_PromotionUpgrade where PromotionType = ?");
+		}
+
+		pResults->Bind(1, szPromotionType);
+		pResults->Step();
+		m_iNumUpgradePromotions = pResults->GetInt(0);
+		pResults->Reset();
+		m_pUpgradePromotions = new std::pair<PromotionTypes, PromotionTypes>[m_iNumUpgradePromotions];
+	}
+	{
+		std::string strKey("UnitPromotions_PromotionUpgrade");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "SELECT t1.ID AS JudgePromotionID, t2.ID AS NewPromotionID FROM UnitPromotions_PromotionUpgrade LEFT JOIN UnitPromotions t1, UnitPromotions t2 ON t1.Type = JudgePromotionType AND t2.Type = NewPromotionType WHERE PromotionType = ?");
+		}
+
+		pResults->Bind(1, szPromotionType);
+		int idx = 0;
+		while (pResults->Step())
+		{
+			const int iJudgePromotionID = pResults->GetInt(0);
+			const int iNewPromotionID = pResults->GetInt(1);
+			m_pUpgradePromotions[idx] = std::make_pair((PromotionTypes)iJudgePromotionID, (PromotionTypes)iNewPromotionID);
+			idx++;
+		}
+
+		pResults->Reset();
+	}
+#endif
 
 	//UnitPromotions_Terrains
 	{
@@ -2302,6 +2347,14 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 }
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvPromotionEntry::GetNumUpgradePromotions() const
+{
+	return m_iNumUpgradePromotions;
+}
+std::pair<PromotionTypes, PromotionTypes>* CvPromotionEntry::GetUpgradePromotions() const
+{
+	return m_pUpgradePromotions;
+}
 int CvPromotionEntry::GetInsightEnemyDamageModifier() const
 {
 	return m_iInsightEnemyDamageModifier;

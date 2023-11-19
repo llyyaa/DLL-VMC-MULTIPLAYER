@@ -202,3 +202,9 @@ ALTER TABLE UnitPromotions ADD COLUMN 'HeightModLimited' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'InsightEnemyDamageModifier' INTEGER DEFAULT 0;
 
 ALTER TABLE Improvements ADD ExtraScore INTEGER DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS UnitPromotions_PromotionUpgrade (
+    `PromotionType` TEXT DEFAULT '' references UnitPromotions(Type),
+    `JudgePromotionType` TEXT DEFAULT '' references UnitPromotions(Type),
+    `NewPromotionType` TEXT DEFAULT '' references UnitPromotions(Type)
+);
