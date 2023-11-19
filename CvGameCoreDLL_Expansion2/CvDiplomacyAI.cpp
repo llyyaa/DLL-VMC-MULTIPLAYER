@@ -17,6 +17,7 @@
 #include "CvGameCoreUtils.h"
 #include "CvNotifications.h"
 #include "CvDiplomacyRequests.h"
+#include "CustomMods.h"
 
 // must be included after all other headers
 #include "LintFree.h"
@@ -5734,6 +5735,13 @@ void CvDiplomacyAI::MakeWar()
 	}
 }
 
+#ifdef MOD_DISABLE_AI_DO_TURN_DIPLOMACY_TO_HUMAN
+static bool SkipAIDoTurnDiplomacy(CvPlayer* thisPlayer, CvPlayer* thatPlayer)
+{
+	return !thisPlayer->isHuman() && thatPlayer->isHuman() && MOD_DISABLE_AI_DO_TURN_DIPLOMACY_TO_HUMAN;
+}
+#endif
+
 /// We've decided to declare war on someone
 void CvDiplomacyAI::DeclareWar(PlayerTypes ePlayer)
 {
@@ -5752,6 +5760,15 @@ void CvDiplomacyAI::DeclareWar(PlayerTypes ePlayer)
 #endif
 
 		m_pPlayer->GetCitySpecializationAI()->SetSpecializationsDirty(SPECIALIZATION_UPDATE_NOW_AT_WAR);
+
+#ifdef MOD_DISABLE_AI_DO_TURN_DIPLOMACY_TO_HUMAN 
+		bool bSkip = SkipAIDoTurnDiplomacy(GetPlayer(), &GET_PLAYER(ePlayer));
+		// don't show the scene
+		if (bSkip) {
+			LogWarDeclaration(ePlayer);
+			return;
+		}
+#endif
 
 		// Show scene to human
 #if defined(MOD_AI_MP_DIPLOMACY)
@@ -12716,9 +12733,15 @@ void CvDiplomacyAI::DoContactPlayer(PlayerTypes ePlayer)
 	// How predictable do we want the AI to be with regards to what state they're in?
 
 	// Note that the order in which the following functions are called is very important to how the AI behaves - first come, first served
-
+	
+#ifdef MOD_DISABLE_AI_DO_TURN_DIPLOMACY_TO_HUMAN 
+	bool bSkip = SkipAIDoTurnDiplomacy(GetPlayer(), &GET_PLAYER(ePlayer));
+	// AT PEACE
+	if(!IsAtWar(ePlayer) && !bSkip)
+#else
 	// AT PEACE
 	if(!IsAtWar(ePlayer))
+#endif
 	{
 		DoCoopWarTimeStatement(ePlayer, eStatement, iData1);
 		DoCoopWarStatement(ePlayer, eStatement, iData1);
@@ -12808,8 +12831,13 @@ void CvDiplomacyAI::DoContactPlayer(PlayerTypes ePlayer)
 		}
 	}
 
+#ifdef MOD_DISABLE_AI_DO_TURN_DIPLOMACY_TO_HUMAN
+	// AT WAR
+	else if(!GC.getGame().isOption(GAMEOPTION_ALWAYS_WAR) && !bSkip)
+#else
 	// AT WAR
 	else if(!GC.getGame().isOption(GAMEOPTION_ALWAYS_WAR))
+#endif
 	{
 		//	OFFERS - all members but ePlayer passed by address
 		DoPeaceOffer(ePlayer, eStatement, pDeal);

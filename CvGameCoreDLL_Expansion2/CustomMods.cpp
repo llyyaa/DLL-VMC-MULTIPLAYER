@@ -600,6 +600,7 @@ int CustomMods::getOption(string sOption, int defValue) {
 
 		MOD_OPT_CACHE(GLOBAL_CORRUPTION);
 		MOD_OPT_CACHE(GLOBAL_UNIQUE_PROJECT_CAPTURE);
+		MOD_OPT_CACHE(DISABLE_AI_DO_TURN_DIPLOMACY_TO_HUMAN);
 		
 		m_bInit = true;
 	}
