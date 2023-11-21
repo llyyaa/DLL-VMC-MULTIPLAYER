@@ -828,6 +828,8 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #ifdef MOD_GLOBAL_CORRUPTION
 	Method(GetPlotCorruptionScoreReport);
 #endif
+	Method(GetStrengthModifierFromExtraResource);
+	Method(GetStrengthModifierFromExtraHappiness);
 }
 //------------------------------------------------------------------------------
 const char* CvLuaUnit::GetTypeName()
@@ -3399,7 +3401,7 @@ int CvLuaUnit::lGetZOCStatus(lua_State* L)
 
 	if (pkUnit->IsIgnoreZOC())
 	{
-		Localization::String strMessage = Localization::Lookup("TXT_KEY_UNIT_IGNORE_ZOC");
+		Localization::String strMessage = Localization::Lookup("TXT_KEY_UNIT_IGNORE_ZOC_D");
 
 		lua_pushstring(L, strMessage.toUTF8());
 		return 1;
@@ -6242,3 +6244,6 @@ int CvLuaUnit::lGetPlotCorruptionScoreReport(lua_State* L)
 	return 1;
 }
 #endif
+
+LUAAPIIMPL(Unit, GetStrengthModifierFromExtraResource)
+LUAAPIIMPL(Unit, GetStrengthModifierFromExtraHappiness)

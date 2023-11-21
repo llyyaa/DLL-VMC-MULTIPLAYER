@@ -752,6 +752,9 @@ protected:
 #ifdef MOD_GLOBAL_CORRUPTION
 	static int lGetPlotCorruptionScoreReport(lua_State* L);
 #endif
+	LUAAPIEXTN(GetStrengthModifierFromExtraResource, int);
+	LUAAPIEXTN(GetStrengthModifierFromExtraHappiness, int);
+
 };
 
 

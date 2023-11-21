@@ -611,6 +611,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_SUMMARY">
 			<Text>诺贝尔奖得主！</Text>
 		</Row>
+		<Row Tag="TXT_KEY_UNIT_IGNORE_ZOC_D" >
+			<Text>[COLOR_CYAN]无视ZOC[ENDCOLOR]</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

@@ -15499,9 +15499,9 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 				if(pTargetPlot->isRoughGround())
 					iModifier += roughRangedAttackModifier();
 
-	#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 				iModifier += GetTotalHeightMod(*pTargetPlot);
-	#endif
+#endif
 
 				// Bonus for fighting in one's lands
 				if(pTargetPlot->IsFriendlyTerritory(getOwner()))
@@ -17471,6 +17471,7 @@ int CvUnit::GetStrengthModifierFromExtraResource() const
 	mod = mod < 0 ? 0 : mod;
 	return mod;
 }
+
 int CvUnit::GetExtraHappinessCombatModifier() const
 {
 	VALIDATE_OBJECT
