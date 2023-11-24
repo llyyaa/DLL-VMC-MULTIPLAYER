@@ -878,7 +878,6 @@ void CvHomelandAI::PlotFirstTurnSettlerMoves()
 	// Loop through all recruited units
 	for(list<int>::iterator it = m_CurrentTurnUnits.begin(); it != m_CurrentTurnUnits.end(); ++it)
 	{
-		bool bGoingToSettle = false;
 		UnitHandle pUnit = m_pPlayer->getUnit(*it);
 		if(pUnit && !pUnit->isHuman())
 		{
@@ -889,21 +888,8 @@ void CvHomelandAI::PlotFirstTurnSettlerMoves()
 					CvHomelandUnit unit;
 					unit.SetID(pUnit->GetID());
 					m_CurrentMoveUnits.push_back(unit);
-					bGoingToSettle = true;
 				}
 			}
-		}
-
-		// If we find a settler that isn't in an operation, let's keep him in place
-#if defined(MOD_AI_SMART_V3)
-		if(pUnit && (MOD_AI_SMART_V3 && !pUnit->isHuman()) &&
-		   !bGoingToSettle && pUnit->isFound() && pUnit->getArmyID() == FFreeList::INVALID_INDEX)
-#else
-		if(!bGoingToSettle && pUnit->isFound() && pUnit->getArmyID() == FFreeList::INVALID_INDEX)
-#endif
-		{
-			pUnit->PushMission(CvTypes::getMISSION_SKIP());
-			pUnit->finishMoves();
 		}
 	}
 
