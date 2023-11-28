@@ -8210,9 +8210,16 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 			if (!bCivFilter) return false;
 
 			CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(GET_PLAYER(BARBARIAN_PLAYER).getCivilizationType());
-			if (pkInfo && pkInfo->isCivilizationUnitOverridden(eUnitClass))
+			if (pkInfo)
 			{
-				return false;
+				if (pkInfo->isCivilizationUnitOverridden(eUnitClass))
+				{
+					UnitTypes eCivilizationUnit = static_cast<UnitTypes>(pkInfo->getCivilizationUnits(eUnitClass));
+					if (eCivilizationUnit != NO_UNIT && eCivilizationUnit == eUnit)
+					{
+						return false;
+					}
+				}
 			}
 		}
 #else
