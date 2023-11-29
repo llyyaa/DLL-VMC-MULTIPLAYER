@@ -2875,6 +2875,8 @@ CvHandicapInfo::CvHandicapInfo() :
 	m_iAIFreeXP(0),
 	m_iAIFreeXPPercent(0),
 	m_iNumGoodies(0),
+	m_iStrategicResourceMod(0),
+	m_iStrategicResourceModPerEra(0),
 	m_piGoodies(NULL),
 	m_pbFreeTechs(NULL),
 	m_pbAIFreeTechs(NULL)
@@ -3195,6 +3197,16 @@ int CvHandicapInfo::getGoodies(int i) const
 	return m_piGoodies[i];
 }
 //------------------------------------------------------------------------------
+int CvHandicapInfo::getStrategicResourceMod() const
+{
+	return m_iStrategicResourceMod;
+}
+//------------------------------------------------------------------------------
+int CvHandicapInfo::getStrategicResourceModPerEra() const
+{
+	return m_iStrategicResourceModPerEra;
+}
+//------------------------------------------------------------------------------
 int CvHandicapInfo::isFreeTechs(int i) const
 {
 	CvAssertMsg(i < GC.getNumTechInfos(), "Index out of bounds");
@@ -3273,6 +3285,8 @@ bool CvHandicapInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility
 	m_iAIAdvancedStartPercent = kResults.GetInt("AIAdvancedStartPercent");
 	m_iAIFreeXP = kResults.GetInt("AIFreeXP");
 	m_iAIFreeXPPercent = kResults.GetInt("AIFreeXPPercent");
+	m_iStrategicResourceMod = kResults.GetInt("StrategicResourceMod");
+	m_iStrategicResourceModPerEra = kResults.GetInt("StrategicResourceModPerEra");
 
 	//Arrays
 	const char* szHandicapType = GetType();

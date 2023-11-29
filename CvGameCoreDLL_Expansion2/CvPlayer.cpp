@@ -22045,10 +22045,16 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 		iTotalNumResource += iCityPOPResource / 100;
 		iTotalNumResource += iCityResourceFromPolicy;
 
-
 		if(GetStrategicResourceMod() != 0)
 		{
 			iTotalNumResource *= GetStrategicResourceMod();
+			iTotalNumResource /= 100;
+		}
+		if(!isHuman() && isMajorCiv() && !IsAITeammateOfHuman())
+		{
+			int iHanHandicapMod = GC.getGame().getHandicapInfo().getStrategicResourceMod();
+			iHanHandicapMod += GC.getGame().getHandicapInfo().getStrategicResourceModPerEra() * GetCurrentEra();
+			iTotalNumResource *= iHanHandicapMod;
 			iTotalNumResource /= 100;
 		}
 	}

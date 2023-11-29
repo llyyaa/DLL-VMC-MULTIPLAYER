@@ -120,6 +120,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iTriggersIdeologyTech(NO_TECH),
 	m_iNaturalWonderCorruptionScoreChange(0),
 	m_iNaturalWonderCorruptionRadius(0),
 	m_iCultureBonusUnitStrengthModify(0),
@@ -679,6 +680,10 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetTriggersIdeologyTech() const
+{
+	return m_iTriggersIdeologyTech;
+}
 int CvTraitEntry::GetNaturalWonderCorruptionScoreChange() const
 {
 	return m_iNaturalWonderCorruptionScoreChange;
@@ -1573,6 +1578,11 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	szTextVal = kResults.GetText("TriggersIdeologyTech");
+	if(szTextVal)
+	{
+		m_iTriggersIdeologyTech = GC.getInfoTypeForString(szTextVal, true);
+	}
 	m_iNaturalWonderCorruptionScoreChange = kResults.GetInt("NaturalWonderCorruptionScoreChange");
 	m_iNaturalWonderCorruptionRadius = kResults.GetInt("NaturalWonderCorruptionRadius");
 	m_iCultureBonusUnitStrengthModify = kResults.GetInt("CultureBonusUnitStrengthModify");
@@ -2387,6 +2397,10 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			if(trait->GetTriggersIdeologyTech() != NO_TECH)
+			{
+				m_iTriggersIdeologyTech = trait->GetTriggersIdeologyTech();
+			}
 			m_iNaturalWonderCorruptionScoreChange += trait->GetNaturalWonderCorruptionScoreChange();
 			m_iNaturalWonderCorruptionRadius += trait->GetNaturalWonderCorruptionRadius();
 			m_iRiverCorruptionScoreChange += trait->GetRiverCorruptionScoreChange();
@@ -2885,6 +2899,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iTriggersIdeologyTech = NO_TECH;
 	m_iNaturalWonderCorruptionScoreChange = 0;
 	m_iNaturalWonderCorruptionRadius = 0;
 	m_iCultureBonusUnitStrengthModify = 0;
@@ -4313,6 +4328,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iTriggersIdeologyTech;
 	kStream >> m_iNaturalWonderCorruptionScoreChange;
 	kStream >> m_iNaturalWonderCorruptionRadius;
 	kStream >> m_iCultureBonusUnitStrengthModify;
@@ -4701,6 +4717,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iTriggersIdeologyTech;
 	kStream << m_iNaturalWonderCorruptionScoreChange;
 	kStream << m_iNaturalWonderCorruptionRadius;
 	kStream << m_iCultureBonusUnitStrengthModify;

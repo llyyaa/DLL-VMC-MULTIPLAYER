@@ -5548,6 +5548,10 @@ void CvTeam::setHasTech(TechTypes eIndex, bool bNewValue, PlayerTypes ePlayer, b
 				{
 					pLoopCity->updateStrengthValue();
 				}
+#if defined(MOD_EVENTS_PLAYER_SET_HAS_TECH)
+				if(MOD_EVENTS_PLAYER_SET_HAS_TECH)
+					GAMEEVENTINVOKE_HOOK(GAMEEVENT_PlayerSetHasTech, kLoopPlayer.GetID(), eIndex, bNewValue);
+#endif
 			}
 		}
 
@@ -7311,6 +7315,12 @@ void CvTeam::SetCurrentEra(EraTypes eNewValue)
 			if(kPlayer.isAlive() && kPlayer.getTeam() == GetID())
 			{
 				gDLL->GameplayEraChanged(ePlayer, eNewValue);
+#if defined(MOD_EVENTS_NEW_ERA)
+				if (MOD_EVENTS_NEW_ERA) 
+				{
+					GAMEEVENTINVOKE_HOOK(GAMEEVENT_PlayerSetEra, kPlayer.GetID(), eNewValue, !bAlreadyProvided);
+				}
+#endif
 			}
 		}
 
@@ -7328,7 +7338,7 @@ void CvTeam::SetCurrentEra(EraTypes eNewValue)
 
 #if defined(MOD_EVENTS_NEW_ERA)
 		if (MOD_EVENTS_NEW_ERA && GetCurrentEra() != GC.getGame().getStartEra()) {
-			GAMEEVENTINVOKE_HOOK(GAMEEVENT_TeamSetEra, GetID(), GetCurrentEra(), ((GetID() < MAX_MAJOR_CIVS) && !bAlreadyProvided));
+			GAMEEVENTINVOKE_HOOK(GAMEEVENT_TeamSetEra, GetID(), GetCurrentEra(), ((GetID() < MAX_TEAMS) && !bAlreadyProvided));
 		} else {
 #endif
 		ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();

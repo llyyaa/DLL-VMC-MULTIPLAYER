@@ -140,6 +140,7 @@ public:
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetTriggersIdeologyTech() const;
 	int GetNaturalWonderCorruptionScoreChange() const;
 	int GetNaturalWonderCorruptionRadius() const;
 	int GetCultureBonusUnitStrengthModify() const;
@@ -400,6 +401,7 @@ protected:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iTriggersIdeologyTech;
 	int m_iNaturalWonderCorruptionScoreChange;
 	int m_iNaturalWonderCorruptionRadius;
 	int m_iCultureBonusUnitStrengthModify;
@@ -917,6 +919,10 @@ public:
 	}
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetTriggersIdeologyTech() const
+	{
+		return m_iTriggersIdeologyTech;
+	}
 	int GetNaturalWonderCorruptionScoreChange() const
 	{
 		return m_iNaturalWonderCorruptionScoreChange;
@@ -1355,6 +1361,7 @@ private:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iTriggersIdeologyTech;
 	int m_iNaturalWonderCorruptionScoreChange;
 	int m_iNaturalWonderCorruptionRadius;
 	int m_iCultureBonusUnitStrengthModify;

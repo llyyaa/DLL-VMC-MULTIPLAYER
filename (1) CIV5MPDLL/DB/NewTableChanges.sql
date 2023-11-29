@@ -208,3 +208,6 @@ CREATE TABLE IF NOT EXISTS UnitPromotions_PromotionUpgrade (
     `JudgePromotionType` TEXT DEFAULT '' references UnitPromotions(Type),
     `NewPromotionType` TEXT DEFAULT '' references UnitPromotions(Type)
 );
+
+ALTER TABLE HandicapInfos ADD StrategicResourceMod INTEGER DEFAULT 100;
+ALTER TABLE HandicapInfos ADD StrategicResourceModPerEra INTEGER DEFAULT 0;

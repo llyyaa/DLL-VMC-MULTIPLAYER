@@ -5092,6 +5092,11 @@ bool CvPlayerPolicies::IsTimeToChooseIdeology() const
 				}
 			}
 		}
+		int iTraitsTriggerTech = m_pPlayer->GetPlayerTraits()->GetTriggersIdeologyTech();
+		if (iTraitsTriggerTech != NO_TECH && m_pPlayer->HasTech((TechTypes)iTraitsTriggerTech))
+		{
+			return true;
+		}
 	}
 
 	return false;

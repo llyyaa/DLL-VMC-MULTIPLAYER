@@ -6966,7 +6966,8 @@ ResourceTypes CvPlot::getResourceType(TeamTypes eTeam) const
 		if(m_eResourceType != NO_RESOURCE)
 		{
 			CvGame& Game = GC.getGame();
-			bool bDebug = Game.isDebugMode() || GET_PLAYER(Game.getActivePlayer()).isObserver();
+			CvPlayerAI& kActivePlayer = GET_PLAYER(Game.getActivePlayer());
+			bool bDebug = Game.isDebugMode() || (kActivePlayer.isObserver() && kActivePlayer.getTeam() == eTeam);
 
 			int iPolicyReveal = GC.getResourceInfo((ResourceTypes)m_eResourceType)->getPolicyReveal();
 			if (!bDebug && iPolicyReveal != NO_POLICY)

@@ -492,8 +492,12 @@
 
     <!-- Event sent when the player enters a new era, see also NewEraPopup.lua and BUTTONPOPUP_NEW_ERA (v19) -->
     <!--   GameEvents.TeamSetEra.Add(function(eTeam, eEra, bFirst) end) -->
+    <!--   GameEvents.PlayerSetEra.Add(function(ePlayer, eEra, bFirst) end)-->
     <!-- See also: "Global - Espionage Race" -->
     <Row Class="3" Name="EVENTS_NEW_ERA" Value="0"/>
+
+    <!--   GameEvents.PlayerSetHasTech.Add(function(ePlayer, eIndex, bNewValue) end)-->
+    <Row Class="3" Name="EVENTS_PLAYER_SET_HAS_TECH" Value="0"/>
 
     <!-- Event sent when the team discovers a new Natural Wonder (v19) -->
     <!--   GameEvents.NaturalWonderDiscovered.Add(function(iTeam, iFeature, iX, iY, bFirst, iPlayer, iUnit) end) -->

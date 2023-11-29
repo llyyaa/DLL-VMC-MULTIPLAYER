@@ -892,6 +892,8 @@ public:
 	int getAIFreeXP() const;
 	int getAIFreeXPPercent() const;
 	int getNumGoodies() const;
+	int getStrategicResourceMod() const;
+	int getStrategicResourceModPerEra() const;
 
 	// Arrays
 	int getGoodies(int i) const;
@@ -962,6 +964,8 @@ protected:
 	int m_iAIFreeXP;
 	int m_iAIFreeXPPercent;
 	int m_iNumGoodies;
+	int m_iStrategicResourceMod;
+	int m_iStrategicResourceModPerEra;
 
 	CvString m_strHandicapName;
 
