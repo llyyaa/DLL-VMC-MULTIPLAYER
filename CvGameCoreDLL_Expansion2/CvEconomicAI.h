@@ -213,6 +213,14 @@ public:
 	{
 		return m_iExplorersDisbanded;
 	};
+	void IncrementSeaExplorersDisbanded()
+	{
+		m_iSeaExplorersDisbanded++;
+	};
+	int GetSeaExplorersDisbanded()
+	{
+		return m_iSeaExplorersDisbanded;
+	};
 	int GetLastTurnWorkerDisbanded() const
 	{
 		return m_iLastTurnWorkerDisbanded;
@@ -257,6 +265,7 @@ private:
 	ReconState m_eReconState;
 	ReconState m_eNavalReconState;
 	int m_iExplorersDisbanded;
+	int m_iSeaExplorersDisbanded;
 	int m_iLastTurnWorkerDisbanded;
 	int m_iVisibleAntiquitySites;
 

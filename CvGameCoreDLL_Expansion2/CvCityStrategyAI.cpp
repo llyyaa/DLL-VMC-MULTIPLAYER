@@ -2346,7 +2346,8 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_NeedTileImprovers(AICityStrategyT
 					{
 						if(pLoopPlot->getOwner() == pCity->getOwner())
 						{
-							if(!pLoopPlot->isWater())
+							//for SP, Worker can Improvement water plot
+							if(MOD_SP_SMART_AI || !pLoopPlot->isWater())
 							{
 								if(pLoopPlot->getImprovementType() != NO_IMPROVEMENT)
 								{
@@ -2719,6 +2720,8 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_NeedNavalGrowth(AICityStrategyTyp
 /// "Need Naval Tile Improvement" City Strategy: If there's an unimproved Resource in the water that we could be using, HIGHLY prioritize NAVAL_TILE_IMPROVEMENT in this City: should give us a Workboat in short order
 bool CityStrategyAIHelpers::IsTestCityStrategy_NeedNavalTileImprovement(CvCity* pCity)
 {
+	//for SP, we only need workers
+	if(MOD_SP_SMART_AI) return false;
 	int iNumUnimprovedWaterResources = 0;
 
 	CvPlot* pLoopPlot;

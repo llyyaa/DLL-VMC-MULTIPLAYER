@@ -19962,6 +19962,11 @@ void CvPlayer::setTurnActive(bool bNewValue, bool bDoTurn)
 			{
 				DLLUI->PublishRemotePlayerTurnStart();
 			}
+#if defined(MOD_EVENTS_PLAYER_TURN)
+			if (MOD_EVENTS_PLAYER_TURN && isAlive()) {
+				GAMEEVENTINVOKE_HOOK(GAMEEVENT_PlayerTurnStart, GetID());
+			}
+#endif
 		}
 
 		/////////////////////////////////////////////

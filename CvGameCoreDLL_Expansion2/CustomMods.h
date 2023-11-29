@@ -608,6 +608,7 @@
 
 // Event sent by ending turn (v94)
 //   GameEvents.PlayerDoneTurn.Add(function(iPlayer) end)
+//   GameEvents.PlayerTurnStart.Add(function(iPlayer) end)
 #define MOD_EVENTS_PLAYER_TURN                      gCustomMods.isEVENTS_PLAYER_TURN()
 
 // Event sent by golden ages (v52)
@@ -1225,6 +1226,7 @@ enum BattleTypeTypes
 #define GAMEEVENT_PlayerCanSpreadReligion		"PlayerCanSpreadReligion",		"iiii"
 #define GAMEEVENT_PlayerCanTransitMinorCity		"PlayerCanTransitMinorCity",	"iiiii"
 #define GAMEEVENT_PlayerDoneTurn				"PlayerDoneTurn",				"i"
+#define GAMEEVENT_PlayerTurnStart				"PlayerTurnStart",				"i"
 #define GAMEEVENT_PlayerGifted					"PlayerGifted",					"iiiiii"
 #define GAMEEVENT_PlayerCompletedQuest			"PlayerCompletedQuest",			"iiiiii"
 #define GAMEEVENT_PlayerGoldenAge				"PlayerGoldenAge",				"ibi"

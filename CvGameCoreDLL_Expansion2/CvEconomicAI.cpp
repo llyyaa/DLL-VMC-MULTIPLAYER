@@ -328,6 +328,7 @@ void CvEconomicAI::Reset()
 	}
 
 	m_iExplorersDisbanded = 0;
+	m_iSeaExplorersDisbanded = 0;
 	m_eReconState = NO_RECON_STATE;
 	m_eNavalReconState = NO_RECON_STATE;
 	m_iLastTurnWorkerDisbanded = -1;
@@ -426,6 +427,7 @@ void CvEconomicAI::Read(FDataStream& kStream)
 	m_eNavalReconState = (ReconState)iTemp;
 
 	kStream >> m_iExplorersDisbanded;
+	kStream >> m_iSeaExplorersDisbanded;
 	kStream >> m_iLastTurnWorkerDisbanded;
 	kStream >> m_iVisibleAntiquitySites;
 
@@ -471,6 +473,7 @@ void CvEconomicAI::Write(FDataStream& kStream)
 	kStream << (int)m_eReconState;
 	kStream << (int)m_eNavalReconState;
 	kStream << m_iExplorersDisbanded;
+	kStream << m_iSeaExplorersDisbanded;
 	kStream << m_iLastTurnWorkerDisbanded;
 	kStream << m_iVisibleAntiquitySites;
 
@@ -2211,7 +2214,7 @@ void CvEconomicAI::DoReconState()
 	else
 	{
 		// How many Units do we have exploring or being trained to do this job? The more Units we have the less we want this Strategy
-		iNumExploringUnits = m_pPlayer->GetNumUnitsWithUnitAI(UNITAI_EXPLORE_SEA, true, true);
+		iNumExploringUnits = m_pPlayer->GetNumUnitsWithUnitAI(UNITAI_EXPLORE_SEA, true, true) + m_iSeaExplorersDisbanded;
 		iStrategyWeight = /*100*/ GC.getAI_STRATEGY_EARLY_EXPLORATION_STARTING_WEIGHT();
 		iWeightThreshold = 110;  // So result is a number from 10 to 100
 		iWeightThreshold -= m_pPlayer->GetGrandStrategyAI()->GetPersonalityAndGrandStrategy((FlavorTypes)GC.getInfoTypeForString("FLAVOR_NAVAL_RECON")) *

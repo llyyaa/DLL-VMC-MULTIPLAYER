@@ -1488,14 +1488,10 @@ void CvHomelandAI::PlotUpgradeMoves()
 	{
 		// Don't try and upgrade a human player's unit or one already recruited for an operation
 		UnitHandle pUnit = m_pPlayer->getUnit(*it);
-#if defined(MOD_AI_SMART_V3)
 		if(pUnit && !pUnit->isHuman() && (MOD_AI_SMART_V3 || pUnit->getArmyID() == -1))
-#else
-		if(pUnit && !pUnit->isHuman() && pUnit->getArmyID() == -1)
-#endif
 		{
-#if defined(MOD_AI_SMART_V3)
-			if (MOD_AI_SMART_V3)
+			// for SP, AI Force Upgrade Units(Even in a Army)
+			if (!MOD_SP_SMART_AI && MOD_AI_SMART_V3)
 			{
 				// Also eligible to upgrade if army is not moving/at destination
 				int iArmyId = pUnit->getArmyID();
@@ -1512,7 +1508,6 @@ void CvHomelandAI::PlotUpgradeMoves()
 					}
 				}
 			}
-#endif
 
 			// Can this unit be upgraded?
 			UnitTypes eUpgradeUnitType = pUnit->GetUpgradeUnitType();
@@ -1581,20 +1576,23 @@ void CvHomelandAI::PlotUpgradeMoves()
 		std::stable_sort(m_CurrentMoveUnits.begin(), m_CurrentMoveUnits.end(), HomelandAIHelpers::CvHomelandUnitAuxIntReverseSort);
 
 		int iFlavorMilitaryTraining = 0;
-		for(int iFlavorLoop = 0; iFlavorLoop < GC.getNumFlavorTypes() && iFlavorMilitaryTraining == 0; iFlavorLoop++)
+		// for SP, AI Force Upgrade all Units
+		if(!MOD_SP_SMART_AI)
 		{
-			if(GC.getFlavorTypes((FlavorTypes)iFlavorLoop) == "FLAVOR_MILITARY_TRAINING")
+			for(int iFlavorLoop = 0; iFlavorLoop < GC.getNumFlavorTypes() && iFlavorMilitaryTraining == 0; iFlavorLoop++)
 			{
-				iFlavorMilitaryTraining = m_pPlayer->GetGrandStrategyAI()->GetPersonalityAndGrandStrategy((FlavorTypes)iFlavorLoop);
+				if(GC.getFlavorTypes((FlavorTypes)iFlavorLoop) == "FLAVOR_MILITARY_TRAINING")
+				{
+					iFlavorMilitaryTraining = m_pPlayer->GetGrandStrategyAI()->GetPersonalityAndGrandStrategy((FlavorTypes)iFlavorLoop);
+				}
 			}
-		}
 
-		iFlavorMilitaryTraining = max(1,iFlavorMilitaryTraining/3);
-		int iBonusUpgrades = max(0,GC.getGame().getHandicapInfo().GetID() - 5); // more at the higher difficulties (the AI should have more money to spend)
-#if defined(MOD_AI_SMART_V3)
-		iFlavorMilitaryTraining += (MOD_AI_SMART_V3 ? (m_CurrentMoveUnits.size() / 4) : 0);
-#endif
-		iFlavorMilitaryTraining += iBonusUpgrades;
+			iFlavorMilitaryTraining = max(1,iFlavorMilitaryTraining/3);
+			int iBonusUpgrades = max(0,GC.getGame().getHandicapInfo().GetID() - 5); // more at the higher difficulties (the AI should have more money to spend)
+			iFlavorMilitaryTraining += m_CurrentMoveUnits.size() / 4;
+
+			iFlavorMilitaryTraining += iBonusUpgrades;
+		}
 
 		// Try to find a unit that can upgrade immediately
 		int iNumUpgraded = 0;
@@ -1618,9 +1616,11 @@ void CvHomelandAI::PlotUpgradeMoves()
 				}
 
 				iNumUpgraded++;
-				if(iNumUpgraded >= iFlavorMilitaryTraining)
+				if(!MOD_SP_SMART_AI && iNumUpgraded >= iFlavorMilitaryTraining)
 				{
-					return; // Only upgrade iFlavorMilitaryTraining units per turn
+					// Only upgrade iFlavorMilitaryTraining units per turn
+					// for SP, AI Force Upgrade Units
+					return;
 				}
 			}
 		}
@@ -2761,15 +2761,19 @@ void CvHomelandAI::ExecuteExplorerMoves()
 						LogHomelandMessage(strLogString);
 					}
 
-					CvCity* pLoopCity;
-					int iLoop;
 					bool bFoundPath = false;
-					for(pLoopCity = m_pPlayer->firstCity(&iLoop); pLoopCity != NULL; pLoopCity = m_pPlayer->nextCity(&iLoop))
+					//for SP, Just disband it
+					if(!MOD_SP_SMART_AI)
 					{
-						if(GC.getIgnoreUnitsPathFinder().DoesPathExist(*(pUnit), pUnit->plot(), pLoopCity->plot()))
+						CvCity* pLoopCity;
+						int iLoop;
+						for(pLoopCity = m_pPlayer->firstCity(&iLoop); pLoopCity != NULL; pLoopCity = m_pPlayer->nextCity(&iLoop))
 						{
-							bFoundPath = true;
-							break;
+							if(GC.getIgnoreUnitsPathFinder().DoesPathExist(*(pUnit), pUnit->plot(), pLoopCity->plot()))
+							{
+								bFoundPath = true;
+								break;
+							}
 						}
 					}
 					if(!bFoundPath)
@@ -2790,6 +2794,17 @@ void CvHomelandAI::ExecuteExplorerMoves()
 						CvString strLogString;
 						strLogString.Format("UnitID: %d Sea explorer (AI) found no target, X: %d, Y: %d", pUnit->GetID(), pUnit->getX(), pUnit->getY());
 						LogHomelandMessage(strLogString);
+					}
+					//for SP, Just disband it
+					if(MOD_SP_SMART_AI)
+					{
+						CvString strLogString;
+						strLogString.Format("UnitID: %d Disbanding Sea explorer, X: %d, Y: %d", pUnit->GetID(), pUnit->getX(), pUnit->getY());
+						LogHomelandMessage(strLogString);
+
+						UnitProcessed(pUnit->GetID());
+						pUnit->kill(true);
+						m_pPlayer->GetEconomicAI()->IncrementSeaExplorersDisbanded();
 					}
 				}
 			}
