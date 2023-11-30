@@ -1221,6 +1221,7 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 
 		UpdateProjectedPlotYields(pPlot, eBuild);
 		int iScore = ScorePlot(eImprovement, eExistingImprovement);
+		if (pkBuild->isFeatureRemove(FEATURE_ICE)) iScore += 600;
 
 		// if we're going backward, bail out!
 		if (iScore <= 0)
@@ -2257,6 +2258,7 @@ int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement, ImprovementType
 
 	//special define in XML
 	iScore += pImprovement->GetExtraScore();
+	if(m_bKeepJungle && pImprovement->GetNewFeature() == FEATURE_JUNGLE) iScore += 2 * pImprovement->GetExtraScore();
 	if(eExistingImprovement != NO_IMPROVEMENT && GC.getImprovementInfo(eExistingImprovement))
 	{
 		iScore -= GC.getImprovementInfo(eExistingImprovement)->GetExtraScore();
