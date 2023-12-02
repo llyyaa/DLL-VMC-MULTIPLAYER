@@ -754,7 +754,7 @@ protected:
 #endif
 	LUAAPIEXTN(GetStrengthModifierFromExtraResource, int);
 	LUAAPIEXTN(GetStrengthModifierFromExtraHappiness, int);
-
+	LUAAPIEXTN(GetBarbarianCombatBonusTotal, int);
 };
 
 

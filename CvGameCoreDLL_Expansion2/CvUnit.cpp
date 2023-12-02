@@ -6451,6 +6451,36 @@ void CvUnit::ChangeBarbarianCombatBonus(int iValue)
 }
 
 //	--------------------------------------------------------------------------------
+int CvUnit::GetBarbarianCombatBonusTotal() const
+{
+	int iTotalBonus = 0;
+	CvPlayer& kPlayer = GET_PLAYER(getOwner());
+	// Generic Barb Combat Bonus
+	iTotalBonus = kPlayer.GetBarbarianCombatBonus();
+
+#if defined(MOD_ROG_CORE)
+	iTotalBonus += GetBarbarianCombatBonus();
+#endif
+
+	CvHandicapInfo& thisGameHandicap = GC.getGame().getHandicapInfo();
+	// Human bonus
+	if(isHuman())
+	{
+		iTotalBonus += thisGameHandicap.getBarbarianCombatModifier();;
+	}
+	// AI bonus
+	else
+	{
+		iTotalBonus += thisGameHandicap.getAIBarbarianCombatModifier();;
+	}
+
+	if(GC.getGame().isOption(GAMEOPTION_RAGING_BARBARIANS))
+	{
+		iTotalBonus += 25;
+	}
+	return iTotalBonus;
+}
+//	--------------------------------------------------------------------------------
 int CvUnit::GetDamageAoEFortified() const
 {
 	return m_iDamageAoEFortified;
@@ -14389,33 +14419,7 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 		// OTHER UNIT is a Barbarian
 		if(pOtherUnit->isBarbarian())
 		{
-			// Generic Barb Combat Bonus
-			iTempModifier = kPlayer.GetBarbarianCombatBonus();
-			iModifier += iTempModifier;
-
-#if defined(MOD_ROG_CORE)
-			iModifier += GetBarbarianCombatBonus();
-#endif
-
-			CvHandicapInfo& thisGameHandicap = GC.getGame().getHandicapInfo();
-
-			// Human bonus
-			if(isHuman())
-			{
-				iTempModifier = thisGameHandicap.getBarbarianCombatModifier();
-				iModifier += iTempModifier;
-			}
-			// AI bonus
-			else
-			{
-				iTempModifier = thisGameHandicap.getAIBarbarianCombatModifier();
-				iModifier += iTempModifier;
-			}
-
-			if(GC.getGame().isOption(GAMEOPTION_RAGING_BARBARIANS))
-			{
-				iModifier += 25;
-			}
+			iModifier += GetBarbarianCombatBonusTotal();
 		}
 	}
 
@@ -15391,33 +15395,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 		// OTHER UNIT is a Barbarian
 		if(pOtherUnit->isBarbarian())
 		{
-			// Generic Barb Combat Bonus
-			iTempModifier = kPlayer.GetBarbarianCombatBonus();
-			iModifier += iTempModifier;
-
-#if defined(MOD_ROG_CORE)
-			iModifier += GetBarbarianCombatBonus();
-#endif
-
-			CvHandicapInfo& thisGameHandicap = GC.getGame().getHandicapInfo();
-
-			// Human bonus
-			if(isHuman())
-			{
-				iTempModifier = thisGameHandicap.getBarbarianCombatModifier();
-				iModifier += iTempModifier;
-			}
-			// AI bonus
-			else
-			{
-				iTempModifier = thisGameHandicap.getAIBarbarianCombatModifier();
-				iModifier += iTempModifier;
-			}
-
-			if(GC.getGame().isOption(GAMEOPTION_RAGING_BARBARIANS))
-			{
-				iModifier += 25;
-			}
+			iModifier += GetBarbarianCombatBonusTotal();
 		}
 
 		// ATTACKING

@@ -830,6 +830,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #endif
 	Method(GetStrengthModifierFromExtraResource);
 	Method(GetStrengthModifierFromExtraHappiness);
+	Method(GetBarbarianCombatBonusTotal);
 }
 //------------------------------------------------------------------------------
 const char* CvLuaUnit::GetTypeName()
@@ -6247,3 +6248,4 @@ int CvLuaUnit::lGetPlotCorruptionScoreReport(lua_State* L)
 
 LUAAPIIMPL(Unit, GetStrengthModifierFromExtraResource)
 LUAAPIIMPL(Unit, GetStrengthModifierFromExtraHappiness)
+LUAAPIIMPL(Unit, GetBarbarianCombatBonusTotal)

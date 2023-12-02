@@ -4423,7 +4423,8 @@ int CvLuaCity::lUpdateStrengthValue(lua_State* L)
 int CvLuaCity::lGetStrengthValue(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
-	const int iResult = pkCity->getStrengthValue();
+	bool bForRangeStrike = luaL_optbool(L, 2, false);
+	const int iResult = pkCity->getStrengthValue(bForRangeStrike);
 
 	lua_pushinteger(L, iResult);
 	return 1;

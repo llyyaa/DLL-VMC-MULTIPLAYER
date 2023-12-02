@@ -1767,6 +1767,7 @@ public:
 
 	int GetBarbarianCombatBonus() const;
 	void ChangeBarbarianCombatBonus(int iValue);
+	int GetBarbarianCombatBonusTotal() const;
 #endif
 
 	int GetCaptureDefeatedEnemyChance() const;

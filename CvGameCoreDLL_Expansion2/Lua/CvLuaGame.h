@@ -409,6 +409,8 @@ protected:
 	static int lGetNumArchaeologySites(lua_State *L);
 	static int lGetNumHiddenArchaeologySites(lua_State *L);
 
+	static int lGetHappinessFromHandicap(lua_State* L);
+
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_EXTENSIONS)
 	LUAAPIEXTN(ExitLeaderScreen, void);
 #endif

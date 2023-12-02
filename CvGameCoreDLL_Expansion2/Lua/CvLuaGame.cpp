@@ -468,6 +468,8 @@ void CvLuaGame::RegisterMembers(lua_State* L)
 	Method(GetNumArchaeologySites);
 	Method(GetNumHiddenArchaeologySites);
 
+	Method(GetHappinessFromHandicap);
+
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_EXTENSIONS)
 	Method(ExitLeaderScreen);
 #endif
@@ -3241,6 +3243,15 @@ int CvLuaGame::lGetNumHiddenArchaeologySites(lua_State* L)
 	lua_pushinteger(L, GC.getGame().GetNumHiddenArchaeologySites());
 	return 1;
 }
+
+//------------------------------------------------------------------------------
+int CvLuaGame::lGetHappinessFromHandicap(lua_State* L)
+{
+	lua_pushinteger(L, GC.getGame().getHandicapInfo().getHappinessDefault());
+	return 1;
+}
+
+//------------------------------------------------------------------------------
 
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_EXTENSIONS)
 int CvLuaGame::lExitLeaderScreen(lua_State* L)
