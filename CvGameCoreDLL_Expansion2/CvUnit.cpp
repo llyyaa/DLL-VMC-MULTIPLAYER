@@ -15325,6 +15325,10 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 	if(kPlayer.isGoldenAge())
 		iModifier += pTraits->GetGoldenAgeCombatModifier();
 
+	// Adjacent Friendly military Unit?
+	if(IsFriendlyUnitAdjacent(/*bCombatUnit*/ true))
+		iModifier += GetAdjacentModifier();
+
 	////////////////////////
 	// OTHER UNIT IS KNOWN
 	////////////////////////
