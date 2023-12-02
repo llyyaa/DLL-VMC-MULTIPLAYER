@@ -4900,7 +4900,6 @@ void CvUnitCombat::DoCollateralDamage(const CvCombatInfo& kCombatInfo)
 			bool bImmune = pAffectedUnit->GetCollateralImmuneRC() > 0;
 			if (pAffectedUnit == pDefenderUnit) continue;
 			if (bImmune) continue;
-			if (pAffectedUnit->getDomainType() != DOMAIN_LAND && pAffectedUnit->getDomainType() != DOMAIN_SEA) continue;
 			if (!kAttackPlayer.IsAtWarWith(pAffectedUnit->getOwner())) continue;
 			if (dedupSet.count(pAffectedUnit) > 0) continue;
 			dedupSet.insert(pAffectedUnit);
