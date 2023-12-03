@@ -952,6 +952,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(IsAskedToStopDigging);
 	Method(IsDoFMessageTooSoon);
 	Method(IsDoF);
+	Method(IsMarriageAccepted);
+	Method(GetMarriageCounter);
 	Method(GetDoFCounter);
 	Method(IsPlayerDoFwithAnyFriend);
 	Method(IsPlayerDoFwithAnyEnemy);
@@ -8605,6 +8607,29 @@ int CvLuaPlayer::lIsDoF(lua_State* L)
 	lua_pushboolean(L, bTooSoon);
 	return 1;
 }
+
+int CvLuaPlayer::lIsMarriageAccepted(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	PlayerTypes eWithPlayer = (PlayerTypes) lua_tointeger(L, 2);
+
+	const bool bTooSoon = pkPlayer->GetDiplomacyAI()->IsMarriageAccepted(eWithPlayer);
+
+	lua_pushboolean(L, bTooSoon);
+	return 1;
+}
+
+int CvLuaPlayer::lGetMarriageCounter(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	PlayerTypes eWithPlayer = (PlayerTypes) lua_tointeger(L, 2);
+
+	const short iCounter = pkPlayer->GetDiplomacyAI()->GetMarriageCounter(eWithPlayer);
+
+	lua_pushinteger(L, iCounter);
+	return 1;
+}
+
 //------------------------------------------------------------------------------
 int CvLuaPlayer::lGetDoFCounter(lua_State* L)
 {
@@ -11282,6 +11307,15 @@ int CvLuaPlayer::lGetOpinionTable(lua_State* L)
 		Opinion kOpinion;
 		kOpinion.m_iValue = iValue;
 		kOpinion.m_str = Localization::Lookup("TXT_KEY_DIPLO_HUMAN_DOF_WITH_ENEMY");
+		aOpinions.push_back(kOpinion);
+	}
+
+	iValue = pDiploAI->GetMarriageAcceptedScore(eWithPlayer);
+	if (iValue != 0)
+	{
+		Opinion kOpinion;
+		kOpinion.m_iValue = iValue;
+		kOpinion.m_str = Localization::Lookup("TXT_KEY_DIPLO_MARRIAGE");
 		aOpinions.push_back(kOpinion);
 	}
 

@@ -820,6 +820,28 @@ bool CvDeal::IsPossibleToTradeItem(PlayerTypes ePlayer, PlayerTypes eToPlayer, T
 		if(!pFromPlayer->GetLeagueAI()->CanCommitVote(eToPlayer))
 			return false;
 	}
+	else if (eItem == TRADE_ITEM_DIPLOMATIC_MARRIAGE)
+	{
+		if (!GET_PLAYER(ePlayer).GetPlayerTraits()->CanDiplomaticMarriage() && !GET_PLAYER(eToPlayer).GetPlayerTraits()->CanDiplomaticMarriage())
+		{
+			return false;
+		}
+
+		// A player can only have one diplomatic marriage at a time
+		for (int i = 0; i < MAX_MAJOR_CIVS; ++i)
+		{
+			PlayerTypes otherPlayer = static_cast<PlayerTypes>(i);
+			if (otherPlayer != ePlayer && GET_PLAYER(ePlayer).GetDiplomacyAI()->IsMarriageAccepted(otherPlayer))
+			{
+				return false;
+			}
+			if (otherPlayer != eToPlayer && GET_PLAYER(eToPlayer).GetDiplomacyAI()->IsMarriageAccepted(otherPlayer))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 
 	return true;
 }
@@ -1363,6 +1385,22 @@ void CvDeal::AddVoteCommitment(PlayerTypes eFrom, int iResolutionID, int iVoteCh
 	}
 }
 
+void CvDeal::AddDiplomaticMarriage(PlayerTypes eFrom, int iDuration)
+{
+	CvAssertMsg(eFrom == m_eFromPlayer || eFrom == m_eToPlayer, "DEAL: Adding deal item for a player that's not actually in this deal!");
+	if(IsPossibleToTradeItem(eFrom, GetOtherPlayer(eFrom), TRADE_ITEM_DIPLOMATIC_MARRIAGE))
+	{
+		CvTradedItem item;
+		item.m_eItemType = TRADE_ITEM_DIPLOMATIC_MARRIAGE;
+		item.m_eFromPlayer = eFrom;
+		m_TradedItems.push_back(item);
+	}
+	else
+	{
+		CvAssertMsg(false, "DEAL: Trying to add an invalid Vote Commitment item to a deal");
+	}
+}
+
 int CvDeal::GetGoldTrade(PlayerTypes eFrom)
 {
 	TradedItemList::iterator it;
@@ -1615,6 +1653,19 @@ bool CvDeal::IsVoteCommitmentTrade(PlayerTypes eFrom)
 	return false;
 }
 
+bool CvDeal::IsDiplomaticMarriage(PlayerTypes eFrom)
+{
+	TradedItemList::iterator it;
+	for(it = m_TradedItems.begin(); it != m_TradedItems.end(); ++it)
+	{
+		if(it->m_eItemType == TRADE_ITEM_DIPLOMATIC_MARRIAGE && it->m_eFromPlayer == eFrom)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 CvDeal::DealRenewStatus CvDeal::GetItemTradeableState(TradeableItems eTradeItem)
 {
 	switch(eTradeItem)
@@ -1630,6 +1681,7 @@ CvDeal::DealRenewStatus CvDeal::GetItemTradeableState(TradeableItems eTradeItem)
 	case TRADE_ITEM_THIRD_PARTY_PEACE:
 	case TRADE_ITEM_THIRD_PARTY_WAR:
 	case TRADE_ITEM_VOTE_COMMITMENT:
+	case TRADE_ITEM_DIPLOMATIC_MARRIAGE:
 		return DEAL_NONRENEWABLE;
 		break;
 
@@ -1800,6 +1852,20 @@ void CvDeal::RemoveVoteCommitment(PlayerTypes eFrom, int iResolutionID, int iVot
 			it->m_iData2 == iVoteChoice &&
 			it->m_iData3 == iNumVotes &&
 			it->m_bFlag1 == bRepeal)
+		{
+			m_TradedItems.erase(it);
+			break;
+		}
+	}
+}
+
+void CvDeal::RemoveDiplomaticMarriage(PlayerTypes eFrom)
+{
+	TradedItemList::iterator it;
+	for(it = m_TradedItems.begin(); it != m_TradedItems.end(); ++it)
+	{
+		if (it->m_eItemType == TRADE_ITEM_DIPLOMATIC_MARRIAGE &&
+			it->m_eFromPlayer == eFrom)
 		{
 			m_TradedItems.erase(it);
 			break;
@@ -2340,6 +2406,19 @@ void CvGameDeals::FinalizeDealValidAndAccepted(PlayerTypes eFromPlayer, PlayerTy
 		{
 			GET_PLAYER(eAcceptedFromPlayer).GetLeagueAI()->AddVoteCommitment(eAcceptedToPlayer, it->m_iData1, it->m_iData2, it->m_iData3, it->m_bFlag1);
 		}
+		else if (it->m_eItemType == TRADE_ITEM_DIPLOMATIC_MARRIAGE)
+		{
+			GET_PLAYER(eAcceptedFromPlayer).GetDiplomacyAI()->SetMarriageAccepted(eAcceptedToPlayer, true);
+			GET_PLAYER(eAcceptedFromPlayer).GetDiplomacyAI()->SetMarriageCounter(eAcceptedToPlayer, 0);
+			GET_PLAYER(eAcceptedToPlayer).GetDiplomacyAI()->SetMarriageAccepted(eAcceptedFromPlayer, true);
+			GET_PLAYER(eAcceptedToPlayer).GetDiplomacyAI()->SetMarriageCounter(eAcceptedFromPlayer, 0);
+
+			// let's forget the denounce
+			GET_PLAYER(eAcceptedFromPlayer).GetDiplomacyAI()->SetDenouncedPlayer(eAcceptedToPlayer, false);
+			GET_PLAYER(eAcceptedFromPlayer).GetDiplomacyAI()->SetDenouncedPlayerCounter(eAcceptedToPlayer, -1);
+			GET_PLAYER(eAcceptedToPlayer).GetDiplomacyAI()->SetDenouncedPlayer(eAcceptedFromPlayer, false);
+			GET_PLAYER(eAcceptedToPlayer).GetDiplomacyAI()->SetDenouncedPlayerCounter(eAcceptedFromPlayer, -1);
+		}
 		// Open Borders
 		else if(it->m_eItemType == TRADE_ITEM_OPEN_BORDERS)
 		{
@@ -2687,6 +2766,19 @@ bool CvGameDeals::FinalizeDeal(PlayerTypes eFromPlayer, PlayerTypes eToPlayer, b
 				else if(it->m_eItemType == TRADE_ITEM_VOTE_COMMITMENT)
 				{
 					GET_PLAYER(eAcceptedFromPlayer).GetLeagueAI()->AddVoteCommitment(eAcceptedToPlayer, it->m_iData1, it->m_iData2, it->m_iData3, it->m_bFlag1);
+				}
+				else if (it->m_eItemType == TRADE_ITEM_DIPLOMATIC_MARRIAGE)
+				{
+					GET_PLAYER(eAcceptedFromPlayer).GetDiplomacyAI()->SetMarriageAccepted(eAcceptedToPlayer, true);
+					GET_PLAYER(eAcceptedFromPlayer).GetDiplomacyAI()->SetMarriageCounter(eAcceptedToPlayer, 0);
+					GET_PLAYER(eAcceptedToPlayer).GetDiplomacyAI()->SetMarriageAccepted(eAcceptedFromPlayer, true);
+					GET_PLAYER(eAcceptedToPlayer).GetDiplomacyAI()->SetMarriageCounter(eAcceptedFromPlayer, 0);
+
+					// let's forget the denounce
+					GET_PLAYER(eAcceptedFromPlayer).GetDiplomacyAI()->SetDenouncedPlayer(eAcceptedToPlayer, false);
+					GET_PLAYER(eAcceptedFromPlayer).GetDiplomacyAI()->SetDenouncedPlayerCounter(eAcceptedToPlayer, -1);
+					GET_PLAYER(eAcceptedToPlayer).GetDiplomacyAI()->SetDenouncedPlayer(eAcceptedFromPlayer, false);
+					GET_PLAYER(eAcceptedToPlayer).GetDiplomacyAI()->SetDenouncedPlayerCounter(eAcceptedFromPlayer, -1);
 				}
 				// Open Borders
 				else if(it->m_eItemType == TRADE_ITEM_OPEN_BORDERS)
@@ -3978,6 +4070,9 @@ void CvGameDeals::LogDealFailed(CvDeal* pDeal, bool bNoRenew, bool bNotAccepted,
 				break;
 			case TRADE_ITEM_VOTE_COMMITMENT:
 				strTemp.Format("***** Vote Commitment: ID %d, Choice %d *****", itemIter->m_iData1, itemIter->m_iData2);
+				break;
+			case TRADE_ITEM_DIPLOMATIC_MARRIAGE:
+				strTemp.Format("***** Diplomatic Marriage *****");
 				break;
 			default:
 				strTemp.Format("***** UNKNOWN TRADE!!! *****");

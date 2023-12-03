@@ -695,6 +695,25 @@
 		<Row Tag="TXT_KEY_MULTIPLIER_YIELD">
 			<Text>[NEWLINE][ICON_BULLET]City Multiplier: {1_Num}%</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_DIPLO_MARRIAGE">
+			<Text>Diplomatic marriage</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_MARRIAGE_EXPIRED_S">
+			<Text>Your diplomatic marriage with {1_LeaderName} has expired. </Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_MARRIAGE_EXPIRED">
+			<Text>The diplomatic marriage has expired</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_MARRIAGE">
+			<Text>{1_CivName:textkey} and {2_CivName:textkey} decided to enter into a political
+				marriage to establish a solid bond between the two countries. </Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_MARRIAGE_S">
+			<Text>{1_CivName:textkey} and {2_CivName:textkey} are now married! </Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>

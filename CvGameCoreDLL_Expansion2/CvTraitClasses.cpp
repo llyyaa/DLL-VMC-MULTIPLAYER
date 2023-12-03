@@ -1490,6 +1490,11 @@ int CvTraitEntry::GetShareAllyResearchPercent() const
 	return m_iShareAllyResearchPercent;
 }
 
+bool CvTraitEntry::CanDiplomaticMarriage() const
+{
+	return m_bCanDiplomaticMarriage;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2294,6 +2299,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iGoldenAgeResearchCityCountCostModifier = kResults.GetInt("GoldenAgeResearchCityCountCostModifier");
 	m_iGoldenAgeGrowThresholdModifier = kResults.GetInt("GoldenAgeGrowThresholdModifier");
 	m_iShareAllyResearchPercent = kResults.GetInt("ShareAllyResearchPercent");
+	m_bCanDiplomaticMarriage = kResults.GetBool("CanDiplomaticMarriage");
 
 	return true;
 }
@@ -2661,6 +2667,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iGoldenAgeResearchCityCountCostModifier = trait->GetGoldenAgeResearchCityCountCostModifier();
 			m_iGoldenAgeGrowThresholdModifier = trait->GetGoldenAgeGrowThresholdModifier();
 			m_iShareAllyResearchPercent = trait->GetShareAllyResearchPercent();
+			m_bCanDiplomaticMarriage = trait->CanDiplomaticMarriage();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -4748,6 +4755,8 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_iGoldenAgeResearchCityCountCostModifier;
 	kStream >> m_iGoldenAgeGrowThresholdModifier;
 	kStream >> m_iShareAllyResearchPercent;
+
+	kStream >> m_bCanDiplomaticMarriage;
 }
 
 /// Serialization write
@@ -5022,6 +5031,8 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iGoldenAgeResearchCityCountCostModifier;
 	kStream << m_iGoldenAgeGrowThresholdModifier;
 	kStream << m_iShareAllyResearchPercent;
+
+	kStream << m_bCanDiplomaticMarriage;
 }
 
 // PRIVATE METHODS
@@ -5265,4 +5276,8 @@ int CvPlayerTraits::GetGoldenAgeGrowThresholdModifier() const
 int CvPlayerTraits::GetShareAllyResearchPercent() const
 {
 	return m_iShareAllyResearchPercent;
+}
+bool CvPlayerTraits::CanDiplomaticMarriage() const
+{
+	return m_bCanDiplomaticMarriage;
 }

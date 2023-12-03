@@ -801,6 +801,14 @@ public:
 	void SetFriendDeclaredWarOnUs(PlayerTypes ePlayer, bool bValue);
 	int GetWeDeclaredWarOnFriendCount();
 
+	// Marriage with players
+	bool IsMarriageAccepted(PlayerTypes ePlayer) const;
+	void SetMarriageAccepted(PlayerTypes ePlayer, bool bValue);
+
+	short GetMarriageCounter(PlayerTypes ePlayer) const;
+	void SetMarriageCounter(PlayerTypes ePlayer, int iValue);
+	void ChangeMarriageCounter(PlayerTypes ePlayer, int iChange);
+
 	// Working Against Player
 	//bool DoTestWorkingAgainstPlayersDesire(PlayerTypes ePlayer, PlayerTypes &eChosenAgainstPlayer);
 
@@ -1010,6 +1018,7 @@ public:
 	int GetDOFAcceptedScore(PlayerTypes ePlayer);
 	int GetDOFWithAnyFriendScore(PlayerTypes ePlayer);
 	int GetDOFWithAnyEnemyScore(PlayerTypes ePlayer);
+	int GetMarriageAcceptedScore(PlayerTypes ePlayer);
 	int GetFriendDenouncementScore(PlayerTypes ePlayer);
 	int GetWeDenouncedFriendScore(PlayerTypes ePlayer);
 	int GetFriendDenouncedUsScore(PlayerTypes ePlayer);
@@ -1377,6 +1386,9 @@ private:
 		char m_aacCoopWarAcceptedState[MAX_MAJOR_CIVS* MAX_MAJOR_CIVS];
 		short m_aaiCoopWarCounter[MAX_MAJOR_CIVS* MAX_MAJOR_CIVS];
 
+		std::tr1::array<bool, MAX_MAJOR_CIVS> m_pabMarriageAccepted;
+		std::tr1::array<short, MAX_MAJOR_CIVS> m_paiMarriageCounter;
+
 #if defined(MOD_AI_MP_DIPLOMACY)
 		float m_aTradePriority[MAX_MAJOR_CIVS]; // current ai to human trade priority
 #endif
@@ -1591,6 +1603,9 @@ private:
 	short* m_paiOtherPlayerTurnsSinceTheySupportedOurProposal;
 	short* m_paiOtherPlayerTurnsSinceTheyFoiledOurProposal;
 	short* m_paiOtherPlayerTurnsSinceTheySupportedOurHosting;
+
+	std::tr1::array<bool, MAX_MAJOR_CIVS> m_pabMarriageAccepted;
+	std::tr1::array<short, MAX_MAJOR_CIVS> m_paiMarriageCounter;
 
 	// Memory of what we've talked about with people
 	DiploLogData** m_ppaDiploStatementsLog;

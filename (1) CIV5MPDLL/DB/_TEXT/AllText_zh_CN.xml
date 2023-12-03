@@ -699,6 +699,25 @@
 		<Row Tag="TXT_KEY_MULTIPLIER_YIELD">
 			<Text>[NEWLINE][ICON_BULLET]城市级总值修正: {1_Num}%</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_DIPLO_MARRIAGE">
+			<Text>外交联姻</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_MARRIAGE_EXPIRED_S">
+			<Text>你与{1_LeaderName}的外交联姻已经到期。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_MARRIAGE_EXPIRED">
+			<Text>外交联姻已经到期</Text>
+		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_MARRIAGE">
+			<Text>{1_CivName:textkey}与{2_CivName:textkey}决定进行政治联姻，在两国间建立起稳固的纽带。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_MARRIAGE_S">
+			<Text>{1_CivName:textkey}与{2_CivName:textkey}现在达成联姻了！</Text>
+		</Row>
+		
 	</Language_zh_CN>
 
 </GameData>

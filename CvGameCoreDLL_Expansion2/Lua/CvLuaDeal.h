@@ -184,6 +184,10 @@ protected:
 	};
 
 	static int lAddVoteCommitment(lua_State* L); // Too many args for template, defined in cpp
+	static int lAddDiplomaticMarriage(lua_State* L)
+	{
+		return BasicLuaMethod(L, &CvDeal::AddDiplomaticMarriage);
+	}
 
 	static int lChangeGoldTrade(lua_State* L)
 	{
@@ -236,6 +240,10 @@ protected:
 		return BasicLuaMethod(L, &CvDeal::RemoveThirdPartyEmbargo);
 	};
 	static int lRemoveVoteCommitment(lua_State* L); // Too many args for template, defined in cpp
+	static int lRemoveDiplomaticMarriage(lua_State* L)
+	{
+		return BasicLuaMethod(L, &CvDeal::RemoveDiplomaticMarriage);
+	}
 
 	static TradedItemList::iterator m_iterator;
 };

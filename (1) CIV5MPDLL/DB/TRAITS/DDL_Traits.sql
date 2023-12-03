@@ -58,3 +58,5 @@ create table Trait_CityYieldModifierFromAdjacentFeature (
 );
 
 ALTER TABLE Traits ADD COLUMN 'ExceedingHappinessImmigrationModifier' INTEGER DEFAULT 0;
+
+alter table Traits add column `CanDiplomaticMarriage` boolean not null default 0;

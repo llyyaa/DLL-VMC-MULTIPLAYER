@@ -88,6 +88,7 @@ void CvLuaDeal::PushMethods(lua_State* L, int t)
 	Method(AddThirdPartyEmbargo);
 	Method(AddDeclarationOfFriendship);
 	Method(AddVoteCommitment);
+	Method(AddDiplomaticMarriage);
 
 	Method(RemoveByType);
 	Method(RemoveResourceTrade);
@@ -97,6 +98,7 @@ void CvLuaDeal::PushMethods(lua_State* L, int t)
 	Method(RemoveThirdPartyWar);
 	Method(RemoveThirdPartyEmbargo);
 	Method(RemoveVoteCommitment);
+	Method(RemoveDiplomaticMarriage);
 
 	Method(ChangeGoldTrade);
 	Method(ChangeGoldPerTurnTrade);

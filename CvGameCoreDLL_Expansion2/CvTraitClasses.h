@@ -312,6 +312,8 @@ public:
 
 	int GetShareAllyResearchPercent() const;
 
+	bool CanDiplomaticMarriage() const;
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -561,6 +563,8 @@ protected:
 	int m_iGoldenAgeGrowThresholdModifier = 0;
 
 	int m_iShareAllyResearchPercent = 0;
+
+	bool m_bCanDiplomaticMarriage = false;
 private:
 	CvTraitEntry(const CvTraitEntry&);
 	CvTraitEntry& operator=(const CvTraitEntry&);
@@ -1298,6 +1302,8 @@ public:
 
 	int GetShareAllyResearchPercent() const;
 
+	bool CanDiplomaticMarriage() const;
+
 	// Serialization
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
@@ -1561,6 +1567,8 @@ private:
 	int m_iGoldenAgeGrowThresholdModifier = 0;
 
 	int m_iShareAllyResearchPercent = 0;
+
+	bool m_bCanDiplomaticMarriage = false;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H
