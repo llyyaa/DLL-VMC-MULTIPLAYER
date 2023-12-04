@@ -13,7 +13,7 @@
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
-        <Row>
+		<Row>
 			<ID>8</ID>
 			<Type>YIELD_GREAT_GENERAL_POINTS</Type>
 			<Description>TXT_KEY_YIELD_GREAT_GENERAL_POINTS</Description>
@@ -33,7 +33,7 @@
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
-		
+
 		<Row>
 			<ID>10</ID>
 			<Type>YIELD_HEALTH</Type>
@@ -77,8 +77,7 @@
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
 
-
-                                  <Row>
+		<Row>
 			<ID>15</ID>
 			<Type>YIELD_VIOLENCE</Type>
 			<Description>TXT_KEY_YIELD_VIOLENCE</Description>
@@ -87,8 +86,7 @@
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
 
-		
-	                 <Row>
+		<Row>
 			<ID>16</ID>
 			<Type>YIELD_HERESY</Type>
 			<Description>TXT_KEY_YIELD_HERESY</Description>
@@ -103,36 +101,36 @@
 			<Value>-50</Value>
 		</Row>
 
-        <Row Name="PUPPET_GREAT_GENERAL_POINTS_MODIFIER">
+		<Row Name="PUPPET_GREAT_GENERAL_POINTS_MODIFIER">
 			<Value>-50</Value>
 		</Row>
-	
-         <Row Name="PUPPET_GREAT_ADMIRAL_POINTS_MODIFIER">
+
+		<Row Name="PUPPET_GREAT_ADMIRAL_POINTS_MODIFIER">
 			<Value>-50</Value>
 		</Row>
-	
-        <Row Name="PUPPET_HEALTH_MODIFIER">
+
+		<Row Name="PUPPET_HEALTH_MODIFIER">
 			<Value>-25</Value>
 		</Row>
-	
-        <Row Name="PUPPET_DISEASE_MODIFIER">
+
+		<Row Name="PUPPET_DISEASE_MODIFIER">
 			<Value>25</Value>
 		</Row>
-        <Row Name="PUPPET_CRIME_MODIFIER">
+		<Row Name="PUPPET_CRIME_MODIFIER">
 			<Value>50</Value>
 		</Row>
-        <Row Name="PUPPET_LOYALTY_MODIFIER">
+		<Row Name="PUPPET_LOYALTY_MODIFIER">
 			<Value>-25</Value>
 		</Row>
-        <Row Name="PUPPET_SOVEREIGNTY_MODIFIER">
+		<Row Name="PUPPET_SOVEREIGNTY_MODIFIER">
 			<Value>-25</Value>
 		</Row>
-	  </Defines>
- 
+	</Defines>
+
 	<!-- Text moved to AllText_en_US.xml -->
 
 	<CustomModDbUpdates>
-        <Row Name="API_UNIFIED_YIELDS_MORE" Value="1"/>
-		<Row Name="API_UNIFIED_YIELDS_GOLDEN_AGE" Value="1"/>
+		<Row Name="API_UNIFIED_YIELDS_MORE" Value="1" />
+		<Row Name="API_UNIFIED_YIELDS_GOLDEN_AGE" Value="1" />
 	</CustomModDbUpdates>
 </GameData>
