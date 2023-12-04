@@ -25,6 +25,7 @@
 	<!-- If A declares war on B that preempts a co-op war, A is locked into the war for the same number of turns as if they had agreed to the co-op war (v86) -->
     <!-- See also: "Global - Early Coop War Lock" -->
     
+    <!-- Enabled option may influence Game -->
     <Row Class="5" Name="GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY" Value="1"/>
 
     <Row Class="5" Name="GLOBAL_EARLY_COOP_WAR_LOCK" Value="0"/>
@@ -233,6 +234,7 @@
 
     <!-- Separates the Engineer, Scientist and Merchant GP counters (v52) -->
     <!-- See also: "Global - Separate GP Counters" -->
+    <!-- Enabled option may influence Game -->
     <Row Class="6" Name="GLOBAL_SEPARATE_GP_COUNTERS" Value="1"/>
 
     <!-- Removes free GP (from buildings, policies, traits, etc) from the GP counters (v61) -->
@@ -241,6 +243,7 @@
 
     <!-- Displays the opinion weight in the tooltip when meeting a leader (v80) -->
     <!-- See also: "Diplomacy - By Numbers" -->
+    <!-- Enabled option may influence Game -->
     <Row Class="4" Name="DIPLOMACY_BY_NUMBERS" Value="1"/>
 
     <!-- Tech bonuses from other teams require an embassy or spy in their capital and not from just having met them (v30) -->
@@ -993,9 +996,9 @@
 
     <Row Class="2" Name="ROG_CORE" Value="1"/>
     <Row Class="2" Name="IMPROVEMENT_FUNCTION" Value="0"/>
- <Row Class="2" Name="BUILDING_IMPROVEMENT_RESOURCES" Value="0"/>
+    <Row Class="2" Name="BUILDING_IMPROVEMENT_RESOURCES" Value="0"/>
 
-<Row Class="2" Name="TRAIN_ALL_CORE" Value="0"/>
+    <Row Class="2" Name="TRAIN_ALL_CORE" Value="0"/>
 
     <Row Class="4" Name="MORE_NATURAL_WONDER" Value="0"/>
 
@@ -1121,6 +1124,7 @@
 
     <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="0"/> 
 
+    <!-- Enabled option may influence Game -->
     <Row Class="6" Name="CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT" Value="1"/>
 
     <Row Class="6" Name="GLOBAL_BUILDING_INSTANT_YIELD" Value="1"/>
