@@ -1588,11 +1588,7 @@ void CvMap::DoPlaceNaturalWonders()
 	{
 		eFeature = (FeatureTypes) iFeatureLoop;
 		CvFeatureInfo* feature = GC.getFeatureInfo(eFeature);
-#if defined(MOD_MORE_NATURAL_WONDER)
-		if (feature && feature->IsNaturalWonder(true))
-#else
 		if (feature && feature->IsNaturalWonder())
-#endif
 		{
 			eNWFeature = eFeature;
 

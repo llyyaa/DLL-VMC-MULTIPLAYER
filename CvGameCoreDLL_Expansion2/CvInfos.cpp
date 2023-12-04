@@ -5229,11 +5229,7 @@ bool CvFeatureInfo::IsRough() const
 	return m_bRough;
 }
 //------------------------------------------------------------------------------
-#if defined(MOD_MORE_NATURAL_WONDER)
 bool CvFeatureInfo::IsNaturalWonder(bool orPseudoNatural) const
-#else
-bool CvFeatureInfo::IsNaturalWonder() const
-#endif
 {
 #if defined(MOD_MORE_NATURAL_WONDER)
 	return m_bNaturalWonder || (orPseudoNatural && IsPseudoNaturalWonder());

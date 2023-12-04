@@ -1575,10 +1575,10 @@ public:
 	bool IsRough() const;
 
 #if defined(MOD_MORE_NATURAL_WONDER)
-	bool IsNaturalWonder(bool orPseudoNatural = false) const;
+	bool IsNaturalWonder(bool orPseudoNatural = true) const;
 	bool IsPseudoNaturalWonder() const;
 #else
-	bool IsNaturalWonder() const;
+	bool IsNaturalWonder(bool orPseudoNatural = false) const;
 #endif
 
 #if defined(MOD_MORE_NATURAL_WONDER)

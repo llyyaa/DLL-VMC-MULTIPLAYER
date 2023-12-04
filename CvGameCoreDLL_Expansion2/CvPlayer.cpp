@@ -13260,7 +13260,7 @@ int CvPlayer::GetHappinessFromNaturalWonders() const
 void CvPlayer::SetNaturalWonderOwned(FeatureTypes eFeature, bool bValue)
 {
 	VALIDATE_OBJECT
-		CvAssertMsg(eFeature >= 0, "eFeature is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eFeature >= 0, "eFeature is expected to be non-negative (invalid Index)");
 	CvAssertMsg(eFeature < GC.getNumFeatureInfos(), "eEvent is expected to be within maximum bounds (invalid Index)");
 
 	vector<FeatureTypes>::const_iterator it = std::find(m_ownedNaturalWonders.begin(), m_ownedNaturalWonders.end(), eFeature);
