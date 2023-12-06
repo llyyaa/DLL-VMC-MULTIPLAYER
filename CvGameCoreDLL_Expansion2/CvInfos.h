@@ -1575,11 +1575,9 @@ public:
 	bool IsRough() const;
 
 #if defined(MOD_MORE_NATURAL_WONDER)
-	bool IsNaturalWonder(bool orPseudoNatural = true) const;
 	bool IsPseudoNaturalWonder() const;
-#else
-	bool IsNaturalWonder(bool orPseudoNatural = false) const;
 #endif
+	bool IsNaturalWonder(bool orPseudoNatural = false) const;
 
 #if defined(MOD_MORE_NATURAL_WONDER)
 	bool IsVolcano() const;

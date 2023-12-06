@@ -532,11 +532,7 @@ public:
 
 	void setFeatureType(FeatureTypes eNewValue, int iVariety = -1);
 
-#if defined(MOD_MORE_NATURAL_WONDER)
-	bool IsNaturalWonder(bool orPseudoNatural = true) const;
-#else
 	bool IsNaturalWonder(bool orPseudoNatural = false) const;
-#endif
 
 	ResourceTypes getResourceType(TeamTypes eTeam = NO_TEAM) const;
 	ResourceTypes getNonObsoleteResourceType(TeamTypes eTeam = NO_TEAM) const;

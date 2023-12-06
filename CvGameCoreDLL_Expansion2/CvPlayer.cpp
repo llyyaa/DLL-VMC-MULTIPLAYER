@@ -29761,7 +29761,7 @@ int CvPlayer::GetNumNaturalWondersInOwnedPlots()
 		}
 
 		CvPlot* pPlot = GC.getMap().plotByIndex(aiPlots[ui]);
-		if (pPlot && pPlot->IsNaturalWonder())
+		if (pPlot && pPlot->IsNaturalWonder(true))
 		{
 			iValue++;
 		}

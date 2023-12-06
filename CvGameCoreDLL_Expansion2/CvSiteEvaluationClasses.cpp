@@ -471,9 +471,9 @@ int CvCitySiteEvaluator::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, YieldT
 
 							// if this tile is a NW boost the value just so that we force the AI to claim them (if we can work it)
 #if defined(MOD_GLOBAL_CITY_WORKING)
-							if (pLoopPlot->IsNaturalWonder() && iDistance > 0 && iDistance <= pPlayer->getWorkPlotDistance())
+							if (pLoopPlot->IsNaturalWonder(true) && iDistance > 0 && iDistance <= pPlayer->getWorkPlotDistance())
 #else	
-							if (pLoopPlot->IsNaturalWonder() && iDistance > 0 && iDistance <= NUM_CITY_RINGS)
+							if (pLoopPlot->IsNaturalWonder(true) && iDistance > 0 && iDistance <= NUM_CITY_RINGS)
 #endif
 							{
 								//iPlotValue += iPlotValue * 2 + 10;
@@ -530,7 +530,7 @@ int CvCitySiteEvaluator::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, YieldT
 								}
 							}
 
-							if (pLoopPlot->IsNaturalWonder())
+							if (pLoopPlot->IsNaturalWonder(true))
 							{
 								if (iDistance <= 1)
 								{

@@ -9868,7 +9868,7 @@ int CvCity::GetYieldPerTurnFromUnimprovedFeatures(YieldTypes eYield) const
 	{
 		FeatureTypes eFeature = (FeatureTypes) iI;
 
-		if (!GC.getFeatureInfo(eFeature)->IsNaturalWonder())
+		if (!GC.getFeatureInfo(eFeature)->IsNaturalWonder(true))
 		{
 			int iBaseYield = kPlayer.getCityYieldFromUnimprovedFeature(eFeature, eYield);
 			iBaseYield += kPlayer.GetPlayerTraits()->GetCityYieldFromUnimprovedFeature(eFeature, eYield);
@@ -14902,7 +14902,7 @@ void CvCity::GetBuyablePlotList(std::vector<int>& aiPlotList)
 					}
 
 					// while we're at it grab Natural Wonders quickly also
-					if (pLoopPlot->IsNaturalWonder())
+					if (pLoopPlot->IsNaturalWonder(true))
 					{
 						iInfluenceCost += iPLOT_INFLUENCE_NW_COST;
 					}
@@ -14937,7 +14937,7 @@ void CvCity::GetBuyablePlotList(std::vector<int>& aiPlotList)
 										--iInfluenceCost;
 									}
 								}
-								if (pAdjacentPlot->IsNaturalWonder())
+								if (pAdjacentPlot->IsNaturalWonder(true))
 								{
 #if defined(MOD_GLOBAL_CITY_WORKING)
 									if (iPlotDistance <= getWorkPlotDistance()) // grab for this city
@@ -19126,7 +19126,7 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 				pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iMountainRange);
 				if(pLoopPlot)
 				{
-					if(pLoopPlot->isMountain() && !pLoopPlot->IsNaturalWonder() && pLoopPlot->getOwner() == getOwner())
+					if(pLoopPlot->isMountain() && !pLoopPlot->IsNaturalWonder(true) && pLoopPlot->getOwner() == getOwner())
 					{
 						bFoundMountain = true;
 						break;
@@ -20789,7 +20789,7 @@ bool CvCity::HasAnyNaturalWonder() const
 			continue;
 		}
 
-		if (pLoopPlot->IsNaturalWonder()) {
+		if (pLoopPlot->IsNaturalWonder(true)) {
 			return true;
 		}
 	}

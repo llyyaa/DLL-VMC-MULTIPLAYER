@@ -1357,7 +1357,7 @@ bool CvWorldBuilderMapLoader::Save(const wchar_t* wszFilename, const char* szMap
 		else
 		{
 			CvFeatureInfo* pkFeatureInfo = GC.getFeatureInfo(eFeatureType);
-			if (pkFeatureInfo != NULL && pkFeatureInfo->IsNaturalWonder())
+			if (pkFeatureInfo != NULL && pkFeatureInfo->IsNaturalWonder(true))
 			{
 				kPlotData.SetFeatureType(CvWorldBuilderMap::PlotMapData::InvalidFeature);
 				kPlotData.SetNaturalWonderType((byte)eFeatureType);

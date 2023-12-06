@@ -24392,7 +24392,7 @@ bool CvDiplomacyAI::IsPlayerBadTheftTarget(PlayerTypes ePlayer,const CvPlot* pPl
 	if (GET_PLAYER(ePlayer).isMinorCiv())
 	{
 			// Steal Natural Wonders and other teams' embassies, the City-State's feelings be damned!
-			if (pPlot->IsNaturalWonder())
+			if (pPlot->IsNaturalWonder(true))
 			{
 				return false;
 			}

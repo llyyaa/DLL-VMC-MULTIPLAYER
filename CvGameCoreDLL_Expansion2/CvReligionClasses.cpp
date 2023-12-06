@@ -6266,7 +6266,7 @@ int CvReligionAI::ScoreBeliefAtPlot(CvBeliefEntry* pEntry, CvPlot* pPlot)
 		{
 			iRtnValue += pEntry->GetFeatureYieldChange(eFeature, iI);
 
-			if(pPlot->IsNaturalWonder())
+			if(pPlot->IsNaturalWonder(true))
 			{
 				iRtnValue += pEntry->GetYieldChangeNaturalWonder(iI);
 				iRtnValue += (pEntry->GetYieldModifierNaturalWonder(iI) / 25);

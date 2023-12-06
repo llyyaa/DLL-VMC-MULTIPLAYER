@@ -2602,7 +2602,7 @@ bool CvPlot::canHaveImprovement(ImprovementTypes eImprovement, TeamTypes eTeam, 
 			return false;
 		}
 
-		if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder())
+		if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder(true))
 		{
 			return false;
 		}
@@ -6168,7 +6168,7 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 
 				if(getFeatureType() != NO_FEATURE)
 				{
-					if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder())
+					if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder(true))
 					{
 						bShouldUpdateHappiness = true;
 					}
@@ -6848,7 +6848,7 @@ void CvPlot::setFeatureType(FeatureTypes eNewValue, int iVariety)
 		if(eNewValue != NO_FEATURE)
 		{
 			// Now a Natural Wonder here
-			if ((eOldFeature == NO_FEATURE || !GC.getFeatureInfo(eOldFeature)->IsNaturalWonder()) && GC.getFeatureInfo(eNewValue)->IsNaturalWonder())
+			if ((eOldFeature == NO_FEATURE || !GC.getFeatureInfo(eOldFeature)->IsNaturalWonder(true)) && GC.getFeatureInfo(eNewValue)->IsNaturalWonder(true))
 			{
 				GC.getMap().ChangeNumNaturalWonders(1);
 				GC.getMap().getArea(getArea())->ChangeNumNaturalWonders(1);
@@ -6857,7 +6857,7 @@ void CvPlot::setFeatureType(FeatureTypes eNewValue, int iVariety)
 		if(eOldFeature != NO_FEATURE)
 		{
 			// Was a Natural Wonder, isn't any more
-			if (GC.getFeatureInfo(eOldFeature)->IsNaturalWonder() && (eNewValue == NO_FEATURE || !GC.getFeatureInfo(eNewValue)->IsNaturalWonder()))
+			if (GC.getFeatureInfo(eOldFeature)->IsNaturalWonder(true) && (eNewValue == NO_FEATURE || !GC.getFeatureInfo(eNewValue)->IsNaturalWonder(true)))
 			{
 				GC.getMap().ChangeNumNaturalWonders(-1);
 				GC.getMap().getArea(getArea())->ChangeNumNaturalWonders(-1);
@@ -8686,7 +8686,7 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 	if(isImpassable() || isMountain())
 	{
 		// No Feature, or the Feature isn't a Natural Wonder (which are impassable but allowed to be worked)
-		if(getFeatureType() == NO_FEATURE || !GC.getFeatureInfo(getFeatureType())->IsNaturalWonder())
+		if(getFeatureType() == NO_FEATURE || !GC.getFeatureInfo(getFeatureType())->IsNaturalWonder(true))
 		{
 			return 0;
 		}
@@ -8821,7 +8821,7 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 #endif
 
 			// Natural Wonders
-			if (m_eOwner != NO_PLAYER && pFeatureInfo->IsNaturalWonder())
+			if (m_eOwner != NO_PLAYER && pFeatureInfo->IsNaturalWonder(true))
 			{
 				int iMod = 0;
 
@@ -8934,7 +8934,7 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 		if (ePlot != NO_PLOT && GC.getPlotInfo(ePlot)->IsAdjacentFeatureYieldChange())
 		{
 			// yield from adjacent features
-			bool bNaturalWonderPlot = IsNaturalWonder();
+			bool bNaturalWonderPlot = IsNaturalWonder(true);
 			for (int iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
 			{
 				CvPlot* pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
@@ -10144,7 +10144,7 @@ bool CvPlot::setRevealed(TeamTypes eTeam, bool bNewValue, bool bTerrainOnly, Tea
 		{
 			if(getFeatureType() != NO_FEATURE)
 			{
-				if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder())
+				if (GC.getFeatureInfo(getFeatureType())->IsNaturalWonder(true))
 				{
 					GET_TEAM(eTeam).ChangeNumNaturalWondersDiscovered(1);
 
@@ -12901,7 +12901,7 @@ bool CvPlot::IsFeatureRiver() const
 
 bool CvPlot::HasAnyNaturalWonder() const
 {
-	return IsNaturalWonder();
+	return IsNaturalWonder(true);
 }
 
 bool CvPlot::HasNaturalWonder(FeatureTypes iFeatureType) const
@@ -13339,7 +13339,7 @@ int CvPlot::CalculateCorruptionScoreModifierFromTrait(PlayerTypes ePlayer) const
 			for (int iDY = -iRange; iDY <= iRange; iDY++)
 			{
 				CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iRange);
-				if (pLoopPlot != NULL && pLoopPlot->IsNaturalWonder())
+				if (pLoopPlot != NULL && pLoopPlot->IsNaturalWonder(true))
 				{
 					return iTraitBounsTotal;
 				}

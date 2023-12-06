@@ -5110,7 +5110,7 @@ int CvCityCulture::GetCultureFromNaturalWonders() const
 					// Working the Plot?
 					if (m_pCity->GetCityCitizens()->IsWorkingPlot(pLoopPlot))
 					{
-						if (pLoopPlot->IsNaturalWonder())
+						if (pLoopPlot->IsNaturalWonder(true))
 						{
 							iRtnValue += pLoopPlot->getYield(YIELD_CULTURE);
 						}
