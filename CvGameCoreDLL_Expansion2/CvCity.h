@@ -508,7 +508,6 @@ public:
 	int GetJONSCulturePerTurnFromTraits() const;
 
 	int GetJONSCulturePerTurnFromReligion() const;
-	void ChangeJONSCulturePerTurnFromReligion(int iChange);
 
 	int GetJONSCulturePerTurnFromLeagues() const;
 
@@ -1336,9 +1335,6 @@ protected:
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromBuildings;
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromPolicies;
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromSpecialists;
-	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromReligion;
-	int m_iFaithPerTurnFromPolicies;
-	int m_iFaithPerTurnFromReligion;
 	FAutoVariable<int, CvCity> m_iCultureRateModifier;
 	FAutoVariable<int, CvCity> m_iNumWorldWonders;
 	FAutoVariable<int, CvCity> m_iNumTeamWonders;

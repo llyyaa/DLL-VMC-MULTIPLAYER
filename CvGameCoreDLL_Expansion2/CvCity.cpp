@@ -250,9 +250,6 @@ CvCity::CvCity() :
 	, m_iJONSCulturePerTurnFromBuildings("CvCity::m_iJONSCulturePerTurnFromBuildings", m_syncArchive)
 	, m_iJONSCulturePerTurnFromPolicies("CvCity::m_iJONSCulturePerTurnFromPolicies", m_syncArchive)
 	, m_iJONSCulturePerTurnFromSpecialists("CvCity::m_iJONSCulturePerTurnFromSpecialists", m_syncArchive)
-	, m_iJONSCulturePerTurnFromReligion("CvCity::m_iJONSCulturePerTurnFromReligion", m_syncArchive)
-	, m_iFaithPerTurnFromPolicies(0)
-	, m_iFaithPerTurnFromReligion(0)
 	, m_iCultureRateModifier("CvCity::m_iCultureRateModifier", m_syncArchive)
 	, m_iNumWorldWonders("CvCity::m_iNumWorldWonders", m_syncArchive)
 	, m_iNumTeamWonders("CvCity::m_iNumTeamWonders", m_syncArchive)
@@ -1050,9 +1047,6 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iJONSCulturePerTurnFromBuildings = 0;
 	m_iJONSCulturePerTurnFromPolicies = 0;
 	m_iJONSCulturePerTurnFromSpecialists = 0;
-	m_iJONSCulturePerTurnFromReligion = 0;
-	m_iFaithPerTurnFromPolicies = 0;
-	m_iFaithPerTurnFromReligion = 0;
 	m_iCultureRateModifier = 0;
 	m_iNumWorldWonders = 0;
 	m_iNumTeamWonders = 0;
@@ -7975,13 +7969,7 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 	updateYield();
 
 	// Reset city level yields
-	m_iJONSCulturePerTurnFromReligion = 0;
-	m_iFaithPerTurnFromReligion = 0;
-#if defined(MOD_BUGFIX_MINOR)
 	for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
-#else
-	for(int iYield = 0; iYield <= YIELD_SCIENCE; iYield++)
-#endif
 	{
 		m_aiBaseYieldRateFromReligion[iYield] = 0;
 	}
@@ -7991,15 +7979,7 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 		int iYieldPerReligion = GetYieldPerReligionTimes100((YieldTypes)iYield);
 		if (iYieldPerReligion > 0)
 		{
-			switch(iYield)
-			{
-				case YIELD_CULTURE:
-					ChangeJONSCulturePerTurnFromReligion((GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
-					break;
-				default:
-					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, (GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
-					break;
-			}
+			ChangeBaseYieldRateFromReligion((YieldTypes)iYield, (GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
 		}
 
 		if(eNewMajority != NO_RELIGION)
@@ -8032,15 +8012,7 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 #endif
 				}
 
-				switch(iYield)
-				{
-				case YIELD_CULTURE:
-					ChangeJONSCulturePerTurnFromReligion(iReligionYieldChange);
-					break;
-				default:
-					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionYieldChange);
-					break;
-				}
+				ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionYieldChange);
 
 				if(IsRouteToCapitalConnected())
 				{
@@ -8051,28 +8023,12 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 						iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetYieldChangeTradeRoute((YieldTypes)iYield);
 					}
 
-					switch(iYield)
-					{
-					case YIELD_CULTURE:
-						ChangeJONSCulturePerTurnFromReligion(iReligionChange);
-						break;
-					default:
-						ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionChange);
-						break;
-					}
+					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionChange);
 				}
 				
 				if (GetCityCitizens()->GetTotalSpecialistCount() > 0)
 				{
-					switch(iYield)
-					{
-					case YIELD_CULTURE:
-						ChangeJONSCulturePerTurnFromReligion(pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
-						break;
-					default:
-						ChangeBaseYieldRateFromReligion((YieldTypes)iYield, pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
-						break;
-					}
+					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
 				}
 
 				// Buildings
@@ -8103,15 +8059,7 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 								iYieldFromBuilding += pReligion->m_Beliefs.GetYieldChangeWorldWonder((YieldTypes)iYield);
 							}
 
-							switch(iYield)
-							{
-							case YIELD_CULTURE:
-								ChangeJONSCulturePerTurnFromReligion(iYieldFromBuilding);
-								break;
-							default:
-								ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iYieldFromBuilding);
-								break;
-							}
+							ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iYieldFromBuilding);
 						}
 					}
 				}
@@ -8149,15 +8097,7 @@ void CvCity::UpdateReligiousYieldFromSpecialist(bool bFirstOneAdded)
 		{
 			int iChange = pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield);
 			iChange *= bFirstOneAdded ? 1 : -1;
-			switch(iYield)
-			{
-			case YIELD_CULTURE:
-				ChangeJONSCulturePerTurnFromReligion(iChange);
-				break;
-			default:
-				ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iChange);
-				break;
-			}
+			ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iChange);
 		}
 	}
 }
@@ -9686,17 +9626,7 @@ int CvCity::GetJONSCulturePerTurnFromTraits() const
 int CvCity::GetJONSCulturePerTurnFromReligion() const
 {
 	VALIDATE_OBJECT
-	return m_iJONSCulturePerTurnFromReligion;
-}
-
-//	--------------------------------------------------------------------------------
-void CvCity::ChangeJONSCulturePerTurnFromReligion(int iChange)
-{
-	VALIDATE_OBJECT
-	if(iChange != 0)
-	{
-		m_iJONSCulturePerTurnFromReligion = (m_iJONSCulturePerTurnFromReligion + iChange);
-	}
+	return GetBaseYieldRateFromReligion(YIELD_CULTURE);
 }
 
 //	--------------------------------------------------------------------------------
@@ -12747,16 +12677,8 @@ int CvCity::GetBaseYieldRateFromReligionAllCase(YieldTypes eIndex) const
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
-	switch (eIndex)
-	{
-	case YIELD_CULTURE:
-		return GetJONSCulturePerTurnFromReligion();
-		break;
-	default:
-		return GetBaseYieldRateFromReligion(eIndex);
-		break;
-	}
 
+	return GetBaseYieldRateFromReligion(eIndex);
 }
 //	--------------------------------------------------------------------------------
 /// Base yield rate from Leagues --TODO this is a very simple func now
@@ -18285,10 +18207,6 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iJONSCulturePerTurnFromBuildings;
 	kStream >> m_iJONSCulturePerTurnFromPolicies;
 	kStream >> m_iJONSCulturePerTurnFromSpecialists;
-	kStream >> m_iJONSCulturePerTurnFromReligion;
-	kStream >> m_iFaithPerTurnFromPolicies;
-	kStream >> m_iFaithPerTurnFromReligion;
-
 	kStream >> m_iCultureRateModifier;
 	kStream >> m_iNumWorldWonders;
 	kStream >> m_iNumTeamWonders;
@@ -18747,9 +18665,6 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iJONSCulturePerTurnFromBuildings;
 	kStream << m_iJONSCulturePerTurnFromPolicies;
 	kStream << m_iJONSCulturePerTurnFromSpecialists;
-	kStream << m_iJONSCulturePerTurnFromReligion;
-	kStream << m_iFaithPerTurnFromPolicies;
-	kStream << m_iFaithPerTurnFromReligion;
 	kStream << m_iCultureRateModifier;
 	kStream << m_iNumWorldWonders;
 	kStream << m_iNumTeamWonders;

@@ -2854,10 +2854,13 @@ int CvLuaCity::lGetJONSCulturePerTurnFromReligion(lua_State* L)
 	return BasicLuaMethod(L, &CvCity::GetJONSCulturePerTurnFromReligion);
 }
 //------------------------------------------------------------------------------
-//void ChangeJONSCulturePerTurnFromReligion(int iChange);
+//void ChangeBaseYieldRateFromReligion(YIELD_CULTURE, iChange);
 int CvLuaCity::lChangeJONSCulturePerTurnFromReligion(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromReligion);
+	CvCity* pkCity = GetInstance(L);
+	int iChange = lua_tointeger(L, 2);
+	pkCity->ChangeBaseYieldRateFromReligion(YIELD_CULTURE, iChange);
+	return 0;
 }
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromLeagues() const;
