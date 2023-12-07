@@ -2827,7 +2827,10 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromPolicies(lua_State* L)
 //int GetJONSCulturePerTurnFromSpecialists() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromSpecialists(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvCity::GetJONSCulturePerTurnFromSpecialists);
+	CvCity* pkCity = GetInstance(L);
+	lua_pushinteger(L, pkCity->GetJONSCulturePerTurnFromSpecialists() + pkCity->GetBaseYieldRateFromSpecialists(YIELD_CULTURE));
+
+	return 1;
 }
 //------------------------------------------------------------------------------
 //void ChangeJONSCulturePerTurnFromSpecialists(int iChange);

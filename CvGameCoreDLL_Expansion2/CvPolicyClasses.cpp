@@ -635,7 +635,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 			const int iYieldID = pResults->GetInt(1);
 			const int iYieldChange = pResults->GetInt(2);
 
-			m_ppiBuildingClassYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
+			m_ppiBuildingClassYieldChanges[BuildingClassID][iYieldID] += iYieldChange;
 		}
 
 		strKey = "Policy_BuildingClassCultureChanges";
@@ -653,7 +653,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 			const int iYieldID = YIELD_CULTURE;
 			const int iYieldChange = pResults->GetInt(1);
 
-			m_ppiBuildingClassYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
+			m_ppiBuildingClassYieldChanges[BuildingClassID][iYieldID] += iYieldChange;
 		}
 	}
 

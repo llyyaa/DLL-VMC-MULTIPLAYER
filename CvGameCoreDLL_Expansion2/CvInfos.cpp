@@ -712,7 +712,6 @@ CvSpecialistInfo::CvSpecialistInfo() :
 	m_iCost(0),
 	m_iGreatPeopleUnitClass(NO_UNITCLASS),
 	m_iGreatPeopleRateChange(0),
-	m_iCulturePerTurn(0),
 	m_iMissionType(NO_MISSION),
 	m_bVisible(false),
 	m_piYieldChange(NULL),
@@ -742,11 +741,6 @@ int CvSpecialistInfo::getGreatPeopleRateChange() const
 	return m_iGreatPeopleRateChange;
 }
 //------------------------------------------------------------------------------
-int CvSpecialistInfo::getCulturePerTurn() const
-{
-	return m_iCulturePerTurn;
-}
-
 int CvSpecialistInfo::getMissionType() const
 {
 	return m_iMissionType;
@@ -805,7 +799,6 @@ bool CvSpecialistInfo::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCost = kResults.GetInt("Cost");
 	m_iExperience = kResults.GetInt("Experience");
 	m_iGreatPeopleRateChange = kResults.GetInt("GreatPeopleRateChange");
-	m_iCulturePerTurn = kResults.GetInt("CulturePerTurn");
 
 	setTexture(kResults.GetText("Texture"));
 
@@ -815,7 +808,38 @@ bool CvSpecialistInfo::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	//Arrays
 	const char* szType = GetType();
 	kUtility.SetFlavors(m_piFlavorValue, "SpecialistFlavors", "SpecialistType", szType);
-	kUtility.SetYields(m_piYieldChange, "SpecialistYields", "SpecialistType", szType);
+	//SpecialistYields
+	{
+		kUtility.InitializeArray(m_piYieldChange, kUtility.MaxRows("Yields"));
+		std::string strKey("SpecialistYields");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Yields.ID as YieldID, Yield from SpecialistYields inner join Yields on Yields.Type = YieldType where SpecialistType = ?");
+		}
+
+		pResults->Bind(1, szType, strlen(szType), false);
+		while (pResults->Step())
+		{
+			const int iYieldID = pResults->GetInt(0);
+			const int iYield = pResults->GetInt(1);
+			m_piYieldChange[iYieldID] += iYield;
+		}
+
+		strKey = "Specialists.CulturePerTurn";
+		pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select CulturePerTurn from Specialists where Type = ?");
+		}
+		pResults->Bind(1, szType, strlen(szType), false);
+		while (pResults->Step())
+		{
+			const int iYieldID = YIELD_CULTURE;
+			const int iYield = pResults->GetInt(0);
+			m_piYieldChange[iYieldID] += iYield;
+		}
+	}
 
 #ifdef MOD_SPECIALIST_RESOURCES
 	{

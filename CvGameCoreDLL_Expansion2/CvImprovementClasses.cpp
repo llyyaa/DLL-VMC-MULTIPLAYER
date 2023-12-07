@@ -646,7 +646,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 				const int yield = pResults->GetInt(2);
 
-				m_ppiAdjacentImprovementYieldChanges[improvement_idx][yield_idx] = yield;
+				m_ppiAdjacentImprovementYieldChanges[improvement_idx][yield_idx] += yield;
 			}
 			pResults->Reset();
 
@@ -668,7 +668,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 				const int yield = pResults->GetInt(2);
 
-				m_ppiAdjacentImprovementYieldChanges[improvement_idx][yield_idx] = yield;
+				m_ppiAdjacentImprovementYieldChanges[improvement_idx][yield_idx] += yield;
 			}
 			pResults->Reset();
 
@@ -685,7 +685,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 				const int improvement_idx = pResults->GetInt(0);
 				CvAssert(improvement_idx > -1);
 				const int yield = pResults->GetInt(1);
-				m_ppiAdjacentImprovementYieldChanges[improvement_idx][YIELD_CULTURE] = yield;
+				m_ppiAdjacentImprovementYieldChanges[improvement_idx][YIELD_CULTURE] += yield;
 			}
 			pResults->Reset();
 		}
@@ -796,7 +796,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 			const int yield = pResults->GetInt(2);
 
-			m_ppiAdjacentTerrainYieldChanges[terrain_idx][yield_idx] = yield;
+			m_ppiAdjacentTerrainYieldChanges[terrain_idx][yield_idx] += yield;
 		}
 		pResults->Reset();
 
@@ -817,7 +817,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 			const int terrain_idx = TERRAIN_MOUNTAIN;
 
-			m_ppiAdjacentTerrainYieldChanges[terrain_idx][yield_idx] = yield;
+			m_ppiAdjacentTerrainYieldChanges[terrain_idx][yield_idx] += yield;
 		}
 		pResults->Reset();
 

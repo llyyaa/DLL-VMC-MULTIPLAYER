@@ -749,7 +749,7 @@ bool CvCityCitizens::IsAIWantSpecialistRightNow()
 					{
 						const SpecialistTypes eSpecialist = (SpecialistTypes) pkBuildingInfo->GetSpecialistType();
 						CvSpecialistInfo* pSpecialistInfo = GC.getSpecialistInfo(eSpecialist);
-						if(pSpecialistInfo && pSpecialistInfo->getCulturePerTurn() > 0)
+						if(pSpecialistInfo && pSpecialistInfo->getYieldChange(YIELD_CULTURE) > 0)
 						{
 							iWeight *= 3;
 							break;

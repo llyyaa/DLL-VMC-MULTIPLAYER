@@ -8101,8 +8101,7 @@ int CvCity::GetCultureFromSpecialist(SpecialistTypes eSpecialist) const
 		return 0;
 	}
 
-	int iCulture = pkSpecialistInfo->getCulturePerTurn();
-	iCulture += GET_PLAYER(getOwner()).GetSpecialistCultureChange();
+	int iCulture = GET_PLAYER(getOwner()).GetSpecialistCultureChange();
 
 	return iCulture;
 }
@@ -9491,7 +9490,7 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 	iCulturePerTurn += GetJONSCulturePerTurnFromSpecialists();
 
 #if defined(MOD_API_UNIFIED_YIELDS)
-	// GetJONSCulturePerTurnFromSpecialists() uses the Specialists.CulturePerTurn column,
+	// GetJONSCulturePerTurnFromSpecialists() uses the Buildings.SpecialistExtraCulture column,
 	// GetBaseYieldRateFromSpecialists(YIELD_CULTURE) gets everything else!
 	iCulturePerTurn += GetBaseYieldRateFromSpecialists(YIELD_CULTURE);
 	iCulturePerTurn += GetBaseYieldRateFromProjects(YIELD_CULTURE);
