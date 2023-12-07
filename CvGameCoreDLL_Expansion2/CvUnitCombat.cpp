@@ -4033,8 +4033,7 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::AttackAirSweep(CvUnit& kAttacker, CvPl
 	else
 	{
 		bool bFallbackAttack = false;
-		if (MOD_AIR_SWEEP_FOUND_SOMETHING)
-			bFallbackAttack = kAttacker.attemptGroundAttacks(targetPlot);
+		bFallbackAttack = kAttacker.attemptGroundAttacks(targetPlot);
 
 		if (bFallbackAttack)
 		{

@@ -27157,13 +27157,15 @@ bool CvUnit::attemptGroundAttacks(const CvPlot& pPlot)
 	if (!IsAirSweepCapable())
 		return bFoundSomething;
 
-	int iAirSweepDamage = getGroundAttackDamage();
-	int iRange = getGroundAttackRange() + 1;
-
-	CvString strAppendText = GetLocalizedText("TXT_KEY_PROMOTION_AIR_SWEEP");
-
+	int iRange = getGroundAttackRange();
+	if(MOD_AIR_SWEEP_FOUND_SOMETHING)
+	{
+		iRange++;
+	}
 	if (iRange > 0)
 	{
+		int iAirSweepDamage = getGroundAttackDamage();
+		CvString strAppendText = GetLocalizedText("TXT_KEY_PROMOTION_AIR_SWEEP");
 		for (int i = -iRange; i <= iRange; ++i)
 		{
 			for (int j = -iRange; j <= iRange; ++j)
