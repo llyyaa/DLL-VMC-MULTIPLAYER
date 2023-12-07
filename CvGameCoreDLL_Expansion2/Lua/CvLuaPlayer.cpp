@@ -267,6 +267,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetResearchTurnsLeft);
 	Method(GetResearchCost);
 	Method(GetResearchProgress);
+	Method(GetResearchProgressExceptOverflow);
 
 	Method(UnitsRequiredForGoldenAge);
 	Method(UnitsGoldenAgeCapable);
@@ -2358,6 +2359,17 @@ int CvLuaPlayer::lGetResearchProgress(lua_State* L)
 	const TechTypes eTech	= (TechTypes)lua_tointeger(L, 2);
 
 	const int iResult = pkPlayer->GetPlayerTechs()->GetResearchProgress(eTech);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+//int GetResearchProgressExceptOverflow(TechTypes  eTech);
+int CvLuaPlayer::lGetResearchProgressExceptOverflow(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const TechTypes eTech = (TechTypes)lua_tointeger(L, 2);
+	const int iResult = GET_TEAM(pkPlayer->getTeam()).GetTeamTechs()->GetResearchProgress(eTech);
 	lua_pushinteger(L, iResult);
 	return 1;
 }
