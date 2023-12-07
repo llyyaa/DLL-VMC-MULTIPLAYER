@@ -7278,17 +7278,6 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 		m_pCityReligions->ChangeReligiousPressureModifier(pBuildingInfo->GetReligiousPressureModifier() * iChange);
 
-		PolicyTypes ePolicy;
-		for(int iPolicyLoop = 0; iPolicyLoop < GC.getNumPolicyInfos(); iPolicyLoop++)
-		{
-			ePolicy = (PolicyTypes) iPolicyLoop;
-
-			if(owningPlayer.GetPlayerPolicies()->HasPolicy(ePolicy) && !owningPlayer.GetPlayerPolicies()->IsPolicyBlocked(ePolicy))
-			{
-				ChangeJONSCulturePerTurnFromPolicies(GC.getPolicyInfo(ePolicy)->GetBuildingClassCultureChange(eBuildingClass) * iChange);
-			}
-		}
-
 		changeMaxFoodKeptPercent(pBuildingInfo->GetFoodKept() * iChange);
 		changeMilitaryProductionModifier(pBuildingInfo->GetMilitaryProductionModifier() * iChange);
 		changeSpaceProductionModifier(pBuildingInfo->GetSpaceProductionModifier() * iChange);
@@ -9532,7 +9521,7 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 	iCulturePerTurn += GetYieldPerTurnFromUnimprovedFeatures(YIELD_CULTURE);
 #endif
 	iCulturePerTurn += GetJONSCulturePerTurnFromTraits();
-	iCulturePerTurn += GetJONSCulturePerTurnFromReligion();
+	iCulturePerTurn += GetBaseYieldRateFromReligion(YIELD_CULTURE);
 	iCulturePerTurn += GetJONSCulturePerTurnFromLeagues();
 
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -9575,7 +9564,7 @@ int CvCity::GetJONSCulturePerTurnFromBuildings() const
 int CvCity::GetJONSCulturePerTurnFromPolicies() const
 {
 	VALIDATE_OBJECT
-	return m_iJONSCulturePerTurnFromPolicies;
+	return m_iJONSCulturePerTurnFromPolicies + GetBaseYieldRateFromBuildingsPolicies(YIELD_CULTURE);
 }
 
 //	--------------------------------------------------------------------------------

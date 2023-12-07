@@ -26657,45 +26657,19 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 							iTotalWonders += iBuildingCount;
 						}
 #endif
-						
-#if defined(MOD_API_UNIFIED_YIELDS)
-						iYieldMod = pPolicy->GetBuildingClassYieldModifiers(eBuildingClass, YIELD_CULTURE);
-						if (iYieldMod > 0)
-						{
-							pLoopCity->changeYieldRateModifier(YIELD_CULTURE, iYieldMod * iBuildingCount * iChange);
-						}
-						iYieldChange = pPolicy->GetBuildingClassCultureChange(eBuildingClass);
-						iYieldChange += pPolicy->GetBuildingClassYieldChanges(eBuildingClass, YIELD_CULTURE);
-						if (iYieldChange != 0)
-						{
-							pLoopCity->ChangeJONSCulturePerTurnFromPolicies(iYieldChange * iBuildingCount * iChange);
-						}
-#else
-						pLoopCity->ChangeJONSCulturePerTurnFromPolicies(pPolicy->GetBuildingClassCultureChange(eBuildingClass) * iBuildingCount * iChange);
-#endif
-
 						// Building Class Yield Stuff
 						for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
 						{
-							switch(iJ)
+							eYield = (YieldTypes) iJ;
+							iYieldMod = pPolicy->GetBuildingClassYieldModifiers(eBuildingClass, eYield);
+							if (iYieldMod > 0)
 							{
-							case YIELD_CULTURE:
-								// Skip, handled above
-								break;
-							default:
-								{
-									eYield = (YieldTypes) iJ;
-									iYieldMod = pPolicy->GetBuildingClassYieldModifiers(eBuildingClass, eYield);
-									if (iYieldMod > 0)
-									{
-										pLoopCity->changeYieldRateModifier(eYield, iYieldMod * iBuildingCount * iChange);
-									}
-									iYieldChange = pPolicy->GetBuildingClassYieldChanges(eBuildingClass, eYield);
-									if (iYieldChange != 0)
-									{
-										pLoopCity->ChangeBaseYieldRateFromBuildingsPolicies(eYield, iYieldChange * iBuildingCount * iChange);
-									}
-								}
+								pLoopCity->changeYieldRateModifier(eYield, iYieldMod * iBuildingCount * iChange);
+							}
+							iYieldChange = pPolicy->GetBuildingClassYieldChanges(eBuildingClass, eYield);
+							if (iYieldChange != 0)
+							{
+								pLoopCity->ChangeBaseYieldRateFromBuildingsPolicies(eYield, iYieldChange * iBuildingCount * iChange);
 							}
 						}
 					}

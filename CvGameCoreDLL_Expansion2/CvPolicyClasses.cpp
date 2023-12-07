@@ -215,7 +215,6 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_pabFreePromotion(NULL),
 	m_paiUnitCombatProductionModifiers(NULL),
 	m_paiUnitCombatFreeExperiences(NULL),
-	m_paiBuildingClassCultureChanges(NULL),
 	m_paiBuildingClassProductionModifiers(NULL),
 	m_paiBuildingClassTourismModifiers(NULL),
 	m_paiBuildingClassHappiness(NULL),
@@ -270,7 +269,6 @@ CvPolicyEntry::~CvPolicyEntry(void)
 	SAFE_DELETE_ARRAY(m_pabFreePromotion);
 	SAFE_DELETE_ARRAY(m_paiUnitCombatProductionModifiers);
 	SAFE_DELETE_ARRAY(m_paiUnitCombatFreeExperiences);
-	SAFE_DELETE_ARRAY(m_paiBuildingClassCultureChanges);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassProductionModifiers);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassTourismModifiers);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassHappiness);
@@ -553,7 +551,6 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.PopulateArrayByValue(m_paiUnitCombatFreeExperiences, "UnitCombatInfos", "Policy_UnitCombatFreeExperiences", "UnitCombatType", "PolicyType", szPolicyType, "FreeExperience");
 	kUtility.PopulateArrayByValue(m_paiUnitCombatProductionModifiers, "UnitCombatInfos", "Policy_UnitCombatProductionModifiers", "UnitCombatType", "PolicyType", szPolicyType, "ProductionModifier");
 
-	kUtility.PopulateArrayByValue(m_paiBuildingClassCultureChanges, "BuildingClasses", "Policy_BuildingClassCultureChanges", "BuildingClassType", "PolicyType", szPolicyType, "CultureChange");
 	kUtility.PopulateArrayByValue(m_paiBuildingClassProductionModifiers, "BuildingClasses", "Policy_BuildingClassProductionModifiers", "BuildingClassType", "PolicyType", szPolicyType, "ProductionModifier");
 	kUtility.PopulateArrayByValue(m_paiBuildingClassTourismModifiers, "BuildingClasses", "Policy_BuildingClassTourismModifiers", "BuildingClassType", "PolicyType", szPolicyType, "TourismModifier");
 	kUtility.PopulateArrayByValue(m_paiBuildingClassHappiness, "BuildingClasses", "Policy_BuildingClassHappiness", "BuildingClassType", "PolicyType", szPolicyType, "Happiness");
@@ -637,6 +634,24 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 			const int BuildingClassID = pResults->GetInt(0);
 			const int iYieldID = pResults->GetInt(1);
 			const int iYieldChange = pResults->GetInt(2);
+
+			m_ppiBuildingClassYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
+		}
+
+		strKey = "Policy_BuildingClassCultureChanges";
+		pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select BuildingClasses.ID as BuildingClassID, CultureChange from Policy_BuildingClassCultureChanges inner join BuildingClasses on BuildingClasses.Type = BuildingClassType where PolicyType = ?");
+		}
+
+		pResults->Bind(1, szPolicyType);
+
+		while(pResults->Step())
+		{
+			const int BuildingClassID = pResults->GetInt(0);
+			const int iYieldID = YIELD_CULTURE;
+			const int iYieldChange = pResults->GetInt(1);
 
 			m_ppiBuildingClassYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
 		}
@@ -2506,14 +2521,6 @@ int CvPolicyEntry::GetUnitCombatFreeExperiences(int i) const
 	CvAssertMsg(i < GC.getNumUnitCombatClassInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_paiUnitCombatFreeExperiences ? m_paiUnitCombatFreeExperiences[i] : -1;
-}
-
-/// Amount of extra Culture per turn a BuildingClass provides
-int CvPolicyEntry::GetBuildingClassCultureChange(int i) const
-{
-	CvAssertMsg(i < GC.getNumBuildingClassInfos(), "Index out of bounds");
-	CvAssertMsg(i > -1, "Index out of bounds");
-	return m_paiBuildingClassCultureChanges ? m_paiBuildingClassCultureChanges[i] : -1;
 }
 
 /// Amount of extra Culture per turn a BuildingClass provides
