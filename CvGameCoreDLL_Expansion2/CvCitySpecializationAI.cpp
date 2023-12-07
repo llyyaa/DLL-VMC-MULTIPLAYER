@@ -1357,6 +1357,7 @@ int CvCitySpecializationAI::AdjustValueBasedOnBuildings(CvCity* pCity, YieldType
 
 	// ... and yield changes
 	int iYieldChanges = pCity->GetBaseYieldRateFromBuildings(eYield);
+	iYieldChanges += pCity->GetBaseYieldRateFromBuildingsPolicies(eYield);
 	if(iYieldChanges > 0)
 	{
 		// +20% per point of yield change

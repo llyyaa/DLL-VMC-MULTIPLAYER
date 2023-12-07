@@ -425,9 +425,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetFaithPerTurnFromPolicies);
 	Method(GetFaithPerTurnFromTraits);
 	Method(GetFaithPerTurnFromReligion);
-#if defined(MOD_BUGFIX_LUA_API)
 	Method(ChangeFaithPerTurnFromReligion);
-#endif
 
 	Method(IsReligionInCity);
 	Method(IsHolyCityForReligion);
@@ -543,6 +541,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	Method(GetBaseYieldRateFromGreatWorks);
 #endif
+	Method(GetBaseYieldRateFromPolicy);
 
 	Method(GetBaseYieldRateFromTerrain);
 	Method(ChangeBaseYieldRateFromTerrain);
@@ -3054,10 +3053,14 @@ int CvLuaCity::lGetFaithPerTurnFromReligion(lua_State* L)
 	return BasicLuaMethod(L, &CvCity::GetFaithPerTurnFromReligion);
 }
 //------------------------------------------------------------------------------
-//void ChangeFaithPerTurnFromReligion(int iChange);
+//void ChangeBaseYieldRateFromReligion(YIELD_FAITH, iChange);
 int CvLuaCity::lChangeFaithPerTurnFromReligion(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvCity::ChangeFaithPerTurnFromReligion);
+	CvCity* pkCity = GetInstance(L);
+	const int iChange = lua_tointeger(L, 2);
+	pkCity->ChangeBaseYieldRateFromReligion(YIELD_FAITH, iChange);
+
+	return 0;
 }
 //------------------------------------------------------------------------------
 //int IsReligionInCity() const;
@@ -3767,6 +3770,11 @@ int CvLuaCity::lGetBaseYieldRateFromGreatWorks(lua_State* L)
 }
 #endif
 //------------------------------------------------------------------------------
+int CvLuaCity::lGetBaseYieldRateFromPolicy(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::GetBaseYieldRateFromPolicy);
+}
+//------------------------------------------------------------------------------
 int CvLuaCity::lGetBaseYieldRateFromTerrain(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::GetBaseYieldRateFromTerrain);
@@ -3779,7 +3787,16 @@ int CvLuaCity::lChangeBaseYieldRateFromTerrain(lua_State* L)
 //------------------------------------------------------------------------------
 int CvLuaCity::lGetBaseYieldRateFromBuildings(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvCity::GetBaseYieldRateFromBuildings);
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eIndex = (YieldTypes)lua_tointeger(L, 2);
+	const bool bIgnorePolicyBonus = luaL_optbool(L, 3, false);
+
+	int iResult = pkCity->GetBaseYieldRateFromBuildings(eIndex);
+	if(!bIgnorePolicyBonus && eIndex != YIELD_FAITH)
+		iResult += pkCity->GetBaseYieldRateFromBuildingsPolicies(eIndex);
+
+	lua_pushinteger(L, iResult);
+	return 1;
 }
 //------------------------------------------------------------------------------
 int CvLuaCity::lChangeBaseYieldRateFromBuildings(lua_State* L)

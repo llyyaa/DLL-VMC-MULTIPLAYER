@@ -329,6 +329,7 @@ CvCity::CvCity() :
 	, m_aiSeaResourceYield("CvCity::m_aiSeaResourceYield", m_syncArchive)
 	, m_aiBaseYieldRateFromTerrain("CvCity::m_aiBaseYieldRateFromTerrain", m_syncArchive, true)
 	, m_aiBaseYieldRateFromBuildings("CvCity::m_aiBaseYieldRateFromBuildings", m_syncArchive)
+	, m_aiBaseYieldRateFromBuildingsPolicies("CvCity::m_aiBaseYieldRateFromBuildingsPolicies", m_syncArchive)
 	, m_aiBaseYieldRateFromSpecialists("CvCity::m_aiBaseYieldRateFromSpecialists", m_syncArchive)
 	, m_aiBaseYieldRateFromProjects("CvCity::m_aiBaseYieldRateFromProjects", m_syncArchive)
 	, m_aiBaseYieldRateFromMisc("CvCity::m_aiBaseYieldRateFromMisc", m_syncArchive)
@@ -1137,6 +1138,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiLakePlotYield.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromTerrain.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromBuildings.resize(NUM_YIELD_TYPES);
+	m_aiBaseYieldRateFromBuildingsPolicies.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromSpecialists.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromProjects.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromMisc.resize(NUM_YIELD_TYPES);
@@ -1173,6 +1175,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiSeaResourceYield.setAt(iI, 0);
 		m_aiBaseYieldRateFromTerrain.setAt(iI, 0);
 		m_aiBaseYieldRateFromBuildings.setAt(iI, 0);
+		m_aiBaseYieldRateFromBuildingsPolicies.setAt(iI, 0);
 		m_aiBaseYieldRateFromSpecialists.setAt(iI, 0);
 		m_aiBaseYieldRateFromProjects.setAt(iI, 0);
 		m_aiBaseYieldRateFromMisc.setAt(iI, 0);
@@ -7289,7 +7292,6 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			if(owningPlayer.GetPlayerPolicies()->HasPolicy(ePolicy) && !owningPlayer.GetPlayerPolicies()->IsPolicyBlocked(ePolicy))
 			{
 				ChangeJONSCulturePerTurnFromPolicies(GC.getPolicyInfo(ePolicy)->GetBuildingClassCultureChange(eBuildingClass) * iChange);
-				ChangeFaithPerTurnFromPolicies(GC.getPolicyInfo(ePolicy)->GetBuildingClassYieldChanges(eBuildingClass, YIELD_FAITH) * iChange);
 			}
 		}
 
@@ -7536,7 +7538,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 			CvPlayerPolicies* pPolicies = GET_PLAYER(getOwner()).GetPlayerPolicies();
 			changeYieldRateModifier(eYield, pPolicies->GetBuildingClassYieldModifier(eBuildingClass, eYield) * iChange);
-			ChangeBaseYieldRateFromBuildings(eYield, pPolicies->GetBuildingClassYieldChange(eBuildingClass, eYield) * iChange);
+			ChangeBaseYieldRateFromBuildingsPolicies(eYield, pPolicies->GetBuildingClassYieldChange(eBuildingClass, eYield) * iChange);
 
 			if ((pBuildingInfo->GetYieldFromInternal(eYield) > 0))
 			{
@@ -7994,9 +7996,6 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 				case YIELD_CULTURE:
 					ChangeJONSCulturePerTurnFromReligion((GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
 					break;
-				case YIELD_FAITH:
-					ChangeFaithPerTurnFromReligion((GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
-					break;
 				default:
 					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, (GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
 					break;
@@ -8038,9 +8037,6 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 				case YIELD_CULTURE:
 					ChangeJONSCulturePerTurnFromReligion(iReligionYieldChange);
 					break;
-				case YIELD_FAITH:
-					ChangeFaithPerTurnFromReligion(iReligionYieldChange);
-					break;
 				default:
 					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionYieldChange);
 					break;
@@ -8060,9 +8056,6 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 					case YIELD_CULTURE:
 						ChangeJONSCulturePerTurnFromReligion(iReligionChange);
 						break;
-					case YIELD_FAITH:
-						ChangeFaithPerTurnFromReligion(iReligionChange);
-						break;
 					default:
 						ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionChange);
 						break;
@@ -8075,9 +8068,6 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 					{
 					case YIELD_CULTURE:
 						ChangeJONSCulturePerTurnFromReligion(pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
-						break;
-					case YIELD_FAITH:
-						ChangeFaithPerTurnFromReligion(pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
 						break;
 					default:
 						ChangeBaseYieldRateFromReligion((YieldTypes)iYield, pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
@@ -8117,9 +8107,6 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 							{
 							case YIELD_CULTURE:
 								ChangeJONSCulturePerTurnFromReligion(iYieldFromBuilding);
-								break;
-							case YIELD_FAITH:
-								ChangeFaithPerTurnFromReligion(iYieldFromBuilding);
 								break;
 							default:
 								ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iYieldFromBuilding);
@@ -8166,9 +8153,6 @@ void CvCity::UpdateReligiousYieldFromSpecialist(bool bFirstOneAdded)
 			{
 			case YIELD_CULTURE:
 				ChangeJONSCulturePerTurnFromReligion(iChange);
-				break;
-			case YIELD_FAITH:
-				ChangeFaithPerTurnFromReligion(iChange);
 				break;
 			default:
 				ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iChange);
@@ -9615,7 +9599,7 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 	// Process production into culture
 	if (getProductionToYieldModifier(YIELD_CULTURE) != 0)
 	{
-	iCulturePerTurn += (getBasicYieldRateTimes100(YIELD_PRODUCTION, false, true) / 100) * (getProductionToYieldModifier(YIELD_CULTURE) + GetYieldFromProcessModifier(YIELD_CULTURE) + GET_PLAYER(getOwner()).GetYieldFromProcessModifierGlobal(YIELD_CULTURE)) / 100;
+		iCulturePerTurn += (getBasicYieldRateTimes100(YIELD_PRODUCTION, false, true) / 100) * (getProductionToYieldModifier(YIELD_CULTURE) + GetYieldFromProcessModifier(YIELD_CULTURE) + GET_PLAYER(getOwner()).GetYieldFromProcessModifierGlobal(YIELD_CULTURE)) / 100;
 	}
 	//iCulturePerTurn += (getBasicYieldRateTimes100(YIELD_PRODUCTION, false, true) / 100) * (getProductionToYieldModifier(YIELD_CULTURE)) / 100;
 
@@ -9835,22 +9819,8 @@ int CvCity::GetFaithPerTurnFromBuildings() const
 int CvCity::GetFaithPerTurnFromPolicies() const
 {
 	VALIDATE_OBJECT
-	return m_iFaithPerTurnFromPolicies;
+	return GetBaseYieldRateFromBuildingsPolicies(YIELD_FAITH);
 }
-
-//	--------------------------------------------------------------------------------
-void CvCity::ChangeFaithPerTurnFromPolicies(int iChange)
-{
-	VALIDATE_OBJECT
-	if(iChange != 0)
-	{
-		m_iFaithPerTurnFromPolicies = (m_iFaithPerTurnFromPolicies + iChange);
-	}
-}
-
-
-
-
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -9984,18 +9954,7 @@ void CvCity::changeSpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eInd
 int CvCity::GetFaithPerTurnFromReligion() const
 {
 	VALIDATE_OBJECT
-	return m_iFaithPerTurnFromReligion;
-	//return GetBaseYieldRateFromReligion(YIELD_FAITH);
-}
-
-//	--------------------------------------------------------------------------------
-void CvCity::ChangeFaithPerTurnFromReligion(int iChange)
-{
-	VALIDATE_OBJECT
-	if(iChange != 0)
-	{
-		m_iFaithPerTurnFromReligion = (m_iFaithPerTurnFromReligion + iChange);
-	}
+	return GetBaseYieldRateFromReligion(YIELD_FAITH);
 }
 
 //	--------------------------------------------------------------------------------
@@ -12482,6 +12441,7 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 	iValue += GetBaseYieldRateFromEspionageSpy(eIndex);
 #endif
 	iValue += GetBaseYieldRateFromBuildings(eIndex);
+	iValue += GetBaseYieldRateFromBuildingsPolicies(eIndex);
 	iValue += GetBaseYieldRateFromSpecialists(eIndex);
 	iValue += GetBaseYieldRateFromMisc(eIndex);
 	iValue += GetBaseYieldRateFromReligion(eIndex);
@@ -12563,7 +12523,7 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		iBaseYieldTimes100 /= 100;
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO", iBaseYieldTimes100, YieldIcon);
 	}
-	//Special case: Yield from Policy, only for Faith and Culture
+	//Yield from Policy
 	iBaseValue = GetBaseYieldRateFromPolicy(eIndex);
 	if(iBaseValue != 0)
 	{
@@ -12622,9 +12582,8 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS", iBaseValue, YieldIcon);
 	}
 
-	iBaseValue = GetBaseYieldRateFromReligion(eIndex);
 	//Special case for FAITH and Culture
-	iBaseValue += GetBaseYieldRateFromReligionSpecialCase(eIndex);
+	iBaseValue = GetBaseYieldRateFromReligionAllCase(eIndex);
 	if(iBaseValue != 0)
 	{
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_RELIGION", iBaseValue, YieldIcon);
@@ -12750,15 +12709,17 @@ int CvCity::GetBaseYieldRateFromPolicy(YieldTypes eIndex) const
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	int iRtnValue = 0;
 	switch (eIndex)
 	{
 	case YIELD_CULTURE:
-		return GetJONSCulturePerTurnFromPolicies();
-	case YIELD_FAITH:
-		return GetFaithPerTurnFromPolicies();
+		iRtnValue += GetJONSCulturePerTurnFromPolicies();
+		break;
 	default:
-		return 0;
+		iRtnValue += GetBaseYieldRateFromBuildingsPolicies(eIndex);
+		break;
 	}
+	return iRtnValue;
 
 }
 //	--------------------------------------------------------------------------------
@@ -12772,14 +12733,16 @@ int CvCity::GetBaseYieldRateFromTrait(YieldTypes eIndex) const
 	{
 	case YIELD_CULTURE:
 		return GetJONSCulturePerTurnFromTraits();
+		break;
 	default:
 		return 0;
+		break;
 	}
 
 }
 //	--------------------------------------------------------------------------------
 /// Base yield rate from Religion Special Case --TODO this is a very simple func now
-int CvCity::GetBaseYieldRateFromReligionSpecialCase(YieldTypes eIndex) const
+int CvCity::GetBaseYieldRateFromReligionAllCase(YieldTypes eIndex) const
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
@@ -12788,10 +12751,10 @@ int CvCity::GetBaseYieldRateFromReligionSpecialCase(YieldTypes eIndex) const
 	{
 	case YIELD_CULTURE:
 		return GetJONSCulturePerTurnFromReligion();
-	case YIELD_FAITH:
-		return GetFaithPerTurnFromReligion();
+		break;
 	default:
-		return 0;
+		return GetBaseYieldRateFromReligion(eIndex);
+		break;
 	}
 
 }
@@ -12806,8 +12769,10 @@ int CvCity::GetBaseYieldRateFromLeagues(YieldTypes eIndex) const
 	{
 	case YIELD_CULTURE:
 		return GetJONSCulturePerTurnFromLeagues();
+		break;
 	default:
 		return 0;
+		break;
 	}
 
 }
@@ -12878,6 +12843,35 @@ void CvCity::ChangeBaseYieldRateFromBuildings(YieldTypes eIndex, int iChange)
 			{
 				DLLUI->setDirty(CityScreen_DIRTY_BIT, true);
 				//DLLUI->setDirty(InfoPane_DIRTY_BIT, true );
+			}
+		}
+	}
+}
+
+//	--------------------------------------------------------------------------------
+/// Base yield rate from Buildings with Policy bonus
+int CvCity::GetBaseYieldRateFromBuildingsPolicies(YieldTypes eIndex) const
+{
+	return m_aiBaseYieldRateFromBuildingsPolicies[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Base yield rate from Buildings with Policy bonus
+void CvCity::ChangeBaseYieldRateFromBuildingsPolicies(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if(iChange != 0)
+	{
+		m_aiBaseYieldRateFromBuildingsPolicies.setAt(eIndex, m_aiBaseYieldRateFromBuildingsPolicies[eIndex] + iChange);
+
+		if(getTeam() == GC.getGame().getActiveTeam())
+		{
+			if(isCitySelected())
+			{
+				DLLUI->setDirty(CityScreen_DIRTY_BIT, true);
 			}
 		}
 	}
@@ -18418,6 +18412,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiSeaResourceYield;
 	kStream >> m_aiBaseYieldRateFromTerrain;
 	kStream >> m_aiBaseYieldRateFromBuildings;
+	kStream >> m_aiBaseYieldRateFromBuildingsPolicies;
 	kStream >> m_aiBaseYieldRateFromSpecialists;
 	kStream >> m_aiBaseYieldRateFromProjects;
 	kStream >> m_aiBaseYieldRateFromMisc;
@@ -18861,6 +18856,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiSeaResourceYield;
 	kStream << m_aiBaseYieldRateFromTerrain;
 	kStream << m_aiBaseYieldRateFromBuildings;
+	kStream << m_aiBaseYieldRateFromBuildingsPolicies;
 	kStream << m_aiBaseYieldRateFromSpecialists;
 	kStream << m_aiBaseYieldRateFromProjects;
 	kStream << m_aiBaseYieldRateFromMisc;

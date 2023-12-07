@@ -532,7 +532,6 @@ public:
 	int GetFaithPerTurnFromBuildings() const;
 
 	int GetFaithPerTurnFromPolicies() const;
-	void ChangeFaithPerTurnFromPolicies(int iChange);
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int GetYieldPerTurnFromUnimprovedFeatures(YieldTypes eYield) const;
@@ -541,7 +540,6 @@ public:
 #endif
 
 	int GetFaithPerTurnFromReligion() const;
-	void ChangeFaithPerTurnFromReligion(int iChange);
 
 	int getNumWorldWonders() const;
 	void changeNumWorldWonders(int iChange);
@@ -777,13 +775,16 @@ public:
 
 	int GetBaseYieldRateFromPolicy(YieldTypes eIndex) const;
 	int GetBaseYieldRateFromTrait(YieldTypes eIndex) const;
-	int GetBaseYieldRateFromReligionSpecialCase(YieldTypes eIndex) const;
+	int GetBaseYieldRateFromReligionAllCase(YieldTypes eIndex) const;
 	int GetBaseYieldRateFromLeagues(YieldTypes eIndex) const;
 	int GetBaseYieldRateFromTerrain(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromTerrain(YieldTypes eIndex, int iChange);
 
 	int GetBaseYieldRateFromBuildings(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromBuildings(YieldTypes eIndex, int iChange);
+
+	int GetBaseYieldRateFromBuildingsPolicies(YieldTypes eIndex) const;
+	void ChangeBaseYieldRateFromBuildingsPolicies(YieldTypes eIndex, int iChange);
 
 	int GetBaseYieldRateFromSpecialists(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromSpecialists(YieldTypes eIndex, int iChange);
@@ -1437,6 +1438,7 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_aiSeaResourceYield;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromTerrain;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromBuildings;
+	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromBuildingsPolicies;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromSpecialists;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromProjects;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromMisc;

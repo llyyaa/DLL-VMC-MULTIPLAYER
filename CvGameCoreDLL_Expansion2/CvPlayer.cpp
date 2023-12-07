@@ -26682,25 +26682,6 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 							case YIELD_CULTURE:
 								// Skip, handled above
 								break;
-							case YIELD_FAITH:
-#if defined(MOD_API_UNIFIED_YIELDS)
-								{
-									eYield = (YieldTypes) iJ;
-									iYieldMod = pPolicy->GetBuildingClassYieldModifiers(eBuildingClass, eYield);
-									if (iYieldMod > 0)
-									{
-										pLoopCity->changeYieldRateModifier(eYield, iYieldMod * iBuildingCount * iChange);
-									}
-									iYieldChange = pPolicy->GetBuildingClassYieldChanges(eBuildingClass, eYield);
-									if (iYieldChange != 0)
-									{
-										pLoopCity->ChangeFaithPerTurnFromPolicies(iYieldChange * iBuildingCount * iChange);
-									}
-								}
-#else
-								pLoopCity->ChangeFaithPerTurnFromPolicies(pPolicy->GetBuildingClassYieldChanges(eBuildingClass, iJ) * iBuildingCount * iChange);
-#endif
-								break;
 							default:
 								{
 									eYield = (YieldTypes) iJ;
@@ -26712,7 +26693,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 									iYieldChange = pPolicy->GetBuildingClassYieldChanges(eBuildingClass, eYield);
 									if (iYieldChange != 0)
 									{
-										pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYieldChange * iBuildingCount * iChange);
+										pLoopCity->ChangeBaseYieldRateFromBuildingsPolicies(eYield, iYieldChange * iBuildingCount * iChange);
 									}
 								}
 							}
