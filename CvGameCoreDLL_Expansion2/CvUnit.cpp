@@ -271,6 +271,7 @@ CvUnit::CvUnit() :
 	, m_iExtraAttackWoundedMod("CvUnit::m_iExtraAttackWoundedMod", m_syncArchive)
 	, m_iFlankAttackModifier(0)
 	, m_iRangedFlankAttackModifier(0)
+	, m_iRangedFlankAttackModifierPercent(0)
 	, m_iExtraOpenDefensePercent("CvUnit::m_iExtraOpenDefensePercent", m_syncArchive)
 	, m_iExtraRoughDefensePercent("CvUnit::m_iExtraRoughDefensePercent", m_syncArchive)
 	, m_iPillageChange("CvUnit::m_iPillageChange", m_syncArchive)
@@ -1238,6 +1239,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraAttackWoundedMod= 0;
 	m_iFlankAttackModifier=0;
 	m_iRangedFlankAttackModifier = 0;
+	m_iRangedFlankAttackModifierPercent = 0;
 	m_iExtraOpenDefensePercent = 0;
 	m_iExtraRoughDefensePercent = 0;
 	m_iPillageChange = 0;
