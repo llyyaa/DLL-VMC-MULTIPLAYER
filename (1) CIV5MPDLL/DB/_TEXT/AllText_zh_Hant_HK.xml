@@ -2,19 +2,19 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
-    <Row Tag="TXT_KEY_NOTIFICATION_SPY_EVICTED_FPRBIDDEN_YOU">
-      <Text>您的間諜{1_SpyRank}{2_SpyName}從{3_CityName}離開，因為這座城市不再支持行動。</Text>
-    </Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SPY_EVICTED_FPRBIDDEN_YOU">
+			<Text>您的間諜{1_SpyRank}{2_SpyName}從{3_CityName}離開，因為這座城市不再支持行動。</Text>
+		</Row>
 		<Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
 			<Text>[NEWLINE]需要國內拥有{1_FeatureName:textkey}。</Text>
 		</Row>
-        <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+		<Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
 			<Text>[NEWLINE]需要城市附近有{1_FeatureName:textkey}。</Text>
 		</Row>
 		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
 			<Text>你的{@1_UnitName}沒有遇到抵抗，並且攻擊了敵人的空軍和地面防空單位！</Text>
 		</Row>
-			<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
+		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK">
 			<Text>我们的{2_Unit}被敵人的{1_Unit}擊退了！</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_MORALE_FALL_BACK_S">
@@ -33,10 +33,10 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
 			<Text>昭昭天命!</Text>
 		</Row>
-        <Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
 			<Text>[NEWLINE][ICON_BULLET]來自改良設施的城市修正值: {1_Num}%</Text>
 		</Row>
-        <Row Tag="TXT_KEY_PRODMOD_SPIES">
+		<Row Tag="TXT_KEY_PRODMOD_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]活躍間諜數的城市修正值: {1_Num}%</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
@@ -78,10 +78,10 @@
 		<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
 			<Text>权威</Text>
 		</Row>
-<Row Tag="TXT_KEY_YIELD_VIOLENCE">
+		<Row Tag="TXT_KEY_YIELD_VIOLENCE">
 			<Text>暴力</Text>
 		</Row>
-                                <Row Tag="TXT_KEY_YIELD_HERESY">
+		<Row Tag="TXT_KEY_YIELD_HERESY">
 			<Text>邪教</Text>
 		</Row>
 		<Row Tag="TXT_KEY_YIELD_LOYALTY">
@@ -111,37 +111,37 @@
 	<!-- GoodyHutMessages.xml -->
 	<Language_zh_Hant_HK>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_GOLD"/>
+			<Where Tag="TXT_KEY_GOODY_GOLD" />
 			<Set>
 				<Text>您在該遺迹中找到了上古帝國的寶藏！</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_PROPHET_FAITH"/>
+			<Where Tag="TXT_KEY_GOODY_PROPHET_FAITH" />
 			<Set>
 				<Text>您發現了一處秘密的宗教社區。傳教士預言了大預言家的降臨。</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_CHOOSE_PROPHET_FAITH"/>
+			<Where Tag="TXT_KEY_GOODY_CHOOSE_PROPHET_FAITH" />
 			<Set>
 				<Text>讓傳教士預言大先知的降臨。</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_FAITH"/>
+			<Where Tag="TXT_KEY_GOODY_FAITH" />
 			<Set>
 				<Text>您發現了一座古老的祭司神殿。祭司向您揭示了神的啟示，賜予您祝福。</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_CULTURE"/>
+			<Where Tag="TXT_KEY_GOODY_CULTURE" />
 			<Set>
 				<Text>您找到了讓人民敬畏的文化寶物！</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_MISC_RECEIVED_GOLD"/>
+			<Where Tag="TXT_KEY_MISC_RECEIVED_GOLD" />
 			<Set>
 				<Text>[SPACE]您獲得了{1_Num}[ICON_GOLD]枚金幣！</Text>
 			</Set>
@@ -182,7 +182,7 @@
 			<Text>無名</Text>
 		</Row>
 	</Language_zh_Hant_HK>
-    
+
 	<!-- UnifiedYieldsGoldenAge.xml -->
 	<Language_zh_Hant_HK>
 		<Row Tag="TXT_KEY_YIELD_GOLDEN_AGE_POINTS">
@@ -195,7 +195,7 @@
 			<Text>通過與該城市建立貿易線路以每回合獲取{1_perTurn:number "#.##"}點[ICON_GOLDEN_AGE]</Text>
 		</Row>
 	</Language_zh_Hant_HK>
-    
+
 	<!-- UnifiedYieldsTourism.xml -->
 	<Language_zh_Hant_HK>
 		<Row Tag="TXT_KEY_YIELD_TOURISM">
@@ -208,7 +208,7 @@
 			<Text>通過與該城市建立貿易線路以每回合獲取{1_perTurn:number "#.##"}點[ICON_TOURISM]</Text>
 		</Row>
 	</Language_zh_Hant_HK>
-    
+
 	<!-- UnitclassNotUnit.xml -->
 	<Language_zh_Hant_HK>
 		<Row Tag="TXT_KEY_TP_FAITH_NEXT_PROPHET_PARAM">
@@ -275,7 +275,7 @@
 			<Text>偵查強化</Text>
 		</Row>
 	</Language_zh_Hant_HK>
-	
+
 	<!-- Quests.xml -->
 	<Language_zh_Hant_HK>
 		<Row Tag="TXT_KEY_CITY_STATE_QUEST_GENERIC_FORMAL">
@@ -466,13 +466,13 @@
 		<Row Tag="TXT_KEY_TOURISM_HELP_INFO">
 			<Text>[ICON_TOURISM]魅力由傑作、文物或建築來產生，是你將你的文化影響力擴張到其它文明的主要途徑。 </Text>
 		</Row>
-                                  <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ESPIONAGE_SPY">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ESPIONAGE_SPY">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自间谍获取</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_FRIENDSHIP">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_FRIENDSHIP">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自友好城邦</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_ALLIANCE">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_ALLIANCE">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自同盟城邦</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO">
@@ -563,23 +563,23 @@
 			<Text>你征服了{1_city}，對所有已見面文明傳播了+{2_num}[ICON_TOURISM]魅力影響。 </Text>
 		</Row>
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
-      		<Text>政策對不同意識形態加成，+{1_Num}%旅遊業績[NEWLINE]</Text>
+			<Text>政策對不同意識形態加成，+{1_Num}%旅遊業績[NEWLINE]</Text>
 		</Row>
 
 		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
-      		<Text>[NEWLINE]兵力不足</Text>
+			<Text>[NEWLINE]兵力不足</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1">
-      		<Text>由於{1_Resource:textkey}[COLOR_NEGATIVE_TEXT]不足[ENDCOLOR]，你受到以下影響:</Text>
+			<Text>由於{1_Resource:textkey}[COLOR_NEGATIVE_TEXT]不足[ENDCOLOR]，你受到以下影響:</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_COMBAT">
-      		<Text>[NEWLINE][ICON_BULLET]所有需要該資源的單位[COLOR_NEGATIVE_TEXT]戰鬥力將大大下降[ENDCOLOR]</Text>
+			<Text>[NEWLINE][ICON_BULLET]所有需要該資源的單位[COLOR_NEGATIVE_TEXT]戰鬥力將大大下降[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_DEBUFF">
-      		<Text>[NEWLINE][ICON_BULLET]全國{1_IconString}{2_Description}[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
+			<Text>[NEWLINE][ICON_BULLET]全國{1_IconString}{2_Description}[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS">
-      		<Text>[NEWLINE][ICON_BULLET]全國[ICON_HAPPINESS_4]不滿[COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR]</Text>
+			<Text>[NEWLINE][ICON_BULLET]全國[ICON_HAPPINESS_4]不滿[COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_IGNOR_TECH_BONUS">
 			<Text>無視科技加成[NEWLINE]</Text>
@@ -612,22 +612,22 @@
 			<Text>{2_name}訓練完成，獲得{1_num}[ICON_CULTURE]文化！</Text>
 		</Row>
 
-        <Row Tag="TXT_KEY_NOBEL_PRIZE_PHYSICS">
-            <Text>諾貝爾物理學獎</Text>
-        </Row>
-        <Row Tag="TXT_KEY_NOBEL_PRIZE_CHEMICAL">
-            <Text>諾貝爾化學獎</Text>
-        </Row>
-        <Row Tag="TXT_KEY_NOBEL_PRIZE_MEDICINE">
-            <Text>諾貝爾醫學或生理學獎</Text>
-        </Row>
-        <Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_MESSAGE">
-            <Text>{1_civ}的大科學家[COLOR_BLUE]{2_person_name}[ENDCOLOR]榮獲新一屆{4_prizeType}，你獲得了+[COLOR_BLUE]{3_research}[ENDCOLOR][ICON_RESEARCH]科學研究！ </Text>
-        </Row>
-        <Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_SUMMARY">
-            <Text>諾貝爾獎得主！ </Text>
-        </Row>
-		<Row Tag="TXT_KEY_UNIT_IGNORE_ZOC_D" >
+		<Row Tag="TXT_KEY_NOBEL_PRIZE_PHYSICS">
+			<Text>諾貝爾物理學獎</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOBEL_PRIZE_CHEMICAL">
+			<Text>諾貝爾化學獎</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOBEL_PRIZE_MEDICINE">
+			<Text>諾貝爾醫學或生理學獎</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_MESSAGE">
+			<Text>{1_civ}的大科學家[COLOR_BLUE]{2_person_name}[ENDCOLOR]榮獲新一屆{4_prizeType}，你獲得了+[COLOR_BLUE]{3_research}[ENDCOLOR][ICON_RESEARCH]科學研究！ </Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_SUMMARY">
+			<Text>諾貝爾獎得主！ </Text>
+		</Row>
+		<Row Tag="TXT_KEY_UNIT_IGNORE_ZOC_D">
 			<Text>[COLOR_CYAN]無視ZOC[ENDCOLOR]</Text>
 		</Row>
 	</Language_zh_Hant_HK>

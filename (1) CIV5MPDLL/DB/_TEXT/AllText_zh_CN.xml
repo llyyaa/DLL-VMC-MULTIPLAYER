@@ -2,13 +2,13 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_zh_CN>
-    <Row Tag="TXT_KEY_NOTIFICATION_SPY_EVICTED_FPRBIDDEN_YOU">
-      <Text>您的间谍{1_SpyRank}{2_SpyName}从{3_CityName}离开，因为这座城市不再支持行动。</Text>
-    </Row>
-        <Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
+		<Row Tag="TXT_KEY_NOTIFICATION_SPY_EVICTED_FPRBIDDEN_YOU">
+			<Text>您的间谍{1_SpyRank}{2_SpyName}从{3_CityName}离开，因为这座城市不再支持行动。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NO_ACTION_BUILDING_EMPIRE_RESOURCE">
 			<Text>[NEWLINE]需要国內拥有{1_FeatureName:textkey}。</Text>
 		</Row>
-        <Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
+		<Row Tag="TXT_KEY_NO_ACTION_BUILDING_LOCAL_FEATURE">
 			<Text>[NEWLINE]需要城市附近有{1_FeatureName:textkey}。</Text>
 		</Row>
 		<Row Tag="TXT_KEY_AIR_PATROL_BOMBED_GROUND_TARGETS">
@@ -35,15 +35,15 @@
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
 			<Text>[NEWLINE][ICON_BULLET]来自改良设施的城市修正值: {1_Num}%</Text>
 		</Row>
-        <Row Tag="TXT_KEY_PRODMOD_SPIES">
+		<Row Tag="TXT_KEY_PRODMOD_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]活跃间谍数的城市修正值: {1_Num}%</Text>
 		</Row>
- 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
-      		<Text>[NEWLINE][ICON_BULLET]健康度的城市修正值: {1_Num}%</Text>
-    	</Row>
-	 	<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
-     		<Text>[NEWLINE][ICON_BULLET]犯罪率的城市修正值: {1_Num}%</Text>
-    	</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
+			<Text>[NEWLINE][ICON_BULLET]健康度的城市修正值: {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
+			<Text>[NEWLINE][ICON_BULLET]犯罪率的城市修正值: {1_Num}%</Text>
+		</Row>
 
 		<Row Tag="TXT_KEY_UNIT_PLAGUE_TRANSFER">
 			<Text>战斗期间，一种致命的病毒通过你的{1_Unit}转播给了敌方的{2_Unit}!</Text>
@@ -73,10 +73,10 @@
 		<Row Tag="TXT_KEY_YIELD_CRIME">
 			<Text>犯罪率</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_YIELD_VIOLENCE">
+		<Row Tag="TXT_KEY_YIELD_VIOLENCE">
 			<Text>暴力</Text>
 		</Row>
-                                <Row Tag="TXT_KEY_YIELD_HERESY">
+		<Row Tag="TXT_KEY_YIELD_HERESY">
 			<Text>邪教</Text>
 		</Row>
 		<Row Tag="TXT_KEY_YIELD_SOVEREIGNTY">
@@ -108,37 +108,37 @@
 	<!-- GoodyHutMessages.xml -->
 	<Language_zh_CN>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_GOLD"/>
+			<Where Tag="TXT_KEY_GOODY_GOLD" />
 			<Set>
 				<Text>您在该遗迹中找到了上古帝国的宝藏！</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_PROPHET_FAITH"/>
+			<Where Tag="TXT_KEY_GOODY_PROPHET_FAITH" />
 			<Set>
 				<Text>您发现了一处秘密的宗教社区。传教士预言了大预言家的降临。</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_CHOOSE_PROPHET_FAITH"/>
+			<Where Tag="TXT_KEY_GOODY_CHOOSE_PROPHET_FAITH" />
 			<Set>
 				<Text>让传教士预言大先知的降临。</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_FAITH"/>
+			<Where Tag="TXT_KEY_GOODY_FAITH" />
 			<Set>
 				<Text>您发现了一座古老的祭司神殿。祭司向您揭示了神的啟示，赐予您祝福。</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_GOODY_CULTURE"/>
+			<Where Tag="TXT_KEY_GOODY_CULTURE" />
 			<Set>
 				<Text>您找到了让人民敬畏的文化宝物！</Text>
 			</Set>
 		</Update>
 		<Update>
-			<Where Tag="TXT_KEY_MISC_RECEIVED_GOLD"/>
+			<Where Tag="TXT_KEY_MISC_RECEIVED_GOLD" />
 			<Set>
 				<Text>[SPACE]您获得了{1_Num}[ICON_GOLD]枚金币！</Text>
 			</Set>
@@ -154,7 +154,7 @@
 		</Row>
 		<Row Tag="TXT_KEY_MISC_RECEIVED_PRODUCITON">
 			<Text>[SPACE]您的城市{1_Name}获得了{2_Num}[ICON_PRODUCTION]产能！</Text>
-		</Row>	
+		</Row>
 	</Language_zh_CN>
 
 	<!-- Religion.xml -->
@@ -179,7 +179,7 @@
 			<Text>无名</Text>
 		</Row>
 	</Language_zh_CN>
-    
+
 	<!-- UnifiedYieldsGoldenAge.xml -->
 	<Language_zh_CN>
 		<Row Tag="TXT_KEY_YIELD_GOLDEN_AGE_POINTS">
@@ -192,7 +192,7 @@
 			<Text>通过与该城市建立贸易线路以每回合获取{1_perTurn:number "#.##"}点[ICON_GOLDEN_AGE]</Text>
 		</Row>
 	</Language_zh_CN>
-    
+
 	<!-- UnifiedYieldsTourism.xml -->
 	<Language_zh_CN>
 		<Row Tag="TXT_KEY_YIELD_TOURISM">
@@ -205,7 +205,7 @@
 			<Text>通过与该城市建立贸易线路以每回合获取{1_perTurn:number "#.##"}点[ICON_TOURISM]</Text>
 		</Row>
 	</Language_zh_CN>
-    
+
 	<!-- UnitclassNotUnit.xml -->
 	<Language_zh_CN>
 		<Row Tag="TXT_KEY_TP_FAITH_NEXT_PROPHET_PARAM">
@@ -466,13 +466,13 @@
 		<Row Tag="TXT_KEY_TOURISM_HELP_INFO">
 			<Text>[ICON_TOURISM]魅力由杰作、文物或建筑来产生，是你将你的文化影响力扩张到其它文明的主要途径。 </Text>
 		</Row>
-                               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ESPIONAGE_SPY">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ESPIONAGE_SPY">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自间谍获取</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_ALLIANCE">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_ALLIANCE">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自同盟城邦</Text>
 		</Row>
-                                <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_FRIENDSHIP">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_FRIENDSHIP">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自友好城邦</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CITY_PRODUCTION_TO">
@@ -560,26 +560,26 @@
 		</Row>
 
 		<Row Tag="TXT_KEY_NOTIFICATION_INSTANT_TOURISM_WHEN_CONQUER">
-      		<Text>你征服了{1_city}，对所有已见面文明传播了+{2_num}[ICON_TOURISM]魅力影响。</Text>
+			<Text>你征服了{1_city}，对所有已见面文明传播了+{2_num}[ICON_TOURISM]魅力影响。</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_DIFFERENT_IDEOLOGY">
-      		<Text>+{1_Num}%奖励 由于政策对不同意识形态加成[NEWLINE]</Text>
+			<Text>+{1_Num}%奖励 由于政策对不同意识形态加成[NEWLINE]</Text>
 		</Row>
 
 		<Row Tag="TXT_KEY_NO_ACTION_LACKING_TROOPS">
-      		<Text>[NEWLINE]兵力不足</Text>
+			<Text>[NEWLINE]兵力不足</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1">
-      		<Text>由于{1_Resource:textkey}[COLOR_NEGATIVE_TEXT]不足[ENDCOLOR]，你受到以下影响:</Text>
+			<Text>由于{1_Resource:textkey}[COLOR_NEGATIVE_TEXT]不足[ENDCOLOR]，你受到以下影响:</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_COMBAT">
-      		<Text>[NEWLINE][ICON_BULLET]所有需要该资源的单位[COLOR_NEGATIVE_TEXT]战斗力将大大下降[ENDCOLOR]</Text>
+			<Text>[NEWLINE][ICON_BULLET]所有需要该资源的单位[COLOR_NEGATIVE_TEXT]战斗力将大大下降[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_DEBUFF">
-      		<Text>[NEWLINE][ICON_BULLET]全国{1_IconString}{2_Description}[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
+			<Text>[NEWLINE][ICON_BULLET]全国{1_IconString}{2_Description}[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_OVER_RESOURCE_LIMIT_UNHAPPINESS">
-      		<Text>[NEWLINE][ICON_BULLET]全国[ICON_HAPPINESS_4]不满[COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR]</Text>
+			<Text>[NEWLINE][ICON_BULLET]全国[ICON_HAPPINESS_4]不满[COLOR_NEGATIVE_TEXT]+{1_Num}%[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CO_PLAYER_TOURISM_IGNOR_TECH_BONUS">
 			<Text>无视科技加成[NEWLINE]</Text>
@@ -614,21 +614,21 @@
 		</Row>
 
 		<Row Tag="TXT_KEY_NOBEL_PRIZE_PHYSICS">
-            <Text>诺贝尔物理学奖</Text>
+			<Text>诺贝尔物理学奖</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOBEL_PRIZE_CHEMICAL">
-            <Text>诺贝尔化学奖</Text>
+			<Text>诺贝尔化学奖</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOBEL_PRIZE_MEDICINE">
-            <Text>诺贝尔医学或生理学奖</Text>
+			<Text>诺贝尔医学或生理学奖</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_MESSAGE">
-            <Text>{1_civ}的大科学家[COLOR_BLUE]{2_person_name}[ENDCOLOR]荣获新一届{4_prizeType}，你获得了+[COLOR_BLUE]{3_research}[ENDCOLOR][ICON_RESEARCH]科研！</Text>
+			<Text>{1_civ}的大科学家[COLOR_BLUE]{2_person_name}[ENDCOLOR]荣获新一届{4_prizeType}，你获得了+[COLOR_BLUE]{3_research}[ENDCOLOR][ICON_RESEARCH]科研！</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_WIN_NOBEL_PRIZE_SUMMARY">
 			<Text>诺贝尔奖得主！</Text>
 		</Row>
-		<Row Tag="TXT_KEY_UNIT_IGNORE_ZOC_D" >
+		<Row Tag="TXT_KEY_UNIT_IGNORE_ZOC_D">
 			<Text>[COLOR_CYAN]无视ZOC[ENDCOLOR]</Text>
 		</Row>
 	</Language_zh_CN>
