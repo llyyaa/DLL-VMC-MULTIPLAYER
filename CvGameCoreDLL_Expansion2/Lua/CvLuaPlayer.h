@@ -1261,8 +1261,8 @@ protected:
 #endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	LUAAPIEXTN(GetImmigrationCounter, int, iIndex);
-	LUAAPIEXTN(ChangeImmigrationCounter, int, iIndex, iChange);
-	LUAAPIEXTN(SetImmigrationCounter, int, iIndex, iValue);
+	LUAAPIEXTN(ChangeImmigrationCounter, void, iIndex, iChange);
+	LUAAPIEXTN(SetImmigrationCounter, void, iIndex, iValue);
 #endif
 
 	LUAAPIEXTN(GetScienceTimes100FromFriendsTable);

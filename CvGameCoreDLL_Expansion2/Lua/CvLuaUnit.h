@@ -747,7 +747,7 @@ protected:
 	LUAAPIEXTN(IsImmuneNegtivePromotions, bool);
 #endif
 
-	LUAAPIEXTN(SetExtraPopConsume, void);
+	LUAAPIEXTN(SetExtraPopConsume, void, iValue);
 	LUAAPIEXTN(GetExtraPopConsume, int);
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	LUAAPIEXTN(IsNoTroops, bool);
@@ -759,7 +759,7 @@ protected:
 	LUAAPIEXTN(GetStrengthModifierFromExtraHappiness, int);
 	LUAAPIEXTN(GetBarbarianCombatBonusTotal, int);
 	LUAAPIEXTN(IsBatchMark, bool);
-	LUAAPIEXTN(SetIsBatchMark, void);
+	LUAAPIEXTN(SetIsBatchMark, void, value);
 };
 
 
