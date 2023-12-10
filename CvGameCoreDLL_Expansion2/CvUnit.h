@@ -213,6 +213,10 @@ public:
 	void move(CvPlot& pPlot, bool bShow);
 	bool jumpToNearestValidPlot();
 	bool jumpToNearestValidPlotWithinRange(int iRange);
+	bool MoveToNearestValidPlotWithinRangeFromPlot(const CvPlot& pPlot, int iRange, int& iX, int& iY, int& iLastValidPlotUnit, int &iLastValidPlotIndex);
+	void BatchMove(CvPlot& pPlot, int iRange);
+	bool IsBatchMark() const;
+	void SetIsBatchMark(bool value);
 
 	bool canScrap(bool bTestVisible = false) const;
 	void scrap();
@@ -2528,6 +2532,7 @@ protected:
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	bool m_bIsNewCapture = false;
 #endif
+	bool m_bIsBatchMark = false;
 
 	mutable CvPathNodeArray m_kLastPath;
 	mutable uint m_uiLastPathCacheDest;

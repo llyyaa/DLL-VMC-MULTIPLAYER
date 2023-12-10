@@ -758,6 +758,8 @@ protected:
 	LUAAPIEXTN(GetStrengthModifierFromExtraResource, int);
 	LUAAPIEXTN(GetStrengthModifierFromExtraHappiness, int);
 	LUAAPIEXTN(GetBarbarianCombatBonusTotal, int);
+	LUAAPIEXTN(IsBatchMark, bool);
+	LUAAPIEXTN(SetIsBatchMark, void);
 };
 
 

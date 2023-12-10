@@ -834,6 +834,8 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetStrengthModifierFromExtraResource);
 	Method(GetStrengthModifierFromExtraHappiness);
 	Method(GetBarbarianCombatBonusTotal);
+	Method(IsBatchMark);
+	Method(SetIsBatchMark);
 }
 //------------------------------------------------------------------------------
 const char* CvLuaUnit::GetTypeName()
@@ -6278,3 +6280,6 @@ int CvLuaUnit::lGetPlotCorruptionScoreReport(lua_State* L)
 LUAAPIIMPL(Unit, GetStrengthModifierFromExtraResource)
 LUAAPIIMPL(Unit, GetStrengthModifierFromExtraHappiness)
 LUAAPIIMPL(Unit, GetBarbarianCombatBonusTotal)
+
+LUAAPIIMPL(Unit, IsBatchMark)
+LUAAPIIMPL(Unit, SetIsBatchMark)

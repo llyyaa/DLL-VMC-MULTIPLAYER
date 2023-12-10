@@ -1594,6 +1594,7 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	m_bIsNewCapture = false;
 #endif
+	m_bIsBatchMark = false;
 
 	if(!bConstructorCall)
 	{
@@ -4673,6 +4674,112 @@ bool CvUnit::jumpToNearestValidPlotWithinRange(int iRange)
 }
 
 
+//	--------------------------------------------------------------------------------
+bool CvUnit::MoveToNearestValidPlotWithinRangeFromPlot(const CvPlot& pPlot, int iRange, int& iX, int& iY, int& iLastValidPlotUnit, int &iLastValidPlotIndex)
+{
+	CvPlot* pLoopPlot = NULL;
+	CvPlot* pLastValidPlot = GC.getMap().plotByIndex(iLastValidPlotIndex);
+	int iDesPlotIndex = pPlot.GetPlotIndex();
+	for(int iDX = iX; iDX <= iRange; iDX++)
+	{
+		for(int iDY = iY; iDY <= iRange; iDY++)
+		{
+			if(iRange > 1)
+			{
+				int iAbsX = iDX >=0 ? iDX : -iDX;
+				int iAbsY = iDY >=0 ? iDY : -iDY;
+				//If not found Valid Plot in the first round, do not repeat the search in the second round
+				if(iAbsX < iRange && iAbsY < iRange) continue;
+			}
+			
+			pLoopPlot = plotXYWithRangeCheck(pPlot.getX(), pPlot.getY(), iDX, iDY, iRange);
+			if(pLoopPlot != NULL)
+			{
+				if(pLoopPlot->isValidDomainForLocation(*this))
+				{
+					if(!canMoveInto(*pLoopPlot)) continue;
+					int iNumUnit = pLoopPlot->getNumFriendlyUnitsOfType(this);
+					int iLoopPlotIndex = pLoopPlot->GetPlotIndex();
+					//Target plot already has a unit which call function BatchMove()
+					if (iLoopPlotIndex == iDesPlotIndex) iNumUnit++;
+					int iNumUnitLimit = 0;
+#if defined(MOD_GLOBAL_STACKING_RULES)
+					iNumUnitLimit = pLoopPlot->getUnitLimit();
+#else
+					iNumUnitLimit = GC.getPLOT_UNIT_LIMIT();
+#endif
+					if(iNumUnit >= iNumUnitLimit) continue;
+					if(canEnterTerritory(pLoopPlot->getTeam()) && pLoopPlot->isRevealed(getTeam()))
+					{
+						if(iLoopPlotIndex != iLastValidPlotIndex)
+						{
+							PushMission(CvTypes::getMISSION_MOVE_TO(), pLoopPlot->getX(), pLoopPlot->getY());
+							//new plot, change index
+							iLastValidPlotUnit = 1;
+							iLastValidPlotIndex = iLoopPlotIndex;
+							iX = iDX;
+							iY = iDY;
+							return true;
+						}
+						else if(iLoopPlotIndex == iLastValidPlotIndex && (iNumUnit + iLastValidPlotUnit < iNumUnitLimit))
+						{
+							PushMission(CvTypes::getMISSION_MOVE_TO(), pLoopPlot->getX(), pLoopPlot->getY());
+							//old plot, only change iLastValidPlotUnit and avoid another unit choose same plot
+							iLastValidPlotUnit++;
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+void CvUnit::BatchMove(CvPlot& pPlot, int iRange)
+{
+	CvPlot* pLoopPlot = NULL;
+	CvPlot* pValidPlot = NULL;
+
+	int iLastValidPlotUnit = 0;
+	int iLastValidPlotIndex = -1;
+	int iDesRange = iRange;
+	int iDX = -iRange, iDY = -iRange;
+	std::vector<CvUnit*> vPlotUnit;
+	for(int iSX = -iRange; iSX <= iRange; iSX++)
+	{
+		for(int iSY = -iRange; iSY <= iRange; iSY++)
+		{
+			pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iSX, iSY, iRange);
+			if (pLoopPlot == NULL) continue;
+			int iPlotNumUnits = pLoopPlot->getNumUnits();
+			if (iPlotNumUnits == 0) continue;
+
+			vPlotUnit.clear();
+			for (int iK = 0; iK < iPlotNumUnits; iK++)
+			{
+				CvUnit* pLoopUnit = pLoopPlot->getUnitByIndex(iK);
+				if (pLoopUnit != NULL && pLoopUnit->getOwner() == getOwner() && pLoopUnit->GetID() != GetID() && pLoopUnit->getDomainType() == getDomainType() && pLoopUnit->IsCivilianUnit() == IsCivilianUnit())
+				{
+					//found a unit need move
+					vPlotUnit.push_back(pLoopUnit);
+				}
+			}
+			for(auto& pUnit : vPlotUnit)
+			{
+				if(!pUnit->MoveToNearestValidPlotWithinRangeFromPlot(pPlot, iDesRange, iDX, iDY, iLastValidPlotUnit, iLastValidPlotIndex))
+				{
+					//1 range cannot move all, move to range 2
+					iDesRange++;
+					iDX = -iDesRange;
+					iDY = -iDesRange;
+					iLastValidPlotIndex = -1;
+					iLastValidPlotUnit = 0;
+					pUnit->MoveToNearestValidPlotWithinRangeFromPlot(pPlot, iDesRange, iDX, iDY, iLastValidPlotUnit, iLastValidPlotIndex);
+				}
+			}
+		}
+	}
+}
 //	--------------------------------------------------------------------------------
 bool CvUnit::CanAutomate(AutomateTypes eAutomate, bool bTestVisibility) const
 {
@@ -24512,6 +24619,16 @@ void CvUnit::SetIsNewCapture(bool value)
 #endif
 
 //	--------------------------------------------------------------------------------
+bool CvUnit::IsBatchMark() const
+{
+	return m_bIsBatchMark;
+}
+void CvUnit::SetIsBatchMark(bool value)
+{
+	m_bIsBatchMark = value;
+}
+
+//	--------------------------------------------------------------------------------
 std::string CvUnit::getScriptData() const
 {
 	VALIDATE_OBJECT
@@ -28582,6 +28699,15 @@ bool CvUnit::CanDoInterfaceMode(InterfaceModeTypes eInterfaceMode, bool bTestVis
 void CvUnit::PushMission(MissionTypes eMission, int iData1, int iData2, int iFlags, bool bAppend, bool bManual, MissionAITypes eMissionAI, CvPlot* pMissionAIPlot, CvUnit* pMissionAIUnit)
 {
 	VALIDATE_OBJECT
+	if(IsBatchMark())
+	{
+		SetIsBatchMark(false);
+		if(eMission == CvTypes::getMISSION_MOVE_TO())
+		{
+			CvPlot* pPlot = GC.getMap().plot(iData1, iData2);
+			if(pPlot != NULL) BatchMove(*pPlot, 1);
+		}
+	}
 	CvUnitMission::PushMission(this, eMission, iData1, iData2, iFlags, bAppend, bManual, eMissionAI, pMissionAIPlot, pMissionAIUnit);
 }
 
