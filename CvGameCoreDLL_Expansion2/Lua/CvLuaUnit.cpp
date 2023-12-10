@@ -94,6 +94,11 @@ void CvLuaUnit::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lChangeExperienceTimes100);
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lChangeStatsKilled);
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lChangeStatsTravelled);
+
+	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetIsBatchMark);
+	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetMaxHitPointsChangeFromRazedCityPop);
+	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetCombatStrengthChangeFromKilledUnits);
+	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetRangedCombatStrengthChangeFromKilledUnits);
 	
 }
 //------------------------------------------------------------------------------
