@@ -445,7 +445,7 @@ void CvPlot::doTurn()
 #endif
 
 #if defined(MOD_VOLCANO_BREAK)
-	if (MOD_VOLCANO_BREAK && IsVolcano() && GC.getGame().getGameTurn() > 6)
+	if (MOD_VOLCANO_BREAK && IsVolcano() && GC.getGame().getElapsedGameTurns() > 6)
 	{
 		if (GetBreakTurns() > 0  )
 		{
@@ -505,7 +505,7 @@ void CvPlot::doTurn()
 				
 			else if (bOutBreakLv2)
 			{
-				int iRange = 2;
+				int iRange = 1;
 				for (int iDX = -iRange; iDX <= iRange; iDX++)
 				{
 					for (int iDY = -iRange; iDY <= iRange; iDY++)
