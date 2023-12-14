@@ -2403,6 +2403,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			}
 			m_iNaturalWonderCorruptionScoreChange += trait->GetNaturalWonderCorruptionScoreChange();
 			m_iNaturalWonderCorruptionRadius += trait->GetNaturalWonderCorruptionRadius();
+			m_iCultureBonusUnitStrengthModify += trait->GetCultureBonusUnitStrengthModify();
 			m_iRiverCorruptionScoreChange += trait->GetRiverCorruptionScoreChange();
 			m_iGreatWorksTourism += trait->GetGreatWorksTourism();
 			if(trait->GetCiviliansFreePromotion() != NO_PROMOTION)
