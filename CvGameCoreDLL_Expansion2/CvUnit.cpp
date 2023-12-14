@@ -28624,6 +28624,10 @@ bool CvUnit::CanDoInterfaceMode(InterfaceModeTypes eInterfaceMode, bool bTestVis
 	case INTERFACEMODE_ATTACK:
 		if(IsCanAttackWithMove() && !isOutOfAttacks())
 		{
+			if(MOD_SHOW_ATTACK_INTERFACE_WITHOUT_ENEMY)
+			{
+				return true;
+			}
 			if(IsEnemyInMovementRange(false, IsCityAttackOnly()) || bTestVisibility)
 			{
 				return true;
