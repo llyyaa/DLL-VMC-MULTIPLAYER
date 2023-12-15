@@ -166,6 +166,7 @@ void CvLuaPlot::PushMethods(lua_State* L, int t)
 	Method(GetNumVisibleEnemyDefenders);
 	Method(GetNumVisiblePotentialEnemyDefenders);
 	Method(IsVisibleEnemyUnit);
+	Method(IsVisibleEnemyUnitFromUnit);
 	Method(IsVisibleOtherUnit);
 	Method(GetNumFriendlyUnitsOfType);
 	Method(IsFighting);
@@ -1037,6 +1038,16 @@ int CvLuaPlot::lIsVisibleEnemyUnit(lua_State* L)
 	CvPlot* pkPlot = GetInstance(L);
 	const PlayerTypes ePlayer = (PlayerTypes)lua_tointeger(L, 2);
 	const bool bResult = pkPlot->isVisibleEnemyUnit(ePlayer);
+	lua_pushboolean(L, bResult);
+	return 1;
+}
+//------------------------------------------------------------------------------
+//bool CvPlot::isVisibleEnemyUnit(const CvUnit* pUnit) const
+int CvLuaPlot::lIsVisibleEnemyUnitFromUnit(lua_State* L)
+{
+	CvPlot* pkPlot = GetInstance(L);
+	CvUnit* pkUnit = CvLuaUnit::GetInstance(L, 2);
+	const bool bResult = pkPlot->isVisibleEnemyUnit(pkUnit);
 	lua_pushboolean(L, bResult);
 	return 1;
 }

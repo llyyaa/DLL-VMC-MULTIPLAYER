@@ -631,6 +631,12 @@
 		<Row Tag="TXT_KEY_UNIT_IGNORE_ZOC_D">
 			<Text>[COLOR_CYAN]无视ZOC[ENDCOLOR]</Text>
 		</Row>
+		<Row Tag="TXT_KEY_SP_NOTIFICATION_MP_PLOT_SIGNAL">
+			<Text>{1_PlayerName}标记了一处地点。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_SP_NOTIFICATION_MP_PLOT_SIGNAL_SUMMARY">
+			<Text>标记地点。</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

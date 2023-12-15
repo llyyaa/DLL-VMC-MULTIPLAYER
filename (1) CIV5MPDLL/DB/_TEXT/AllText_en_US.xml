@@ -626,6 +626,12 @@
 		<Row Tag="TXT_KEY_UNIT_IGNORE_ZOC_D">
 			<Text>[COLOR_CYAN]Ignor ZOC[ENDCOLOR]</Text>
 		</Row>
+		<Row Tag="TXT_KEY_SP_NOTIFICATION_MP_PLOT_SIGNAL">
+			<Text>{1_PlayerName}Marks a Plot.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_SP_NOTIFICATION_MP_PLOT_SIGNAL_SUMMARY">
+			<Text>Mark Plot.</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>
