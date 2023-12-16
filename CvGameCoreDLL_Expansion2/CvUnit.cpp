@@ -6779,6 +6779,7 @@ int CvUnit::GetExtraPopConsume() const
 void CvUnit::ChangeAttackBonusFromDeathUnit(int iValue)
 {
 	m_iAttackBonusFromDeathUnit += iValue;
+	if(m_iAttackBonusFromDeathUnit < 0) m_iAttackBonusFromDeathUnit = 0;
 }
 int CvUnit::GetAttackBonusFromDeathUnit() const
 {

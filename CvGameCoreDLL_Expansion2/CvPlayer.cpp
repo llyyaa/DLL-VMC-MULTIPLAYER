@@ -5569,7 +5569,8 @@ void CvPlayer::DoUnitReset()
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 		pLoopUnit->SetIsNewCapture(false);
 #endif
-		pLoopUnit->ChangeAttackBonusFromDeathUnit(iAttackBonusDecreasePerTurn);
+		if (iAttackBonusDecreasePerTurn != 0)
+			pLoopUnit->ChangeAttackBonusFromDeathUnit(iAttackBonusDecreasePerTurn);
 #if defined(MOD_PROMOTIONS_FLAGSHIP)
 		if(pLoopUnit->IsGreatGeneral() || (MOD_PROMOTIONS_FLAGSHIP && pLoopUnit->IsGreatAdmiral()))
 #else
