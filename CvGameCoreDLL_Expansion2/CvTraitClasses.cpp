@@ -120,6 +120,10 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iPromotionWhenKilledUnit(NO_PROMOTION),
+	m_iPromotionRadiusWhenKilledUnit(0),
+	m_iAttackBonusAdjacentWhenUnitKilled(0),
+	m_iKilledAttackBonusDecreasePerTurn(0),
 	m_iTriggersIdeologyTech(NO_TECH),
 	m_iNaturalWonderCorruptionScoreChange(0),
 	m_iNaturalWonderCorruptionRadius(0),
@@ -680,6 +684,22 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetPromotionWhenKilledUnit() const
+{
+	return m_iPromotionWhenKilledUnit;
+}
+int CvTraitEntry::GetPromotionRadiusWhenKilledUnit() const
+{
+	return m_iPromotionRadiusWhenKilledUnit;
+}
+int CvTraitEntry::GetAttackBonusAdjacentWhenUnitKilled() const
+{
+	return m_iAttackBonusAdjacentWhenUnitKilled;
+}
+int CvTraitEntry::GetKilledAttackBonusDecreasePerTurn() const
+{
+	return m_iKilledAttackBonusDecreasePerTurn;
+}
 int CvTraitEntry::GetTriggersIdeologyTech() const
 {
 	return m_iTriggersIdeologyTech;
@@ -1583,6 +1603,10 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	{
 		m_iTriggersIdeologyTech = GC.getInfoTypeForString(szTextVal, true);
 	}
+	m_iPromotionWhenKilledUnit = kResults.GetInt("PromotionWhenKilledUnit");
+	m_iPromotionRadiusWhenKilledUnit = kResults.GetInt("PromotionRadiusWhenKilledUnit");
+	m_iAttackBonusAdjacentWhenUnitKilled = kResults.GetInt("AttackBonusAdjacentWhenUnitKilled");
+	m_iKilledAttackBonusDecreasePerTurn = kResults.GetInt("KilledAttackBonusDecreasePerTurn");
 	m_iNaturalWonderCorruptionScoreChange = kResults.GetInt("NaturalWonderCorruptionScoreChange");
 	m_iNaturalWonderCorruptionRadius = kResults.GetInt("NaturalWonderCorruptionRadius");
 	m_iCultureBonusUnitStrengthModify = kResults.GetInt("CultureBonusUnitStrengthModify");
@@ -2401,6 +2425,10 @@ void CvPlayerTraits::InitPlayerTraits()
 			{
 				m_iTriggersIdeologyTech = trait->GetTriggersIdeologyTech();
 			}
+			m_iPromotionWhenKilledUnit += trait->GetPromotionWhenKilledUnit();
+			m_iPromotionRadiusWhenKilledUnit += trait->GetPromotionRadiusWhenKilledUnit();
+			m_iAttackBonusAdjacentWhenUnitKilled += trait->GetAttackBonusAdjacentWhenUnitKilled();
+			m_iKilledAttackBonusDecreasePerTurn += trait->GetKilledAttackBonusDecreasePerTurn();
 			m_iNaturalWonderCorruptionScoreChange += trait->GetNaturalWonderCorruptionScoreChange();
 			m_iNaturalWonderCorruptionRadius += trait->GetNaturalWonderCorruptionRadius();
 			m_iCultureBonusUnitStrengthModify += trait->GetCultureBonusUnitStrengthModify();
@@ -2900,6 +2928,10 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iPromotionWhenKilledUnit = NO_PROMOTION;
+	m_iPromotionRadiusWhenKilledUnit = 0;
+	m_iAttackBonusAdjacentWhenUnitKilled = 0;
+	m_iKilledAttackBonusDecreasePerTurn = 0;
 	m_iTriggersIdeologyTech = NO_TECH;
 	m_iNaturalWonderCorruptionScoreChange = 0;
 	m_iNaturalWonderCorruptionRadius = 0;
@@ -4329,6 +4361,10 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iPromotionWhenKilledUnit;
+	kStream >> m_iPromotionRadiusWhenKilledUnit;
+	kStream >> m_iAttackBonusAdjacentWhenUnitKilled;
+	kStream >> m_iKilledAttackBonusDecreasePerTurn;
 	kStream >> m_iTriggersIdeologyTech;
 	kStream >> m_iNaturalWonderCorruptionScoreChange;
 	kStream >> m_iNaturalWonderCorruptionRadius;
@@ -4718,6 +4754,10 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iPromotionWhenKilledUnit;
+	kStream << m_iPromotionRadiusWhenKilledUnit;
+	kStream << m_iAttackBonusAdjacentWhenUnitKilled;
+	kStream << m_iKilledAttackBonusDecreasePerTurn;
 	kStream << m_iTriggersIdeologyTech;
 	kStream << m_iNaturalWonderCorruptionScoreChange;
 	kStream << m_iNaturalWonderCorruptionRadius;

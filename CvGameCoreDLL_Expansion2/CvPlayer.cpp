@@ -2254,11 +2254,7 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 		{
 			if(pLoopUnit->IsImmobile())
 			{
-#if defined(MOD_API_EXTENSIONS)
 				DoUnitKilledCombat(NULL, pLoopUnit->getOwner(), pLoopUnit->getUnitType(), pLoopUnit);
-#else
-				DoUnitKilledCombat(pLoopUnit->getOwner(), pLoopUnit->getUnitType());
-#endif
 				pLoopUnit->kill(false, GetID());
 			}
 		}
@@ -5493,6 +5489,10 @@ void CvPlayer::DoUnitReset()
 	CvUnit* pLoopUnit;
 	int iLoop;
 
+	int iAttackBonusDecreasePerTurn = 0;
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	iAttackBonusDecreasePerTurn += GetPlayerTraits()->GetKilledAttackBonusDecreasePerTurn();
+#endif
 	for(pLoopUnit = firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = nextUnit(&iLoop))
 	{
 		// HEAL UNIT?
@@ -5569,6 +5569,7 @@ void CvPlayer::DoUnitReset()
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 		pLoopUnit->SetIsNewCapture(false);
 #endif
+		pLoopUnit->ChangeAttackBonusFromDeathUnit(iAttackBonusDecreasePerTurn);
 #if defined(MOD_PROMOTIONS_FLAGSHIP)
 		if(pLoopUnit->IsGreatGeneral() || (MOD_PROMOTIONS_FLAGSHIP && pLoopUnit->IsGreatAdmiral()))
 #else
@@ -15720,11 +15721,7 @@ void static DoSpreadReligionAfterKilling(CvPlayer* pKillingPlayer, CvUnit* pKill
 
 //	--------------------------------------------------------------------------------
 /// Do effects when a unit is killed in combat
-#if defined(MOD_API_EXTENSIONS)
 void CvPlayer::DoUnitKilledCombat(CvUnit* pKillingUnit, PlayerTypes eKilledPlayer, UnitTypes eUnitType, CvUnit* pKilledUnit)
-#else
-void CvPlayer::DoUnitKilledCombat(PlayerTypes eKilledPlayer, UnitTypes eUnitType)
-#endif
 {
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
 	if(pkScriptSystem)
@@ -15742,11 +15739,10 @@ void CvPlayer::DoUnitKilledCombat(PlayerTypes eKilledPlayer, UnitTypes eUnitType
 		LuaSupport::CallHook(pkScriptSystem, "UnitKilledInCombat", args.get(), bResult);
 	}
 
+	CvPlayerAI &pKilledPlayer = GET_PLAYER(eKilledPlayer);
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	if (MOD_GLOBAL_WAR_CASUALTIES)
 	{
-		CvPlayerAI &pKilledPlayer = GET_PLAYER(eKilledPlayer);
-
 		int iDelta = GC.getWAR_CASUALTIES_DELTA_BASE();
 		iDelta = (100 + pKilledUnit->GetWarCasualtiesModifier()) * iDelta / 100;
 		iDelta = iDelta < 0 ? 0 : iDelta;
@@ -15756,11 +15752,80 @@ void CvPlayer::DoUnitKilledCombat(PlayerTypes eKilledPlayer, UnitTypes eUnitType
 	}
 #endif
 
+#if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int iAttackBonusFromDeathUnit = pKilledPlayer.GetPlayerTraits()->GetAttackBonusAdjacentWhenUnitKilled();
+	if(iAttackBonusFromDeathUnit != 0)
+	{
+		CvPlot* pPlot = pKilledUnit->plot();
+		if(pPlot != NULL)
+		{
+			int iRange = 1;
+			int iPlotX = pPlot->getX();
+			int iPlotY = pPlot->getY();
+			for(int iSX = -iRange; iSX <= iRange; iSX++)
+			{
+				for(int iSY = -iRange; iSY <= iRange; iSY++)
+				{
+					CvPlot* pLoopPlot = plotXYWithRangeCheck(iPlotX, iPlotY, iSX, iSY, iRange);
+					if (pLoopPlot != NULL)
+					{
+						int iPlotNumUnits = pLoopPlot->getNumUnits();
+
+						for (int iK = 0; iK < iPlotNumUnits; iK++)
+						{
+							CvUnit* pLoopUnit = pLoopPlot->getUnitByIndex(iK);
+							if (pLoopUnit != NULL && pLoopUnit->getOwner() == eKilledPlayer)
+							{
+								pLoopUnit->ChangeAttackBonusFromDeathUnit(iAttackBonusFromDeathUnit);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if(pKillingUnit != NULL)
+	{
+		CvPlayerAI &pKillingPlayer = GET_PLAYER(pKillingUnit->getOwner());
+		PromotionTypes promotionWhenKilledUnit = (PromotionTypes)pKillingPlayer.GetPlayerTraits()->GetPromotionWhenKilledUnit();
+		if(promotionWhenKilledUnit != NO_PROMOTION)
+		{
+			CvPlot* pPlot = pKillingUnit->plot();
+			if(pPlot != NULL)
+			{
+				int iRange = pKillingPlayer.GetPlayerTraits()->GetPromotionRadiusWhenKilledUnit();
+				int iPlotX = pPlot->getX();
+				int iPlotY = pPlot->getY();
+				for(int iSX = -iRange; iSX <= iRange; iSX++)
+				{
+					for(int iSY = -iRange; iSY <= iRange; iSY++)
+					{
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(iPlotX, iPlotY, iSX, iSY, iRange);
+						if (pLoopPlot != NULL)
+						{
+							int iPlotNumUnits = pLoopPlot->getNumUnits();
+
+							for (int iK = 0; iK < iPlotNumUnits; iK++)
+							{
+								CvUnit* pLoopUnit = pLoopPlot->getUnitByIndex(iK);
+								if (pLoopUnit != NULL && pLoopUnit->getOwner() == pKillingUnit->getOwner())
+								{
+									pLoopUnit->setHasPromotion(promotionWhenKilledUnit,true);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+#endif
+
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
-  if (MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING)
-  {
-    DoSpreadReligionAfterKilling(this, pKilledUnit);
-  }
+	if (MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING)
+	{
+		DoSpreadReligionAfterKilling(this, pKilledUnit);
+	}
 #endif
 }
 

@@ -140,6 +140,10 @@ public:
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetPromotionWhenKilledUnit() const;
+	int GetPromotionRadiusWhenKilledUnit() const;
+	int GetAttackBonusAdjacentWhenUnitKilled() const;
+	int GetKilledAttackBonusDecreasePerTurn() const;
 	int GetTriggersIdeologyTech() const;
 	int GetNaturalWonderCorruptionScoreChange() const;
 	int GetNaturalWonderCorruptionRadius() const;
@@ -401,6 +405,10 @@ protected:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iPromotionWhenKilledUnit;
+	int m_iPromotionRadiusWhenKilledUnit;
+	int m_iAttackBonusAdjacentWhenUnitKilled;
+	int m_iKilledAttackBonusDecreasePerTurn;
 	int m_iTriggersIdeologyTech;
 	int m_iNaturalWonderCorruptionScoreChange;
 	int m_iNaturalWonderCorruptionRadius;
@@ -919,6 +927,22 @@ public:
 	}
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetPromotionWhenKilledUnit() const
+	{
+		return m_iPromotionWhenKilledUnit;
+	}
+	int GetPromotionRadiusWhenKilledUnit() const
+	{
+		return m_iPromotionRadiusWhenKilledUnit;
+	}
+	int GetAttackBonusAdjacentWhenUnitKilled() const
+	{
+		return m_iAttackBonusAdjacentWhenUnitKilled;
+	}
+	int GetKilledAttackBonusDecreasePerTurn() const
+	{
+		return m_iKilledAttackBonusDecreasePerTurn;
+	}
 	int GetTriggersIdeologyTech() const
 	{
 		return m_iTriggersIdeologyTech;
@@ -1361,6 +1385,10 @@ private:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iPromotionWhenKilledUnit;
+	int m_iPromotionRadiusWhenKilledUnit;
+	int m_iAttackBonusAdjacentWhenUnitKilled;
+	int m_iKilledAttackBonusDecreasePerTurn;
 	int m_iTriggersIdeologyTech;
 	int m_iNaturalWonderCorruptionScoreChange;
 	int m_iNaturalWonderCorruptionRadius;

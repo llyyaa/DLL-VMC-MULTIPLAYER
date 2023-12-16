@@ -830,6 +830,8 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 
 	Method(SetExtraPopConsume);
 	Method(GetExtraPopConsume);
+	Method(ChangeAttackBonusFromDeathUnit);
+	Method(GetAttackBonusFromDeathUnit);
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	Method(IsNoTroops);
 #endif
@@ -6268,6 +6270,8 @@ LUAAPIIMPL(Unit, IsImmuneNegtivePromotions)
 
 LUAAPIIMPL(Unit, SetExtraPopConsume)
 LUAAPIIMPL(Unit, GetExtraPopConsume)
+LUAAPIIMPL(Unit, ChangeAttackBonusFromDeathUnit)
+LUAAPIIMPL(Unit, GetAttackBonusFromDeathUnit)
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 LUAAPIIMPL(Unit, IsNoTroops)
 #endif

@@ -749,6 +749,8 @@ protected:
 
 	LUAAPIEXTN(SetExtraPopConsume, void, iValue);
 	LUAAPIEXTN(GetExtraPopConsume, int);
+	LUAAPIEXTN(ChangeAttackBonusFromDeathUnit, void, iValue);
+	LUAAPIEXTN(GetAttackBonusFromDeathUnit, int);
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	LUAAPIEXTN(IsNoTroops, bool);
 #endif

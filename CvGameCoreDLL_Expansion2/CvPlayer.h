@@ -837,11 +837,7 @@ public:
 	void SetGreatGeneralCombatBonus(int iValue);
 
 	// Unit Killed in Combat
-#if defined(MOD_API_EXTENSIONS)
 	void DoUnitKilledCombat(CvUnit* pKillingUnit, PlayerTypes eKilledPlayer, UnitTypes eUnitType, CvUnit* pKilledUnit);
-#else
-	void DoUnitKilledCombat(PlayerTypes eKilledPlayer, UnitTypes eUnit);
-#endif
 
 	// Great People Expenditure
 #if defined(MOD_EVENTS_GREAT_PEOPLE)

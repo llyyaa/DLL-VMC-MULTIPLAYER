@@ -44,3 +44,8 @@ alter table Traits add column `CultureBonusUnitStrengthModify` int not null defa
 alter table Traits add column `NaturalWonderCorruptionScoreChange` int not null default 0;
 alter table Traits add column `NaturalWonderCorruptionRadius` int not null default 0;
 ALTER TABLE Traits ADD COLUMN 'TriggersIdeologyTech' TEXT DEFAULT NULL;
+
+ALTER TABLE Traits ADD COLUMN 'PromotionWhenKilledUnit' TEXT DEFAULT NULL;
+ALTER TABLE Traits ADD COLUMN 'PromotionRadiusWhenKilledUnit' TEXT DEFAULT NULL;
+ALTER TABLE Traits ADD COLUMN 'AttackBonusAdjacentWhenUnitKilled' TEXT DEFAULT NULL;
+ALTER TABLE Traits ADD COLUMN 'KilledAttackBonusDecreasePerTurn' TEXT DEFAULT NULL;

@@ -1838,6 +1838,9 @@ public:
 
 	void SetExtraPopConsume(int iValue);
 	int GetExtraPopConsume() const;
+
+	void ChangeAttackBonusFromDeathUnit(int iValue);
+	int GetAttackBonusFromDeathUnit() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	const int GetInsightEnemyDamageModifier() const;
 	void ChangeInsightEnemyDamageModifier(int iValue);
@@ -2478,6 +2481,7 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 	int m_iExtraPopConsume;
+	int m_iAttackBonusFromDeathUnit;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int m_iInsightEnemyDamageModifier;
 	int m_iHeightModPerX;

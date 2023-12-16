@@ -469,6 +469,7 @@ CvUnit::CvUnit() :
 	, m_iCapitalDefenseFalloff(0)
 	, m_iCityAttackPlunderModifier(0)
 	, m_iExtraPopConsume(0)
+	, m_iAttackBonusFromDeathUnit(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	, m_iInsightEnemyDamageModifier(0)
 	, m_iHeightModPerX(0)
@@ -1436,6 +1437,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCapitalDefenseFalloff = 0;
 	m_iCityAttackPlunderModifier = 0;
 	m_iExtraPopConsume = 0;
+	m_iAttackBonusFromDeathUnit = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iInsightEnemyDamageModifier = 0;
 	m_iHeightModPerX = 0;
@@ -6772,6 +6774,15 @@ void CvUnit::SetExtraPopConsume(int iValue)
 int CvUnit::GetExtraPopConsume() const
 {
 	return m_iExtraPopConsume;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeAttackBonusFromDeathUnit(int iValue)
+{
+	m_iAttackBonusFromDeathUnit += iValue;
+}
+int CvUnit::GetAttackBonusFromDeathUnit() const
+{
+	return m_iAttackBonusFromDeathUnit;
 }
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
@@ -14581,6 +14592,10 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 	iTempModifier = getAttackModifier();
 	iModifier += iTempModifier;
 
+	//modifier from Death Unit(SP Jp UA)
+	iTempModifier = GetAttackBonusFromDeathUnit();
+	iModifier += iTempModifier;
+
 #if defined(MOD_ROG_CORE)
 	int NumOriginalCapitalAttackMod = getNumOriginalCapitalAttackMod();
 	if(NumOriginalCapitalAttackMod != 0)
@@ -15372,6 +15387,9 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 	// Kamikaze attack
 	if(getKamikazePercent() != 0)
 		iModifier += getKamikazePercent();
+
+	//modifier from Death Unit(SP Jp UA)
+	iModifier += GetAttackBonusFromDeathUnit();
 
 	// If the empire is unhappy, then Units get a combat penalty
 #if defined(MOD_GLOBAL_CS_RAZE_RARELY)
@@ -19586,11 +19604,7 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 #else
 											kPlayer.DoYieldsFromKill(getUnitType(), pLoopUnit->getUnitType(), iX, iY, pLoopUnit->isBarbarian(), 0);
 #endif
-#if defined(MOD_API_EXTENSIONS)
 											kPlayer.DoUnitKilledCombat(this, pLoopUnit->getOwner(), pLoopUnit->getUnitType(), pLoopUnit);
-#else
-											kPlayer.DoUnitKilledCombat(pLoopUnit->getOwner(), pLoopUnit->getUnitType());
-#endif
 										}
 
 										CvNotifications* pNotification = GET_PLAYER(pLoopUnit->getOwner()).GetNotifications();
@@ -20735,11 +20749,7 @@ int CvUnit::setDamage(int iNewValue, PlayerTypes ePlayer, float fAdditionalTextD
 				GET_PLAYER(ePlayer).GetPlayerTraits()->SetDefeatedBarbarianCampGuardType(getUnitType());
 			}
 
-#if defined(MOD_API_EXTENSIONS)
 			GET_PLAYER(ePlayer).DoUnitKilledCombat(NULL, getOwner(), getUnitType(), this);
-#else
-			GET_PLAYER(ePlayer).DoUnitKilledCombat(getOwner(), getUnitType());
-#endif
 
 #if defined(MOD_API_UNIT_STATS)
 			if (iUnit != -1) {
@@ -26173,6 +26183,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 	kStream >> m_iExtraPopConsume;
+	kStream >> m_iAttackBonusFromDeathUnit;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream >> m_iInsightEnemyDamageModifier;
 	kStream >> m_iHeightModPerX;
@@ -26563,6 +26574,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCityAttackPlunderModifier;
 	kStream << m_iExtraPopConsume;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_iAttackBonusFromDeathUnit;
 	kStream << m_iInsightEnemyDamageModifier;
 	kStream << m_iHeightModPerX;
 	kStream << m_iHeightModLimited;
