@@ -3233,6 +3233,11 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 		return false;
 	}
 
+	if(pkBuildingInfo->IsNoPuppet() && IsPuppet())
+	{
+		return false;
+	}
+
 #if defined(MOD_API_EXTENSIONS)
 	if (!bWillPurchase && pkBuildingInfo->IsPurchaseOnly())
 	{

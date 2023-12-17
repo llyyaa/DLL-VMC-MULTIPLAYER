@@ -669,6 +669,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iGlobalProductionNeededBuildingModifier = kResults.GetInt("GlobalProductionNeededBuildingModifier");
 	m_iGlobalProductionNeededProjectModifier = kResults.GetInt("GlobalProductionNeededProjectModifier");
 	m_bDummyBuilding = kResults.GetBool("DummyBuilding");
+	m_bNoPuppet = kResults.GetBool("NoPuppet");
 
 	m_iInstantResearchFromFriendlyGreatScientist = kResults.GetInt("InstantResearchFromFriendlyGreatScientist");
 
@@ -2189,6 +2190,10 @@ int CvBuildingEntry::GetGlobalProductionNeededProjectModifier() const {
 
 bool CvBuildingEntry::IsDummyBuilding() const {
 	return m_bDummyBuilding;
+}
+
+bool CvBuildingEntry::IsNoPuppet() const {
+	return m_bNoPuppet;
 }
 
 int CvBuildingEntry::GetInstantResearchFromFriendlyGreatScientist() const {
