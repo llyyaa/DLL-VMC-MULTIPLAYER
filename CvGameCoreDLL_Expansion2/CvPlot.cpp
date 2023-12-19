@@ -2583,6 +2583,11 @@ bool CvPlot::canHaveImprovement(ImprovementTypes eImprovement, TeamTypes eTeam, 
 		return false;
 	}
 
+	if(pkImprovementInfo->IsNoLake() && isLake())
+	{
+		return false;
+	}
+
 	if(getFeatureType() != NO_FEATURE)
 	{
 		if(GC.getFeatureInfo(getFeatureType())->isNoImprovement())

@@ -1598,15 +1598,19 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	szTextVal = kResults.GetText("PromotionWhenKilledUnit");
+	if(szTextVal)
+	{
+		m_iPromotionWhenKilledUnit = GC.getInfoTypeForString(szTextVal, true);
+	}
+	m_iPromotionRadiusWhenKilledUnit = kResults.GetInt("PromotionRadiusWhenKilledUnit");
+	m_iAttackBonusAdjacentWhenUnitKilled = kResults.GetInt("AttackBonusAdjacentWhenUnitKilled");
+	m_iKilledAttackBonusDecreasePerTurn = kResults.GetInt("KilledAttackBonusDecreasePerTurn");
 	szTextVal = kResults.GetText("TriggersIdeologyTech");
 	if(szTextVal)
 	{
 		m_iTriggersIdeologyTech = GC.getInfoTypeForString(szTextVal, true);
 	}
-	m_iPromotionWhenKilledUnit = kResults.GetInt("PromotionWhenKilledUnit");
-	m_iPromotionRadiusWhenKilledUnit = kResults.GetInt("PromotionRadiusWhenKilledUnit");
-	m_iAttackBonusAdjacentWhenUnitKilled = kResults.GetInt("AttackBonusAdjacentWhenUnitKilled");
-	m_iKilledAttackBonusDecreasePerTurn = kResults.GetInt("KilledAttackBonusDecreasePerTurn");
 	m_iNaturalWonderCorruptionScoreChange = kResults.GetInt("NaturalWonderCorruptionScoreChange");
 	m_iNaturalWonderCorruptionRadius = kResults.GetInt("NaturalWonderCorruptionRadius");
 	m_iCultureBonusUnitStrengthModify = kResults.GetInt("CultureBonusUnitStrengthModify");
@@ -2421,14 +2425,17 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			if(trait->GetPromotionWhenKilledUnit() != NO_PROMOTION)
+			{
+				m_iPromotionWhenKilledUnit = trait->GetPromotionWhenKilledUnit();
+			}
+			m_iPromotionRadiusWhenKilledUnit += trait->GetPromotionRadiusWhenKilledUnit();
+			m_iAttackBonusAdjacentWhenUnitKilled += trait->GetAttackBonusAdjacentWhenUnitKilled();
+			m_iKilledAttackBonusDecreasePerTurn += trait->GetKilledAttackBonusDecreasePerTurn();
 			if(trait->GetTriggersIdeologyTech() != NO_TECH)
 			{
 				m_iTriggersIdeologyTech = trait->GetTriggersIdeologyTech();
 			}
-			m_iPromotionWhenKilledUnit += trait->GetPromotionWhenKilledUnit();
-			m_iPromotionRadiusWhenKilledUnit += trait->GetPromotionRadiusWhenKilledUnit();
-			m_iAttackBonusAdjacentWhenUnitKilled += trait->GetAttackBonusAdjacentWhenUnitKilled();
-			m_iKilledAttackBonusDecreasePerTurn += trait->GetKilledAttackBonusDecreasePerTurn();
 			m_iNaturalWonderCorruptionScoreChange += trait->GetNaturalWonderCorruptionScoreChange();
 			m_iNaturalWonderCorruptionRadius += trait->GetNaturalWonderCorruptionRadius();
 			m_iCultureBonusUnitStrengthModify += trait->GetCultureBonusUnitStrengthModify();

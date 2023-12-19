@@ -2442,7 +2442,7 @@ int RouteValid(CvAStarNode* parent, CvAStarNode* node, int data, const void* poi
 
 	if(kPlayer.GetPlayerTraits()->IsMoveFriendlyWoodsAsRoad())
 	{
-		if(pNewPlot->getOwner() == ePlayer)
+		if(MOD_TRAIT_WOOD_AS_ROAD_SP || pNewPlot->getOwner() == ePlayer)
 		{
 			if(pNewPlot->getFeatureType() == FEATURE_FOREST || pNewPlot->getFeatureType() == FEATURE_JUNGLE)
 			{

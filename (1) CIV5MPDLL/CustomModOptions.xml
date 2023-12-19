@@ -1118,6 +1118,9 @@
     <!-- see DDL_Traits.sql -->
     <Row Class="6" Name="TRAIT_NEW_EFFECT_FOR_SP" Value="1"/>
 
+    <!-- Trait.MoveFriendlyWoodsAsRoad include all forest -->
+    <Row Class="6" Name="TRAIT_WOOD_AS_ROAD_SP" Value="1"/>
+
     <!-- table changes: -->
     <!-- see TroopsAndCrops.sql -->
     <Row Class="6" Name="TROOPS_AND_CROPS_FOR_SP" Value="0"/>

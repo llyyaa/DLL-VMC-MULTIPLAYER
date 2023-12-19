@@ -139,6 +139,7 @@ public:
 	bool IsRemovesResource() const;
 	bool IsPromptWhenComplete() const;
 	bool IsWater() const;
+	bool IsNoLake() const;
 	bool IsCoastal() const;
 	bool IsDestroyedWhenPillaged() const;
 	bool IsDisplacePillager() const;
@@ -358,6 +359,7 @@ protected:
 	bool m_bRemovesResource;
 	bool m_bPromptWhenComplete;
 	bool m_bWater;
+	bool m_bNoLake;
 	bool m_bCoastal;
 	bool m_bDestroyedWhenPillaged;
 	bool m_bDisplacePillager;

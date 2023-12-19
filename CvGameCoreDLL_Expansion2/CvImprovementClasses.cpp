@@ -152,6 +152,7 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_bRemovesResource(false),
 	m_bPromptWhenComplete(false),
 	m_bWater(false),
+	m_bNoLake(false),
 	m_bCoastal(false),
 	m_bDestroyedWhenPillaged(false),
 	m_bDisplacePillager(false),
@@ -356,6 +357,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	m_bRemovesResource = kResults.GetBool("RemovesResource");
 	m_bPromptWhenComplete = kResults.GetBool("PromptWhenComplete");
 	m_bWater = kResults.GetBool("Water");
+	m_bNoLake = kResults.GetBool("NoLake");
 	m_bCoastal = kResults.GetBool("Coastal");
 	m_bDestroyedWhenPillaged = kResults.GetBool("DestroyedWhenPillaged");
 	m_bDisplacePillager = kResults.GetBool("DisplacePillager");
@@ -1438,6 +1440,12 @@ bool CvImprovementEntry::IsPromptWhenComplete() const
 bool CvImprovementEntry::IsWater() const
 {
 	return m_bWater;
+}
+
+/// Is this cannot placed out in the Lake?
+bool CvImprovementEntry::IsNoLake() const
+{
+	return m_bNoLake;
 }
 
 /// Is this only placed on the coast?
