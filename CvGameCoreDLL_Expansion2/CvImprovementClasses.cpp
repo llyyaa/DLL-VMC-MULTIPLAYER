@@ -106,6 +106,7 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_iCreateFeatureList(NULL),
 	m_iCreateFeatureOnlyList(NULL),
 #endif
+	m_iForbidSameBuildUnitClasses(NO_UNITCLASS),
 	m_iExtraScore(0),
 
 	m_iPillageGold(0),
@@ -491,6 +492,8 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	const char* szSetNewFeature = kResults.GetText("SetNewFeature");
 	m_iSetNewFeature = GC.getInfoTypeForString(szSetNewFeature, true);
 #endif
+	const char* szForbidSameBuildUnitClasses = kResults.GetText("ForbidSameBuildUnitClasses");
+	m_iForbidSameBuildUnitClasses = GC.getInfoTypeForString(szForbidSameBuildUnitClasses, true);
 	m_iExtraScore = kResults.GetInt("ExtraScore");
 
 	m_iPillageGold = kResults.GetInt("PillageGold");
@@ -1240,6 +1243,10 @@ int CvImprovementEntry::GetCreateResource(CvPlot* pPlot) const
 	return -1;
 }
 #endif
+UnitClassTypes CvImprovementEntry::GetForbidSameBuildUnitClasses() const
+{
+	return (UnitClassTypes)m_iForbidSameBuildUnitClasses;
+}
 int CvImprovementEntry::GetExtraScore() const
 {
 	return m_iExtraScore;

@@ -2857,13 +2857,33 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 		{
 			return false;
 		}
+		CvImprovementEntry* pkImprovement = GC.getImprovementInfo(eImprovement);
 #if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
 		// Can not create resource in a plot where already has one
-		if(MOD_IMPROVEMENTS_CREATE_ITEMS && getResourceType() != NO_RESOURCE && GC.getImprovementInfo(eImprovement)->GetCreateItemMod() > 2)
+		if(MOD_IMPROVEMENTS_CREATE_ITEMS && getResourceType() != NO_RESOURCE && pkImprovement->GetCreateItemMod() > 2)
 		{
 			return false;
 		}
 #endif
+		UnitClassTypes eUnitClass = pkImprovement->GetForbidSameBuildUnitClasses();
+		if(eUnitClass != NO_UNITCLASS)
+		{
+			int iNumUnitClass = 0;
+			// check for any other units working in this plot
+			const IDInfo* pUnitNode = headUnitNode();
+			const CvUnit* pLoopUnit = NULL;
+
+			while(pUnitNode != NULL)
+			{
+				pLoopUnit = ::getUnit(*pUnitNode);
+				pUnitNode = nextUnitNode(pUnitNode);
+				if(pLoopUnit && pLoopUnit->getUnitClassType() == eUnitClass)
+				{
+					iNumUnitClass++;
+					if(iNumUnitClass >= 2) return false;
+				}
+			}
+		}
 		// Already an improvement here
 		if(getImprovementType() != NO_IMPROVEMENT)
 		{
@@ -2895,7 +2915,6 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 		// Requirements on adjacent plots?
 		if (!bTestVisible)
 		{
-			CvImprovementEntry *pkImprovement = GC.getImprovementInfo(eImprovement);
 			bool bHasLuxuryRequirement = pkImprovement->IsAdjacentLuxury();
 			bool bHasNoAdjacencyRequirement = pkImprovement->IsNoTwoAdjacent();
 			if (pkImprovement && (bHasLuxuryRequirement || bHasNoAdjacencyRequirement))
@@ -2942,13 +2961,13 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 
 		if(!bTestVisible)
 		{
-			if(!GC.getImprovementInfo(eImprovement)->IsIgnoreOwnership())
+			if(!pkImprovement->IsIgnoreOwnership())
 			{
 				// Gifts for minors can ignore borders requirements
 				if(bTestPlotOwner)
 				{
 					// Outside Borders - Can be built in or outside our lands, but not in other lands
-					if(GC.getImprovementInfo(eImprovement)->IsOutsideBorders())
+					if(pkImprovement->IsOutsideBorders())
 					{
 						if (getTeam() != eTeam && getTeam() != NO_TEAM)
 						{
@@ -2956,7 +2975,7 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 						}
 					}
 					// In Adjacent Friendly - Can be built in or adjacent to our lands
-					else if (GC.getImprovementInfo(eImprovement)->IsInAdjacentFriendly())
+					else if (pkImprovement->IsInAdjacentFriendly())
 					{
 						if (getTeam() != eTeam && !isAdjacentTeam(eTeam, false))
 						{
@@ -2964,7 +2983,7 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 						}
 					}
 					// Only City State Territory - Can only be built in City-State territory (not our own lands)
-					else if (GC.getImprovementInfo(eImprovement)->IsOnlyCityStateTerritory())
+					else if (pkImprovement->IsOnlyCityStateTerritory())
 					{
 						bool bCityStateTerritory = false;
 						if (isOwned())

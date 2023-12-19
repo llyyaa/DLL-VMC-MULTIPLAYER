@@ -98,6 +98,7 @@ public:
 
 	int GetCreateResource(CvPlot* pPlot) const;
 #endif
+	UnitClassTypes GetForbidSameBuildUnitClasses() const;
 	int GetExtraScore() const;
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
@@ -316,6 +317,7 @@ protected:
 	int* m_iCreateFeatureList;
 	bool* m_iCreateFeatureOnlyList;
 #endif
+	int m_iForbidSameBuildUnitClasses;
 	int m_iExtraScore;
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL

@@ -2279,7 +2279,8 @@ void CvPlayerCulture::DoArchaeologyChoice (ArchaeologyChoiceType eChoice)
 	CvCity *pHousingCity;
 	CvPlot *pPlot;
 	CvUnit *pUnit = GetNextDigCompleteArchaeologist(&pPlot);
-	if (pUnit)
+	ImprovementTypes eImprovement = pPlot->getImprovementType();
+	if (pUnit && eImprovement != NO_IMPROVEMENT && GC.getImprovementInfo(eImprovement)->IsPromptWhenComplete())
 	{
 		GreatWorkSlotType eArtArtifactSlot = CvTypes::getGREAT_WORK_SLOT_ART_ARTIFACT();
 		GreatWorkSlotType eWritingSlot = CvTypes::getGREAT_WORK_SLOT_LITERATURE();
@@ -2394,9 +2395,9 @@ void CvPlayerCulture::DoArchaeologyChoice (ArchaeologyChoiceType eChoice)
 			break;
 		}
 
-		m_pPlayer->SetNumArchaeologyChoices(m_pPlayer->GetNumArchaeologyChoices() - 1);
-		m_pPlayer->GetCulture()->RemoveDigCompletePlot(pPlot);
 	}
+	m_pPlayer->SetNumArchaeologyChoices(m_pPlayer->GetNumArchaeologyChoices() - 1);
+	m_pPlayer->GetCulture()->RemoveDigCompletePlot(pPlot);
 }
 
 // CULTURAL INFLUENCE
