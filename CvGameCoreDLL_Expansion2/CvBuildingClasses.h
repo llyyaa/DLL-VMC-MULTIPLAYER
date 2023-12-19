@@ -198,6 +198,8 @@ public:
 
 #if defined(MOD_ROG_CORE)
 	int GetExtraDamageHeal() const;
+	int GetBombardRange() const;
+	bool IsBombardIndirect() const;
 	int CityRangedStrikeModifier() const;
 	int GetPopulationChange() const;
 	int GetMinorCivFriendship() const;
@@ -596,6 +598,8 @@ private:
 #if defined(MOD_ROG_CORE)
 	int* m_piGreatWorkYieldChange;
 	int m_iExtraDamageHeal;
+	int m_iBombardRange;
+	bool m_bBombardIndirect;
 	int m_iRangedStrikeModifier;
 	int m_iPopulationChange;
 	int m_iMinorCivFriendship;

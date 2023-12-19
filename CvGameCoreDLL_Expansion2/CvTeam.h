@@ -181,6 +181,14 @@ public:
 	bool isGoldTrading() const;
 	void changeGoldTradingCount(int iChange);
 
+
+	int getBombardIndirectCount() const;
+	bool isBombardIndirect() const;
+	void changeBombardIndirectCount(int iChange);
+
+	int GetBombardRange() const;
+	void ChangeBombardRange(int iChange);
+
 	bool HavePolicyInTeam(PolicyTypes ePolicy);
 
 	int getAllowEmbassyTradingAllowedCount() const;
@@ -472,6 +480,8 @@ protected:
 	int m_iMapTradingCount;
 	int m_iTechTradingCount;
 	int m_iGoldTradingCount;
+	int m_iBombardIndirectCount;
+	int m_iBombardRange;
 	int m_iAllowEmbassyTradingAllowedCount;
 	int m_iOpenBordersTradingAllowedCount;
 	int m_iDefensivePactTradingAllowedCount;

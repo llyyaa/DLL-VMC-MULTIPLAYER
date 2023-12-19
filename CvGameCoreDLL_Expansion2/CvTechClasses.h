@@ -69,6 +69,8 @@ public:
 	bool IsTechTrading() const;
 	bool IsGoldTrading() const;
 	bool IsAllowEmbassyTradingAllowed() const;
+	bool IsBombardIndirect() const;
+	int GetBombardRange() const;
 	bool IsOpenBordersTradingAllowed() const;
 	bool IsDefensivePactTradingAllowed() const;
 	bool IsResearchAgreementTradingAllowed() const;
@@ -123,6 +125,7 @@ private:
 	int m_iFirstFreeUnitClass;
 	int m_iFirstFreeTechs;
 	int m_iEmbarkedMoveChange;
+	int m_iBombardRange;
 	int m_iInternationalTradeRoutesChange;
 	int m_iInfluenceSpreadModifier;
 	int m_iExtraVotesPerDiplomat;
@@ -146,6 +149,7 @@ private:
 	bool m_bTechTrading;
 	bool m_bGoldTrading;
 	bool m_bAllowEmbassyTradingAllowed;
+	bool m_bBombardIndirect;
 	bool m_bOpenBordersTradingAllowed;
 	bool m_bDefensivePactTradingAllowed;
 	bool m_bResearchAgreementTradingAllowed;

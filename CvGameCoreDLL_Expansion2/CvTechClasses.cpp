@@ -54,6 +54,8 @@ CvTechEntry::CvTechEntry(void):
 	m_bTechTrading(false),
 	m_bGoldTrading(false),
 	m_bAllowEmbassyTradingAllowed(false),
+	m_bBombardIndirect(false),
+	m_iBombardRange(0),
 	m_bOpenBordersTradingAllowed(false),
 	m_bDefensivePactTradingAllowed(false),
 	m_bResearchAgreementTradingAllowed(false),
@@ -126,6 +128,8 @@ bool CvTechEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_bTechTrading = kResults.GetBool("TechTrading");
 	m_bGoldTrading = kResults.GetBool("GoldTrading");
 	m_bAllowEmbassyTradingAllowed = kResults.GetBool("AllowEmbassyTradingAllowed");
+	m_bBombardIndirect = kResults.GetBool("BombardIndirect");
+	m_iBombardRange = kResults.GetInt("BombardRange");
 	m_bOpenBordersTradingAllowed = kResults.GetBool("OpenBordersTradingAllowed");
 	m_bDefensivePactTradingAllowed = kResults.GetBool("DefensivePactTradingAllowed");
 	m_bResearchAgreementTradingAllowed = kResults.GetBool("ResearchAgreementTradingAllowed");
@@ -452,6 +456,16 @@ bool CvTechEntry::IsGoldTrading() const
 bool CvTechEntry::IsAllowEmbassyTradingAllowed() const
 {
 	return m_bAllowEmbassyTradingAllowed;
+}
+
+bool CvTechEntry::IsBombardIndirect() const
+{
+	return m_bBombardIndirect;
+}
+
+int CvTechEntry::GetBombardRange() const
+{
+	return m_iBombardRange;
 }
 
 /// Can you permit open borders?

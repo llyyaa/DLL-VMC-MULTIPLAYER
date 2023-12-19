@@ -2149,11 +2149,7 @@ void CvPlot::changeAdjacentSight(TeamTypes eTeam, int iRange, bool bIncrement, I
 }
 
 //	--------------------------------------------------------------------------------
-#if defined MOD_BUGFIX_NAVAL_TARGETING
 bool CvPlot::canSeePlot(const CvPlot* pPlot, TeamTypes eTeam, int iRange, DirectionTypes eFacingDirection, DomainTypes eUnitDomain) const
-#else
-bool CvPlot::canSeePlot(const CvPlot* pPlot, TeamTypes eTeam, int iRange, DirectionTypes eFacingDirection) const
-#endif
 {
 	iRange++;
 
@@ -2196,7 +2192,6 @@ bool CvPlot::canSeePlot(const CvPlot* pPlot, TeamTypes eTeam, int iRange, Direct
 			}
 
 			//check if anything blocking the plot
-#if defined MOD_BUGFIX_NAVAL_TARGETING
 			int iLevel;
 
 			if (eUnitDomain == DOMAIN_SEA && !isWater()) {
@@ -2214,9 +2209,6 @@ bool CvPlot::canSeePlot(const CvPlot* pPlot, TeamTypes eTeam, int iRange, Direct
 			}
 
 			if (CvTargeting::CanSeeDisplacementPlot(startX, startY, dx, dy, iLevel))
-#else
-			if (CvTargeting::CanSeeDisplacementPlot(startX, startY, dx, dy, seeFromLevel(eTeam)))
-#endif
 			{
 				return true;
 			}

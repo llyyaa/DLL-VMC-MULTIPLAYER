@@ -153,6 +153,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piGreatWorkYieldChange(NULL),
 
 	m_iExtraDamageHeal(0),
+	m_iBombardRange(0),
+	m_bBombardIndirect(false),
 	m_iRangedStrikeModifier(0),
 	m_iPopulationChange(0),
 	m_iMinorCivFriendship(0),
@@ -490,6 +492,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #if defined(MOD_ROG_CORE)
 	m_iExtraDamageHeal = kResults.GetInt("ExtraDamageHeal");
+	m_iBombardRange = kResults.GetInt("BombardRange");
+	m_bBombardIndirect = kResults.GetBool("BombardIndirect");
 	m_iRangedStrikeModifier = kResults.GetInt("RangedStrikeModifier");
 	m_iPopulationChange = kResults.GetInt("PopulationChange");
 	m_iMinorCivFriendship = kResults.GetInt("MinorCivFriendship");
@@ -2096,6 +2100,16 @@ int CvBuildingEntry::CityRangedStrikeModifier() const
 int CvBuildingEntry::GetExtraDamageHeal() const
 {
 	return m_iExtraDamageHeal;
+}
+
+int CvBuildingEntry::GetBombardRange() const
+{
+	return m_iBombardRange;
+}
+
+bool CvBuildingEntry::IsBombardIndirect() const
+{
+	return m_bBombardIndirect;
 }
 
 

@@ -3818,11 +3818,7 @@ bool CvUnit::willRevealByMove(const CvPlot& plot) const
 			CvPlot* pLoopPlot = ::plotXYWithRangeCheck(plot.getX(), plot.getY(), i, j, iRange);
 			if(NULL != pLoopPlot)
 			{
-#if defined MOD_BUGFIX_NAVAL_TARGETING
 				if (!pLoopPlot->isRevealed(eTeam) && plot.canSeePlot(pLoopPlot, eTeam, iVisRange, NO_DIRECTION, getDomainType()))
-#else
-				if (!pLoopPlot->isRevealed(eTeam) && plot.canSeePlot(pLoopPlot, eTeam, iVisRange, NO_DIRECTION))
-#endif
 				{
 					return true;
 				}
@@ -20236,11 +20232,8 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 	setInfoBarDirty(true);
 
 	// if there is an enemy city nearby, alert any scripts to this
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 	int iAttackRange = (MOD_EVENTS_CITY_BOMBARD ? GC.getMAX_CITY_ATTACK_RANGE() : GC.getCITY_ATTACK_RANGE());
-#else
-	int iAttackRange = GC.getCITY_ATTACK_RANGE();
-#endif
+
 	for(int iDX = -iAttackRange; iDX <= iAttackRange; iDX++)
 	{
 		for(int iDY = -iAttackRange; iDY <= iAttackRange; iDY++)
@@ -20252,15 +20245,11 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 				{
 					// do it
 					CvCity* pkPlotCity = pTargetPlot->getPlotCity();
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 					if (!MOD_EVENTS_CITY_BOMBARD || plotXYWithRangeCheck(getX(), getY(), iDX, iDY, pkPlotCity->getBombardRange()))
 					{
-#endif
 						auto_ptr<ICvCity1> pPlotCity = GC.WrapCityPointer(pkPlotCity);
 						DLLUI->SetSpecificCityInfoDirty(pPlotCity.get(), CITY_UPDATE_TYPE_ENEMY_IN_RANGE);
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 					}
-#endif
 				}
 			}
 		}
@@ -26936,11 +26925,7 @@ bool CvUnit::canEverRangeStrikeAt(int iX, int iY) const
 	// Ignores LoS or can see the plot directly?
 	if(!IsRangeAttackIgnoreLOS() && getDomainType() != DOMAIN_AIR)
 	{
-#if defined MOD_BUGFIX_NAVAL_TARGETING
 		if (!pSourcePlot->canSeePlot(pTargetPlot, getTeam(), GetRange(), getFacingDirection(true), getDomainType()))
-#else
-		if (!pSourcePlot->canSeePlot(pTargetPlot, getTeam(), GetRange(), getFacingDirection(true)))
-#endif
 		{
 			return false;
 		}
@@ -27777,11 +27762,7 @@ bool CvUnit::SentryAlert() const
 				if(NULL != pPlot)
 				{
 					// because canSeePlot() adds one to the range internally
-#if defined MOD_BUGFIX_NAVAL_TARGETING
 					if (plot()->canSeePlot(pPlot, getTeam(), (iRange - 1), NO_DIRECTION, getDomainType()))
-#else
-					if (plot()->canSeePlot(pPlot, getTeam(), (iRange - 1), NO_DIRECTION))
-#endif
 					{
 						if(pPlot->isVisibleEnemyUnit(this))
 						{

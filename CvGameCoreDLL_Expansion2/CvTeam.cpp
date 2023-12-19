@@ -186,6 +186,8 @@ void CvTeam::uninit()
 	m_iMapTradingCount = 0;
 	m_iTechTradingCount = 0;
 	m_iGoldTradingCount = 0;
+	m_iBombardIndirectCount = 0;
+	m_iBombardRange = 0;
 	m_iAllowEmbassyTradingAllowedCount = 0;
 	m_iOpenBordersTradingAllowedCount = 0;
 	m_iDefensivePactTradingAllowedCount = 0;
@@ -3033,6 +3035,44 @@ void CvTeam::changeGoldTradingCount(int iChange)
 	m_iGoldTradingCount = (m_iGoldTradingCount + iChange);
 	CvAssert(getGoldTradingCount() >= 0);
 }
+
+
+
+//	--------------------------------------------------------------------------------
+int CvTeam::getBombardIndirectCount() const
+{
+	return m_iBombardIndirectCount;
+}
+
+
+//	--------------------------------------------------------------------------------
+bool CvTeam::isBombardIndirect() const
+{
+	return (getBombardIndirectCount() > 0);
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvTeam::changeBombardIndirectCount(int iChange)
+{
+	m_iBombardIndirectCount = (m_iBombardIndirectCount + iChange);
+	CvAssert(getBombardIndirectCount() >= 0);
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvTeam::GetBombardRange() const
+{
+	return m_iBombardRange;
+}
+
+//	--------------------------------------------------------------------------------
+void CvTeam::ChangeBombardRange(int iChange)
+{
+	m_iBombardRange = (m_iBombardRange + iChange);
+}
+
+
 
 //	--------------------------------------------------------------------------------
 bool CvTeam::HavePolicyInTeam(PolicyTypes ePolicy)
@@ -6576,6 +6616,17 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 		changeGoldTradingCount(iChange);
 	}
 
+
+	if (pTech->IsBombardIndirect())
+	{
+		changeBombardIndirectCount(iChange);
+	}
+
+	if (pTech->GetBombardRange() != 0)
+	{
+		ChangeBombardRange(pTech->GetBombardRange() * iChange);
+	}
+
 	if(pTech->IsAllowEmbassyTradingAllowed())
 	{
 		changeAllowEmbassyTradingAllowedCount(iChange);
@@ -6585,6 +6636,8 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 	{
 		changeOpenBordersTradingAllowedCount(iChange);
 	}
+
+
 
 	if(pTech->IsDefensivePactTradingAllowed())
 	{
@@ -7489,6 +7542,8 @@ void CvTeam::Read(FDataStream& kStream)
 	kStream >> m_iMapTradingCount;
 	kStream >> m_iTechTradingCount;
 	kStream >> m_iGoldTradingCount;
+	kStream >> m_iBombardIndirectCount;
+	kStream >> m_iBombardRange;
 	kStream >> m_iAllowEmbassyTradingAllowedCount;
 	kStream >> m_iOpenBordersTradingAllowedCount;
 	kStream >> m_iDefensivePactTradingAllowedCount;
@@ -7687,6 +7742,8 @@ void CvTeam::Write(FDataStream& kStream) const
 	kStream << m_iMapTradingCount;
 	kStream << m_iTechTradingCount;
 	kStream << m_iGoldTradingCount;
+	kStream << m_iBombardIndirectCount;
+	kStream << m_iBombardRange;
 	kStream << m_iAllowEmbassyTradingAllowedCount;
 	kStream << m_iOpenBordersTradingAllowedCount;
 	kStream << m_iDefensivePactTradingAllowedCount;
