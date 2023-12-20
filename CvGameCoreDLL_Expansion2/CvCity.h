@@ -852,6 +852,8 @@ public:
 	int getPowerYieldRateModifier(YieldTypes eIndex) const;
 	void changePowerYieldRateModifier(YieldTypes eIndex, int iChange);
 
+	int getAdjacentFeaturesYieldRateModifier(YieldTypes eIndex) const;
+
 	int getImprovementYieldRateModifier(YieldTypes eIndex) const;
 	void changeImprovementYieldRateModifier(YieldTypes eIndex, int iChange);
 

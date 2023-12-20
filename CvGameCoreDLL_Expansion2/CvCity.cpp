@@ -7033,13 +7033,13 @@ void CvCity::processImprovement(ImprovementTypes eImprovement, int iChange)
 {
 	VALIDATE_OBJECT
 
-		// Yield modifier for having a local resource
-		for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
-		{
-			const YieldTypes eYield = static_cast<YieldTypes>(iI);
-			changeImprovementYieldRateModifier(eYield, (getImprovementYieldRateModifier(eYield, eImprovement) * iChange));
-			UpdateCityYields(eYield);
-		}
+	// Yield modifier for having a local Improvement
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		const YieldTypes eYield = static_cast<YieldTypes>(iI);
+		changeImprovementYieldRateModifier(eYield, (getImprovementYieldRateModifier(eYield, eImprovement) * iChange));
+		UpdateCityYields(eYield);
+	}
 }
 
 
@@ -12008,6 +12008,11 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	if(iTempMod != 0 && toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD", iTempMod);
 
+	// Yield Modifier from adjacent Feature
+	iTempMod = getAdjacentFeaturesYieldRateModifier(eIndex);
+	iModifier += iTempMod;
+	if(iTempMod != 0 && toolTipSink)
+		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ADJACENT_FEATURE", iTempMod);
 
 	// Improvement Yield Rate Modifier
 	iTempMod = getImprovementYieldRateModifier(eIndex);
@@ -13630,7 +13635,31 @@ void CvCity::changeYieldRateModifier(YieldTypes eIndex, int iChange)
 }
 
 
+//	--------------------------------------------------------------------------------
+// Base yield rate from Adjacent Features
+int CvCity::getAdjacentFeaturesYieldRateModifier(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
 
+	CvPlayerTraits* pTraits = GET_PLAYER(m_eOwner).GetPlayerTraits();
+	if(!pTraits->IsHasCityAdjacentFeatureModifier()) return 0;
+
+	int iRtnValue = 0;
+	CvPlot* pAdjacentPlot = NULL;
+	for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+	{
+		pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+		if (pAdjacentPlot)
+		{
+			FeatureTypes eFeature = pAdjacentPlot->getFeatureType();
+			if (eFeature == NO_FEATURE) continue;
+			iRtnValue += pTraits->GetCityYieldModifierFromAdjacentFeature(eFeature, eIndex);
+		}
+	}
+	return iRtnValue;
+}
 //	--------------------------------------------------------------------------------
 int CvCity::getImprovementYieldRateModifier(YieldTypes eIndex) const
 {

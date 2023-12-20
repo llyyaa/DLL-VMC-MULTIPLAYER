@@ -49,3 +49,10 @@ ALTER TABLE Traits ADD COLUMN 'PromotionWhenKilledUnit' TEXT DEFAULT NULL;
 ALTER TABLE Traits ADD COLUMN 'PromotionRadiusWhenKilledUnit' INTEGER DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN 'AttackBonusAdjacentWhenUnitKilled' INTEGER DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN 'KilledAttackBonusDecreasePerTurn' INTEGER DEFAULT 0;
+
+create table Trait_CityYieldModifierFromAdjacentFeature (
+    TraitType text references Traits(Type),
+    FeatureType text references Features(Type),
+    YieldType text references Yields(Type),
+    Yield int default 0
+);

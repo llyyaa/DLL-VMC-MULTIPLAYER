@@ -140,6 +140,7 @@ public:
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetNumCityAdjacentFeatureModifier() const;
 	int GetPromotionWhenKilledUnit() const;
 	int GetPromotionRadiusWhenKilledUnit() const;
 	int GetAttackBonusAdjacentWhenUnitKilled() const;
@@ -245,6 +246,7 @@ public:
 	int GetCityYieldFromUnimprovedFeature(FeatureTypes eIndex1, YieldTypes eIndex2) const;
 #endif
 	int GetUnimprovedFeatureYieldChanges(FeatureTypes eIndex1, YieldTypes eIndex2) const;
+	int GetCityYieldModifierFromAdjacentFeature(FeatureTypes eIndex1, YieldTypes eIndex2) const;
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool IsFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
@@ -405,6 +407,7 @@ protected:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iNumCityAdjacentFeatureModifier;
 	int m_iPromotionWhenKilledUnit;
 	int m_iPromotionRadiusWhenKilledUnit;
 	int m_iAttackBonusAdjacentWhenUnitKilled;
@@ -508,6 +511,7 @@ protected:
 	int** m_ppiCityYieldFromUnimprovedFeature;
 #endif
 	int** m_ppiUnimprovedFeatureYieldChanges;
+	int** m_ppiCityYieldModifierFromAdjacentFeature;
 
 	std::multimap<int, int> m_FreePromotionUnitCombats;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
@@ -927,6 +931,10 @@ public:
 	}
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	bool IsHasCityAdjacentFeatureModifier() const
+	{
+		return m_bHasCityAdjacentFeatureModifier;
+	}
 	int GetPromotionWhenKilledUnit() const
 	{
 		return m_iPromotionWhenKilledUnit;
@@ -1181,6 +1189,7 @@ public:
 	int GetCityYieldFromUnimprovedFeature(FeatureTypes eFeature, YieldTypes eYield) const;
 #endif
 	int GetUnimprovedFeatureYieldChange(FeatureTypes eFeature, YieldTypes eYield) const;
+	int GetCityYieldModifierFromAdjacentFeature(FeatureTypes eFeature, YieldTypes eYield) const;
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool HasFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
@@ -1385,6 +1394,7 @@ private:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	bool m_bHasCityAdjacentFeatureModifier = false;
 	int m_iPromotionWhenKilledUnit;
 	int m_iPromotionRadiusWhenKilledUnit;
 	int m_iAttackBonusAdjacentWhenUnitKilled;
@@ -1501,6 +1511,7 @@ private:
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiCityYieldFromUnimprovedFeature;
 #endif
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppaaiUnimprovedFeatureYieldChange;
+	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiCityYieldModifierFromAdjacentFeature;
 
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
 

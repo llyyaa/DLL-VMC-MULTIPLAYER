@@ -605,6 +605,9 @@
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_GLOBAL">
 			<Text>[NEWLINE][ICON_BULLET]城邦商路全局修正: {1_Num}%</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ADJACENT_FEATURE">
+			<Text>[NEWLINE][ICON_BULLET]臨近地貌修正: {1_Num}%</Text>
+		</Row>
 		<Row Tag="TXT_KEY_TRAIT_CULTURE_FROM_UNIT">
 			<Text>板載!{2_name}訓練完成，獲得{1_num}[ICON_CULTURE]文化！</Text>
 		</Row>
