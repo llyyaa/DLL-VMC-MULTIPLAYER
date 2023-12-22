@@ -300,6 +300,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iTradeRouteSeaGoldBonusGlobal(0),
 	m_iTradeRouteLandGoldBonusGlobal(0),
 	m_bAnyWater(false),
+	m_bRiverOrCoastal(false),
 	m_pbBuildingClassNeededGlobal(NULL),
 #endif
 	m_bArtInfoEraVariation(false),
@@ -523,6 +524,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iTradeRouteSeaGoldBonusGlobal = kResults.GetInt("TradeRouteSeaGoldBonusGlobal");
 	m_iTradeRouteLandGoldBonusGlobal = kResults.GetInt("TradeRouteLandGoldBonusGlobal");
 	m_bAnyWater = kResults.GetBool("AnyWater");
+	m_bRiverOrCoastal = kResults.GetBool("RiverOrCoastal");
 #endif
 	m_bMountain = kResults.GetBool("Mountain");
 	m_bHill = kResults.GetBool("Hill");
@@ -3616,6 +3618,10 @@ int CvBuildingEntry::GetTradeRouteLandGoldBonusGlobal() const
 bool CvBuildingEntry::IsAnyWater() const
 {
 	return m_bAnyWater;
+}
+bool CvBuildingEntry::IsRiverOrCoastal() const
+{
+	return m_bRiverOrCoastal;
 }
 /// Can it only built if there is a building of this class Global?
 bool CvBuildingEntry::IsBuildingClassNeededGlobal(int i) const

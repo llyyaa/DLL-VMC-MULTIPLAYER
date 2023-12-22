@@ -444,6 +444,7 @@ public:
 	int GetTradeRouteSeaGoldBonusGlobal() const;
 	int GetTradeRouteLandGoldBonusGlobal() const;
 	bool IsAnyWater() const;
+	bool IsRiverOrCoastal() const;
 	bool IsBuildingClassNeededGlobal(int i) const;
 #endif
 	int GetNumFreeUnit() const;
@@ -838,6 +839,7 @@ private:
 	int m_iTradeRouteSeaGoldBonusGlobal;
 	int m_iTradeRouteLandGoldBonusGlobal;
 	bool m_bAnyWater;
+	bool m_bRiverOrCoastal;
 	bool* m_pbBuildingClassNeededGlobal;
 #endif
 	int m_iNumFreeUnit;

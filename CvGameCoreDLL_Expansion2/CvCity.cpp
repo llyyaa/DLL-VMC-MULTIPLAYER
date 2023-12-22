@@ -19363,6 +19363,11 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 		if(!(isCoastal(pkBuildingInfo->GetMinAreaSize()) || plot()->isFreshWater()))
 			return false;
 	}
+	if(pkBuildingInfo->IsRiverOrCoastal())
+	{
+		if(!(isCoastal(pkBuildingInfo->GetMinAreaSize()) || plot()->isRiver()))
+			return false;
+	}
 #endif
 
 	// Requires adjacent Mountain
