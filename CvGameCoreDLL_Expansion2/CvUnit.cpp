@@ -27349,13 +27349,13 @@ bool CvUnit::attemptGroundAttacks(const CvPlot& pPlot)
 			    }
 		    }
 	    }
-		if(bFoundSomething)
+		if(bFoundSomething && (MOD_AIR_SWEEP_FOUND_SOMETHING || iAirSweepDamage > 0))
 		{
 			int iExperience = /*5*/ GD_INT_GET(EXPERIENCE_ATTACKING_AIR_SWEEP);
 			changeExperienceTimes100(100 * iExperience, -1, true, pPlot.getOwner() == getOwner(), true);
 			testPromotionReady();
-			if(iAirSweepDamage <= 0) bFoundSomething = false;
 		}
+		if(iAirSweepDamage <= 0) bFoundSomething = false;
 	}
 	return bFoundSomething;
 }
