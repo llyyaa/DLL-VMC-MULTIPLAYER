@@ -294,6 +294,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiHurryModifier(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iMinNumReligions(0),
 	m_iCityStateTradeRouteProductionModifierGlobal(0),
 	m_iLandmarksTourismPercentGlobal(0),
 	m_iGreatWorksTourismModifierGlobal(0),
@@ -518,6 +519,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iMinNumReligions = kResults.GetInt("MinNumReligions");
 	m_iCityStateTradeRouteProductionModifierGlobal = kResults.GetInt("CityStateTradeRouteProductionModifierGlobal");
 	m_iLandmarksTourismPercentGlobal = kResults.GetInt("LandmarksTourismPercentGlobal");
 	m_iGreatWorksTourismModifierGlobal = kResults.GetInt("GreatWorksTourismModifierGlobal");
@@ -3590,6 +3592,11 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvBuildingEntry::GetMinNumReligions() const
+{
+	return m_iMinNumReligions;
+}
+
 int CvBuildingEntry::GetCityStateTradeRouteProductionModifierGlobal() const
 {
 	return m_iCityStateTradeRouteProductionModifierGlobal;

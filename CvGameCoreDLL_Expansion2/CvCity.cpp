@@ -3289,6 +3289,12 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 		return false;
 	}
 
+	int iMinNumReligions = pkBuildingInfo->GetMinNumReligions();
+	if(iMinNumReligions > 0 && GetCityReligions()->GetNumReligionsWithFollowers() < iMinNumReligions)
+	{
+		return false;
+	}
+
 	CvCivilizationInfo& thisCivInfo = *GC.getCivilizationInfo(getCivilizationType());
 	int iNumBuildingClassInfos = GC.getNumBuildingClassInfos();
 
@@ -8100,12 +8106,6 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 
 	for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 	{
-		int iYieldPerReligion = GetYieldPerReligionTimes100((YieldTypes)iYield);
-		if (iYieldPerReligion > 0)
-		{
-			ChangeBaseYieldRateFromReligion((YieldTypes)iYield, (GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
-		}
-
 		if(eNewMajority != NO_RELIGION)
 		{
 			const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eNewMajority, getOwner());
@@ -9701,6 +9701,7 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 	iCulturePerTurn += GetBaseYieldRateFromProjects(YIELD_CULTURE);
 	iCulturePerTurn += (GetYieldPerPopTimes100(YIELD_CULTURE) * getPopulation()) / 100;
 #endif
+	iCulturePerTurn += (GetYieldPerReligionTimes100(YIELD_CULTURE) * GetCityReligions()->GetNumReligionsWithFollowers()) /100;
 
 #if defined(MOD_ROG_CORE)
 	iCulturePerTurn += GetBaseYieldRateFromCSAlliance(YIELD_CULTURE);
@@ -9857,6 +9858,7 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 	iFaith += GetBaseYieldRateFromSpecialists(YIELD_FAITH);
 	iFaith += (GetYieldPerPopTimes100(YIELD_FAITH) * getPopulation()) / 100;
 #endif
+	iFaith += (GetYieldPerReligionTimes100(YIELD_FAITH) * GetCityReligions()->GetNumReligionsWithFollowers()) /100;
 
 #if defined(MOD_ROG_CORE)
 	iFaith += GetBaseYieldRateFromCSAlliance(YIELD_FAITH);
