@@ -4838,14 +4838,14 @@ void CvUnitCombat::DoNukeDamage(const CvCombatInfo& kCombatInfo)
 					}
 				}
 
-				if (pLoopCity != NULL)
-				{
-					int iTotalDamage;
+				//if (pLoopCity != NULL)
+				//{
+					//int iTotalDamage;
 					// Add damage to the city
-					iTotalDamage = (pLoopCity->GetMaxHitPoints() - pLoopCity->getDamage()) * /*50*/ GC.getNUKE_CITY_HIT_POINT_DAMAGE();
-					iTotalDamage /= 100;
-					pLoopCity->changeDamage(iTotalDamage);
-				}
+					//iTotalDamage = (pLoopCity->GetMaxHitPoints() - pLoopCity->getDamage()) * /*50*/ GC.getNUKE_CITY_HIT_POINT_DAMAGE();
+					//iTotalDamage /= 100;
+					//pLoopCity->changeDamage(iTotalDamage);
+				//}
 			}
 		}
 	}
