@@ -1640,7 +1640,6 @@ protected:
 	void doProcess();
 	void doDecay();
 	void doGreatPeople();
-	void doMeltdown();
 	bool doCheckProduction();
 
 	int getExtraProductionDifference(int iExtra, UnitTypes eUnit) const;

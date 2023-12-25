@@ -326,7 +326,18 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_COLL_DAMAGE_ENEMY_DEATH">
 			<Text>你的{1_UnitName}攻击时的穿透伤害将敌方{2_EnUName}消灭了！</Text>
 		</Row>
-
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE">
+			<Text>在防御中，你的{2_UnitName}受到敌方{1_EnUName}攻击时的[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]点核火力伤害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY">
+			<Text>你的{1_UnitName}攻击时对敌方{2_EnUName}造成了[COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR]点核火力伤害！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_DEATH">
+			<Text>在防御中，你的{2_UnitName}被敌方{1_EnUName}攻击时的核火力伤害消灭了！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY_DEATH">
+			<Text>你的{1_UnitName}攻击时的核火力伤害将敌方{2_EnUName}消灭了！</Text>
+		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKING">
 			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] 建筑在此次袭击中被摧毁！</Text>
 		</Row>

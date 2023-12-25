@@ -326,6 +326,19 @@
 			<Text>Your {1_UnitName} destroyed an enemy {2_EnUName} due to Collateral Damage!</Text>
 		</Row>
 
+                               <Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE">
+			<Text>While defending, Your {2_UnitName} was [COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR] damaged by an enemy {1_EnUName} due to Nuke Damage!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY">
+			<Text>Your {1_UnitName} did [COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR] damage to an enemy {2_EnUName} due to Nuke Damage!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_DEATH">
+			<Text>While defending, Your {2_UnitName} was destroyed by {1_EnUName} due to Nuke Damage!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY_DEATH">
+			<Text>Your {1_UnitName} destroyed an enemy {2_EnUName} due to Nuke Damage!</Text>
+		</Row>
+
 		<Row Tag="TXT_KEY_NOTIFICATION_BOMBER_CITY_BUILDING_DESTROYED_ATTACKING">
 			<Text>[COLOR_NEGATIVE_TEXT]{1_num}[ENDCOLOR] Building(s) DESTROYED in the traget city during this bombardment!</Text>
 		</Row>
