@@ -199,6 +199,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iCaptureEmenyExtraMax(0),
+	m_iCaptureEmenyPercent(0),
+	m_iHealPercentCaptureCity(0),
+	m_iMovePercentCaptureCity(0),
 	m_iNumUpgradePromotions(0),
 	m_pUpgradePromotions(nullptr),
 	m_iInsightEnemyDamageModifier(0),
@@ -705,6 +709,10 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iCaptureEmenyExtraMax = kResults.GetInt("CaptureEmenyExtraMax");
+	m_iCaptureEmenyPercent = kResults.GetInt("CaptureEmenyPercent");
+	m_iMovePercentCaptureCity = kResults.GetInt("MovePercentCaptureCity");
+	m_iHealPercentCaptureCity = kResults.GetInt("HealPercentCaptureCity");
 	m_iInsightEnemyDamageModifier = kResults.GetInt("InsightEnemyDamageModifier");
 	m_iHeightModPerX = kResults.GetInt("HeightModPerX");
 	m_iHeightModLimited = kResults.GetInt("HeightModLimited");
@@ -2363,6 +2371,22 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 }
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvPromotionEntry::GetCaptureEmenyExtraMax() const
+{
+	return m_iCaptureEmenyExtraMax;
+}
+int CvPromotionEntry::GetCaptureEmenyPercent() const
+{
+	return m_iCaptureEmenyPercent;
+}
+int CvPromotionEntry::GetMovePercentCaptureCity() const
+{
+	return m_iMovePercentCaptureCity;
+}
+int CvPromotionEntry::GetHealPercentCaptureCity() const
+{
+	return m_iHealPercentCaptureCity;
+}
 int CvPromotionEntry::GetNumUpgradePromotions() const
 {
 	return m_iNumUpgradePromotions;

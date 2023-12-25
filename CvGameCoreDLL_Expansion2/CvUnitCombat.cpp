@@ -1421,7 +1421,7 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		DoBounsFromCombatDamage(kCombatInfo, iAttackerDamageInflicted);
-		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && pkAttacker->GetLostAllMovesAttackCity() > 0)
+		if(pkAttacker->GetLostAllMovesAttackCity() > 0)
 		{
 			pkAttacker->setMoves(0);
 			if (pkAttacker->getOwner() == GC.getGame().getActivePlayer())
@@ -1547,6 +1547,16 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 				}
 
 				pkAttacker->UnitMove(pkPlot, true, pkAttacker);
+				int iMovePercentCaptureCity = pkAttacker->GetMovePercentCaptureCity();
+				if(iMovePercentCaptureCity != 0)
+				{
+					pkAttacker->setMoves(pkAttacker->maxMoves() * iMovePercentCaptureCity / 100);
+				}
+				int iHealPercentCaptureCity = pkAttacker->GetHealPercentCaptureCity();
+				if(iHealPercentCaptureCity != 0)
+				{
+					pkAttacker->changeDamage(-(iHealPercentCaptureCity * pkAttacker->GetMaxHitPoints() / 100));
+				}
 
 				bCityConquered = true;
 			}

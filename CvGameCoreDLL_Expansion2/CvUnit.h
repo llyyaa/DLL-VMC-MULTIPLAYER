@@ -1842,6 +1842,18 @@ public:
 	void ChangeAttackBonusFromDeathUnit(int iValue);
 	int GetAttackBonusFromDeathUnit() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	const int GetCaptureEmenyExtraMax() const;
+	void ChangeCaptureEmenyExtraMax(int iValue);
+
+	const int GetCaptureEmenyPercent() const;
+	void ChangeCaptureEmenyPercent(int iValue);
+
+	const int GetMovePercentCaptureCity() const;
+	void ChangeMovePercentCaptureCity(int iValue);
+
+	const int GetHealPercentCaptureCity() const;
+	void ChangeHealPercentCaptureCity(int iValue);
+
 	const int GetInsightEnemyDamageModifier() const;
 	void ChangeInsightEnemyDamageModifier(int iValue);
 
@@ -2484,6 +2496,10 @@ protected:
 	int m_iExtraPopConsume;
 	int m_iAttackBonusFromDeathUnit;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iCaptureEmenyExtraMax;
+	int m_iCaptureEmenyPercent;
+	int m_iMovePercentCaptureCity;
+	int m_iHealPercentCaptureCity;
 	int m_iInsightEnemyDamageModifier;
 	int m_iHeightModPerX;
 	int m_iHeightModLimited;
