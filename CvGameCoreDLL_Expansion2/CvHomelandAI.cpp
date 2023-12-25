@@ -873,6 +873,7 @@ void CvHomelandAI::PlotExplorerSeaMoves()
 /// Get our first city built
 void CvHomelandAI::PlotFirstTurnSettlerMoves()
 {
+	if(!m_pPlayer->getNumCities() == 0) return;
 	ClearCurrentMoveUnits();
 
 	// Loop through all recruited units
@@ -881,7 +882,7 @@ void CvHomelandAI::PlotFirstTurnSettlerMoves()
 		UnitHandle pUnit = m_pPlayer->getUnit(*it);
 		if(pUnit && !pUnit->isHuman())
 		{
-			if(m_pPlayer->getNumCities() == 0 && m_CurrentMoveUnits.size() == 0)
+			if(m_CurrentMoveUnits.size() == 0)
 			{
 				if(pUnit->canFound(pUnit->plot()))
 				{

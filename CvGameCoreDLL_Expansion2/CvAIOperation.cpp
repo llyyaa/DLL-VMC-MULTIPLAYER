@@ -3184,6 +3184,7 @@ bool CvAIOperationFoundCity::ArmyInPosition(CvArmyAI* pArmy)
 
 		if(pSettler != NULL)
 		{
+			CvPlot* pPlot = pSettler->plot();
 			if((GetTargetPlot()->getOwner() != NO_PLAYER && GetTargetPlot()->getOwner() != m_eOwner) || GetTargetPlot()->IsAdjacentOwnedByOtherTeam(pSettler->getTeam()))
 			{
 				if(GC.getLogging() && GC.getAILogging())
@@ -3201,21 +3202,20 @@ bool CvAIOperationFoundCity::ArmyInPosition(CvArmyAI* pArmy)
 				}
 			}
 			// If the settler made it, we don't care about the entire army
-			else if(pSettler->plot() == GetTargetPlot() && pSettler->canMove() && pSettler->canFound(pSettler->plot()))
+			else if(pPlot == GetTargetPlot() && pSettler->canMove() && pSettler->canFound(pPlot))
 			{
-				CvPlot* pCityPlot = pSettler->plot();
-				int iPlotValue = GC.getGame().GetSettlerSiteEvaluator()->PlotFoundValue(pCityPlot, &GET_PLAYER(m_eOwner), NO_YIELD, false);
+				int iPlotValue = GC.getGame().GetSettlerSiteEvaluator()->PlotFoundValue(pPlot, &GET_PLAYER(m_eOwner), NO_YIELD, false);
 
 				pSettler->PushMission(CvTypes::getMISSION_FOUND());
 
 				if(GC.getLogging() && GC.getAILogging())
 				{
-					CvArea* pArea = pCityPlot->area();
-					CvCity* pCity = pCityPlot->getPlotCity();
+					CvArea* pArea = pPlot->area();
+					CvCity* pCity = pPlot->getPlotCity();
 
 					if (pCity != NULL)
 					{
-						strMsg.Format("City founded, At X=%d, At Y=%d, %s, %d, %d", pCityPlot->getX(), pCityPlot->getY(), pCity->getName().GetCString(), iPlotValue, pArea->getTotalFoundValue());
+						strMsg.Format("City founded, At X=%d, At Y=%d, %s, %d, %d", pPlot->getX(), pPlot->getY(), pCity->getName().GetCString(), iPlotValue, pArea->getTotalFoundValue());
 						LogOperationSpecialMessage(strMsg);
 					}
 				}
@@ -3224,7 +3224,7 @@ bool CvAIOperationFoundCity::ArmyInPosition(CvArmyAI* pArmy)
 
 			// If we're at our target but can no longer found a city, might be someone else beat us to this area
 			// So move back out, picking a new target
-			else if(pSettler->plot() == GetTargetPlot() && !pSettler->canFound(pSettler->plot()))
+			else if(pPlot == GetTargetPlot() && !pSettler->canFound(pPlot))
 			{
 				if(GC.getLogging() && GC.getAILogging())
 				{
@@ -3240,6 +3240,7 @@ bool CvAIOperationFoundCity::ArmyInPosition(CvArmyAI* pArmy)
 					pEscort->finishMoves();
 				}
 			}
+			
 		}
 		break;
 

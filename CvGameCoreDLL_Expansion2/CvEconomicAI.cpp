@@ -3599,8 +3599,15 @@ bool EconomicAIHelpers::IsTestStrategy_CitiesNeedNavalTileImprovement(EconomicAI
 //   upgrade if that assumption is no longer true
 bool EconomicAIHelpers::IsTestStrategy_FoundCity(EconomicAIStrategyTypes /*eStrategy*/, CvPlayer* pPlayer)
 {
+	// Never run this strategy for a human or barbarian player
+	if(pPlayer->isHuman() || pPlayer->isBarbarian()) return false;
+	// Don't run this strategy if have 0 cities, in that case we just want to drop down a city wherever we happen to be
+	if(pPlayer->getNumCities() < 1) return false;
+	// Won't be allowed to settle ...
+	if (pPlayer->IsEmpireVeryUnhappy()) return false;
+
 	int iUnitLoop;
-	CvUnit* pLoopUnit;
+	CvUnit* pLoopUnit = NULL;
 	CvUnit* pFirstSettler = 0;
 	int iLooseSettler = 0;
 	//int iStrategyWeight = 0;
@@ -3610,85 +3617,76 @@ bool EconomicAIHelpers::IsTestStrategy_FoundCity(EconomicAIStrategyTypes /*eStra
 	int iNumAreas;
 	int iArea = -1;
 
-	if(GC.getGame().isOption(GAMEOPTION_ONE_CITY_CHALLENGE) && pPlayer->isHuman())
+	// Look at map for loose settlers
+	for(pLoopUnit = pPlayer->firstUnit(&iUnitLoop); pLoopUnit != NULL; pLoopUnit = pPlayer->nextUnit(&iUnitLoop))
 	{
-		return false;
-	}
-
-	// Never run this strategy for a human player
-	if(!pPlayer->isHuman())
-	{
-		// Look at map for loose settlers
-		for(pLoopUnit = pPlayer->firstUnit(&iUnitLoop); pLoopUnit != NULL; pLoopUnit = pPlayer->nextUnit(&iUnitLoop))
+		if(pLoopUnit != NULL)
 		{
-			if(pLoopUnit != NULL)
+			if(pLoopUnit->AI_getUnitAIType() == UNITAI_SETTLE)
 			{
-				if(pLoopUnit->AI_getUnitAIType() == UNITAI_SETTLE)
+				if(pLoopUnit->getArmyID() == FFreeList::INVALID_INDEX)
 				{
-					if(pLoopUnit->getArmyID() == FFreeList::INVALID_INDEX)
-					{
-						iLooseSettler++;
-						iFirstSettlerArea = pLoopUnit->getArea();
-						pFirstSettler = pLoopUnit;
-						break;
-					}
+					iLooseSettler++;
+					iFirstSettlerArea = pLoopUnit->getArea();
+					pFirstSettler = pLoopUnit;
+					break;
 				}
 			}
 		}
+	}
 
-		// Don't run this strategy if have 0 cities, in that case we just want to drop down a city wherever we happen to be
-		if (iLooseSettler && pPlayer->getNumCities() >= 1)
+	
+	if (iLooseSettler)
+	{
+		iNumAreas = pPlayer->GetBestSettleAreas(pPlayer->GetEconomicAI()->GetMinimumSettleFertility(), iBestArea, iSecondBestArea);
+		if(iNumAreas == 0)
 		{
-			iNumAreas = pPlayer->GetBestSettleAreas(pPlayer->GetEconomicAI()->GetMinimumSettleFertility(), iBestArea, iSecondBestArea);
-			if(iNumAreas == 0)
+			return false;
+		}
+
+		bool bCanEmbark = GET_TEAM(pPlayer->getTeam()).canEmbark() || pPlayer->GetPlayerTraits()->IsEmbarkedAllWater();
+		bool bWantEscort = false;
+
+		// CASE 1: we can go offshore
+		if (bCanEmbark)
+		{
+			int iRandArea = GC.getGame().getJonRandNum(6, "Randomly choose an area to settle");
+
+			if (iRandArea <= 1) // this is "pick best tile I know ignoring what area it is part of", in the early game this is usually the start landmass
 			{
-				return false;
+				iArea = -1;
+				CvPlot* pPlot = pPlayer->GetBestSettlePlot(pFirstSettler, bWantEscort, -1);
+				if (!pPlot)
+				{
+					bWantEscort = true;
+				}
+			}
+			else if (iRandArea == 2) // least likely
+			{
+				iArea = iSecondBestArea;
+				bWantEscort = IsAreaSafeForQuickColony(iArea, pPlayer);
+			}
+			else // this is as likely as the other options combined
+			{
+				iArea = iBestArea;
+				bWantEscort = IsAreaSafeForQuickColony(iArea, pPlayer);
 			}
 
-			bool bCanEmbark = GET_TEAM(pPlayer->getTeam()).canEmbark() || pPlayer->GetPlayerTraits()->IsEmbarkedAllWater();
-			bool bWantEscort = false;
-
-			// CASE 1: we can go offshore
-			if (bCanEmbark && (pPlayer->getNumCities() > 1))
+			if (bWantEscort)
 			{
-				int iRandArea = GC.getGame().getJonRandNum(6, "Randomly choose an area to settle");
-
-				if (iRandArea <= 1) // this is "pick best tile I know ignoring what area it is part of", in the early game this is usually the start landmass
-				{
-					iArea = -1;
-					CvPlot* pPlot = pPlayer->GetBestSettlePlot(pFirstSettler, bWantEscort, -1);
-					if (!pPlot)
-					{
-						bWantEscort = true;
-					}
-				}
-				else if (iRandArea == 2) // least likely
-				{
-					iArea = iSecondBestArea;
-					bWantEscort = IsAreaSafeForQuickColony(iArea, pPlayer);
-				}
-				else // this is as likely as the other options combined
-				{
-					iArea = iBestArea;
-					bWantEscort = IsAreaSafeForQuickColony(iArea, pPlayer);
-				}
-
-				if (bWantEscort)
-				{
-					pPlayer->addAIOperation(AI_OPERATION_FOUND_CITY, NO_PLAYER, iArea);
-				}
-				else
-				{
-					pPlayer->addAIOperation(AI_OPERATION_QUICK_COLONIZE, NO_PLAYER, iArea);
-				}
-
-				return true;
+				pPlayer->addAIOperation(AI_OPERATION_FOUND_CITY, NO_PLAYER, iArea);
 			}
-			else // we can't embark yet
+			else
 			{
-				pPlayer->addAIOperation(AI_OPERATION_FOUND_CITY, NO_PLAYER, iBestArea);
-				return true;
+				pPlayer->addAIOperation(AI_OPERATION_QUICK_COLONIZE, NO_PLAYER, iArea);
 			}
+
+			return true;
+		}
+		else // we can't embark yet
+		{
+			pPlayer->addAIOperation(AI_OPERATION_FOUND_CITY, NO_PLAYER, iBestArea);
+			return true;
 		}
 	}
 
