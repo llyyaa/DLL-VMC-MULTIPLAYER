@@ -780,6 +780,10 @@ public:
 	void changeNukeImmuneCount(int iValue);
 	int getNukeImmuneCount() const;
 
+	bool isCanDoNukeDamage() const;
+	void changeCanDoNukeDamageCount(int iValue);
+	int getCanDoNukeDamageCount() const;
+
 	int maxInterceptionProbability() const;
 	int currInterceptionProbability() const;
 	int evasionProbability() const;
@@ -2288,6 +2292,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iNoDefensiveBonusCount;
 	FAutoVariable<int, CvUnit> m_iNoCaptureCount;
 	FAutoVariable<int, CvUnit> m_iNukeImmuneCount;
+	FAutoVariable<int, CvUnit> m_iCanDoNukeDamageCount;
 	FAutoVariable<int, CvUnit> m_iHiddenNationalityCount;
 	FAutoVariable<int, CvUnit> m_iAlwaysHostileCount;
 	FAutoVariable<int, CvUnit> m_iNoRevealMapCount;

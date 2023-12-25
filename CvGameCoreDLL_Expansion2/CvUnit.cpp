@@ -389,6 +389,7 @@ CvUnit::CvUnit() :
 	, m_iNoDefensiveBonusCount("CvUnit::m_iNoDefensiveBonusCount", m_syncArchive)
 	, m_iNoCaptureCount("CvUnit::m_iNoCaptureCount", m_syncArchive)
 	, m_iNukeImmuneCount("CvUnit::m_iNukeImmuneCount", m_syncArchive)
+    , m_iCanDoNukeDamageCount("CvUnit::m_iCanDoNukeDamageCount", m_syncArchive)
 	, m_iHiddenNationalityCount("CvUnit::m_iHiddenNationalityCount", m_syncArchive)
 	, m_iAlwaysHostileCount("CvUnit::m_iAlwaysHostileCount", m_syncArchive)
 	, m_iNoRevealMapCount("CvUnit::m_iNoRevealMapCount", m_syncArchive)
@@ -1389,6 +1390,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iNoDefensiveBonusCount = 0;
 	m_iNoCaptureCount = 0;
 	m_iNukeImmuneCount = 0;
+	m_iCanDoNukeDamageCount = 0;
 	m_iAlwaysHealCount = 0;
 	m_iHiddenNationalityCount = 0;
 	m_iAlwaysHostileCount = 0;
@@ -18262,6 +18264,29 @@ int CvUnit::getNukeImmuneCount() const
 }
 
 //	--------------------------------------------------------------------------------
+bool CvUnit::isCanDoNukeDamage() const
+{
+	VALIDATE_OBJECT
+	return (getCanDoNukeDamageCount() > 0);
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvUnit::changeCanDoNukeDamageCount(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iCanDoNukeDamageCount += iValue;
+	CvAssert(getCanDoNukeDamageCount() >= 0);
+
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::getCanDoNukeDamageCount() const
+{
+	VALIDATE_OBJECT
+	return m_iCanDoNukeDamageCount;
+}
+//	--------------------------------------------------------------------------------
 bool CvUnit::isHiddenNationality() const
 {
 	VALIDATE_OBJECT
@@ -25661,6 +25686,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeNoDefensiveBonusCount((thisPromotion.IsNoDefensiveBonus()) ? iChange : 0);
 		changeNoCaptureCount((thisPromotion.IsNoCapture()) ? iChange : 0);
 		changeNukeImmuneCount((thisPromotion.IsNukeImmune()) ? iChange: 0);
+		changeCanDoNukeDamageCount((thisPromotion.IsCanDoNukeDamage()) ? iChange : 0);
 		changeHiddenNationalityCount((thisPromotion.IsHiddenNationality()) ? iChange: 0);
 		changeAlwaysHostileCount((thisPromotion.IsAlwaysHostile()) ? iChange: 0);
 		changeNoRevealMapCount((thisPromotion.IsNoRevealMap()) ? iChange: 0);

@@ -351,6 +351,7 @@ public:
 	bool IsOnlyDefensive() const;
 	bool IsNoDefensiveBonus() const;
 	bool IsNukeImmune() const;
+	bool IsCanDoNukeDamage() const;
 	bool IsHiddenNationality() const;
 	bool IsAlwaysHostile() const;
 	bool IsNoRevealMap() const;
@@ -811,6 +812,7 @@ protected:
 	bool m_bOnlyDefensive;
 	bool m_bNoDefensiveBonus;
 	bool m_bNukeImmune;
+	bool m_bCanDoNukeDamage;
 	bool m_bHiddenNationality;
 	bool m_bAlwaysHostile;
 	bool m_bNoRevealMap;

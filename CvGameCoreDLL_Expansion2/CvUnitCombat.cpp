@@ -759,6 +759,9 @@ void CvUnitCombat::GenerateRangedCombatInfo(CvUnit& kAttacker, CvUnit* pkDefende
 		InterveneInflictDamage(&ctx);
 #endif
 
+
+		//CvUnitCombat::ApplyNuclearExplosionDamage(pkDefender->plot(), 1);
+
 #if defined(MOD_UNITS_MAX_HP)
 		if(iDamage + pkDefender->getDamage() > kAttacker.GetMaxHitPoints())
 		{
@@ -1267,6 +1270,7 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 	}
 	
 	BATTLE_FINISHED();
+
 	DoNewBattleEffects(kCombatInfo, iDamage);
 }
 
@@ -3139,10 +3143,10 @@ void CvUnitCombat::GenerateNuclearExplosionDamage(CvPlot* pkTargetPlot, int iDam
 								{
 									CvAssertMsg(*piDamageMembers < iMaxDamageMembers, "Ran out of entries for the nuclear damage array");
 								}
-									}
-								}
 							}
 						}
+					}
+				}
 
 				if (pLoopCity != NULL)
 				{
@@ -3202,10 +3206,10 @@ void CvUnitCombat::GenerateNuclearExplosionDamage(CvPlot* pkTargetPlot, int iDam
 						CvAssertMsg(*piDamageMembers < iMaxDamageMembers, "Ran out of entries for the nuclear damage array");
 					}
 				}
-					}
-				}
 			}
 		}
+	}
+}
 
 //	---------------------------------------------------------------------------
 //	Function: ResolveNuclearCombat
@@ -3440,7 +3444,9 @@ void CvUnitCombat::ResolveCombat(const CvCombatInfo& kInfo, uint uiParentEventID
 		if(kInfo.getUnit(BATTLE_UNIT_ATTACKER))
 		{
 			ResolveRangedUnitVsCombat(kInfo, uiParentEventID);
-			CvPlot *pPlot = kInfo.getPlot();
+
+			CvPlot* pPlot = kInfo.getPlot();
+
 			if (kInfo.getUnit(BATTLE_UNIT_ATTACKER) && kInfo.getUnit(BATTLE_UNIT_DEFENDER) && pPlot)
 			{
 				pPlot->AddArchaeologicalRecord(CvTypes::getARTIFACT_BATTLE_RANGED(), kInfo.getUnit(BATTLE_UNIT_ATTACKER)->getOwner(), kInfo.getUnit(BATTLE_UNIT_DEFENDER)->getOwner());
@@ -4698,6 +4704,7 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo, int iAtta
 {
 	if (!ShouldDoNewBattleEffects(kCombatInfo))
 		return;
+	DoNukeDamage(kCombatInfo);
 	DoSplashDamage(kCombatInfo);
 	DoCollateralDamage(kCombatInfo);
 	DoAddEnemyPromotions(kCombatInfo);
@@ -4720,6 +4727,131 @@ bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 	// May provide GameOption to enable for AI later.
 	return kAttackPlayer.isHuman() || kDefensePlayer.isHuman();
 }
+
+
+
+// AOE damage for units with the splash damage promotion
+void CvUnitCombat::DoNukeDamage(const CvCombatInfo& kCombatInfo)
+{
+	if (!MOD_ROG_CORE) {
+		return;
+	}
+
+	CvUnit* pAttackerUnit = kCombatInfo.getUnit(BATTLE_UNIT_ATTACKER);
+	CvCity* pAttackerCity = kCombatInfo.getCity(BATTLE_UNIT_ATTACKER);
+	CvUnit* pDefenderUnit = kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER);
+	CvCity* pDefenderCity = kCombatInfo.getCity(BATTLE_UNIT_DEFENDER);
+
+
+	// Only works if the attacker is a unit.
+	if (pAttackerCity != nullptr || !pAttackerUnit->isCanDoNukeDamage()) return;
+
+	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
+	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);
+	CvPlot* pFromPlot = pAttackerUnit ? pAttackerUnit->plot() : pAttackerCity->plot();
+	CvPlot* pTargetPlot = kCombatInfo.getPlot();
+
+	int iX = pTargetPlot->getX();
+	int iY = pTargetPlot->getY();
+
+
+	int iBlastRadius = /*2*/ GD_INT_GET(NUKE_BLAST_RADIUS);
+
+	for (int iDX = -(iBlastRadius); iDX <= iBlastRadius; iDX++)
+	{
+		for (int iDY = -(iBlastRadius); iDY <= iBlastRadius; iDY++)
+		{
+			CvPlot* pLoopPlot = plotXYWithRangeCheck(iX, iY, iDX, iDY, iBlastRadius);
+
+			if (pLoopPlot != NULL)
+			{
+				CvCity* pLoopCity = pLoopPlot->getPlotCity();
+
+				FFastSmallFixedList<IDInfo, 25, true, c_eCiv5GameplayDLL > oldUnits;
+				IDInfo* pUnitNode = pLoopPlot->headUnitNode();
+
+				while (pUnitNode != NULL)
+				{
+					oldUnits.insertAtEnd(pUnitNode);
+					pUnitNode = pLoopPlot->nextUnitNode(pUnitNode);
+				}
+
+				pUnitNode = oldUnits.head();
+
+				while (pUnitNode != NULL)
+				{
+					CvUnit* pLoopUnit = ::getUnit(*pUnitNode);
+					pUnitNode = oldUnits.next(pUnitNode);
+
+					if (pLoopUnit != NULL)
+					{
+						if (pLoopUnit != pAttackerUnit)
+						{
+							if (!pLoopUnit->isNukeImmune() && !pLoopUnit->isDelayedDeath())
+							{
+								int iNukeDamage;
+								// How much destruction is unleashed on nearby Units?
+
+								iNukeDamage = (/*3*/ GC.getNUKE_UNIT_DAMAGE_BASE() + /*4*/ GC.getGame().getJonRandNum(GC.getNUKE_UNIT_DAMAGE_RAND_1(), "Nuke Damage 1") + /*4*/ GC.getGame().getJonRandNum(GC.getNUKE_UNIT_DAMAGE_RAND_2(), "Nuke Damage 2"));
+
+								if (pLoopCity != NULL)
+								{
+									iNukeDamage *= std::max(0, (pLoopCity->getNukeModifier() + 100));
+									iNukeDamage /= 100;
+								}
+
+								ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+
+								bool bKill = iNukeDamage >= pLoopUnit->GetCurrHitPoints();
+								pLoopUnit->changeDamage(iNukeDamage, kAttackPlayer.GetID(), pAttackerUnit->GetID());
+								pLoopUnit->ShowDamageDeltaText(iNukeDamage, pLoopUnit->plot());
+
+
+								if (kAttackPlayer.isHuman())
+								{
+									if (bKill)
+									{
+										CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY_DEATH", pAttackerUnit->getNameKey(), pLoopUnit->getNameKey());
+										pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer);
+									}
+									else
+									{
+										CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY", pAttackerUnit->getNameKey(), pLoopUnit->getNameKey(), iNukeDamage);
+										pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer );
+									}
+								}
+								if (kDefensePlayer.isHuman())
+								{
+									if (bKill)
+									{
+										CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_NUKED_DAMAGE_DEATH", pAttackerUnit->getNameKey(), pLoopUnit->getNameKey());
+										pkDLLInterface->AddMessage(0, kDefensePlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer );
+									}
+									else
+									{
+										CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_NUKED_DAMAGE", pAttackerUnit->getNameKey(), pLoopUnit->getNameKey(), iNukeDamage);
+										pkDLLInterface->AddMessage(0, kDefensePlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (pLoopCity != NULL)
+				{
+					int iTotalDamage;
+					// Add damage to the city
+					iTotalDamage = (pLoopCity->GetMaxHitPoints() - pLoopCity->getDamage()) * /*50*/ GC.getNUKE_CITY_HIT_POINT_DAMAGE();
+					iTotalDamage /= 100;
+					pLoopCity->changeDamage(iTotalDamage);
+				}
+			}
+		}
+	}
+}
+
+
 
 #ifdef MOD_PROMOTION_SPLASH_DAMAGE
 

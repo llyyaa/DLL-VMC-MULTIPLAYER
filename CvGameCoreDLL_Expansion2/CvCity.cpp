@@ -2127,7 +2127,6 @@ void CvCity::doTurn()
 
 		doDecay();
 
-		doMeltdown();
 
 		{
 			AI_PERF_FORMAT_NESTED("City-AI-perf.csv", ("doImprovement, Turn %03d, %s, %s", GC.getGame().getElapsedGameTurns(), GetPlayer()->getCivilizationShortDescription(), getName().c_str()) );
@@ -18583,44 +18582,6 @@ void CvCity::doDecay()
 	}
 }
 
-//	--------------------------------------------------------------------------------
-void CvCity::doMeltdown()
-{
-	VALIDATE_OBJECT
-	AI_PERF_FORMAT("City-AI-perf.csv", ("CvCity::doMeltdown, Turn %03d, %s, %s", GC.getGame().getElapsedGameTurns(), GetPlayer()->getCivilizationShortDescription(), getName().c_str()) );
-
-	int iNumBuildingInfos = GC.getNumBuildingInfos();
-	for(int iI = 0; iI < iNumBuildingInfos; iI++)
-	{
-		const BuildingTypes eBuilding = static_cast<BuildingTypes>(iI);
-		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
-		if(NULL != pkBuildingInfo && m_pCityBuildings->GetNumBuilding((BuildingTypes)iI) > 0)
-		{
-			if(pkBuildingInfo->GetNukeExplosionRand() != 0)
-			{
-				if(GC.getGame().getJonRandNum(pkBuildingInfo->GetNukeExplosionRand(), "Meltdown!!!") == 0)
-				{
-					if(m_pCityBuildings->GetNumRealBuilding((BuildingTypes)iI) > 0)
-					{
-						m_pCityBuildings->SetNumRealBuilding(((BuildingTypes)iI), 0);
-					}
-
-					CvUnitCombat::ApplyNuclearExplosionDamage(plot(), 1);
-
-					if(getOwner() == GC.getGame().getActivePlayer())
-					{
-						Localization::String localizedText = Localization::Lookup("TXT_KEY_MISC_MELTDOWN_CITY");
-						localizedText << getNameKey();
-
-						DLLUI->AddCityMessage(0, GetIDInfo(), getOwner(), false, GC.getEVENT_MESSAGE_TIME(), localizedText.toUTF8()/*, "AS2D_MELTDOWN", MESSAGE_TYPE_MINOR_EVENT, NULL, (ColorTypes)GC.getInfoTypeForString("COLOR_RED"), getX(), getY(), true, true*/);
-					}
-
-					break;
-				}
-			}
-		}
-	}
-}
 
 //	--------------------------------------------------------------------------------
 CvCityStrategyAI* CvCity::GetCityStrategyAI() const
