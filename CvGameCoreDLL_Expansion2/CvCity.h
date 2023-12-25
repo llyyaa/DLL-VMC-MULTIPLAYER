@@ -350,10 +350,17 @@ public:
 	bool canConscript() const;
 	void conscript();
 
-	int getImprovementYieldRateModifier(YieldTypes eIndex, ImprovementTypes eImprovement) const;
-	int getResourceYieldRateModifier(YieldTypes eIndex, ResourceTypes eResource) const;
+	int getYieldModifierFromFeature(FeatureTypes eIndex1, YieldTypes eIndex2) const;
+	void changeYieldModifierFromFeature(FeatureTypes eIndex1, YieldTypes eIndex2, int iChange);
 
-	void processImprovement(ImprovementTypes eResource, int iChange);
+	int getYieldModifierFromImprovement(ImprovementTypes eIndex1, YieldTypes eIndex2) const;
+	void changeYieldModifierFromImprovement(ImprovementTypes eIndex1, YieldTypes eIndex2, int iChange);
+
+	int getYieldModifierFromResource(ResourceTypes eIndex1, YieldTypes eIndex2) const;
+	void changeYieldModifierFromResource(ResourceTypes eIndex1, YieldTypes eIndex2, int iChange);
+
+	void processFeature(FeatureTypes eFeature, int iChange);
+	void processImprovement(ImprovementTypes eImprovement, int iChange);
 	void processResource(ResourceTypes eResource, int iChange);
 	void processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, bool bObsolete = false, bool bApplyingAllCitiesBonus = false);
 	void processProcess(ProcessTypes eProcess, int iChange);
@@ -853,6 +860,9 @@ public:
 	void changePowerYieldRateModifier(YieldTypes eIndex, int iChange);
 
 	int getAdjacentFeaturesYieldRateModifier(YieldTypes eIndex) const;
+
+	int getFeatureYieldRateModifier(YieldTypes eIndex) const;
+	void changeFeatureYieldRateModifier(YieldTypes eIndex, int iChange);
 
 	int getImprovementYieldRateModifier(YieldTypes eIndex) const;
 	void changeImprovementYieldRateModifier(YieldTypes eIndex, int iChange);
@@ -1502,6 +1512,7 @@ protected:
 
 	std::vector<int> m_aiYieldPerReligion;
 	FAutoVariable<std::vector<int>, CvCity> m_aiPowerYieldRateModifier;
+	FAutoVariable<std::vector<int>, CvCity> m_aiFeatureYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiImprovementYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiExtraSpecialistYield;
@@ -1531,6 +1542,10 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_paiFreePromotionCount;
 	FAutoVariable<std::vector<int>, CvCity> m_viTradeRouteDomainRangeModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_viTradeRouteDomainGoldBonus;
+
+	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiYieldModifierFromFeature;
+	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiYieldModifierFromImprovement;
+	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiYieldModifierFromResource;
 
 	int m_iBaseHappinessFromBuildings;
 	int m_iUnmoddedHappinessFromBuildings;

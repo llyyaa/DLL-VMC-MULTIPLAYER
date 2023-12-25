@@ -2121,10 +2121,14 @@ int CvLuaCity::lConscript(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
-//int getResourceYieldRateModifier(YieldTypes eIndex, ResourceTypes eResource);
+//int getYieldModifierFromResource(YieldTypes eIndex, ResourceTypes eResource);
 int CvLuaCity::lGetResourceYieldRateModifier(lua_State* L)
 {
-	return BasicLuaMethod<int, YieldTypes, ResourceTypes>(L, &CvCity::getResourceYieldRateModifier);
+	CvCity* pkCity = GetInstance(L);
+	const YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	const ResourceTypes eResource = (ResourceTypes)lua_tointeger(L, 3);
+	lua_pushinteger(L, pkCity->getYieldModifierFromResource(eResource, eYield));
+	return 1;
 }
 //------------------------------------------------------------------------------
 //HandicapTypes getHandicapType();

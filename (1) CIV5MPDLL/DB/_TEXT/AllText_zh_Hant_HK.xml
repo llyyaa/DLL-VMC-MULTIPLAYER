@@ -33,8 +33,11 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
 			<Text>昭昭天命!</Text>
 		</Row>
-		<Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
-			<Text>[NEWLINE][ICON_BULLET]來自改良設施的城市修正值: {1_Num}%</Text>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_FEATURES">
+			<Text>[NEWLINE][ICON_BULLET]來自有市民工作的地貌的修正: {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENTS">
+			<Text>[NEWLINE][ICON_BULLET]來自有市民工作的改良設施的修正: {1_Num}%</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]活躍間諜數的城市修正值: {1_Num}%</Text>

@@ -33,8 +33,11 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
 			<Text>Manifest Destiny!</Text>
 		</Row>
-		<Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENT">
-			<Text>[NEWLINE][ICON_BULLET]City correction from improved facilities: {1_Num}%</Text>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_FEATURES">
+			<Text>[NEWLINE][ICON_BULLET]Modifier for Worked Features: {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_IMPROVEMENTS">
+			<Text>[NEWLINE][ICON_BULLET]Modifier for Worked Improvements: {1_Num}%</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]Active Spies Modifier: {1_Num}%</Text>

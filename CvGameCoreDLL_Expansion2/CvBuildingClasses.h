@@ -460,6 +460,8 @@ public:
 	int* GetSpecialistYieldChangeArray(int i) const;
 	int GetImprovementYieldModifier(int i, int j) const;
 	int* GetImprovementYieldModifierArray(int i) const;
+	int GetFeatureYieldModifier(int i, int j) const;
+	int* GetFeatureYieldModifierArray(int i) const;
 	int GetResourceYieldModifier(int i, int j) const;
 	int* GetResourceYieldModifierArray(int i) const;
 	int GetTerrainYieldChange(int i, int j) const;
@@ -852,6 +854,7 @@ private:
 	int** m_ppaiFeatureYieldChange;
 	int** m_ppaiSpecialistYieldChange;
 	int** m_ppaiImprovementYieldModifier;
+	int** m_ppaiFeatureYieldModifier;
 	int** m_ppaiResourceYieldModifier;
 	int** m_ppaiTerrainYieldChange;
 #if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
