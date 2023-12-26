@@ -1221,6 +1221,8 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 
 		UpdateProjectedPlotYields(pPlot, eBuild);
 		int iScore = ScorePlot(eImprovement, eExistingImprovement);
+		//if this plot already has a improvement, reduce the iScore
+		if (eExistingImprovement != NO_IMPROVEMENT) iScore -= 150;
 		if (pkBuild->isFeatureRemove(FEATURE_ICE)) iScore += 600;
 
 		// if we're going backward, bail out!
@@ -1728,12 +1730,9 @@ bool CvBuilderTaskingAI::ShouldBuilderConsiderPlot(CvUnit* pUnit, CvPlot* pPlot)
 	switch(pUnit->getDomainType())
 	{
 	case DOMAIN_LAND:
-#if defined(MOD_AI_SECONDARY_WORKERS)
 		// As embarked workers can now build fishing boats, we need to consider plots adjacent to land
-		if(pPlot->isWater() && !pPlot->isAdjacentToLand())
-#else
-		if(pPlot->isWater())
-#endif
+		// For SP, we only use workers
+		if(!MOD_SP_SMART_AI && pPlot->isWater() && !pPlot->isAdjacentToLand())
 		{
 			return false;
 		}
@@ -2264,7 +2263,6 @@ int CvBuilderTaskingAI::ScorePlot(ImprovementTypes eImprovement, ImprovementType
 	if(eExistingImprovement != NO_IMPROVEMENT && GC.getImprovementInfo(eExistingImprovement))
 	{
 		iScore -= GC.getImprovementInfo(eExistingImprovement)->GetExtraScore();
-		iScore -= 25;
 	}
 
 	if (pCity->isCapital()) // this is our capital and needs emphasis
