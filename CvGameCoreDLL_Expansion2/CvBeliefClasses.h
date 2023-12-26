@@ -94,6 +94,7 @@ public:
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int GetYieldPerFollowingCity(int i) const;
 	int GetYieldPerXFollowers(int i) const;
+	int GetHolyCityYieldPerForeignFollowers(int i) const;
 	int GetYieldPerOtherReligionFollower(int i) const;
 #endif
 	int GetResourceQuantityModifier(int i) const;
@@ -231,6 +232,7 @@ protected:
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int* m_piYieldPerFollowingCity;
 	int* m_piYieldPerXFollowers;
+	int* m_piHolyCityYieldPerForeignFollowers;
 	int* m_piYieldPerOtherReligionFollower;
 #endif
 	int* m_piResourceQuantityModifiers;
@@ -496,6 +498,7 @@ public:
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int GetYieldPerFollowingCity(YieldTypes eYield) const;
 	int GetYieldPerXFollowers(YieldTypes eYield) const;
+	int GetHolyCityYieldPerForeignFollowers(YieldTypes eYield) const;
 	int GetYieldPerOtherReligionFollower(YieldTypes eYield) const;
 #endif
 	int GetResourceQuantityModifier(ResourceTypes eResource) const;

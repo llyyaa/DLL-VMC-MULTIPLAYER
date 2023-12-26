@@ -6647,6 +6647,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 			{
 				iRtnValue += 10 * iFlavorCulture / pEntry->GetYieldChangePerXForeignFollowers(iI);
 			}
+			iRtnValue += pEntry->GetHolyCityYieldPerForeignFollowers(iI) /5 * iFlavorCulture;
 		}
 		else
 		{
@@ -6655,6 +6656,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 			{
 				iRtnValue += 50 / pEntry->GetYieldChangePerXForeignFollowers(iI);
 			}
+			iRtnValue += pEntry->GetHolyCityYieldPerForeignFollowers(iI) * 2;
 		}
 	}
 

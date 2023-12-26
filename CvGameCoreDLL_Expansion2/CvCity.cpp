@@ -12087,12 +12087,18 @@ int CvCity::GetYieldPerTurnFromReligion(ReligionTypes eReligion, YieldTypes eYie
 	int iYieldPerTurn = 0;
 	const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion, NO_PLAYER);
 
-	// Only do this for food and production, other yields from religion are handled at the player level
-	if (pReligion && (eYield == YIELD_FOOD || eYield == YIELD_PRODUCTION))
+	if (pReligion && GetCityReligions()->IsHolyCityForReligion(eReligion))
 	{
-		if (GetCityReligions()->IsHolyCityForReligion(eReligion))
+		// Only do this for food and production, other yields from religion are handled at the player level
+		if (eYield == YIELD_FOOD || eYield == YIELD_PRODUCTION)
 		{
 			iYieldPerTurn += pReligion->m_Beliefs.GetHolyCityYieldChange(eYield);
+		}
+		int iHolyCityYieldPerForeignFollowers = pReligion->m_Beliefs.GetHolyCityYieldPerForeignFollowers(eYield);
+		if(iHolyCityYieldPerForeignFollowers > 0 && GET_PLAYER(getOwner()).HasReligion(eReligion))
+		{
+			int iFollowers = GET_PLAYER(getOwner()).GetReligions()->GetNumForeignFollowers(false /*bAtPeace*/);
+			iYieldPerTurn += iHolyCityYieldPerForeignFollowers * iFollowers /100;
 		}
 	}
 

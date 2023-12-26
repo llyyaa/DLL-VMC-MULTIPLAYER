@@ -125,6 +125,13 @@
 		<Column name="YieldType" type="text" reference="Yields(Type)"/>
 		<Column name="PerXFollowers" type="integer"/>
 	</Table>
+	<Table name="Belief_HolyCityYieldPerForeignFollowers">
+		<!-- Refer to Beliefs.GoldPerXFollowers -->
+		<Column name="BeliefType" type="text" reference="Beliefs(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="PerForeignFollowers" type="integer"/>
+	</Table>
+
 	
 	<Table name="Feature_CoastalLandYields">
 		<!-- Refer to Improvement_CoastalLandYields -->
