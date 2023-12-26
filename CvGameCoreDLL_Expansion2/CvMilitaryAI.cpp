@@ -4989,17 +4989,12 @@ bool MilitaryAIHelpers::IsTestStrategy_NeedAirCarriers(CvPlayer* pPlayer)
 		}
 	}
 
+	int iFactor = 1;
 #if defined(MOD_CONFIG_AI_IN_XML)
 	// Why would we ever want to load EVERY plane onto a carrier?
-	int iFactor = GC.getAI_CONFIG_MILITARY_AIRCRAFT_PER_CARRIER_SPACE();
-	if (iNumLoadableAirUnits > iFactor*iNumTotalCargoSpace)
-#else
-#if defined(MOD_AI_SMART_V3)
-	if ((iNumLoadableAirUnits > iNumTotalCargoSpace) && (!MOD_AI_SMART_V3 || ((iNumNavalUnits / 4) >= iNumCargoUnits)))
-#else
-	if (iNumLoadableAirUnits > iNumTotalCargoSpace)
+	iFactor = GC.getAI_CONFIG_MILITARY_AIRCRAFT_PER_CARRIER_SPACE();
 #endif
-#endif
+	if ((iNumLoadableAirUnits > iFactor*iNumTotalCargoSpace) || (MOD_SP_SMART_AI && (iNumNavalUnits / 6) >= iNumCargoUnits))
 	{
 		return true;
 	}

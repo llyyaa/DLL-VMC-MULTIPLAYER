@@ -19553,14 +19553,14 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 	// Requires Hills
 	if(pkBuildingInfo->IsHill())
 	{
-		if(!plot()->isHills())
+		if(!(plot()->isHills() || plot()->isMountain()))
 			return false;
 	}
 
 	// Requires Flat
 	if(pkBuildingInfo->IsFlat())
 	{
-		if(plot()->isHills())
+		if(plot()->isHills() || plot()->isMountain())
 			return false;
 	}
 
