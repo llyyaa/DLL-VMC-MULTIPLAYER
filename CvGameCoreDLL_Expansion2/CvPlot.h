@@ -289,6 +289,7 @@ public:
 	}
 
 	bool isFriendlyCity(const CvUnit& kUnit, bool bCheckImprovement) const;
+	bool isDangerCity(const CvUnit& kUnit) const;
 #if defined(MOD_GLOBAL_PASSABLE_FORTS)
 	bool isPassableImprovement() const;
 	bool isFriendlyCityOrPassableImprovement(const CvUnit& kUnit, bool bCheckImprovement) const;

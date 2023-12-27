@@ -2404,8 +2404,8 @@ void CvTacticalAI::PlotMovesToSafety(bool bCombatUnits)
 #if defined(MOD_AI_SMART_V3)
 						if (MOD_AI_SMART_V3)
 						{
-							//But not if we're in a city!
-							if(pUnit->plot()->isCity())
+							//But not if we're in a safty city!
+							if(pUnit->plot()->isCity() && !pUnit->plot()->isDangerCity(*pUnit))
 							{
 								bAddUnit = false;
 							}
@@ -6844,6 +6844,7 @@ void CvTacticalAI::ExecuteMovesToSafestPlot()
 			{
 				for(int iY = -iRange; iY <= iRange; iY++)
 				{
+					int iAbsRange = iRange < 0 ? -iRange : iRange;
 					CvPlot* pPlot = kMap.plot(iUnitX + iX, iUnitY + iY);
 					if(pPlot == NULL)
 					{
@@ -6892,9 +6893,16 @@ void CvTacticalAI::ExecuteMovesToSafestPlot()
 
 					iDanger = m_pPlayer->GetPlotDanger(*pPlot);
 					bool bIsZeroDanger = (iDanger <= 0);
-					bool bIsInCity = pPlot->isFriendlyCity(*pUnit, false);
-					bool bIsInCover = (pPlot->getNumDefenders(ePlayerID) > 0) && !pUnit->IsCanDefend(pPlot); // only move to cover if I'm defenseless here
-					bool bIsInTerritory = (pPlot->getTeam() == ePlayerTeam);
+					bool bIsInCity = false;
+					bool bIsInCover = false;
+					bool bIsInTerritory = false;
+					//for SP, give up danger city
+					if(!MOD_SP_SMART_AI || !pPlot->isDangerCity(*pUnit))
+					{
+						bIsInCity = pPlot->isFriendlyCity(*pUnit, false);
+						bIsInCover = (pPlot->getNumDefenders(ePlayerID) > 0) && !pUnit->IsCanDefend(pPlot); // only move to cover if I'm defenseless here
+						bIsInTerritory = (pPlot->getTeam() == ePlayerTeam);
+					}
 #if defined(MOD_AI_SMART_V3)					
 					bool bNeedEmbark = ((eUnitDomain == DOMAIN_LAND) && (!pUnit->plot()->isWater()) && (pPlot->isWater()));
 #endif
@@ -6914,13 +6922,13 @@ void CvTacticalAI::ExecuteMovesToSafestPlot()
 					{
 						aCityList.push_back(pPlot, iDanger);
 					}
-					else
-					if(bIsZeroDanger)
+					else if(bIsZeroDanger)
 					{
-						aZeroDangerList.push_back(pPlot, (bIsInTerritory)?0:1);
+						//add range so we can get nearest
+						int iValue = iAbsRange + (bIsInTerritory?0:1);
+						aZeroDangerList.push_back(pPlot, iValue);
 					}
-					else
-					if(bIsInCover)
+					else if(bIsInCover)
 					{
 						aCoverList.push_back(pPlot, iDanger);
 					}
@@ -8933,12 +8941,23 @@ bool CvTacticalAI::FindUnitsForThisMove(TacticalAIMoveTypes eMove, CvPlot* pTarg
 					continue;
 				}
 
-				// Don't put units with a combat strength boosted from promotions in cities, these boosts are ignored
-				if(pLoopUnit->getDefenseModifier() == 0 &&
-				        pLoopUnit->getAttackModifier() == 0 &&
-				        pLoopUnit->getExtraCombatPercent() == 0)
+				// For SP, we want all unit except Militia Units 
+				if(MOD_SP_SMART_AI)
 				{
-					bSuitableUnit = true;
+					if(!pLoopUnit->getUnitCombatType() == (UnitCombatTypes)GC.getInfoTypeForString("UNITCOMBAT_RECON", true))
+					{
+						bSuitableUnit = true;
+					}
+				}
+				else
+				{
+					// Don't put units with a combat strength boosted from promotions in cities, these boosts are ignored
+					if(pLoopUnit->getDefenseModifier() == 0 &&
+							pLoopUnit->getAttackModifier() == 0 &&
+							pLoopUnit->getExtraCombatPercent() == 0)
+					{
+						bSuitableUnit = true;
+					}
 				}
 			}
 

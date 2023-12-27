@@ -3014,6 +3014,7 @@ void CvHomelandAI::ExecuteMovesToSafestPlot()
 			{
 				for(int iY = -iRange; iY <= iRange; iY++)
 				{
+					int iAbsRange = iRange < 0 ? -iRange : iRange;
 					CvPlot* pPlot = GC.getMap().plot(pUnit->getX() + iX, pUnit->getY() + iY);
 					if(pPlot == NULL)
 					{
@@ -3033,9 +3034,16 @@ void CvHomelandAI::ExecuteMovesToSafestPlot()
 
 					iDanger = m_pPlayer->GetPlotDanger(*pPlot);
 					bool bIsZeroDanger = (iDanger <= 0);
-					bool bIsInCity = pPlot->isFriendlyCity(*pUnit, false);
-					bool bIsInCover = (pPlot->getNumDefenders(m_pPlayer->GetID()) > 0) && !pUnit->IsCanDefend();
-					bool bIsInTerritory = (pPlot->getTeam() == m_pPlayer->getTeam());
+					bool bIsInCity = false;
+					bool bIsInCover = false;
+					bool bIsInTerritory = false;
+					//for SP, give up danger city
+					if(!MOD_SP_SMART_AI || !pPlot->isDangerCity(*pUnit))
+					{
+						bIsInCity = pPlot->isFriendlyCity(*pUnit, false);
+						bIsInCover = (pPlot->getNumDefenders(m_pPlayer->GetID()) > 0) && !pUnit->IsCanDefend();
+						bIsInTerritory = (pPlot->getTeam() == m_pPlayer->getTeam());
+					}
 
 #if defined(MOD_AI_SMART_V3)
 					bool bNeedEmbark = ((pUnit->getDomainType() == DOMAIN_LAND) && (!pUnit->plot()->isWater()) && (pPlot->isWater()));
@@ -3046,68 +3054,33 @@ void CvHomelandAI::ExecuteMovesToSafestPlot()
 					CvAssert(iDanger < MAX_DANGER_VALUE);
 
 					int iScore;
-#if defined(MOD_AI_SMART_V3)
-					if (MOD_AI_SMART_V3) {
-						// AMS: Lower preference if water and uncovered.
-						if(bNeedEmbark && !bIsInCover)
-						{
-							iScore = PREFERENCE_LEVEL(0, iDanger);
-						}
-						else if(bIsInCity)
-						{
-							iScore = PREFERENCE_LEVEL(6, iDanger);
-						}
-						else if(bIsZeroDanger)
-						{
-							if (bIsInTerritory)
-								iScore = PREFERENCE_LEVEL(5, iDanger);
-							else
-								iScore = PREFERENCE_LEVEL(4, iDanger);
-						}
-						else if(bIsInCover)
-						{
-							iScore = PREFERENCE_LEVEL(3, iDanger);
-						}
-						else if(bIsInTerritory)
-						{
-							iScore = PREFERENCE_LEVEL(2, iDanger);
-						}
-						// if we have no good home, head to the lowest danger value
-						else 
-						{
-							iScore = PREFERENCE_LEVEL(1, iDanger);
-						}
+					// AMS: Lower preference if water and uncovered.
+					if(bNeedEmbark && !bIsInCover)
+					{
+						iScore = PREFERENCE_LEVEL(0, iDanger);
 					}
-					else
+					else if(bIsInCity)
 					{
-#endif
-					if(bIsInCity)
-					{
-						iScore = PREFERENCE_LEVEL(5, iDanger);
+						iScore = PREFERENCE_LEVEL(6, iDanger);
 					}
 					else if(bIsZeroDanger)
 					{
-						if (bIsInTerritory)
-							iScore = PREFERENCE_LEVEL(4, iDanger);
-						else
-							iScore = PREFERENCE_LEVEL(3, iDanger);
+						//add range so we can get nearest
+						iScore = PREFERENCE_LEVEL(bIsInTerritory ? 5:4, iDanger-iAbsRange);
 					}
 					else if(bIsInCover)
 					{
-						iScore = PREFERENCE_LEVEL(2, iDanger);
+						iScore = PREFERENCE_LEVEL(3, iDanger);
 					}
 					else if(bIsInTerritory)
 					{
-						iScore = PREFERENCE_LEVEL(1, iDanger);
+						iScore = PREFERENCE_LEVEL(2, iDanger);
 					}
 					// if we have no good home, head to the lowest danger value
 					else 
 					{
-						iScore = PREFERENCE_LEVEL(0, iDanger);
+						iScore = PREFERENCE_LEVEL(1, iDanger);
 					}
-#if defined(MOD_AI_SMART_V3)
-					}
-#endif
 
 					aBestPlotList.push_back(pPlot, iScore);
 				}
@@ -5441,7 +5414,8 @@ bool CvHomelandAI::FindUnitsForThisMove(AIHomelandMove eMove, bool bFirstTime)
 				case AI_HOMELAND_MOVE_GARRISON:
 				case AI_HOMELAND_MOVE_GARRISON_CITY_STATE:
 					// Want to put ranged units in cities to give them a ranged attack
-					if(pLoopUnit->isRanged() && !pLoopUnit->getUnitInfo().GetUnitAIType(UNITAI_CITY_BOMBARD))
+					// For SP, Siege Unit is ok
+					if(pLoopUnit->isRanged() && (MOD_SP_SMART_AI || !pLoopUnit->getUnitInfo().GetUnitAIType(UNITAI_CITY_BOMBARD)))
 					{
 						bSuitableUnit = true;
 						bHighPriority = true;
@@ -5450,12 +5424,23 @@ bool CvHomelandAI::FindUnitsForThisMove(AIHomelandMove eMove, bool bFirstTime)
 					// Don't use non-combatants
 					else if(pLoopUnit->IsCanAttack())
 					{
-						// Don't put units with a combat strength boosted from promotions in cities, these boosts are ignored
-						if(pLoopUnit->getDefenseModifier() == 0 &&
-						        pLoopUnit->getAttackModifier() == 0 &&
-						        pLoopUnit->getExtraCombatPercent() == 0)
+						// For SP, we want all Land unit except Militia Units 
+						if(MOD_SP_SMART_AI)
 						{
-							bSuitableUnit = true;
+							if(!pLoopUnit->getUnitCombatType() == (UnitCombatTypes)GC.getInfoTypeForString("UNITCOMBAT_RECON", true))
+							{
+								bSuitableUnit = true;
+							}
+						}
+						else
+						{
+							// Don't put units with a combat strength boosted from promotions in cities, these boosts are ignored
+							if(pLoopUnit->getDefenseModifier() == 0 &&
+									pLoopUnit->getAttackModifier() == 0 &&
+									pLoopUnit->getExtraCombatPercent() == 0)
+							{
+								bSuitableUnit = true;
+							}
 						}
 					}
 					break;
