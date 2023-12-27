@@ -6797,6 +6797,11 @@ int CvUnit::GetAttackBonusFromDeathUnit() const
 	return m_iAttackBonusFromDeathUnit;
 }
 //	--------------------------------------------------------------------------------
+int CvUnit::GetAttackModifierFromWorldCongress() const
+{
+	return GC.getGame().GetGameLeagues()->GetGlobalAttackModifier();
+}
+//	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeCaptureEmenyExtraMax(int iValue)
@@ -14644,6 +14649,9 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 	iTempModifier = GetAttackBonusFromDeathUnit();
 	iModifier += iTempModifier;
 
+	iTempModifier = GetAttackModifierFromWorldCongress();
+	iModifier += iTempModifier;
+
 #if defined(MOD_ROG_CORE)
 	int NumOriginalCapitalAttackMod = getNumOriginalCapitalAttackMod();
 	if(NumOriginalCapitalAttackMod != 0)
@@ -15438,6 +15446,8 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 	//modifier from Death Unit(SP Jp UA)
 	iModifier += GetAttackBonusFromDeathUnit();
+
+	iModifier += GetAttackModifierFromWorldCongress();
 
 	// If the empire is unhappy, then Units get a combat penalty
 #if defined(MOD_GLOBAL_CS_RAZE_RARELY)

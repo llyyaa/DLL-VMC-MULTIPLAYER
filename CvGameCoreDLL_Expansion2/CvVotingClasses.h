@@ -125,6 +125,8 @@ struct CvResolutionEffects
 	int iGreatPersonTileImprovementCulture;
 	int iLandmarkCulture;
 #if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	int iGlobalAttackModifier;
+	int iGlobalWarCasualtiesChanges;
 	bool bEmbargoIdeology;
 #endif
 };
@@ -578,10 +580,6 @@ public:
 	int GetPressureForIdeology(PolicyBranchTypes eIdeology);
 	int GetArtsyGreatPersonRateModifier();
 	int GetScienceyGreatPersonRateModifier();
-#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
-	bool IsIdeologyEmbargoed(PlayerTypes eTrader, PlayerTypes eRecipient);
-	bool IsColdWarActive();
-#endif
 
 	// Text composition for UI
 	CvString GetResolutionName(ResolutionTypes eResolution, int iResolutionID, int iProposerChoice, bool bIncludePrefix);
@@ -731,8 +729,13 @@ public:
 	int GetArtsyGreatPersonRateModifier(PlayerTypes ePlayer);
 	int GetScienceyGreatPersonRateModifier(PlayerTypes ePlayer);
 #if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	int GetGlobalAttackModifier();
+	void ChangeGlobalAttackModifier(int iChange);
+	int GetGlobalWarCasualtiesChanges();
+	void ChangeGlobalWarCasualtiesChanges(int iChange);
 	bool IsIdeologyEmbargoed(PlayerTypes eTrader, PlayerTypes eRecipient);
 	bool IsColdWarActive();
+	void SetColdWarActive(int iValue);
 #endif
 
 	// General Logging
@@ -744,6 +747,11 @@ public:
 	int m_iNumLeaguesEverFounded;
 	PlayerTypes m_eDiplomaticVictor;
 	EraTypes m_eLastEraTrigger;
+#if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	int m_iGlobalAttackModifier;
+	int m_iGlobalWarCasualtiesChanges;
+	bool m_bEmbargoIdeology;
+#endif
 
 private:
 	// Logging
@@ -1251,6 +1259,8 @@ public:
 	int GetGreatPersonTileImprovementCulture() const;
 	int GetLandmarkCulture() const;
 #if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	int GetGlobalAttackModifier() const;
+	int GetGlobalWarCasualtiesChanges() const;
 	bool IsEmbargoIdeology() const;
 #endif
 protected:
@@ -1288,6 +1298,8 @@ protected:
 	int m_iGreatPersonTileImprovementCulture;
 	int m_iLandmarkCulture;
 #if defined(MOD_VOTING_NEW_EFFECT_FOR_SP)
+	int m_iGlobalAttackModifier;
+	int m_iGlobalWarCasualtiesChanges;
 	bool m_bEmbargoIdeology;
 #endif
 

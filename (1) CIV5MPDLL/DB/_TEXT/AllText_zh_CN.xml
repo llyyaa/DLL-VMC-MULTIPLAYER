@@ -413,6 +413,19 @@
 			<Text>意识形态分歧已将世界推入冷战，经济和政治派系正在根据各自秉持的意识形态而形成。[NEWLINE][NEWLINE]如果决议通过，所有文明只能与和他们意识形态相同的文明或结盟的城邦建立[ICON_INTERNATIONAL_TRADE]国际商路。并且，与结盟城邦的[ICON_INFLUENCE]影响力不再衰退。[NEWLINE][NEWLINE]在有文明研发完成原子理论之后即可提案。</Text>
 		</Row>
 
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GLOBAL_ATTACK_MODIFIER">
+			<Text>所有军事单位攻击时战斗力变化{1_NumModifier}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GLOBAL_WAR_CASUTIES_CHANGES">
+			<Text>全球战争伤亡和攻占城市后的人口损失变化{1_NumModifier}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_WAR_CONVENTION">
+			<Text>战争公约</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_WAR_CONVENTION_HELP">
+			<Text>随着国际人道主义的发展，世界人民都要求各国军队在交战中保持基本原则和底线。[NEWLINE][NEWLINE]如果决议通过，全球战争伤亡和攻占城市后的人口损失减少20%，所有军事单位攻击战斗力减少10%。[NEWLINE][NEWLINE]在有文明研发完成原子理论之后即可提案。</Text>
+		</Row>
+
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_REPORT">
 			<Text>[COLOR_WARNING_TEXT]-管理成本报告-[ENDCOLOR]</Text>
 		</Row>

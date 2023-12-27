@@ -414,6 +414,19 @@
 			<Text>Ideological differences have pushed the world into a cold war, and economic and political factions are forming based on ideology alone. [NEWLINE][NEWLINE]While this resolution is active, players may only make [ICON_INTERNATIONAL_TRADE] Trade Routes with civilizations that follow the same ideology, or with allied City-States. Furthermore, [ICON_INFLUENCE] Influence levels with allied City-States do not decline. [NEWLINE][NEWLINE]Available once any Civilization discovers Atomic Theory.</Text>
 		</Row>
 
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GLOBAL_ATTACK_MODIFIER">
+			<Text>All Units attack modifier change {1_NumModifier}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GLOBAL_WAR_CASUTIES_CHANGES">
+			<Text>Global war Casualties and Population losses after capture Cities change {1_NumModifier}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_WAR_CONVENTION">
+			<Text>War Convention</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_WAR_CONVENTION_HELP">
+			<Text>With the development of international humanism, All over the world have asked the militaries of all countries to maintain basic principles and bottom lines in the war. [NEWLINE][NEWLINE]While this resolution is active, All Units attack modifier -10%, global war Casualties and Population losses after the capture of a city are reduced by 20% . [NEWLINE][NEWLINE]Available once any Civilization discovers Atomic Theory.</Text>
+		</Row>
+
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_REPORT">
 			<Text>[COLOR_WARNING_TEXT]-Administrative Cost Report-[ENDCOLOR]</Text>
 		</Row>

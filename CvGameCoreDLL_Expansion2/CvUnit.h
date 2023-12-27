@@ -1845,6 +1845,7 @@ public:
 
 	void ChangeAttackBonusFromDeathUnit(int iValue);
 	int GetAttackBonusFromDeathUnit() const;
+	int GetAttackModifierFromWorldCongress() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	const int GetCaptureEmenyExtraMax() const;
 	void ChangeCaptureEmenyExtraMax(int iValue);

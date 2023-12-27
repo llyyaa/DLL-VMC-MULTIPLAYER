@@ -2829,7 +2829,8 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 		int iPercentPopulationRetained = /*50*/ GC.getCITY_CAPTURE_POPULATION_PERCENT();
 		int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
 		iPercentPopulationRetained += (iInfluenceReduction * (100 - iPercentPopulationRetained) / 100);
-
+		iPercentPopulationRetained -= GC.getGame().GetGameLeagues()->GetGlobalWarCasualtiesChanges();
+		iPercentPopulationRetained = iPercentPopulationRetained > 100 ? 100 : iPercentPopulationRetained;
 		iPopulation = max(1, iPopulation * iPercentPopulationRetained / 100);
 	}
 
@@ -15747,7 +15748,7 @@ void CvPlayer::DoUnitKilledCombat(CvUnit* pKillingUnit, PlayerTypes eKilledPlaye
 		int iDelta = GC.getWAR_CASUALTIES_DELTA_BASE();
 		iDelta = (100 + pKilledUnit->GetWarCasualtiesModifier()) * iDelta / 100;
 		iDelta = iDelta < 0 ? 0 : iDelta;
-		iDelta = (100 + pKilledPlayer.GetWarCasualtiesModifier()) * iDelta / 100;
+		iDelta = (100 + pKilledPlayer.GetWarCasualtiesModifier() + GC.getGame().GetGameLeagues()->GetGlobalWarCasualtiesChanges()) * iDelta / 100;
 		pKilledPlayer.ChangeWarCasualtiesCounter(iDelta < 0 ? 0 : iDelta);
 		pKilledPlayer.CheckAndUpdateWarCasualtiesCounter();
 	}

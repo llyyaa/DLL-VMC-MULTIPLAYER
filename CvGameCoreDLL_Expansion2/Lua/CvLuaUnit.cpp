@@ -832,6 +832,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetExtraPopConsume);
 	Method(ChangeAttackBonusFromDeathUnit);
 	Method(GetAttackBonusFromDeathUnit);
+	Method(GetAttackModifierFromWorldCongress);
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	Method(IsNoTroops);
 #endif
@@ -6272,6 +6273,7 @@ LUAAPIIMPL(Unit, SetExtraPopConsume)
 LUAAPIIMPL(Unit, GetExtraPopConsume)
 LUAAPIIMPL(Unit, ChangeAttackBonusFromDeathUnit)
 LUAAPIIMPL(Unit, GetAttackBonusFromDeathUnit)
+LUAAPIIMPL(Unit, GetAttackModifierFromWorldCongress)
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 LUAAPIIMPL(Unit, IsNoTroops)
 #endif

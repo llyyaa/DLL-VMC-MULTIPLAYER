@@ -416,6 +416,19 @@
 			<Text>意識形態分歧已將世界推入冷戰，經濟和政治派系正在根據各自秉持的意識形態而形成。[NEWLINE][NEWLINE]如果決議通過，所有文明只能與和他們意識形態相同的文明或結盟的城邦建立[ICON_INTERNATIONAL_TRADE]國際商路。並且，與結盟城邦的[ICON_INFLUENCE]影響力不再衰退。[NEWLINE][NEWLINE]在有文明研發完成原子理論之後即可提案。</Text>
 		</Row>
 
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GLOBAL_ATTACK_MODIFIER">
+			<Text>所有軍事單位攻擊時戰鬥力變化{1_NumModifier}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GLOBAL_WAR_CASUTIES_CHANGES">
+			<Text>全球戰爭傷亡和攻占城市後的人口損失變化{1_NumModifier}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_WAR_CONVENTION">
+			<Text>戰爭公約</Text>
+		</Row>
+		<Row Tag="TXT_KEY_RESOLUTION_WAR_CONVENTION_HELP">
+			<Text>隨著國際人道主義的發展，世界人民都要求各國軍隊在交戰中保持基本原則和底線。[NEWLINE][NEWLINE]如果決議通過，全球戰爭傷亡和攻占城市後的人口損失減少20%，所有軍事單位攻擊戰鬥力減少10%。[NEWLINE][NEWLINE]在有文明研發完成原子理論之後即可提案。</Text>
+		</Row>
+
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_REPORT">
 			<Text>[COLOR_WARNING_TEXT]-管理成本報告-[ENDCOLOR]</Text>
 		</Row>
