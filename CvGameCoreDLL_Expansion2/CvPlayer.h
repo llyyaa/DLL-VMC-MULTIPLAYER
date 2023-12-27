@@ -2393,23 +2393,23 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iFreeExperienceFromMinors;
 	FAutoVariable<int, CvPlayer> m_iFeatureProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
-	FAutoVariable<int, CvPlayer> m_iSharedIdeologyTourismModifier;
+	int m_iSharedIdeologyTourismModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
-	FAutoVariable<int, CvPlayer> m_iDifferentIdeologyTourismModifier;
-	FAutoVariable<int, CvPlayer> m_iHappinessPerPolicy;
-	FAutoVariable<int, CvPlayer> m_iWaterBuildSpeedModifier;
-	FAutoVariable<int, CvPlayer> m_iSettlerProductionEraModifier;
-	FAutoVariable<int, CvPlayer> m_iSettlerProductionStartEra;
+	int m_iDifferentIdeologyTourismModifier;
+	int m_iHappinessPerPolicy;
+	int m_iWaterBuildSpeedModifier;
+	int m_iSettlerProductionEraModifier;
+	int m_iSettlerProductionStartEra;
 #endif
-	FAutoVariable<int, CvPlayer> m_iNullifyInfluenceModifier;
-	FAutoVariable<int, CvPlayer> m_iNumTradeRouteBonus;
+	int m_iNullifyInfluenceModifier;
+	int m_iNumTradeRouteBonus;
 	FAutoVariable<std::vector<int>, CvPlayer> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
-	FAutoVariable<int, CvPlayer> m_iCityStateTradeRouteProductionModifierGlobal;
-	FAutoVariable<int, CvPlayer> m_iLandmarksTourismPercentGlobal;
-	FAutoVariable<int, CvPlayer> m_iGreatWorksTourismModifierGlobal;
-	FAutoVariable<int, CvPlayer> m_iTradeRouteSeaGoldBonusGlobal;
-	FAutoVariable<int, CvPlayer> m_iTradeRouteLandGoldBonusGlobal;
+	int m_iCityStateTradeRouteProductionModifierGlobal;
+	int m_iLandmarksTourismPercentGlobal;
+	int m_iGreatWorksTourismModifierGlobal;
+	int m_iTradeRouteSeaGoldBonusGlobal;
+	int m_iTradeRouteLandGoldBonusGlobal;
 #endif
 	FAutoVariable<int, CvPlayer> m_iImprovementCostModifier;
 	FAutoVariable<int, CvPlayer> m_iImprovementUpgradeRateModifier;
