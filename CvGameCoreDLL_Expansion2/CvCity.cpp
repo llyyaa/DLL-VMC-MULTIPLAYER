@@ -7501,6 +7501,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		changeCultureRateModifier(pBuildingInfo->GetCultureRateModifier() * iChange);
 		changePlotCultureCostModifier(pBuildingInfo->GetPlotCultureCostModifier() * iChange);
 		changePlotBuyCostModifier(pBuildingInfo->GetPlotBuyCostModifier() * iChange);
+		ChangeUnitMaxExperienceLocal(pBuildingInfo->GetUnitMaxExperienceLocal() * iChange);
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 		changeCityWorkingChange(pBuildingInfo->GetCityWorkingChange() * iChange);
 #endif
@@ -12552,6 +12553,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	if(iTempMod != 0)
 	{	
 		iModifier *= (iTempMod + 100);
+		iModifier /= 100;
 		if(iTempMod != 0 && toolTipSink){
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_MULTIPLIER_YIELD", iTempMod);
 		}
