@@ -255,6 +255,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piYieldChangePerPop(NULL),
 	m_piYieldChangePerReligion(NULL),
 	m_piYieldModifier(NULL),
+	m_piYieldMultiplier(NULL),
 	m_piAreaYieldModifier(NULL),
 	m_piGlobalYieldModifier(NULL),
 	m_piTechEnhancedYieldChange(NULL),
@@ -367,6 +368,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piYieldChangePerPop);
 	SAFE_DELETE_ARRAY(m_piYieldChangePerReligion);
 	SAFE_DELETE_ARRAY(m_piYieldModifier);
+	SAFE_DELETE_ARRAY(m_piYieldMultiplier);
 	SAFE_DELETE_ARRAY(m_piAreaYieldModifier);
 	SAFE_DELETE_ARRAY(m_piGlobalYieldModifier);
 	SAFE_DELETE_ARRAY(m_piTechEnhancedYieldChange);
@@ -797,6 +799,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piYieldChangePerPop, "Building_YieldChangesPerPop", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldChangePerReligion, "Building_YieldChangesPerReligion", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldModifier, "Building_YieldModifiers", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldMultiplier, "Building_YieldMultiplier", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piYieldFromInternal, "Building_YieldFromInternalTR", "BuildingType", szBuildingType);
 #if defined(MOD_ROG_CORE)
 	kUtility.SetYields(m_piYieldFromConstruction, "Building_YieldFromConstruction", "BuildingType", szBuildingType);
@@ -3000,6 +3003,20 @@ int CvBuildingEntry::GetYieldModifier(int i) const
 int* CvBuildingEntry::GetYieldModifierArray() const
 {
 	return m_piYieldModifier;
+}
+
+/// Multiplier to yield by type
+int CvBuildingEntry::GetYieldMultiplier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldMultiplier ? m_piYieldMultiplier[i] : -1;
+}
+
+/// Array of yield Multipliers
+int* CvBuildingEntry::GetYieldMultiplierArray() const
+{
+	return m_piYieldMultiplier;
 }
 
 

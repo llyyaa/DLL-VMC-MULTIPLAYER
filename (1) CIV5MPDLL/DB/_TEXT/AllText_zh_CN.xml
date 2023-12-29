@@ -667,6 +667,9 @@
 		<Row Tag="TXT_KEY_SP_NOTIFICATION_MP_PLOT_SIGNAL_SUMMARY">
 			<Text>标记地点。</Text>
 		</Row>
+		<Row Tag="TXT_KEY_MULTIPLIER_YIELD">
+			<Text>[NEWLINE][ICON_BULLET]城市级总值修正: {1_Num}%</Text>
+		</Row>
 	</Language_zh_CN>
 
 </GameData>

@@ -38,3 +38,5 @@ ALTER TABLE Buildings ADD 'DummyBuilding' BOOLEAN DEFAULT 0;
 ALTER TABLE Buildings ADD 'InstantResearchFromFriendlyGreatScientist' INTEGER DEFAULT 0;
 
 ALTER TABLE Buildings ADD 'NoPuppet' BOOLEAN DEFAULT 0;
+
+ALTER TABLE Buildings ADD 'UnitMaxExperienceLocal' INTEGER DEFAULT 0;

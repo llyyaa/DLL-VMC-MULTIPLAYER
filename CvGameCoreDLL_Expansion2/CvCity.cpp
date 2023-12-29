@@ -338,6 +338,7 @@ CvCity::CvCity() :
 	, m_aiBaseYieldRateFromProjects("CvCity::m_aiBaseYieldRateFromProjects", m_syncArchive)
 	, m_aiBaseYieldRateFromMisc("CvCity::m_aiBaseYieldRateFromMisc", m_syncArchive)
 	, m_aiYieldRateModifier("CvCity::m_aiYieldRateModifier", m_syncArchive)
+	, m_aiYieldRateMultiplier("CvCity::m_aiYieldRateMultiplier", m_syncArchive)
 	, m_aiYieldPerPop("CvCity::m_aiYieldPerPop", m_syncArchive)
 	, m_aiPowerYieldRateModifier("CvCity::m_aiPowerYieldRateModifier", m_syncArchive)
 	, m_aiFeatureYieldRateModifier("CvCity::m_aiFeatureYieldRateModifier", m_syncArchive)
@@ -1175,6 +1176,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 
 	m_aiYieldPerReligion.resize(NUM_YIELD_TYPES);
 	m_aiYieldRateModifier.resize(NUM_YIELD_TYPES);
+	m_aiYieldRateMultiplier.resize(NUM_YIELD_TYPES);
 	m_aiPowerYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiFeatureYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiImprovementYieldRateModifier.resize(NUM_YIELD_TYPES);
@@ -1197,6 +1199,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiYieldPerPop.setAt(iI, 0);
 		m_aiYieldPerReligion[iI] = 0;
 		m_aiYieldRateModifier.setAt(iI, 0);
+		m_aiYieldRateMultiplier.setAt(iI, 0);
 		m_aiPowerYieldRateModifier.setAt(iI, 0);
 		m_aiFeatureYieldRateModifier.setAt(iI, 0);
 		m_aiImprovementYieldRateModifier.setAt(iI, 0);
@@ -7743,6 +7746,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			ChangeYieldPerPopTimes100(eYield, pBuildingInfo->GetYieldChangePerPop(eYield) * iChange);
 			ChangeYieldPerReligionTimes100(eYield, pBuildingInfo->GetYieldChangePerReligion(eYield) * iChange);
 			changeYieldRateModifier(eYield, (pBuildingInfo->GetYieldModifier(eYield) * iChange));
+			changeYieldRateMultiplier(eYield, (pBuildingInfo->GetYieldMultiplier(eYield) * iChange));
 
 			CvPlayerPolicies* pPolicies = GET_PLAYER(getOwner()).GetPlayerPolicies();
 			changeYieldRateModifier(eYield, pPolicies->GetBuildingClassYieldModifier(eBuildingClass, eYield) * iChange);
@@ -12492,10 +12496,22 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 
 	iModifier += iExtra;
 
+	iModifier += 100;
+
+	// Yield Rate Multiplier
+	iTempMod = getYieldRateMultiplier(eIndex);
+	if(iTempMod != 0)
+	{	
+		iModifier *= (iTempMod + 100);
+		if(iTempMod != 0 && toolTipSink){
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_MULTIPLIER_YIELD", iTempMod);
+		}
+	}
+
 	// note: player->invalidateYieldRankCache() must be called for anything that is checked here
 	// so if any extra checked things are added here, the cache needs to be invalidated
 
-	return std::max(0, (iModifier + 100));
+	return std::max(0, iModifier);
 }
 
 //	--------------------------------------------------------------------------------
@@ -13788,6 +13804,31 @@ void CvCity::changeYieldRateModifier(YieldTypes eIndex, int iChange)
 		m_aiYieldRateModifier.setAt(eIndex, m_aiYieldRateModifier[eIndex] + iChange);
 		CvAssert(getYieldRate(eIndex, false) >= 0);
 
+		GET_PLAYER(getOwner()).invalidateYieldRankCache(eIndex);
+	}
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvCity::getYieldRateMultiplier(YieldTypes eIndex)	const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldRateMultiplier[eIndex];
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvCity::changeYieldRateMultiplier(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if(iChange != 0)
+	{
+		m_aiYieldRateMultiplier.setAt(eIndex, m_aiYieldRateMultiplier[eIndex] + iChange);
 		GET_PLAYER(getOwner()).invalidateYieldRankCache(eIndex);
 	}
 }
@@ -18823,6 +18864,7 @@ void CvCity::read(FDataStream& kStream)
 		}
 	}
 	kStream >> m_aiYieldRateModifier;
+	kStream >> m_aiYieldRateMultiplier;
 	kStream >> m_aiPowerYieldRateModifier;
 	kStream >> m_aiFeatureYieldRateModifier;
 	kStream >> m_aiImprovementYieldRateModifier;
@@ -19259,6 +19301,7 @@ void CvCity::write(FDataStream& kStream) const
 #endif
 	kStream << m_aiYieldPerReligion;
 	kStream << m_aiYieldRateModifier;
+	kStream << m_aiYieldRateMultiplier;
 	kStream << m_aiPowerYieldRateModifier;
 	kStream << m_aiFeatureYieldRateModifier;
 	kStream << m_aiImprovementYieldRateModifier;

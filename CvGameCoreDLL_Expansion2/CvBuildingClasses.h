@@ -373,6 +373,8 @@ public:
 	int* GetYieldChangePerReligionArray() const;
 	int GetYieldModifier(int i) const;;
 	int* GetYieldModifierArray() const;
+	int GetYieldMultiplier(int i) const;;
+	int* GetYieldMultiplierArray() const;
 
 #if defined(MOD_ROG_CORE)
 	int GetYieldFromConstruction(int i) const;
@@ -800,6 +802,7 @@ private:
 	int* m_piYieldChangePerPop;
 	int* m_piYieldChangePerReligion;
 	int* m_piYieldModifier;
+	int* m_piYieldMultiplier;
 
 #if defined(MOD_ROG_CORE)
 	int* m_piYieldFromConstruction;

@@ -664,6 +664,9 @@
 		<Row Tag="TXT_KEY_SP_NOTIFICATION_MP_PLOT_SIGNAL_SUMMARY">
 			<Text>Mark Plot.</Text>
 		</Row>
+		<Row Tag="TXT_KEY_MULTIPLIER_YIELD">
+			<Text>[NEWLINE][ICON_BULLET]City Multiplier: {1_Num}%</Text>
+		  </Row>
 	</Language_en_US>
 
 </GameData>
