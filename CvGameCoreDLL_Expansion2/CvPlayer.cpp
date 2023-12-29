@@ -22234,7 +22234,7 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 			iTotalNumResource *= GetStrategicResourceMod();
 			iTotalNumResource /= 100;
 		}
-		if(!isHuman() && isMajorCiv() && !IsAITeammateOfHuman())
+		if(!isHuman() && isMajorCiv() && !IsAITeammateOfHuman() && GetDiplomacyAI()->GetStateAllWars() != STATE_ALL_WARS_LOSING)
 		{
 			int iHanHandicapMod = GC.getGame().getHandicapInfo().getStrategicResourceMod();
 			iHanHandicapMod += GC.getGame().getHandicapInfo().getStrategicResourceModPerEra() * GetCurrentEra();
