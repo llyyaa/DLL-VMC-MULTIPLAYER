@@ -265,6 +265,7 @@ CvCity::CvCity() :
 	, m_iCapturePlunderModifier("CvCity::m_iCapturePlunderModifier", m_syncArchive)
 	, m_iPlotCultureCostModifier("CvCity::m_iPlotCultureCostModifier", m_syncArchive)
 	, m_iPlotBuyCostModifier(0)
+	, m_iUnitMaxExperienceLocal(0)
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	, m_iCityWorkingChange(0)
 #endif
@@ -393,6 +394,7 @@ CvCity::CvCity() :
 	, m_abBaseYieldRankValid("CvCity::m_abBaseYieldRankValid", m_syncArchive)
 	, m_aiYieldRank("CvCity::m_aiYieldRank", m_syncArchive)
 	, m_abYieldRankValid("CvCity::m_abYieldRankValid", m_syncArchive)
+	, m_paiHurryModifier("CvCity::m_paiHurryModifier", m_syncArchive)
 	, m_bOwedCultureBuilding(false)
 
 	, m_yieldChanges(NUM_YIELD_TYPES)
@@ -995,6 +997,7 @@ void CvCity::uninit()
 	m_ppiYieldModifierFromFeature.clear();
 	m_ppiYieldModifierFromImprovement.clear();
 	m_ppiYieldModifierFromResource.clear();
+	m_paiHurryModifier.clear();
 }
 
 //	--------------------------------------------------------------------------------
@@ -1071,6 +1074,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iCapturePlunderModifier = 0;
 	m_iPlotCultureCostModifier = 0;
 	m_iPlotBuyCostModifier = 0;
+	m_iUnitMaxExperienceLocal = 0;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	m_iCityWorkingChange = 0;
 #endif
@@ -1534,6 +1538,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	{
 		m_ppiYieldModifierFromResource[i] = yield;
 	}
+	m_paiHurryModifier.clear();
+	m_paiHurryModifier.resize(GC.getNumHurryInfos(), 0);
 }
 
 
@@ -4688,6 +4694,11 @@ int CvCity::getProductionExperience(UnitTypes eUnit)
 #endif
 		}
 	}
+	int iMaxExperience = GetUnitMaxExperienceLocal();
+	if(iMaxExperience > 0 && iExperience > iMaxExperience)
+	{
+		iExperience = iMaxExperience;
+	}
 
 	return std::max(0, iExperience);
 }
@@ -6110,13 +6121,8 @@ int CvCity::GetPurchaseCostFromProduction(int iProduction)
 
 	if(eHurry != NO_HURRY)
 	{
-		int iHurryMod = GET_PLAYER(getOwner()).getHurryModifier(eHurry);
-
-		if(iHurryMod != 0)
-		{
-			iPurchaseCost *= (100 + iHurryMod);
-			iPurchaseCost /= 100;
-		}
+		iPurchaseCost *= GetHurryModifier(eHurry);
+		iPurchaseCost /= 100;
 	}
 
 	// Game Speed modifier
@@ -7929,6 +7935,11 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 					ChangeBaseYieldRateFromBuildings(eYield, iBuildingClassBonus * iChange);
 			}
 		}
+		// Hurries Local
+		for(int iI = 0; iI < GC.getNumHurryInfos(); iI++)
+		{
+			ChangeHurryModifierLocal((HurryTypes) iI, (pBuildingInfo->GetHurryModifierLocal(iI) * iChange));
+		}
 
 		if(GC.getBuildingInfo(eBuilding)->GetSpecialistType() != NO_SPECIALIST)
 		{
@@ -8780,11 +8791,8 @@ int CvCity::getHurryCostModifier(HurryTypes eHurry, int iBaseModifier, int iProd
 	// Some places just don't care what kind of Hurry it is (leftover from Civ 4)
 	if(eHurry != NO_HURRY)
 	{
-		if(GET_PLAYER(getOwner()).getHurryModifier(eHurry) != 0)
-		{
-			iModifier *= (100 + GET_PLAYER(getOwner()).getHurryModifier(eHurry));
-			iModifier /= 100;
-		}
+		iModifier *= GetHurryModifier(eHurry);
+		iModifier /= 100;
 	}
 
 	return iModifier;
@@ -8905,6 +8913,33 @@ int CvCity::hurryProduction(HurryTypes eHurry) const
 	}
 
 	return iProduction;
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetHurryModifier(HurryTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumHurryInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+	int tmp = 100;
+	tmp += GET_PLAYER(getOwner()).getHurryModifier(eIndex);
+	tmp += GetHurryModifierLocal(eIndex);
+	return tmp < 0 ? 0 : tmp;
+}
+//	--------------------------------------------------------------------------------
+int CvCity::GetHurryModifierLocal(HurryTypes eIndex) const
+{
+	return m_paiHurryModifier[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeHurryModifierLocal(HurryTypes eIndex, int iChange)
+{
+	if(iChange != 0)
+	{
+		CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+		CvAssertMsg(eIndex < GC.getNumHurryInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+		m_paiHurryModifier.setAt(eIndex, m_paiHurryModifier[eIndex] + iChange);
+	}
 }
 
 //	--------------------------------------------------------------------------------
@@ -10476,6 +10511,20 @@ void CvCity::changePlotBuyCostModifier(int iChange)
 	m_iPlotBuyCostModifier = (m_iPlotBuyCostModifier + iChange);
 }
 
+//	--------------------------------------------------------------------------------
+int CvCity::GetUnitMaxExperienceLocal() const
+{
+	VALIDATE_OBJECT
+	return m_iUnitMaxExperienceLocal;
+}
+void CvCity::ChangeUnitMaxExperienceLocal(int iChange)
+{
+	VALIDATE_OBJECT
+	m_iUnitMaxExperienceLocal = (m_iUnitMaxExperienceLocal + iChange);
+}
+
+
+//	--------------------------------------------------------------------------------
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 //	--------------------------------------------------------------------------------
 int CvCity::GetCityWorkingChange() const
@@ -18711,6 +18760,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iCapturePlunderModifier;
 	kStream >> m_iPlotCultureCostModifier;
 	kStream >> m_iPlotBuyCostModifier;
+	kStream >> m_iUnitMaxExperienceLocal;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	MOD_SERIALIZE_READ(23, kStream, m_iCityWorkingChange, 0);
 #endif
@@ -19026,6 +19076,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_abBaseYieldRankValid;
 	kStream >> m_aiYieldRank;
 	kStream >> m_abYieldRankValid;
+	kStream >> m_paiHurryModifier;
 
 	kStream >> m_iGameTurnLastExpanded;
 	m_strName = "";
@@ -19180,6 +19231,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iCapturePlunderModifier;  // Added for Version 3
 	kStream << m_iPlotCultureCostModifier; // Added for Version 3
 	kStream << m_iPlotBuyCostModifier; // Added for Version 12
+	kStream << m_iUnitMaxExperienceLocal;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	MOD_SERIALIZE_WRITE(kStream, m_iCityWorkingChange);
 #endif
@@ -19398,6 +19450,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_abBaseYieldRankValid;
 	kStream << m_aiYieldRank;
 	kStream << m_abYieldRankValid;
+	kStream << m_paiHurryModifier;
 
 	kStream << m_iGameTurnLastExpanded;
 

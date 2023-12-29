@@ -788,6 +788,9 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetMaxCorruptionLevel);
 	Method(IsCorruptionLevelReduceByOne);
 #endif
+	Method(GetHurryModifier);
+	Method(GetHurryModifierLocal);
+	Method(GetUnitMaxExperienceLocal);
 }
 //------------------------------------------------------------------------------
 void CvLuaCity::HandleMissingInstance(lua_State* L)
@@ -5226,4 +5229,8 @@ int CvLuaCity::lDecideCorruptionLevelForNormalCity(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+
+LUAAPIIMPL(City, GetHurryModifier);
+LUAAPIIMPL(City, GetHurryModifierLocal);
+LUAAPIIMPL(City, GetUnitMaxExperienceLocal);
 #endif

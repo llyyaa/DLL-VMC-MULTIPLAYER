@@ -714,6 +714,9 @@ protected:
 	LUAAPIEXTN(GetMaxCorruptionLevel, int);
 	LUAAPIEXTN(IsCorruptionLevelReduceByOne, bool);
 #endif
+	LUAAPIEXTN(GetHurryModifier, int);
+	LUAAPIEXTN(GetHurryModifierLocal, int);
+	LUAAPIEXTN(GetUnitMaxExperienceLocal, int);
 };
 
 #endif //CVLUACITY_H

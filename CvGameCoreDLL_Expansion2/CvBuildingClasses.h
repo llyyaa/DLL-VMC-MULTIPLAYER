@@ -446,8 +446,10 @@ public:
 	int GetFeatureOr(int i) const;
 	int GetFeatureAnd(int i) const;
 	int GetHurryModifier(int i) const;
+	int GetHurryModifierLocal(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int GetUnitMaxExperienceLocal() const;
 	int GetMinNumReligions() const;
 	int GetCityStateTradeRouteProductionModifierGlobal() const;
 	int GetLandmarksTourismPercentGlobal() const;
@@ -847,6 +849,7 @@ private:
 	int* m_piLocalFeatureOrs;
 	int* m_piLocalFeatureAnds;
 	int* m_paiHurryModifier;
+	int* m_paiHurryModifierLocal;
 
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
 	int m_iNumAllowPurchaseUnits[NUM_YIELD_TYPES];
@@ -855,6 +858,7 @@ private:
 
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iUnitMaxExperienceLocal;
 	int m_iMinNumReligions;
 	int m_iCityStateTradeRouteProductionModifierGlobal;
 	int m_iLandmarksTourismPercentGlobal;

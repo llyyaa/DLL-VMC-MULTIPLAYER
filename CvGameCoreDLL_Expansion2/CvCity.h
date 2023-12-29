@@ -575,6 +575,8 @@ public:
 
 	int getPlotBuyCostModifier() const;
 	void changePlotBuyCostModifier(int iChange);
+	int GetUnitMaxExperienceLocal() const;
+	void ChangeUnitMaxExperienceLocal(int iChange);
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	int GetCityWorkingChange() const;
 	void changeCityWorkingChange(int iChange);
@@ -1347,6 +1349,9 @@ public:
 	void SetYieldFromCrime(YieldTypes eYield, int iValue);
 	int GetYieldFromCrime(YieldTypes eYield) const;
 #endif
+	int GetHurryModifier(HurryTypes eIndex) const;
+	int GetHurryModifierLocal(HurryTypes eIndex) const;
+	void ChangeHurryModifierLocal(HurryTypes eIndex, int iChange);
 
 protected:
 	FAutoArchiveClassContainer<CvCity> m_syncArchive;
@@ -1385,6 +1390,7 @@ protected:
 	FAutoVariable<int, CvCity> m_iCapturePlunderModifier;
 	FAutoVariable<int, CvCity> m_iPlotCultureCostModifier;
 	int m_iPlotBuyCostModifier;
+	int m_iUnitMaxExperienceLocal;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	int m_iCityWorkingChange;
 #endif
@@ -1636,6 +1642,8 @@ protected:
 	FAutoVariable<std::vector<bool>, CvCity> m_abBaseYieldRankValid;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldRank;
 	FAutoVariable<std::vector<bool>, CvCity> m_abYieldRankValid;
+
+	FAutoVariable<std::vector<int>, CvCity> m_paiHurryModifier;
 
 	IDInfo m_combatUnit;		// The unit the city is in combat with
 
