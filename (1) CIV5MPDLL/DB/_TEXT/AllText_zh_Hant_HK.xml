@@ -507,6 +507,9 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ESPIONAGE_SPY">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自间谍获取</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_GARRISONED_UNIT">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自驻军</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CS_FRIENDSHIP">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自友好城邦</Text>
 		</Row>

@@ -12205,6 +12205,24 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		iModifier += iTempMod;
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_SPIES", iTempMod);
 	}
+
+
+	
+	if (eIndex == YIELD_CRIME && owner.isGoldenAge())
+	{
+		iTempMod = GC.getCITY_CRIME_GOLDEN_AGE_YIELD();
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_GOLDEN_AGE", iTempMod);
+	}
+
+	if (eIndex == YIELD_LOYALTY && owner.isGoldenAge())
+	{
+		iTempMod = GC.getCITY_LOYALTY_GOLDEN_AGE_YIELD();
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_GOLDEN_AGE", iTempMod);
+	}
 #endif
 
 
@@ -12794,15 +12812,10 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 	}
 
 	if (eIndex == YIELD_CRIME)
-	{	    int NumForeignSpy = getNumForeignSpy();
-			iValue += NumForeignSpy * GC.getCITY_CRIME_SPY_YIELD();
-			if (HasOwnSpy())
-			{
-				iValue -= GC.getCITY_CRIME_SPY_YIELD();
-			}
-
-			int CrimeFromOpinion = getCrimeFromOpinion();
-			iValue += CrimeFromOpinion;
+	{
+		iValue += getCrimeFromSpy();
+		iValue += getCrimeFromOpinion();
+		iValue += getCrimeFromGarrisonedUnit();
 	}
 
 	iValue += GetYieldFromHealth(eIndex);
@@ -12839,16 +12852,17 @@ int CvCity::getNumForeignSpy() const
 	return iNumForeignSpy;
 }
 
-//	--------------------------------------------------------------------------------
-bool CvCity::HasOwnSpy() const
+
+int CvCity::getCrimeFromSpy() const
 {
-	int iSpyIndex = GetCityEspionage()->m_aiSpyAssignment[getOwner()];
-	if (iSpyIndex != -1 && !GET_PLAYER(getOwner()).GetEspionage()->IsDiplomat(iSpyIndex));
+	int iNumOtherSpy = getNumForeignSpy();
+
+	if (GetCityEspionage()->m_aiSpyAssignment[getOwner()] != -1)
 	{
-		return true;
+		iNumOtherSpy -= 1;
 	}
 
-	return false;
+	return iNumOtherSpy* GC.getCITY_CRIME_SPY_YIELD();
 }
 
 int CvCity::getCrimeFromOpinion() const
@@ -12870,6 +12884,40 @@ int CvCity::getCrimeFromOpinion() const
 		iCrimeFromOpinion = GC.getCITY_CRIME_OPINION_DISSIDENTS_YIELD();
 	}
 	return iCrimeFromOpinion;
+}
+
+int CvCity::getCrimeFromGarrisonedUnit() const
+{
+	int iCrimeFromGarrisonedUnit = 0;
+	// Garrisoned Unit
+	CvUnit* pGarrisonedUnit = GetGarrisonedUnit();
+	if (pGarrisonedUnit)
+	{
+		int iGarrisonedStrength = 0;
+		iGarrisonedStrength = pGarrisonedUnit->GetBaseCombatStrength();
+
+		if (iGarrisonedStrength <= 30)
+		{
+			iCrimeFromGarrisonedUnit = -3;
+		}
+		else if (iGarrisonedStrength >30 && iGarrisonedStrength<= 60)
+		{
+			iCrimeFromGarrisonedUnit = -5;
+		}
+		else if (iGarrisonedStrength > 60 && iGarrisonedStrength <= 100)
+		{
+			iCrimeFromGarrisonedUnit = -7;
+		}
+		else if (iGarrisonedStrength > 100 && iGarrisonedStrength <= 200)
+		{
+			iCrimeFromGarrisonedUnit = -10;
+		}
+		else if (iGarrisonedStrength > 200 )
+		{
+			iCrimeFromGarrisonedUnit = -15;
+		}
+	}
+	return iCrimeFromGarrisonedUnit;
 }
 
 //	--------------------------------------------------------------------------------
@@ -13014,12 +13062,8 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 
 	if (eIndex == YIELD_CRIME)
 	{
-		int NumForeignSpy = getNumForeignSpy();
-		iBaseValue = NumForeignSpy * GC.getCITY_CRIME_SPY_YIELD();
-		if (HasOwnSpy())
-		{
-			iBaseValue -= GC.getCITY_CRIME_SPY_YIELD();
-		}
+
+		iBaseValue = getCrimeFromSpy();
 		if (iBaseValue != 0)
 		{
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPIES", iBaseValue, YieldIcon);
@@ -13029,6 +13073,12 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		if (iBaseValue != 0)
 		{
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OPINION", iBaseValue, YieldIcon);
+		}
+
+		iBaseValue = getCrimeFromGarrisonedUnit();
+		if (iBaseValue != 0)
+		{
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_GARRISONED_UNIT", iBaseValue, YieldIcon);
 		}
 	}
 
