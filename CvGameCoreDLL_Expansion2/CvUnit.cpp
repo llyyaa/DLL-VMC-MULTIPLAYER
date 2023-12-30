@@ -29974,6 +29974,14 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetCityAttackPercent(), getDomainType() == DOMAIN_SEA ? 1 : getExtraCityAttackPercent(), iFlavorOffense, lowPriority);
 		}
+		if (iValue == 0)
+		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetMovePercentCaptureCity(), getExtraCityAttackPercent(), iFlavorOffense, lowPriority);
+		}
+		if (iValue == 0)
+		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetHealPercentCaptureCity(), getExtraCityAttackPercent(), iFlavorOffense, lowPriority);
+		}
 
 		if (iValue == 0)
 		{
@@ -30267,6 +30275,22 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		{
 			iValue += iFlavorRanged * 2;
 		}
+	}
+	iTemp = pkPromotionInfo->GetMovePercentCaptureCity();
+	if(iTemp != 0 && !isRanged())
+	{
+		iExtra = getExtraCityAttackPercent();
+		iTemp *= (100 + iExtra * 2);
+		iTemp /= 100;
+		iValue += iTemp + iFlavorOffense * 2;
+	}
+	iTemp = pkPromotionInfo->GetHealPercentCaptureCity();
+	if(iTemp != 0 && !isRanged())
+	{
+		iExtra = getExtraCityAttackPercent();
+		iTemp *= (100 + iExtra * 2);
+		iTemp /= 100;
+		iValue += iTemp + iFlavorOffense * 2;
 	}
 
 	iTemp = pkPromotionInfo->GetCityDefensePercent();
