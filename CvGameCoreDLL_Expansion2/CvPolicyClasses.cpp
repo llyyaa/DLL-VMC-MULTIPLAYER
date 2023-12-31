@@ -152,6 +152,8 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iProtectedMinorPerTurnInfluence(0),
 	m_iAfraidMinorPerTurnInfluence(0),
 	m_iMinorBullyScoreModifier(0),
+	m_iMinorLocalBullyScoreModifier(0),
+	m_iMinorAllyBullyScoreModifier(0),
 	m_iMinorBullyInfluenceLossModifier(0),
 	m_iThemingBonusMultiplier(0),
 	m_iInternalTradeRouteYieldModifier(0),
@@ -460,6 +462,8 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iProtectedMinorPerTurnInfluence = kResults.GetInt("ProtectedMinorPerTurnInfluence");
 	m_iAfraidMinorPerTurnInfluence = kResults.GetInt("AfraidMinorPerTurnInfluence");
 	m_iMinorBullyScoreModifier = kResults.GetInt("MinorBullyScoreModifier");
+	m_iMinorLocalBullyScoreModifier = kResults.GetInt("MinorLocalBullyScoreModifier");
+	m_iMinorAllyBullyScoreModifier = kResults.GetInt("MinorAllyBullyScoreModifier");
 	m_iMinorBullyInfluenceLossModifier = kResults.GetInt("MinorBullyInfluenceLossModifier");
 	m_iThemingBonusMultiplier = kResults.GetInt("ThemingBonusMultiplier");
 	m_iInternalTradeRouteYieldModifier = kResults.GetInt("InternalTradeRouteYieldModifier");
@@ -2041,6 +2045,18 @@ int CvPolicyEntry::GetAfraidMinorPerTurnInfluence() const
 int CvPolicyEntry::GetMinorBullyScoreModifier() const
 {
 	return m_iMinorBullyScoreModifier;
+}
+
+/// Score modifier for ability to Local bully a minor
+int CvPolicyEntry::GetMinorLocalBullyScoreModifier() const
+{
+	return m_iMinorLocalBullyScoreModifier;
+}
+
+/// Score modifier for ability to Ally bully a minor
+int CvPolicyEntry::GetMinorAllyBullyScoreModifier() const
+{
+	return m_iMinorAllyBullyScoreModifier;
 }
 
 int CvPolicyEntry::GetMinorBullyInfluenceLossModifier() const

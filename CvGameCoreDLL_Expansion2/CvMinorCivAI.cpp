@@ -9029,6 +9029,14 @@ int CvMinorCivAI::CalculateBullyMetric(PlayerTypes eBullyPlayer, bool bForUnit, 
 	if(!GetPlayer()->isAlive())
 		return iFailScore;
 
+	PlayerTypes eAllyPlayer = GetAlly();
+	int iAllyBullyScoreModifier = 0;
+	if(eAllyPlayer != NO_PLAYER && eAllyPlayer != eBullyPlayer)
+	{
+		CvPlayerAI& kAllyPlayer = GET_PLAYER(eAllyPlayer);
+		iAllyBullyScoreModifier = kAllyPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_MINOR_ALLY_BULLY_SCORE_MODIFIER);
+	}
+
 	// **************************
 	// Global military power ranking of major
 	//
@@ -9037,6 +9045,7 @@ int CvMinorCivAI::CalculateBullyMetric(PlayerTypes eBullyPlayer, bool bForUnit, 
 	CvWeightedVector<PlayerTypes, MAX_MAJOR_CIVS, true> veMilitaryRankings;
 	PlayerTypes eMajorLoop;
 	int iGlobalMilitaryScore = 0;
+	int iAllyMilitaryScore = 0;
 	for(int iMajorLoop = 0; iMajorLoop < MAX_MAJOR_CIVS; iMajorLoop++)
 	{
 		eMajorLoop = (PlayerTypes) iMajorLoop;
@@ -9053,10 +9062,21 @@ int CvMinorCivAI::CalculateBullyMetric(PlayerTypes eBullyPlayer, bool bForUnit, 
 		{
 			float fRankRatio = (float)(veMilitaryRankings.size() - iRanking) / (float)(veMilitaryRankings.size());
 			iGlobalMilitaryScore = (int)(fRankRatio * 75); // A score between 75*(1 / num majors alive) and 75, with the highest rank major getting 75
-			iScore += iGlobalMilitaryScore;
-			break;
+		}
+		else if(veMilitaryRankings.GetElement(iRanking) == eAllyPlayer)
+		{
+			float fRankRatio = (float)(veMilitaryRankings.size() - iRanking) / (float)(veMilitaryRankings.size());
+			iAllyMilitaryScore = (int)(fRankRatio * 75); // A score between 75*(1 / num majors alive) and 75, with the highest rank major getting 75
 		}
 	}
+
+	if(iAllyBullyScoreModifier != 0)
+	{
+		iGlobalMilitaryScore -= iAllyMilitaryScore * iAllyBullyScoreModifier /100;
+		iGlobalMilitaryScore = iGlobalMilitaryScore < 0 ? 0 : iGlobalMilitaryScore;
+	}
+
+	iScore += iGlobalMilitaryScore;
 	
 	if (sTooltipSink)
 	{
@@ -9082,9 +9102,11 @@ int CvMinorCivAI::CalculateBullyMetric(PlayerTypes eBullyPlayer, bool bForUnit, 
 	int iMinorCapitalY = pMinorCapitalPlot->getY();
 	int iMinorLocalPower = 0;
 	int iBullyLocalPower = 0;
+	int iAllyLocalPower = 0;
 	CvPlot* pLoopPlot;
 	IDInfo* pUnitNode;
 	CvUnit* pLoopUnit;
+	PlayerTypes eMinorPlayer = GetPlayer()->GetID();
 
 	// Include the minor's city power
 	iMinorLocalPower += pMinorCapital->GetPower();
@@ -9114,9 +9136,13 @@ int CvMinorCivAI::CalculateBullyMetric(PlayerTypes eBullyPlayer, bool bForUnit, 
 							{
 								iBullyLocalPower += pLoopUnit->GetPower();
 							}
-							else if(pLoopUnit->getOwner() == GetPlayer()->GetID())
+							else if(pLoopUnit->getOwner() == eMinorPlayer)
 							{
 								iMinorLocalPower += pLoopUnit->GetPower();
+							}
+							else if(pLoopUnit->getOwner() == eAllyPlayer)
+							{
+								iAllyLocalPower += pLoopUnit->GetPower();
 							}
 						}
 					}
@@ -9125,7 +9151,14 @@ int CvMinorCivAI::CalculateBullyMetric(PlayerTypes eBullyPlayer, bool bForUnit, 
 			}
 		}
 	}
-	float fLocalPowerRatio = (float)iBullyLocalPower / (float)iMinorLocalPower;
+
+	float fLocalPowerRatio = (float)iBullyLocalPower;
+	if(iAllyBullyScoreModifier != 0)
+	{
+		fLocalPowerRatio -= (float)(iAllyLocalPower * iAllyBullyScoreModifier) / 100;
+	}
+	fLocalPowerRatio /= (float)iMinorLocalPower;
+
 	int iLocalPowerScore = 0;
 	if(fLocalPowerRatio >= 3.0)
 	{
@@ -9164,6 +9197,8 @@ int CvMinorCivAI::CalculateBullyMetric(PlayerTypes eBullyPlayer, bool bForUnit, 
 	// **************************
 	int iPoliciesScore = 0;
 	int iPoliciesMod = GET_PLAYER(eBullyPlayer).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_MINOR_BULLY_SCORE_MODIFIER);
+	int iLocalPoliciesScore = 0;
+	int iLocalPoliciesMod = GET_PLAYER(eBullyPlayer).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_MINOR_LOCAL_BULLY_SCORE_MODIFIER);
 	if (iPoliciesMod != 0)
 	{
 		iPoliciesScore += iGlobalMilitaryScore;
@@ -9172,6 +9207,13 @@ int CvMinorCivAI::CalculateBullyMetric(PlayerTypes eBullyPlayer, bool bForUnit, 
 		iPoliciesScore *= iPoliciesMod;
 		iPoliciesScore /= 100;
 	}
+	if (iLocalPoliciesMod != 0)
+	{
+		iLocalPoliciesScore += iLocalPowerScore;
+		iLocalPoliciesScore *= iLocalPoliciesMod;
+		iLocalPoliciesScore /= 100;
+	}
+	iPoliciesScore += iLocalPoliciesScore;
 	if (sTooltipSink && iPoliciesScore != 0)
 	{
 		Localization::String strPositiveFactor = Localization::Lookup("TXT_KEY_POP_CSTATE_BULLY_FACTOR_POSITIVE");

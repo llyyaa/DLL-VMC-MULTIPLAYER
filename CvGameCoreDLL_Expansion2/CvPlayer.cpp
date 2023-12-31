@@ -26292,6 +26292,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changePolicyModifiers(POLICYMOD_PROTECTED_MINOR_INFLUENCE, pPolicy->GetProtectedMinorPerTurnInfluence() * iChange);
 	changePolicyModifiers(POLICYMOD_AFRAID_INFLUENCE, pPolicy->GetAfraidMinorPerTurnInfluence() * iChange);
 	changePolicyModifiers(POLICYMOD_MINOR_BULLY_SCORE_MODIFIER, pPolicy->GetMinorBullyScoreModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_MINOR_LOCAL_BULLY_SCORE_MODIFIER, pPolicy->GetMinorLocalBullyScoreModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_MINOR_ALLY_BULLY_SCORE_MODIFIER, pPolicy->GetMinorAllyBullyScoreModifier() * iChange);
 	changePolicyModifiers(POLICYMOD_MINOR_BULLY_INFLUENCE_LOSS_MODIFIER, pPolicy->GetMinorBullyInfluenceLossModifier() * iChange);
 	changePolicyModifiers(POLICYMOD_STEAL_TECH_FASTER_MODIFIER, pPolicy->GetStealTechFasterModifier() * iChange);
 	changePolicyModifiers(POLICYMOD_THEMING_BONUS, pPolicy->GetThemingBonusMultiplier() * iChange);

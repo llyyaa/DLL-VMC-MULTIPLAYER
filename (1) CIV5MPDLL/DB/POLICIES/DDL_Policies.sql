@@ -65,3 +65,6 @@ ALTER TABLE Policies ADD 'SettlerPopConsume' BOOLEAN DEFAULT 0;
 
 ALTER TABLE Policies ADD 'DeepWaterNavalStrengthCultureModifier' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'FreeBuildingClass' text default null references BuildingClasses(Type);
+
+ALTER TABLE Policies ADD 'MinorLocalBullyScoreModifier' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD 'MinorAllyBullyScoreModifier' INTEGER DEFAULT 0;

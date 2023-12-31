@@ -167,6 +167,8 @@ public:
 	int GetProtectedMinorPerTurnInfluence() const;
 	int GetAfraidMinorPerTurnInfluence() const;
 	int GetMinorBullyScoreModifier() const;
+	int GetMinorLocalBullyScoreModifier() const;
+	int GetMinorAllyBullyScoreModifier() const;
 	int GetMinorBullyInfluenceLossModifier() const;
 	int GetThemingBonusMultiplier() const;
 	int GetInternalTradeRouteYieldModifier() const;
@@ -463,6 +465,8 @@ private:
 	int m_iProtectedMinorPerTurnInfluence;
 	int m_iAfraidMinorPerTurnInfluence;
 	int m_iMinorBullyScoreModifier;
+	int m_iMinorLocalBullyScoreModifier;
+	int m_iMinorAllyBullyScoreModifier;
 	int m_iMinorBullyInfluenceLossModifier;
 	int m_iThemingBonusMultiplier;
 	int m_iInternalTradeRouteYieldModifier;
