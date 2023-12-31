@@ -12818,6 +12818,13 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 		iValue += getCrimeFromGarrisonedUnit();
 	}
 
+
+	if (eIndex == YIELD_HERESY)
+	{
+		iValue += getHeresyFromDiscord();
+	}
+
+
 	iValue += GetYieldFromHealth(eIndex);
 	iValue += GetYieldFromHappiness(eIndex);
 	if (eIndex != YIELD_CRIME)
@@ -12829,6 +12836,23 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 	return iValue;
 }
 
+#if defined(MOD_API_UNIFIED_YIELDS_MORE)
+int CvCity::getHeresyFromDiscord() const
+{
+	int  iHeresyPerTurnFromDiscord = 0;
+
+	for (int i = 0; i < MAX_MAJOR_CIVS; i++)
+	{
+		PlayerTypes eTargetPlayer = (PlayerTypes)i;
+
+		if (GET_PLAYER(eTargetPlayer).isEverAlive() && GET_PLAYER(eTargetPlayer).GetReligions()->HasCreatedReligion() && eTargetPlayer != getOwner())
+		{
+			iHeresyPerTurnFromDiscord += GetCityReligions()->GetNumFollowers(GET_PLAYER(eTargetPlayer).GetReligions()->GetReligionCreatedByPlayer(true));
+		}
+
+	}
+	return iHeresyPerTurnFromDiscord;
+}
 
 int CvCity::getNumForeignSpy() const
 {
@@ -12919,6 +12943,7 @@ int CvCity::getCrimeFromGarrisonedUnit() const
 	}
 	return iCrimeFromGarrisonedUnit;
 }
+#endif
 
 //	--------------------------------------------------------------------------------
 CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) const
@@ -13079,6 +13104,15 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		if (iBaseValue != 0)
 		{
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_GARRISONED_UNIT", iBaseValue, YieldIcon);
+		}
+	}
+
+	if (eIndex == YIELD_HERESY)
+	{
+		iBaseValue = getHeresyFromDiscord();
+		if (iBaseValue != 0)
+		{
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_DISCORD", iBaseValue, YieldIcon);
 		}
 	}
 
