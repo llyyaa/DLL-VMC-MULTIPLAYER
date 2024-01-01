@@ -191,6 +191,8 @@ public:
 
 	bool GetTerrainMakesValid(int i) const;
 	bool GetFeatureMakesValid(int i) const;
+	bool IsFeatureNeeded() const;
+	bool GetFeaturesNeeded(int i) const;
 	bool GetImprovementMakesValid(int i) const;
 
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -398,6 +400,8 @@ protected:
 
 	bool* m_pbTerrainMakesValid;
 	bool* m_pbFeatureMakesValid;
+	bool m_bFeatureNeeded;
+	bool* m_pbFeaturesNeeded;
 	bool* m_pbImprovementMakesValid;
 
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)

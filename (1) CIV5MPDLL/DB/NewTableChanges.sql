@@ -220,6 +220,10 @@ ALTER TABLE UnitPromotions ADD COLUMN 'CaptureEmenyPercent' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'CaptureEmenyExtraMax' INTEGER DEFAULT 0;
 
 ALTER TABLE Improvements ADD ExtraScore INTEGER DEFAULT 0;
+CREATE TABLE IF NOT EXISTS Improvement_FeaturesNeeded (
+    `ImprovementType` TEXT DEFAULT '' references Improvements(Type),
+    `FeatureType` TEXT DEFAULT '' references Features(Type)
+);
 
 CREATE TABLE IF NOT EXISTS UnitPromotions_PromotionUpgrade (
     `PromotionType` TEXT DEFAULT '' references UnitPromotions(Type),

@@ -2630,6 +2630,10 @@ bool CvPlot::canHaveImprovement(ImprovementTypes eImprovement, TeamTypes eTeam, 
 	{
 		return false;
 	}
+	if(pkImprovementInfo->IsFeatureNeeded() && (getFeatureType() == NO_FEATURE || !pkImprovementInfo->GetFeaturesNeeded(getFeatureType())))
+	{
+		return false;
+	}
 
 	if(pkImprovementInfo->IsRequiresImprovement())
 	{

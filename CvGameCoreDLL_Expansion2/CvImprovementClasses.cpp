@@ -184,6 +184,8 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_piFlavorValue(NULL),
 	m_pbTerrainMakesValid(NULL),
 	m_pbFeatureMakesValid(NULL),
+	m_bFeatureNeeded(false),
+	m_pbFeaturesNeeded(NULL),
 	m_pbImprovementMakesValid(NULL),
 #if defined(MOD_API_VP_ADJACENT_YIELD_BOOST)
 	m_ppiAdjacentImprovementYieldChanges(NULL),
@@ -227,6 +229,7 @@ CvImprovementEntry::~CvImprovementEntry(void)
 	SAFE_DELETE_ARRAY(m_piFlavorValue);
 	SAFE_DELETE_ARRAY(m_pbTerrainMakesValid);
 	SAFE_DELETE_ARRAY(m_pbFeatureMakesValid);
+	SAFE_DELETE_ARRAY(m_pbFeaturesNeeded);
 	SAFE_DELETE_ARRAY(m_pbImprovementMakesValid);
 
 #if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
@@ -546,6 +549,26 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	kUtility.PopulateArrayByExistence(m_pbFeatureMakesValid,
 	                                  "Features",
 	                                  "Improvement_ValidFeatures",
+	                                  "FeatureType",
+	                                  "ImprovementType",
+	                                  szImprovementType);
+
+	{
+		//Is Has Features Needed ?
+		std::string strKey = "Improvements - FeaturesNeeded_MaxRow";
+		Database::Results*pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select count(*) from Improvement_FeaturesNeeded where ImprovementType = ?");
+		}
+		pResults->Bind(1, szImprovementType, lenImprovementType, false);
+		pResults->Step();
+		m_bFeatureNeeded = pResults->GetInt(0) > 0;
+		pResults->Reset();
+	}
+	kUtility.PopulateArrayByExistence(m_pbFeaturesNeeded,
+	                                  "Features",
+	                                  "Improvement_FeaturesNeeded",
 	                                  "FeatureType",
 	                                  "ImprovementType",
 	                                  szImprovementType);
@@ -1696,6 +1719,19 @@ bool CvImprovementEntry::GetFeatureMakesValid(int i) const
 	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_pbFeatureMakesValid ? m_pbFeatureMakesValid[i] : false;
+}
+
+/// this improvement requires a feature
+bool CvImprovementEntry::IsFeatureNeeded() const
+{
+	return m_bFeatureNeeded;
+}
+/// this improvement requires a feature
+bool CvImprovementEntry::GetFeaturesNeeded(int i) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_pbFeaturesNeeded ? m_pbFeaturesNeeded[i] : false;
 }
 
 /// If this improvement requires a different improvement to be valid
