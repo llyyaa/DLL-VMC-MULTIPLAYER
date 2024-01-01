@@ -9743,23 +9743,12 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 		}
 
 		// Free techs
-		if(pBuildingInfo->GetFreeTechs() > 0)
+		int iNumFreeTechs = pBuildingInfo->GetFreeTechs() * iChange;
+		if(iNumFreeTechs > 0)
 		{
-			if(!isHuman())
-			{
-				for(iI = 0; iI < pBuildingInfo->GetFreeTechs(); iI++)
-				{
-					for(int iLoop = 0; iLoop < iChange; iLoop++)
-						AI_chooseFreeTech();
-				}
-			}
-			else
-			{
-				Localization::String localizedText = Localization::Lookup("TXT_KEY_MISC_COMPLETED_WONDER_CHOOSE_TECH");
-				localizedText << pBuildingInfo->GetTextKey();
-				chooseTech(pBuildingInfo->GetFreeTechs() * iChange, localizedText.toUTF8());
-			}
+			ChooseFreeTechs(iNumFreeTechs, GetLocalizedText("TXT_KEY_MISC_COMPLETED_WONDER_CHOOSE_TECH", pBuildingInfo->GetTextKey()));
 		}
+
 		if(pBuildingInfo->GetMedianTechPercentChange() > 0)
 		{
 			ChangeMedianTechPercentage(pBuildingInfo->GetMedianTechPercentChange());
@@ -9811,8 +9800,10 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 			for(int iMinorLoop = MAX_MAJOR_CIVS; iMinorLoop < MAX_CIV_PLAYERS; iMinorLoop++)
 			{
 				iNewValue = GET_PLAYER((PlayerTypes) iMinorLoop).GetMinorCivAI()->GetBaseFriendshipWithMajorTimes100(GetID());
-				iNewValue *= iMinorFriendshipChange;
-				iNewValue /= 100;
+				long long i64Value = (long long)iNewValue;
+				i64Value *= iMinorFriendshipChange;
+				i64Value /= 100;
+				iNewValue = (int)std::min((long long)MAX_INT, i64Value);
 
 				GET_PLAYER((PlayerTypes) iMinorLoop).GetMinorCivAI()->SetFriendshipWithMajorTimes100(GetID(), iNewValue);
 			}
@@ -27034,18 +27025,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	int iNumFreeTechs = pPolicy->GetNumFreeTechs() * iChange;
 	if(iNumFreeTechs > 0)
 	{
-		if(!isHuman())
-		{
-			for(iI = 0; iI < iNumFreeTechs; iI++)
-			{
-				AI_chooseFreeTech();
-			}
-		}
-		else
-		{
-			CvString strBuffer = GetLocalizedText("TXT_KEY_MISC_COMPLETED_WONDER_CHOOSE_TECH", pPolicy->GetTextKey());
-			chooseTech(iNumFreeTechs, strBuffer.GetCString());
-		}
+		ChooseFreeTechs(iNumFreeTechs, GetLocalizedText("TXT_KEY_MISC_COMPLETED_WONDER_CHOOSE_TECH", pPolicy->GetTextKey()));
 	}
 
 	ChangeMedianTechPercentage(pPolicy->GetMedianTechPercentChange());
@@ -30638,6 +30618,26 @@ void CvPlayer::SetNumFreeTechs(int iValue)
 	}
 }
 
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChooseFreeTechs(int iNumTech, CvString strBuffer)
+{
+	if(iNumTech <= 0) return;
+	if(!isHuman())
+	{
+		for(int iI = 0; iI < iNumTech; iI++)
+		{
+			AI_chooseFreeTech();
+		}
+	}
+	else
+	{
+		if(strBuffer.length() == 0)
+		{
+			strBuffer = GetLocalizedText("TXT_KEY_CHOOSE_FREE_TECH");
+		}
+		chooseTech(iNumTech, strBuffer.GetCString());
+	}
+}
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetMedianTechPercentage() const
 {

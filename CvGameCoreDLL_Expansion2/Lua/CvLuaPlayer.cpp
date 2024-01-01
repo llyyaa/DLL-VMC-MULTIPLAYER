@@ -72,7 +72,10 @@ void CvLuaPlayer::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeGoldenAgeTurns);
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeNumUnitGoldenAges);
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeGoldPerUnitTimes100);
-	
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeFreePromotionCount);
+
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChooseFreeTechs);
+
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lInitUnit);
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lInitCity);
 
@@ -1054,6 +1057,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetNumFreeTechs);
 	Method(SetNumFreeTechs);
+	Method(ChooseFreeTechs);
 	Method(GetNumFreePolicies);
 	Method(SetNumFreePolicies);
 	Method(ChangeNumFreePolicies);
@@ -10082,6 +10086,15 @@ int CvLuaPlayer::lSetNumFreeTechs(lua_State* L)
 	return 1;
 }
 
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChooseFreeTechs(lua_State* L)
+{
+	CvPlayer* pkPlayer = GetInstance(L);
+	const int iNumTechs = lua_tointeger(L, 2);
+
+	pkPlayer->ChooseFreeTechs(iNumTechs);
+	return 1;
+}
 //------------------------------------------------------------------------------
 int CvLuaPlayer::lGetNumFreePolicies(lua_State* L)
 {

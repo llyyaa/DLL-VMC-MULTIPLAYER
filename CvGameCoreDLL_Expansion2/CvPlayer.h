@@ -1822,6 +1822,7 @@ public:
 
 	int GetNumFreeTechs() const;
 	void SetNumFreeTechs(int iValue);
+	void ChooseFreeTechs(int iNumTech, CvString strBuffer = "");
 
 	int GetMedianTechPercentage() const;
 	void ChangeMedianTechPercentage(int iValue);
