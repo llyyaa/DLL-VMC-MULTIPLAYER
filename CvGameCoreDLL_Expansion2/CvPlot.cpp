@@ -5670,7 +5670,7 @@ void CvPlot::updatePotentialCityWork()
 
 		if(pLoopPlot != NULL)
 		{
-			if(!(pLoopPlot->isWater()))
+			if(!pLoopPlot->isWater() || pLoopPlot->isCity())
 			{
 				bValid = true;
 				break;

@@ -8160,6 +8160,26 @@ void CvPlayer::found(int iX, int iY)
 
 	DoUpdateNextPolicyCost();
 
+	if(pCity->plot() && pCity->plot()->isWater())
+	{
+		CvPlot* pLoopPlot = NULL;
+		int iX = pCity->getX();
+		int iY = pCity->getY();
+#if defined(MOD_GLOBAL_CITY_WORKING)
+		for(int iI = 0; iI < MAX_CITY_PLOTS; ++iI)
+#else
+		for(int iI = 0; iI < NUM_CITY_PLOTS; ++iI)
+#endif
+		{
+			pLoopPlot = plotCity(iX, iY, iI);
+
+			if(pLoopPlot != NULL)
+			{
+				pLoopPlot->updatePotentialCityWork();
+			}
+		}
+	}
+
 	if(isHuman() && getAdvancedStartPoints() < 0)
 	{
 		// Human player is prompted to choose production BEFORE the AI runs for the turn.

@@ -152,7 +152,7 @@ bool CvCitySiteEvaluator::CanFound(CvPlot* pPlot, const CvPlayer* pPlayer, bool 
 	if(pPlot->isWater())
 	{
 #ifdef MOD_TRAITS_CAN_FOUND_COAST_CITY
-		if (MOD_TRAITS_CAN_FOUND_COAST_CITY && pPlot->getTerrainType() == TERRAIN_COAST && pPlayer && pPlayer->GetCanFoundCoastCity() && !pPlot->isLake())
+		if (MOD_TRAITS_CAN_FOUND_COAST_CITY && pPlayer && pPlayer->GetCanFoundCoastCity() && !pPlot->isLake() && pPlot->isAdjacentToLand())
 		{
 			bValid = true;
 			goto DONE_bValid;
