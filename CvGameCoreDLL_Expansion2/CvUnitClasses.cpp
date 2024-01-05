@@ -96,6 +96,8 @@ CvUnitEntry::CvUnitEntry(void) :
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
 	m_iUnitPromotionType(NO_UNITCOMBAT),
 #endif
+	m_bGivePoliciesWithSpreaded(false),
+	m_bGoldenAgeWithSpreaded(false),
 #if defined(MOD_EVENTS_CAN_MOVE_INTO)
 	m_bSendCanMoveIntoEvent(false),
 #endif
@@ -346,6 +348,8 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	}
 #endif
 
+	m_bGivePoliciesWithSpreaded = kResults.GetBool("GivePoliciesWithSpreaded");
+	m_bGoldenAgeWithSpreaded = kResults.GetBool("GoldenAgeWithSpreaded");
 #if defined(MOD_EVENTS_CAN_MOVE_INTO)
 	m_bSendCanMoveIntoEvent = kResults.GetBool("SendCanMoveIntoEvent");
 #endif
@@ -937,6 +941,14 @@ int CvUnitEntry::GetUnitPromotionType() const
 }
 #endif
 
+bool CvUnitEntry::IsGivePoliciesWithSpreaded() const
+{
+	return m_bGivePoliciesWithSpreaded;
+}
+bool CvUnitEntry::IsGoldenAgeWithSpreaded() const
+{
+	return m_bGoldenAgeWithSpreaded;
+}
 #if defined(MOD_EVENTS_CAN_MOVE_INTO)
 /// Send CanMoveInto events for this unit type?
 bool CvUnitEntry::IsSendCanMoveIntoEvent() const

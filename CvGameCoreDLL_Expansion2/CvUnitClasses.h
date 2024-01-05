@@ -114,6 +114,8 @@ public:
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
 	int GetUnitPromotionType() const;
 #endif
+	bool IsGivePoliciesWithSpreaded() const;
+	bool IsGoldenAgeWithSpreaded() const;
 #if defined(MOD_EVENTS_CAN_MOVE_INTO)
 	bool IsSendCanMoveIntoEvent() const;
 #endif
@@ -299,6 +301,8 @@ private:
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
 	int m_iUnitPromotionType;
 #endif
+	bool m_bGivePoliciesWithSpreaded;
+	bool m_bGoldenAgeWithSpreaded;
 #if defined(MOD_EVENTS_CAN_MOVE_INTO)
 	bool m_bSendCanMoveIntoEvent;
 #endif

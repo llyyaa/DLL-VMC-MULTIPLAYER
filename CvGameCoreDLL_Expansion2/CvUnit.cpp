@@ -11947,7 +11947,7 @@ bool CvUnit::canGoldenAge(const CvPlot* pPlot, bool bTestVisible) const
 	}
 
 	// If prophet has  started spreading religion, can't do other functions
-	if(m_pUnitInfo->IsSpreadReligion())
+	if(m_pUnitInfo->IsSpreadReligion() && !m_pUnitInfo->IsGoldenAgeWithSpreaded())
 	{
 		if(GetReligionData()->GetSpreadsLeft() < m_pUnitInfo->GetReligionSpreads())
 		{
@@ -12063,7 +12063,7 @@ bool CvUnit::canGivePolicies(const CvPlot* /*pPlot*/, bool /*bTestVisible*/) con
 	}
 
 	// If prophet has  started spreading religion, can't do other functions
-	if(m_pUnitInfo->IsSpreadReligion())
+	if(m_pUnitInfo->IsSpreadReligion() && !m_pUnitInfo->IsGivePoliciesWithSpreaded())
 	{
 		if(GetReligionData()->GetSpreadsLeft() < m_pUnitInfo->GetReligionSpreads())
 		{

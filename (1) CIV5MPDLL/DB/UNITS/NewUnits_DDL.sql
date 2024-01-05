@@ -21,3 +21,6 @@ create table Unit_InstantYieldFromTrainings (
     YieldType integer references Yields(Type),
     Yield integer default 0
 );
+
+ALTER TABLE Units ADD COLUMN 'GivePoliciesWithSpreaded' BOOLEAN DEFAULT 0;
+ALTER TABLE Units ADD COLUMN 'GoldenAgeWithSpreaded' BOOLEAN DEFAULT 0;
