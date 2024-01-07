@@ -3285,12 +3285,13 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 		return false;
 	}
 
-	if(!(GET_PLAYER(getOwner()).canConstruct(eBuilding, bContinue, bTestVisible, bIgnoreCost, toolTipSink)))
+	CvPlayerAI& kPlayer = GET_PLAYER(getOwner());
+	if(!kPlayer.canConstruct(eBuilding, bContinue, bTestVisible, bIgnoreCost, toolTipSink))
 	{
 		return false;
 	}
 
-	if(pkBuildingInfo->IsNoPuppet() && IsPuppet())
+	if(pkBuildingInfo->IsNoPuppet() && IsPuppet() && !kPlayer.GetPlayerTraits()->IsNoAnnexing())
 	{
 		return false;
 	}
@@ -3301,7 +3302,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 		return false;
 	}
 
-	if (!(GET_PLAYER(getOwner()).isHuman()) && pkBuildingInfo->IsHumanOnly())
+	if (!kPlayer.isHuman() && pkBuildingInfo->IsHumanOnly())
 	{
 		return false;
 	}
@@ -3384,7 +3385,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 
 			if(ePrereqBuilding != NO_BUILDING)
 			{
-				if(0 == GET_PLAYER(getOwner()).getNumBuildings(ePrereqBuilding))
+				if(0 == kPlayer.getNumBuildings(ePrereqBuilding))
 				{
 					return false;
 				}
