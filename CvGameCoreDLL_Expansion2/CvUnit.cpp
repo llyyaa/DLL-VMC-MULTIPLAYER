@@ -22878,12 +22878,12 @@ int CvUnit::GetRangedFlankAttackModifier() const
 void CvUnit::ChangeRangedFlankAttackModifier(int iChange)
 {
 	VALIDATE_OBJECT
-		if (iChange != 0)
-		{
-			m_iRangedFlankAttackModifier = (m_iRangedFlankAttackModifier + iChange);
+	if (iChange != 0)
+	{
+		m_iRangedFlankAttackModifier = (m_iRangedFlankAttackModifier + iChange);
 
-			setInfoBarDirty(true);
-		}
+		setInfoBarDirty(true);
+	}
 }
 
 
@@ -22891,7 +22891,7 @@ void CvUnit::ChangeRangedFlankAttackModifier(int iChange)
 int CvUnit::GetRangedFlankAttackModifierPercent() const
 {
 	VALIDATE_OBJECT
-		return m_iRangedFlankAttackModifierPercent;
+	return m_iRangedFlankAttackModifierPercent;
 }
 
 
@@ -22899,12 +22899,12 @@ int CvUnit::GetRangedFlankAttackModifierPercent() const
 void CvUnit::ChangeRangedFlankAttackModifierPercent(int iChange)
 {
 	VALIDATE_OBJECT
-		if (iChange != 0)
-		{
-			m_iRangedFlankAttackModifierPercent = (m_iRangedFlankAttackModifierPercent + iChange);
+	if (iChange != 0)
+	{
+		m_iRangedFlankAttackModifierPercent = (m_iRangedFlankAttackModifierPercent + iChange);
 
-			setInfoBarDirty(true);
-		}
+		setInfoBarDirty(true);
+	}
 }
 
 //	--------------------------------------------------------------------------------
@@ -22981,14 +22981,10 @@ bool CvUnit::isOutOfAttacks() const
 {
 	VALIDATE_OBJECT
 
-		//if (!bIgnoreMoves && !canMove())
-				//return true;
-
-		// Units with blitz don't run out of attacks!
-		if (isBlitz())
-		{
-			return false;
-		}
+	if (isBlitz())
+	{
+		return false;
+	}
 	//return m_iAttacksMade >= m_iNumAttacks;
 	return getNumAttacksMadeThisTurn() >= getNumAttacks();
 }
@@ -22998,21 +22994,21 @@ bool CvUnit::isOutOfAttacks() const
 void CvUnit::setMadeAttack(bool bNewValue)
 {
 	VALIDATE_OBJECT
-		if (bNewValue)
-		{
-			m_iAttacksMade++;
-		}
-		else
-		{
-			m_iAttacksMade = 0;
-		}
+	if (bNewValue)
+	{
+		m_iAttacksMade++;
+	}
+	else
+	{
+		m_iAttacksMade = 0;
+	}
 }
 
 void CvUnit::ChangeMadeAttackNum(int iChange)
 {
 	VALIDATE_OBJECT
-		if (iChange != 0)
-			m_iAttacksMade += iChange;
+	if (iChange != 0)
+		m_iAttacksMade += iChange;
 	if (m_iAttacksMade < 0);
 	{
 		m_iAttacksMade = 0;
@@ -23073,7 +23069,7 @@ bool CvUnit::IsNearOurCitadel(int& iCitadelHeal)
 {
 	VALIDATE_OBJECT
 
-		int iCitadelRange = 1;
+	int iCitadelRange = 1;
 
 	CvPlot* pLoopPlot;
 
