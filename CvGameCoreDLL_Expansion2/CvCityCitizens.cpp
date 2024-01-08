@@ -1169,16 +1169,16 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 	iHappinessYieldValue = m_pCity->GetPlayer()->IsEmpireUnhappy() ? iHappinessYieldValue * 2 : iHappinessYieldValue; // TODO: un-hardcode this
 
 	int iResourceValue = 0;
-	for (auto &rinfo : pSpecialistInfo->GetResourceInfo())
+	/*for (auto &rinfo : pSpecialistInfo->GetResourceInfo())
 	{
 		if (pPlayer->MeetSpecialistResourceRequirement(rinfo))
 		{
 			//if lacking this resource(Fuzzy), multiply it
-			int iNumResource = pPlayer->getNumResourceTotalCache(rinfo.m_eResource);
+			int iNumResource = pPlayer->getNumResourceTotalCache(rinfo.m_eResource) - pPlayer->getNumResourceUsed(rinfo.m_eResource);
 			iNumResource -= rinfo.m_iQuantity;
 			if(iNumResource < 0) iResourceValue -= iNumResource * rinfo.m_iQuantity;
 		}
-	}
+	}*/
 
 	// How much surplus food are we making?
 	int iExcessFoodTimes100 = m_pCity->getYieldRateTimes100(YIELD_FOOD, false) - (m_pCity->foodConsumption() * 100);

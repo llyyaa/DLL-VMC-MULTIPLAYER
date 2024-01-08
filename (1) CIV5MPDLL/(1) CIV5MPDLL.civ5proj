@@ -283,6 +283,11 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
+        <FileName>DB/GLOBAL/International_Immigration.sql</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
         <FileName>DB/PROMOTIONS/AuraChange.sql</FileName>
       </Action>
       <Action>
@@ -843,6 +848,10 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="DB/GLOBAL/TroopsAndCrops.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="DB/GLOBAL/International_Immigration.sql">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>

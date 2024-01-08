@@ -5548,6 +5548,12 @@ public:
 		return m_iTROOP_NUM_BASE;
 	}
 #endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	inline int getIMMIGRATION_BASE_RATE()
+	{
+		return m_iIMMIGRATION_BASE_RATE;
+	}
+#endif
 
 	inline int getMAX_POPULATION_INCREASE_NOTIOFACATION()
 	{
@@ -9231,6 +9237,9 @@ protected:
 	int m_iTROOP_RATE_TIMES100_DEFAULT;
 	int m_iTROOP_RATE_TIMES100_HIGH;
 	int m_iTROOP_NUM_BASE;
+#endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	int m_iIMMIGRATION_BASE_RATE;
 #endif
 
 #if defined(MOD_ROG_CORE)

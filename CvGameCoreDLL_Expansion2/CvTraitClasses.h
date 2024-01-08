@@ -140,6 +140,7 @@ public:
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetExceedingHappinessImmigrationModifier() const;
 	int GetNumCityAdjacentFeatureModifier() const;
 	int GetPromotionWhenKilledUnit() const;
 	int GetPromotionRadiusWhenKilledUnit() const;
@@ -407,6 +408,7 @@ protected:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iExceedingHappinessImmigrationModifier;
 	int m_iNumCityAdjacentFeatureModifier;
 	int m_iPromotionWhenKilledUnit;
 	int m_iPromotionRadiusWhenKilledUnit;
@@ -931,6 +933,10 @@ public:
 	}
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetExceedingHappinessImmigrationModifier() const
+	{
+		return m_iExceedingHappinessImmigrationModifier;
+	}
 	bool IsHasCityAdjacentFeatureModifier() const
 	{
 		return m_bHasCityAdjacentFeatureModifier;
@@ -1394,6 +1400,7 @@ private:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iExceedingHappinessImmigrationModifier;
 	bool m_bHasCityAdjacentFeatureModifier = false;
 	int m_iPromotionWhenKilledUnit;
 	int m_iPromotionRadiusWhenKilledUnit;

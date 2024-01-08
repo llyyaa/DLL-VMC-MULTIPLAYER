@@ -160,6 +160,8 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iSharedReligionTourismModifier(0),
 	m_iTradeRouteTourismModifier(0),
 	m_iOpenBordersTourismModifier(0),
+	m_iImmigrationInModifier(0),
+	m_iImmigrationOutModifier(0),
 	m_iCityStateTradeChange(0),
 	m_bMinorGreatPeopleAllies(false),
 	m_bMinorScienceAllies(false),
@@ -470,6 +472,8 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iSharedReligionTourismModifier = kResults.GetInt("SharedReligionTourismModifier");
 	m_iTradeRouteTourismModifier = kResults.GetInt("TradeRouteTourismModifier");
 	m_iOpenBordersTourismModifier = kResults.GetInt("OpenBordersTourismModifier");
+	m_iImmigrationInModifier = kResults.GetInt("ImmigrationInModifier");
+	m_iImmigrationOutModifier = kResults.GetInt("ImmigrationOutModifier");
 	m_iCityStateTradeChange = kResults.GetInt("CityStateTradeChange");
 	m_bMinorGreatPeopleAllies = kResults.GetBool("MinorGreatPeopleAllies");
 	m_bMinorScienceAllies = kResults.GetBool("MinorScienceAllies");
@@ -2092,6 +2096,15 @@ int CvPolicyEntry::GetTradeRouteTourismModifier() const
 int CvPolicyEntry::GetOpenBordersTourismModifier() const
 {
 	return m_iOpenBordersTourismModifier;
+}
+
+int CvPolicyEntry::GetImmigrationInModifier() const
+{
+	return m_iImmigrationInModifier;
+}
+int CvPolicyEntry::GetImmigrationOutModifier() const
+{
+	return m_iImmigrationOutModifier;
 }
 
 /// Boost to museum theming

@@ -693,6 +693,10 @@ protected:
 	static int lIsSecondaryReligionActive(lua_State* L);
 #endif
 
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	LUAAPIEXTN(IsCanDoImmigration, bool);
+	LUAAPIEXTN(SetCanDoImmigration, void);
+#endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	LUAAPIEXTN(GetScale, int);
 	LUAAPIEXTN(CanGrowNormally, bool);

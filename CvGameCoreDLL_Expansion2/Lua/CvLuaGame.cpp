@@ -469,6 +469,7 @@ void CvLuaGame::RegisterMembers(lua_State* L)
 	Method(GetNumHiddenArchaeologySites);
 
 	Method(GetHappinessFromHandicap);
+	Method(GetImmigrationRegressand);
 
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_EXTENSIONS)
 	Method(ExitLeaderScreen);
@@ -3251,6 +3252,18 @@ int CvLuaGame::lGetHappinessFromHandicap(lua_State* L)
 	return 1;
 }
 
+//------------------------------------------------------------------------------
+int CvLuaGame::lGetImmigrationRegressand(lua_State* L)
+{
+	int iRtnValue = 0;
+	if(!GC.getGame().isOption(GAMEOPTION_SP_IMMIGRATION_OFF))
+	{
+		iRtnValue = GC.getIMMIGRATION_BASE_RATE() * GC.getGame().getGameSpeedInfo().getCulturePercent();
+		iRtnValue /= 100;
+	}
+	lua_pushinteger(L, iRtnValue);
+	return 1;
+}
 //------------------------------------------------------------------------------
 
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_API_EXTENSIONS)

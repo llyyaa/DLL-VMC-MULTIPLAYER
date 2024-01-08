@@ -2191,6 +2191,7 @@ public:
 	int GetImmigrationCounter(int iIndex) const;
 	void ChangeImmigrationCounter(int iIndex, int iChange);
 	void SetImmigrationCounter(int iIndex, int iValue);
+	int GetImmigrationRate(PlayerTypes eTargetPlayer) const;
 #endif
 
 	void UpdateUCsFromCapturedOriginalCapitals();

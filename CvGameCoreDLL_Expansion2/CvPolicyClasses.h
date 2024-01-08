@@ -175,6 +175,8 @@ public:
 	int GetSharedReligionTourismModifier() const;
 	int GetTradeRouteTourismModifier() const;
 	int GetOpenBordersTourismModifier() const;
+	int GetImmigrationInModifier() const;
+	int GetImmigrationOutModifier() const;
 	int GetCityStateTradeChange() const;
 	bool IsMinorGreatPeopleAllies() const;
 	bool IsMinorScienceAllies() const;
@@ -473,6 +475,8 @@ private:
 	int m_iSharedReligionTourismModifier;
 	int m_iTradeRouteTourismModifier;
 	int m_iOpenBordersTourismModifier;
+	int m_iImmigrationInModifier;
+	int m_iImmigrationOutModifier;
 	int m_iCityStateTradeChange;
 	bool m_bMinorGreatPeopleAllies;
 	bool m_bMinorScienceAllies;

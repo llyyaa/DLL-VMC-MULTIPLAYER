@@ -56,3 +56,5 @@ create table Trait_CityYieldModifierFromAdjacentFeature (
     YieldType text references Yields(Type),
     Yield int default 0
 );
+
+ALTER TABLE Traits ADD COLUMN 'ExceedingHappinessImmigrationModifier' INTEGER DEFAULT 0;

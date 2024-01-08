@@ -2,7 +2,7 @@
 <GameData>
 	<!-- Espionage.xml -->
 	<Language_en_US>
-	<Row Tag="TXT_KEY_UNIT_PLAGUE_CHANCE">
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_CHANCE">
 			<Text>[COLOR_CYAN]Status Effect Chance ({1_Name})[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_ALREADY_PLAGUED">
@@ -339,7 +339,7 @@
 			<Text>Your {1_UnitName} destroyed an enemy {2_EnUName} due to Collateral Damage!</Text>
 		</Row>
 
-                               <Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE">
+		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE">
 			<Text>While defending, Your {2_UnitName} was [COLOR_NEGATIVE_TEXT]{3_Damage}[ENDCOLOR] damaged by an enemy {1_EnUName} due to Nuke Damage!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_NOTIFICATION_NUKED_DAMAGE_ENEMY">
@@ -567,10 +567,10 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CRIME">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Crime</Text>
 		</Row>
-	               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPIES">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from spy</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OPINION">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OPINION">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from opinion</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POPULATION">
@@ -691,7 +691,7 @@
 		</Row>
 		<Row Tag="TXT_KEY_MULTIPLIER_YIELD">
 			<Text>[NEWLINE][ICON_BULLET]City Multiplier: {1_Num}%</Text>
-		  </Row>
+		</Row>
 	</Language_en_US>
 
 </GameData>

@@ -68,3 +68,6 @@ ALTER TABLE Policies ADD 'FreeBuildingClass' text default null references Buildi
 
 ALTER TABLE Policies ADD 'MinorLocalBullyScoreModifier' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'MinorAllyBullyScoreModifier' INTEGER DEFAULT 0;
+
+ALTER TABLE Policies ADD 'ImmigrationInModifier' INTEGER DEFAULT 0;
+ALTER TABLE Policies ADD 'ImmigrationOutModifier' INTEGER DEFAULT 0;

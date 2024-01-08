@@ -3,7 +3,7 @@
 	<!-- Espionage.xml -->
 	<Language_zh_Hant_HK>
 
-	<Row Tag="TXT_KEY_UNIT_PLAGUE_CHANCE">
+		<Row Tag="TXT_KEY_UNIT_PLAGUE_CHANCE">
 			<Text>[COLOR_CYAN]受到({1_Name})狀態影響的幾率[ENDCOLOR]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_UNIT_ALREADY_PLAGUED">
@@ -570,10 +570,10 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CRIME">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自犯罪率</Text>
 		</Row>
-                               <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPIES">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自間諜</Text>
 		</Row>
-	                <Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OPINION">
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OPINION">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自公共輿論</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_POPULATION">

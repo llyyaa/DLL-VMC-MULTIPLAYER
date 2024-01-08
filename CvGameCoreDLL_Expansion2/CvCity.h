@@ -1277,6 +1277,10 @@ public:
 	//void ChangeYieldFromOtherYield(const YieldTypes eInType, const YieldTypes eOutType, const YieldFromYield eConvertType, const int iChange);
 #endif
 
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	bool IsCanDoImmigration() const;
+	void SetCanDoImmigration(bool iValue);
+#endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes GetScale() const { return m_eCityScale; }
 	CvCityScaleEntry* GetScaleInfo() const { return GC.getCityScaleInfo(m_eCityScale); }
@@ -1606,6 +1610,9 @@ protected:
 
 	int** m_aaiBuildingSpecialistUpgradeProgresses;
 
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	bool m_iCanDoImmigration = true;
+#endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eCityScale = NO_CITY_SCALE;
 #endif

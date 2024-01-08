@@ -120,6 +120,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iExceedingHappinessImmigrationModifier(0),
 	m_iNumCityAdjacentFeatureModifier(0),
 	m_iPromotionWhenKilledUnit(NO_PROMOTION),
 	m_iPromotionRadiusWhenKilledUnit(0),
@@ -687,6 +688,10 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetExceedingHappinessImmigrationModifier() const
+{
+	return m_iExceedingHappinessImmigrationModifier;
+}
 int CvTraitEntry::GetNumCityAdjacentFeatureModifier() const
 {
 	return m_iNumCityAdjacentFeatureModifier;
@@ -1615,6 +1620,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iExceedingHappinessImmigrationModifier = kResults.GetInt("ExceedingHappinessImmigrationModifier");
 	szTextVal = kResults.GetText("PromotionWhenKilledUnit");
 	if(szTextVal)
 	{
@@ -2466,6 +2472,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			m_iExceedingHappinessImmigrationModifier += trait->GetExceedingHappinessImmigrationModifier();
 			m_bHasCityAdjacentFeatureModifier = trait->GetNumCityAdjacentFeatureModifier() > 0;
 			if(trait->GetPromotionWhenKilledUnit() != NO_PROMOTION)
 			{
@@ -2985,6 +2992,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iExceedingHappinessImmigrationModifier = 0;
 	m_bHasCityAdjacentFeatureModifier = false;
 	m_iPromotionWhenKilledUnit = NO_PROMOTION;
 	m_iPromotionRadiusWhenKilledUnit = 0;
@@ -4436,6 +4444,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iExceedingHappinessImmigrationModifier;
 	kStream >> m_bHasCityAdjacentFeatureModifier;
 	kStream >> m_iPromotionWhenKilledUnit;
 	kStream >> m_iPromotionRadiusWhenKilledUnit;
@@ -4831,6 +4840,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iExceedingHappinessImmigrationModifier;
 	kStream << m_bHasCityAdjacentFeatureModifier;
 	kStream << m_iPromotionWhenKilledUnit;
 	kStream << m_iPromotionRadiusWhenKilledUnit;

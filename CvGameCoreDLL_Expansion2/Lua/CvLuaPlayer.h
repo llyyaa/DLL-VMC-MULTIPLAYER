@@ -1264,6 +1264,7 @@ protected:
 	LUAAPIEXTN(GetImmigrationCounter, int, iIndex);
 	LUAAPIEXTN(ChangeImmigrationCounter, void, iIndex, iChange);
 	LUAAPIEXTN(SetImmigrationCounter, void, iIndex, iValue);
+	LUAAPIEXTN(GetImmigrationRate, int, eTargetPlayer);
 #endif
 
 	LUAAPIEXTN(GetScienceTimes100FromFriendsTable);
