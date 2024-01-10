@@ -433,6 +433,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(MoveLfetAttackMod);
 	Method(MoveUsedAttackMod);
 	Method(GoldenAgeMod);
+	Method(GoldenAgeModTotal);
 	Method(GetAntiHigherPopMod);
 	Method(PerAdjacentUnitCombatModifier);
 	Method(PerAdjacentUnitCombatAttackMod);
@@ -4423,10 +4424,26 @@ int CvLuaUnit::lPerAdjacentUnitCombatDefenseMod(lua_State* L)
 	return 1;
 }
 
+//------------------------------------------------------------------------------
 int CvLuaUnit::lGoldenAgeMod(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
 	const int bResult = pkUnit->GetGoldenAgeMod();
+	lua_pushinteger(L, bResult);
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+int CvLuaUnit::lGoldenAgeModTotal(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	int bResult = pkUnit->GetGoldenAgeMod();
+	if(pkUnit->getOwner() != NO_PLAYER)
+	{
+		CvPlayerAI& kPlayer = GET_PLAYER(pkUnit->getOwner());
+		bResult += kPlayer.GetPlayerTraits()->GetGoldenAgeCombatModifier();
+		bResult += kPlayer.GetGoldenAgeUnitCombatModifier();
+	}
 	lua_pushinteger(L, bResult);
 	return 1;
 }

@@ -440,6 +440,7 @@ protected:
 	static int lMoveUsedAttackMod(lua_State* L);
 	static int lMoveLfetAttackMod(lua_State* L);
 	static int lGoldenAgeMod(lua_State* L);
+	static int lGoldenAgeModTotal(lua_State* L);
 	static int lGetForcedDamageValue(lua_State* L);
 	static int lGetChangeDamageValue(lua_State* L);
 	static int lGetNearbyUnitPromotionModifierFromUnitPromotion(lua_State* L);
