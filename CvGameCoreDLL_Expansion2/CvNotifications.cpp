@@ -531,9 +531,7 @@ void CvNotifications::Dismiss(int iLookupIndex, bool bUserInvoked)
 				{
 					GC.GetEngineUserInterface()->SetPolicyNotificationSeen(true);
 				}
-#if defined(MOD_BUGFIX_MINOR)
 				break;
-#endif
 			}
 #if defined(MOD_AI_MP_DIPLOMACY)
 			case NOTIFICATION_PLAYER_DEAL_RECEIVED:
@@ -571,6 +569,16 @@ bool CvNotifications::MayUserDismiss(int iLookupIndex)
 			case NOTIFICATION_TECH:
 			case NOTIFICATION_FREE_TECH:
 			case NOTIFICATION_FREE_POLICY:
+				if(GC.getGame().isOption(GAMEOPTION_POLICY_SAVING))
+				{
+					return true;
+					break;
+				}
+				else
+				{
+					return false;
+					break;
+				}
 			case NOTIFICATION_FREE_GREAT_PERSON:
 			case NOTIFICATION_FOUND_PANTHEON:
 			case NOTIFICATION_FOUND_RELIGION:
