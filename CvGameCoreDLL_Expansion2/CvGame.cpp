@@ -8421,9 +8421,12 @@ void CvGame::updateMoves()
 						else
 						{
 							const CvUnit* pReadyUnit = player.GetFirstReadyUnit();
-							if(pReadyUnit && !player.GetTacticalAI()->IsInQueuedAttack(pReadyUnit))
+							//there was a hang with a queued attack on autoplay so setAutoMoves(true) was never calle, from Community-Patch
+							if(pReadyUnit /*&& !player.GetTacticalAI()->IsInQueuedAttack(pReadyUnit)*/)
 							{
-								int iWaitTime = 100;
+								//in Community-Patch, they set it 1000
+								int iWaitTime = 1000;
+								//int iWaitTime = 100;
 								if(!isNetworkMultiPlayer())
 								{
 									iWaitTime = 10;
