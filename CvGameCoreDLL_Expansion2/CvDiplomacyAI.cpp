@@ -2328,8 +2328,7 @@ void CvDiplomacyAI::DoCounters()
 				}
 
 				// Has our marriage expired?
-				// if (IsMarriageAccepted(eLoopPlayer) && GetMarriageCounter(eLoopPlayer) >= GC.getGame().getGameSpeedInfo().getRelationshipDuration())
-				if (IsMarriageAccepted(eLoopPlayer) && GetMarriageCounter(eLoopPlayer) >= 3) // FIXME: debug tmp value
+				if (IsMarriageAccepted(eLoopPlayer) && GetMarriageCounter(eLoopPlayer) >= GC.getGame().getGameSpeedInfo().getRelationshipDuration())
 				{
 					SetMarriageCounter(eLoopPlayer, -1);
 					SetMarriageAccepted(eLoopPlayer, false);
