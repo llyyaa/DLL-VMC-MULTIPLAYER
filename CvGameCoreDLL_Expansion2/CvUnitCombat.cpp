@@ -707,7 +707,7 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 		GET_PLAYER(pkAttacker->getOwner()).GetTacticalAI()->CombatResolved(pkAttacker, bDefenderDead);
 	}
 
-	BATTLE_FINISHED();
+	BATTLE_FINISHED(kCombatInfo.getDefenderCaptured());
 	DoNewBattleEffects(kCombatInfo, iAttackerDamageInflicted);
 }
 
@@ -1380,7 +1380,7 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 		GET_PLAYER(pkAttacker->getOwner()).GetTacticalAI()->CombatResolved(pkAttacker, bTargetDied);
 	}
 	
-	BATTLE_FINISHED();
+	BATTLE_FINISHED(false);
 
 	DoNewBattleEffects(kCombatInfo, iDamage);
 }
@@ -1511,7 +1511,7 @@ void CvUnitCombat::ResolveRangedCityVsUnitCombat(const CvCombatInfo& kCombatInfo
 	if(pkAttacker)
 		GET_PLAYER(pkAttacker->getOwner()).GetTacticalAI()->CombatResolved((void*)pkAttacker, bTargetDied, true);
 	
-	BATTLE_FINISHED();
+	BATTLE_FINISHED(false);
 }
 
 //	---------------------------------------------------------------------------
@@ -1722,7 +1722,7 @@ void CvUnitCombat::ResolveCityMeleeCombat(const CvCombatInfo& kCombatInfo, uint 
 		GET_PLAYER(pkAttacker->getOwner()).GetTacticalAI()->CombatResolved(pkAttacker, bCityConquered);
 	}
 	
-	BATTLE_FINISHED();
+	BATTLE_FINISHED(false);
 	DoNewBattleEffects(kCombatInfo, iAttackerDamageInflicted);
 }
 
@@ -2323,7 +2323,7 @@ void CvUnitCombat::ResolveAirUnitVsCombat(const CvCombatInfo& kCombatInfo, uint 
 		GET_PLAYER(pkAttacker->getOwner()).GetTacticalAI()->CombatResolved(pkAttacker, bTargetDied);
 	}
 	
-	BATTLE_FINISHED();
+	BATTLE_FINISHED(false);
 	DoNewBattleEffects(kCombatInfo, iAttackerDamageInflicted);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	DoGiveEXPToCarrier(kCombatInfo);
@@ -2742,7 +2742,7 @@ void CvUnitCombat::ResolveAirSweep(const CvCombatInfo& kCombatInfo, uint uiParen
 		GET_PLAYER(pkAttacker->getOwner()).GetTacticalAI()->CombatResolved(pkAttacker, bDefenderDead);
 	}
 	
-	BATTLE_FINISHED();
+	BATTLE_FINISHED(false);
 	DoNewBattleEffects(kCombatInfo, iAttackerDamageInflicted);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	DoGiveEXPToCarrier(kCombatInfo);
@@ -3453,7 +3453,7 @@ void CvUnitCombat::ResolveNuclearCombat(const CvCombatInfo& kCombatInfo, uint ui
 		GET_PLAYER(pkAttacker->getOwner()).GetTacticalAI()->CombatResolved(pkAttacker, true);
 	}
 
-	BATTLE_FINISHED();
+	BATTLE_FINISHED(false);
 	DoNewBattleEffects(kCombatInfo);
 }
 
@@ -3542,7 +3542,7 @@ bool CvUnitCombat::ParadropIntercept(CvUnit& pParaUnit, CvPlot& pDropPlot) {
 				MILITARYLOG(pParaUnit.getOwner(), strBuffer.c_str(), pParaUnit.plot(), pInterceptor->getOwner());
 			}
 			
-			BATTLE_FINISHED();
+			BATTLE_FINISHED(false);
 		}
 	}
 	

@@ -1027,7 +1027,7 @@ enum BattleTypeTypes
 #if defined(MOD_EVENTS_BATTLES)
 #define BATTLE_STARTED(iType, pPlot)              if (MOD_EVENTS_BATTLES) { GAMEEVENTINVOKE_HOOK(GAMEEVENT_BattleStarted, iType, pPlot.getX(), pPlot.getY()); }
 #define BATTLE_JOINED(pCombatant, iRole, bIsCity) if (MOD_EVENTS_BATTLES && pCombatant) { GAMEEVENTINVOKE_HOOK(GAMEEVENT_BattleJoined, (pCombatant)->getOwner(), (pCombatant)->GetID(), iRole, bIsCity); }
-#define BATTLE_FINISHED()                         if (MOD_EVENTS_BATTLES) { GAMEEVENTINVOKE_HOOK(GAMEEVENT_BattleFinished); }
+#define BATTLE_FINISHED(bIsCaptured)			  if (MOD_EVENTS_BATTLES) { GAMEEVENTINVOKE_HOOK(GAMEEVENT_BattleFinished, bIsCaptured); }
 #else
 #define BATTLE_STARTED(pPlot)            __noop
 #define BATTLE_JOINED(pCombatant, iRole) __noop
@@ -1140,7 +1140,7 @@ enum BattleTypeTypes
 //                    iInterceptorPlayerID, iInterceptorUnitOrCityID, bInterceptorIsCity, iInterceptorDamage,
 //                    ) -> iDamageDelta
 #define GAMEEVENT_BattleCustomDamage			"BattleCustomDamage",			"iiiibiiibiiibi"
-#define GAMEEVENT_BattleFinished				"BattleFinished",				""
+#define GAMEEVENT_BattleFinished				"BattleFinished",				"b"
 #define GAMEEVENT_BattleJoined					"BattleJoined",					"iiib"
 #define GAMEEVENT_BattleStarted					"BattleStarted",				"iii"
 #define GAMEEVENT_CanAirliftFrom				"CanAirliftFrom",				"iiii"
