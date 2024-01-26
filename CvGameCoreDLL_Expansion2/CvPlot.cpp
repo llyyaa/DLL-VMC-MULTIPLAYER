@@ -13372,6 +13372,10 @@ int CvPlot::CalculateCorruptionScoreFromDistance(const CvCity& capitalCity) cons
 	int capY = capitalCity.plot()->getY();
 	return plotDistance(capX, capY, getX(), getY()) * GC.getCORRUPTION_SCORE_PER_DISTANCE();
 }
+int CvPlot::CalculateCorruptionScoreFromCoastalBonus(const CvCity& capitalCity) const
+{
+	return capitalCity.isCoastal() && isCoastalArea() ? GC.getCORRUPTION_SCORE_COASTAL_BONUS() : 0;
+}
 int CvPlot::CalculateCorruptionScoreFromResource() const
 {
 	auto* resourceInfo = GC.getResourceInfo(getResourceType());

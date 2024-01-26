@@ -450,6 +450,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_DISTANCE">
 			<Text>From Capital Distance: {1_score}</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_COASTAL_BONUS">
+			<Text>From Capital and City are both coastal: {1_score}</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_BUILDING">
 			<Text>From Building: {1_score}</Text>
 		</Row>

@@ -453,6 +453,9 @@
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_DISTANCE">
 			<Text>來自離心傾向: {1_score}</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_COASTAL_BONUS">
+			<Text>來自首都和城市同時沿海: {1_score}</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_BUILDING">
 			<Text>來自建築: {1_score}</Text>
 		</Row>

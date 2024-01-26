@@ -899,6 +899,7 @@ public:
 
 #ifdef MOD_GLOBAL_CORRUPTION
 	int CalculateCorruptionScoreFromDistance(const CvCity& capitalCity) const;
+	int CalculateCorruptionScoreFromCoastalBonus(const CvCity& capitalCity) const;
 	int CalculateCorruptionScoreFromResource() const;
 	int CalculateCorruptionScoreFromTrait(PlayerTypes ePlayer) const;
 	int CalculateCorruptionScoreModifierFromTrait(PlayerTypes ePlayer) const;

@@ -31803,6 +31803,13 @@ CvString CvUnit::GetPlotCorruptionScoreReport() const
 			szRtnValue += "[NEWLINE][ICON_BULLET]";
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_DISTANCE", tmp);
 		}
+		tmp = pPlot->CalculateCorruptionScoreFromCoastalBonus(*capitalCity);
+		if(tmp != 0)
+		{
+			iTotalScore += tmp;
+			szRtnValue += "[NEWLINE][ICON_BULLET]";
+			szRtnValue += GetLocalizedText("TXT_KEY_CITYBANNER_CORRUPTION_SCORE_FROM_COASTAL_BONUS", tmp);
+		}
 		tmp = pPlot->CalculateCorruptionScoreFromResource();
 		if(tmp != 0)
 		{

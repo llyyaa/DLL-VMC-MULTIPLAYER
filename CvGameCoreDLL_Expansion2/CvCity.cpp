@@ -23047,6 +23047,7 @@ int CvCity::CalculateTotalCorruptionScore() const
 	// Base Score
 	int score = 0;
 	score += CalculateCorruptionScoreFromDistance();
+	score += CalculateCorruptionScoreFromCoastalBonus();
 	score += CalculateCorruptionScoreFromResource();
 	score += GetCorruptionScoreChangeFromBuilding();
 	score += CalculateCorruptionScoreFromTrait();
@@ -23093,6 +23094,17 @@ int CvCity::CalculateCorruptionScoreFromDistance() const
 	}
 
 	return score;
+}
+
+int CvCity::CalculateCorruptionScoreFromCoastalBonus() const
+{
+	CvPlayerAI& owner = GET_PLAYER(getOwner());
+	CvCity* capital = owner.getCapitalCity();
+	if (capital == nullptr || capital == this)
+	{
+		return 0;
+	}
+	return capital->isCoastal() && plot()->isCoastalArea() ? GC.getCORRUPTION_SCORE_COASTAL_BONUS() : 0;
 }
 
 int CvCity::CalculateCorruptionScoreModifierFromSpy() const

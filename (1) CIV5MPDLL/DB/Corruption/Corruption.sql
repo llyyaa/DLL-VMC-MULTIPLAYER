@@ -31,3 +31,4 @@ create table Policy_CorruptionLevelPolicyCostModifier (
 );
 
 INSERT INTO Defines(Name, Value) VALUES('CORRUPTION_SCORE_PER_DISTANCE', 100);
+INSERT INTO Defines(Name, Value) VALUES('CORRUPTION_SCORE_COASTAL_BONUS', -200);

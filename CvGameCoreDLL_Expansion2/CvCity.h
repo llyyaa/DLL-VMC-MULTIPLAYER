@@ -1314,6 +1314,7 @@ public:
 
 	int CalculateTotalCorruptionScore() const;
 	int CalculateCorruptionScoreFromDistance() const;
+	int CalculateCorruptionScoreFromCoastalBonus() const;
 	int CalculateCorruptionScoreFromResource() const;
 	int CalculateCorruptionScoreFromTrait() const;
 	int CalculateCorruptionScoreModifierFromSpy() const;
