@@ -2704,9 +2704,10 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 }
 
 #ifdef MOD_GLOBAL_PROMOTIONS_REMOVAL
-bool CvUnit::CanRemoveDebuff(const AutoRemoveInfo& kAutoRemoveInfo) const
+bool CvUnit::CanRemoveDebuff(AutoRemoveInfo& kAutoRemoveInfo) const
 {
-	if (kAutoRemoveInfo.m_iTurnToRemove >= 0 && GC.getGame().getGameTurn() >= kAutoRemoveInfo.m_iTurnToRemove)
+	if (kAutoRemoveInfo.m_iTurnToRemove > 0) kAutoRemoveInfo.m_iTurnToRemove--;
+	if (kAutoRemoveInfo.m_iTurnToRemove == 0)
 	{
 		return true;
 	}
@@ -2733,6 +2734,28 @@ void CvUnit::RemoveDebuffWhenDoTurn()
 	std::vector<PromotionTypes> vPromotionsToRemove;
 	for (auto iter = m_mapAutoRemovePromotions.begin(); iter != m_mapAutoRemovePromotions.end(); iter++)
 	{
+		if (GC.getPromotionInfo(iter->first)->CanAutoRemoveDoneTurn()) continue;
+		if (!CanRemoveDebuff(iter->second)) continue;
+		vPromotionsToRemove.push_back(iter->first);
+	}
+
+	for (auto promotion : vPromotionsToRemove)
+	{
+		setHasPromotion(promotion, false);
+	}
+}
+void CvUnit::RemoveDebuffWhenDoneTurn()
+{
+	if (!MOD_GLOBAL_PROMOTIONS_REMOVAL)
+		return;
+
+	if (m_mapAutoRemovePromotions.empty())
+		return;
+
+	std::vector<PromotionTypes> vPromotionsToRemove;
+	for (auto iter = m_mapAutoRemovePromotions.begin(); iter != m_mapAutoRemovePromotions.end(); iter++)
+	{
+		if (!GC.getPromotionInfo(iter->first)->CanAutoRemoveDoneTurn()) continue;
 		if (!CanRemoveDebuff(iter->second)) continue;
 		vPromotionsToRemove.push_back(iter->first);
 	}
@@ -26311,7 +26334,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		{
 			if (iChange == 1)
 			{
-				int iTurnToRemove = thisPromotion.GetRemoveAfterXTurns() > 0 ? GC.getGame().getGameTurn() + thisPromotion.GetRemoveAfterXTurns() : -1;
+				int iTurnToRemove = thisPromotion.GetRemoveAfterXTurns();
+				iTurnToRemove = iTurnToRemove > 0 ? iTurnToRemove : -1;
 				AutoRemoveInfo info(thisPromotion, iTurnToRemove);
 				m_mapAutoRemovePromotions[info.m_ePromotion] = info;
 			}

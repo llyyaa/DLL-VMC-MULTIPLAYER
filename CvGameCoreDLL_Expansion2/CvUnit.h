@@ -2030,7 +2030,8 @@ public:
 	void ClearSamePlotPromotions();
 	std::tr1::unordered_set<PromotionTypes>& GetPromotionsThatCanBeActionCleared();
 	void RemoveDebuffWhenDoTurn();
-	bool CanRemoveDebuff(const AutoRemoveInfo& kAutoRemoveInfo) const;
+	void RemoveDebuffWhenDoneTurn();
+	bool CanRemoveDebuff(AutoRemoveInfo& kAutoRemoveInfo) const;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER

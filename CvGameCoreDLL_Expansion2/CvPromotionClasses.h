@@ -457,6 +457,7 @@ public:
 	bool GetRemoveAfterFullyHeal() const;
 	bool GetRemoveWithLuaCheck() const;
 	bool GetCanActionClear() const;
+	bool CanAutoRemoveDoneTurn() const;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
@@ -899,6 +900,7 @@ protected:
 	bool m_bRemoveAfterFullyHeal = 0;
 	bool m_bRemoveWithLuaCheck = 0;
 	bool m_bCanActionClear = 0;
+	bool m_bAutoRemoveDoneTurn = false;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER

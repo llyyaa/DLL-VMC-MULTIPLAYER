@@ -772,6 +772,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_bRemoveAfterFullyHeal = kResults.GetBool("RemoveAfterFullyHeal");
 	m_bRemoveWithLuaCheck = kResults.GetBool("RemoveWithLuaCheck");
 	m_bCanActionClear = kResults.GetBool("CanActionClear");
+	m_bAutoRemoveDoneTurn = kResults.GetBool("AutoRemoveDoneTurn");
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
@@ -3626,6 +3627,10 @@ bool CvPromotionEntry::GetRemoveWithLuaCheck() const{
 
 bool CvPromotionEntry::GetCanActionClear() const{
 	return m_bCanActionClear;
+}
+
+bool CvPromotionEntry::CanAutoRemoveDoneTurn() const{
+	return m_bAutoRemoveDoneTurn;
 }
 #endif
 
