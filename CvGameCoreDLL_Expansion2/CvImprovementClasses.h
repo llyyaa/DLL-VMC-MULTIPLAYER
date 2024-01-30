@@ -157,6 +157,8 @@ public:
 	bool IsCreatedByGreatPerson() const;
 	bool IsSpecificCivRequired() const;
 
+	ImprovementTypes GetRequiredAdjacentImprovement() const;
+
 	CivilizationTypes GetRequiredCivilization() const;
 
 	const char* GetArtDefineTag() const;
@@ -378,6 +380,8 @@ protected:
 	bool m_bAllowsWalkWater;
 	bool m_bCreatedByGreatPerson;
 	bool m_bSpecificCivRequired;
+
+	ImprovementTypes m_iRequiredAdjacentImprovement = NO_IMPROVEMENT;
 
 	CvString m_strArtDefineTag;
 	ImprovementUsageTypes m_eImprovementUsageType;

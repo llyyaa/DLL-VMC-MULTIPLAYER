@@ -239,3 +239,5 @@ CREATE TABLE IF NOT EXISTS UnitPromotions_PromotionUpgrade (
 
 ALTER TABLE HandicapInfos ADD StrategicResourceMod INTEGER DEFAULT 100;
 ALTER TABLE HandicapInfos ADD StrategicResourceModPerEra INTEGER DEFAULT 0;
+
+ALTER TABLE Improvements ADD COLUMN 'RequiredAdjacentImprovement' TEXT DEFAULT NULL REFERENCES Improvements(Type);
