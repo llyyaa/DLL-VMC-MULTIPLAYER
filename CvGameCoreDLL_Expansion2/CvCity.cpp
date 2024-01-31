@@ -12467,6 +12467,13 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD", iTempMod);
 	}
 
+	if (eIndex == YIELD_DISEASE)
+	{
+		iTempMod = owner.GetTrade()->GetNumTradeRoutesUsed(true)* GC.getHEALTH_DISEASE_TRADE_MOD()/100;
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_FROM_INTER_TRADE_MOD", iTempMod);
+	}
 
 	if (owner.getYieldModifierFromActiveSpies(eIndex) != 0)
 	{
@@ -13274,47 +13281,27 @@ int CvCity::getCrimeFromGarrisonedUnit() const
 	CvUnit* pGarrisonedUnit = GetGarrisonedUnit();
 	if (pGarrisonedUnit)
 	{
-		int iGarrisonedStrength = 0;
-		iGarrisonedStrength = pGarrisonedUnit->GetBaseCombatStrength();
-
-		if (iGarrisonedStrength <= 30)
+		int iGarrisonedStrength = pGarrisonedUnit->GetBaseCombatStrength()/10;
+		if (iGarrisonedStrength < 6)
 		{
-			iCrimeFromGarrisonedUnit = -3;
+			iGarrisonedStrength=5;
 		}
-		else if (iGarrisonedStrength >30 && iGarrisonedStrength<= 60)
-		{
-			iCrimeFromGarrisonedUnit = -5;
-		}
-		else if (iGarrisonedStrength > 60 && iGarrisonedStrength <= 100)
-		{
-			iCrimeFromGarrisonedUnit = -7;
-		}
-		else if (iGarrisonedStrength > 100 && iGarrisonedStrength <= 200)
-		{
-			iCrimeFromGarrisonedUnit = -10;
-		}
-		else if (iGarrisonedStrength > 200 )
-		{
-			iCrimeFromGarrisonedUnit = -15;
-		}
+		iCrimeFromGarrisonedUnit -= iGarrisonedStrength;
 	}
 	return iCrimeFromGarrisonedUnit;
 }
 
+
 int CvCity::getDiseaseFromConnectionAndTradeRoute() const
 {
 	int DiseaseFromConnectionAndTradeRoute = 0;
+	DiseaseFromConnectionAndTradeRoute += getTradeRouteNum() * getPopulation() * GC.getHEALTH_DISEASE_CONNECTION_MOD() / 100;
+	return DiseaseFromConnectionAndTradeRoute;
+}
 
-
-	CvCity* theCapital = GET_PLAYER(getOwner()).getCapitalCity();
-
-	if (theCapital != NULL && !isCapital() && theCapital->HasPlague() && IsConnectedToCapital() )
-	{
-		int diseaseConnections = ((theCapital->getYieldRate(YIELD_DISEASE, false) * GC.getHEALTH_DISEASE_CONNECTION_MOD()) / 100);
-		DiseaseFromConnectionAndTradeRoute += std::max(0, (int)ceil(diseaseConnections / 1.0));
-	}
-
-
+int CvCity::getTradeRouteNum() const
+{
+	int num = 0;
 	CvGameTrade* pTrade = GC.getGame().GetGameTrade();
 	for (uint ui = 0; ui < pTrade->m_aTradeConnections.size(); ui++)
 	{
@@ -13322,42 +13309,17 @@ int CvCity::getDiseaseFromConnectionAndTradeRoute() const
 		{
 			continue;
 		}
-
 		TradeConnection* pConnection = &(pTrade->m_aTradeConnections[ui]);
+		CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
+		CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
 
-		if (pConnection->m_eOriginOwner == GET_PLAYER(getOwner()).GetID())
+		if (pFromCity == this || pToCity == this);
 		{
-			CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
-			CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
-
-			CvPlayer* pToPlayer = &GET_PLAYER(pToCity->getOwner());
-
-
-			if (pToCity == this);
-			{
-				DiseaseFromConnectionAndTradeRoute += std::max(0, (pFromCity->getYieldRate(YIELD_DISEASE, false) * GC.getHEALTH_DISEASE_TRADE_MOD() / 100));
-			}
-		}
-
-		if ((pConnection->m_eOriginOwner != pConnection->m_eDestOwner) && (pConnection->m_eDestOwner == GET_PLAYER(getOwner()).GetID()))
-		{
-			CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
-			CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
-
-			CvPlayer* pFromPlayer = &GET_PLAYER(pFromCity->getOwner());
-			CvPlayer* pToPlayer = &GET_PLAYER(pToCity->getOwner());
-
-			if (pToCity == this);
-			{
-				DiseaseFromConnectionAndTradeRoute += std::max(0, (pFromCity->getYieldRate(YIELD_DISEASE, false) * GC.getHEALTH_DISEASE_TRADE_MOD() / 100));
-			}
-
+			num+=1;
 		}
 	}
-
-	return DiseaseFromConnectionAndTradeRoute;
+	return num;
 }
-
 #endif
 
 //	--------------------------------------------------------------------------------

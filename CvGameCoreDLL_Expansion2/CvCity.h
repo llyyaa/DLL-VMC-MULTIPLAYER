@@ -805,7 +805,7 @@ public:
 	int getCrimeFromOpinion() const;
 	int getCrimeFromGarrisonedUnit() const;
 	int getDiseaseFromConnectionAndTradeRoute() const;
-
+	int getTradeRouteNum() const;
 	int getHeresyFromDiscord() const;
 #endif
 

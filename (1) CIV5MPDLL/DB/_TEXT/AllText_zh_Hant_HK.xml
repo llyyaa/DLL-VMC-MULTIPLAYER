@@ -62,7 +62,9 @@
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_HEALTH_MOD">
 			<Text>[NEWLINE][ICON_BULLET]健康度的城市修正值: {1_Num}%</Text>
 		</Row>
-
+	    <Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_INTER_TRADE_MOD">
+			<Text>[NEWLINE][ICON_BULLET]商路数量的修正值: {1_Num}%</Text>
+		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FROM_CRIME_MOD">
 			<Text>[NEWLINE][ICON_BULLET]犯罪率的城市修正值: {1_Num}%</Text>
 		</Row>

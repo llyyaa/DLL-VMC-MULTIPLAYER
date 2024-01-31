@@ -56,7 +56,8 @@
 			<ID>12</ID>
 			<Type>YIELD_CRIME</Type>
 			<Description>TXT_KEY_YIELD_CRIME</Description>
-			<IconString>[ICON_CRIME]</IconString>
+			<IconString>[ICON_SILVER_FIST]</IconString>
+			<ImageTexture>yieldatlas_128_crime.dds</ImageTexture>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
@@ -81,7 +82,7 @@
 			<ID>15</ID>
 			<Type>YIELD_VIOLENCE</Type>
 			<Description>TXT_KEY_YIELD_VIOLENCE</Description>
-			<IconString>[ICON_CRIME]</IconString>
+			<IconString>[ICON_SILVER_FIST]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
@@ -90,7 +91,7 @@
 			<ID>16</ID>
 			<Type>YIELD_HERESY</Type>
 			<Description>TXT_KEY_YIELD_HERESY</Description>
-			<IconString>[ICON_CRIME]</IconString>
+			<IconString>[ICON_SILVER_FIST]</IconString>
 			<MinCity>0</MinCity>
 			<AIWeightPercent>80</AIWeightPercent>
 		</Row>
