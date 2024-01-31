@@ -520,6 +520,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 	const char* szRequiredAdjacentImprovement = kResults.GetText("RequiredAdjacentImprovement");
 	m_iRequiredAdjacentImprovement = (ImprovementTypes)GC.getInfoTypeForString(szRequiredAdjacentImprovement, true);
+	m_bRequiredAdjacentCity = kResults.GetBool("RequiredAdjacentCity");
 
 	const char* szCivilizationType = kResults.GetText("CivilizationType");
 	m_eRequiredCivilization = (CivilizationTypes)GC.getInfoTypeForString(szCivilizationType, true);
@@ -1543,6 +1544,11 @@ bool CvImprovementEntry::IsNoTwoAdjacent() const
 ImprovementTypes CvImprovementEntry::GetRequiredAdjacentImprovement() const
 {
 	return m_iRequiredAdjacentImprovement;
+}
+
+bool CvImprovementEntry::IsRequiredAdjacentCity() const
+{
+	return m_bRequiredAdjacentCity;
 }
 
 /// Does this improvement need to be built next to a luxury resource?

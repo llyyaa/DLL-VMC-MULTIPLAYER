@@ -158,6 +158,7 @@ public:
 	bool IsSpecificCivRequired() const;
 
 	ImprovementTypes GetRequiredAdjacentImprovement() const;
+	bool IsRequiredAdjacentCity() const;
 
 	CivilizationTypes GetRequiredCivilization() const;
 
@@ -382,6 +383,7 @@ protected:
 	bool m_bSpecificCivRequired;
 
 	ImprovementTypes m_iRequiredAdjacentImprovement = NO_IMPROVEMENT;
+	bool m_bRequiredAdjacentCity = false;
 
 	CvString m_strArtDefineTag;
 	ImprovementUsageTypes m_eImprovementUsageType;

@@ -2926,10 +2926,12 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 			bool bHasNoAdjacencyRequirement = pkImprovement->IsNoTwoAdjacent();
 			ImprovementTypes iRequiredAdjacentImprovement = pkImprovement->GetRequiredAdjacentImprovement();
 			bool bHasRequiredAdjacentImprovement = iRequiredAdjacentImprovement != NO_IMPROVEMENT;
-			if (pkImprovement && (bHasLuxuryRequirement || bHasNoAdjacencyRequirement || bHasRequiredAdjacentImprovement))
+			bool bIsRequiredAdjacentCity = pkImprovement->IsRequiredAdjacentCity();
+			if (pkImprovement && (bHasLuxuryRequirement || bHasNoAdjacencyRequirement || bHasRequiredAdjacentImprovement || bIsRequiredAdjacentCity))
 			{
 				bool bLuxuryRequirementMet = !bHasLuxuryRequirement;
 				bool bFoundRequiredAdjacentImprovement = false;
+				bool bFoundAdjacentCity = false;
 				for (int iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
 				{
 					CvPlot *pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
@@ -2968,6 +2970,13 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 								bFoundRequiredAdjacentImprovement = true;
 							}
 						}
+						if (bIsRequiredAdjacentCity)
+						{
+							if (pAdjacentPlot->isCity())
+							{
+								bFoundAdjacentCity = true;
+							}
+						}
 					}
 				}
 				if (bHasLuxuryRequirement && !bLuxuryRequirementMet)
@@ -2975,6 +2984,10 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 					return false;
 				}
 				if (bHasRequiredAdjacentImprovement && !bFoundRequiredAdjacentImprovement)
+				{
+					return false;
+				}
+				if (bIsRequiredAdjacentCity && !bFoundAdjacentCity)
 				{
 					return false;
 				}
