@@ -2433,6 +2433,13 @@ bool CvCity::isCitySelected()
 	return DLLUI->isCitySelected(pCity.get());
 }
 
+//	--------------------------------------------------------------------------------
+bool CvCity::isThis(const CvCity& pCity) const
+{
+	VALIDATE_OBJECT
+	return pCity.getX() == getX() && pCity.getY() == getY();
+}
+
 
 //	--------------------------------------------------------------------------------
 bool CvCity::canBeSelected() const
@@ -13313,10 +13320,8 @@ int CvCity::getTradeRouteNum() const
 		CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
 		CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
 
-		if (pFromCity == this || pToCity == this);
-		{
-			num+=1;
-		}
+		if (pFromCity && isThis(*pFromCity)) num+=1;
+		else if (pToCity && isThis(*pToCity)) num+=1;
 	}
 	return num;
 }
@@ -22265,7 +22270,7 @@ bool CvCity::HasAnyDomesticTradeRoute() const
 		CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
 		CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
 
-		if (pFromCity == this && pToCity->getOwner() == getOwner()) {
+		if (pFromCity && isThis(*pFromCity) && pToCity->getOwner() == getOwner()) {
 			return true;
 		}
 	}
@@ -22285,7 +22290,7 @@ bool CvCity::HasAnyInternationalTradeRoute() const
 		CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
 		CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
 
-		if (pFromCity == this && pToCity->getOwner() != getOwner()) {
+		if (pFromCity && isThis(*pFromCity) && pToCity->getOwner() != getOwner()) {
 			return true;
 		}
 	}
@@ -22304,7 +22309,7 @@ bool CvCity::HasTradeRouteToAnyCity() const
 		TradeConnection* pConnection = &(pTrade->m_aTradeConnections[iTradeRoute]);
 		CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
 
-		if (pFromCity == this) {
+		if (pFromCity && isThis(*pFromCity)) {
 			return true;
 		}
 	}
@@ -22324,7 +22329,7 @@ bool CvCity::HasTradeRouteTo(CvCity* pCity) const
 		CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
 		CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
 
-		if (pFromCity == this && pToCity == pCity) {
+		if (pFromCity && isThis(*pFromCity) && pToCity && pToCity->isThis(*pCity)) {
 			return true;
 		}
 	}
@@ -22343,7 +22348,7 @@ bool CvCity::HasTradeRouteFromAnyCity() const
 		TradeConnection* pConnection = &(pTrade->m_aTradeConnections[iTradeRoute]);
 		CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
 
-		if (pToCity == this) {
+		if (pToCity && isThis(*pToCity)) {
 			return true;
 		}
 	}
@@ -22363,7 +22368,7 @@ bool CvCity::HasTradeRouteFrom(CvCity* pCity) const
 		CvCity* pFromCity = GC.getMap().plot(pConnection->m_iOriginX, pConnection->m_iOriginY)->getPlotCity();
 		CvCity* pToCity = GC.getMap().plot(pConnection->m_iDestX, pConnection->m_iDestY)->getPlotCity();
 
-		if (pToCity == this && pFromCity == pCity) {
+		if (pToCity && isThis(*pToCity) && pFromCity && pFromCity->isThis(*pCity)) {
 			return true;
 		}
 	}

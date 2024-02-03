@@ -604,7 +604,7 @@
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Leagues</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
-			<Text>[NEWLINE]{1_Num}{2_IconString} from Projects</Text>
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Projects</Text>
 		</Row>
 
 		<Row Tag="TXT_KEY_VOLCAN_EVENT_TITLE">

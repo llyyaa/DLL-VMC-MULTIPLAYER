@@ -131,7 +131,7 @@ void CvCityAI::AI_chooseProduction(bool bInterruptWonders)
 					for(pLoopCity = kOwner.firstCity(&iLoop); pLoopCity != NULL; pLoopCity = kOwner.nextCity(&iLoop))
 					{
 						int cityProd = pLoopCity->getCurrentProductionDifference(true, false);
-						if (pLoopCity == this)
+						if (isThis(*pLoopCity))
 						{
 							currentCityProd = cityProd;
 						}

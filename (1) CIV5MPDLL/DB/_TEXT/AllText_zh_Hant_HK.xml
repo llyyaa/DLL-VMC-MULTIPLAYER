@@ -606,7 +606,7 @@
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自世界議會</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PROJECTS">
-			<Text>[NEWLINE]{1_Num}{2_IconString} 來自已完成計劃</Text>
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自已完成計劃</Text>
 		</Row>
 
 

@@ -105,6 +105,8 @@ public:
 
 	void doTurn();
 
+	bool isThis(const CvCity& pCity) const;
+
 	bool isCitySelected();
 	bool canBeSelected() const;
 	void updateSelectedCity();
