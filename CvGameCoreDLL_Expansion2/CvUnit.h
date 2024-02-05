@@ -1360,6 +1360,7 @@ public:
 	void rotateFacingDirectionCounterClockwise();
 
 	bool isSuicide() const;
+	bool isNoFallout() const;
 	bool isTrade() const;
 
 	int getDropRange() const;
@@ -1847,7 +1848,7 @@ public:
 	void ChangeNearNumEnemyDefenseMod(int iValue);
 	int GetNearNumEnemyDefenseMod() const;
 
-
+	int GetExtraNukeBlastRadius() const;
 	int GetNumEnemyAdjacent() const;
 
 #endif

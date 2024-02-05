@@ -197,7 +197,8 @@ ALTER TABLE UnitPromotions ADD COLUMN 'PlagueIDImmunity' INTEGER DEFAULT -1;
 ALTER TABLE UnitPromotions ADD COLUMN 'MoraleBreakChance' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD  'CanDoFallBackDamage' BOOLEAN DEFAULT 0;
 ALTER TABLE Units ADD COLUMN 'UnitTechUpgrade' BOOLEAN DEFAULT 0;
-
+ALTER TABLE Units ADD COLUMN 'NoFallout' BOOLEAN DEFAULT false;
+ALTER TABLE Units ADD COLUMN 'ExtraNukeBlastRadius' INTEGER DEFAULT 0;
 ALTER TABLE Features ADD  'Volcano'  boolean default 0;
 
 ALTER TABLE Policies ADD COLUMN 'DefenseBoostAllCities' INTEGER DEFAULT 0;

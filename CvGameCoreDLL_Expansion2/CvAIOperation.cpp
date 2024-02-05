@@ -5678,6 +5678,7 @@ CvPlot* CvAIOperationNukeAttack::FindBestTarget()
 						iThisCityValue -= pLoopCity->getDamage() / 5; // No point nuking a city that is already trashed unless it is good city
 
 						// check to see if there is anything good or bad in the radius that we should account for
+						iBlastRadius = GC.getNUKE_BLAST_RADIUS()+ pLoopUnit->GetExtraNukeBlastRadius();
 
 						for(int iDX = -iBlastRadius; iDX <= iBlastRadius; iDX++)
 						{

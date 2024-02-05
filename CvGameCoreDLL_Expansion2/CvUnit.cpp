@@ -8285,7 +8285,7 @@ bool CvUnit::isNukeVictim(const CvPlot* pPlot, TeamTypes eTeam) const
 		return false;
 	}
 
-	int iBlastRadius = /*2*/ GC.getNUKE_BLAST_RADIUS();
+	int iBlastRadius = /*2*/ GC.getNUKE_BLAST_RADIUS() + GetExtraNukeBlastRadius();
 
 	for(iDX = -(iBlastRadius); iDX <= iBlastRadius; iDX++)
 	{
@@ -27826,6 +27826,14 @@ bool CvUnit::isSuicide() const
 	return (getUnitInfo().IsSuicide() || getKamikazePercent() != 0);
 }
 
+
+//	--------------------------------------------------------------------------------
+bool CvUnit::isNoFallout() const
+{
+	VALIDATE_OBJECT
+	return (getUnitInfo().IsSuicide());
+}
+
 //	--------------------------------------------------------------------------------
 int CvUnit::getDropRange() const
 {
@@ -31567,6 +31575,14 @@ bool CvUnit::isUnitTechUpgrade() const
 {
 	VALIDATE_OBJECT
 	return getUnitInfo().IsUnitTechUpgrade();
+}
+
+int CvUnit::GetExtraNukeBlastRadius() const
+{
+	VALIDATE_OBJECT
+	int iRadius;
+	iRadius = m_pUnitInfo->GetExtraNukeBlastRadius();
+	return iRadius;
 }
 
 

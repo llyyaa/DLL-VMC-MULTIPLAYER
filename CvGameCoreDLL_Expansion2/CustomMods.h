@@ -1198,7 +1198,6 @@ enum BattleTypeTypes
 #define GAMEEVENT_MinorFriendsChanged			"MinorFriendsChanged",			"iibii"
 #define GAMEEVENT_MinorGift						"MinorGift",					"iiiiibbs"
 #define GAMEEVENT_NaturalWonderDiscovered		"NaturalWonderDiscovered",		"iiiibii"
-//#define GAMEEVENT_NuclearDetonation				"NuclearDetonation",			"iiibb"
 #define GAMEEVENT_PantheonFounded				"PantheonFounded",				"iiii"
 #define GAMEEVENT_ParadropAt					"ParadropAt",					"iiiiii"
 #define GAMEEVENT_PlaceResource					"PlaceResource",				"iiiii"

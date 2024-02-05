@@ -46,6 +46,7 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_iHurryMultiplier(0),
 	m_bRushBuilding(false),
 	m_iBaseGold(0),
+	m_iExtraNukeBlastRadius(0),
 	m_iNumGoldPerEra(0),
 	m_bSpreadReligion(false),
 	m_bRemoveHeresy(false),
@@ -133,6 +134,7 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_bPrereqResources(false),
 	m_bMechanized(false),
 	m_bSuicide(false),
+	m_bNoFallout(false),
 	m_bCaptureWhileEmbarked(false),
 	m_bRangeAttackOnlyInDomain(false),
 	m_bTrade(false),
@@ -242,6 +244,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_iHurryMultiplier = kResults.GetInt("HurryMultiplier");
 	m_bRushBuilding= kResults.GetInt("RushBuilding");
 	m_iBaseGold = kResults.GetInt("BaseGold");
+	m_iExtraNukeBlastRadius = kResults.GetInt("ExtraNukeBlastRadius");
 	m_iNumGoldPerEra = kResults.GetInt("NumGoldPerEra");
 	m_bSpreadReligion = kResults.GetBool("SpreadReligion");
 	m_bRemoveHeresy = kResults.GetBool("RemoveHeresy");
@@ -303,6 +306,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_bPrereqResources = kResults.GetBool("PrereqResources");
 	m_bMechanized = kResults.GetBool("Mechanized");
 	m_bSuicide = kResults.GetBool("Suicide");
+	m_bNoFallout = kResults.GetBool("NoFallout");
 	m_bCaptureWhileEmbarked = kResults.GetBool("CaptureWhileEmbarked");
 	m_bRangeAttackOnlyInDomain = kResults.GetBool("RangeAttackOnlyInDomain");
 	m_bTrade = kResults.GetBool("Trade");
@@ -718,6 +722,11 @@ bool CvUnitEntry::IsRushBuilding() const
 int CvUnitEntry::GetBaseGold() const
 {
 	return m_iBaseGold;
+}
+
+int CvUnitEntry::GetExtraNukeBlastRadius() const
+{
+	return m_iExtraNukeBlastRadius;
 }
 
 /// Era boost to gold (for great people)
@@ -1144,6 +1153,11 @@ bool CvUnitEntry::IsMechUnit() const
 bool CvUnitEntry::IsSuicide() const
 {
 	return m_bSuicide;
+}
+
+bool CvUnitEntry::IsNoFallout() const
+{
+	return m_bNoFallout;
 }
 
 /// Capture this unit even if he's embarked?

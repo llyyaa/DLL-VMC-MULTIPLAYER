@@ -61,6 +61,7 @@ public:
 	int GetHurryMultiplier() const;
 	bool IsRushBuilding() const;
 	int GetBaseGold() const;
+	int GetExtraNukeBlastRadius() const;
 	int GetNumGoldPerEra() const;
 	bool IsSpreadReligion() const;
 	int GetReligionSpreads() const;
@@ -153,6 +154,7 @@ public:
 	bool IsPrereqResources() const;
 	bool IsMechUnit() const;
 	bool IsSuicide() const;
+	bool IsNoFallout() const;
 	bool IsCaptureWhileEmbarked() const;
 	bool IsRangeAttackOnlyInDomain() const;
 	bool IsTrade() const;
@@ -250,6 +252,7 @@ private:
 	int m_iHurryMultiplier;
 	bool m_bRushBuilding;
 	int m_iBaseGold;
+	int m_iExtraNukeBlastRadius;
 	int m_iNumGoldPerEra;
 	bool m_bSpreadReligion;
 	int m_iReligionSpreads;
@@ -341,6 +344,7 @@ private:
 	bool m_bPrereqResources;
 	bool m_bMechanized;
 	bool m_bSuicide;
+	bool m_bNoFallout;
 	bool m_bCaptureWhileEmbarked;
 	bool m_bRangeAttackOnlyInDomain;
 	int m_iProjectPrereq;
