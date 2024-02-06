@@ -1789,7 +1789,8 @@ public:
 
 	int getAOEDamageOnKill() const;
 	void changeAOEDamageOnKill(int iChange);
-
+	int getAOEDamageOnPillage() const;
+	void changeAOEDamageOnPillage(int iChange);
 	int GetBarbarianCombatBonus() const;
 	void ChangeBarbarianCombatBonus(int iValue);
 	int GetBarbarianCombatBonusTotal() const;
@@ -2472,6 +2473,7 @@ protected:
 	int m_iPillageReplenishAttck;
 	int m_iPillageReplenishHealth;
 	int m_iAOEDamageOnKill;
+	int m_iAOEDamageOnPillage;
 #endif
 
 	int m_iCannotBeCapturedCount;

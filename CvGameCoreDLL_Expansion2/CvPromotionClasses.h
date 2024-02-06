@@ -189,6 +189,7 @@ public:
 	int GetOutsideCapitalLandDefenseMod() const;
 	int GetBarbarianCombatBonus() const;
 	int GetAOEDamageOnKill() const;
+	int GetAOEDamageOnPillage() const;
 	int GetDamageAoEFortified() const;
 	int GetMoraleBreakChance() const;
 	int GetIgnoreDamageChance() const;
@@ -706,6 +707,7 @@ protected:
 	int m_iNearbyUnitPromotionBonusRange;
 	PromotionTypes m_iCombatBonusFromNearbyUnitPromotion;
 	int m_iAOEDamageOnKill;
+	int m_iAOEDamageOnPillage;
 	int m_iMoraleBreakChance;
 	int m_iIgnoreDamageChance;
 	int m_iDamageAoEFortified;

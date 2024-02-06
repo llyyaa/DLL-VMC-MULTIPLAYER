@@ -125,6 +125,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iNearbyUnitPromotionBonusRange(0),
 	m_iCombatBonusFromNearbyUnitPromotion(NO_PROMOTION),
 	m_iAOEDamageOnKill(0),
+	m_iAOEDamageOnPillage(0),
 	m_iMoraleBreakChance(0),
 	m_iIgnoreDamageChance(0),
 	m_iDamageAoEFortified(0),
@@ -543,6 +544,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iAdjacentSapExperience = kResults.GetInt("AdjacentSapExperience");
 	m_iAdjacentFriendlySapMovement = kResults.GetInt("AdjacentFriendlySapMovement");
 	m_iAOEDamageOnKill = kResults.GetInt("AOEDamageOnKill");
+	m_iAOEDamageOnPillage = kResults.GetInt("AOEDamageOnPillage");
 	m_iBarbarianCombatBonus = kResults.GetInt("BarbarianCombatBonus");
 	m_iPillageReplenishMoves = kResults.GetInt("PillageReplenishMoves");
 	m_iPillageReplenishAttck = kResults.GetInt("PillageReplenishAttck");
@@ -2040,7 +2042,10 @@ int CvPromotionEntry::GetAOEDamageOnKill() const
 {
 	return m_iAOEDamageOnKill;
 }
-
+int CvPromotionEntry::GetAOEDamageOnPillage() const
+{
+	return m_iAOEDamageOnPillage;
+}
 int CvPromotionEntry::GetMoraleBreakChance() const
 {
 	return m_iMoraleBreakChance;

@@ -457,6 +457,7 @@ CvUnit::CvUnit() :
 		, m_iPillageReplenishMoves(0)
 		, m_iPillageReplenishHealth(0)
 		, m_iAOEDamageOnKill(0)
+		, m_iAOEDamageOnPillage(0)
 #endif
 
 	, m_iCannotBeCapturedCount(0)
@@ -1324,6 +1325,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iPillageReplenishMoves = 0;
 	m_iPillageReplenishHealth = 0;
 	m_iAOEDamageOnKill = 0;
+	m_iAOEDamageOnPillage = 0;
 #endif
 	m_iImmueMeleeAttack = 0;
 
@@ -6652,25 +6654,36 @@ int CvUnit::GetRangedSupportFireMod() const
 	return m_iRangedSupportFireMod;
 }
 
-
 int CvUnit::getAOEDamageOnKill() const
 {
 	VALIDATE_OBJECT
-		return m_iAOEDamageOnKill;
+	return m_iAOEDamageOnKill;
 }
 //	--------------------------------------------------------------------------------
 void CvUnit::changeAOEDamageOnKill(int iChange)
 {
 	VALIDATE_OBJECT
-		m_iAOEDamageOnKill = (m_iAOEDamageOnKill + iChange);
+	m_iAOEDamageOnKill = (m_iAOEDamageOnKill + iChange);
 	CvAssert(getAOEDamageOnKill() >= 0);
 }
-
+//	--------------------------------------------------------------------------------
+int CvUnit::getAOEDamageOnPillage() const
+{
+	VALIDATE_OBJECT
+	return m_iAOEDamageOnPillage;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::changeAOEDamageOnPillage(int iChange)
+{
+	VALIDATE_OBJECT
+	m_iAOEDamageOnPillage = (m_iAOEDamageOnPillage + iChange);
+	CvAssert(getAOEDamageOnPillage() >= 0);
+}
 //	--------------------------------------------------------------------------------
 int CvUnit::GetBarbarianCombatBonus() const
 {
 	VALIDATE_OBJECT
-		return m_iBarbCombatBonus;
+	return m_iBarbCombatBonus;
 }
 
 //	--------------------------------------------------------------------------------
@@ -9898,8 +9911,9 @@ bool CvUnit::pillage()
 #if defined(MOD_ROG_CORE)
 	if (IsPillageReplenishAttck())
 	{
-		setMadeAttack(false);	
+		ChangeMadeAttackNum(-1);
 	}
+
 	int iHealMoves = GetPillageReplenishMoves();
 	int iHealExtra = GetPillageReplenishHealth();
 	if (iHealMoves !=0)
@@ -9915,6 +9929,8 @@ bool CvUnit::pillage()
 
 	if(bSuccessfulNonRoadPillage)
 	{
+		DoAdjacentPlotDamage(pPlot, getAOEDamageOnPillage());
+
 		if (hasHealOnPillage())
 		{
 			// completely heal unit
@@ -25978,6 +25994,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeAdjacentFriendlySapMovement((thisPromotion.GetAdjacentFriendlySapMovement()) * iChange);
 		ChangeBarbarianCombatBonus((thisPromotion.GetBarbarianCombatBonus())* iChange);
 		changeAOEDamageOnKill(thisPromotion.GetAOEDamageOnKill()* iChange);
+		changeAOEDamageOnPillage(thisPromotion.GetAOEDamageOnPillage() * iChange);
 #endif
 
 
@@ -26716,6 +26733,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iPillageReplenishMoves;
 	kStream >> m_iPillageReplenishHealth;
 	kStream >> m_iAOEDamageOnKill;
+	kStream >> m_iAOEDamageOnPillage;
 #endif
 
 	kStream >> m_iImmueMeleeAttack;
@@ -27093,6 +27111,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iPillageReplenishMoves;
 	kStream << m_iPillageReplenishHealth;
 	kStream << m_iAOEDamageOnKill;
+	kStream << m_iAOEDamageOnPillage;
 #endif
 
 
@@ -27831,7 +27850,7 @@ bool CvUnit::isSuicide() const
 bool CvUnit::isNoFallout() const
 {
 	VALIDATE_OBJECT
-	return (getUnitInfo().IsSuicide());
+	return (getUnitInfo().IsNoFallout());
 }
 
 //	--------------------------------------------------------------------------------
