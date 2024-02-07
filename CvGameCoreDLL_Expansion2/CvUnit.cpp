@@ -493,6 +493,8 @@ CvUnit::CvUnit() :
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	, m_iCrops(0)
 	, m_iArmee(0)
+	, m_iNumEstablishCorps(0)
+	, m_iCannotBeEstablishedCorps(0)
 #endif
 	, m_iReligiousStrengthLossRivalTerritory(0)
 	, m_iTradeMissionInfluenceModifier(0)
@@ -1466,6 +1468,8 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iCrops = 0;
 	m_iArmee = 0;
+	m_iNumEstablishCorps = 0;
+	m_iCannotBeEstablishedCorps = 0;
 #endif
 	m_iReligiousStrengthLossRivalTerritory = 0;
 	m_iTradeMissionInfluenceModifier = 0;
@@ -7155,7 +7159,7 @@ void CvUnit::ChangeCrops(int iValue)
 		GET_PLAYER(getOwner()).ChangeNumCropsUsed(-1);
 	}
 }
-const bool CvUnit::IsCrops() const
+bool CvUnit::IsCrops() const
 {
 	return m_iCrops > 0;
 }
@@ -7177,9 +7181,36 @@ void CvUnit::ChangeArmee(int iValue)
 		GET_PLAYER(getOwner()).ChangeNumArmeeUsed(-1);
 	}
 }
-const bool CvUnit::IsArmee() const
+bool CvUnit::IsArmee() const
 {
 	return m_iArmee > 0;
+}
+//	--------------------------------------------------------------------------------
+bool CvUnit::IsNoTroops() const
+{
+	VALIDATE_OBJECT
+	return m_pUnitInfo->IsNoTroops() || !IsCombatUnit();
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeNumEstablishCorps(int iValue)
+{
+	m_iNumEstablishCorps += iValue;
+}
+bool CvUnit::IsCanEstablishCorps() const
+{
+	return m_iNumEstablishCorps > 0;
+}
+
+void CvUnit::ChangeNumCannotBeEstablishedCorps(int iValue)
+{
+	m_iCannotBeEstablishedCorps += iValue;
+}
+bool CvUnit::IsCanBeEstablishedCorps() const
+{
+	return 
+		m_iCannotBeEstablishedCorps <= 0
+		&& IsCombatUnit() && canMove()
+		&& m_pUnitInfo->GetDomainType() == DOMAIN_LAND && !isEmbarked();
 }
 
 #endif
@@ -17382,14 +17413,6 @@ int CvUnit::GetBoundWaterImprovement() const
 
 
 //	--------------------------------------------------------------------------------
-#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-bool CvUnit::IsNoTroops() const
-{
-	VALIDATE_OBJECT
-	return m_pUnitInfo->IsNoTroops() || !IsCombatUnit();
-}
-#endif
-//	--------------------------------------------------------------------------------
 int CvUnit::maxXPValue() const
 {
 	VALIDATE_OBJECT
@@ -26107,6 +26130,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 		if(thisPromotion.IsCrops()) ChangeCrops(iChange);
 		if(thisPromotion.IsArmee()) ChangeArmee(iChange);
+		ChangeNumEstablishCorps(thisPromotion.GetNumEstablishCorps() * iChange);
+		ChangeNumCannotBeEstablishedCorps(thisPromotion.IsCannotBeEstablishedCorps() ? iChange: 0);
 #endif
 		ChangeReligiousStrengthLossRivalTerritory((thisPromotion.GetReligiousStrengthLossRivalTerritory()) *  iChange);
 		ChangeTradeMissionInfluenceModifier((thisPromotion.GetTradeMissionInfluenceModifier()) * iChange);
@@ -26662,6 +26687,8 @@ void CvUnit::read(FDataStream& kStream)
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	kStream >> m_iCrops;
 	kStream >> m_iArmee;
+	kStream >> m_iNumEstablishCorps;
+	kStream >> m_iCannotBeEstablishedCorps;
 #endif
 	kStream >> m_iReligiousStrengthLossRivalTerritory;
 	kStream >> m_iTradeMissionInfluenceModifier;
@@ -27054,6 +27081,8 @@ void CvUnit::write(FDataStream& kStream) const
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	kStream << m_iCrops;
 	kStream << m_iArmee;
+	kStream << m_iNumEstablishCorps;
+	kStream << m_iCannotBeEstablishedCorps;
 #endif
 	kStream << m_iReligiousStrengthLossRivalTerritory;
 	kStream << m_iTradeMissionInfluenceModifier;

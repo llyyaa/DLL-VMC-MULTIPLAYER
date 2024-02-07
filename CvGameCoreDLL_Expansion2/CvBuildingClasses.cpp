@@ -708,6 +708,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 #ifdef MOD_GLOBAL_CORRUPTION
 	m_iCorruptionScoreChange = kResults.GetInt("CorruptionScoreChange");
 	m_iCorruptionLevelChange = kResults.GetInt("CorruptionLevelChange");
+	m_iCorruptionPolicyCostModifier = kResults.GetInt("CorruptionPolicyCostModifier");
 #endif
 
 	m_iGlobalProductionNeededUnitModifier = kResults.GetInt("GlobalProductionNeededUnitModifier");
@@ -2398,6 +2399,11 @@ int CvBuildingEntry::GetCorruptionScoreChange() const
 int CvBuildingEntry::GetCorruptionLevelChange() const
 {
 	return m_iCorruptionLevelChange;
+}
+
+int CvBuildingEntry::GetCorruptionPolicyCostModifier() const
+{
+	return m_iCorruptionPolicyCostModifier;
 }
 #endif
 

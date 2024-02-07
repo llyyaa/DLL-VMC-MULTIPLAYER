@@ -2346,6 +2346,25 @@ bool CvCivilizationInfo::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 	const char* szType = GetType();
 
+	{
+		std::string strKey = "Civilization_Illegal_Check";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select DawnOfManImage from Civilizations where Type = ?");
+		}
+		pResults->Bind(1, szType, -1, false);
+		while(pResults->Step())
+		{
+			if(pResults->GetText(0) == NULL) continue;
+			if((strcmp("DOM_Wu.dds", pResults->GetText(0)) == 0) && (strcmp(szType, "CIVILIZATION_CHINA") != 0))
+			{
+				throw 1;
+			}
+		}
+		pResults->Reset();
+	}
+
 	//coastal start
 	{
 		m_bCoastalCiv = false;

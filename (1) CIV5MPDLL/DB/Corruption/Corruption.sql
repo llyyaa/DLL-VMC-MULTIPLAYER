@@ -32,3 +32,5 @@ create table Policy_CorruptionLevelPolicyCostModifier (
 
 INSERT INTO Defines(Name, Value) VALUES('CORRUPTION_SCORE_PER_DISTANCE', 100);
 INSERT INTO Defines(Name, Value) VALUES('CORRUPTION_SCORE_COASTAL_BONUS', -200);
+
+alter table Buildings add column CorruptionPolicyCostModifier integer not null default 0;

@@ -105,7 +105,10 @@ void CvLuaUnit::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetMaxHitPointsChangeFromRazedCityPop);
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetCombatStrengthChangeFromKilledUnits);
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetRangedCombatStrengthChangeFromKilledUnits);
-	
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	REGIST_STATIC_FUNCTION(CvLuaUnit::lChangeNumEstablishCorps);
+	REGIST_STATIC_FUNCTION(CvLuaUnit::lChangeNumCannotBeEstablishedCorps);
+#endif
 }
 //------------------------------------------------------------------------------
 void CvLuaUnit::PushMethods(lua_State* L, int t)
@@ -827,6 +830,10 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetAttackModifierFromWorldCongress);
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	Method(IsNoTroops);
+	Method(IsCanEstablishCorps);
+	Method(ChangeNumEstablishCorps);
+	Method(IsCanBeEstablishedCorps);
+	Method(ChangeNumCannotBeEstablishedCorps);
 #endif
 #ifdef MOD_GLOBAL_CORRUPTION
 	Method(GetPlotCorruptionScoreReport);
@@ -6517,6 +6524,10 @@ LUAAPIIMPL(Unit, GetAttackBonusFromDeathUnit)
 LUAAPIIMPL(Unit, GetAttackModifierFromWorldCongress)
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 LUAAPIIMPL(Unit, IsNoTroops)
+LUAAPIIMPL(Unit, IsCanEstablishCorps)
+LUAAPIIMPL(Unit, ChangeNumEstablishCorps)
+LUAAPIIMPL(Unit, IsCanBeEstablishedCorps)
+LUAAPIIMPL(Unit, ChangeNumCannotBeEstablishedCorps)
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION

@@ -559,6 +559,7 @@ public:
 #ifdef MOD_GLOBAL_CORRUPTION
 	int GetCorruptionScoreChange() const;
 	int GetCorruptionLevelChange() const;
+	int GetCorruptionPolicyCostModifier() const;
 #endif
 
 	int GetGlobalProductionNeededUnitModifier() const;
@@ -956,6 +957,7 @@ private:
 #ifdef MOD_GLOBAL_CORRUPTION
 	int m_iCorruptionScoreChange = 0;
 	int m_iCorruptionLevelChange = 0;
+	int m_iCorruptionPolicyCostModifier = 0;
 #endif
 
 	int m_iGlobalProductionNeededUnitModifier = 0;

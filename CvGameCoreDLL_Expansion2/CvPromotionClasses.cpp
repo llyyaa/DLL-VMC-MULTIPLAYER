@@ -217,6 +217,8 @@ CvPromotionEntry::CvPromotionEntry():
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bCrops(false),
 	m_bArmee(false),
+	m_iNumEstablishCorps(0),
+	m_bCannotBeEstablishedCorps(false),
 #endif
 
 	m_iReligiousStrengthLossRivalTerritory(0),
@@ -737,6 +739,8 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bCrops = kResults.GetBool("IsCrops");
 	m_bArmee = kResults.GetBool("IsArmee");
+	m_iNumEstablishCorps = kResults.GetInt("NumEstablishCorps");
+	m_bCannotBeEstablishedCorps = kResults.GetBool("CannotBeEstablishedCorps");
 #endif
 	m_iReligiousStrengthLossRivalTerritory = kResults.GetInt("ReligiousStrengthLossRivalTerritory");
 	m_iTradeMissionInfluenceModifier = kResults.GetInt("TradeMissionInfluenceModifier");
@@ -2522,6 +2526,14 @@ bool CvPromotionEntry::IsCrops() const
 bool CvPromotionEntry::IsArmee() const
 {
 	return m_bArmee;
+}
+int CvPromotionEntry::GetNumEstablishCorps() const
+{
+	return m_iNumEstablishCorps;
+}
+bool CvPromotionEntry::IsCannotBeEstablishedCorps() const
+{
+	return m_bCannotBeEstablishedCorps;
 }
 #endif
 
