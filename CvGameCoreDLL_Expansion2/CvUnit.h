@@ -618,10 +618,6 @@ public:
 	int GetBoundWaterImprovement() const;
 #endif
 
-#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	bool IsNoTroops() const;
-#endif
-
 	int maxXPValue() const;
 
 	int firstStrikes() const;
@@ -1921,11 +1917,19 @@ public:
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	const int GetCrops() const;
 	void ChangeCrops(int iValue);
-	const bool IsCrops() const;
+	bool IsCrops() const;
 
 	const int GetArmee() const;
 	void ChangeArmee(int iValue);
-	const bool IsArmee() const;
+	bool IsArmee() const;
+
+	bool IsNoTroops() const;
+
+	bool IsCanEstablishCorps() const;
+	void ChangeNumEstablishCorps(int iValue);
+
+	bool IsCanBeEstablishedCorps() const;
+	void ChangeNumCannotBeEstablishedCorps(int iValue);
 #endif
 
 	void ChangeReligiousStrengthLossRivalTerritory(int iValue);
@@ -2544,6 +2548,8 @@ protected:
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	int m_iCrops;
 	int m_iArmee;
+	int m_iNumEstablishCorps;
+	int m_iCannotBeEstablishedCorps;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;

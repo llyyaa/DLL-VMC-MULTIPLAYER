@@ -286,6 +286,8 @@ public:
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool IsCrops() const;
 	bool IsArmee() const;
+	int GetNumEstablishCorps() const;
+	bool IsCannotBeEstablishedCorps() const;
 #endif
 	int GetReligiousStrengthLossRivalTerritory() const;
 	
@@ -643,6 +645,8 @@ protected:
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool m_bCrops;
 	bool m_bArmee;
+	int m_iNumEstablishCorps;
+	bool m_bCannotBeEstablishedCorps;
 #endif
 	int m_iReligiousStrengthLossRivalTerritory;
 	int m_iTradeMissionInfluenceModifier;
