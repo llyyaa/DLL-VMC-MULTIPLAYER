@@ -10060,6 +10060,13 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeTradeRouteLandGoldBonusGlobal(pBuildingInfo->GetTradeRouteLandGoldBonusGlobal() * iChange);
 #endif
 
+#ifdef MOD_GLOBAL_CORRUPTION
+		if (MOD_GLOBAL_CORRUPTION)
+		{
+			ChangeCorruptionPolicyCostModifier(pBuildingInfo->GetCorruptionPolicyCostModifier() * iChange);
+		}
+#endif
+
 
 	for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
@@ -15677,6 +15684,8 @@ void CvPlayer::recomputePolicyCostModifier()
 			auto level = pLoopCity->GetCorruptionLevel();
 			iSum += GetCorruptionLevelPolicyCostModifier(level);
 		}
+		iSum += GetCorruptionPolicyCostModifier();
+		iSum = iSum < 0 ? 0 : iSum;
 		iCost += iSum;
 	}
 #endif
@@ -28415,6 +28424,8 @@ void CvPlayer::Read(FDataStream& kStream)
 #ifdef MOD_GLOBAL_CORRUPTION
 	kStream >> m_iCorruptionScoreModifierFromPolicy;
 	kStream >> m_iCorruptionLevelReduceByOneRC;
+	kStream >> m_iCorruptionPolicyCostModifier;
+	
 	kStream >> m_paiCorruptionLevelPolicyCostModifier;
 #endif
 
@@ -29067,6 +29078,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 #ifdef MOD_GLOBAL_CORRUPTION
 	kStream << m_iCorruptionScoreModifierFromPolicy;
 	kStream << m_iCorruptionLevelReduceByOneRC;
+	kStream << m_iCorruptionPolicyCostModifier;
+
 	kStream << m_paiCorruptionLevelPolicyCostModifier;
 #endif
 
@@ -32730,6 +32743,17 @@ bool CvPlayer::IsCorruptionLevelReduceByOne() const
 void CvPlayer::ChangeCorruptionLevelReduceByOneRC(int change)
 {
 	m_iCorruptionLevelReduceByOneRC += change;
+}
+
+int CvPlayer::GetCorruptionPolicyCostModifier() const
+{
+	return m_iCorruptionPolicyCostModifier;
+}
+void CvPlayer::ChangeCorruptionPolicyCostModifier(int change)
+{
+	m_iCorruptionPolicyCostModifier += change;
+	recomputePolicyCostModifier();
+	DoUpdateNextPolicyCost();
 }
 
 int CvPlayer::GetCorruptionLevelPolicyCostModifier(CorruptionLevelTypes level) const
