@@ -272,6 +272,7 @@ public:
 	int GetHeightModPerX() const;
 	int GetHeightModLimited() const;
 	int GetExtraMoveTimesXX() const;
+	int GetRangeAttackCostModifier() const;
 	int GetOriginalCapitalDamageFix() const;
 	int GetMultipleInitExperence() const;
 	int GetLostAllMovesAttackCity() const;
@@ -631,6 +632,7 @@ protected:
 	int m_iHeightModPerX;
 	int m_iHeightModLimited;
 	int m_iExtraMoveTimesXX;
+	int m_iRangeAttackCostModifier;
 	int m_iOriginalCapitalDamageFix;
 	int m_iMultipleInitExperence;
 	int m_iLostAllMovesAttackCity;

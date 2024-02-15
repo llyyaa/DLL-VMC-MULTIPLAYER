@@ -3873,7 +3873,8 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::AttackRanged(CvUnit& kAttacker, int iX
 		{
 			kAttacker.setMadeAttack(true);
 		}
-		kAttacker.changeMoves(-GC.getMOVE_DENOMINATOR());
+		int iMoveCost = GC.getMOVE_DENOMINATOR() * kAttacker.GetRangeAttackCostModifier() / 100;
+		kAttacker.changeMoves(-iMoveCost);
 	}
 
 	// Unit that attacks loses his Fort bonus

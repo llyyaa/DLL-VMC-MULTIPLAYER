@@ -1884,6 +1884,9 @@ public:
 	const int GetExtraMoveTimesXX() const;
 	void ChangeExtraMoveTimesXX(int iValue);
 
+	const int GetRangeAttackCostModifier() const;
+	void ChangeRangeAttackCostModifier(int iValue);
+
 	const int GetOriginalCapitalDamageFixTotal() const;
 	const int GetOriginalCapitalDamageFix() const;
 	void ChangeOriginalCapitalDamageFix(int iValue);
@@ -2534,6 +2537,7 @@ protected:
 	int m_iHeightModPerX;
 	int m_iHeightModLimited;
 	int m_iExtraMoveTimesXX;
+	int m_iRangeAttackCostModifier;
 	int m_iOriginalCapitalDamageFix;
 	int m_iMultipleInitExperence;
 	int m_iLostAllMovesAttackCity;
