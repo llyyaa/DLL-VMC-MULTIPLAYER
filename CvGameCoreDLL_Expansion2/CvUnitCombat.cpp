@@ -4849,6 +4849,8 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo, int iAtta
 bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 {
 	if (kCombatInfo.getAttackIsNuclear()) return false;
+	// in one city challenge will cause CTD
+	if (kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER) == nullptr && kCombatInfo.getCity(BATTLE_UNIT_DEFENDER) == nullptr) return false;
 
 	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
 	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);

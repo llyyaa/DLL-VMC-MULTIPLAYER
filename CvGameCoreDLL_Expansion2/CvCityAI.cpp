@@ -116,7 +116,7 @@ void CvCityAI::AI_chooseProduction(bool bInterruptWonders)
 			bool checkBuildWonder = true;
 			
 			// All of this only has sense if the AI is able to expand...
-			if (MOD_AI_SMART_V3 && !GC.getGame().isOption(GAMEOPTION_ONE_CITY_CHALLENGE))
+			if (MOD_AI_SMART_V3)
 			{
 				int cityExpansionFlavor = m_pCityStrategyAI->GetLatestFlavorValue((FlavorTypes)GC.getInfoTypeForString("FLAVOR_EXPANSION"));
 				int cityWonderFlavor = m_pCityStrategyAI->GetLatestFlavorValue((FlavorTypes)GC.getInfoTypeForString("FLAVOR_WONDER"));
