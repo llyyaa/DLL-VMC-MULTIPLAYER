@@ -908,11 +908,11 @@ bool CvDllGameContext::RandomNumberGeneratorSyncCheck(PlayerTypes ePlayer, ICvRa
 		rngLogMessage += formatBuf;
 
 		rngLogMessage += ", remote.seed=";
-		_itoa_s(pkRandom->getSeed(), formatBuf, 10);
+		_ultoa_s(pkRandom->getSeed(), formatBuf, 10);
 		rngLogMessage += formatBuf;
 
 		rngLogMessage += "\n\tlocal.callCount=";
-		_itoa_s(localSimRandomNumberGenerator.getCallCount(), formatBuf, 10);
+		_ultoa_s(localSimRandomNumberGenerator.getCallCount(), formatBuf, 10);
 		rngLogMessage += formatBuf;
 
 		rngLogMessage += ", remote.callCount=";
