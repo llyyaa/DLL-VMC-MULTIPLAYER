@@ -3873,7 +3873,8 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::AttackRanged(CvUnit& kAttacker, int iX
 		{
 			kAttacker.setMadeAttack(true);
 		}
-		kAttacker.changeMoves(-GC.getMOVE_DENOMINATOR());
+		int iMoveCost = GC.getMOVE_DENOMINATOR() * kAttacker.GetRangeAttackCostModifier() / 100;
+		kAttacker.changeMoves(-iMoveCost);
 	}
 
 	// Unit that attacks loses his Fort bonus
@@ -4848,6 +4849,8 @@ void CvUnitCombat::DoNewBattleEffects(const CvCombatInfo& kCombatInfo, int iAtta
 bool CvUnitCombat::ShouldDoNewBattleEffects(const CvCombatInfo& kCombatInfo)
 {
 	if (kCombatInfo.getAttackIsNuclear()) return false;
+	// in one city challenge will cause CTD
+	if (kCombatInfo.getUnit(BATTLE_UNIT_DEFENDER) == nullptr && kCombatInfo.getCity(BATTLE_UNIT_DEFENDER) == nullptr) return false;
 
 	CvPlayerAI& kAttackPlayer = getAttackerPlayer(kCombatInfo);
 	CvPlayerAI& kDefensePlayer = getDefenderPlayer(kCombatInfo);

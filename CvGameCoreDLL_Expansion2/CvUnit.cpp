@@ -479,6 +479,7 @@ CvUnit::CvUnit() :
 	, m_iHeightModPerX(0)
 	, m_iHeightModLimited(0)
 	, m_iExtraMoveTimesXX(0)
+	, m_iRangeAttackCostModifier(100)
 	, m_iOriginalCapitalDamageFix(0)
 	, m_iMultipleInitExperence(0)
 	, m_iLostAllMovesAttackCity(0)
@@ -1454,6 +1455,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iHeightModPerX = 0;
 	m_iHeightModLimited = 0;
 	m_iExtraMoveTimesXX = 0;
+	m_iRangeAttackCostModifier = 100;
 	m_iOriginalCapitalDamageFix = 0;
 	m_iMultipleInitExperence = 0;
 	m_iLostAllMovesAttackCity = 0;
@@ -7030,6 +7032,15 @@ void CvUnit::ChangeExtraMoveTimesXX(int iValue)
 const int CvUnit::GetExtraMoveTimesXX() const
 {
 	return m_iExtraMoveTimesXX;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeRangeAttackCostModifier(int iValue)
+{
+	m_iRangeAttackCostModifier += iValue;
+}
+const int CvUnit::GetRangeAttackCostModifier() const
+{
+	return m_iRangeAttackCostModifier;
 }
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeOriginalCapitalDamageFix(int iValue)
@@ -26116,6 +26127,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeHeightModPerX((thisPromotion.GetHeightModPerX()) * iChange);
 		ChangeHeightModLimited((thisPromotion.GetHeightModLimited()) * iChange);
 		ChangeExtraMoveTimesXX((thisPromotion.GetExtraMoveTimesXX()) * iChange);
+		ChangeRangeAttackCostModifier((thisPromotion.GetRangeAttackCostModifier()) * iChange);
 		ChangeOriginalCapitalDamageFix((thisPromotion.GetOriginalCapitalDamageFix()) * iChange);
 		ChangeMultipleInitExperence((thisPromotion.GetMultipleInitExperence()) * iChange);
 		ChangeLostAllMovesAttackCity((thisPromotion.GetLostAllMovesAttackCity()) * iChange);
@@ -26673,6 +26685,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iHeightModPerX;
 	kStream >> m_iHeightModLimited;
 	kStream >> m_iExtraMoveTimesXX;
+	kStream >> m_iRangeAttackCostModifier;
 	kStream >> m_iOriginalCapitalDamageFix;
 	kStream >> m_iMultipleInitExperence;
 	kStream >> m_iLostAllMovesAttackCity;
@@ -27067,6 +27080,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iHeightModPerX;
 	kStream << m_iHeightModLimited;
 	kStream << m_iExtraMoveTimesXX;
+	kStream << m_iRangeAttackCostModifier;
 	kStream << m_iOriginalCapitalDamageFix;
 	kStream << m_iMultipleInitExperence;
 	kStream << m_iLostAllMovesAttackCity;
