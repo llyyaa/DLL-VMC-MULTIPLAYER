@@ -161,6 +161,9 @@ CvDiplomacyAI::DiplomacyAIData::DiplomacyAIData() :
 	, m_aaiWorkingAgainstPlayerCounter()
 	, m_aacCoopWarAcceptedState()
 	, m_aaiCoopWarCounter()
+	, m_pabMarriageAccepted()
+	, m_paiMarriageCounter()
+	, m_paiMarriageFinishCounter()
 {
 }
 
