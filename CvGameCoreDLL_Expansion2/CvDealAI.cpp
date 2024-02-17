@@ -1279,6 +1279,12 @@ int CvDealAI::GetResourceValue(ResourceTypes eResource, int iResourceQuantity, i
 		if(!GET_TEAM(GetPlayer()->getTeam()).IsResourceObsolete(eResource))
 		{
 			iItemValue += (iResourceQuantity * iNumTurns * 150 / 100);	// Ex: 5 Iron for 30 turns * 2 = value of 300
+			// for SP, Protecting AI from tricksy humans
+			if(MOD_SP_SMART_AI && iResourceQuantity == 1)
+			{
+				int iExtraValue = bFromMe ? iNumTurns * 50 : iNumTurns * -50;
+				iItemValue += iExtraValue / 100;
+			}
 		}
 		else
 		{
