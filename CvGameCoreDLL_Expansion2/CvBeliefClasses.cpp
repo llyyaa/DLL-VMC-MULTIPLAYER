@@ -110,6 +110,8 @@ CvBeliefEntry::CvBeliefEntry() :
 #endif
 	m_ppaiResourceYieldChange(NULL),
 	m_ppaiTerrainYieldChange(NULL),
+	m_ppaiTerrainYieldChangeAdditive(NULL),
+	m_ppaiTerrainCityYieldChanges(NULL),
 #if defined(MOD_API_UNIFIED_YIELDS)
 	m_ppiTradeRouteYieldChange(NULL),
 	m_ppiSpecialistYieldChange(NULL),
@@ -149,6 +151,8 @@ CvBeliefEntry::~CvBeliefEntry()
 #endif
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainYieldChange);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainYieldChangeAdditive);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainCityYieldChanges);
 #if defined(MOD_API_UNIFIED_YIELDS)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiTradeRouteYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiSpecialistYieldChange);
@@ -610,6 +614,26 @@ int CvBeliefEntry::GetTerrainYieldChange(int i, int j) const
 	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
 	CvAssertMsg(j > -1, "Index out of bounds");
 	return m_ppaiTerrainYieldChange ? m_ppaiTerrainYieldChange[i][j] : -1;
+}
+
+/// Change to yield by terrain
+int CvBeliefEntry::GetTerrainYieldChangeAdditive(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiTerrainYieldChangeAdditive ? m_ppaiTerrainYieldChangeAdditive[i][j] : -1;
+}
+
+/// Change to city yield by terrain
+int CvBeliefEntry::GetTerrainCityYieldChanges(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiTerrainCityYieldChanges ? m_ppaiTerrainCityYieldChanges[i][j] : -1;
 }
 
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -1119,6 +1143,51 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 			const int yield = pResults->GetInt(2);
 
 			m_ppaiTerrainYieldChange[TerrainID][YieldID] = yield;
+		}
+	}
+	//TerrainYieldChangesAdditive
+	{
+		kUtility.Initialize2DArray(m_ppaiTerrainYieldChangeAdditive, "Terrains", "Yields");
+
+		std::string strKey("TerrainYieldChangesAdditive");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Terrains.ID as TerrainID, Yields.ID as YieldID, Yield from Belief_TerrainYieldChangesAdditive inner join Terrains on Terrains.Type = TerrainType inner join Yields on Yields.Type = YieldType where BeliefType = ?");
+		}
+
+		pResults->Bind(1, szBeliefType);
+
+		while(pResults->Step())
+		{
+			const int TerrainID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiTerrainYieldChangeAdditive[TerrainID][YieldID] = yield;
+		}
+	}
+
+	//TerrainCityYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppaiTerrainCityYieldChanges, "Terrains", "Yields");
+
+		std::string strKey("TerrainCityYieldChanges");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Terrains.ID as TerrainID, Yields.ID as YieldID, Yield from Belief_TerrainCityYieldChanges inner join Terrains on Terrains.Type = TerrainType inner join Yields on Yields.Type = YieldType where BeliefType = ?");
+		}
+
+		pResults->Bind(1, szBeliefType);
+
+		while(pResults->Step())
+		{
+			const int TerrainID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiTerrainCityYieldChanges[TerrainID][YieldID] = yield;
 		}
 	}
 	
@@ -1991,6 +2060,34 @@ int CvReligionBeliefs::GetTerrainYieldChange(TerrainTypes eTerrain, YieldTypes e
 	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
 	{
 		rtnValue += pBeliefs->GetEntry(*i)->GetTerrainYieldChange(eTerrain, eYieldType);
+	}
+
+	return rtnValue;
+}
+
+/// Get yield change from beliefs for a specific terrain(include forest and natural wonders)
+int CvReligionBeliefs::GetTerrainYieldChangeAdditive(TerrainTypes eTerrain, YieldTypes eYieldType) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetTerrainYieldChangeAdditive(eTerrain, eYieldType);
+	}
+
+	return rtnValue;
+}
+
+/// Get yield change from beliefs for a specific terrain(include forest and natural wonders)
+int CvReligionBeliefs::GetTerrainCityYieldChanges(TerrainTypes eTerrain, YieldTypes eYieldType) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetTerrainCityYieldChanges(eTerrain, eYieldType);
 	}
 
 	return rtnValue;

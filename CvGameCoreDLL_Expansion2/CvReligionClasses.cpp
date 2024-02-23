@@ -6247,6 +6247,7 @@ int CvReligionAI::ScoreBeliefAtPlot(CvBeliefEntry* pEntry, CvPlot* pPlot)
 		if(eTerrain != NO_TERRAIN)
 		{
 			iRtnValue += pEntry->GetTerrainYieldChange(eTerrain, iI);
+			iRtnValue += pEntry->GetTerrainYieldChangeAdditive(eTerrain, iI);
 		}
 
 #if defined(MOD_RELIGION_PLOT_YIELDS)
@@ -6302,6 +6303,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 	int iMinPop;
 	int iMinFollowers;
 	int iHappinessMultiplier = 2;
+	int iTerrain = (int)pCity->plot()->getTerrainType();
 
 	CvFlavorManager* pFlavorManager = m_pPlayer->GetFlavorManager();
 	int iFlavorOffense = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_OFFENSE"));
@@ -6410,6 +6412,11 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 			}
 		}
 		iRtnValue += iTempValue;
+
+		if(iTerrain != NO_TERRAIN)
+		{
+			iRtnValue += pEntry->GetTerrainCityYieldChanges(iTerrain, iI);
+		}
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 		if (pCity->isCapital()) {

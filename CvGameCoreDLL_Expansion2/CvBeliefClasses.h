@@ -110,6 +110,8 @@ public:
 #endif
 	int GetResourceYieldChange(int i, int j) const;
 	int GetTerrainYieldChange(int i, int j) const;
+	int GetTerrainYieldChangeAdditive(int i, int j) const;
+	int GetTerrainCityYieldChanges(int i, int j) const;
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int GetTradeRouteYieldChange(int i, int j) const;
 	int GetSpecialistYieldChange(int i, int j) const;
@@ -249,6 +251,8 @@ protected:
 #endif
 	int** m_ppaiResourceYieldChange;
 	int** m_ppaiTerrainYieldChange;
+	int** m_ppaiTerrainYieldChangeAdditive;
+	int** m_ppaiTerrainCityYieldChanges;
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int** m_ppiTradeRouteYieldChange;
 	int** m_ppiSpecialistYieldChange;
@@ -516,6 +520,8 @@ public:
 #endif
 	int GetResourceYieldChange(ResourceTypes eResource, YieldTypes eYieldType) const;
 	int GetTerrainYieldChange(TerrainTypes eTerrain, YieldTypes eYieldType) const;
+	int GetTerrainYieldChangeAdditive(TerrainTypes eTerrain, YieldTypes eYieldType) const;
+	int GetTerrainCityYieldChanges(TerrainTypes eTerrain, YieldTypes eYieldType) const;
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int GetTradeRouteYieldChange(DomainTypes eDomain, YieldTypes eYieldType) const;
 	int GetSpecialistYieldChange(SpecialistTypes eSpecialist, YieldTypes eYieldType) const;

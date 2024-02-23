@@ -8422,55 +8422,70 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 		m_aiBaseYieldRateFromReligion[iYield] = 0;
 	}
 
+	BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
+	const CvReligion* pReligion = (eNewMajority != NO_RELIGION) ? GC.getGame().GetGameReligions()->GetReligion(eNewMajority, getOwner()) : 0;
+	const CvBeliefEntry* pSecondaryPantheon = (eSecondaryPantheon != NO_BELIEF) ? GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon) : 0;
+	TerrainTypes eTerrain = plot()->getTerrainType();
+
 	for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 	{
+		YieldTypes eYield = (YieldTypes)iYield;
 		if(eNewMajority != NO_RELIGION)
 		{
-			const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eNewMajority, getOwner());
 			if(pReligion)
 			{
 				int iFollowers = GetCityReligions()->GetNumFollowers(eNewMajority);
 
-				int iReligionYieldChange = pReligion->m_Beliefs.GetCityYieldChange(getPopulation(), (YieldTypes)iYield);
+				int iReligionYieldChange = pReligion->m_Beliefs.GetCityYieldChange(getPopulation(), eYield);
 #if defined(MOD_API_UNIFIED_YIELDS)
 				if (isCapital()) {
-					iReligionYieldChange += pReligion->m_Beliefs.GetCapitalYieldChange(getPopulation(), (YieldTypes)iYield);
+					iReligionYieldChange += pReligion->m_Beliefs.GetCapitalYieldChange(getPopulation(), eYield);
 				}
 				if (isCoastal()) {
-					iReligionYieldChange += pReligion->m_Beliefs.GetCoastalCityYieldChange(getPopulation(), (YieldTypes)iYield);
+					iReligionYieldChange += pReligion->m_Beliefs.GetCoastalCityYieldChange(getPopulation(), eYield);
 				}
 #endif
-				BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
-				if (eSecondaryPantheon != NO_BELIEF && getPopulation() >= GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetMinPopulation())
+				if(eTerrain != NO_TERRAIN)
 				{
-					iReligionYieldChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCityYieldChange((YieldTypes)iYield);
+					iReligionYieldChange += pReligion->m_Beliefs.GetTerrainCityYieldChanges(eTerrain, eYield);
+				}
+				if (eSecondaryPantheon != NO_BELIEF)
+				{
+					if(getPopulation() >= pSecondaryPantheon->GetMinPopulation())
+					{
+						iReligionYieldChange += pSecondaryPantheon->GetCityYieldChange(eYield);
 #if defined(MOD_API_UNIFIED_YIELDS)
-					if (isCapital()) {
-						iReligionYieldChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCapitalYieldChange((YieldTypes)iYield);
-					}
-					if (isCoastal()) {
-						iReligionYieldChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCoastalCityYieldChange((YieldTypes)iYield);
-					}
+						if (isCapital()) {
+							iReligionYieldChange += pSecondaryPantheon->GetCapitalYieldChange(eYield);
+						}
+						if (isCoastal()) {
+							iReligionYieldChange += pSecondaryPantheon->GetCoastalCityYieldChange(eYield);
+						}
 #endif
+					}
+					if(eTerrain != NO_TERRAIN)
+					{
+						iReligionYieldChange += pSecondaryPantheon->GetTerrainCityYieldChanges(eTerrain, eYield);
+					}
 				}
 
-				ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionYieldChange);
+				ChangeBaseYieldRateFromReligion(eYield, iReligionYieldChange);
 
 				if(IsRouteToCapitalConnected())
 				{
-					int iReligionChange = pReligion->m_Beliefs.GetYieldChangeTradeRoute((YieldTypes)iYield);
+					int iReligionChange = pReligion->m_Beliefs.GetYieldChangeTradeRoute(eYield);
 					//BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
 					if (eSecondaryPantheon != NO_BELIEF)
 					{
-						iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetYieldChangeTradeRoute((YieldTypes)iYield);
+						iReligionChange += pSecondaryPantheon->GetYieldChangeTradeRoute(eYield);
 					}
 
-					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionChange);
+					ChangeBaseYieldRateFromReligion(eYield, iReligionChange);
 				}
 				
 				if (GetCityCitizens()->GetTotalSpecialistCount() > 0)
 				{
-					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
+					ChangeBaseYieldRateFromReligion(eYield, pReligion->m_Beliefs.GetYieldChangeAnySpecialist(eYield));
 				}
 
 				// Buildings
@@ -8491,17 +8506,17 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 					{
 						if(GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
 						{
-							int iYieldFromBuilding = pReligion->m_Beliefs.GetBuildingClassYieldChange(eBuildingClass, (YieldTypes)iYield, iFollowers);
+							int iYieldFromBuilding = pReligion->m_Beliefs.GetBuildingClassYieldChange(eBuildingClass, eYield, iFollowers);
 #if defined(MOD_BUGFIX_MINOR)
 							iYieldFromBuilding *= GetCityBuildings()->GetNumBuilding(eBuilding);
 #endif
 
 							if (isWorldWonderClass(*pkBuildingClassInfo))
 							{
-								iYieldFromBuilding += pReligion->m_Beliefs.GetYieldChangeWorldWonder((YieldTypes)iYield);
+								iYieldFromBuilding += pReligion->m_Beliefs.GetYieldChangeWorldWonder(eYield);
 							}
 
-							ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iYieldFromBuilding);
+							ChangeBaseYieldRateFromReligion(eYield, iYieldFromBuilding);
 						}
 					}
 				}
@@ -13430,6 +13445,7 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	if (MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD)
 	{
+		iBaseValue = GetBaseYieldRateFromOtherYield(eIndex);
 		for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
 		{
 			YieldTypes eIndex2 = (YieldTypes)iI;
@@ -13442,7 +13458,6 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 			iBaseValue += GetRealYieldFromYield(eIndex2, eIndex);
 		}
 
-		iBaseValue += GetBaseYieldRateFromOtherYield(eIndex);
 		if(iBaseValue != 0)
 		{
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_OTHER_YIELD", iBaseValue, YieldIcon);
