@@ -9555,6 +9555,11 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 	{
 		iYield = std::max(iYield, kYield.getMinCity());
 
+#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
+		PlotTypes ePlot = getPlotType();
+		// Extra yield for plot City
+		if(ePlot != NO_PLOT) iYield += GC.getPlotInfo(ePlot)->getCityYield(eYield);
+#endif
 		// Mod for Player; used for Policies and such
 		int iTemp = GET_PLAYER(getOwner()).GetCityYieldChangeTimes100(eYield);	// In hundreds - will be added to capitalYieldChange below
 #if defined(MOD_API_UNIFIED_YIELDS)
