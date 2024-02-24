@@ -110,6 +110,8 @@ public:
 #endif
 	int GetResourceYieldChange(int i, int j) const;
 	int GetTerrainYieldChange(int i, int j) const;
+	int GetTerrainYieldChangeAdditive(int i, int j) const;
+	int GetTerrainCityYieldChanges(int i, int j) const;
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int GetTradeRouteYieldChange(int i, int j) const;
 	int GetSpecialistYieldChange(int i, int j) const;
@@ -131,6 +133,7 @@ public:
 	bool IsGreatPersonPointsPerCity() const;
 	bool IsGreatPersonPointsHolyCity() const;
 	int GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) const;
+	int GetTerrainCityFoodConsumption(int i) const;
 	int GetFreePromotionForProphet() const;
 	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
@@ -139,6 +142,7 @@ public:
 	int GetCityExtraMissionarySpreads() const;
 	bool AllowYieldPerBirth() const;
 	int GetYieldPerBirth(int i) const;
+	int GetLakePlotYieldChange(int i) const;
 #endif
 	int GetResourceHappiness(int i) const;
 	int GetYieldChangeAnySpecialist(int i) const;
@@ -200,6 +204,7 @@ protected:
 	bool m_bGreatPersonPointsPerCity;
 	bool m_bGreatPersonPointsHolyCity;
 	int* m_piGreatPersonPoints;
+	int* m_piTerrainCityFoodConsumption;
 	int m_iFreePromotionForProphet;
 	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
@@ -208,6 +213,7 @@ protected:
 	int m_iCityExtraMissionarySpreads;
 	bool m_bAllowYieldPerBirth;
 	int* m_piYieldPerBirth;
+	int* m_piLakePlotYieldChange;
 #endif
 
 	bool m_bPantheon;
@@ -249,6 +255,8 @@ protected:
 #endif
 	int** m_ppaiResourceYieldChange;
 	int** m_ppaiTerrainYieldChange;
+	int** m_ppaiTerrainYieldChangeAdditive;
+	int** m_ppaiTerrainCityYieldChanges;
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int** m_ppiTradeRouteYieldChange;
 	int** m_ppiSpecialistYieldChange;
@@ -516,6 +524,8 @@ public:
 #endif
 	int GetResourceYieldChange(ResourceTypes eResource, YieldTypes eYieldType) const;
 	int GetTerrainYieldChange(TerrainTypes eTerrain, YieldTypes eYieldType) const;
+	int GetTerrainYieldChangeAdditive(TerrainTypes eTerrain, YieldTypes eYieldType) const;
+	int GetTerrainCityYieldChanges(TerrainTypes eTerrain, YieldTypes eYieldType) const;
 #if defined(MOD_API_UNIFIED_YIELDS)
 	int GetTradeRouteYieldChange(DomainTypes eDomain, YieldTypes eYieldType) const;
 	int GetSpecialistYieldChange(SpecialistTypes eSpecialist, YieldTypes eYieldType) const;
@@ -532,7 +542,9 @@ public:
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	int GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, bool bCapital, bool bHolyCity) const;
+	int GetTerrainCityFoodConsumption(TerrainTypes eTerrain) const;
 	int GetYieldPerBirth(YieldTypes eYieldType) const;
+	int GetLakePlotYieldChange(YieldTypes eYieldType) const;
 #endif
 	int GetResourceHappiness(ResourceTypes eResource) const;
 	int GetYieldChangeAnySpecialist(YieldTypes eYieldType) const;

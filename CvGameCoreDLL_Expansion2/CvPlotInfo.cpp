@@ -13,7 +13,8 @@ CvPlotInfo::CvPlotInfo() :
 #if defined(MOD_ROG_CORE)
 	m_pppiAdjacentFeatureYieldChange(),
 #endif
-	m_piYields(NULL)
+	m_piYields(NULL),
+	m_piCityYields(NULL)
 {
 }
 
@@ -23,6 +24,7 @@ CvPlotInfo::~CvPlotInfo()
 	m_pppiAdjacentFeatureYieldChange.clear();
 #endif
 	SAFE_DELETE_ARRAY(m_piYields);
+	SAFE_DELETE_ARRAY(m_piCityYields);
 }
 
 bool CvPlotInfo::isWater() const
@@ -41,6 +43,14 @@ int CvPlotInfo::getYield(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piYields ? m_piYields[i] : -1;
 }
+
+int CvPlotInfo::getCityYield(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piCityYields ? m_piCityYields[i] : -1;
+}
+
 
 
 #if defined(MOD_ROG_CORE)
@@ -143,6 +153,7 @@ bool CvPlotInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kU
 	//Arrays
 	const char* szPlotType = GetType();
 	kUtility.SetYields(m_piYields, "Plot_Yields", "PlotType", szPlotType);
+	kUtility.SetYields(m_piCityYields, "Plot_CityYields", "PlotType", szPlotType);
 
 
 #if defined(MOD_ROG_CORE)

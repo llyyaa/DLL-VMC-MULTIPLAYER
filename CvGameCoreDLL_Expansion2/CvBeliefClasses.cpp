@@ -64,6 +64,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_bGreatPersonPointsPerCity(false),
 	m_bGreatPersonPointsHolyCity(false),
 	m_piGreatPersonPoints(NULL),
+	m_piTerrainCityFoodConsumption(NULL),
 	m_iFreePromotionForProphet(NO_PROMOTION),
 	m_iLandmarksTourismPercent(0),
 	m_iHolyCityUnitExperence(0),
@@ -72,6 +73,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iCityExtraMissionarySpreads(0),
 	m_bAllowYieldPerBirth(false),
 	m_piYieldPerBirth(NULL),
+	m_piLakePlotYieldChange(NULL),
 #endif
 
 	m_bPantheon(false),
@@ -110,6 +112,8 @@ CvBeliefEntry::CvBeliefEntry() :
 #endif
 	m_ppaiResourceYieldChange(NULL),
 	m_ppaiTerrainYieldChange(NULL),
+	m_ppaiTerrainYieldChangeAdditive(NULL),
+	m_ppaiTerrainCityYieldChanges(NULL),
 #if defined(MOD_API_UNIFIED_YIELDS)
 	m_ppiTradeRouteYieldChange(NULL),
 	m_ppiSpecialistYieldChange(NULL),
@@ -149,6 +153,8 @@ CvBeliefEntry::~CvBeliefEntry()
 #endif
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainYieldChange);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainYieldChangeAdditive);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiTerrainCityYieldChanges);
 #if defined(MOD_API_UNIFIED_YIELDS)
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiTradeRouteYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiSpecialistYieldChange);
@@ -612,6 +618,26 @@ int CvBeliefEntry::GetTerrainYieldChange(int i, int j) const
 	return m_ppaiTerrainYieldChange ? m_ppaiTerrainYieldChange[i][j] : -1;
 }
 
+/// Change to yield by terrain
+int CvBeliefEntry::GetTerrainYieldChangeAdditive(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiTerrainYieldChangeAdditive ? m_ppaiTerrainYieldChangeAdditive[i][j] : -1;
+}
+
+/// Change to city yield by terrain
+int CvBeliefEntry::GetTerrainCityYieldChanges(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiTerrainCityYieldChanges ? m_ppaiTerrainCityYieldChanges[i][j] : -1;
+}
+
 #if defined(MOD_API_UNIFIED_YIELDS)
 int CvBeliefEntry::GetTradeRouteYieldChange(int i, int j) const
 {
@@ -728,6 +754,12 @@ int CvBeliefEntry::GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) co
 
 	return resValue;
 }
+int CvBeliefEntry::GetTerrainCityFoodConsumption(int i) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piTerrainCityFoodConsumption ? m_piTerrainCityFoodConsumption[i] : -1;
+}
 //Extra Free Promotion For Prophet
 int CvBeliefEntry::GetFreePromotionForProphet() const
 {
@@ -768,6 +800,13 @@ int CvBeliefEntry::GetYieldPerBirth(int i) const
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piYieldPerBirth ? m_piYieldPerBirth[i] : -1;
+}
+//Lake Yield
+int CvBeliefEntry::GetLakePlotYieldChange(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piLakePlotYieldChange ? m_piLakePlotYieldChange[i] : -1;
 }
 #endif
 
@@ -931,6 +970,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	const char* szBeliefType = GetType();
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	kUtility.SetYields(m_piYieldPerBirth, "Belief_YieldPerBirth", "BeliefType", szBeliefType);
+	kUtility.SetYields(m_piLakePlotYieldChange, "Belief_LakePlotYieldChanges", "BeliefType", szBeliefType);
 #endif
 	kUtility.SetYields(m_paiCityYieldChange, "Belief_CityYieldChanges", "BeliefType", szBeliefType);
 	kUtility.SetYields(m_paiHolyCityYieldChange, "Belief_HolyCityYieldChanges", "BeliefType", szBeliefType);
@@ -941,6 +981,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.SetYields(m_piYieldModifierNaturalWonder, "Belief_YieldModifierNaturalWonder", "BeliefType", szBeliefType);
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	kUtility.PopulateArrayByValue(m_piGreatPersonPoints, "GreatPersons", "Belief_GreatPersonPoints", "GreatPersonType", "BeliefType", szBeliefType, "Value");
+	kUtility.PopulateArrayByValue(m_piTerrainCityFoodConsumption, "Terrains", "Belief_TerrainCityFoodConsumption", "TerrainType", "BeliefType", szBeliefType, "Modifier");
 #endif
 	kUtility.PopulateArrayByValue(m_piMaxYieldModifierPerFollower, "Yields", "Belief_MaxYieldModifierPerFollower", "YieldType", "BeliefType", szBeliefType, "Max");
 	kUtility.PopulateArrayByValue(m_piResourceHappiness, "Resources", "Belief_ResourceHappiness", "ResourceType", "BeliefType", szBeliefType, "HappinessChange");
@@ -1119,6 +1160,51 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 			const int yield = pResults->GetInt(2);
 
 			m_ppaiTerrainYieldChange[TerrainID][YieldID] = yield;
+		}
+	}
+	//TerrainYieldChangesAdditive
+	{
+		kUtility.Initialize2DArray(m_ppaiTerrainYieldChangeAdditive, "Terrains", "Yields");
+
+		std::string strKey("TerrainYieldChangesAdditive");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Terrains.ID as TerrainID, Yields.ID as YieldID, Yield from Belief_TerrainYieldChangesAdditive inner join Terrains on Terrains.Type = TerrainType inner join Yields on Yields.Type = YieldType where BeliefType = ?");
+		}
+
+		pResults->Bind(1, szBeliefType);
+
+		while(pResults->Step())
+		{
+			const int TerrainID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiTerrainYieldChangeAdditive[TerrainID][YieldID] = yield;
+		}
+	}
+
+	//TerrainCityYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppaiTerrainCityYieldChanges, "Terrains", "Yields");
+
+		std::string strKey("TerrainCityYieldChanges");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Terrains.ID as TerrainID, Yields.ID as YieldID, Yield from Belief_TerrainCityYieldChanges inner join Terrains on Terrains.Type = TerrainType inner join Yields on Yields.Type = YieldType where BeliefType = ?");
+		}
+
+		pResults->Bind(1, szBeliefType);
+
+		while(pResults->Step())
+		{
+			const int TerrainID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiTerrainCityYieldChanges[TerrainID][YieldID] = yield;
 		}
 	}
 	
@@ -1996,6 +2082,34 @@ int CvReligionBeliefs::GetTerrainYieldChange(TerrainTypes eTerrain, YieldTypes e
 	return rtnValue;
 }
 
+/// Get yield change from beliefs for a specific terrain(include forest and natural wonders)
+int CvReligionBeliefs::GetTerrainYieldChangeAdditive(TerrainTypes eTerrain, YieldTypes eYieldType) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetTerrainYieldChangeAdditive(eTerrain, eYieldType);
+	}
+
+	return rtnValue;
+}
+
+/// Get yield change from beliefs for a specific terrain(include forest and natural wonders)
+int CvReligionBeliefs::GetTerrainCityYieldChanges(TerrainTypes eTerrain, YieldTypes eYieldType) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetTerrainCityYieldChanges(eTerrain, eYieldType);
+	}
+
+	return rtnValue;
+}
+
 #if defined(MOD_API_UNIFIED_YIELDS)
 int CvReligionBeliefs::GetTradeRouteYieldChange(DomainTypes eDomain, YieldTypes eYieldType) const
 {
@@ -2167,7 +2281,21 @@ int CvReligionBeliefs::GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, 
 	return rtnValue;
 }
 
-/// Get yield modifier from beliefs from birth
+/// Get City Food Consume Modifier with Terrain from beliefs
+int CvReligionBeliefs::GetTerrainCityFoodConsumption(TerrainTypes eTerrain) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetTerrainCityFoodConsumption(eTerrain);
+	}
+
+	return rtnValue;
+}
+
+/// Get yield from beliefs with birth
 int CvReligionBeliefs::GetYieldPerBirth(YieldTypes eYieldType) const
 {
 	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
@@ -2176,6 +2304,19 @@ int CvReligionBeliefs::GetYieldPerBirth(YieldTypes eYieldType) const
 	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
 	{
 		rtnValue += pBeliefs->GetEntry(*i)->GetYieldPerBirth(eYieldType);
+	}
+
+	return rtnValue;
+}
+/// Get lake yield from beliefs
+int CvReligionBeliefs::GetLakePlotYieldChange(YieldTypes eYieldType) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetLakePlotYieldChange(eYieldType);
 	}
 
 	return rtnValue;

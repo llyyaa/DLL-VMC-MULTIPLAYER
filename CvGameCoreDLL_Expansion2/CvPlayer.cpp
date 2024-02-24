@@ -15685,7 +15685,7 @@ void CvPlayer::recomputePolicyCostModifier()
 			iSum += GetCorruptionLevelPolicyCostModifier(level);
 		}
 		iSum += GetCorruptionPolicyCostModifier();
-		//iSum = iSum < 0 ? 0 : iSum;
+		if(MOD_GLOBAL_CORRUPTION_POLICY_COST_MIN_ZERO) iSum = iSum < 0 ? 0 : iSum;
 		iCost += iSum;
 	}
 #endif

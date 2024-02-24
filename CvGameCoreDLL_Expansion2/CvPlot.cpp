@@ -8764,8 +8764,6 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 {
 	ResourceTypes eResource;
 	int iYield;
-	ReligionTypes eMajority = NO_RELIGION;
-	BeliefTypes eSecondaryPantheon = NO_BELIEF;
 
 #if !defined(MOD_RELIGION_PLOT_YIELDS) && !defined(MOD_API_PLOT_YIELDS)
 	if(isImpassable() || isMountain())
@@ -8779,13 +8777,6 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 #endif
 
 	const CvYieldInfo& kYield = *GC.getYieldInfo(eYield);
-
-	CvCity* pWorkingCity = getWorkingCity();
-	if(pWorkingCity)
-	{
-		eMajority = pWorkingCity->GetCityReligions()->GetReligiousMajority();
-		eSecondaryPantheon = pWorkingCity->GetCityReligions()->GetSecondaryReligionPantheonBelief();
-	}
 
 	CvAssertMsg(getTerrainType() != NO_TERRAIN, "TerrainType is not assigned a valid value");
 
@@ -8803,32 +8794,6 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 	}
 #endif
 
-	// Extra yield for religion on this terrain
-	if(pWorkingCity != NULL && eMajority != NO_RELIGION)
-	{
-		const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, pWorkingCity->getOwner());
-		if(pReligion)
-		{
-			int iReligionChange = pReligion->m_Beliefs.GetTerrainYieldChange(getTerrainType(), eYield);
-			if (eSecondaryPantheon != NO_BELIEF)
-			{
-				iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetTerrainYieldChange(getTerrainType(), eYield);
-			}
-			
-#if defined(MOD_RELIGION_PLOT_YIELDS)
-			if (MOD_RELIGION_PLOT_YIELDS) {
-				iReligionChange += pReligion->m_Beliefs.GetPlotYieldChange(getPlotType(), eYield);
-				if (eSecondaryPantheon != NO_BELIEF)
-				{
-					iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetPlotYieldChange(getPlotType(), eYield);
-				}
-			}
-#endif
-
-			iYield += iReligionChange;
-		}
-	}
-
 	if(isHills())
 	{
 		iYield += kYield.getHillsChange();
@@ -8842,6 +8807,44 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 	if(isLake())
 	{
 		iYield += kYield.getLakeChange();
+	}
+
+	CvCity* pWorkingCity = getWorkingCity();
+	ReligionTypes eMajority = NO_RELIGION;
+	BeliefTypes eSecondaryPantheon = NO_BELIEF;
+	int iReligionChange = 0;
+	if(pWorkingCity)
+	{
+		eMajority = pWorkingCity->GetCityReligions()->GetReligiousMajority();
+		eSecondaryPantheon = pWorkingCity->GetCityReligions()->GetSecondaryReligionPantheonBelief();
+	}
+	const CvReligion* pReligion = (eMajority != NO_RELIGION) ? GC.getGame().GetGameReligions()->GetReligion(eMajority, pWorkingCity->getOwner()) : 0;
+	const CvBeliefEntry* pSecondaryPantheon = (eSecondaryPantheon != NO_BELIEF) ? GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon) : 0;
+
+	// Extra yield for religion on this terrain
+	if(pReligion)
+	{
+		//Mountain should not has Terrain Yield Change from Religion
+		if(!isImpassable() && !isMountain())
+		{
+			iReligionChange = pReligion->m_Beliefs.GetTerrainYieldChange(getTerrainType(), eYield);
+			if (pSecondaryPantheon)
+			{
+				iReligionChange += pSecondaryPantheon->GetTerrainYieldChange(getTerrainType(), eYield);
+			}
+		}
+			
+#if defined(MOD_RELIGION_PLOT_YIELDS)
+		if (MOD_RELIGION_PLOT_YIELDS) {
+			iReligionChange += pReligion->m_Beliefs.GetPlotYieldChange(getPlotType(), eYield);
+			if (pSecondaryPantheon)
+			{
+				iReligionChange += pSecondaryPantheon->GetPlotYieldChange(getPlotType(), eYield);
+			}
+		}
+#endif
+
+		iYield += iReligionChange;
 	}
 
 	if(!bIgnoreFeature)
@@ -8860,18 +8863,14 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 #if defined(MOD_API_UNIFIED_YIELDS)
 				iYieldChange +=  GET_PLAYER((PlayerTypes)m_eOwner).getUnimprovedFeatureYieldChange(getFeatureType(), eYield);
 
-				if(pWorkingCity != NULL && eMajority != NO_RELIGION)
+				if(pReligion)
 				{
-					const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, pWorkingCity->getOwner());
-					if(pReligion)
+					iReligionChange = pReligion->m_Beliefs.GetUnimprovedFeatureYieldChange(getFeatureType(), eYield);
+					if (pSecondaryPantheon)
 					{
-						int iReligionChange = pReligion->m_Beliefs.GetUnimprovedFeatureYieldChange(getFeatureType(), eYield);
-						if (eSecondaryPantheon != NO_BELIEF)
-						{
-							iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetUnimprovedFeatureYieldChange(getFeatureType(), eYield);
-						}
-						iYieldChange += iReligionChange;
+						iReligionChange += pSecondaryPantheon->GetUnimprovedFeatureYieldChange(getFeatureType(), eYield);
 					}
+					iYieldChange += iReligionChange;
 				}
 #endif
 			}
@@ -8883,18 +8882,14 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 			}
 
 			// Religion
-			if(pWorkingCity != NULL && eMajority != NO_RELIGION)
+			if(pReligion)
 			{
-				const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, pWorkingCity->getOwner());
-				if(pReligion)
+				iReligionChange = pReligion->m_Beliefs.GetFeatureYieldChange(getFeatureType(), eYield);
+				if (pSecondaryPantheon)
 				{
-					int iReligionChange = pReligion->m_Beliefs.GetFeatureYieldChange(getFeatureType(), eYield);
-					if (eSecondaryPantheon != NO_BELIEF)
-					{
-						iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetFeatureYieldChange(getFeatureType(), eYield);
-					}
-					iYieldChange += iReligionChange;
+					iReligionChange += pSecondaryPantheon->GetFeatureYieldChange(getFeatureType(), eYield);
 				}
+				iYieldChange += iReligionChange;
 			}
 
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -8911,24 +8906,19 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 				int iMod = 0;
 
 				// Boost from religion in nearby city?
-				if(pWorkingCity && eMajority != NO_RELIGION)
+				if(pReligion)
 				{
-					const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, pWorkingCity->getOwner());
-					if(pReligion)
+					iReligionChange = pReligion->m_Beliefs.GetYieldChangeNaturalWonder(eYield);
+					if (pSecondaryPantheon)
 					{
-						int iReligionChange = pReligion->m_Beliefs.GetYieldChangeNaturalWonder(eYield);
-						if (eSecondaryPantheon != NO_BELIEF)
-						{
-							iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetYieldChangeNaturalWonder(eYield);
-						}
-						iYieldChange += iReligionChange;
+						iReligionChange += pSecondaryPantheon->GetYieldChangeNaturalWonder(eYield);
+					}
+					iYieldChange += iReligionChange;
 
-						int iReligionMod = pReligion->m_Beliefs.GetYieldModifierNaturalWonder(eYield);
-						if (eSecondaryPantheon != NO_BELIEF)
-						{
-							iReligionMod += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetYieldModifierNaturalWonder(eYield);
-						}
-						iMod += iReligionMod;
+					iMod += pReligion->m_Beliefs.GetYieldModifierNaturalWonder(eYield);
+					if (pSecondaryPantheon)
+					{
+						iMod += pSecondaryPantheon->GetYieldModifierNaturalWonder(eYield);
 					}
 				}
 
@@ -8956,6 +8946,26 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 		}
 	}
 
+	// Extra yield for religion on this terrain
+	if(pReligion && !isImpassable() && !isMountain())
+	{
+		//Mountain should not has Terrain Yield Change from Religion
+		iReligionChange = pReligion->m_Beliefs.GetTerrainYieldChangeAdditive(getTerrainType(), eYield);
+		if (pSecondaryPantheon)
+		{
+			iReligionChange += pSecondaryPantheon->GetTerrainYieldChangeAdditive(getTerrainType(), eYield);
+		}
+		if(isLake())
+		{
+			iReligionChange += pReligion->m_Beliefs.GetLakePlotYieldChange(eYield);
+			if (pSecondaryPantheon)
+			{
+				iReligionChange += pSecondaryPantheon->GetLakePlotYieldChange(eYield);
+			}
+		}
+		iYield += iReligionChange;
+	}
+
 	if(eTeam != NO_TEAM)
 	{
 		eResource = getResourceType(eTeam);
@@ -8965,18 +8975,14 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 			iYield += GC.getResourceInfo(eResource)->getYieldChange(eYield);
 
 			// Extra yield for religion
-			if(pWorkingCity != NULL && eMajority != NO_RELIGION)
+			if(pReligion)
 			{
-				const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, pWorkingCity->getOwner());
-				if(pReligion)
+				iReligionChange = pReligion->m_Beliefs.GetResourceYieldChange(eResource, eYield);
+				if (pSecondaryPantheon)
 				{
-					int iReligionChange = pReligion->m_Beliefs.GetResourceYieldChange(eResource, eYield);
-					if (eSecondaryPantheon != NO_BELIEF)
-					{
-						iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetResourceYieldChange(eResource, eYield);
-					}
-					iYield += iReligionChange;
+					iReligionChange += pSecondaryPantheon->GetResourceYieldChange(eResource, eYield);
 				}
+				iYield += iReligionChange;
 			}
 
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -9557,6 +9563,11 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 	{
 		iYield = std::max(iYield, kYield.getMinCity());
 
+#if defined(MOD_API_UNIFIED_YIELDS) && defined(MOD_API_PLOT_YIELDS)
+		PlotTypes ePlot = getPlotType();
+		// Extra yield for plot City
+		if(ePlot != NO_PLOT) iYield += GC.getPlotInfo(ePlot)->getCityYield(eYield);
+#endif
 		// Mod for Player; used for Policies and such
 		int iTemp = GET_PLAYER(getOwner()).GetCityYieldChangeTimes100(eYield);	// In hundreds - will be added to capitalYieldChange below
 #if defined(MOD_API_UNIFIED_YIELDS)

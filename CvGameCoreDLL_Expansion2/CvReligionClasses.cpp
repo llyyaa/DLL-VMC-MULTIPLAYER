@@ -6247,6 +6247,7 @@ int CvReligionAI::ScoreBeliefAtPlot(CvBeliefEntry* pEntry, CvPlot* pPlot)
 		if(eTerrain != NO_TERRAIN)
 		{
 			iRtnValue += pEntry->GetTerrainYieldChange(eTerrain, iI);
+			iRtnValue += pEntry->GetTerrainYieldChangeAdditive(eTerrain, iI);
 		}
 
 #if defined(MOD_RELIGION_PLOT_YIELDS)
@@ -6289,6 +6290,12 @@ int CvReligionAI::ScoreBeliefAtPlot(CvBeliefEntry* pEntry, CvPlot* pPlot)
 				}
 			}
 		}
+
+		//Lake
+		if (pPlot->isLake())
+		{
+			iRtnValue += pEntry->GetLakePlotYieldChange(iI) * 2;
+		}
 	}
 
 	return iRtnValue;
@@ -6302,6 +6309,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 	int iMinPop;
 	int iMinFollowers;
 	int iHappinessMultiplier = 2;
+	int iTerrain = (int)pCity->plot()->getTerrainType();
 
 	CvFlavorManager* pFlavorManager = m_pPlayer->GetFlavorManager();
 	int iFlavorOffense = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_OFFENSE"));
@@ -6383,7 +6391,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 	}
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	if(MOD_BELIEF_NEW_EFFECT_FOR_SP && pEntry->IsGreatPersonPointsCapital() || pEntry->IsGreatPersonPointsPerCity())
+	if(pEntry->IsGreatPersonPointsCapital() || pEntry->IsGreatPersonPointsPerCity())
 	{
 		// Great People
 		iTempValue = 0;
@@ -6394,6 +6402,12 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 				continue;
 			iTempValue += (pEntry->GetGreatPersonPoints(eGP,pCity->isCapital(),false) * iFlavorGP) / 10;
 		}
+		iRtnValue += iTempValue;
+	}
+	if(iTerrain != NO_TERRAIN)
+	{
+		iTempValue = pEntry->GetTerrainCityFoodConsumption(iTerrain);
+		iTempValue = -iTempValue / 5;
 		iRtnValue += iTempValue;
 	}
 #endif
@@ -6410,6 +6424,11 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 			}
 		}
 		iRtnValue += iTempValue;
+
+		if(iTerrain != NO_TERRAIN)
+		{
+			iRtnValue += pEntry->GetTerrainCityYieldChanges(iTerrain, iI);
+		}
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 		if (pCity->isCapital()) {
@@ -6461,7 +6480,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 		iRtnValue += iTempValue;
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-		if(MOD_BELIEF_NEW_EFFECT_FOR_SP && pEntry->AllowYieldPerBirth())
+		if(pEntry->AllowYieldPerBirth())
 		{
 			iTempValue = pEntry->GetYieldPerBirth(iI);
 			if(pCity->getPopulation() < 15)  // Like it more with small cities

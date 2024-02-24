@@ -29,6 +29,7 @@ public:
 
 	// Arrays
 	int getYield(int i) const;
+	int getCityYield(int i) const;
 
 	// Other
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
@@ -43,8 +44,7 @@ protected:
 
 	// Arrays
 	int* m_piYields;
-
-
+	int* m_piCityYields;
 
 private:
 	CvPlotInfo(const CvPlotInfo&);

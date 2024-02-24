@@ -926,6 +926,9 @@ protected:
 	static int lDoForceDoF(lua_State* L);
 	static int lDoForceDenounce(lua_State* L);
 
+	static int lIsCanDiplomaticMarriage(lua_State* L);
+	static int lIsAbleToDualEmpire(lua_State* L);
+
 	// END Diplomacy Stuff
 
 	static int lGetNumNotifications(lua_State* L);
