@@ -64,6 +64,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_bGreatPersonPointsPerCity(false),
 	m_bGreatPersonPointsHolyCity(false),
 	m_piGreatPersonPoints(NULL),
+	m_piTerrainCityFoodConsumption(NULL),
 	m_iFreePromotionForProphet(NO_PROMOTION),
 	m_iLandmarksTourismPercent(0),
 	m_iHolyCityUnitExperence(0),
@@ -752,6 +753,12 @@ int CvBeliefEntry::GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) co
 
 	return resValue;
 }
+int CvBeliefEntry::GetTerrainCityFoodConsumption(int i) const
+{
+	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piTerrainCityFoodConsumption ? m_piTerrainCityFoodConsumption[i] : -1;
+}
 //Extra Free Promotion For Prophet
 int CvBeliefEntry::GetFreePromotionForProphet() const
 {
@@ -965,6 +972,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.SetYields(m_piYieldModifierNaturalWonder, "Belief_YieldModifierNaturalWonder", "BeliefType", szBeliefType);
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	kUtility.PopulateArrayByValue(m_piGreatPersonPoints, "GreatPersons", "Belief_GreatPersonPoints", "GreatPersonType", "BeliefType", szBeliefType, "Value");
+	kUtility.PopulateArrayByValue(m_piTerrainCityFoodConsumption, "Terrains", "Belief_TerrainCityFoodConsumption", "TerrainType", "BeliefType", szBeliefType, "Modifier");
 #endif
 	kUtility.PopulateArrayByValue(m_piMaxYieldModifierPerFollower, "Yields", "Belief_MaxYieldModifierPerFollower", "YieldType", "BeliefType", szBeliefType, "Max");
 	kUtility.PopulateArrayByValue(m_piResourceHappiness, "Resources", "Belief_ResourceHappiness", "ResourceType", "BeliefType", szBeliefType, "HappinessChange");
@@ -2259,6 +2267,20 @@ int CvReligionBeliefs::GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, 
 		{
 			rtnValue += iValue;
 		}
+	}
+
+	return rtnValue;
+}
+
+/// Get City Food Consume Modifier with Terrain from beliefs
+int CvReligionBeliefs::GetTerrainCityFoodConsumption(TerrainTypes eTerrain) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetTerrainCityFoodConsumption(eTerrain);
 	}
 
 	return rtnValue;

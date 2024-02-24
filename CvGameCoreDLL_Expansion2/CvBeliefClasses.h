@@ -133,6 +133,7 @@ public:
 	bool IsGreatPersonPointsPerCity() const;
 	bool IsGreatPersonPointsHolyCity() const;
 	int GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) const;
+	int GetTerrainCityFoodConsumption(int i) const;
 	int GetFreePromotionForProphet() const;
 	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
@@ -202,6 +203,7 @@ protected:
 	bool m_bGreatPersonPointsPerCity;
 	bool m_bGreatPersonPointsHolyCity;
 	int* m_piGreatPersonPoints;
+	int* m_piTerrainCityFoodConsumption;
 	int m_iFreePromotionForProphet;
 	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
@@ -538,6 +540,7 @@ public:
 #endif
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	int GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, bool bCapital, bool bHolyCity) const;
+	int GetTerrainCityFoodConsumption(TerrainTypes eTerrain) const;
 	int GetYieldPerBirth(YieldTypes eYieldType) const;
 #endif
 	int GetResourceHappiness(ResourceTypes eResource) const;

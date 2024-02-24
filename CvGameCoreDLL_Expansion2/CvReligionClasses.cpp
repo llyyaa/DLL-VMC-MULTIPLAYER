@@ -6385,7 +6385,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 	}
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	if(MOD_BELIEF_NEW_EFFECT_FOR_SP && pEntry->IsGreatPersonPointsCapital() || pEntry->IsGreatPersonPointsPerCity())
+	if(pEntry->IsGreatPersonPointsCapital() || pEntry->IsGreatPersonPointsPerCity())
 	{
 		// Great People
 		iTempValue = 0;
@@ -6396,6 +6396,12 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 				continue;
 			iTempValue += (pEntry->GetGreatPersonPoints(eGP,pCity->isCapital(),false) * iFlavorGP) / 10;
 		}
+		iRtnValue += iTempValue;
+	}
+	if(iTerrain != NO_TERRAIN)
+	{
+		iTempValue = pEntry->GetTerrainCityFoodConsumption(iTerrain);
+		iTempValue = -iTempValue / 5;
 		iRtnValue += iTempValue;
 	}
 #endif
@@ -6468,7 +6474,7 @@ int CvReligionAI::ScoreBeliefAtCity(CvBeliefEntry* pEntry, CvCity* pCity)
 		iRtnValue += iTempValue;
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-		if(MOD_BELIEF_NEW_EFFECT_FOR_SP && pEntry->AllowYieldPerBirth())
+		if(pEntry->AllowYieldPerBirth())
 		{
 			iTempValue = pEntry->GetYieldPerBirth(iI);
 			if(pCity->getPopulation() < 15)  // Like it more with small cities

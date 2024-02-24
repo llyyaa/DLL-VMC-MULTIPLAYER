@@ -8840,7 +8840,7 @@ int CvCity::foodConsumption(bool /*bNoAngry*/, int iExtra) const
 
 	int iFoodPerPop = /*2*/ GC.getFOOD_CONSUMPTION_PER_POPULATION();
 
-	iFoodPerPop += GetAdditionalFood() * 100;
+	iFoodPerPop += GetAdditionalFood();
 
 	int iNum = iPopulation * iFoodPerPop;
 
@@ -8852,6 +8852,22 @@ int CvCity::foodConsumption(bool /*bNoAngry*/, int iExtra) const
 		iNum -= iFoodReduction;
 	}
 
+	TerrainTypes eTerrain = plot()->getTerrainType();
+	if(eTerrain == NO_TERRAIN) return iNum;
+
+	int iConsumptionModifier = 100;
+	ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
+	if(eMajority != NO_RELIGION)
+	{
+		iConsumptionModifier += GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner())->m_Beliefs.GetTerrainCityFoodConsumption(eTerrain);
+	}	
+	BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
+	if(eSecondaryPantheon != NO_BELIEF)
+	{
+		iConsumptionModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetTerrainCityFoodConsumption(eTerrain);
+	}
+	iNum = iNum * iConsumptionModifier / 100;
+	
 	return iNum;
 }
 

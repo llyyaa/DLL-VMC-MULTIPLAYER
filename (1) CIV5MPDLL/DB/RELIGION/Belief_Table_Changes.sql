@@ -1,7 +1,7 @@
 CREATE TABLE Belief_YieldPerBirth (
     BeliefType TEXT REFERENCES Beliefs(Type),
     YieldType TEXT REFERENCES Yields(Type),
-    Yield NOT NULL DEFAULT 0
+    Yield INTEGER DEFAULT 0
 );
 
 ALTER TABLE Beliefs ADD COLUMN 'AllowYieldPerBirth' BOOLEAN DEFAULT 0;
@@ -28,12 +28,18 @@ CREATE TABLE Belief_TerrainYieldChangesAdditive (
     BeliefType TEXT REFERENCES Beliefs(Type),
     TerrainType TEXT REFERENCES Terrains(Type),
     YieldType TEXT REFERENCES Yields(Type),
-    Yield NOT NULL DEFAULT 0
+    Yield INTEGER DEFAULT 0
 );
 
 CREATE TABLE Belief_TerrainCityYieldChanges (
     BeliefType TEXT REFERENCES Beliefs(Type),
     TerrainType TEXT REFERENCES Terrains(Type),
     YieldType TEXT REFERENCES Yields(Type),
-    Yield NOT NULL DEFAULT 0
+    Yield INTEGER DEFAULT 0
+);
+
+CREATE TABLE Belief_TerrainCityFoodConsumption (
+    BeliefType TEXT REFERENCES Beliefs(Type),
+    TerrainType TEXT REFERENCES Terrains(Type),
+    Modifier INTEGER DEFAULT 0
 );
