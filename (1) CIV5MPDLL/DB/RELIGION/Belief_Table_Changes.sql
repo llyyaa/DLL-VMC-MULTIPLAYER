@@ -43,3 +43,9 @@ CREATE TABLE Belief_TerrainCityFoodConsumption (
     TerrainType TEXT REFERENCES Terrains(Type),
     Modifier INTEGER DEFAULT 0
 );
+
+CREATE TABLE Belief_LakePlotYieldChanges (
+    BeliefType TEXT REFERENCES Beliefs(Type),
+    YieldType TEXT REFERENCES Yields(Type),
+    Yield INTEGER DEFAULT 0
+);

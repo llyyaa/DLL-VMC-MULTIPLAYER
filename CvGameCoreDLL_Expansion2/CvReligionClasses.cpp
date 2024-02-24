@@ -6290,6 +6290,12 @@ int CvReligionAI::ScoreBeliefAtPlot(CvBeliefEntry* pEntry, CvPlot* pPlot)
 				}
 			}
 		}
+
+		//Lake
+		if (pPlot->isLake())
+		{
+			iRtnValue += pEntry->GetLakePlotYieldChange(iI) * 2;
+		}
 	}
 
 	return iRtnValue;

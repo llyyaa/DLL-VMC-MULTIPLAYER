@@ -73,6 +73,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iCityExtraMissionarySpreads(0),
 	m_bAllowYieldPerBirth(false),
 	m_piYieldPerBirth(NULL),
+	m_piLakePlotYieldChange(NULL),
 #endif
 
 	m_bPantheon(false),
@@ -800,6 +801,13 @@ int CvBeliefEntry::GetYieldPerBirth(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piYieldPerBirth ? m_piYieldPerBirth[i] : -1;
 }
+//Lake Yield
+int CvBeliefEntry::GetLakePlotYieldChange(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piLakePlotYieldChange ? m_piLakePlotYieldChange[i] : -1;
+}
 #endif
 
 /// Happiness from a resource
@@ -962,6 +970,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	const char* szBeliefType = GetType();
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	kUtility.SetYields(m_piYieldPerBirth, "Belief_YieldPerBirth", "BeliefType", szBeliefType);
+	kUtility.SetYields(m_piLakePlotYieldChange, "Belief_LakePlotYieldChanges", "BeliefType", szBeliefType);
 #endif
 	kUtility.SetYields(m_paiCityYieldChange, "Belief_CityYieldChanges", "BeliefType", szBeliefType);
 	kUtility.SetYields(m_paiHolyCityYieldChange, "Belief_HolyCityYieldChanges", "BeliefType", szBeliefType);
@@ -2286,7 +2295,7 @@ int CvReligionBeliefs::GetTerrainCityFoodConsumption(TerrainTypes eTerrain) cons
 	return rtnValue;
 }
 
-/// Get yield modifier from beliefs from birth
+/// Get yield from beliefs with birth
 int CvReligionBeliefs::GetYieldPerBirth(YieldTypes eYieldType) const
 {
 	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
@@ -2295,6 +2304,19 @@ int CvReligionBeliefs::GetYieldPerBirth(YieldTypes eYieldType) const
 	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
 	{
 		rtnValue += pBeliefs->GetEntry(*i)->GetYieldPerBirth(eYieldType);
+	}
+
+	return rtnValue;
+}
+/// Get lake yield from beliefs
+int CvReligionBeliefs::GetLakePlotYieldChange(YieldTypes eYieldType) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetLakePlotYieldChange(eYieldType);
 	}
 
 	return rtnValue;

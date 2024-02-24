@@ -142,6 +142,7 @@ public:
 	int GetCityExtraMissionarySpreads() const;
 	bool AllowYieldPerBirth() const;
 	int GetYieldPerBirth(int i) const;
+	int GetLakePlotYieldChange(int i) const;
 #endif
 	int GetResourceHappiness(int i) const;
 	int GetYieldChangeAnySpecialist(int i) const;
@@ -212,6 +213,7 @@ protected:
 	int m_iCityExtraMissionarySpreads;
 	bool m_bAllowYieldPerBirth;
 	int* m_piYieldPerBirth;
+	int* m_piLakePlotYieldChange;
 #endif
 
 	bool m_bPantheon;
@@ -542,6 +544,7 @@ public:
 	int GetGreatPersonPoints(GreatPersonTypes eGreatPersonTypes, bool bCapital, bool bHolyCity) const;
 	int GetTerrainCityFoodConsumption(TerrainTypes eTerrain) const;
 	int GetYieldPerBirth(YieldTypes eYieldType) const;
+	int GetLakePlotYieldChange(YieldTypes eYieldType) const;
 #endif
 	int GetResourceHappiness(ResourceTypes eResource) const;
 	int GetYieldChangeAnySpecialist(YieldTypes eYieldType) const;
