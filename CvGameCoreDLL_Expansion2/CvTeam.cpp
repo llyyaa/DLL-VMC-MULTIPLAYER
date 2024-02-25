@@ -6863,6 +6863,14 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 					kPlayer.ChangeFreePromotionCount(ePromotion, iChange);
 			}
 
+			// Free Promotion Removed
+			PromotionTypes eFreePromotionRemoved = (PromotionTypes) pTech->GetFreePromotionRemoved();
+			if(eFreePromotionRemoved != NO_PROMOTION)
+			{
+				kPlayer.ChangeFreePromotionCount(eFreePromotionRemoved, -iChange);
+				if(pTech->IsRemoveCurrentPromotion()) kPlayer.RemoveCurrentPromotion(eFreePromotionRemoved);
+			}
+
 			// Update our traits (some may have become obsolete)
 			kPlayer.GetPlayerTraits()->Reset();
 			kPlayer.GetPlayerTraits()->InitPlayerTraits();

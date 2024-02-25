@@ -75,6 +75,8 @@ public:
 	int GetFreeExperience() const;
 	int GetWorkerSpeedModifier() const;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int GetFreePromotionRemoved() const;
+	bool IsRemoveCurrentPromotion() const;
 	bool IsNullifyInfluenceModifier() const;
 	int GetDifferentIdeologyTourismModifier() const;
 	int GetHappinessPerPolicy() const;
@@ -383,6 +385,8 @@ private:
 	int m_iFreeExperience;
 	int m_iWorkerSpeedModifier;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	int m_iFreePromotionRemoved;
+	bool m_bRemoveCurrentPromotion;
 	bool m_bNullifyInfluenceModifier;
 	int m_iDifferentIdeologyTourismModifier;
 	int m_iHappinessPerPolicy;

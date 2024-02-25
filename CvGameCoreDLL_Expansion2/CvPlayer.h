@@ -1484,6 +1484,7 @@ public:
 	int GetFreePromotionCount(PromotionTypes eIndex) const;
 	bool IsFreePromotion(PromotionTypes eIndex) const;
 	void ChangeFreePromotionCount(PromotionTypes eIndex, int iChange);
+	void RemoveCurrentPromotion(PromotionTypes eIndex);
 
 	int getUnitCombatProductionModifiers(UnitCombatTypes eIndex) const;
 	void changeUnitCombatProductionModifiers(UnitCombatTypes eIndex, int iChange);

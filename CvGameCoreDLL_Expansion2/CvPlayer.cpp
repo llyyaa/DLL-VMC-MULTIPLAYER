@@ -23161,6 +23161,18 @@ void CvPlayer::ChangeFreePromotionCount(PromotionTypes ePromotion, int iChange)
 
 
 //	--------------------------------------------------------------------------------
+void CvPlayer::RemoveCurrentPromotion(PromotionTypes ePromotion)
+{
+	// Loop through Units
+	CvUnit* pLoopUnit = NULL;
+	int iLoop = 0;
+	for(pLoopUnit = firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = nextUnit(&iLoop))
+	{
+		pLoopUnit->setHasPromotion(ePromotion, false);
+	}
+}
+
+//	--------------------------------------------------------------------------------
 int CvPlayer::getUnitCombatProductionModifiers(UnitCombatTypes eIndex) const
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
@@ -26899,6 +26911,14 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 		if(pPolicy->IsFreePromotion(ePromotion))
 			ChangeFreePromotionCount(ePromotion, iChange);
+	}
+
+	// Free Promotion Removed
+	PromotionTypes eFreePromotionRemoved = (PromotionTypes)pPolicy->GetFreePromotionRemoved();
+	if(eFreePromotionRemoved != NO_PROMOTION)
+	{
+		ChangeFreePromotionCount(eFreePromotionRemoved, -iChange);
+		if(pPolicy->IsRemoveCurrentPromotion()) RemoveCurrentPromotion(eFreePromotionRemoved);
 	}
 
 
