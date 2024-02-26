@@ -3739,6 +3739,22 @@ int CvLuaUnit::lGetBeFallBackDefenseMod(lua_State* L)
 	return 1;
 }
 
+int CvLuaUnit::lGetNumTimesDoFallBackThisTurn(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const int iResult = pkUnit->GetNumTimesDoFallBackThisTurn();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+
+int CvLuaUnit::lGetNumTimesBeFallBackThisTurn(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+
+	const int iResult = pkUnit->GetNumTimesBeFallBackThisTurn();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
 //------------------------------------------------------------------------------
 int CvLuaUnit::lGetMultiAttackBonus(lua_State* L)
 {
