@@ -660,6 +660,8 @@ void CvUnitCombat::ResolveMeleeCombat(const CvCombatInfo& kCombatInfo, uint uiPa
 				if (pkAttacker->IsCanHeavyCharge() && !pkDefender->isDelayedDeath() && bAttackerDidMoreDamage)
 				{
 					pkDefender->DoFallBack(*pkAttacker);
+					pkAttacker->ChangeNumTimesDoFallBackThisTurn(1);
+					pkDefender->ChangeNumTimesBeFallBackThisTurn(1);
 					DoHeavyChargeEffects(pkAttacker, pkDefender, pkTargetPlot);
 				}
 
@@ -1264,7 +1266,8 @@ void CvUnitCombat::ResolveRangedUnitVsCombat(const CvCombatInfo& kCombatInfo, ui
 							if (iRand <= pkAttacker->GetMoraleBreakChance())
 							{
 								pkDefender->DoFallBack(*pkAttacker);
-
+								pkAttacker->ChangeNumTimesDoFallBackThisTurn(1);
+								pkDefender->ChangeNumTimesBeFallBackThisTurn(1);
 								CvNotifications* pNotifications = GET_PLAYER(pkDefender->getOwner()).GetNotifications();
 								if (pNotifications)
 								{
@@ -3684,7 +3687,8 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::Attack(CvUnit& kAttacker, CvPlot& targ
 	if(pDefender->getExtraWithdrawal() > 0 && pDefender->CanFallBack(kAttacker, true))
 	{
 		pDefender->DoFallBack(kAttacker);
-
+		kAttacker.ChangeNumTimesDoFallBackThisTurn(1);
+		pDefender->ChangeNumTimesBeFallBackThisTurn(1);
 		if(kAttacker.getOwner() == GC.getGame().getActivePlayer())
 		{
 			strBuffer = GetLocalizedText("TXT_KEY_MISC_ENEMY_UNIT_WITHDREW", pDefender->getNameKey());

@@ -1838,6 +1838,20 @@ public:
 	void ChangeCurrentHitPointDefenseMod(int iValue);
 	int GetCurrentHitPointDefenseMod() const;
 
+	void ChangeDoFallBackAttackMod(int iValue);
+	int GetDoFallBackAttackMod() const;
+	void ChangeDoFallBackDefenseMod(int iValue);
+	int GetDoFallBackDefenseMod() const;
+
+	void ChangeBeFallBackAttackMod(int iValue);
+	int GetBeFallBackAttackMod() const;
+	void ChangeBeFallBackDefenseMod(int iValue);
+	int GetBeFallBackDefenseMod() const;
+
+	void ChangeNumTimesDoFallBackThisTurn(int iValue);
+	int GetNumTimesDoFallBackThisTurn() const;
+	void ChangeNumTimesBeFallBackThisTurn(int iValue);
+	int GetNumTimesBeFallBackThisTurn() const;
 
 	void ChangeNearNumEnemyAttackMod(int iValue);
 	int GetNearNumEnemyAttackMod() const;
@@ -2286,6 +2300,13 @@ protected:
 
 	FAutoVariable<int, CvUnit> m_iCurrentHitPointAttackMod;
 	FAutoVariable<int, CvUnit> m_iCurrentHitPointDefenseMod;
+	FAutoVariable<int, CvUnit> m_iDoFallBackAttackMod;
+	FAutoVariable<int, CvUnit> m_iDoFallBackDefenseMod;
+	FAutoVariable<int, CvUnit> m_iBeFallBackAttackMod;
+	FAutoVariable<int, CvUnit> m_iBeFallBackDefenseMod;
+
+	FAutoVariable<int, CvUnit> m_aiNumTimesDoFallBackThisTurn;
+	FAutoVariable<int, CvUnit> m_aiNumTimesBeFallBackThisTurn;
 
 	FAutoVariable<int, CvUnit> m_iNearNumEnemyAttackMod;
 	FAutoVariable<int, CvUnit> m_iNearNumEnemyDefenseMod;

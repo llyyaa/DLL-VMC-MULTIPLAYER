@@ -377,6 +377,13 @@ protected:
 	static int lGetDefenseModifier(lua_State* L);
 
 #if defined(MOD_ROG_CORE)
+	static int lGetDoFallBackAttackMod(lua_State* L);
+	static int lGetDoFallBackDefenseMod(lua_State* L);
+	static int lGetBeFallBackAttackMod(lua_State* L);
+	static int lGetBeFallBackDefenseMod(lua_State* L);
+	static int lGetNumTimesDoFallBackThisTurn(lua_State* L);
+	static int lGetNumTimesBeFallBackThisTurn(lua_State* L);
+
 	static int lGetMultiAttackBonus(lua_State* L);
 	static int lGetMultiAttackBonusCity(lua_State* L);
 	static int lGetNumAttacksMadeThisTurnAttackMod(lua_State* L);

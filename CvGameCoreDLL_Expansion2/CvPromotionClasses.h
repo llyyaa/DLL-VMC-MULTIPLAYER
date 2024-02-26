@@ -230,6 +230,10 @@ public:
 	int GetCurrentHitPointAttackMod() const;
 	int GetCurrentHitPointDefenseMod() const;
 
+	int GetDoFallBackAttackMod() const;
+	int GetDoFallBackDefenseMod() const;
+	int GetBeFallBackAttackMod() const;
+	int GetBeFallBackDefenseMod() const;
 
 	int GetNearNumEnemyAttackMod() const;
 	int GetNearNumEnemyDefenseMod() const;
@@ -706,6 +710,11 @@ protected:
 
 	int m_iCurrentHitPointAttackMod;
 	int m_iCurrentHitPointDefenseMod;
+
+	int m_iDoFallBackAttackMod;
+	int m_iDoFallBackDefenseMod;
+	int m_iBeFallBackAttackMod;
+	int m_iBeFallBackDefenseMod;
 
 	int m_iNearNumEnemyAttackMod;
 	int m_iNearNumEnemyDefenseMod;
