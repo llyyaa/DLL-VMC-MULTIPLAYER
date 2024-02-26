@@ -1840,11 +1840,7 @@ public:
 
 	void ChangeDoFallBackAttackMod(int iValue);
 	int GetDoFallBackAttackMod() const;
-	void ChangeDoFallBackDefenseMod(int iValue);
-	int GetDoFallBackDefenseMod() const;
 
-	void ChangeBeFallBackAttackMod(int iValue);
-	int GetBeFallBackAttackMod() const;
 	void ChangeBeFallBackDefenseMod(int iValue);
 	int GetBeFallBackDefenseMod() const;
 
@@ -2301,8 +2297,6 @@ protected:
 	FAutoVariable<int, CvUnit> m_iCurrentHitPointAttackMod;
 	FAutoVariable<int, CvUnit> m_iCurrentHitPointDefenseMod;
 	FAutoVariable<int, CvUnit> m_iDoFallBackAttackMod;
-	FAutoVariable<int, CvUnit> m_iDoFallBackDefenseMod;
-	FAutoVariable<int, CvUnit> m_iBeFallBackAttackMod;
 	FAutoVariable<int, CvUnit> m_iBeFallBackDefenseMod;
 
 	FAutoVariable<int, CvUnit> m_aiNumTimesDoFallBackThisTurn;

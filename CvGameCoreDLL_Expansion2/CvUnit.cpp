@@ -344,8 +344,6 @@ CvUnit::CvUnit() :
 		, m_iCurrentHitPointAttackMod("CvUnit::m_iCurrentHitPointAttackMod", m_syncArchive)
 		, m_iCurrentHitPointDefenseMod("CvUnit::m_iCurrentHitPointDefenseMod", m_syncArchive)
 		, m_iDoFallBackAttackMod("CvUnit::m_iDoFallBackAttackMod", m_syncArchive)
-		, m_iDoFallBackDefenseMod("CvUnit::m_iDoFallBackDefenseMod", m_syncArchive)
-		, m_iBeFallBackAttackMod("CvUnit::m_iBeFallBackAttackMod", m_syncArchive)
 		, m_iBeFallBackDefenseMod("CvUnit::m_iBeFallBackDefenseMod", m_syncArchive)
 		, m_aiNumTimesDoFallBackThisTurn("CvUnit::m_aiNumTimesDoFallBackThisTurn", m_syncArchive)
 		, m_aiNumTimesBeFallBackThisTurn("CvUnit::m_aiNumTimesBeFallBackThisTurn", m_syncArchive)
@@ -1343,8 +1341,6 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCurrentHitPointDefenseMod = 0;
 
 	m_iDoFallBackAttackMod = 0;
-	m_iDoFallBackDefenseMod = 0;
-	m_iBeFallBackAttackMod = 0;
 	m_iBeFallBackDefenseMod = 0;
 	m_aiNumTimesDoFallBackThisTurn = 0;
 	m_aiNumTimesBeFallBackThisTurn = 0;
@@ -6523,29 +6519,6 @@ void CvUnit::ChangeDoFallBackAttackMod(int iValue)
 int CvUnit::GetDoFallBackAttackMod() const
 {
 	return m_iDoFallBackAttackMod;
-}
-
-//	--------------------------------------------------------------------------------
-void CvUnit::ChangeDoFallBackDefenseMod(int iValue)
-{
-	m_iDoFallBackDefenseMod += iValue;
-}
-
-//	--------------------------------------------------------------------------------
-int CvUnit::GetDoFallBackDefenseMod() const
-{
-	return m_iDoFallBackDefenseMod;
-}
-
-void CvUnit::ChangeBeFallBackAttackMod(int iValue)
-{
-	m_iBeFallBackAttackMod += iValue;
-}
-
-//	--------------------------------------------------------------------------------
-int CvUnit::GetBeFallBackAttackMod() const
-{
-	return m_iBeFallBackAttackMod;
 }
 
 //	--------------------------------------------------------------------------------
@@ -15327,7 +15300,7 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 	int iModifier = GetGenericMaxStrengthModifier(pAttacker, pInPlot, /*bIgnoreUnitAdjacency*/ bFromRangedAttack);
 
 	// Generic Defense Bonus
-	iTempModifier = GetNumTimesDoFallBackThisTurn() * GetDoFallBackDefenseMod();
+	iTempModifier = GetNumTimesBeFallBackThisTurn() * GetBeFallBackDefenseMod();
 	iModifier += iTempModifier;
 
 	iTempModifier = getDefenseModifier();
@@ -16155,11 +16128,8 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 #if defined(MOD_ROG_CORE)
 
 		// Generic Attack bonus
-		iTempModifier = GetNumTimesDoFallBackThisTurn() * GetDoFallBackAttackMod();
-		iModifier += iTempModifier;
-
-		iTempModifier = GetNumAttacksMadeThisTurnAttackMod() * getNumAttacksMadeThisTurn();
-		iModifier += iTempModifier;
+		iModifier += GetNumTimesDoFallBackThisTurn() * GetDoFallBackAttackMod();
+		iModifier += GetNumAttacksMadeThisTurnAttackMod() * getNumAttacksMadeThisTurn();
 
 
 		int iNumOriginalCapitalAttackMod = getNumOriginalCapitalAttackMod();
@@ -16493,8 +16463,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 		}
 #endif
 
-		iModifier += GetNumTimesDoFallBackThisTurn() * GetDoFallBackDefenseMod();
-
+		iModifier += GetNumTimesBeFallBackThisTurn() * GetBeFallBackDefenseMod();
 		iModifier += getDefenseModifier();
 
 #if defined(MOD_DEFENSE_MOVES_BONUS)
@@ -26114,8 +26083,6 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCurrentHitPointDefenseMod(thisPromotion.GetCurrentHitPointDefenseMod() * iChange);
 
 		ChangeDoFallBackAttackMod(thisPromotion.GetDoFallBackAttackMod()* iChange);
-		ChangeDoFallBackDefenseMod(thisPromotion.GetDoFallBackDefenseMod()* iChange);
-		ChangeBeFallBackAttackMod(thisPromotion.GetBeFallBackAttackMod()* iChange);
 		ChangeBeFallBackDefenseMod(thisPromotion.GetBeFallBackDefenseMod()* iChange);
 
 		ChangeNearNumEnemyAttackMod(thisPromotion.GetNearNumEnemyAttackMod() * iChange);

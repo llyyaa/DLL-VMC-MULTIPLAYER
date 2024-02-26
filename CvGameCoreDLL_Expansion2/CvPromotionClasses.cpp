@@ -167,8 +167,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCurrentHitPointAttackMod(0),
 	m_iCurrentHitPointDefenseMod(0),
 	m_iDoFallBackAttackMod(0),
-	m_iDoFallBackDefenseMod(0),
-	m_iBeFallBackAttackMod(0),
 	m_iBeFallBackDefenseMod(0),
 #endif
 
@@ -577,8 +575,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCurrentHitPointDefenseMod = kResults.GetInt("CurrentHitPointDefenseMod");
 
 	m_iDoFallBackAttackMod = kResults.GetInt("DoFallBackAttackMod");
-	m_iDoFallBackDefenseMod = kResults.GetInt("DoFallBackDefenseMod");
-	m_iBeFallBackAttackMod = kResults.GetInt("BeFallBackAttackMod");
 	m_iBeFallBackDefenseMod = kResults.GetInt("BeFallBackDefenseMod");
 
 	m_iNearNumEnemyAttackMod = kResults.GetInt("NearNumEnemyAttackMod");
@@ -2205,16 +2201,6 @@ int CvPromotionEntry::GetCurrentHitPointDefenseMod() const
 int CvPromotionEntry::GetDoFallBackAttackMod() const
 {
 	return m_iDoFallBackAttackMod;
-}
-
-int CvPromotionEntry::GetDoFallBackDefenseMod() const
-{
-	return m_iDoFallBackDefenseMod;
-}
-
-int CvPromotionEntry::GetBeFallBackAttackMod() const
-{
-	return m_iBeFallBackAttackMod;
 }
 
 int CvPromotionEntry::GetBeFallBackDefenseMod() const
