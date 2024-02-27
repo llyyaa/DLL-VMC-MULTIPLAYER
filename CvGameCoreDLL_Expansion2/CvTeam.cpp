@@ -6868,8 +6868,14 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 			if(eFreePromotionRemoved != NO_PROMOTION)
 			{
 				kPlayer.ChangeFreePromotionCount(eFreePromotionRemoved, -iChange);
-				if(pTech->IsRemoveCurrentPromotion()) kPlayer.RemoveCurrentPromotion(eFreePromotionRemoved);
+				if(pTech->IsRemoveCurrentPromotion() && iChange > 0) kPlayer.RemoveCurrentPromotion(eFreePromotionRemoved);
 			}
+			if(pTech->IsRemoveOceanImpassableCivilian())
+			{
+				kPlayer.ChangeRemoveOceanImpassableCivilian(iChange);
+				if(iChange > 0) kPlayer.RemoveOceanImpassableCivilian();
+			}
+			
 
 			// Update our traits (some may have become obsolete)
 			kPlayer.GetPlayerTraits()->Reset();

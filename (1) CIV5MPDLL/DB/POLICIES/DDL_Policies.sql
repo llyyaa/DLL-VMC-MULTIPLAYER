@@ -74,3 +74,4 @@ ALTER TABLE Policies ADD 'ImmigrationOutModifier' INTEGER DEFAULT 0;
 
 alter table Policies add column FreePromotionRemoved integer default -1;
 alter table Policies add column RemoveCurrentPromotion boolean default 0;
+alter table Policies add column RemoveOceanImpassableCombatUnit boolean default 0;

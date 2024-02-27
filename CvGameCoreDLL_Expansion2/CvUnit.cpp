@@ -906,6 +906,16 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 			setHasPromotion(ePromotionOceanImpassableUntilAstronomy, false);
 		}
 	}
+	if(IsCivilianUnit() && kPlayer.IsRemoveOceanImpassableCivilian())
+	{
+		PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
+		setHasPromotion(ePromotionOceanImpassable, false);
+	}
+	if(IsCombatUnit() && kPlayer.IsRemoveOceanImpassableCombatUnit())
+	{
+		PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
+		setHasPromotion(ePromotionOceanImpassable, false);
+	}
 
 	// Any exotic goods that can be sold? (Portuguese unique unit mission)
 	if (getUnitInfo().GetNumExoticGoods() > 0)

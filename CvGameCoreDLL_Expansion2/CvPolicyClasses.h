@@ -77,6 +77,7 @@ public:
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	int GetFreePromotionRemoved() const;
 	bool IsRemoveCurrentPromotion() const;
+	bool IsRemoveOceanImpassableCombatUnit() const;
 	bool IsNullifyInfluenceModifier() const;
 	int GetDifferentIdeologyTourismModifier() const;
 	int GetHappinessPerPolicy() const;
@@ -463,6 +464,7 @@ private:
 	int m_iCommonFoeTourismModifier;
 	int m_iLessHappyTourismModifier;
 	int m_iSharedIdeologyTourismModifier;
+	bool m_bRemoveOceanImpassableCombatUnit;
 	int m_iLandTradeRouteGoldChange;
 	int m_iSeaTradeRouteGoldChange;
 	int m_iSharedIdeologyTradeGoldChange;

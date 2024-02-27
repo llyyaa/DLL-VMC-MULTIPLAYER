@@ -285,6 +285,8 @@ CvPlayer::CvPlayer() :
 	, m_iFeatureProductionModifier("CvPlayer::m_iFeatureProductionModifier", m_syncArchive)
 	, m_iWorkerSpeedModifier("CvPlayer::m_iWorkerSpeedModifier", m_syncArchive)
 	, m_iSharedIdeologyTourismModifier(0)
+	, m_iRemoveOceanImpassableCombatUnit(0)
+	, m_iRemoveOceanImpassableCivilian(0)
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	, m_iDifferentIdeologyTourismModifier(0)
 	, m_iHappinessPerPolicy(0)
@@ -1081,6 +1083,8 @@ void CvPlayer::uninit()
 	m_iFeatureProductionModifier = 0;
 	m_iWorkerSpeedModifier = 0;
 	m_iSharedIdeologyTourismModifier = 0;
+	m_iRemoveOceanImpassableCombatUnit = 0;
+	m_iRemoveOceanImpassableCivilian = 0;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	m_iDifferentIdeologyTourismModifier = 0;
 	m_iHappinessPerPolicy = 0;
@@ -16824,6 +16828,28 @@ void CvPlayer::changeSharedIdeologyTourismModifier(int iChange)
 
 
 //	--------------------------------------------------------------------------------
+bool CvPlayer::IsRemoveOceanImpassableCombatUnit() const
+{
+	return m_iRemoveOceanImpassableCombatUnit > 0;
+}
+void CvPlayer::ChangeRemoveOceanImpassableCombatUnit(int iChange)
+{
+	m_iRemoveOceanImpassableCombatUnit += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
+bool CvPlayer::IsRemoveOceanImpassableCivilian() const
+{
+	return m_iRemoveOceanImpassableCivilian > 0;
+}
+void CvPlayer::ChangeRemoveOceanImpassableCivilian(int iChange)
+{
+	m_iRemoveOceanImpassableCivilian += iChange;
+}
+
+
+//	--------------------------------------------------------------------------------
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 int CvPlayer::getDifferentIdeologyTourismModifier() const
 {
@@ -23171,6 +23197,31 @@ void CvPlayer::RemoveCurrentPromotion(PromotionTypes ePromotion)
 		pLoopUnit->setHasPromotion(ePromotion, false);
 	}
 }
+void CvPlayer::RemoveOceanImpassableCivilian()
+{
+	// Loop through Units
+	CvUnit* pLoopUnit = NULL;
+	int iLoop = 0;
+	PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
+	for(pLoopUnit = firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = nextUnit(&iLoop))
+	{
+		if(pLoopUnit->IsCivilianUnit())
+			pLoopUnit->setHasPromotion(ePromotionOceanImpassable, false);
+	}
+	
+}
+void CvPlayer::RemoveOceanImpassableCombatUnit()
+{
+	// Loop through Units
+	CvUnit* pLoopUnit = NULL;
+	int iLoop = 0;
+	PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
+	for(pLoopUnit = firstUnit(&iLoop); pLoopUnit != NULL; pLoopUnit = nextUnit(&iLoop))
+	{
+		if(pLoopUnit->IsCombatUnit())
+			pLoopUnit->setHasPromotion(ePromotionOceanImpassable, false);
+	}
+}
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::getUnitCombatProductionModifiers(UnitCombatTypes eIndex) const
@@ -26918,7 +26969,12 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	if(eFreePromotionRemoved != NO_PROMOTION)
 	{
 		ChangeFreePromotionCount(eFreePromotionRemoved, -iChange);
-		if(pPolicy->IsRemoveCurrentPromotion()) RemoveCurrentPromotion(eFreePromotionRemoved);
+		if(pPolicy->IsRemoveCurrentPromotion() && iChange > 0) RemoveCurrentPromotion(eFreePromotionRemoved);
+	}
+	if(pPolicy->IsRemoveOceanImpassableCombatUnit())
+	{
+		ChangeRemoveOceanImpassableCombatUnit(iChange);
+		if(iChange > 0) RemoveOceanImpassableCombatUnit();
 	}
 
 
@@ -27883,6 +27939,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iFeatureProductionModifier;
 	kStream >> m_iWorkerSpeedModifier;
 	kStream >> m_iSharedIdeologyTourismModifier;
+	kStream >> m_iRemoveOceanImpassableCombatUnit;
+	kStream >> m_iRemoveOceanImpassableCivilian;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	kStream >> m_iDifferentIdeologyTourismModifier;
 	kStream >> m_iHappinessPerPolicy;
@@ -28635,6 +28693,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iFeatureProductionModifier;
 	kStream << m_iWorkerSpeedModifier;
 	kStream << m_iSharedIdeologyTourismModifier;
+	kStream << m_iRemoveOceanImpassableCombatUnit;
+	kStream << m_iRemoveOceanImpassableCivilian;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	kStream << m_iDifferentIdeologyTourismModifier;
 	kStream << m_iHappinessPerPolicy;

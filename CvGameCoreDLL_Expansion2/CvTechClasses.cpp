@@ -138,6 +138,7 @@ bool CvTechEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_bPermanentAllianceTrading = kResults.GetBool("PermanentAllianceTradingAllowed");
 	m_iRazeSpeedModifier = kResults.GetInt("RazeSpeedModifier");
 	m_bRemoveCurrentPromotion = kResults.GetBool("RemoveCurrentPromotion");
+	m_bRemoveOceanImpassableCivilian = kResults.GetBool("RemoveOceanImpassableCivilian");
 #if defined(MOD_TECHS_CITY_WORKING)
 	m_iCityWorkingChange = kResults.GetInt("CityWorkingChange");
 #endif
@@ -629,6 +630,11 @@ int CvTechEntry::GetFreePromotionRemoved() const
 bool CvTechEntry::IsRemoveCurrentPromotion() const
 {
 	return m_bRemoveCurrentPromotion;
+}
+
+bool CvTechEntry::IsRemoveOceanImpassableCivilian() const
+{
+	return m_bRemoveOceanImpassableCivilian;
 }
 
 #if defined(MOD_ROG_CORE)
