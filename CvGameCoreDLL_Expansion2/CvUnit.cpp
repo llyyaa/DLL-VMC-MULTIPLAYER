@@ -15247,11 +15247,11 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 			iModifier += attackFullyHealedModifier();
 
 #if defined(MOD_ROG_CORE)
-			//More than half?
-			if (pDefender->getDamage() < (pDefender->GetMaxHitPoints() / 2))
-				iModifier += attackAbove50HealthModifier();
-			else
-				iModifier += attackBelow50HealthModifier();
+		//More than half?
+		if (pDefender->getDamage() < (pDefender->GetMaxHitPoints() / 2))
+			iModifier += attackAbove50HealthModifier();
+		else
+			iModifier += attackBelow50HealthModifier();
 
 
 		int iSpyStayAttackModValue;
@@ -22050,7 +22050,7 @@ void CvUnit::DoAdjacentPlotDamage(CvPlot* pWhere, int iValue)
 	int iY = pWhere->getY();
 
 
-	int iRadius = 2;
+	int iRadius = 1;
 	for (int i = -iRadius; i <= iRadius; ++i) {
 		for (int j = -iRadius; j <= iRadius; ++j) {
 			CvPlot* pLoopPlot = plotXYWithRangeCheck(iX, iY, i, j, 1);
