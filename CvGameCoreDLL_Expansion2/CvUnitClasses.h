@@ -174,6 +174,8 @@ public:
 	const bool GetUnitArtInfoEraVariation() const;
 	int GetUnitFlagIconOffset() const;
 	int GetUnitPortraitOffset() const;
+	bool IsBarbarianCanTrait() const;
+	bool IsBarbarianTraitTechObsolete() const;
 
 	CvString* GetUnitNames(int i);
 	GreatWorkType GetGreatWorks(int i) const;
@@ -358,6 +360,8 @@ private:
 
 	int m_iUnitFlagIconOffset;
 	int m_iUnitPortraitOffset;
+	bool m_bBarbarianCanTrait;
+	bool m_bBarbarianTraitTechObsolete;
 
 	CvString m_strUnitArtInfoTag;
 	bool m_bUnitArtInfoCulturalVariation;
