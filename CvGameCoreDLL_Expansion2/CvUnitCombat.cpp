@@ -135,6 +135,15 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 		ctx.piDefenseInflictDamage = &iDefenderDamageInflicted;
 		ctx.bMelee = true;
 		InterveneInflictDamage(&ctx);
+
+		if (kAttacker.GetIgnoreDamageChance() > 0)
+		{
+			int iRand = GC.getGame().getJonRandNum(100, "Ignore Damage Chance");
+			if (iRand <= kAttacker.GetIgnoreDamageChance())
+			{
+				iDefenderDamageInflicted = 0;
+			}
+		}
 #endif
 
 		int iAttackerTotalDamageInflicted = iAttackerDamageInflicted + pkCity->getDamage();
@@ -238,6 +247,15 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 		ctx.piDefenseInflictDamage = &iDefenderDamageInflicted;
 		ctx.bMelee = true;
 		InterveneInflictDamage(&ctx);
+
+		if (kAttacker.GetIgnoreDamageChance() > 0)
+		{
+			int iRand = GC.getGame().getJonRandNum(100, "Ignore Damage Chance");
+			if (iRand <= kAttacker.GetIgnoreDamageChance())
+			{
+				iDefenderDamageInflicted = 0;
+			}
+		}
 
 		if (pkDefender->GetIgnoreDamageChance() > 0)
 		{
@@ -1830,6 +1848,15 @@ void CvUnitCombat::GenerateAirCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender, 
 		ctx.bAirCombat = true;
 		InterveneInflictDamage(&ctx);
 
+		if (kAttacker.GetIgnoreDamageChance() > 0)
+		{
+			int iRand = GC.getGame().getJonRandNum(100, "Ignore Damage Chance");
+			if (iRand <= kAttacker.GetIgnoreDamageChance())
+			{
+				iDefenderDamageInflicted = 0;
+			}
+		}
+
 		if (pkDefender->GetIgnoreDamageChance() > 0)
 		{
 			int iRand = GC.getGame().getJonRandNum(100, "Ignore Damage Chance");
@@ -1916,6 +1943,15 @@ void CvUnitCombat::GenerateAirCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender, 
 		ctx.piDefenseInflictDamage = &iDefenderDamageInflicted;
 		ctx.bAirCombat = true;
 		InterveneInflictDamage(&ctx);
+
+		if (kAttacker.GetIgnoreDamageChance() > 0)
+		{
+			int iRand = GC.getGame().getJonRandNum(100, "Ignore Damage Chance");
+			if (iRand <= kAttacker.GetIgnoreDamageChance())
+			{
+				iDefenderDamageInflicted = 0;
+			}
+		}
 #endif
 
 
@@ -2418,6 +2454,15 @@ void CvUnitCombat::GenerateAirSweepCombatInfo(CvUnit& kAttacker, CvUnit* pkDefen
 		int iDefenderDamageInflicted = pkDefender->getCombatDamage(iDefenderStrength, iAttackerStrength, pkDefender->getDamage(), /*bIncludeRand*/ true, /*bAttackerIsCity*/ false, /*bDefenderIsCity*/ false);
 
 #if defined(MOD_ROG_CORE)
+		if (kAttacker.GetIgnoreDamageChance() > 0)
+		{
+			int iRand = GC.getGame().getJonRandNum(100, "Ignore Damage Chance");
+			if (iRand <= kAttacker.GetIgnoreDamageChance())
+			{
+				iDefenderDamageInflicted = 0;
+			}
+		}
+
 		if (pkDefender->GetIgnoreDamageChance() > 0)
 		{
 			int iRand = GC.getGame().getJonRandNum(100, "Ignore Damage Chance");
