@@ -71,3 +71,7 @@ ALTER TABLE Policies ADD 'MinorAllyBullyScoreModifier' INTEGER DEFAULT 0;
 
 ALTER TABLE Policies ADD 'ImmigrationInModifier' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'ImmigrationOutModifier' INTEGER DEFAULT 0;
+
+alter table Policies add column FreePromotionRemoved integer default -1;
+alter table Policies add column RemoveCurrentPromotion boolean default 0;
+alter table Policies add column RemoveOceanImpassableCombatUnit boolean default 0;

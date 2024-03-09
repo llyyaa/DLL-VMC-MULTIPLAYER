@@ -163,7 +163,9 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_bUnitArtInfoEraVariation(false),
 	m_bUnitArtInfoCulturalVariation(false),
 	m_iUnitFlagIconOffset(0),
-	m_iUnitPortraitOffset(0)
+	m_iUnitPortraitOffset(0),
+	m_bBarbarianCanTrait(false),
+	m_bBarbarianTraitTechObsolete(false)
 #ifdef MOD_BALANCE_CORE
 	,m_piScalingFromOwnedImprovements(NULL)
 	,m_iScaleFromNumGWs(0)
@@ -288,6 +290,8 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_iUnhappiness = kResults.GetInt("Unhappiness");
 	m_iUnitFlagIconOffset = kResults.GetInt("UnitFlagIconOffset");
 	m_iUnitPortraitOffset = kResults.GetInt("PortraitIndex");
+	m_bBarbarianCanTrait = kResults.GetBool("BarbarianCanTrait");
+	m_bBarbarianTraitTechObsolete = kResults.GetBool("BarbarianTraitTechObsolete");
 	m_iLeaderExperience = kResults.GetInt("LeaderExperience");
 	m_bFoodProduction = kResults.GetBool("Food");
 	m_bNoBadGoodies = kResults.GetBool("NoBadGoodies");
@@ -1426,6 +1430,15 @@ int CvUnitEntry::GetUnitFlagIconOffset() const
 int CvUnitEntry::GetUnitPortraitOffset() const
 {
 	return m_iUnitPortraitOffset;
+}
+
+bool CvUnitEntry::IsBarbarianCanTrait() const
+{
+	return m_bBarbarianCanTrait;
+}
+bool CvUnitEntry::IsBarbarianTraitTechObsolete() const
+{
+	return m_bBarbarianTraitTechObsolete;
 }
 
 

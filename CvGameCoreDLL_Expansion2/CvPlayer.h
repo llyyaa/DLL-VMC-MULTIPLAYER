@@ -885,6 +885,12 @@ public:
 
 	int getSharedIdeologyTourismModifier() const;
 	void changeSharedIdeologyTourismModifier(int iChange);
+
+	bool IsRemoveOceanImpassableCombatUnit() const;
+	void ChangeRemoveOceanImpassableCombatUnit(int iChange);
+
+	bool IsRemoveOceanImpassableCivilian() const;
+	void ChangeRemoveOceanImpassableCivilian(int iChange);
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	int getDifferentIdeologyTourismModifier() const;
 	void changeDifferentIdeologyTourismModifier(int iChange);
@@ -1484,6 +1490,9 @@ public:
 	int GetFreePromotionCount(PromotionTypes eIndex) const;
 	bool IsFreePromotion(PromotionTypes eIndex) const;
 	void ChangeFreePromotionCount(PromotionTypes eIndex, int iChange);
+	void RemoveCurrentPromotion(PromotionTypes eIndex);
+	void RemoveOceanImpassableCivilian();
+	void RemoveOceanImpassableCombatUnit();
 
 	int getUnitCombatProductionModifiers(UnitCombatTypes eIndex) const;
 	void changeUnitCombatProductionModifiers(UnitCombatTypes eIndex, int iChange);
@@ -2420,6 +2429,8 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iFeatureProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iWorkerSpeedModifier;
 	int m_iSharedIdeologyTourismModifier;
+	int m_iRemoveOceanImpassableCombatUnit;
+	int m_iRemoveOceanImpassableCivilian;
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
 	int m_iDifferentIdeologyTourismModifier;
 	int m_iHappinessPerPolicy;

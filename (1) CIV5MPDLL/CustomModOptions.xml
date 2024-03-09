@@ -1188,6 +1188,8 @@
     <Row Class="6" Name="GLOBAL_CORRUPTION" Value="0"/>
     <Row Class="6" Name="GLOBAL_CORRUPTION_POLICY_COST_MIN_ZERO" Value="0"/>
 
+    <Row Class="6" Name="GLOBAL_UNIT_BARBARIAN_CAN_TRAIN" Value="0"/>
+
     <Row Class="6" Name="GLOBAL_UNIQUE_PROJECT_CAPTURE" Value="0"/>
 
     <Row Class="6" Name="DISABLE_AI_DO_TURN_DIPLOMACY_TO_HUMAN" Value="0"/>

@@ -626,7 +626,26 @@ UnitTypes CvBarbarians::GetRandomBarbarianUnitType(CvArea* pArea, UnitAITypes eU
 
 			if(bValid)
 			{
-				if(!GET_PLAYER(BARBARIAN_PLAYER).canTrain(eLoopUnit))
+				if(MOD_GLOBAL_UNIT_BARBARIAN_CAN_TRAIN)
+				{
+					if(!kUnit.IsBarbarianCanTrait()) bValid = false;
+					
+					// Tech requirements
+					if(!GET_TEAM(BARBARIAN_TEAM).GetTeamTechs()->HasTech((TechTypes)kUnit.GetPrereqAndTech()))
+					{
+						bValid = false;
+					}
+					// Obsolete Tech
+					TechTypes eObsoleteTech = (TechTypes)kUnit.GetObsoleteTech();
+					if(!kUnit.IsBarbarianTraitTechObsolete() && eObsoleteTech != NO_TECH)
+					{
+						if(GET_TEAM(BARBARIAN_TEAM).GetTeamTechs()->HasTech(eObsoleteTech))
+						{
+							bValid = false;
+						}
+					}
+				}
+				else if(!MOD_GLOBAL_UNIT_BARBARIAN_CAN_TRAIN && !GET_PLAYER(BARBARIAN_PLAYER).canTrain(eLoopUnit))
 				{
 					bValid = false;
 				}

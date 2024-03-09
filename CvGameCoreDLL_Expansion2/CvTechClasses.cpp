@@ -137,6 +137,8 @@ bool CvTechEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_bTradeAgreementTradingAllowed = kResults.GetBool("TradeAgreementTradingAllowed");
 	m_bPermanentAllianceTrading = kResults.GetBool("PermanentAllianceTradingAllowed");
 	m_iRazeSpeedModifier = kResults.GetInt("RazeSpeedModifier");
+	m_bRemoveCurrentPromotion = kResults.GetBool("RemoveCurrentPromotion");
+	m_bRemoveOceanImpassableCivilian = kResults.GetBool("RemoveOceanImpassableCivilian");
 #if defined(MOD_TECHS_CITY_WORKING)
 	m_iCityWorkingChange = kResults.GetInt("CityWorkingChange");
 #endif
@@ -153,6 +155,9 @@ bool CvTechEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	const char* szTextVal = NULL;
 	szTextVal = kResults.GetText("Era");
 	m_iEra = GC.getInfoTypeForString(szTextVal, true);
+
+	szTextVal = kResults.GetText("FreePromotionRemoved");
+	m_iFreePromotionRemoved = GC.getInfoTypeForString(szTextVal, true);
 
 	szTextVal = kResults.GetText("FirstFreeUnitClass");
 	m_iFirstFreeUnitClass = GC.getInfoTypeForString(szTextVal, true);
@@ -615,6 +620,21 @@ int CvTechEntry::GetPrereqAndTechs(int i) const
 int CvTechEntry::GetRazeSpeedModifier() const
 {
 	return m_iRazeSpeedModifier;
+}
+
+int CvTechEntry::GetFreePromotionRemoved() const
+{
+	return m_iFreePromotionRemoved;
+}
+
+bool CvTechEntry::IsRemoveCurrentPromotion() const
+{
+	return m_bRemoveCurrentPromotion;
+}
+
+bool CvTechEntry::IsRemoveOceanImpassableCivilian() const
+{
+	return m_bRemoveOceanImpassableCivilian;
 }
 
 #if defined(MOD_ROG_CORE)

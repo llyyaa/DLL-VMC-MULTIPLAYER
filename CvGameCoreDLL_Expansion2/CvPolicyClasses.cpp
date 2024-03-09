@@ -65,6 +65,9 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iFreeExperience(0),
 	m_iWorkerSpeedModifier(0),
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	m_iFreePromotionRemoved(NO_PROMOTION),
+	m_bRemoveCurrentPromotion(false),
+	m_bRemoveOceanImpassableCombatUnit(false),
 	m_bNullifyInfluenceModifier(false),
 	m_iDifferentIdeologyTourismModifier(0),
 	m_iHappinessPerPolicy(0),
@@ -362,6 +365,10 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iFreeExperience = kResults.GetInt("FreeExperience");
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
+	const char* szFreePromotionRemoved = kResults.GetText("FreePromotionRemoved");
+	m_iFreePromotionRemoved = GC.getInfoTypeForString(szFreePromotionRemoved, true);
+	m_bRemoveCurrentPromotion = kResults.GetBool("RemoveCurrentPromotion");
+	m_bRemoveOceanImpassableCombatUnit = kResults.GetBool("RemoveOceanImpassableCombatUnit");
 	m_bNullifyInfluenceModifier = kResults.GetBool("NullifyInfluenceModifier");
 	m_iDifferentIdeologyTourismModifier = kResults.GetInt("DifferentIdeologyTourismModifier");
 	m_iHappinessPerPolicy = kResults.GetInt("HappinessPerPolicy");
@@ -1576,7 +1583,21 @@ int CvPolicyEntry::GetWorkerSpeedModifier() const
 	return m_iWorkerSpeedModifier;
 }
 #if defined(MOD_POLICY_NEW_EFFECT_FOR_SP)
-///
+///Remove Free Promotion
+int CvPolicyEntry::GetFreePromotionRemoved() const
+{
+	return m_iFreePromotionRemoved;
+}
+///Remove Current Units Promotion
+bool CvPolicyEntry::IsRemoveCurrentPromotion() const
+{
+	return m_bRemoveCurrentPromotion;
+}
+bool CvPolicyEntry::IsRemoveOceanImpassableCombatUnit() const
+{
+	return m_bRemoveOceanImpassableCombatUnit;
+}
+///Nullify Tourism Influence
 bool CvPolicyEntry::IsNullifyInfluenceModifier() const
 {
 	return m_bNullifyInfluenceModifier;

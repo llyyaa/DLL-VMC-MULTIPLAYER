@@ -108,6 +108,9 @@ public:
 	int GetPrereqAndTechs(int i) const;
 
 	int GetRazeSpeedModifier() const;
+	int GetFreePromotionRemoved() const;
+	bool IsRemoveCurrentPromotion() const;
+	bool IsRemoveOceanImpassableCivilian() const;
 
 #if defined(MOD_ROG_CORE)
 	int GetTechYieldChanges(int i, int j) const;
@@ -169,6 +172,9 @@ private:
 	bool m_bAllowsWorldCongress;
 
 	int m_iRazeSpeedModifier = 0;
+	int m_iFreePromotionRemoved = NO_PROMOTION;
+	bool m_bRemoveCurrentPromotion = false;
+	bool m_bRemoveOceanImpassableCivilian = false;
 
 	CvString m_strQuoteKey;
 	CvString m_wstrQuote;

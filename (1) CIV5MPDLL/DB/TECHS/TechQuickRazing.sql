@@ -1,1 +1,0 @@
-alter table Technologies add column RazeSpeedModifier integer not null default 0;
