@@ -308,6 +308,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	m_iUnitMaxExperienceLocal(0),
+	m_iExtraSellRefund(0),
+	m_iExtraSellRefundModifierPerEra(0),
 	m_iMinNumReligions(0),
 	m_iCityStateTradeRouteProductionModifierGlobal(0),
 	m_iLandmarksTourismPercentGlobal(0),
@@ -555,6 +557,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	m_iUnitMaxExperienceLocal = kResults.GetInt("UnitMaxExperienceLocal");
+	m_iExtraSellRefund = kResults.GetInt("ExtraSellRefund");
+	m_iExtraSellRefundModifierPerEra = kResults.GetInt("ExtraSellRefundModifierPerEra");
 	m_iMinNumReligions = kResults.GetInt("MinNumReligions");
 	m_iCityStateTradeRouteProductionModifierGlobal = kResults.GetInt("CityStateTradeRouteProductionModifierGlobal");
 	m_iLandmarksTourismPercentGlobal = kResults.GetInt("LandmarksTourismPercentGlobal");
@@ -3845,6 +3849,16 @@ int CvBuildingEntry::GetUnitMaxExperienceLocal() const
 	return m_iUnitMaxExperienceLocal;
 }
 
+int CvBuildingEntry::GetExtraSellRefund() const
+{
+	return m_iExtraSellRefund;
+}
+
+int CvBuildingEntry::GetExtraSellRefundModifierPerEra() const
+{
+	return m_iExtraSellRefundModifierPerEra;
+}
+
 int CvBuildingEntry::GetMinNumReligions() const
 {
 	return m_iMinNumReligions;
@@ -4599,8 +4613,26 @@ int CvCityBuildings::GetSellBuildingRefund(BuildingTypes eIndex) const
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < m_pBuildings->GetNumBuildings(), "eIndex expected to be < m_pBuildings->GetNumBuildings()");
 
-	int iRefund = GET_PLAYER(m_pCity->getOwner()).getProductionNeeded(eIndex);
-	iRefund /= /*10*/ GC.getBUILDING_SALE_DIVISOR();
+	CvBuildingEntry* pkBuildingEntry = GC.getBuildingInfo(eIndex);
+	if(!pkBuildingEntry) return 0;
+
+	CvPlayerAI& pPlayer = GET_PLAYER(m_pCity->getOwner());
+
+	int iRefund = 0;
+
+	int iExtraSellRefund = pkBuildingEntry->GetExtraSellRefund();
+	if(iExtraSellRefund != 0)
+	{
+		int iExtraModifier = pkBuildingEntry->GetExtraSellRefundModifierPerEra() *  pPlayer.GetCurrentEra() + 100;
+		iExtraSellRefund *= iExtraModifier;
+		iExtraSellRefund /= 100;
+		iRefund += iExtraSellRefund;
+	}
+	else
+	{
+		iRefund += pPlayer.getProductionNeeded(eIndex);
+		iRefund /= /*10*/ GC.getBUILDING_SALE_DIVISOR();
+	}
 
 	return iRefund;
 }

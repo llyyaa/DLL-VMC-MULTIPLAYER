@@ -645,7 +645,7 @@ UnitTypes CvBarbarians::GetRandomBarbarianUnitType(CvArea* pArea, UnitAITypes eU
 						}
 					}
 				}
-				else if(!MOD_GLOBAL_UNIT_BARBARIAN_CAN_TRAIN && !GET_PLAYER(BARBARIAN_PLAYER).canTrain(eLoopUnit))
+				else if(!GET_PLAYER(BARBARIAN_PLAYER).canTrain(eLoopUnit))
 				{
 					bValid = false;
 				}

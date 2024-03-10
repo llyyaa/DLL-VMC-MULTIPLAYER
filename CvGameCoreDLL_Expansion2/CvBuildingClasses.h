@@ -481,6 +481,8 @@ public:
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	int GetUnitMaxExperienceLocal() const;
+	int GetExtraSellRefund() const;
+	int GetExtraSellRefundModifierPerEra() const;
 	int GetMinNumReligions() const;
 	int GetCityStateTradeRouteProductionModifierGlobal() const;
 	int GetLandmarksTourismPercentGlobal() const;
@@ -905,6 +907,8 @@ private:
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
 	int m_iUnitMaxExperienceLocal;
+	int m_iExtraSellRefund;
+	int m_iExtraSellRefundModifierPerEra;
 	int m_iMinNumReligions;
 	int m_iCityStateTradeRouteProductionModifierGlobal;
 	int m_iLandmarksTourismPercentGlobal;
