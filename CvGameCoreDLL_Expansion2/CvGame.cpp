@@ -8424,9 +8424,7 @@ void CvGame::updateMoves()
 							//there was a hang with a queued attack on autoplay so setAutoMoves(true) was never calle, from Community-Patch
 							if(pReadyUnit /*&& !player.GetTacticalAI()->IsInQueuedAttack(pReadyUnit)*/)
 							{
-								//in Community-Patch, they set it 1000
-								int iWaitTime = 1000;
-								//int iWaitTime = 100;
+								int iWaitTime = 100;
 								if(!isNetworkMultiPlayer())
 								{
 									iWaitTime = 10;
