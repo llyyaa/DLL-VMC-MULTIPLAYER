@@ -16968,7 +16968,11 @@ int CvPlayer::getCityDefenseModifierGlobal() const
 }
 void CvPlayer::changeCityDefenseModifierGlobal(int iChange)
 {
-	m_iCityDefenseModifierGlobal += iChange;
+	if(iChange != 0)
+	{
+		m_iCityDefenseModifierGlobal += iChange;
+		UpdateCityStrength();
+	}
 }
 
 
