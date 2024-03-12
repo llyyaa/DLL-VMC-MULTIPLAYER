@@ -298,6 +298,7 @@ CvPlayer::CvPlayer() :
 	, m_iNumTradeRouteBonus(0)
 	, m_viTradeRouteDomainExtraRange("CvPlayer::m_viTradeRouteDomainExtraRange", m_syncArchive)
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	, m_iCityDefenseModifierGlobal(0)
 	, m_iCityStateTradeRouteProductionModifierGlobal(0)
 	, m_iLandmarksTourismPercentGlobal(0)
 	, m_iGreatWorksTourismModifierGlobal(0)
@@ -10057,6 +10058,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeNullifyInfluenceModifier(pBuildingInfo->NullifyInfluenceModifier() ? iChange : 0);
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	changeCityDefenseModifierGlobal(pBuildingInfo->GetCityDefenseModifierGlobal() * iChange);
 	changeCityStateTradeRouteProductionModifierGlobal(pBuildingInfo->GetCityStateTradeRouteProductionModifierGlobal() * iChange);
 	changeLandmarksTourismPercentGlobal(pBuildingInfo->GetLandmarksTourismPercentGlobal() * iChange);
 	changeGreatWorksTourismModifierGlobal(pBuildingInfo->GetGreatWorksTourismModifierGlobal() * iChange);
@@ -16960,7 +16962,17 @@ void CvPlayer::changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange)
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvPlayer::getCityDefenseModifierGlobal() const
+{
+	return m_iCityDefenseModifierGlobal;
+}
+void CvPlayer::changeCityDefenseModifierGlobal(int iChange)
+{
+	m_iCityDefenseModifierGlobal += iChange;
+}
 
+
+//	--------------------------------------------------------------------------------
 int CvPlayer::getCityStateTradeRouteProductionModifierGlobal() const
 {
 	if(m_iCityStateTradeRouteProductionModifierGlobal != 0)
@@ -27952,6 +27964,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	kStream >> m_iCityDefenseModifierGlobal;
 	kStream >> m_iCityStateTradeRouteProductionModifierGlobal;
 	kStream >> m_iLandmarksTourismPercentGlobal;
 	kStream >> m_iGreatWorksTourismModifierGlobal;
@@ -28706,6 +28719,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iNumTradeRouteBonus;
 	kStream << m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	kStream << m_iCityDefenseModifierGlobal;
 	kStream << m_iCityStateTradeRouteProductionModifierGlobal;
 	kStream << m_iLandmarksTourismPercentGlobal;
 	kStream << m_iGreatWorksTourismModifierGlobal;

@@ -42,3 +42,4 @@ ALTER TABLE Buildings ADD 'NoPuppet' BOOLEAN DEFAULT 0;
 ALTER TABLE Buildings ADD 'UnitMaxExperienceLocal' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'ExtraSellRefund' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'ExtraSellRefundModifierPerEra' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'CityDefenseModifierGlobal' INTEGER DEFAULT 0;

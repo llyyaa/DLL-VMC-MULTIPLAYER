@@ -917,6 +917,9 @@ public:
 	void changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange);
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int getCityDefenseModifierGlobal() const;
+	void changeCityDefenseModifierGlobal(int iChange);
+
 	int getCityStateTradeRouteProductionModifierGlobal() const;
 	void changeCityStateTradeRouteProductionModifierGlobal(int iChange);
 
@@ -2442,6 +2445,7 @@ protected:
 	int m_iNumTradeRouteBonus;
 	FAutoVariable<std::vector<int>, CvPlayer> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iCityDefenseModifierGlobal;
 	int m_iCityStateTradeRouteProductionModifierGlobal;
 	int m_iLandmarksTourismPercentGlobal;
 	int m_iGreatWorksTourismModifierGlobal;

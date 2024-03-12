@@ -480,6 +480,7 @@ public:
 	int GetHurryModifierLocal(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int GetCityDefenseModifierGlobal() const;
 	int GetUnitMaxExperienceLocal() const;
 	int GetExtraSellRefund() const;
 	int GetExtraSellRefundModifierPerEra() const;
@@ -906,6 +907,7 @@ private:
 
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iCityDefenseModifierGlobal;
 	int m_iUnitMaxExperienceLocal;
 	int m_iExtraSellRefund;
 	int m_iExtraSellRefundModifierPerEra;

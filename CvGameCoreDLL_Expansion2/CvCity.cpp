@@ -2135,7 +2135,8 @@ void CvCity::doTurn()
 			iHitsHealed++;
 		}
 		int iBuildingDefense = m_pCityBuildings->GetBuildingDefense();
-		iBuildingDefense *= (100 + m_pCityBuildings->GetBuildingDefenseMod());
+		int iBuildingDefenseMod = 100 + m_pCityBuildings->GetBuildingDefenseMod() + GET_PLAYER(m_eOwner).getCityDefenseModifierGlobal();
+		iBuildingDefense *= iBuildingDefenseMod;
 		iBuildingDefense /= 100;
 		iHitsHealed += iBuildingDefense / 500;
 

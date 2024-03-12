@@ -307,6 +307,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiHurryModifierLocal(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iCityDefenseModifierGlobal(0),
 	m_iUnitMaxExperienceLocal(0),
 	m_iExtraSellRefund(0),
 	m_iExtraSellRefundModifierPerEra(0),
@@ -556,6 +557,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iCityDefenseModifierGlobal = kResults.GetInt("CityDefenseModifierGlobal");
 	m_iUnitMaxExperienceLocal = kResults.GetInt("UnitMaxExperienceLocal");
 	m_iExtraSellRefund = kResults.GetInt("ExtraSellRefund");
 	m_iExtraSellRefundModifierPerEra = kResults.GetInt("ExtraSellRefundModifierPerEra");
@@ -3844,6 +3846,11 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvBuildingEntry::GetCityDefenseModifierGlobal() const
+{
+	return m_iCityDefenseModifierGlobal;
+}
+
 int CvBuildingEntry::GetUnitMaxExperienceLocal() const
 {
 	return m_iUnitMaxExperienceLocal;
