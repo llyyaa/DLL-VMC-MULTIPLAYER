@@ -1870,6 +1870,9 @@ public:
 	int GetAttackBonusFromDeathUnit() const;
 	int GetAttackModifierFromWorldCongress() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	const int GetMeleeAttackModifier() const;
+	void ChangeMeleeAttackModifier(int iValue);
+
 	const int GetCaptureEmenyExtraMax() const;
 	void ChangeCaptureEmenyExtraMax(int iValue);
 
@@ -2544,6 +2547,7 @@ protected:
 	int m_iExtraPopConsume;
 	int m_iAttackBonusFromDeathUnit;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iMeleeAttackModifier;
 	int m_iCaptureEmenyExtraMax;
 	int m_iCaptureEmenyPercent;
 	int m_iMovePercentCaptureCity;

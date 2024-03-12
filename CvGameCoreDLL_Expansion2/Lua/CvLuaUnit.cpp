@@ -642,6 +642,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	Method(GetTotalHeightMod);
+	Method(GetMeleeAttackModifier);
 #endif
 
 	Method(GetExtraCombatPercent);
@@ -5393,6 +5394,8 @@ int CvLuaUnit::lGetTotalHeightMod(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+
+LUAAPIIMPL(Unit, GetMeleeAttackModifier)
 #endif
 //------------------------------------------------------------------------------
 //int getExtraCombatPercent();

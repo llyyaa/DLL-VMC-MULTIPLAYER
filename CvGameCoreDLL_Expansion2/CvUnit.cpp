@@ -462,6 +462,7 @@ CvUnit::CvUnit() :
 	, m_iExtraPopConsume(0)
 	, m_iAttackBonusFromDeathUnit(0)
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	, m_iMeleeAttackModifier(0)
 	, m_iCaptureEmenyExtraMax(0)
 	, m_iCaptureEmenyPercent(0)
 	, m_iMovePercentCaptureCity(0)
@@ -1441,6 +1442,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraPopConsume = 0;
 	m_iAttackBonusFromDeathUnit = 0;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iMeleeAttackModifier = 0;
 	m_iCaptureEmenyExtraMax = 0;
 	m_iCaptureEmenyPercent = 0;
 	m_iHealPercentCaptureCity = 0;
@@ -6985,6 +6987,15 @@ int CvUnit::GetAttackModifierFromWorldCongress() const
 }
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeMeleeAttackModifier(int iValue)
+{
+	m_iMeleeAttackModifier += iValue;
+}
+const int CvUnit::GetMeleeAttackModifier() const
+{
+	return m_iMeleeAttackModifier;
+}
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeCaptureEmenyExtraMax(int iValue)
 {
@@ -15177,6 +15188,8 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 			iModifier += GetTotalHeightMod(*const_cast<CvPlot*>(pToPlot));
 #endif
 		}
+
+		iModifier += GetMeleeAttackModifier();
 
 		// Bonus for attacking in one's lands
 		if(pToPlot->IsFriendlyTerritory(getOwner()))
@@ -26155,6 +26168,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+		ChangeMeleeAttackModifier((thisPromotion.GetMeleeAttackModifier()) * iChange);
 		ChangeCaptureEmenyExtraMax((thisPromotion.GetCaptureEmenyExtraMax()) * iChange);
 		ChangeCaptureEmenyPercent((thisPromotion.GetCaptureEmenyPercent()) * iChange);
 		ChangeMovePercentCaptureCity((thisPromotion.GetMovePercentCaptureCity()) * iChange);
@@ -26713,6 +26727,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iExtraPopConsume;
 	kStream >> m_iAttackBonusFromDeathUnit;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream >> m_iMeleeAttackModifier;
 	kStream >> m_iCaptureEmenyExtraMax;
 	kStream >> m_iCaptureEmenyPercent;
 	kStream >> m_iMovePercentCaptureCity;
@@ -27107,6 +27122,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCityAttackPlunderModifier;
 	kStream << m_iExtraPopConsume;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	kStream << m_iMeleeAttackModifier;
 	kStream << m_iCaptureEmenyExtraMax;
 	kStream << m_iCaptureEmenyPercent;
 	kStream << m_iMovePercentCaptureCity;
@@ -30384,7 +30400,6 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 			iValue = GetPromotionValue(pkPromotionInfo->GetAttackWoundedMod(), getExtraAttackWoundedMod(), iFlavorOffense, mediumPriority);
 		}
 
-
 		if (iValue == 0)
 		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetNumAttacksMadeThisTurnAttackMod(), GetNumAttacksMadeThisTurnAttackMod(), iFlavorOffense, mediumPriority);
@@ -30432,6 +30447,10 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		}
 
 		// Low priority promotions
+		if (iValue == 0)
+		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetMeleeAttackModifier(), 0, iFlavorOffense, lowPriority);
+		}
 
 		if (iValue == 0)
 		{
@@ -30989,6 +31008,12 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 		{
 			iValue += 10 + (iFlavorMobile + iFlavorOffense) * 2;
 		}
+	}
+
+	iTemp = pkPromotionInfo->GetMeleeAttackModifier();
+	if(iTemp != 0 && !(isRanged() && isOnlyDefensive()))
+	{
+		iValue += (iTemp * 100);
 	}
 
 	iTemp = pkPromotionInfo->GetExtraAttacks();
