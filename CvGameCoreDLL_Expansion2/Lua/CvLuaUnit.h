@@ -771,6 +771,7 @@ protected:
 #ifdef MOD_GLOBAL_CORRUPTION
 	static int lGetPlotCorruptionScoreReport(lua_State* L);
 #endif
+	LUAAPIEXTN(GetGreatPersonOutputModifierFromGWs, int);
 	LUAAPIEXTN(GetStrengthModifierFromExtraResource, int);
 	LUAAPIEXTN(GetStrengthModifierFromExtraHappiness, int);
 	LUAAPIEXTN(GetBarbarianCombatBonusTotal, int);

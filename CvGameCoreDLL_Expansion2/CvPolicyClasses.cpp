@@ -250,6 +250,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 #endif
 	m_piYieldModifierFromActiveSpies(NULL),
 	m_piYieldModifierPerArtifacts(NULL),
+	m_piGreatPersonOutputModifierPerGWs(NULL),
 	m_ppiBuildingClassYieldModifiers(NULL),
 	m_ppiBuildingClassYieldChanges(NULL),
 	m_piCityLoveKingDayYieldMod(NULL),
@@ -308,6 +309,7 @@ CvPolicyEntry::~CvPolicyEntry(void)
 #endif
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromActiveSpies);
 	SAFE_DELETE_ARRAY(m_piYieldModifierPerArtifacts);
+	SAFE_DELETE_ARRAY(m_piGreatPersonOutputModifierPerGWs);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldModifiers);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldChanges);
 	if(m_pFreeUnitClasses)
@@ -925,6 +927,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #endif
 	kUtility.SetYields(m_piYieldModifierFromActiveSpies, "Policy_YieldModifierFromActiveSpies", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piYieldModifierPerArtifacts, "Policy_YieldModifierPerArtifacts", "PolicyType", szPolicyType);
+	kUtility.PopulateArrayByValue(m_piGreatPersonOutputModifierPerGWs, "GreatPersons", "Policy_GreatPersonOutputModifierPerGWs", "GreatPersonType", "PolicyType", szPolicyType, "Modifier");
 	//ImprovementCultureChanges
 	kUtility.PopulateArrayByValue(m_piImprovementCultureChange, "Improvements", "Policy_ImprovementCultureChanges", "ImprovementType", "PolicyType", szPolicyType, "CultureChange");
 
@@ -5432,4 +5435,11 @@ int CvPolicyEntry::GetYieldModifierPerArtifacts(int i) const
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piYieldModifierPerArtifacts ? m_piYieldModifierPerArtifacts[i] : 0;
+}
+
+int CvPolicyEntry::GetGreatPersonOutputModifierPerGWs(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piGreatPersonOutputModifierPerGWs ? m_piGreatPersonOutputModifierPerGWs[i] : 0;
 }

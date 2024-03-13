@@ -307,7 +307,7 @@
 			<Text>[NEWLINE][ICON_BULLET]Great Work Modifiers: {1_Num}%</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_NUM_ARTIFACT">
-			<Text>[NEWLINE][ICON_BULLET]Artefacts Modifiers: {1_Num}%</Text>
+			<Text>[NEWLINE][ICON_BULLET]Artifacts Modifiers: {1_Num}%</Text>
 		</Row>
 	</Language_en_US>
 

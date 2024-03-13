@@ -1311,6 +1311,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetYieldModifierFromHappiness);
 	Method(GetYieldModifierFromNumGreakWork);
+	Method(GetYieldModifierFromNumArtifact);
 	Method(GetYieldModifierFromHappinessPolicy);
 
 	Method(GetGlobalYieldModifierFromResource);
@@ -1351,6 +1352,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(ChangeImmigrationCounter);
 	Method(SetImmigrationCounter);
 	Method(GetImmigrationRate);
+	Method(GetImmigrationInRateFromPolicy);
+	Method(GetImmigrationOutRateFromPolicy);
 #endif
 
 	Method(GetScienceTimes100FromFriendsTable);
@@ -12646,6 +12649,15 @@ int CvLuaPlayer::lGetYieldModifierFromNumGreakWork(lua_State* L)
 	return 1;
 }
 
+int CvLuaPlayer::lGetYieldModifierFromNumArtifact(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = static_cast<YieldTypes>(lua_tointeger(L, 2));
+	int result = pkPlayer->GetYieldModifierFromNumArtifact(GC.getYieldInfo(eYield));
+	lua_pushinteger(L, result);
+	return 1;
+}
+
 int CvLuaPlayer::lGetYieldModifierFromHappinessPolicy(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
@@ -12782,6 +12794,18 @@ int CvLuaPlayer::lGetImmigrationRate(lua_State* L)
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	PlayerTypes eTargetPlayer = (PlayerTypes)lua_tointeger(L, 2);
 	lua_pushinteger(L, pkPlayer->GetImmigrationRate(eTargetPlayer));
+	return 1;
+}
+int CvLuaPlayer::lGetImmigrationInRateFromPolicy(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	lua_pushinteger(L, pkPlayer->getPolicyModifiers(POLICYMOD_IMMIGRATION_IN_MODIFIER));
+	return 1;
+}
+int CvLuaPlayer::lGetImmigrationOutRateFromPolicy(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	lua_pushinteger(L, pkPlayer->getPolicyModifiers(POLICYMOD_IMMIGRATION_OUT_MODIFIER));
 	return 1;
 }
 #endif

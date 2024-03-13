@@ -2012,11 +2012,14 @@ public:
 	int CountAllOriginalCapitalCity();
 #endif
 
-	int getYieldModifierFromActiveSpies(YieldTypes eIndex)	const;
+	int getYieldModifierFromActiveSpies(YieldTypes eIndex) const;
 	void changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange);
 
 	int getYieldModifierPerArtifacts(YieldTypes eIndex)	const;
 	void changeYieldModifierPerArtifacts(YieldTypes eIndex, int iChange);
+
+	int GetGreatPersonOutputModifierPerGWs(GreatPersonTypes eGreatPerson) const;
+	void ChangeGreatPersonOutputModifierPerGWs(GreatPersonTypes eGreatPerson, int iChange);
 
 #if defined(MOD_ROG_CORE)
 	int GetNumWorldWonders();
@@ -2666,6 +2669,7 @@ protected:
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiPolicyModifiers;
 	std::vector<int> m_aiYieldModifierFromActiveSpies;
 	std::vector<int> m_aiYieldModifierPerArtifacts;
+	std::vector<int> m_aiGreatPersonOutputModifierPerGWs;
 
 	std::vector<FeatureTypes> m_ownedNaturalWonders;
 

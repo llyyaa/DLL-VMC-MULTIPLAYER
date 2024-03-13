@@ -83,3 +83,11 @@ CREATE TABLE Policy_YieldModifierPerArtifacts (
 	foreign key (PolicyType) references Policies(Type),
 	foreign key (YieldType) references Yields(Type)
 );
+
+CREATE TABLE Policy_GreatPersonOutputModifierPerGWs (
+	'PolicyType' text default '',
+	'GreatPersonType' text default '',
+	'Modifier' integer  not null ,
+	foreign key (PolicyType) references Policies(Type),
+	foreign key (GreatPersonType) references GreatPersons(Type)
+);

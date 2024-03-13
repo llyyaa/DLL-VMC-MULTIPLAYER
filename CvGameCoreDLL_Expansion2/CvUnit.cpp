@@ -11157,7 +11157,13 @@ int CvUnit::GetScaleAmount(int iAmountToScale) const
 		iScaleTotal += iExtra;
 	}
 
-	const int scaleFromNumGWs = getUnitInfo().GetScaleFromNumGWs();
+	int scaleFromNumGWs = getUnitInfo().GetScaleFromNumGWs();
+	GreatPersonTypes eGreatPerson = GetGreatPersonFromUnitClass(getUnitClassType());
+	if(eGreatPerson != NO_GREATPERSON)
+	{
+		scaleFromNumGWs += kPlayer.GetGreatPersonOutputModifierPerGWs(eGreatPerson);
+	}
+
 	if (scaleFromNumGWs != 0)
 	{
 		const int iNumGWs = kPlayer.GetCulture()->GetNumGreatWorks(false);

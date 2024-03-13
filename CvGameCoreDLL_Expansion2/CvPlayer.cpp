@@ -1344,6 +1344,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiYieldModifierPerArtifacts.clear();
 	m_aiYieldModifierPerArtifacts.resize(NUM_YIELD_TYPES, 0);
 
+	m_aiGreatPersonOutputModifierPerGWs.clear();
+	m_aiGreatPersonOutputModifierPerGWs.resize(GC.getNumGreatPersonInfos(), 0);
+
 	m_aiCoastalCityYieldChange.clear();
 	m_aiCoastalCityYieldChange.resize(NUM_YIELD_TYPES, 0);
 
@@ -26966,6 +26969,12 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 			changeGoldenAgeGreatPersonRateModifier((GreatPersonTypes)iI, iMod);
 	}
 #endif
+	for(iI = 0; iI < GC.getNumGreatPersonInfos(); iI++)
+	{
+		iMod = pPolicy->GetGreatPersonOutputModifierPerGWs(iI) * iChange;
+		if(iMod != 0)
+			ChangeGreatPersonOutputModifierPerGWs((GreatPersonTypes)iI, iMod);
+	}
 
 	for(iI = 0; iI < GC.getNumImprovementInfos(); iI++)
 	{
@@ -28201,6 +28210,7 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_aiYieldModifierFromActiveSpies;
 	kStream >> m_aiYieldModifierPerArtifacts;
+	kStream >> m_aiGreatPersonOutputModifierPerGWs;
 	kStream >> m_aiCoastalCityYieldChange;
 	kStream >> m_aiCapitalYieldChange;
 	kStream >> m_aiCapitalYieldPerPopChange;
@@ -28911,6 +28921,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	kStream << m_aiYieldModifierFromActiveSpies;
 	kStream << m_aiYieldModifierPerArtifacts;
+	kStream << m_aiGreatPersonOutputModifierPerGWs;
 	kStream << m_aiCoastalCityYieldChange;
 	kStream << m_aiCapitalYieldChange;
 	kStream << m_aiCapitalYieldPerPopChange;
@@ -32925,9 +32936,6 @@ int CvPlayer::getYieldModifierPerArtifacts(YieldTypes eIndex)	const
 	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
 	return m_aiYieldModifierPerArtifacts[eIndex];
 }
-
-
-//	--------------------------------------------------------------------------------
 void CvPlayer::changeYieldModifierPerArtifacts(YieldTypes eIndex, int iChange)
 {
 	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
@@ -32938,6 +32946,27 @@ void CvPlayer::changeYieldModifierPerArtifacts(YieldTypes eIndex, int iChange)
 		m_aiYieldModifierPerArtifacts[eIndex] = m_aiYieldModifierPerArtifacts[eIndex] + iChange;
 	}
 }
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetGreatPersonOutputModifierPerGWs(GreatPersonTypes eGreatPerson)	const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumGreatPersonInfos(), "eIndex expected to be < GC.getNumGreatPersonInfos()");
+	return m_aiGreatPersonOutputModifierPerGWs[eGreatPerson];
+}
+void CvPlayer::ChangeGreatPersonOutputModifierPerGWs(GreatPersonTypes eGreatPerson, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumGreatPersonInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiGreatPersonOutputModifierPerGWs[eGreatPerson] = m_aiGreatPersonOutputModifierPerGWs[eGreatPerson] + iChange;
+	}
+}
+
+
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetProductionNeededUnitModifier() const {
 	return m_iProductionNeededUnitModifier;
