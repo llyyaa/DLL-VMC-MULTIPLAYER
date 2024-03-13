@@ -2015,6 +2015,8 @@ public:
 	int getYieldModifierFromActiveSpies(YieldTypes eIndex)	const;
 	void changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange);
 
+	int getYieldModifierPerArtifacts(YieldTypes eIndex)	const;
+	void changeYieldModifierPerArtifacts(YieldTypes eIndex, int iChange);
 
 #if defined(MOD_ROG_CORE)
 	int GetNumWorldWonders();
@@ -2151,6 +2153,7 @@ public:
 	int GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const;
 
 	int GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const;
+	int GetYieldModifierFromNumArtifact(CvYieldInfo* info) const;
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	int GetCachedCapturedHolyCity() const;
@@ -2662,6 +2665,7 @@ protected:
 #endif
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiPolicyModifiers;
 	std::vector<int> m_aiYieldModifierFromActiveSpies;
+	std::vector<int> m_aiYieldModifierPerArtifacts;
 
 	std::vector<FeatureTypes> m_ownedNaturalWonders;
 

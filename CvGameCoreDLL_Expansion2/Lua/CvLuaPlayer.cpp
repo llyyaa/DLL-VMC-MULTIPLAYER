@@ -3086,7 +3086,9 @@ int CvLuaPlayer::lGetWrittenArtifactCulture(lua_State* L)
 int CvLuaPlayer::lGetNumGreatWorks(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
-	int iNumWorks = pkPlayer->GetCulture()->GetNumGreatWorks();
+	bool bIncludeArtifact = luaL_optbool(L, 2, true);
+	bool bIncludeGreatWork = luaL_optbool(L, 3, true);
+	int iNumWorks = pkPlayer->GetCulture()->GetNumGreatWorks(bIncludeArtifact, bIncludeGreatWork);
 	lua_pushinteger(L, iNumWorks);
 	return 1;
 }

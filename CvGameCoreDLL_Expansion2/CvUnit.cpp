@@ -11160,7 +11160,7 @@ int CvUnit::GetScaleAmount(int iAmountToScale) const
 	const int scaleFromNumGWs = getUnitInfo().GetScaleFromNumGWs();
 	if (scaleFromNumGWs != 0)
 	{
-		const int iNumGWs = kPlayer.GetCulture()->GetNumGreatWorks();
+		const int iNumGWs = kPlayer.GetCulture()->GetNumGreatWorks(false);
 		iScaleTotal += iAmountToScale * iNumGWs * scaleFromNumGWs / 100;
 	}
 

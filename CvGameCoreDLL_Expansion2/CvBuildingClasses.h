@@ -1085,10 +1085,9 @@ public:
 #endif
 	int GetCultureFromGreatWorks() const;
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
-	int GetNumGreatWorks(bool bIgnoreYield = true) const;
-#else
-	int GetNumGreatWorks() const;
 #endif
+	int GetNumGreatWorks(bool bIgnoreYield = true, bool bIncludeArtifact = true, bool bIncludeGreatWork = true) const;
+
 	int GetNumGreatWorks(GreatWorkSlotType eGreatWorkSlot) const;
 
 	int GetLandmarksTourismPercent() const;

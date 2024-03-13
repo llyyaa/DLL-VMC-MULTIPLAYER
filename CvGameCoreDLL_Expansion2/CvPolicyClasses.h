@@ -133,6 +133,7 @@ public:
 	int GetYieldModifierFromActiveSpies(int i) const;
 	int* GetYieldModifierFromActiveSpiesArray() const;
 
+	int GetYieldModifierPerArtifacts(int i) const;
 
 	int GetGoldPerUnit() const;
 	int GetGoldPerMilitaryUnit() const;
@@ -588,6 +589,7 @@ private:
 	int* m_piYieldChangeWorldWonder;
 #endif
 	int* m_piYieldModifierFromActiveSpies;
+	int* m_piYieldModifierPerArtifacts;
 	int** m_ppiBuildingClassYieldModifiers;
 	int** m_ppiBuildingClassYieldChanges;
 	int* m_piFlavorValue;

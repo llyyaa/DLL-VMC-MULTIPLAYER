@@ -1341,6 +1341,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiYieldModifierFromActiveSpies.clear();
 	m_aiYieldModifierFromActiveSpies.resize(NUM_YIELD_TYPES, 0);
 
+	m_aiYieldModifierPerArtifacts.clear();
+	m_aiYieldModifierPerArtifacts.resize(NUM_YIELD_TYPES, 0);
+
 	m_aiCoastalCityYieldChange.clear();
 	m_aiCoastalCityYieldChange.resize(NUM_YIELD_TYPES, 0);
 
@@ -15984,6 +15987,7 @@ void CvPlayer::DoGreatPersonExpended(UnitTypes eGreatPersonUnit)
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 	GreatPersonTypes eGreatPerson = GetGreatPersonFromUnitClass(pGreatPersonUnit->getUnitClassType());
+
 	if (eGreatPerson != NO_GREATPERSON)
 	{
 		ReligionTypes eReligionFounded = GetReligions()->GetReligionCreatedByPlayer(true);
@@ -22498,7 +22502,7 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 			iTotalNumResource *= GetStrategicResourceMod();
 			iTotalNumResource /= 100;
 		}
-		if(!isHuman() && isMajorCiv() && !IsAITeammateOfHuman() && GetDiplomacyAI()->GetStateAllWars() != STATE_ALL_WARS_LOSING)
+		if(!isHuman() && isMajorCiv() && !IsAITeammateOfHuman() && getNumCities() > 1 && GetDiplomacyAI()->GetStateAllWars() != STATE_ALL_WARS_LOSING)
 		{
 			int iHanHandicapMod = GC.getGame().getHandicapInfo().getStrategicResourceMod();
 			iHanHandicapMod += GC.getGame().getHandicapInfo().getStrategicResourceModPerEra() * GetCurrentEra();
@@ -26877,6 +26881,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 
 		changeYieldModifierFromActiveSpies(eYield, (pPolicy->GetYieldModifierFromActiveSpies(iI) * iChange));
+		changeYieldModifierPerArtifacts(eYield, (pPolicy->GetYieldModifierPerArtifacts(iI) * iChange));
 
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 		if (MOD_API_TRADE_ROUTE_YIELD_RATE)
@@ -28195,6 +28200,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiPolicyModifiers;
 
 	kStream >> m_aiYieldModifierFromActiveSpies;
+	kStream >> m_aiYieldModifierPerArtifacts;
 	kStream >> m_aiCoastalCityYieldChange;
 	kStream >> m_aiCapitalYieldChange;
 	kStream >> m_aiCapitalYieldPerPopChange;
@@ -28904,6 +28910,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiPolicyModifiers;
 
 	kStream << m_aiYieldModifierFromActiveSpies;
+	kStream << m_aiYieldModifierPerArtifacts;
 	kStream << m_aiCoastalCityYieldChange;
 	kStream << m_aiCapitalYieldChange;
 	kStream << m_aiCapitalYieldPerPopChange;
@@ -32785,9 +32792,15 @@ int CvPlayer::GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const
 
 int CvPlayer::GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const
 {
-	int iNum = GetCulture()->GetNumGreatWorks();
+	int iNum = GetCulture()->GetNumGreatWorks(false, true);
 	const int iYieldModFromGws = info->getGreakWorkYieldMod();
 	return iNum * iYieldModFromGws;
+}
+int CvPlayer::GetYieldModifierFromNumArtifact(CvYieldInfo* info) const
+{
+	int iNum = GetCulture()->GetNumGreatWorks(true, false);
+	const int iYieldModFromAfs = getYieldModifierPerArtifacts((YieldTypes)info->GetID());
+	return iNum * iYieldModFromAfs;
 }
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
@@ -32904,6 +32917,28 @@ void CvPlayer::changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange
 	}
 }
 
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getYieldModifierPerArtifacts(YieldTypes eIndex)	const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldModifierPerArtifacts[eIndex];
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeYieldModifierPerArtifacts(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiYieldModifierPerArtifacts[eIndex] = m_aiYieldModifierPerArtifacts[eIndex] + iChange;
+	}
+}
+//	--------------------------------------------------------------------------------
 int CvPlayer::GetProductionNeededUnitModifier() const {
 	return m_iProductionNeededUnitModifier;
 }

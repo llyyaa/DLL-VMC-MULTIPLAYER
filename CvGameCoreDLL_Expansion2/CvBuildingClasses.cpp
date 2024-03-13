@@ -5482,10 +5482,8 @@ int CvCityBuildings::GetCultureFromGreatWorks() const
 
 /// Accessor: How many Great Works of specific slot type present in this city?
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
-int CvCityBuildings::GetNumGreatWorks(bool bIgnoreYield) const
-#else
-int CvCityBuildings::GetNumGreatWorks() const
 #endif
+int CvCityBuildings::GetNumGreatWorks(bool bIgnoreYield, bool bIncludeArtifact, bool bIncludeGreatWork) const
 {
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	int iRtnValue = 0;
@@ -5493,22 +5491,23 @@ int CvCityBuildings::GetNumGreatWorks() const
 	CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
 	if (pkCivInfo)
 	{
+		GreatWorkClass eArtifactClass = (GreatWorkClass)GC.getInfoTypeForString("GREAT_WORK_ARTIFACT");
+		GreatWorkClass eArtClass = (GreatWorkClass)GC.getInfoTypeForString("GREAT_WORK_ART");
 		for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 		{
 			BuildingClassTypes eBldgClass = (*it).eBuildingClass;
 			CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
-			if (pkClassInfo)
-			{
-				BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
-				CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
-				if (pkInfo)
-				{
-					if (bIgnoreYield || pkInfo->GetGreatWorkYieldType() != NO_YIELD)
-					{
-						iRtnValue++;
-					}
-				}
-			}
+			if(!pkClassInfo) continue;
+			
+			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
+			CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
+			if(!pkInfo) continue;
+			
+			if(!bIgnoreYield && pkInfo->GetGreatWorkYieldType() == NO_YIELD) continue;
+			if(!bIncludeArtifact && GC.getGame().GetGameCulture()->GetGreatWorkClass((*it).iGreatWorkIndex) == eArtifactClass) continue;
+			if(!bIncludeGreatWork && GC.getGame().GetGameCulture()->GetGreatWorkClass((*it).iGreatWorkIndex) == eArtClass) continue;
+
+			iRtnValue++;
 		}
 	}
 	return iRtnValue;
