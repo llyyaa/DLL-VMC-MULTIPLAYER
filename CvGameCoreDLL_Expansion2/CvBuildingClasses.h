@@ -480,7 +480,10 @@ public:
 	int GetHurryModifierLocal(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int GetCityDefenseModifierGlobal() const;
 	int GetUnitMaxExperienceLocal() const;
+	int GetExtraSellRefund() const;
+	int GetExtraSellRefundModifierPerEra() const;
 	int GetMinNumReligions() const;
 	int GetCityStateTradeRouteProductionModifierGlobal() const;
 	int GetLandmarksTourismPercentGlobal() const;
@@ -904,7 +907,10 @@ private:
 
 	bool* m_pbBuildingClassNeededInCity;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iCityDefenseModifierGlobal;
 	int m_iUnitMaxExperienceLocal;
+	int m_iExtraSellRefund;
+	int m_iExtraSellRefundModifierPerEra;
 	int m_iMinNumReligions;
 	int m_iCityStateTradeRouteProductionModifierGlobal;
 	int m_iLandmarksTourismPercentGlobal;
@@ -1079,10 +1085,9 @@ public:
 #endif
 	int GetCultureFromGreatWorks() const;
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
-	int GetNumGreatWorks(bool bIgnoreYield = true) const;
-#else
-	int GetNumGreatWorks() const;
 #endif
+	int GetNumGreatWorks(bool bIgnoreYield = true, bool bIncludeArtifact = true, bool bIncludeGreatWork = true) const;
+
 	int GetNumGreatWorks(GreatWorkSlotType eGreatWorkSlot) const;
 
 	int GetLandmarksTourismPercent() const;

@@ -307,7 +307,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiHurryModifierLocal(NULL),
 	m_pbBuildingClassNeededInCity(NULL),
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iCityDefenseModifierGlobal(0),
 	m_iUnitMaxExperienceLocal(0),
+	m_iExtraSellRefund(0),
+	m_iExtraSellRefundModifierPerEra(0),
 	m_iMinNumReligions(0),
 	m_iCityStateTradeRouteProductionModifierGlobal(0),
 	m_iLandmarksTourismPercentGlobal(0),
@@ -554,7 +557,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraAttacks = kResults.GetInt("ExtraAttacks");
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	m_iCityDefenseModifierGlobal = kResults.GetInt("CityDefenseModifierGlobal");
 	m_iUnitMaxExperienceLocal = kResults.GetInt("UnitMaxExperienceLocal");
+	m_iExtraSellRefund = kResults.GetInt("ExtraSellRefund");
+	m_iExtraSellRefundModifierPerEra = kResults.GetInt("ExtraSellRefundModifierPerEra");
 	m_iMinNumReligions = kResults.GetInt("MinNumReligions");
 	m_iCityStateTradeRouteProductionModifierGlobal = kResults.GetInt("CityStateTradeRouteProductionModifierGlobal");
 	m_iLandmarksTourismPercentGlobal = kResults.GetInt("LandmarksTourismPercentGlobal");
@@ -3840,9 +3846,24 @@ bool CvBuildingEntry::IsBuildingClassNeededInCity(int i) const
 }
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvBuildingEntry::GetCityDefenseModifierGlobal() const
+{
+	return m_iCityDefenseModifierGlobal;
+}
+
 int CvBuildingEntry::GetUnitMaxExperienceLocal() const
 {
 	return m_iUnitMaxExperienceLocal;
+}
+
+int CvBuildingEntry::GetExtraSellRefund() const
+{
+	return m_iExtraSellRefund;
+}
+
+int CvBuildingEntry::GetExtraSellRefundModifierPerEra() const
+{
+	return m_iExtraSellRefundModifierPerEra;
 }
 
 int CvBuildingEntry::GetMinNumReligions() const
@@ -4599,8 +4620,26 @@ int CvCityBuildings::GetSellBuildingRefund(BuildingTypes eIndex) const
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < m_pBuildings->GetNumBuildings(), "eIndex expected to be < m_pBuildings->GetNumBuildings()");
 
-	int iRefund = GET_PLAYER(m_pCity->getOwner()).getProductionNeeded(eIndex);
-	iRefund /= /*10*/ GC.getBUILDING_SALE_DIVISOR();
+	CvBuildingEntry* pkBuildingEntry = GC.getBuildingInfo(eIndex);
+	if(!pkBuildingEntry) return 0;
+
+	CvPlayerAI& pPlayer = GET_PLAYER(m_pCity->getOwner());
+
+	int iRefund = 0;
+
+	int iExtraSellRefund = pkBuildingEntry->GetExtraSellRefund();
+	if(iExtraSellRefund != 0)
+	{
+		int iExtraModifier = pkBuildingEntry->GetExtraSellRefundModifierPerEra() *  pPlayer.GetCurrentEra() + 100;
+		iExtraSellRefund *= iExtraModifier;
+		iExtraSellRefund /= 100;
+		iRefund += iExtraSellRefund;
+	}
+	else
+	{
+		iRefund += pPlayer.getProductionNeeded(eIndex);
+		iRefund /= /*10*/ GC.getBUILDING_SALE_DIVISOR();
+	}
 
 	return iRefund;
 }
@@ -5443,10 +5482,8 @@ int CvCityBuildings::GetCultureFromGreatWorks() const
 
 /// Accessor: How many Great Works of specific slot type present in this city?
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
-int CvCityBuildings::GetNumGreatWorks(bool bIgnoreYield) const
-#else
-int CvCityBuildings::GetNumGreatWorks() const
 #endif
+int CvCityBuildings::GetNumGreatWorks(bool bIgnoreYield, bool bIncludeArtifact, bool bIncludeGreatWork) const
 {
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	int iRtnValue = 0;
@@ -5454,22 +5491,23 @@ int CvCityBuildings::GetNumGreatWorks() const
 	CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
 	if (pkCivInfo)
 	{
+		GreatWorkClass eArtifactClass = (GreatWorkClass)GC.getInfoTypeForString("GREAT_WORK_ARTIFACT");
+		GreatWorkClass eArtClass = (GreatWorkClass)GC.getInfoTypeForString("GREAT_WORK_ART");
 		for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 		{
 			BuildingClassTypes eBldgClass = (*it).eBuildingClass;
 			CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
-			if (pkClassInfo)
-			{
-				BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
-				CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
-				if (pkInfo)
-				{
-					if (bIgnoreYield || pkInfo->GetGreatWorkYieldType() != NO_YIELD)
-					{
-						iRtnValue++;
-					}
-				}
-			}
+			if(!pkClassInfo) continue;
+			
+			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
+			CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
+			if(!pkInfo) continue;
+			
+			if(!bIgnoreYield && pkInfo->GetGreatWorkYieldType() == NO_YIELD) continue;
+			if(!bIncludeArtifact && GC.getGame().GetGameCulture()->GetGreatWorkClass((*it).iGreatWorkIndex) == eArtifactClass) continue;
+			if(!bIncludeGreatWork && GC.getGame().GetGameCulture()->GetGreatWorkClass((*it).iGreatWorkIndex) == eArtClass) continue;
+
+			iRtnValue++;
 		}
 	}
 	return iRtnValue;

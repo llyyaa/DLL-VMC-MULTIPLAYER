@@ -183,7 +183,7 @@ public:
 	bool HasAvailableGreatWorkSlot(GreatWorkSlotType eGreatWorkSlot);
 	int GetNumAvailableGreatWorkSlots(GreatWorkSlotType eGreatWorkSlot) const;
 	CvCity *GetClosestAvailableGreatWorkSlot(int iX, int iY, GreatWorkSlotType eGreatWorkSlot, BuildingClassTypes *eBuildingClass, int *iSlot) const;
-	int GetNumGreatWorks() const;
+	int GetNumGreatWorks(bool bIncludeArtifact = true, bool bIncludeGreatWork = true) const;
 	int GetNumGreatWorkSlots() const;
 	int GetNumGreatWorkSlots(GreatWorkSlotType eGreatWorkSlot) const;
 	bool ControlsGreatWork (int iIndex);
@@ -329,10 +329,9 @@ public:
 	void Init(CvCity* m_pCity);
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
-	int GetNumGreatWorks(bool bIgnoreYield = true) const;
-#else
-	int GetNumGreatWorks() const;
 #endif
+	int GetNumGreatWorks(bool bIgnoreYield = true, bool bIncludeArtifact = true, bool bIncludeGreatWork = true) const;
+
 	int GetNumGreatWorkSlots() const;
 	int GetNumAvailableGreatWorkSlots(GreatWorkSlotType eSlotType) const;
 	void ClearGreatWorks();

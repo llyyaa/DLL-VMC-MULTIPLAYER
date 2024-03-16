@@ -195,6 +195,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iMeleeAttackModifier(0),
 	m_iCaptureEmenyExtraMax(0),
 	m_iCaptureEmenyPercent(0),
 	m_iHealPercentCaptureCity(0),
@@ -723,6 +724,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	m_iMeleeAttackModifier = kResults.GetInt("MeleeAttackModifier");
 	m_iCaptureEmenyExtraMax = kResults.GetInt("CaptureEmenyExtraMax");
 	m_iCaptureEmenyPercent = kResults.GetInt("CaptureEmenyPercent");
 	m_iMovePercentCaptureCity = kResults.GetInt("MovePercentCaptureCity");
@@ -2441,6 +2443,10 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 }
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+int CvPromotionEntry::GetMeleeAttackModifier() const
+{
+	return m_iMeleeAttackModifier;
+}
 int CvPromotionEntry::GetCaptureEmenyExtraMax() const
 {
 	return m_iCaptureEmenyExtraMax;

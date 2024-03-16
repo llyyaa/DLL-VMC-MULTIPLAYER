@@ -642,6 +642,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	Method(GetTotalHeightMod);
+	Method(GetMeleeAttackModifier);
 #endif
 
 	Method(GetExtraCombatPercent);
@@ -841,6 +842,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 #ifdef MOD_GLOBAL_CORRUPTION
 	Method(GetPlotCorruptionScoreReport);
 #endif
+	Method(GetGreatPersonOutputModifierFromGWs);
 	Method(GetStrengthModifierFromExtraResource);
 	Method(GetStrengthModifierFromExtraHappiness);
 	Method(GetBarbarianCombatBonusTotal);
@@ -5393,6 +5395,8 @@ int CvLuaUnit::lGetTotalHeightMod(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+
+LUAAPIIMPL(Unit, GetMeleeAttackModifier)
 #endif
 //------------------------------------------------------------------------------
 //int getExtraCombatPercent();
@@ -6576,6 +6580,23 @@ int CvLuaUnit::lGetPlotCorruptionScoreReport(lua_State* L)
 	return 1;
 }
 #endif
+
+int CvLuaUnit::lGetGreatPersonOutputModifierFromGWs(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	int iResult = 0;
+
+	iResult += pkUnit->getUnitInfo().GetScaleFromNumGWs();
+	GreatPersonTypes eGreatPerson = GetGreatPersonFromUnitClass(pkUnit->getUnitClassType());
+	if(eGreatPerson != NO_GREATPERSON)
+	{
+		iResult += GET_PLAYER(pkUnit->getOwner()).GetGreatPersonOutputModifierPerGWs(eGreatPerson);
+	}
+	iResult *= GET_PLAYER(pkUnit->getOwner()).GetCulture()->GetNumGreatWorks(false, true);
+
+	lua_pushinteger(L, iResult);
+	return 1;
+}
 
 LUAAPIIMPL(Unit, GetStrengthModifierFromExtraResource)
 LUAAPIIMPL(Unit, GetStrengthModifierFromExtraHappiness)

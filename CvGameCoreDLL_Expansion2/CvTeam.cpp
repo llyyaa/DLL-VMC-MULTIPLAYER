@@ -785,17 +785,21 @@ void CvTeam::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst)
 	}
 
 	// Effects in every City on this Team
-	for(int iPlayerLoop = 0; iPlayerLoop < MAX_CIV_PLAYERS; iPlayerLoop++)
+	int iGlobalDefenseModifier = pBuildingInfo->GetGlobalDefenseModifier();
+	if(iGlobalDefenseModifier != 0)
 	{
-		CvPlayerAI& kPlayer = GET_PLAYER((PlayerTypes) iPlayerLoop);
-		if(kPlayer.getTeam() == m_eID && kPlayer.isAlive())
+		for(int iPlayerLoop = 0; iPlayerLoop < MAX_CIV_PLAYERS; iPlayerLoop++)
 		{
-			CvCity* pLoopCity;
-			int iLoop;
-
-			for(pLoopCity = kPlayer.firstCity(&iLoop); pLoopCity != NULL; pLoopCity = kPlayer.nextCity(&iLoop))
+			CvPlayerAI& kPlayer = GET_PLAYER((PlayerTypes) iPlayerLoop);
+			if(kPlayer.getTeam() == m_eID && kPlayer.isAlive())
 			{
-				pLoopCity->GetCityBuildings()->ChangeBuildingDefenseMod(pBuildingInfo->GetGlobalDefenseModifier() * iChange);
+				CvCity* pLoopCity;
+				int iLoop;
+
+				for(pLoopCity = kPlayer.firstCity(&iLoop); pLoopCity != NULL; pLoopCity = kPlayer.nextCity(&iLoop))
+				{
+					pLoopCity->GetCityBuildings()->ChangeBuildingDefenseMod(pBuildingInfo->GetGlobalDefenseModifier() * iChange);
+				}
 			}
 		}
 	}

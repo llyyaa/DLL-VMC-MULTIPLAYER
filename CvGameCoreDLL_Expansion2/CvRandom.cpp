@@ -27,7 +27,6 @@ RNGStackWalker dbgRNGStackWalker;
 #define RANDOM_C      (12345)
 #define RANDOM_SHIFT  (16)
 
-bool CvRandom::isMapGenerating = false;
 
 CvRandom::CvRandom() :
 	m_ulRandomSeed(0)
@@ -134,7 +133,7 @@ unsigned short CvRandom::get(unsigned short usNum, const char* pszLog)
 	unsigned long ulNewSeed = ((RANDOM_A * m_ulRandomSeed) + RANDOM_C);
 	unsigned short us = ((unsigned short)((((ulNewSeed >> RANDOM_SHIFT) & MAX_UNSIGNED_SHORT) * ((unsigned long)usNum)) / (MAX_UNSIGNED_SHORT + 1)));
 
-	if(!isMapGenerating)
+	if(true)
 	{
 		int iRandLogging = GC.getRandLogging();
 		if(iRandLogging > 0 && m_bSynchronous)
@@ -148,7 +147,7 @@ unsigned short CvRandom::get(unsigned short usNum, const char* pszLog)
 			
 			//if(kGame.getTurnSlice() > 0 || ((iRandLogging & RAND_LOGGING_PREGAME_FLAG) != 0))
 			{
-				FILogFile* pLog = LOGFILEMGR.GetLog("RandCalls.csv", FILogFile::kDontTimeStamp);
+				FILogFile* pLog = LOGFILEMGR.GetLog("RandCalls.log", FILogFile::kDontTimeStamp);
 				if(pLog)
 				{
 					char szOut[2048] = { 0 };
@@ -158,7 +157,7 @@ unsigned short CvRandom::get(unsigned short usNum, const char* pszLog)
 					string outStr = "turn: ";
 					_itoa_s(turn, buf, 10);
 					outStr += buf;
-
+					
 					outStr += ", max: ";
 					_itoa_s(usNum, buf, 10);
 					outStr += buf;

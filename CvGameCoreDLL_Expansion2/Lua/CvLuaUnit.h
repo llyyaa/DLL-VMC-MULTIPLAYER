@@ -573,6 +573,7 @@ protected:
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	static int lGetTotalHeightMod(lua_State* L);
+	LUAAPIEXTN(GetMeleeAttackModifier, int);
 #endif
 
 	static int lGetExtraCombatPercent(lua_State* L);
@@ -770,6 +771,7 @@ protected:
 #ifdef MOD_GLOBAL_CORRUPTION
 	static int lGetPlotCorruptionScoreReport(lua_State* L);
 #endif
+	LUAAPIEXTN(GetGreatPersonOutputModifierFromGWs, int);
 	LUAAPIEXTN(GetStrengthModifierFromExtraResource, int);
 	LUAAPIEXTN(GetStrengthModifierFromExtraHappiness, int);
 	LUAAPIEXTN(GetBarbarianCombatBonusTotal, int);

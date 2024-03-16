@@ -109,7 +109,6 @@ class CvRandom
 {
 
 public:
-	static bool isMapGenerating;
 	explicit CvRandom(bool extendedCallStackDebugging);
 	CvRandom();
 	CvRandom(const CvRandom& source);

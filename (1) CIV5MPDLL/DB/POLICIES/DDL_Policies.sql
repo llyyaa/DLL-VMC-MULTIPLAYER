@@ -75,3 +75,19 @@ ALTER TABLE Policies ADD 'ImmigrationOutModifier' INTEGER DEFAULT 0;
 alter table Policies add column FreePromotionRemoved integer default -1;
 alter table Policies add column RemoveCurrentPromotion boolean default 0;
 alter table Policies add column RemoveOceanImpassableCombatUnit boolean default 0;
+
+CREATE TABLE Policy_YieldModifierPerArtifacts (
+	'PolicyType' text default '',
+	'YieldType' text default '',
+	'Yield' integer  not null ,
+	foreign key (PolicyType) references Policies(Type),
+	foreign key (YieldType) references Yields(Type)
+);
+
+CREATE TABLE Policy_GreatPersonOutputModifierPerGWs (
+	'PolicyType' text default '',
+	'GreatPersonType' text default '',
+	'Modifier' integer  not null ,
+	foreign key (PolicyType) references Policies(Type),
+	foreign key (GreatPersonType) references GreatPersons(Type)
+);

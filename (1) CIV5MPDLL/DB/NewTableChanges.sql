@@ -228,6 +228,7 @@ ALTER TABLE UnitPromotions ADD COLUMN 'MovePercentCaptureCity' INTEGER DEFAULT 0
 ALTER TABLE UnitPromotions ADD COLUMN 'HealPercentCaptureCity' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'CaptureEmenyPercent' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'CaptureEmenyExtraMax' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'MeleeAttackModifier' INTEGER DEFAULT 0;
 
 ALTER TABLE Improvements ADD ExtraScore INTEGER DEFAULT 0;
 CREATE TABLE IF NOT EXISTS Improvement_FeaturesNeeded (

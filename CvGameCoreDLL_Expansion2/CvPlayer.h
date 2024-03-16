@@ -917,6 +917,9 @@ public:
 	void changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange);
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int getCityDefenseModifierGlobal() const;
+	void changeCityDefenseModifierGlobal(int iChange);
+
 	int getCityStateTradeRouteProductionModifierGlobal() const;
 	void changeCityStateTradeRouteProductionModifierGlobal(int iChange);
 
@@ -2009,9 +2012,14 @@ public:
 	int CountAllOriginalCapitalCity();
 #endif
 
-	int getYieldModifierFromActiveSpies(YieldTypes eIndex)	const;
+	int getYieldModifierFromActiveSpies(YieldTypes eIndex) const;
 	void changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange);
 
+	int getYieldModifierPerArtifacts(YieldTypes eIndex)	const;
+	void changeYieldModifierPerArtifacts(YieldTypes eIndex, int iChange);
+
+	int GetGreatPersonOutputModifierPerGWs(GreatPersonTypes eGreatPerson) const;
+	void ChangeGreatPersonOutputModifierPerGWs(GreatPersonTypes eGreatPerson, int iChange);
 
 #if defined(MOD_ROG_CORE)
 	int GetNumWorldWonders();
@@ -2148,6 +2156,7 @@ public:
 	int GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const;
 
 	int GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const;
+	int GetYieldModifierFromNumArtifact(CvYieldInfo* info) const;
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	int GetCachedCapturedHolyCity() const;
@@ -2442,6 +2451,7 @@ protected:
 	int m_iNumTradeRouteBonus;
 	FAutoVariable<std::vector<int>, CvPlayer> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	int m_iCityDefenseModifierGlobal;
 	int m_iCityStateTradeRouteProductionModifierGlobal;
 	int m_iLandmarksTourismPercentGlobal;
 	int m_iGreatWorksTourismModifierGlobal;
@@ -2658,6 +2668,8 @@ protected:
 #endif
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiPolicyModifiers;
 	std::vector<int> m_aiYieldModifierFromActiveSpies;
+	std::vector<int> m_aiYieldModifierPerArtifacts;
+	std::vector<int> m_aiGreatPersonOutputModifierPerGWs;
 
 	std::vector<FeatureTypes> m_ownedNaturalWonders;
 

@@ -2135,7 +2135,8 @@ void CvCity::doTurn()
 			iHitsHealed++;
 		}
 		int iBuildingDefense = m_pCityBuildings->GetBuildingDefense();
-		iBuildingDefense *= (100 + m_pCityBuildings->GetBuildingDefenseMod());
+		int iBuildingDefenseMod = 100 + m_pCityBuildings->GetBuildingDefenseMod() + GET_PLAYER(m_eOwner).getCityDefenseModifierGlobal();
+		iBuildingDefense *= iBuildingDefenseMod;
 		iBuildingDefense /= 100;
 		iHitsHealed += iBuildingDefense / 500;
 
@@ -12668,6 +12669,14 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	}
 #endif
 
+	iTempMod = owner.GetYieldModifierFromNumArtifact(pYield);
+	if (iTempMod != 0)
+	{
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_NUM_ARTIFACT", iTempMod);
+	}
+	iModifier += iTempMod;
+
 	const int iModFromHappiness = owner.GetYieldModifierFromHappiness(pYield);
 	if (iModFromHappiness != 0)
 	{
@@ -15540,8 +15549,8 @@ void CvCity::updateStrengthValue()
 
 	// Building Defense
 	int iBuildingDefense = m_pCityBuildings->GetBuildingDefense();
-
-	iBuildingDefense *= (100 + m_pCityBuildings->GetBuildingDefenseMod());
+	int iBuildingDefenseMod = 100 + m_pCityBuildings->GetBuildingDefenseMod() + GET_PLAYER(m_eOwner).getCityDefenseModifierGlobal();
+	iBuildingDefense *= iBuildingDefenseMod;
 	iBuildingDefense /= 100;
 
 	iStrengthValue += iBuildingDefense;

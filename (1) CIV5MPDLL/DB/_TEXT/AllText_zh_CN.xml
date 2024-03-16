@@ -308,6 +308,9 @@
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_NUM_GREAT_WORK">
 			<Text>[NEWLINE][ICON_BULLET]杰作修正: {1_Num}%</Text>
 		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_NUM_ARTIFACT">
+			<Text>[NEWLINE][ICON_BULLET]文物修正: {1_Num}%</Text>
+		</Row>
 	</Language_zh_CN>
 
 	<Language_zh_CN>

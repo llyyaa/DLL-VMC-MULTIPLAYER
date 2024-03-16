@@ -264,6 +264,7 @@ public:
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int GetMeleeAttackModifier() const;
 	int GetCaptureEmenyExtraMax() const;
 	int GetCaptureEmenyPercent() const;
 	int GetMovePercentCaptureCity() const;
@@ -624,6 +625,7 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+	int m_iMeleeAttackModifier;
 	int m_iCaptureEmenyExtraMax;
 	int m_iCaptureEmenyPercent;
 	int m_iMovePercentCaptureCity;

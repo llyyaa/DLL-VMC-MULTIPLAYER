@@ -298,6 +298,7 @@ CvPlayer::CvPlayer() :
 	, m_iNumTradeRouteBonus(0)
 	, m_viTradeRouteDomainExtraRange("CvPlayer::m_viTradeRouteDomainExtraRange", m_syncArchive)
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	, m_iCityDefenseModifierGlobal(0)
 	, m_iCityStateTradeRouteProductionModifierGlobal(0)
 	, m_iLandmarksTourismPercentGlobal(0)
 	, m_iGreatWorksTourismModifierGlobal(0)
@@ -1339,6 +1340,12 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	m_aiYieldModifierFromActiveSpies.clear();
 	m_aiYieldModifierFromActiveSpies.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiYieldModifierPerArtifacts.clear();
+	m_aiYieldModifierPerArtifacts.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiGreatPersonOutputModifierPerGWs.clear();
+	m_aiGreatPersonOutputModifierPerGWs.resize(GC.getNumGreatPersonInfos(), 0);
 
 	m_aiCoastalCityYieldChange.clear();
 	m_aiCoastalCityYieldChange.resize(NUM_YIELD_TYPES, 0);
@@ -10057,6 +10064,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeNullifyInfluenceModifier(pBuildingInfo->NullifyInfluenceModifier() ? iChange : 0);
 
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	changeCityDefenseModifierGlobal(pBuildingInfo->GetCityDefenseModifierGlobal() * iChange);
 	changeCityStateTradeRouteProductionModifierGlobal(pBuildingInfo->GetCityStateTradeRouteProductionModifierGlobal() * iChange);
 	changeLandmarksTourismPercentGlobal(pBuildingInfo->GetLandmarksTourismPercentGlobal() * iChange);
 	changeGreatWorksTourismModifierGlobal(pBuildingInfo->GetGreatWorksTourismModifierGlobal() * iChange);
@@ -15982,6 +15990,7 @@ void CvPlayer::DoGreatPersonExpended(UnitTypes eGreatPersonUnit)
 
 #if defined(MOD_API_UNIFIED_YIELDS)
 	GreatPersonTypes eGreatPerson = GetGreatPersonFromUnitClass(pGreatPersonUnit->getUnitClassType());
+
 	if (eGreatPerson != NO_GREATPERSON)
 	{
 		ReligionTypes eReligionFounded = GetReligions()->GetReligionCreatedByPlayer(true);
@@ -16960,7 +16969,21 @@ void CvPlayer::changeTradeRouteDomainExtraRange(DomainTypes eIndex, int iChange)
 
 //	--------------------------------------------------------------------------------
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+int CvPlayer::getCityDefenseModifierGlobal() const
+{
+	return m_iCityDefenseModifierGlobal;
+}
+void CvPlayer::changeCityDefenseModifierGlobal(int iChange)
+{
+	if(iChange != 0)
+	{
+		m_iCityDefenseModifierGlobal += iChange;
+		UpdateCityStrength();
+	}
+}
 
+
+//	--------------------------------------------------------------------------------
 int CvPlayer::getCityStateTradeRouteProductionModifierGlobal() const
 {
 	if(m_iCityStateTradeRouteProductionModifierGlobal != 0)
@@ -22482,7 +22505,7 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 			iTotalNumResource *= GetStrategicResourceMod();
 			iTotalNumResource /= 100;
 		}
-		if(!isHuman() && isMajorCiv() && !IsAITeammateOfHuman() && GetDiplomacyAI()->GetStateAllWars() != STATE_ALL_WARS_LOSING)
+		if(!isHuman() && isMajorCiv() && !IsAITeammateOfHuman() && getNumCities() > 1 && GetDiplomacyAI()->GetStateAllWars() != STATE_ALL_WARS_LOSING)
 		{
 			int iHanHandicapMod = GC.getGame().getHandicapInfo().getStrategicResourceMod();
 			iHanHandicapMod += GC.getGame().getHandicapInfo().getStrategicResourceModPerEra() * GetCurrentEra();
@@ -26861,6 +26884,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 
 		changeYieldModifierFromActiveSpies(eYield, (pPolicy->GetYieldModifierFromActiveSpies(iI) * iChange));
+		changeYieldModifierPerArtifacts(eYield, (pPolicy->GetYieldModifierPerArtifacts(iI) * iChange));
 
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 		if (MOD_API_TRADE_ROUTE_YIELD_RATE)
@@ -26945,6 +26969,12 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 			changeGoldenAgeGreatPersonRateModifier((GreatPersonTypes)iI, iMod);
 	}
 #endif
+	for(iI = 0; iI < GC.getNumGreatPersonInfos(); iI++)
+	{
+		iMod = pPolicy->GetGreatPersonOutputModifierPerGWs(iI) * iChange;
+		if(iMod != 0)
+			ChangeGreatPersonOutputModifierPerGWs((GreatPersonTypes)iI, iMod);
+	}
 
 	for(iI = 0; iI < GC.getNumImprovementInfos(); iI++)
 	{
@@ -27952,6 +27982,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iNumTradeRouteBonus;
 	kStream >> m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	kStream >> m_iCityDefenseModifierGlobal;
 	kStream >> m_iCityStateTradeRouteProductionModifierGlobal;
 	kStream >> m_iLandmarksTourismPercentGlobal;
 	kStream >> m_iGreatWorksTourismModifierGlobal;
@@ -28178,6 +28209,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiPolicyModifiers;
 
 	kStream >> m_aiYieldModifierFromActiveSpies;
+	kStream >> m_aiYieldModifierPerArtifacts;
+	kStream >> m_aiGreatPersonOutputModifierPerGWs;
 	kStream >> m_aiCoastalCityYieldChange;
 	kStream >> m_aiCapitalYieldChange;
 	kStream >> m_aiCapitalYieldPerPopChange;
@@ -28706,6 +28739,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iNumTradeRouteBonus;
 	kStream << m_viTradeRouteDomainExtraRange;
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
+	kStream << m_iCityDefenseModifierGlobal;
 	kStream << m_iCityStateTradeRouteProductionModifierGlobal;
 	kStream << m_iLandmarksTourismPercentGlobal;
 	kStream << m_iGreatWorksTourismModifierGlobal;
@@ -28886,6 +28920,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiPolicyModifiers;
 
 	kStream << m_aiYieldModifierFromActiveSpies;
+	kStream << m_aiYieldModifierPerArtifacts;
+	kStream << m_aiGreatPersonOutputModifierPerGWs;
 	kStream << m_aiCoastalCityYieldChange;
 	kStream << m_aiCapitalYieldChange;
 	kStream << m_aiCapitalYieldPerPopChange;
@@ -32767,9 +32803,15 @@ int CvPlayer::GetYieldModifierFromHappinessPolicy(CvYieldInfo* info) const
 
 int CvPlayer::GetYieldModifierFromNumGreakWork(CvYieldInfo* info) const
 {
-	int iNum = GetCulture()->GetNumGreatWorks();
+	int iNum = GetCulture()->GetNumGreatWorks(false, true);
 	const int iYieldModFromGws = info->getGreakWorkYieldMod();
 	return iNum * iYieldModFromGws;
+}
+int CvPlayer::GetYieldModifierFromNumArtifact(CvYieldInfo* info) const
+{
+	int iNum = GetCulture()->GetNumGreatWorks(true, false);
+	const int iYieldModFromAfs = getYieldModifierPerArtifacts((YieldTypes)info->GetID());
+	return iNum * iYieldModFromAfs;
 }
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
@@ -32886,6 +32928,46 @@ void CvPlayer::changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange
 	}
 }
 
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getYieldModifierPerArtifacts(YieldTypes eIndex)	const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldModifierPerArtifacts[eIndex];
+}
+void CvPlayer::changeYieldModifierPerArtifacts(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiYieldModifierPerArtifacts[eIndex] = m_aiYieldModifierPerArtifacts[eIndex] + iChange;
+	}
+}
+
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetGreatPersonOutputModifierPerGWs(GreatPersonTypes eGreatPerson)	const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumGreatPersonInfos(), "eIndex expected to be < GC.getNumGreatPersonInfos()");
+	return m_aiGreatPersonOutputModifierPerGWs[eGreatPerson];
+}
+void CvPlayer::ChangeGreatPersonOutputModifierPerGWs(GreatPersonTypes eGreatPerson, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < GC.getNumGreatPersonInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiGreatPersonOutputModifierPerGWs[eGreatPerson] = m_aiGreatPersonOutputModifierPerGWs[eGreatPerson] + iChange;
+	}
+}
+
+
+//	--------------------------------------------------------------------------------
 int CvPlayer::GetProductionNeededUnitModifier() const {
 	return m_iProductionNeededUnitModifier;
 }

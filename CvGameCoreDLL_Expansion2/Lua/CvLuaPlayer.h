@@ -1228,6 +1228,7 @@ protected:
 
 	LUAAPIEXTN(GetYieldModifierFromHappiness, int, eYieldType);
 	LUAAPIEXTN(GetYieldModifierFromNumGreakWork, int, eYieldType);
+	LUAAPIEXTN(GetYieldModifierFromNumArtifact, int, eYieldType);
 	LUAAPIEXTN(GetYieldModifierFromHappinessPolicy, int, eYieldType);
 
 	LUAAPIEXTN(GetGlobalYieldModifierFromResource, int, eYieldType);
@@ -1270,6 +1271,8 @@ protected:
 	LUAAPIEXTN(ChangeImmigrationCounter, void, iIndex, iChange);
 	LUAAPIEXTN(SetImmigrationCounter, void, iIndex, iValue);
 	LUAAPIEXTN(GetImmigrationRate, int, eTargetPlayer);
+	LUAAPIEXTN(GetImmigrationInRateFromPolicy, int);
+	LUAAPIEXTN(GetImmigrationOutRateFromPolicy, int);
 #endif
 
 	LUAAPIEXTN(GetScienceTimes100FromFriendsTable);
