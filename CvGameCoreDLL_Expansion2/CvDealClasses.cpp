@@ -2524,12 +2524,21 @@ void CvGameDeals::FinalizeDealValidAndAccepted(PlayerTypes eFromPlayer, PlayerTy
 
 			if (pLeader != nullptr && pFollower != nullptr)
 			{
+				auto* pFollowerCapital = pFollower->getCapitalCity();
+				auto* pNewSecondCapital = pLeader->acquireCity(pFollowerCapital, false, true, true, true);
+				if (pNewSecondCapital != nullptr)
+				{
+					pNewSecondCapital->SetSecondCapital(true);
+					pLeader->AddSecondCapital(pNewSecondCapital->GetID());
+				}
+
 				int iLoop = 0;
 				for (CvCity* pCity = pFollower->firstCity(&iLoop); pCity != NULL; pCity = pFollower->nextCity(&iLoop))
 				{
-					pLeader->acquireCity(pCity, false, true, true, true);
+					auto* newCity = pLeader->acquireCity(pCity, false, true, true, true);
 				}
 
+				iLoop = 0;
 				for (CvCity* pCity = pLeader->firstCity(&iLoop); pCity != NULL; pCity = pLeader->nextCity(&iLoop))
 				{
 					pCity->UpdateCorruption();

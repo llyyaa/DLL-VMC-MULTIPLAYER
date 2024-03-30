@@ -2902,11 +2902,6 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	{
 		GET_PLAYER(eOldOwner).RemoveSecondCapital(pOldCity->GetID());
 	}
-	pNewCity->SetSecondCapital(bCapital && bIsMajorCivBuyout); // for major buyout, we treat the capital as the second capital (new Austria UA)
-	if (pNewCity->IsSecondCapital())
-	{
-		this->AddSecondCapital(pNewCity->GetID());
-	}
 
 	if(bCapital)
 	{
