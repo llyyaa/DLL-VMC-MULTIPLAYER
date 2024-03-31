@@ -855,6 +855,8 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iHeavyChargeCollateralFixed = kResults.GetInt("HeavyChargeCollateralFixed");
 	m_iHeavyChargeCollateralPercent = kResults.GetInt("HeavyChargeCollateralPercent");
 
+	m_iOutsideFriendlyLandsInflictDamageChange = kResults.GetInt("OutsideFriendlyLandsInflictDamageChange");
+
 	const char* szPromotionPrereq = kResults.GetText("PromotionPrereq");
 	m_iPrereqPromotion = GC.getInfoTypeForString(szPromotionPrereq, true);
 
@@ -3643,6 +3645,11 @@ int CvPromotionEntry::GetHeavyChargeCollateralFixed() const
 int CvPromotionEntry::GetHeavyChargeCollateralPercent() const
 {
 	return m_iHeavyChargeCollateralPercent;
+}
+
+int CvPromotionEntry::GetOutsideFriendlyLandsInflictDamageChange() const
+{
+	return m_iOutsideFriendlyLandsInflictDamageChange;
 }
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS

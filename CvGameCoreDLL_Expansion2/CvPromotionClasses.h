@@ -510,6 +510,8 @@ public:
 	int GetHeavyChargeCollateralFixed() const;
 	int GetHeavyChargeCollateralPercent() const;
 
+	int GetOutsideFriendlyLandsInflictDamageChange() const;
+
 protected:
 	int m_iLayerAnimationPath;
 	int m_iPrereqPromotion;
@@ -940,6 +942,8 @@ protected:
 	int m_iHeavyChargeExtraDamage = 0;
 	int m_iHeavyChargeCollateralFixed = 0;
 	int m_iHeavyChargeCollateralPercent = 0;
+
+	int m_iOutsideFriendlyLandsInflictDamageChange = 0;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

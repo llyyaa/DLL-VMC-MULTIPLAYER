@@ -134,6 +134,7 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 		ctx.piAttackInflictDamage = &iAttackerDamageInflicted;
 		ctx.piDefenseInflictDamage = &iDefenderDamageInflicted;
 		ctx.bMelee = true;
+		ctx.pCombatInfo = pkCombatInfo;
 		InterveneInflictDamage(&ctx);
 
 		if (kAttacker.GetIgnoreDamageChance() > 0)
@@ -246,6 +247,7 @@ void CvUnitCombat::GenerateMeleeCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender
 		ctx.piAttackInflictDamage = &iAttackerDamageInflicted;
 		ctx.piDefenseInflictDamage = &iDefenderDamageInflicted;
 		ctx.bMelee = true;
+		ctx.pCombatInfo = pkCombatInfo;
 		InterveneInflictDamage(&ctx);
 
 		if (kAttacker.GetIgnoreDamageChance() > 0)
@@ -791,6 +793,7 @@ void CvUnitCombat::GenerateRangedCombatInfo(CvUnit& kAttacker, CvUnit* pkDefende
 		ctx.pAttackerUnit = &kAttacker;
 		ctx.piAttackInflictDamage = &iDamage;
 		ctx.bRanged = true;
+		ctx.pCombatInfo = pkCombatInfo;
 		InterveneInflictDamage(&ctx);
 
 		if (pkDefender->GetIgnoreDamageChance() > 0)
@@ -865,6 +868,7 @@ void CvUnitCombat::GenerateRangedCombatInfo(CvUnit& kAttacker, CvUnit* pkDefende
 		ctx.pAttackerUnit = &kAttacker;
 		ctx.piAttackInflictDamage = &iDamage;
 		ctx.bRanged = true;
+		ctx.pCombatInfo = pkCombatInfo;
 		InterveneInflictDamage(&ctx);
 #endif
 
@@ -981,6 +985,7 @@ void CvUnitCombat::GenerateRangedCombatInfo(CvCity& kAttacker, CvUnit* pkDefende
 		ctx.pAttackerCity = &kAttacker;
 		ctx.piAttackInflictDamage = &iDamage;
 		ctx.bRanged = true;
+		ctx.pCombatInfo = pkCombatInfo;
 		InterveneInflictDamage(&ctx);
 
 		if (pkDefender->GetIgnoreDamageChance() > 0)
@@ -1846,6 +1851,7 @@ void CvUnitCombat::GenerateAirCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender, 
 		ctx.piAttackInflictDamage = &iAttackerDamageInflicted;
 		ctx.piDefenseInflictDamage = &iDefenderDamageInflicted;
 		ctx.bAirCombat = true;
+		ctx.pCombatInfo = pkCombatInfo;
 		InterveneInflictDamage(&ctx);
 
 		if (kAttacker.GetIgnoreDamageChance() > 0)
@@ -1942,6 +1948,7 @@ void CvUnitCombat::GenerateAirCombatInfo(CvUnit& kAttacker, CvUnit* pkDefender, 
 		ctx.piAttackInflictDamage = &iAttackerDamageInflicted;
 		ctx.piDefenseInflictDamage = &iDefenderDamageInflicted;
 		ctx.bAirCombat = true;
+		ctx.pCombatInfo = pkCombatInfo;
 		InterveneInflictDamage(&ctx);
 
 		if (kAttacker.GetIgnoreDamageChance() > 0)
@@ -4822,6 +4829,30 @@ static void SiegeDamageInterveneIfSameReligion(InflictDamageContext* ctx)
 }
 #endif
 
+static void OutsideFriendlyLandsDamageIntervene(InflictDamageContext* ctx)
+{
+	auto* targetPlot = ctx->pCombatInfo ? ctx->pCombatInfo->getPlot() : nullptr;
+	if (targetPlot == nullptr)
+	{
+		return;
+	}
+
+	if (ctx->pAttackerUnit)
+	{
+		if (!targetPlot->IsFriendlyTerritory(ctx->pAttackerUnit->getOwner()))
+		{
+			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOutsideFriendlyLandsInflictDamageChange();
+		}
+	}
+	if (ctx->pDefenderUnit)
+	{
+		if (!targetPlot->IsFriendlyTerritory(ctx->pDefenderUnit->getOwner()))
+		{
+			*ctx->piDefenseInflictDamage += ctx->pAttackerUnit->GetOutsideFriendlyLandsInflictDamageChange();
+		}
+	}
+}
+
 void CvUnitCombat::InterveneInflictDamage(InflictDamageContext* ctx)
 {
 	if (ctx == nullptr) return;
@@ -4830,6 +4861,7 @@ void CvUnitCombat::InterveneInflictDamage(InflictDamageContext* ctx)
 	UnitAttackInflictDamageIntervene(ctx);
 	UnitDefenseInflictDamageIntervene(ctx);
 	SiegeInflictDamageIntervene(ctx);
+	OutsideFriendlyLandsDamageIntervene(ctx);
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	DamageInterveneFromTraitReligion(ctx);

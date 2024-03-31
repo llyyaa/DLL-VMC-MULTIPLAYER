@@ -1067,6 +1067,9 @@ public:
 	void ChangeHeavyChargeCollateralFixed(int iChange);
 	void ChangeHeavyChargeCollateralPercent(int iChange);
 
+	int GetOutsideFriendlyLandsInflictDamageChange() const;
+	void ChangeOutsideFriendlyLandsInflictDamageChange(int iChange);
+
 	int getAmphibCount() const;
 	bool isAmphib() const;
 	void changeAmphibCount(int iChange);
@@ -2594,6 +2597,8 @@ protected:
 	int m_iHeavyChargeExtraDamage = 0;
 	int m_iHeavyChargeCollateralFixed = 0;
 	int m_iHeavyChargeCollateralPercent = 0;
+
+	int m_iOutsideFriendlyLandsInflictDamageChange = 0;
 	
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	CvString m_strUnitName;

@@ -1604,6 +1604,8 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	m_iHeavyChargeCollateralFixed = 0;
 	m_iHeavyChargeCollateralPercent = 0;
 
+	m_iOutsideFriendlyLandsInflictDamageChange = 0;
+
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	m_bIsNewCapture = false;
 #endif
@@ -26507,6 +26509,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeHeavyChargeCollateralFixed(iChange * thisPromotion.GetHeavyChargeCollateralFixed());
 		ChangeHeavyChargeCollateralPercent(iChange * thisPromotion.GetHeavyChargeCollateralPercent());
 
+		ChangeOutsideFriendlyLandsInflictDamageChange(iChange * thisPromotion.GetOutsideFriendlyLandsInflictDamageChange());
+
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 		if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 		{
@@ -27046,6 +27050,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iHeavyChargeCollateralFixed;
 	kStream >> m_iHeavyChargeCollateralPercent;
 
+	kStream >> m_iOutsideFriendlyLandsInflictDamageChange;
+
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	kStream >> m_bIsNewCapture;
 #endif
@@ -27366,6 +27372,8 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iHeavyChargeExtraDamage;
 	kStream << m_iHeavyChargeCollateralFixed;
 	kStream << m_iHeavyChargeCollateralPercent;
+
+	kStream << m_iOutsideFriendlyLandsInflictDamageChange;
 
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	kStream << m_bIsNewCapture;
@@ -31987,7 +31995,14 @@ void CvUnit::ChangeHeavyChargeCollateralPercent(int iChange)
 	m_iHeavyChargeCollateralPercent += iChange;
 }
 
-
+int CvUnit::GetOutsideFriendlyLandsInflictDamageChange() const
+{
+	return m_iOutsideFriendlyLandsInflictDamageChange;
+}
+void CvUnit::ChangeOutsideFriendlyLandsInflictDamageChange(int iChange)
+{
+	m_iOutsideFriendlyLandsInflictDamageChange += iChange;
+}
 
 
 
