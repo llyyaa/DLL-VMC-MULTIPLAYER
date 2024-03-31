@@ -1398,6 +1398,9 @@ public:
 	int GetHurryModifierLocal(HurryTypes eIndex) const;
 	void ChangeHurryModifierLocal(HurryTypes eIndex, int iChange);
 
+	int GetTradeRouteFromTheCityYields(YieldTypes eIndex) const;
+	void ChangeTradeRouteFromTheCityYields(YieldTypes eIndex, int iChange);
+
 protected:
 	FAutoArchiveClassContainer<CvCity> m_syncArchive;
 
@@ -1683,6 +1686,8 @@ protected:
 	std::vector<int> m_aiYieldFromCrime;
 	std::vector<int> m_aiStaticCityYield;
 #endif
+
+	std::tr1::array<int, YieldTypes::NUM_YIELD_TYPES> m_aTradeRouteFromTheCityYields;
 
 	CvCityBuildings* m_pCityBuildings;
 	CvCityStrategyAI* m_pCityStrategyAI;

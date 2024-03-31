@@ -11,6 +11,7 @@
 #define CIV5_BUILDING_CLASSES_H
 
 #include "CvDatabaseUtility.h"
+#include <array>
 
 #define MAX_THEMING_BONUSES 12
 
@@ -573,6 +574,8 @@ public:
 
 	int GetInstantResearchFromFriendlyGreatScientist() const;
 
+	int GetTradeRouteFromTheCityYields(YieldTypes eYieldTypes) const;
+
 private:
 	int m_iBuildingClassType;
 	const CvBuildingClassInfo* m_pkBuildingClassInfo;
@@ -973,6 +976,8 @@ private:
 	bool m_bNoPuppet = false;
 
 	int m_iInstantResearchFromFriendlyGreatScientist = 0;
+
+	std::tr1::array<int, YieldTypes::NUM_YIELD_TYPES> m_aTradeRouteFromTheCityYields;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

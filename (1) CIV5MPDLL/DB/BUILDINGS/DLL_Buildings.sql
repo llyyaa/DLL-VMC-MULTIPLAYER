@@ -43,3 +43,9 @@ ALTER TABLE Buildings ADD 'UnitMaxExperienceLocal' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'ExtraSellRefund' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'ExtraSellRefundModifierPerEra' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'CityDefenseModifierGlobal' INTEGER DEFAULT 0;
+
+CREATE TABLE Building_TradeRouteFromTheCityYields (
+	'BuildingType' text no null references Buildings(Type),
+	'YieldType' text references Yields(Type),
+	'YieldValue' int default 0 not null
+);

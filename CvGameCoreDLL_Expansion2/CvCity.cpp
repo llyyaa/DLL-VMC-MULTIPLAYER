@@ -1605,6 +1605,11 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	}
 	m_paiHurryModifier.clear();
 	m_paiHurryModifier.resize(GC.getNumHurryInfos(), 0);
+
+	for (int i = 0; i < NUM_YIELD_TYPES; ++i)
+	{
+		m_aTradeRouteFromTheCityYields[i] = 0;
+	}
 }
 
 
@@ -7987,7 +7992,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				}
 			}
 
-
+			ChangeTradeRouteFromTheCityYields(eYield, pBuildingInfo->GetTradeRouteFromTheCityYields(eYield) * iChange);
 
 			if ((pBuildingInfo->GetYieldFromBirth(eYield) > 0))
 			{
@@ -9219,6 +9224,25 @@ void CvCity::ChangeHurryModifierLocal(HurryTypes eIndex, int iChange)
 		CvAssertMsg(eIndex < GC.getNumHurryInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
 		m_paiHurryModifier.setAt(eIndex, m_paiHurryModifier[eIndex] + iChange);
 	}
+}
+
+int CvCity::GetTradeRouteFromTheCityYields(YieldTypes eIndex) const
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return 0;
+	}
+
+	return m_aTradeRouteFromTheCityYields[eIndex];
+}
+
+void CvCity::ChangeTradeRouteFromTheCityYields(YieldTypes eIndex, int iChange)
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return;
+	}
+	m_aTradeRouteFromTheCityYields[eIndex] += iChange;
 }
 
 //	--------------------------------------------------------------------------------
@@ -19921,6 +19945,8 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_ppiYieldModifierFromSpecialist;
 	kStream >> m_ppiYieldModifierFromResource;
 
+	kStream >> m_aTradeRouteFromTheCityYields;
+
 	if (uiVersion >= 3)
 	{
 		kStream >> m_iExtraHitPoints;
@@ -20296,6 +20322,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_ppiYieldModifierFromImprovement;
 	kStream << m_ppiYieldModifierFromSpecialist;
 	kStream << m_ppiYieldModifierFromResource;
+
+	kStream << m_aTradeRouteFromTheCityYields;
 
 	kStream << m_iExtraHitPoints;
 }

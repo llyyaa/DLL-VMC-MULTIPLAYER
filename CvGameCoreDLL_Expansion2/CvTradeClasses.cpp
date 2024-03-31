@@ -2714,6 +2714,8 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 				break;
 			}
 		}
+
+		iValue += pOriginCity->GetTradeRouteFromTheCityYields(eYield) * 100;
 	}
 	else
 	{

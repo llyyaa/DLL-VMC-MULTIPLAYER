@@ -1789,6 +1789,34 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	}
 #endif
 
+	// int GetTradeRouteFromTheCityYields(YieldTypes eYieldTypes);
+	{
+		for (size_t i = 0; i < NUM_YIELD_TYPES; i++)
+		{
+			m_aTradeRouteFromTheCityYields[i] = 0;
+		}
+
+		std::string strKey("Building_TradeRouteFromTheCityYields");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == nullptr)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select YieldType, YieldValue from Building_TradeRouteFromTheCityYields where BuildingType = ?");
+		}
+		pResults->Bind(1, szBuildingType);
+
+		while (pResults->Step())
+		{
+			const auto yieldType = (YieldTypes) GC.getInfoTypeForString(pResults->GetText(0));
+			const int yieldValue = pResults->GetInt(1);
+			if (yieldType >= 0 && yieldType < NUM_YIELD_TYPES)
+			{
+				m_aTradeRouteFromTheCityYields[yieldType] = yieldValue;
+			}
+		}
+
+		pResults->Reset();
+	}
+
 #ifdef MOD_GLOBAL_CITY_SCALES
 	m_bEnableAllCityScaleGrowth = kResults.GetBool("EnableAllCityScaleGrowth");
 	auto* strCityScale = kResults.GetText("EnableCityScaleGrowth");
@@ -4261,6 +4289,17 @@ int CvBuildingEntry::GetGoldenAgeMeterMod() const
 	return this->m_iGoldenAgeMeterMod;
 }
 #endif
+
+int CvBuildingEntry::GetTradeRouteFromTheCityYields(YieldTypes eYieldTypes) const
+{
+	if (eYieldTypes < 0 || eYieldTypes >= NUM_YIELD_TYPES)
+	{
+		return 0;
+	}
+
+	return m_aTradeRouteFromTheCityYields[eYieldTypes];
+}
+
 
 //=====================================
 // CvBuildingXMLEntries
