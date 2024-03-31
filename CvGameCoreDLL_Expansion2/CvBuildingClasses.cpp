@@ -725,6 +725,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 	m_iInstantResearchFromFriendlyGreatScientist = kResults.GetInt("InstantResearchFromFriendlyGreatScientist");
 
+	m_iGlobalGrowthFoodNeededModifier = kResults.GetInt("GlobalGrowthFoodNeededModifier");
+
 	//References
 	const char* szTextVal;
 	szTextVal = kResults.GetText("BuildingClass");
@@ -2461,6 +2463,10 @@ bool CvBuildingEntry::IsNoPuppet() const {
 
 int CvBuildingEntry::GetInstantResearchFromFriendlyGreatScientist() const {
 	return m_iInstantResearchFromFriendlyGreatScientist;
+}
+
+int CvBuildingEntry::GetGlobalGrowthFoodNeededModifier() const {
+	return m_iGlobalGrowthFoodNeededModifier;
 }
 
 int CvBuildingEntry::GetExtraAttacks() const

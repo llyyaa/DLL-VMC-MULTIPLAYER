@@ -2250,6 +2250,9 @@ public:
 
 	void DoInstantResearchFromFriendlyGreatScientist(CvUnit* pUnit, int iX, int iY);
 
+	int GetGlobalGrowthFoodNeededModifier() const;
+	void ChangeGlobalGrowthFoodNeededModifier(int iChange);
+
 	const std::vector<int>& GetSecondCapitals() const;
 	void AddSecondCapital(int iNewSecondCapitalID);
 	void RemoveSecondCapital(int iSecondCapitalID);
@@ -2959,6 +2962,8 @@ protected:
 	std::tr1::array<unsigned long long, MAX_MAJOR_CIVS> m_aScienceTimes100FromMajorFriends; // length = MAX_MAJOR_CIVS
 
 	int m_iInstantResearchFromFriendlyGreatScientist = 0;
+
+	int m_iGlobalGrowthFoodNeededModifier = 0;
 };
 
 extern bool CancelActivePlayerEndTurn();

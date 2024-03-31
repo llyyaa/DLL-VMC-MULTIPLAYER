@@ -49,3 +49,5 @@ CREATE TABLE Building_TradeRouteFromTheCityYields (
 	'YieldType' text references Yields(Type),
 	'YieldValue' int default 0 not null
 );
+
+ALTER TABLE Buildings ADD 'GlobalGrowthFoodNeededModifier' INTEGER DEFAULT 0;

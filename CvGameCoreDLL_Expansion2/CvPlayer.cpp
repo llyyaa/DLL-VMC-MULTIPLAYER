@@ -10173,6 +10173,8 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 	ChangeInstantResearchFromFriendlyGreatScientist(pBuildingInfo->GetInstantResearchFromFriendlyGreatScientist() * iChange);
 
+	ChangeGlobalGrowthFoodNeededModifier(pBuildingInfo->GetGlobalGrowthFoodNeededModifier() * iChange);
+
 	// Loop through Cities
 	int iLoop = 0;
 	int iBuildingCount = 0;
@@ -28565,6 +28567,8 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_iInstantResearchFromFriendlyGreatScientist;
 
+	kStream >> m_iGlobalGrowthFoodNeededModifier;
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -29223,6 +29227,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aScienceTimes100FromMajorFriends;
 
 	kStream << m_iInstantResearchFromFriendlyGreatScientist;
+
+	kStream << m_iGlobalGrowthFoodNeededModifier;
 }
 
 //	--------------------------------------------------------------------------------
@@ -29650,6 +29656,9 @@ int CvPlayer::getGrowthThreshold(int iPopulation) const
 		iThreshold *= this->GetPlayerTraits()->GetGoldenAgeGrowThresholdModifier() + 100;
 		iThreshold /= 100;
 	}
+
+	iThreshold *= this->GetGlobalGrowthFoodNeededModifier() + 100;
+	iThreshold /= 100;
 
 	return std::max(1, iThreshold);
 }
@@ -33190,6 +33199,15 @@ void CvPlayer::DoInstantResearchFromFriendlyGreatScientist(CvUnit* pUnit, int iX
 		if (GetID() == this->GetID())
 			bHasBoostThisPlayer = true;
 	}
+}
+
+int CvPlayer::GetGlobalGrowthFoodNeededModifier() const
+{
+	return m_iGlobalGrowthFoodNeededModifier;
+}
+void CvPlayer::ChangeGlobalGrowthFoodNeededModifier(int iChange)
+{
+	m_iGlobalGrowthFoodNeededModifier += iChange;
 }
 
 const std::vector<int>& CvPlayer::GetSecondCapitals() const
