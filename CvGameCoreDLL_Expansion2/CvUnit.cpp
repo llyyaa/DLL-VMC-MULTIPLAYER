@@ -1611,6 +1611,11 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 #endif
 	m_bIsBatchMark = false;
 
+	for (int i = 0; i < NUM_YIELD_TYPES; ++i)
+	{
+		m_aiInstantYieldPerReligionFollowerConverted[i] = 0;
+	}
+
 	if(!bConstructorCall)
 	{
 		m_Promotions.Reset();
@@ -10694,6 +10699,8 @@ bool CvUnit::DoSpreadReligion()
 							{
 								iYieldBonus += pReligion->m_Beliefs.GetSciencePerOtherReligionFollower();
 							}
+
+							iYieldBonus += this->GetInstantYieldPerReligionFollowerConverted(eYield);
 
 							if (iYieldBonus > 0)
 							{
@@ -26280,6 +26287,11 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeNoSupply(thisPromotion.IsNoSupply() ? iChange : 0);
 #endif
 
+		for (int i = 0; i < NUM_YIELD_TYPES; ++i)
+		{
+			ChangeInstantYieldPerReligionFollowerConverted((YieldTypes) i, thisPromotion.GetInstantYieldPerReligionFollowerConverted((YieldTypes) i) * iChange);
+		}
+
 #if defined(MOD_UNITS_MAX_HP)
 		changeMaxHitPointsChange(thisPromotion.GetMaxHitPointsChange() * iChange);
 		changeMaxHitPointsModifier(thisPromotion.GetMaxHitPointsModifier() * iChange);
@@ -27059,6 +27071,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCombatStrengthChangeFromKilledUnits;
 	kStream >> m_iRangedCombatStrengthChangeFromKilledUnits;
 
+	kStream >> m_aiInstantYieldPerReligionFollowerConverted;
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -27381,6 +27394,8 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iCombatStrengthChangeFromKilledUnits;
 	kStream << m_iRangedCombatStrengthChangeFromKilledUnits;
+
+	kStream << m_aiInstantYieldPerReligionFollowerConverted;
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -32119,4 +32134,23 @@ int CvUnit::GetNumTimesAttackedThisTurn(PlayerTypes ePlayer) const
 	CvAssertMsg(ePlayer >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(ePlayer < REALLY_MAX_PLAYERS, "eIndex expected to be < NUM_DOMAIN_TYPES");
 	return m_aiNumTimesAttackedThisTurn[ePlayer];
+}
+
+int CvUnit::GetInstantYieldPerReligionFollowerConverted(YieldTypes eIndex) const
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return 0;
+	}
+
+	return m_aiInstantYieldPerReligionFollowerConverted[eIndex];
+}
+void CvUnit::ChangeInstantYieldPerReligionFollowerConverted(YieldTypes eIndex, int iChange)
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return;
+	}
+
+	m_aiInstantYieldPerReligionFollowerConverted[eIndex] += iChange;
 }

@@ -249,3 +249,9 @@ ALTER TABLE Improvements ADD COLUMN 'RequiredAdjacentImprovement' TEXT DEFAULT N
 ALTER TABLE Improvements ADD COLUMN 'RequiredAdjacentCity' BOOLEAN DEFAULT 0;
 ALTER TABLE Units ADD COLUMN 'BarbarianCanTrait' BOOLEAN DEFAULT false;
 ALTER TABLE Units ADD COLUMN 'BarbarianTraitTechObsolete' BOOLEAN DEFAULT false;
+
+CREATE TABLE IF NOT EXISTS UnitPromotions_InstantYieldPerReligionFollowerConverted (
+    `PromotionType` TEXT DEFAULT '' references UnitPromotions(Type),
+    `YieldType` TEXT DEFAULT '' references Yields(Type),
+    `Yield` INTEGER DEFAULT 0
+);

@@ -1419,6 +1419,41 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	}
 #endif
 
+	{
+		for (int i = 0; i < NUM_YIELD_TYPES; ++i) {
+			m_aiInstantYieldPerReligionFollowerConverted[i] = 0;
+		}
+		// UnitPromotions_InstantYieldPerReligionFollowerConverted
+		std::string sqlKey = "UnitPromotions_InstantYieldPerReligionFollowerConverted";
+		Database::Results* pResults = kUtility.GetResults(sqlKey);
+		if (pResults == nullptr)
+		{
+			const char* sql = "select YieldType, Yield from UnitPromotions_InstantYieldPerReligionFollowerConverted where PromotionType = ?";
+			pResults = kUtility.PrepareResults(sqlKey, sql);
+		}
+
+		CvAssert(pResults);
+		if (pResults == nullptr)
+		{
+			return false;
+		}
+
+		pResults->Bind(1, szPromotionType);
+
+		while (pResults->Step())
+		{
+			const YieldTypes yieldType = (YieldTypes) GC.getInfoTypeForString(pResults->GetText(0));
+			if (yieldType == -1)
+			{
+				continue;
+			}
+			const int yieldValue = pResults->GetInt(1);
+			m_aiInstantYieldPerReligionFollowerConverted[yieldType] = yieldValue;
+		}
+
+		pResults->Reset();
+	}
+
 	kUtility.PopulateArrayByExistence(m_pbPostCombatRandomPromotion,
 		"UnitPromotions",
 		"UnitPromotions_PostCombatRandomPromotion",
@@ -3650,6 +3685,15 @@ int CvPromotionEntry::GetHeavyChargeCollateralPercent() const
 int CvPromotionEntry::GetOutsideFriendlyLandsInflictDamageChange() const
 {
 	return m_iOutsideFriendlyLandsInflictDamageChange;
+}
+
+int CvPromotionEntry::GetInstantYieldPerReligionFollowerConverted(YieldTypes eIndex) const
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return 0;
+	}
+	return m_aiInstantYieldPerReligionFollowerConverted[eIndex];
 }
 
 #ifdef MOD_PROMOTION_ADD_ENEMY_PROMOTIONS

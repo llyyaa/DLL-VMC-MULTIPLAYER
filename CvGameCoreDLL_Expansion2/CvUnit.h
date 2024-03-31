@@ -2085,6 +2085,9 @@ public:
 	CvString GetPlotCorruptionScoreReport() const;
 #endif
 
+	int GetInstantYieldPerReligionFollowerConverted(YieldTypes eIndex) const;
+	void ChangeInstantYieldPerReligionFollowerConverted(YieldTypes eIndex, int iChange);
+
 protected:
 	const MissionQueueNode* HeadMissionQueueNode() const;
 	MissionQueueNode* HeadMissionQueueNode();
@@ -2637,6 +2640,8 @@ protected:
 
 	int m_iCombatStrengthChangeFromKilledUnits = 0;
 	int m_iRangedCombatStrengthChangeFromKilledUnits = 0;
+
+	std::tr1::array<int, NUM_YIELD_TYPES> m_aiInstantYieldPerReligionFollowerConverted;
 
 private:
 
