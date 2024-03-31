@@ -4837,18 +4837,18 @@ static void OutsideFriendlyLandsDamageIntervene(InflictDamageContext* ctx)
 		return;
 	}
 
-	if (ctx->pAttackerUnit)
+	if (ctx->pAttackerUnit && ctx->piAttackInflictDamage)
 	{
 		if (!targetPlot->IsFriendlyTerritory(ctx->pAttackerUnit->getOwner()))
 		{
 			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOutsideFriendlyLandsInflictDamageChange();
 		}
 	}
-	if (ctx->pDefenderUnit)
+	if (ctx->pDefenderUnit && ctx->piDefenseInflictDamage)
 	{
 		if (!targetPlot->IsFriendlyTerritory(ctx->pDefenderUnit->getOwner()))
 		{
-			*ctx->piDefenseInflictDamage += ctx->pAttackerUnit->GetOutsideFriendlyLandsInflictDamageChange();
+			*ctx->piDefenseInflictDamage += ctx->pDefenderUnit->GetOutsideFriendlyLandsInflictDamageChange();
 		}
 	}
 }
