@@ -3329,6 +3329,10 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 	if(m_CurrentDeals.size() > 0)
 	{
 		bool bSomethingChanged = false;
+		int iGoldToCompensate = 0;
+		int iDealDuration = GC.getGame().GetDealDuration();
+		const PlayerTypes eAttackPlayer = eFromPlayer;
+		const PlayerTypes eDefensePlayer = eToPlayer;
 
 		// Copy the deals into a temporary container
 		for(it = m_CurrentDeals.begin(); it != m_CurrentDeals.end(); ++it)
@@ -3345,6 +3349,7 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 			{
 				// Change final turn
 				it->m_iFinalTurn = GC.getGame().getGameTurn();
+				int iDurationTurn = it->m_iFinalTurn - it->m_iStartTurn;
 
 				// Cancel individual items
 				TradedItemList::iterator itemIter;
@@ -3358,6 +3363,11 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 					eToPlayer = it->GetOtherPlayer(eFromPlayer);
 
 					DoEndTradedItem(&*itemIter, eToPlayer, true);
+
+					if(itemIter->m_eItemType == TRADE_ITEM_GOLD && eFromPlayer == eDefensePlayer)
+					{
+						iGoldToCompensate += itemIter->m_iData1 * (iDealDuration - iDurationTurn) / iDealDuration;
+					}
 				}
 				m_HistoricalDeals.push_back(*it);
 			}
@@ -3374,6 +3384,46 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 			if(eFromPlayer == eActivePlayer || eToPlayer == eActivePlayer)
 			{
 				GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
+			}
+
+			if(MOD_SP_SMART_AI && iGoldToCompensate > iDealDuration * iDealDuration)
+			{
+				CvPlayerAI& pAttackPlayer = GET_PLAYER(eAttackPlayer);
+				if(!pAttackPlayer.isHuman()) return;
+				CvPlayerAI& pDefensePlayer = GET_PLAYER(eDefensePlayer);
+				
+				int iAttackGold = pAttackPlayer.GetTreasury()->GetGold();
+				int iAttackGoldShort = iGoldToCompensate - iAttackGold;
+				if(iAttackGoldShort > 0)
+				{
+					pAttackPlayer.ChangeDishonestyCounter(iAttackGoldShort / iDealDuration);
+				}
+				pAttackPlayer.GetTreasury()->ChangeGold(-iGoldToCompensate);
+				pDefensePlayer.GetTreasury()->ChangeGold(iGoldToCompensate);
+				if (eAttackPlayer == eActivePlayer)
+				{
+					CvNotifications *pNotifications = pAttackPlayer.GetNotifications();
+					if (pNotifications)
+					{
+						Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY");
+						strMessage << pDefensePlayer.getName();
+						strMessage << iGoldToCompensate;
+						Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_SHORT");
+						pNotifications->Add(NOTIFICATION_DEAL_EXPIRED_GPT, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, -1);
+					}
+				}
+				if(eDefensePlayer == eActivePlayer)
+				{
+					CvNotifications *pNotifications = pDefensePlayer.GetNotifications();
+					if (pNotifications)
+					{
+						Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_2");
+						strMessage << pAttackPlayer.getName();
+						strMessage << iGoldToCompensate;
+						Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_SHORT");
+						pNotifications->Add(NOTIFICATION_DEAL_EXPIRED_GPT, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, -1);
+					}
+				}
 			}
 		}
 	}

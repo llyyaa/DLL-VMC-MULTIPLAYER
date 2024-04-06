@@ -1048,6 +1048,7 @@ public:
 	int GetSupportedMyProposalScore(PlayerTypes ePlayer);
 	int GetFoiledMyProposalScore(PlayerTypes ePlayer);
 	int GetSupportedMyHostingScore(PlayerTypes ePlayer);
+	int GetWeBreakOurComplianceScore(PlayerTypes ePlayer);
 #if defined(MOD_EVENTS_DIPLO_MODIFIERS)
 	int GetDiploModifiers(PlayerTypes ePlayer, std::vector<Opinion>& aOpinions);
 #endif

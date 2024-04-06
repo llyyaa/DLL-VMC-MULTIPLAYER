@@ -11273,6 +11273,15 @@ int CvLuaPlayer::lGetOpinionTable(lua_State* L)
 		aOpinions.push_back(kOpinion);
 	}
 
+	iValue = pDiploAI->GetWeBreakOurComplianceScore(eWithPlayer);
+	if (iValue != 0)
+	{
+		Opinion kOpinion;
+		kOpinion.m_iValue = iValue;
+		kOpinion.m_str = Localization::Lookup("TXT_KEY_DIPLO_BREAK_COMPLIANCE");
+		aOpinions.push_back(kOpinion);
+	}
+
 	iValue = pDiploAI->GetAngryAboutProtectedMinorKilledScore(eWithPlayer);
 	if (iValue != 0)
 	{

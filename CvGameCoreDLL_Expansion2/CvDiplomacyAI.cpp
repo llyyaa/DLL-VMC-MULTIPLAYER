@@ -2579,6 +2579,8 @@ int CvDiplomacyAI::GetMajorCivOpinionWeight(PlayerTypes ePlayer)
 
 	iOpinionWeight += GetBrokenCoopWarPromiseScore(ePlayer);
 
+	iOpinionWeight += GetWeBreakOurComplianceScore(ePlayer);
+
 	//////////////////////////////////////
 	// PROTECTED MINORS
 	//////////////////////////////////////
@@ -24308,6 +24310,13 @@ int CvDiplomacyAI::GetSupportedMyHostingScore(PlayerTypes ePlayer)
 	{
 		iOpinionWeight += GC.getOPINION_WEIGHT_THEY_SUPPORTED_OUR_HOSTING();	
 	}
+	return iOpinionWeight;
+}
+
+int CvDiplomacyAI::GetWeBreakOurComplianceScore(PlayerTypes ePlayer)
+{
+	int iOpinionWeight = 0;
+	iOpinionWeight += GET_PLAYER(ePlayer).GetDishonestyCounter();
 	return iOpinionWeight;
 }
 

@@ -666,6 +666,20 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY_SHORT">
 			<Text>一批公民離開了城市！</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY">
+			<Text>由於戰爭的爆發，妳與{1_name}之間的大額貿易被迫（通過沒收妳在外國的資產等方式）提前結清，妳[COLOR_NEGATIVE_TEXT]失去{2_num}[ICON_GOLD]金錢[ENDCOLOR]。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_2">
+			<Text>由於戰爭的爆發，妳與{1_name}之間的大額貿易被迫（通過沒收他在本國的資產等方式）提前結清，妳[COLOR_POSITIVE_TEXT]獲得{2_num}[ICON_GOLD]金錢[ENDCOLOR]。</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_SHORT">
+			<Text>交易被迫結清！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_DIPLO_BREAK_COMPLIANCE">
+			<Text>[COLOR_NEGATIVE_TEXT]您曾經簽訂大規模交易合約，但沒有履行到底！[ENDCOLOR]</Text>
+		</Row>
+
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_LOCAL">
 			<Text>[NEWLINE][ICON_BULLET]城邦商路本地修正: {1_Num}%</Text>
 		</Row>

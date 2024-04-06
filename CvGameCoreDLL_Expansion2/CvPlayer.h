@@ -2090,6 +2090,8 @@ public:
 	bool GetCanFoundCoastCity() const;
 #endif
 
+	int GetDishonestyCounter() const;
+	void ChangeDishonestyCounter(const int iChange);
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int GetWarCasualtiesCounter() const;
 	void ChangeWarCasualtiesCounter(const int iChange);
@@ -2904,6 +2906,7 @@ protected:
 
 	CvPlayerAchievements m_kPlayerAchievements;
 
+	int m_iDishonestyCounter = 0;
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int m_iWarCasualtiesCounter = 0;
 #endif

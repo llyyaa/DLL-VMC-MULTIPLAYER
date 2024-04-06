@@ -28500,6 +28500,7 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	m_kPlayerAchievements.Read(kStream);
 
+	kStream >> m_iDishonestyCounter;
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	kStream >> m_iWarCasualtiesCounter;
 	kStream >> m_iWarCasualtiesModifier;
@@ -29161,6 +29162,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	m_kPlayerAchievements.Write(kStream);
 
+	kStream << m_iDishonestyCounter;
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	kStream << m_iWarCasualtiesCounter;
 	kStream << m_iWarCasualtiesModifier;
@@ -32370,6 +32372,15 @@ int CvPlayer::GetNumWorldWonders()
 
 }
 #endif
+
+int CvPlayer::GetDishonestyCounter() const
+{
+	return m_iDishonestyCounter;
+}
+void CvPlayer::ChangeDishonestyCounter(const int iChange)
+{
+	m_iDishonestyCounter += iChange;
+}
 
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 int CvPlayer::GetWarCasualtiesCounter() const

@@ -663,6 +663,20 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SETTLER_TRAINED_CITY_SHORT">
 			<Text>Citizen Left the city!</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY">
+			<Text>Due to the outbreak of the war, your loans Trade with {1_name} was forced to be settled early (by confiscating your foreign assets, etc.), and you [COLOR_NEGATIVE_TEXT] lost {2_num}[ICON_GOLD] Gold [ENDCOLOR].</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_2">
+			<Text>Due to the outbreak of the war, your loans Trade with {1_name} was forced to be settled early (by confiscating their foreign assets, etc.), and you [COLOR_POSITIVE_TEXT] get {2_num}[ICON_GOLD] Gold [ENDCOLOR].</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_SHORT">
+			<Text>Transaction forced to close!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_DIPLO_BREAK_COMPLIANCE">
+			<Text>[COLOR_NEGATIVE_TEXT]You have signed a large trading contract, but did not follow through![ENDCOLOR]</Text>
+		</Row>
+
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_MINOR_TRADE_LOCAL">
 			<Text>[NEWLINE][ICON_BULLET]Modifier for Minor Trade local: {1_Num}%</Text>
 		</Row>
