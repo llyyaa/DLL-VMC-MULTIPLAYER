@@ -323,6 +323,7 @@ private:
 	// Class data
 	CvPlayer* m_pPlayer;
 	std::list<int> m_CurrentTurnUnits;
+	std::list<CvPlot*> m_lPlayerPlots;
 
 	MoveUnitsArray m_CurrentMoveUnits;
 	MoveUnitsArray m_CurrentMoveHighPriorityUnits;

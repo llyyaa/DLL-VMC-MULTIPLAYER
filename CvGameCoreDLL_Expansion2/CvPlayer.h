@@ -1750,6 +1750,7 @@ public:
 	void UpdatePlots();  // Modifies the list of plots and sets which ones the player owns
 	void AddAPlot(CvPlot* pPlot); // adds a plot at the end of the list
 	CvPlotsVector& GetPlots();  // gets the list of plots the player owns
+	void AddPlotsToList(std::list<CvPlot*>& lTargetList);
 	int GetNumPlots() const;
 
 	int GetNumPlotsBought() const;

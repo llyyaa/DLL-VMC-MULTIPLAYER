@@ -9663,7 +9663,10 @@ int CvLuaPlayer::lGetRecommendedWorkerPlots(lua_State* L)
 	bool bUseDirective[cuiDirectiveSize];
 	CvPlot* pDirectivePlots[cuiDirectiveSize] = {0};
 
-	pkPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pWorkerUnit, aDirective, cuiDirectiveSize, true, false, MOD_UNITS_LOCAL_WORKERS && pkPlayer->isHuman());
+	std::list<CvPlot*> lPlayerPlots;
+	pkPlayer->AddPlotsToList(lPlayerPlots);
+
+	pkPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pWorkerUnit, aDirective, cuiDirectiveSize, lPlayerPlots, true, false, MOD_UNITS_LOCAL_WORKERS);
 
 	for(uint ui = 0; ui < cuiDirectiveSize; ui++)
 	{

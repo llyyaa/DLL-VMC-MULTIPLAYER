@@ -74,7 +74,7 @@ public:
 	void Update(void);
 	void UpdateRoutePlots(void);
 
-	bool EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDirectives, UINT uaDirectives, bool bKeepOnlyBest = false, bool bOnlyEvaluateWorkersPlot = false, bool bLimit = false);
+	bool EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDirectives, UINT uaDirectives, std::list<CvPlot*>& lPlayerPlots, bool bKeepOnlyBest = false, bool bOnlyEvaluateWorkersPlot = false, bool bLimit = false);
 
 	void AddImprovingResourcesDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMoveTurnsAway);
 	void AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMoveTurnsAway);
