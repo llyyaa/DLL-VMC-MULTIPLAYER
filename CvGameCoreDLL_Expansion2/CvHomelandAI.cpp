@@ -1289,13 +1289,13 @@ void CvHomelandAI::PlotOpportunisticSettlementMoves()
 #endif
 
 /// Find something for all workers to do
-#if defined(MOD_AI_SECONDARY_WORKERS)
 void CvHomelandAI::PlotWorkerMoves(bool bSecondary)
-#else
-void CvHomelandAI::PlotWorkerMoves()
-#endif
 {
 	ClearCurrentMoveUnits();
+	if (m_pPlayer->IsAtWar())
+	{
+		bSecondary = false;
+	}
 
 	// Loop through all recruited units
 	for(list<int>::iterator it = m_CurrentTurnUnits.begin(); it != m_CurrentTurnUnits.end(); ++it)
@@ -1303,15 +1303,9 @@ void CvHomelandAI::PlotWorkerMoves()
 		UnitHandle pUnit = m_pPlayer->getUnit(*it);
 		if(pUnit)
 		{
-#if defined(MOD_AI_SECONDARY_WORKERS)
 			bool bUsePrimaryUnit = (pUnit->AI_getUnitAIType() == UNITAI_WORKER || pUnit->IsAutomated() && pUnit->getDomainType() == DOMAIN_LAND && pUnit->GetAutomateType() == AUTOMATE_BUILD);
 			bool bUseSecondaryUnit = (pUnit->AI_getUnitAIType() != UNITAI_WORKER && (pUnit->getUnitInfo().GetUnitAIType(UNITAI_WORKER) || pUnit->getUnitInfo().GetUnitAIType(UNITAI_WORKER_SEA)) && pUnit->getDomainType() == DOMAIN_LAND);
-
 			if((!bSecondary && bUsePrimaryUnit) || (bSecondary && bUseSecondaryUnit))
-#else
-			if(pUnit->AI_getUnitAIType() == UNITAI_WORKER  ||
-			        pUnit->IsAutomated() && pUnit->getDomainType() == DOMAIN_LAND && pUnit->GetAutomateType() == AUTOMATE_BUILD)
-#endif
 			{
 				CvHomelandUnit unit;
 				unit.SetID(pUnit->GetID());
@@ -1322,11 +1316,7 @@ void CvHomelandAI::PlotWorkerMoves()
 
 	if(m_CurrentMoveUnits.size() > 0)
 	{
-#if defined(MOD_AI_SECONDARY_WORKERS)
 		ExecuteWorkerMoves(bSecondary);
-#else
-		ExecuteWorkerMoves();
-#endif
 	}
 }
 
@@ -2814,11 +2804,7 @@ void CvHomelandAI::ExecuteExplorerMoves()
 }
 
 /// Moves units to explore the map
-#if defined(MOD_AI_SECONDARY_WORKERS)
 void CvHomelandAI::ExecuteWorkerMoves(bool bSecondary)
-#else
-void CvHomelandAI::ExecuteWorkerMoves()
-#endif
 {
 	CvString strLogString;
 
@@ -2873,11 +2859,7 @@ void CvHomelandAI::ExecuteWorkerMoves()
 				}
 			}
 
-#if defined(MOD_AI_SECONDARY_WORKERS)
 			bool bActionPerformed = ExecuteWorkerMove(pUnit.pointer(), bSecondary);
-#else
-			bool bActionPerformed = ExecuteWorkerMove(pUnit.pointer());
-#endif
 			if(bActionPerformed)
 			{
 				continue;
@@ -5952,11 +5934,7 @@ void CvHomelandAI::UnitProcessed(int iID)
 	pUnit->SetTurnProcessed(true);
 }
 
-#if defined(MOD_AI_SECONDARY_WORKERS)
 bool CvHomelandAI::ExecuteWorkerMove(CvUnit* pUnit, bool bSecondary)
-#else
-bool CvHomelandAI::ExecuteWorkerMove(CvUnit* pUnit)
-#endif
 {
 #if defined(MOD_AI_SECONDARY_WORKERS)
 	// if (bSecondary) CUSTOMLOG("ExecuteWorkerMove(secondary) for %s at (%i, %i)", pUnit->getName().c_str(), pUnit->plot()->getX(), pUnit->plot()->getY());
@@ -5965,11 +5943,8 @@ bool CvHomelandAI::ExecuteWorkerMove(CvUnit* pUnit)
 	BuilderDirective aDirective[ ciDirectiveSize ];
 
 	// evaluator
-#if defined(MOD_AI_SECONDARY_WORKERS)
 	bool bHasDirective = m_pPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pUnit, aDirective, ciDirectiveSize, false, false, bSecondary);
-#else
-	bool bHasDirective = m_pPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pUnit, aDirective, ciDirectiveSize);
-#endif
+	
 	if(bHasDirective)
 	{
 		switch(aDirective[0].m_eDirective)
