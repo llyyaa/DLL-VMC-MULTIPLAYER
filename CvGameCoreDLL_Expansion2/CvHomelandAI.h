@@ -238,11 +238,7 @@ private:
 	void PlotOpportunisticSettlementMoves();
 #endif
 	void PlotSentryMoves();
-#if defined(MOD_AI_SECONDARY_WORKERS)
 	void PlotWorkerMoves(bool bSecondary = false);
-#else
-	void PlotWorkerMoves();
-#endif
 	void PlotWorkerSeaMoves();
 	void PlotPatrolMoves();
 	void PlotUpgradeMoves();
@@ -270,11 +266,7 @@ private:
 	// Routines to execute homeland moves
 	void ExecuteFirstTurnSettlerMoves();
 	void ExecuteExplorerMoves();
-#if defined(MOD_AI_SECONDARY_WORKERS)
 	void ExecuteWorkerMoves(bool bSecondary = false);
-#else
-	void ExecuteWorkerMoves();
-#endif
 	bool ExecuteWorkerSeaMoves(CvHomelandTarget target, CvPlot* pTarget);
 	void ExecuteMovesToSafestPlot();
 	void ExecuteHeals();
@@ -317,11 +309,7 @@ private:
 	CvCity* ChooseBestFreeWonderCity(BuildingTypes eWonder, UnitHandle pEngineer);
 	CvPlot* FindArchaeologistTarget(CvUnit *pUnit);
 	void UnitProcessed(int iID);
-#if defined(MOD_AI_SECONDARY_WORKERS)
 	bool ExecuteWorkerMove(CvUnit* pUnit, bool bSecondary = false);
-#else
-	bool ExecuteWorkerMove(CvUnit* pUnit);
-#endif
 	bool ExecuteCultureBlast(CvUnit* pUnit);
 	bool ExecuteGoldenAgeMove(CvUnit* pUnit);
 	bool IsValidExplorerEndTurnPlot(const CvUnit* pUnit, CvPlot* pPlot) const;
