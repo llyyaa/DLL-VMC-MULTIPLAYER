@@ -2328,9 +2328,11 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_NeedTileImprovers(AICityStrategyT
 	else
 	{
 #if defined(MOD_AI_SMART_V3)
+#endif
 		int iNumCities = 1;
 		
-		if (MOD_AI_SMART_V3)
+		// for SP, AI will cheat to improve tiles, so, simplify it
+		if (MOD_AI_SMART_V3 && !MOD_SP_SMART_AI)
 		{
 			CvCity* pLoopCity = NULL;
 			int iLoop = 0;
@@ -2409,11 +2411,9 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_NeedTileImprovers(AICityStrategyT
 		}
 		else
 		{
-			iNumCities = max(1, (iCurrentNumCities * 3) / 4);
+			if(MOD_SP_SMART_AI && iNumCities < 10) iNumCities = max(1, (iCurrentNumCities * 3) / 2);
+			else iNumCities = max(1, (iCurrentNumCities * 3) / 4);
 		}
-#else
-		int iNumCities = max(1, (iCurrentNumCities * 3) / 4);
-#endif
 		if(iNumWorkers >= iNumCities)
 			return false;
 	}

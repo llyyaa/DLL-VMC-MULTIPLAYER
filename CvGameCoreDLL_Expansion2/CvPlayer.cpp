@@ -29750,6 +29750,28 @@ CvPlotsVector& CvPlayer::GetPlots(void)
 }
 
 //	--------------------------------------------------------------------------------
+void CvPlayer::AddPlotsToList(std::list<CvPlot*>& lTargetList)
+{
+	lTargetList.clear();
+	CvPlot *pPlot = NULL;
+	for(uint uiPlotIndex = 0; uiPlotIndex < m_aiPlots.size(); uiPlotIndex++)
+	{
+		// when we encounter the first plot that is invalid, the rest of the list will be invalid
+		if(m_aiPlots[uiPlotIndex] == -1) return;
+		pPlot = GC.getMap().plotByIndex(m_aiPlots[uiPlotIndex]);
+		// if plot is impassable, bail!
+		if(pPlot->isImpassable() || pPlot->isMountain())
+		{
+			continue;
+		}
+		if(GetPlotDanger(*pPlot) > 0)
+		{
+			continue;
+		} 
+		lTargetList.push_back(pPlot);
+	}
+}
+//	--------------------------------------------------------------------------------
 /// How many plots does this player own?
 int CvPlayer::GetNumPlots() const
 {

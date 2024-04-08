@@ -3060,7 +3060,10 @@ bool CvUnit::isActionRecommended(int iAction)
 		const int ciDirectiveSize = 1;
 		BuilderDirective aDirective[ ciDirectiveSize ];
 
-		GET_PLAYER(getOwner()).GetBuilderTaskingAI()->EvaluateBuilder(this, aDirective, ciDirectiveSize, false, true);
+		std::list<CvPlot*> lPlayerPlots;
+		lPlayerPlots.clear();
+		if(plot()->getOwner() == getOwner()) lPlayerPlots.push_back(plot());
+		GET_PLAYER(getOwner()).GetBuilderTaskingAI()->EvaluateBuilder(this, aDirective, ciDirectiveSize, lPlayerPlots, false, true);
 
 		if(aDirective[0].m_eDirective != BuilderDirective::NUM_DIRECTIVES && aDirective[0].m_eBuild == eBuild)
 		{

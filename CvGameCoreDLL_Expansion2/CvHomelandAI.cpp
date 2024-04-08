@@ -701,6 +701,8 @@ void CvHomelandAI::AssignHomelandMoves()
 {
 	FStaticVector< CvHomelandMove, 64, true, c_eCiv5GameplayDLL >::iterator it;
 
+	m_pPlayer->AddPlotsToList(m_lPlayerPlots);
+
 	// Proceed in priority order
 	for(it = m_MovePriorityList.begin(); it != m_MovePriorityList.end() && !m_CurrentTurnUnits.empty(); ++it)
 	{
@@ -2803,12 +2805,13 @@ void CvHomelandAI::ExecuteExplorerMoves()
 	}
 }
 
-/// Moves units to explore the map
+/// Moves Workers to build
 void CvHomelandAI::ExecuteWorkerMoves(bool bSecondary)
 {
 	CvString strLogString;
 
 	FStaticVector< CvHomelandUnit, 64, true, c_eCiv5GameplayDLL >::iterator it;
+	UnitClassTypes eWorkerClassType = (UnitClassTypes)GC.getInfoTypeForString("UNITCLASS_WORKER");
 	for(it = m_CurrentMoveUnits.begin(); it != m_CurrentMoveUnits.end(); ++it)
 	{
 		UnitHandle pUnit = m_pPlayer->getUnit(it->GetID());
@@ -2915,9 +2918,22 @@ void CvHomelandAI::ExecuteWorkerMoves(bool bSecondary)
 				continue;
 			}
 
-			pUnit->PushMission(CvTypes::getMISSION_SKIP());
-			pUnit->finishMoves();
-			UnitProcessed(pUnit->GetID());
+			// For SP, Worker is cheap, so disband it when AI cannot find a MISSION
+			if(MOD_SP_SMART_AI && GC.getGame().getElapsedGameTurns() > 100 && !m_pPlayer->isHuman() && pUnit->getUnitClassType() == eWorkerClassType)
+			{
+				CvString strLogString;
+				strLogString.Format("UnitID: %d Disbanding Worker, X: %d, Y: %d", pUnit->GetID(), pUnit->getX(), pUnit->getY());
+				LogHomelandMessage(strLogString);
+
+				UnitProcessed(pUnit->GetID());
+				pUnit->kill(true);
+			}
+			else
+			{
+				pUnit->PushMission(CvTypes::getMISSION_SKIP());
+				pUnit->finishMoves();
+				UnitProcessed(pUnit->GetID());
+			}
 		}
 	}
 }
@@ -5943,7 +5959,7 @@ bool CvHomelandAI::ExecuteWorkerMove(CvUnit* pUnit, bool bSecondary)
 	BuilderDirective aDirective[ ciDirectiveSize ];
 
 	// evaluator
-	bool bHasDirective = m_pPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pUnit, aDirective, ciDirectiveSize, false, false, bSecondary);
+	bool bHasDirective = m_pPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pUnit, aDirective, ciDirectiveSize, m_lPlayerPlots, false, false, MOD_UNITS_LOCAL_WORKERS);
 	
 	if(bHasDirective)
 	{

@@ -633,11 +633,11 @@ void CvBuilderTaskingAI::UpdateRoutePlots(void)
 
 int CorrectWeight(int iWeight)
 {
-	return min(iWeight,0x7FFF);
+	return min(iWeight,0x7FFFFF);
 }
 
 /// Use the flavor settings to determine what the worker should do
-bool CvBuilderTaskingAI::EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDirectives, UINT uaDirectives, bool bOnlyKeepBest, bool bOnlyEvaluateWorkersPlot, bool bLimit)
+bool CvBuilderTaskingAI::EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDirectives, UINT uaDirectives, std::list<CvPlot*>& lPlayerPlots, bool bOnlyKeepBest, bool bOnlyEvaluateWorkersPlot, bool bLimit)
 {
 	// number of cities has changed mid-turn, so we need to re-evaluate what workers should do
 	if(m_pPlayer->getNumCities() != m_iNumCities)
@@ -667,42 +667,9 @@ bool CvBuilderTaskingAI::EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDire
 		return true;
 	}
 
-	m_aiPlots.clear();
-	if(bOnlyEvaluateWorkersPlot)
-	{
-		// can't build on plots others own
-		PlayerTypes eOwner = pUnit->plot()->getOwner();
-		if(eOwner == m_pPlayer->GetID())
-		{
-			m_aiPlots.push_back(pUnit->plot()->GetPlotIndex());
-		}
-	}
-	else
-	{
-		m_aiPlots = m_pPlayer->GetPlots();
-	}
-
 	// go through all the plots the player has under their control
-	for(uint uiPlotIndex = 0; uiPlotIndex < m_aiPlots.size(); uiPlotIndex++)
+	for(auto *pPlot : lPlayerPlots)
 	{
-		// when we encounter the first plot that is invalid, the rest of the list will be invalid
-		if(m_aiPlots[uiPlotIndex] == -1)
-		{
-			if(m_bLogging)
-			{
-				CvString strLog = "end of plot list";
-				LogInfo(strLog, m_pPlayer);
-			}
-			break;
-		}
-
-		CvPlot* pPlot = GC.getMap().plotByIndex(m_aiPlots[uiPlotIndex]);
-
-		if(!ShouldBuilderConsiderPlot(pUnit, pPlot))
-		{
-			continue;
-		}
-
 		// distance weight
 		// find how many turns the plot is away
 		int iMoveTurnsAway = FindTurnsAway(pUnit, pPlot, bLimit);
@@ -718,6 +685,11 @@ bool CvBuilderTaskingAI::EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDire
 			continue;
 		}
 
+		if(!ShouldBuilderConsiderPlot(pUnit, pPlot))
+		{
+			continue;
+		}
+
 		UpdateCurrentPlotYields(pPlot);
 
 		//AddRepairDirectives(pUnit, pPlot, iMoveTurnsAway);
@@ -727,10 +699,10 @@ bool CvBuilderTaskingAI::EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDire
 		AddChopDirectives(pUnit, pPlot, iMoveTurnsAway);
 		AddScrubFalloutDirectives(pUnit, pPlot, iMoveTurnsAway);
 		// only AIs have permission to remove roads
-		if(!m_pPlayer->isHuman())
+		/*if(!m_pPlayer->isHuman())
 		{
 			//AddRemoveUselessRoadDirectives(pUnit, pPlot, iMoveTurnsAway);
-		}
+		}*/
 	}
 
 	// we need to evaluate the tiles outside of our territory to build roads
@@ -750,11 +722,6 @@ bool CvBuilderTaskingAI::EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDire
 			}
 		}
 
-		if(!ShouldBuilderConsiderPlot(pUnit, pPlot))
-		{
-			continue;
-		}
-
 		// distance weight
 		// find how many turns the plot is away
 		int iMoveTurnsAway = FindTurnsAway(pUnit, pPlot, bLimit);
@@ -767,6 +734,11 @@ bool CvBuilderTaskingAI::EvaluateBuilder(CvUnit* pUnit, BuilderDirective* paDire
 				LogInfo(strLog, m_pPlayer);
 			}
 
+			continue;
+		}
+
+		if(!ShouldBuilderConsiderPlot(pUnit, pPlot))
+		{
 			continue;
 		}
 
@@ -972,8 +944,9 @@ void CvBuilderTaskingAI::AddImprovingResourcesDirectives(CvUnit* pUnit, CvPlot* 
 		int iScore = ScorePlot(eImprovement, eExistingPlotImprovement);
 		if(iScore > 0)
 		{
-			iWeight *= iScore;
-			iWeight = CorrectWeight(iWeight);
+			long long i64Value = (long long)iWeight;
+			i64Value *= iScore;
+			iWeight = (int)std::min((long long)0x6FFFFFFF, i64Value);
 		}
 
 		{
@@ -1695,18 +1668,6 @@ void CvBuilderTaskingAI::AddScrubFalloutDirectives(CvUnit* pUnit, CvPlot* pPlot,
 /// Evaluates all the circumstances to determine if the builder can and should evaluate the given plot
 bool CvBuilderTaskingAI::ShouldBuilderConsiderPlot(CvUnit* pUnit, CvPlot* pPlot)
 {
-	// if plot is impassable, bail!
-	if(pPlot->isImpassable() || pPlot->isMountain())
-	{
-		if(m_bLogging)
-		{
-			CvString strLog;
-			strLog.Format("x: %d y: %d,,Impassable tile. Toss out", pPlot->getX(), pPlot->getY());
-			LogInfo(strLog, m_pPlayer);
-		}
-		return false;
-	}
-
 	// can't build on plots others own (unless inside a minor)
 	PlayerTypes eOwner = pPlot->getOwner();
 	if(eOwner != NO_PLAYER && eOwner != m_pPlayer->GetID() && !GET_PLAYER(eOwner).isMinorCiv())
@@ -1792,18 +1753,6 @@ bool CvBuilderTaskingAI::ShouldBuilderConsiderPlot(CvUnit* pUnit, CvPlot* pPlot)
 		}
 	}
 
-	if(m_pPlayer->GetPlotDanger(*pPlot) > 0)
-	{
-		if(m_bLogging)
-		{
-			CvString strLog;
-			strLog.Format("plotX: %d plotY: %d, danger: %d,, bailing due to danger", pPlot->getX(), pPlot->getY(), m_pPlayer->GetPlotDanger(*pPlot));
-			LogInfo(strLog, m_pPlayer, true);
-		}
-
-		return false;
-	}
-
 #if defined(MOD_GLOBAL_STACKING_RULES)
 	if(!pUnit->atPlot(*pPlot) && pPlot->getNumFriendlyUnitsOfType(pUnit) >= pPlot->getUnitLimit())
 #else
@@ -1840,8 +1789,8 @@ int CvBuilderTaskingAI::FindTurnsAway(CvUnit* pUnit, CvPlot* pPlot, bool bLimit)
 		int iLimit = iPlotDistance;
 		
 #if defined(MOD_UNITS_LOCAL_WORKERS)
-		if (MOD_UNITS_LOCAL_WORKERS && GET_PLAYER(pUnit->getOwner()).isHuman()) {
-			iLimit = (pUnit->getDomainType() == DOMAIN_SEA) ? gCustomMods.getOption("UNITS_LOCAL_WORKERS_WATERLIMIT", 10) : gCustomMods.getOption("UNITS_LOCAL_WORKERS_LANDLIMIT", 6);
+		if (MOD_UNITS_LOCAL_WORKERS) {
+			iLimit = (pUnit->getDomainType() == DOMAIN_SEA) ? gCustomMods.getOption("UNITS_LOCAL_WORKERS_WATERLIMIT", 10) : gCustomMods.getOption("UNITS_LOCAL_WORKERS_LANDLIMIT", 10);
 		}
 #endif
 
