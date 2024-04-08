@@ -13617,12 +13617,17 @@ CvUnit* CvUnit::DoUpgradeTo(UnitTypes eUnitType, bool bFree)
 		pNewUnit->setupGraphical();
 	
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && pNewUnit->GetRemovePromotionUpgrade() > NO_PROMOTION)
+		if(pNewUnit->GetRemovePromotionUpgrade() > NO_PROMOTION)
 		{
 			if(pNewUnit->HasPromotion((PromotionTypes)pNewUnit->GetRemovePromotionUpgrade()))
 			{
 				pNewUnit->setHasPromotion((PromotionTypes)pNewUnit->GetRemovePromotionUpgrade(),false);
 			}
+		}
+		if(pNewUnit->IsCombatUnit() && thisPlayer.IsRemoveOceanImpassableCombatUnit())
+		{
+			PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
+			pNewUnit->setHasPromotion(ePromotionOceanImpassable, false);
 		}
 #endif
 		
