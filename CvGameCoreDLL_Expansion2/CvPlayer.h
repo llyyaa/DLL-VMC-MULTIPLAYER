@@ -2224,6 +2224,8 @@ public:
 	void SetImmigrationCounter(int iIndex, int iValue);
 	int GetImmigrationRate(PlayerTypes eTargetPlayer) const;
 #endif
+	int GetNegateWarmongerTurn(int iIndex) const;
+	void SetNegateWarmongerTurn(int iIndex, int iValue);
 
 	void UpdateUCsFromCapturedOriginalCapitals();
 	std::tr1::unordered_set<UnitTypes>& GetCanTrainUnitsFromCapturedOriginalCapitals();
@@ -2952,6 +2954,7 @@ protected:
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiImmigrationCounter;
 #endif
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiNegateWarmongerTurn;
 
 	std::vector<int> m_viSecondCapitals;
 

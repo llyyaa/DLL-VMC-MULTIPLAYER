@@ -470,6 +470,7 @@ CvPlayer::CvPlayer() :
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	, m_aiImmigrationCounter("CvPlayer::m_aiImmigrationCounter", m_syncArchive)
 #endif
+	, m_aiNegateWarmongerTurn("CvPlayer::m_aiNegateWarmongerTurn", m_syncArchive)
 	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
 
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
@@ -1324,6 +1325,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiImmigrationCounter.clear();
 	m_aiImmigrationCounter.resize(MAX_MAJOR_CIVS, 0);
 #endif
+	m_aiNegateWarmongerTurn.clear();
+	m_aiNegateWarmongerTurn.resize(MAX_CIV_PLAYERS, 0);
 
 	m_ownedNaturalWonders.clear();
 
@@ -4067,6 +4070,9 @@ void CvPlayer::DoLiberatePlayer(PlayerTypes ePlayer, int iOldCityID)
 
 	// slewis
 	// negate warmonger
+	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(ePlayer, pNewCity->isCapital(), GetID(), true);
+	int iWarmongerModifier = 100;
+
 	for(int iMajorLoop = 0; iMajorLoop < MAX_MAJOR_CIVS; iMajorLoop++)
 	{
 		PlayerTypes eMajor = (PlayerTypes)iMajorLoop;
@@ -4075,17 +4081,15 @@ void CvPlayer::DoLiberatePlayer(PlayerTypes ePlayer, int iOldCityID)
 			// Have I met the player who conquered the city?
 			if(GET_TEAM(GET_PLAYER(eMajor).getTeam()).isHasMet(getTeam()))
 			{
-#if defined(MOD_CONFIG_AI_IN_XML)
-				int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(ePlayer, pNewCity->isCapital());
-				int iWarmongerModifier = 100;
 				GET_PLAYER(eMajor).GetDiplomacyAI()->ChangeOtherPlayerWarmongerAmountTimes100(GetID(), -iWarmongerOffset * iWarmongerModifier);
-#else
-				int iNumCities = max(GET_PLAYER(ePlayer).getNumCities(), 1);
-				int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(iNumCities, GET_PLAYER(ePlayer).isMinorCiv());
-				GET_PLAYER(eMajor).GetDiplomacyAI()->ChangeOtherPlayerWarmongerAmount(GetID(), -iWarmongerOffset);
-#endif
 			}
 		}
+	}
+
+	// increase Turn counters when we can get Negate Warmonger from liberating them
+	if(MOD_SP_SMART_AI && GET_PLAYER(ePlayer).isMinorCiv())
+	{
+		SetNegateWarmongerTurn(ePlayer, GC.getGame().getElapsedGameTurns() + (GC.getGame().GetDealDuration() / 2));
 	}
 
 	// Move Units from player that don't belong here
@@ -17983,6 +17987,21 @@ int CvPlayer::GetImmigrationRate(PlayerTypes eTargetPlayer) const
 }
 #endif
 
+int CvPlayer::GetNegateWarmongerTurn(int iIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_CIV_PLAYERS, "iIndex expected to be < MAX_CIV_PLAYERS");
+	return m_aiNegateWarmongerTurn[iIndex];
+}
+void CvPlayer::SetNegateWarmongerTurn(int iIndex, int iValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_CIV_PLAYERS, "iIndex expected to be < MAX_CIV_PLAYERS");
+	m_aiNegateWarmongerTurn.setAt(iIndex, iValue);
+}
+
 #if defined(MOD_ROG_CORE)
 int CvPlayer::getWorldWonderCityYieldRateModifier(YieldTypes eIndex) const
 {
@@ -28553,6 +28572,7 @@ void CvPlayer::Read(FDataStream& kStream)
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream >> m_aiImmigrationCounter;
 #endif
+	kStream >> m_aiNegateWarmongerTurn;
 
 	kStream >> m_viSecondCapitals;
 
@@ -29215,6 +29235,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream << m_aiImmigrationCounter;
 #endif
+	kStream << m_aiNegateWarmongerTurn;
 
 	kStream << m_viSecondCapitals;
 

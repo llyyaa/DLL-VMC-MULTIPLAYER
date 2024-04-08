@@ -1653,17 +1653,10 @@ private:
 
 namespace CvDiplomacyAIHelpers
 {
-#if defined(MOD_CONFIG_AI_IN_XML)
-	int GetWarmongerOffset(PlayerTypes eOriginalOwner, bool bIsCapital);
-	CvString GetWarmongerPreviewString(PlayerTypes eCurrentOwner, bool bIsCapital);
-	CvString GetLiberationPreviewString(PlayerTypes eOriginalOwner, bool bIsCapital);
+	int GetWarmongerOffset(PlayerTypes eOriginalOwner, bool bIsCapital, PlayerTypes eConqueror = NO_PLAYER, bool IsLiberation = false);
+	CvString GetWarmongerPreviewString(PlayerTypes eCurrentOwner, bool bIsCapital, PlayerTypes eConqueror = NO_PLAYER);
+	CvString GetLiberationPreviewString(PlayerTypes eOriginalOwner, bool bIsCapital, PlayerTypes eConqueror = NO_PLAYER);
 	void ApplyWarmongerPenalties(PlayerTypes eConqueror, PlayerTypes eConquered, bool bIsCapital);
-#else
-	int GetWarmongerOffset(int iNumCitiesRemaining, bool bIsMinor);
-	CvString GetWarmongerPreviewString(PlayerTypes eCurrentOwner);
-	CvString GetLiberationPreviewString(PlayerTypes eOriginalOwner);
-	void ApplyWarmongerPenalties(PlayerTypes eConqueror, PlayerTypes eConquered);
-#endif
 }
 
 #endif //CIV5_AI_DIPLOMACY_H

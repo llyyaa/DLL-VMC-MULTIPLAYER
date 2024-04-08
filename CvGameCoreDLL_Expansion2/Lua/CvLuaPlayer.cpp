@@ -12313,24 +12313,18 @@ int CvLuaPlayer::lHasUnitOfClassType(lua_State* L)
 int CvLuaPlayer::lGetWarmongerPreviewString(lua_State* L)
 {
 	const PlayerTypes eOwner = (PlayerTypes) lua_tointeger(L, 2);
-#if defined(MOD_CONFIG_AI_IN_XML)
 	const bool bIsCapital = luaL_optbool(L, 3, false);
-	lua_pushstring(L, CvDiplomacyAIHelpers::GetWarmongerPreviewString(eOwner, bIsCapital));
-#else
-	lua_pushstring(L, CvDiplomacyAIHelpers::GetWarmongerPreviewString(eOwner));
-#endif
+	const PlayerTypes eConqueror = GC.getGame().getActivePlayer();
+	lua_pushstring(L, CvDiplomacyAIHelpers::GetWarmongerPreviewString(eOwner, bIsCapital, eConqueror));
 	return 1;
 }
 
 int CvLuaPlayer::lGetLiberationPreviewString(lua_State* L)
 {
 	const PlayerTypes eOriginalOwner = (PlayerTypes) lua_tointeger(L, 2);
-#if defined(MOD_CONFIG_AI_IN_XML)
 	const bool bIsCapital = luaL_optbool(L, 3, false);
-	lua_pushstring(L, CvDiplomacyAIHelpers::GetLiberationPreviewString(eOriginalOwner, bIsCapital));
-#else
-	lua_pushstring(L, CvDiplomacyAIHelpers::GetLiberationPreviewString(eOriginalOwner));
-#endif
+	const PlayerTypes eConqueror = GC.getGame().getActivePlayer();
+	lua_pushstring(L, CvDiplomacyAIHelpers::GetLiberationPreviewString(eOriginalOwner, bIsCapital, eConqueror));
 	return 1;
 }
 

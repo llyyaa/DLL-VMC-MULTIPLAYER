@@ -28645,54 +28645,39 @@ FDataStream& operator>>(FDataStream& loadFrom, DeclarationLogData& writeTo)
 
 // AI HELPER ROUTINES
 
-#if defined(MOD_CONFIG_AI_IN_XML)
-int CvDiplomacyAIHelpers::GetWarmongerOffset(PlayerTypes eOriginalOwner, bool bIsCapital)
-#else
-int CvDiplomacyAIHelpers::GetWarmongerOffset(int iNumCitiesRemaining, bool bIsMinor)
-#endif
+int CvDiplomacyAIHelpers::GetWarmongerOffset(PlayerTypes eOriginalOwner, bool bIsCapital, PlayerTypes eConqueror, bool IsLiberation)
 {
+	CvPlayerAI& pPlayer = GET_PLAYER(eOriginalOwner);
+	if(pPlayer.isMinorCiv() && IsLiberation && eConqueror != NO_PLAYER)
+	{
+		CvPlayerAI& pConqueror = GET_PLAYER(eConqueror);
+		if(pConqueror.GetNegateWarmongerTurn(eOriginalOwner) > GC.getGame().getElapsedGameTurns())
+		{
+			return GC.getWARMONGER_THREAT_MINOR_ATTACKED_WEIGHT() - 1; 
+		}
+	}
+
 	int iEstimatedCitiesOnMap = GC.getMap().getWorldInfo().GetEstimatedNumCities();
 	int iActualCitiesOnMap = GC.getGame().getNumCities();
-	int iNumCitiesRemaining = max(GET_PLAYER(eOriginalOwner).getNumCities(), 1);
+	int iNumCitiesRemaining = max(pPlayer.getNumCities(), 1);
 
-#if defined(MOD_CONFIG_AI_IN_XML)
-	int iWarmongerWeight = GET_PLAYER(eOriginalOwner).isMinorCiv() ? GC.getWARMONGER_THREAT_MINOR_CITY_WEIGHT() : GC.getWARMONGER_THREAT_MAJOR_CITY_WEIGHT();
+	int iWarmongerWeight = pPlayer.isMinorCiv() ? GC.getWARMONGER_THREAT_MINOR_CITY_WEIGHT() : GC.getWARMONGER_THREAT_MAJOR_CITY_WEIGHT();
 	if (bIsCapital) iWarmongerWeight *= GC.getWARMONGER_THREAT_CAPITAL_CITY_PERCENT() / 100;
 
 	// TODO - WH - WARMONGER_THREAT_CITY_SIZE_ENABLED
 	// if RemainingCities is 0, use iWarmongerWeight, otherwise
 	// (iWarmongerWeight / iNumCitiesRemaining) * (CapturedCityPop / (RemainingTotalPop/iNumCitiesRemaining))
 	int iWarmongerOffset = (iWarmongerWeight * iEstimatedCitiesOnMap) / (iNumCitiesRemaining * max(iActualCitiesOnMap, 1));
-#else
-	int iWarmongerOffset = (1000 * iEstimatedCitiesOnMap) / (max(iActualCitiesOnMap, 1) * iNumCitiesRemaining);
-
-	// Minor power targeted, half penalty
-	if (bIsMinor)
-	{
-		iWarmongerOffset = (iWarmongerOffset * GC.getWARMONGER_ON_CITY_STATE_MULTIPLIER()) / 100;
-	}
-#endif
 
 	// CUSTOMLOG("GetWarmongerOffset(owner=%i, capital=%s) = %i", ((int) eOriginalOwner), (bIsCapital ? "true" : "false"), iWarmongerOffset);
 	return iWarmongerOffset;
 }
 
-#if defined(MOD_CONFIG_AI_IN_XML)
-CvString CvDiplomacyAIHelpers::GetWarmongerPreviewString(PlayerTypes eCurrentOwner, bool bIsCapital)
-#else
-CvString CvDiplomacyAIHelpers::GetWarmongerPreviewString(PlayerTypes eCurrentOwner)
-#endif
+CvString CvDiplomacyAIHelpers::GetWarmongerPreviewString(PlayerTypes eCurrentOwner, bool bIsCapital, PlayerTypes eConqueror)
 {
 	CvString szRtnValue;
 
-#if defined(MOD_CONFIG_AI_IN_XML)
-	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(eCurrentOwner, bIsCapital);
-#else
-	CvPlayer &kPlayer = GET_PLAYER(eCurrentOwner);
-	int iNumCities = max(kPlayer.getNumCities(), 1);
-	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(iNumCities, kPlayer.isMinorCiv());
-	iWarmongerOffset = iWarmongerOffset * GC.getEraInfo(GC.getGame().getCurrentEra())->getWarmongerPercent() / 100;
-#endif
+	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(eCurrentOwner, bIsCapital, eConqueror, false);
 
 	if (iWarmongerOffset < GC.getWARMONGER_THREAT_MINOR_ATTACKED_WEIGHT())
 	{
@@ -28706,26 +28691,17 @@ CvString CvDiplomacyAIHelpers::GetWarmongerPreviewString(PlayerTypes eCurrentOwn
 	{
 		szRtnValue = Localization::Lookup("TXT_KEY_WARMONGER_PREVIEW_EXTREME").toUTF8();
 	}
-
+	CvString strTemp;
+	strTemp.Format("(%d)", iWarmongerOffset);
+	szRtnValue = szRtnValue + strTemp;
 	return szRtnValue;
 }
 
-#if defined(MOD_CONFIG_AI_IN_XML)
-CvString CvDiplomacyAIHelpers::GetLiberationPreviewString(PlayerTypes eOriginalOwner, bool bIsCapital)
-#else
-CvString CvDiplomacyAIHelpers::GetLiberationPreviewString(PlayerTypes eOriginalOwner)
-#endif
+CvString CvDiplomacyAIHelpers::GetLiberationPreviewString(PlayerTypes eOriginalOwner, bool bIsCapital, PlayerTypes eConqueror)
 {
 	CvString szRtnValue;
 
-#if defined(MOD_CONFIG_AI_IN_XML)
-	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(eOriginalOwner, bIsCapital);
-#else
-	CvPlayer &kPlayer = GET_PLAYER(eOriginalOwner);
-	int iNumCities = kPlayer.getNumCities() + 1;
-	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(iNumCities, kPlayer.isMinorCiv());
-	iWarmongerOffset = iWarmongerOffset * GC.getEraInfo(GC.getGame().getCurrentEra())->getWarmongerPercent() / 100;
-#endif
+	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(eOriginalOwner, bIsCapital, eConqueror, true);
 
 	if (iWarmongerOffset < GC.getWARMONGER_THREAT_MINOR_ATTACKED_WEIGHT())
 	{
@@ -28739,20 +28715,19 @@ CvString CvDiplomacyAIHelpers::GetLiberationPreviewString(PlayerTypes eOriginalO
 	{
 		szRtnValue = Localization::Lookup("TXT_KEY_LIBERATION_PREVIEW_EXTREME").toUTF8();
 	}
+	CvString strTemp;
+	strTemp.Format("(%d)", iWarmongerOffset);
+	szRtnValue = szRtnValue + strTemp;
 	return szRtnValue;
 
 }
 
-#if defined(MOD_CONFIG_AI_IN_XML)
 void CvDiplomacyAIHelpers::ApplyWarmongerPenalties(PlayerTypes eConqueror, PlayerTypes eConquered, bool bIsCapital)
-#else
-void CvDiplomacyAIHelpers::ApplyWarmongerPenalties(PlayerTypes eConqueror, PlayerTypes eConquered)
-#endif
 {
 	CvPlayer &kConqueringPlayer = GET_PLAYER(eConqueror);
-#if defined(MOD_CONFIG_AI_IN_XML)
 	CvPlayer &kConqueredPlayer = GET_PLAYER(eConquered);
-#endif
+	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(eConquered, bIsCapital, eConqueror, false);
+	int iWarmongerAggrievedModifier = 100;
 
 	for(int iMajorLoop = 0; iMajorLoop < MAX_MAJOR_CIVS; iMajorLoop++)
 	{
@@ -28761,12 +28736,8 @@ void CvDiplomacyAIHelpers::ApplyWarmongerPenalties(PlayerTypes eConqueror, Playe
 		{
 			// Have I met the player who conquered the city?
 			CvTeam &kAffectedTeam = GET_TEAM(GET_PLAYER(eMajor).getTeam());
-#if defined(MOD_CONFIG_AI_IN_XML)
 			// ... or the owner of the conquered city?
 			if (kAffectedTeam.isHasMet(kConqueringPlayer.getTeam()) || kAffectedTeam.isHasMet(kConqueredPlayer.getTeam()))
-#else
-			if (kAffectedTeam.isHasMet(kConqueringPlayer.getTeam()))
-#endif
 			{
 #if defined(MOD_API_EXTENSIONS)
 				int iWarmongerModifier = 100;
@@ -28896,19 +28867,10 @@ void CvDiplomacyAIHelpers::ApplyWarmongerPenalties(PlayerTypes eConqueror, Playe
 					}
 				}
 #endif
-
-#if defined(MOD_CONFIG_AI_IN_XML)
-					int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(eConquered, bIsCapital);
-
-					int iWarmongerAggrievedModifier = 100;
 					if (GET_TEAM(kConqueringPlayer.getTeam()).isAggressor(kConqueredPlayer.getTeam()))
 					{
 						iWarmongerAggrievedModifier = GC.getWARMONGER_THREAT_AGGRIEVED_PERCENT();
 					}
-#else
-					int iNumCities = max(GET_PLAYER(eConquered).getNumCities(), 1);
-					int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(iNumCities, GET_PLAYER(eConquered).isMinorCiv());
-#endif
 
 					// Half penalty if I'm also at war with conquered civ
 					if (kAffectedTeam.isAtWar(GET_PLAYER(eConquered).getTeam()))
