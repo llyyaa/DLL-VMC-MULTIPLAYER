@@ -435,6 +435,7 @@ CvCity::CvCity() :
 		, m_aiSpecialistRateModifier()
 		, m_aiStaticCityYield()
 #endif
+	, m_iLastTurnWorkerDisbanded(0)
 {
 	OBJECT_ALLOCATED
 	FSerialization::citiesToCheck.insert(this);
@@ -1610,6 +1611,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	{
 		m_aTradeRouteFromTheCityYields[i] = 0;
 	}
+	m_iLastTurnWorkerDisbanded = 0;
 }
 
 
@@ -9243,6 +9245,20 @@ void CvCity::ChangeTradeRouteFromTheCityYields(YieldTypes eIndex, int iChange)
 		return;
 	}
 	m_aTradeRouteFromTheCityYields[eIndex] += iChange;
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetLastTurnWorkerDisbanded() const
+{
+	VALIDATE_OBJECT
+	return m_iLastTurnWorkerDisbanded;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::SetLastTurnWorkerDisbanded(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iLastTurnWorkerDisbanded = iValue;
 }
 
 //	--------------------------------------------------------------------------------
@@ -19921,6 +19937,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iAdditionalFood;
 	kStream >> m_iBaseTourism;
 	kStream >> m_iBaseTourismBeforeModifiers;
+	kStream >> m_iLastTurnWorkerDisbanded;
 
 #ifdef MOD_API_UNIFIED_YIELDS_MORE	
 	kStream >> m_bIsColony;
@@ -20299,6 +20316,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iAdditionalFood;
 	kStream << m_iBaseTourism;
 	kStream << m_iBaseTourismBeforeModifiers;
+	kStream << m_iLastTurnWorkerDisbanded;
 
 #ifdef MOD_API_UNIFIED_YIELDS_MORE
 	kStream << m_bIsColony;

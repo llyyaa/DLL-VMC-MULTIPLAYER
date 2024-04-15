@@ -2306,6 +2306,12 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_Landlocked(CvCity* pCity)
 /// "Need Tile Improvers" City Strategy: Do we REALLY need to train some Workers?
 bool CityStrategyAIHelpers::IsTestCityStrategy_NeedTileImprovers(AICityStrategyTypes eStrategy, CvCity* pCity)
 {
+	// If we don't have any Workers by turn 30 we really need to get moving
+	int iDesperateTurn = /*30*/ GC.getAI_CITYSTRATEGY_NEED_TILE_IMPROVERS_DESPERATE_TURN();
+	iDesperateTurn *= GC.getGame().getGameSpeedInfo().getTrainPercent();
+	iDesperateTurn /= 100;
+	if(GC.getGame().getElapsedGameTurns() <= iDesperateTurn) return false;
+
 	CvPlayer& kPlayer = GET_PLAYER(pCity->getOwner());
 	// If we're losing at war, return false
 	if(kPlayer.GetDiplomacyAI()->GetStateAllWars() == STATE_ALL_WARS_LOSING)
@@ -2314,6 +2320,11 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_NeedTileImprovers(AICityStrategyT
 
 	int iLastTurnWorkerDisbanded = kPlayer.GetEconomicAI()->GetLastTurnWorkerDisbanded();
 	if(iLastTurnWorkerDisbanded >= 0 && GC.getGame().getGameTurn() - iLastTurnWorkerDisbanded <= 25)
+	{
+		return false;
+	}
+	int iCityLastTurnWorkerDisbanded = pCity->GetLastTurnWorkerDisbanded();
+	if(iCityLastTurnWorkerDisbanded > 0 && GC.getGame().getElapsedGameTurns() - iCityLastTurnWorkerDisbanded <= 15)
 	{
 		return false;
 	}
@@ -2440,14 +2451,7 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_NeedTileImprovers(AICityStrategyT
 	// We have fewer than we think we should, or we have none at all
 	if(iModdedNumWorkers <= iModdedNumCities || iModdedNumWorkers == 0)
 	{
-		// If we don't have any Workers by turn 30 we really need to get moving
-		int iDesperateTurn = /*30*/ GC.getAI_CITYSTRATEGY_NEED_TILE_IMPROVERS_DESPERATE_TURN();
-
-		iDesperateTurn *= GC.getGame().getGameSpeedInfo().getTrainPercent();
-		iDesperateTurn /= 100;
-
-		if(GC.getGame().getElapsedGameTurns() > iDesperateTurn)
-			return true;
+		return true;
 	}
 
 	return false;
@@ -2462,6 +2466,11 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_WantTileImprovers(AICityStrategyT
 		return false;
 	int iLastTurnWorkerDisbanded = kPlayer.GetEconomicAI()->GetLastTurnWorkerDisbanded();
 	if(iLastTurnWorkerDisbanded >= 0 && GC.getGame().getGameTurn() - iLastTurnWorkerDisbanded <= 10)
+	{
+		return false;
+	}
+	int iCityLastTurnWorkerDisbanded = pCity->GetLastTurnWorkerDisbanded();
+	if(iCityLastTurnWorkerDisbanded > 0 && GC.getGame().getElapsedGameTurns() - iCityLastTurnWorkerDisbanded <= 10)
 	{
 		return false;
 	}
@@ -2514,7 +2523,8 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_WantTileImprovers(AICityStrategyT
 			{
 				if(pLoopPlot->getOwner() == pCity->getOwner())
 				{
-					if(!pLoopPlot->isWater())
+					//for SP, Worker can Improvement water plot
+					if(!pLoopPlot->isWater() || MOD_SP_SMART_AI)
 					{
 						ResourceTypes eResource = pLoopPlot->getResourceType(kPlayer.getTeam());
 						if(eResource == NO_RESOURCE)
