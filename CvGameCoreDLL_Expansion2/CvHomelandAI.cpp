@@ -2947,16 +2947,15 @@ void CvHomelandAI::ExecuteWorkerMoves(bool bSecondary)
 							vCityList.push_back(pLoopCity);
 						}
 					}
-					pLoopCity = vCityList[GC.getGame().getJonRandNum(vCityList.size(), "Find a city to send worker")];
-					if(pLoopCity->getArea() != iNowArea)
+					if(vCityList.size() > 0)
 					{
-						pUnit->PushMission(CvTypes::getMISSION_MOVE_TO(), pLoopCity->getX(), pLoopCity->getY());
-						pUnit->finishMoves();
-						continue;
-					}
-					else
-					{
-						pUnit->scrap();
+						pLoopCity = vCityList[GC.getGame().getJonRandNum(vCityList.size(), "Find a city to send worker")];
+						if(pLoopCity->getArea() != iNowArea)
+						{
+							pUnit->PushMission(CvTypes::getMISSION_MOVE_TO(), pLoopCity->getX(), pLoopCity->getY());
+							pUnit->finishMoves();
+							continue;
+						}
 					}
 				}
 				pUnit->scrap();
