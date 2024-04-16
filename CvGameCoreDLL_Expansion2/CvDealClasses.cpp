@@ -438,6 +438,26 @@ bool CvDeal::IsPossibleToTradeItem(PlayerTypes ePlayer, PlayerTypes eToPlayer, T
 			{
 				return false;
 			}
+
+			if(MOD_SP_SMART_AI)
+			{
+				// AI try to avoid human deception: never accept a not enough resource when trade done
+				int iTrueAvailable = iNumAvailable + iNumInRenewDeal - iNumInExistingDeal;
+				TradedItemList::iterator itCityLoop;
+				for(itCityLoop = m_TradedItems.begin(); itCityLoop != m_TradedItems.end(); ++itCityLoop)
+				{
+					if(itCityLoop->m_eItemType != TRADE_ITEM_CITIES) continue;
+					if(itCityLoop->m_eFromPlayer != ePlayer) continue;
+					
+					CvCity* pCity = NULL;
+					CvPlot* pPlot = GC.getMap().plot(itCityLoop->m_iData1, itCityLoop->m_iData2);
+					if(pPlot == NULL) continue;
+					pCity = pPlot->getPlotCity();
+					if(pCity == NULL) continue;
+					iTrueAvailable -= pCity->GetNumResourceLocal(eResource);
+					if(iTrueAvailable < iResourceQuantity) return false;
+				}
+			}
 		}
 	}
 	// City
