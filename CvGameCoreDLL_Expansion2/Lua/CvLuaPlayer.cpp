@@ -1357,6 +1357,9 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 #endif
 
 	Method(GetScienceTimes100FromFriendsTable);
+	Method(GetBossLevel);
+	Method(ChangeBossLevel);
+	Method(SetBossLevel);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12807,3 +12810,7 @@ int CvLuaPlayer::lGetImmigrationOutRateFromPolicy(lua_State* L)
 	return 1;
 }
 #endif
+
+LUAAPIIMPL(Player, GetBossLevel)
+LUAAPIIMPL(Player, ChangeBossLevel)
+LUAAPIIMPL(Player, SetBossLevel)

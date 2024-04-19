@@ -102,6 +102,7 @@ void CvLuaUnit::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lChangeStatsTravelled);
 
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetIsBatchMark);
+	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetIsCheat);
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetMaxHitPointsChangeFromRazedCityPop);
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetCombatStrengthChangeFromKilledUnits);
 	REGIST_STATIC_FUNCTION(CvLuaUnit::lSetRangedCombatStrengthChangeFromKilledUnits);
@@ -848,6 +849,8 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetBarbarianCombatBonusTotal);
 	Method(IsBatchMark);
 	Method(SetIsBatchMark);
+	Method(IsCheat);
+	Method(SetIsCheat);
 }
 //------------------------------------------------------------------------------
 const char* CvLuaUnit::GetTypeName()
@@ -6604,3 +6607,6 @@ LUAAPIIMPL(Unit, GetBarbarianCombatBonusTotal)
 
 LUAAPIIMPL(Unit, IsBatchMark)
 LUAAPIIMPL(Unit, SetIsBatchMark)
+
+LUAAPIIMPL(Unit, IsCheat)
+LUAAPIIMPL(Unit, SetIsCheat)

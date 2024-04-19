@@ -1276,6 +1276,9 @@ protected:
 #endif
 
 	LUAAPIEXTN(GetScienceTimes100FromFriendsTable);
+	LUAAPIEXTN(GetBossLevel, int);
+	LUAAPIEXTN(ChangeBossLevel, void, iChange);
+	LUAAPIEXTN(SetBossLevel, void, iValue);
 };
 
 #endif //CVLUAPLAYER_H

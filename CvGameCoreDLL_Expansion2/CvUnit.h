@@ -220,6 +220,9 @@ public:
 	bool IsBatchMark() const;
 	void SetIsBatchMark(bool value);
 
+	bool IsCheat() const;
+	void SetIsCheat(bool value);
+
 	bool canScrap(bool bTestVisible = false) const;
 	void scrap();
 	int GetScrapGold() const;
@@ -2617,6 +2620,7 @@ protected:
 	bool m_bIsNewCapture = false;
 #endif
 	bool m_bIsBatchMark = false;
+	bool m_bIsCheat = false;
 
 	mutable CvPathNodeArray m_kLastPath;
 	mutable uint m_uiLastPathCacheDest;

@@ -1610,6 +1610,7 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	m_bIsNewCapture = false;
 #endif
 	m_bIsBatchMark = false;
+	m_bIsCheat = false;
 
 	for (int i = 0; i < NUM_YIELD_TYPES; ++i)
 	{
@@ -25186,6 +25187,15 @@ void CvUnit::SetIsBatchMark(bool value)
 	m_bIsBatchMark = value;
 }
 
+//	--------------------------------------------------------------------------------
+bool CvUnit::IsCheat() const
+{
+	return m_bIsCheat;
+}
+void CvUnit::SetIsCheat(bool value)
+{
+	m_bIsCheat = value;
+}
 //	--------------------------------------------------------------------------------
 std::string CvUnit::getScriptData() const
 {

@@ -2262,6 +2262,10 @@ public:
 	void AddSecondCapital(int iNewSecondCapitalID);
 	void RemoveSecondCapital(int iSecondCapitalID);
 
+	int GetBossLevel() const;
+	void ChangeBossLevel(int iChange);
+	void SetBossLevel(int iValue);
+
 protected:
 	class ConqueredByBoolField
 	{
@@ -2971,6 +2975,8 @@ protected:
 	int m_iInstantResearchFromFriendlyGreatScientist = 0;
 
 	int m_iGlobalGrowthFoodNeededModifier = 0;
+
+	int m_iBossLevel = 0;
 };
 
 extern bool CancelActivePlayerEndTurn();

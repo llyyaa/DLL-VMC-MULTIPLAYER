@@ -777,6 +777,8 @@ protected:
 	LUAAPIEXTN(GetBarbarianCombatBonusTotal, int);
 	LUAAPIEXTN(IsBatchMark, bool);
 	LUAAPIEXTN(SetIsBatchMark, void, value);
+	LUAAPIEXTN(IsCheat, bool);
+	LUAAPIEXTN(SetIsCheat, void, value);
 };
 
 

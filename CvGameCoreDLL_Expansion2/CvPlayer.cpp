@@ -28590,6 +28590,8 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_iGlobalGrowthFoodNeededModifier;
 
+	kStream >> m_iBossLevel;
+
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
 		if(!m_pDiplomacyRequests)
@@ -29252,6 +29254,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iInstantResearchFromFriendlyGreatScientist;
 
 	kStream << m_iGlobalGrowthFoodNeededModifier;
+
+	kStream << m_iBossLevel;
 }
 
 //	--------------------------------------------------------------------------------
@@ -33287,4 +33291,18 @@ void CvPlayer::RemoveSecondCapital(int iSecondCapitalID)
 	}
 
 	m_viSecondCapitals.erase(it);
+}
+
+int CvPlayer::GetBossLevel() const
+{
+	if(isHuman()) return 0;
+	return m_iBossLevel;
+}
+void CvPlayer::ChangeBossLevel(int iChange)
+{
+	m_iBossLevel += iChange;
+}
+void CvPlayer::SetBossLevel(int iValue)
+{
+	m_iBossLevel = iValue;
 }
