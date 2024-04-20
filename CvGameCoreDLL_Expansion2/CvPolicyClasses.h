@@ -129,6 +129,7 @@ public:
 	int GetFreeBuildingClass() const;
 	int GetDeepWaterNavalStrengthCultureModifier() const;
 	int GetSettlerPopConsume() const;
+	int GetTourismModifierPerGPCreation() const;
 
 	int GetYieldModifierFromActiveSpies(int i) const;
 	int* GetYieldModifierFromActiveSpiesArray() const;
@@ -441,6 +442,7 @@ private:
 	int m_iFreeBuildingClass;
 	int m_iDeepWaterNavalStrengthCultureModifier;
 	int m_iSettlerPopConsume;
+	int m_iTourismModifierPerGPCreation;
 	int m_iGoldPerUnit;
 	int m_iGoldPerMilitaryUnit;
 	int m_iCityStrengthMod;

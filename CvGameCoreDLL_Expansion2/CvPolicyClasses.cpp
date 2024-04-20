@@ -119,6 +119,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iFreeBuildingClass(0),
 	m_iDeepWaterNavalStrengthCultureModifier(0),
 	m_iSettlerPopConsume(0),
+	m_iTourismModifierPerGPCreation(0),
 	m_iGoldPerUnit(0),
 	m_iGoldPerMilitaryUnit(0),
 	m_iCityStrengthMod(0),
@@ -426,6 +427,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iFreeBuildingClass = GC.getInfoTypeForString(szTextVal, true);
 	m_iDeepWaterNavalStrengthCultureModifier = kResults.GetInt("DeepWaterNavalStrengthCultureModifier");
 	m_iSettlerPopConsume = kResults.GetInt("SettlerPopConsume");
+	m_iTourismModifierPerGPCreation = kResults.GetInt("TourismModifierPerGPCreation");
 	m_iGoldPerUnit = kResults.GetInt("GoldPerUnit");
 	m_iGoldPerMilitaryUnit = kResults.GetInt("GoldPerMilitaryUnit");
 	m_iCityStrengthMod = kResults.GetInt("CityStrengthMod");
@@ -1860,6 +1862,11 @@ int CvPolicyEntry::GetDeepWaterNavalStrengthCultureModifier() const
 int CvPolicyEntry::GetSettlerPopConsume() const
 {
 	return m_iSettlerPopConsume;
+}
+
+int CvPolicyEntry::GetTourismModifierPerGPCreation() const
+{
+	return m_iTourismModifierPerGPCreation;
 }
 
 /// Upkeep cost

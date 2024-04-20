@@ -1011,6 +1011,11 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		kPlayer.GetCulture()->AddTourismAllKnownCivs(iTourism);
 	}
 
+	if(IsGreatPerson() && kPlayer.getPolicyModifiers(POLICYMOD_TOURISM_MODIFIER_PER_GP_CREATION) != 0)
+	{
+		kPlayer.ChangeNumGreatPersonSincePolicy(1);
+	}
+
 	// Recon unit? If so, he sees what's around him
 	if(IsRecon())
 	{
@@ -2569,6 +2574,7 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 	// If we have a great person, use their details
 	if (pkCapturedUnit->IsGreatPerson())
 	{
+		kCapturingPlayer.ChangeNumGreatPersonSincePolicy(-1);
 #if defined(MOD_GLOBAL_NO_LOST_GREATWORKS)
 		if (MOD_GLOBAL_NO_LOST_GREATWORKS && pkCapturedUnit->HasUnusedGreatWork())
 		{

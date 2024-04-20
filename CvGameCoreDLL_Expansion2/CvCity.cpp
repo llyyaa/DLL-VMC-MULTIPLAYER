@@ -12554,6 +12554,14 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_FROM_INTER_TRADE_MOD", iTempMod);
 	}
 
+	if (eIndex == YIELD_TOURISM)
+	{
+		iTempMod = owner.getPolicyModifiers(POLICYMOD_TOURISM_MODIFIER_PER_GP_CREATION) * owner.GetNumGreatPersonSincePolicy();
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_NUM_PER_GP_CREATION", iTempMod);
+	}
+
 	if (owner.getYieldModifierFromActiveSpies(eIndex) != 0)
 	{
 		iTempMod = min(100, (owner.getYieldModifierFromActiveSpies(eIndex) * owner.GetEspionage()->GetNumAssignedSpies()));

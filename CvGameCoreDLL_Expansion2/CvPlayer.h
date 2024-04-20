@@ -2266,6 +2266,8 @@ public:
 	void ChangeBossLevel(int iChange);
 	void SetBossLevel(int iValue);
 
+	int GetNumGreatPersonSincePolicy() const;
+	void ChangeNumGreatPersonSincePolicy(int iChange);
 protected:
 	class ConqueredByBoolField
 	{
@@ -2977,6 +2979,7 @@ protected:
 	int m_iGlobalGrowthFoodNeededModifier = 0;
 
 	int m_iBossLevel = 0;
+	int m_iNumGreatPersonSincePolicy = 0;
 };
 
 extern bool CancelActivePlayerEndTurn();

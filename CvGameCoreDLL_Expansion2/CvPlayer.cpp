@@ -26662,6 +26662,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changePolicyModifiers(POLICYMOD_CONVERSION_MODIFIER, pPolicy->GetConversionModifier() * iChange);
 #endif
 	changePolicyModifiers(POLICYMOD_SETTLER_POPULATION_CONSUME, pPolicy->GetSettlerPopConsume() * iChange);
+	changePolicyModifiers(POLICYMOD_TOURISM_MODIFIER_PER_GP_CREATION, pPolicy->GetTourismModifierPerGPCreation() * iChange);
 	changePolicyModifiers(POLICYMOD_DEEP_WATER_NAVAL_CULTURE_STRENGTH_MODIFIER, pPolicy->GetDeepWaterNavalStrengthCultureModifier() * iChange);
 
 	if(pPolicy->GetFreeBuildingClass() != NO_BUILDINGCLASS)
@@ -28591,6 +28592,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iGlobalGrowthFoodNeededModifier;
 
 	kStream >> m_iBossLevel;
+	kStream >> m_iNumGreatPersonSincePolicy;
 
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
@@ -29256,6 +29258,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iGlobalGrowthFoodNeededModifier;
 
 	kStream << m_iBossLevel;
+	kStream << m_iNumGreatPersonSincePolicy;
 }
 
 //	--------------------------------------------------------------------------------
@@ -33305,4 +33308,13 @@ void CvPlayer::ChangeBossLevel(int iChange)
 void CvPlayer::SetBossLevel(int iValue)
 {
 	m_iBossLevel = iValue;
+}
+
+int CvPlayer::GetNumGreatPersonSincePolicy() const
+{
+	return m_iNumGreatPersonSincePolicy;
+}
+void CvPlayer::ChangeNumGreatPersonSincePolicy(int iChange)
+{
+	m_iNumGreatPersonSincePolicy += iChange;
 }

@@ -3410,19 +3410,19 @@ CvString CvPlayerCulture::GetTourismModifierWithTooltip(PlayerTypes ePlayer) con
 /// Tourism modifier (base plus policy boost) - shared religion
 int CvPlayerCulture::GetTourismModifierSharedReligion() const
 {
-	return GC.getTOURISM_MODIFIER_SHARED_RELIGION() + m_pPlayer->GetPlayerPolicies()->GetNumericModifier(POLICYMOD_SHARED_RELIGION_TOURISM_MODIFIER);
+	return GC.getTOURISM_MODIFIER_SHARED_RELIGION() + m_pPlayer->getPolicyModifiers(POLICYMOD_SHARED_RELIGION_TOURISM_MODIFIER);
 }
 
 /// Tourism modifier (base plus policy boost) - trade route
 int CvPlayerCulture::GetTourismModifierTradeRoute() const
 {
-	return GC.getTOURISM_MODIFIER_SHARED_RELIGION() + m_pPlayer->GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TRADE_ROUTE_TOURISM_MODIFIER);
+	return GC.getTOURISM_MODIFIER_SHARED_RELIGION() + m_pPlayer->getPolicyModifiers(POLICYMOD_TRADE_ROUTE_TOURISM_MODIFIER);
 }
 
 /// Tourism modifier (base plus policy boost) - open borders
 int CvPlayerCulture::GetTourismModifierOpenBorders() const
 {
-	return GC.getTOURISM_MODIFIER_SHARED_RELIGION() + m_pPlayer->GetPlayerPolicies()->GetNumericModifier(POLICYMOD_OPEN_BORDERS_TOURISM_MODIFIER);
+	return GC.getTOURISM_MODIFIER_SHARED_RELIGION() + m_pPlayer->getPolicyModifiers(POLICYMOD_OPEN_BORDERS_TOURISM_MODIFIER);
 }
 
 /// Is the populace satisfied?
