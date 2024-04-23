@@ -5,6 +5,7 @@ CREATE TABLE Building_DomainTroops(
 );
 
 ALTER TABLE Units ADD 'NoTroopConsume' BOOLEAN DEFAULT 0;
+ALTER TABLE Units ADD 'CannotBeEstablishedCorps' BOOLEAN DEFAULT 0;
 --ALTER TABLE UnitPromotions ADD 'NoTroopConsume' INTEGER DEFAULT 0;
 
 --24 for base amount, 4 per city scale
