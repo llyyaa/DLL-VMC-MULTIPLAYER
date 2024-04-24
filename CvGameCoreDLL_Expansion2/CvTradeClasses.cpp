@@ -3847,7 +3847,11 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 		break;
 	}
 
-	int iExtendedRange = GET_PLAYER(m_pPlayer->GetID()).getTradeRouteDomainExtraRange(eDomain);
+	int iExtendedRange = m_pPlayer->getTradeRouteDomainExtraRange(eDomain);
+	if(pOriginCity->isCapital())
+	{
+		iExtendedRange += m_pPlayer->getPolicyModifiers(POLICYMOD_CAPITAL_TRADE_RANGE_CHANGE);
+	}
 
 	int iRangeModifier = pOriginCity->getTradeRouteDomainRangeModifier(eDomain);
 

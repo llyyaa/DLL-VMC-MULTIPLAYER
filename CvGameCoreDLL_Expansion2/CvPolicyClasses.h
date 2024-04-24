@@ -168,6 +168,7 @@ public:
 	int GetLandTradeRouteGoldChange() const;
 	int GetSeaTradeRouteGoldChange() const;
 	int GetCapitalTradeRouteGoldChange() const;
+	int GetCapitalTradeRouteRangeChange() const;
 	int GetSharedIdeologyTradeGoldChange() const;
 	int GetRiggingElectionModifier() const;
 	int GetMilitaryUnitGiftExtraInfluence() const;
@@ -473,6 +474,7 @@ private:
 	int m_iLandTradeRouteGoldChange;
 	int m_iSeaTradeRouteGoldChange;
 	int m_iCapitalTradeRouteGoldChange;
+	int m_iCapitalTradeRouteRangeChange;
 	int m_iSharedIdeologyTradeGoldChange;
 	int m_iRiggingElectionModifier;
 	int m_iMilitaryUnitGiftExtraInfluence;

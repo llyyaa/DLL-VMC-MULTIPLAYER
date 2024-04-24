@@ -94,3 +94,4 @@ CREATE TABLE Policy_GreatPersonOutputModifierPerGWs (
 );
 
 alter table Policies add column CapitalTradeRouteGoldChange integer default 0;
+alter table Policies add column CapitalTradeRouteRangeChange integer default 0;
