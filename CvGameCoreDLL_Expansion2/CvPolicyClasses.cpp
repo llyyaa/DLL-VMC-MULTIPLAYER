@@ -150,6 +150,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iSharedIdeologyTourismModifier(0),
 	m_iLandTradeRouteGoldChange(0),
 	m_iSeaTradeRouteGoldChange(0),
+	m_iCapitalTradeRouteGoldChange(0),
 	m_iSharedIdeologyTradeGoldChange(0),
 	m_iRiggingElectionModifier(0),
 	m_iMilitaryUnitGiftExtraInfluence(0),
@@ -470,6 +471,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iSharedIdeologyTourismModifier = kResults.GetInt("SharedIdeologyTourismModifier");
 	m_iLandTradeRouteGoldChange = kResults.GetInt("LandTradeRouteGoldChange");
 	m_iSeaTradeRouteGoldChange = kResults.GetInt("SeaTradeRouteGoldChange");
+	m_iCapitalTradeRouteGoldChange = kResults.GetInt("CapitalTradeRouteGoldChange");
 	m_iSharedIdeologyTradeGoldChange = kResults.GetInt("SharedIdeologyTradeGoldChange");
 
 	m_iRiggingElectionModifier = kResults.GetInt("RiggingElectionModifier");
@@ -2047,6 +2049,11 @@ int CvPolicyEntry::GetLandTradeRouteGoldChange() const
 int CvPolicyEntry::GetSeaTradeRouteGoldChange() const
 {
 	return m_iSeaTradeRouteGoldChange;
+}
+
+int CvPolicyEntry::GetCapitalTradeRouteGoldChange() const
+{
+	return m_iCapitalTradeRouteGoldChange;
 }
 
 /// Trade route gold change with civs with whom you share an ideology

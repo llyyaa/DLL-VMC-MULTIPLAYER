@@ -92,3 +92,5 @@ CREATE TABLE Policy_GreatPersonOutputModifierPerGWs (
 	foreign key (PolicyType) references Policies(Type),
 	foreign key (GreatPersonType) references GreatPersons(Type)
 );
+
+alter table Policies add column CapitalTradeRouteGoldChange integer default 0;

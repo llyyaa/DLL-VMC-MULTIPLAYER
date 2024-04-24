@@ -167,6 +167,7 @@ public:
 	int GetSharedIdeologyTourismModifier() const;
 	int GetLandTradeRouteGoldChange() const;
 	int GetSeaTradeRouteGoldChange() const;
+	int GetCapitalTradeRouteGoldChange() const;
 	int GetSharedIdeologyTradeGoldChange() const;
 	int GetRiggingElectionModifier() const;
 	int GetMilitaryUnitGiftExtraInfluence() const;
@@ -471,6 +472,7 @@ private:
 	bool m_bRemoveOceanImpassableCombatUnit;
 	int m_iLandTradeRouteGoldChange;
 	int m_iSeaTradeRouteGoldChange;
+	int m_iCapitalTradeRouteGoldChange;
 	int m_iSharedIdeologyTradeGoldChange;
 	int m_iRiggingElectionModifier;
 	int m_iMilitaryUnitGiftExtraInfluence;
