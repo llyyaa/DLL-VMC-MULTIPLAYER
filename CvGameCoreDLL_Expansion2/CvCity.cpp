@@ -12503,6 +12503,12 @@ int CvCity::GetYieldPerTurnFromReligion(ReligionTypes eReligion, YieldTypes eYie
 				int iFollowers = GET_PLAYER(getOwner()).GetReligions()->GetNumForeignFollowers(false /*bAtPeace*/);
 				iYieldPerTurn += iHolyCityYieldPerForeignFollowers * iFollowers /100;
 			}
+			int iHolyCityYieldPerNativeFollowers = pReligion->m_Beliefs.GetHolyCityYieldPerNativeFollowers(eYield);
+			if(iHolyCityYieldPerNativeFollowers > 0 && GET_PLAYER(getOwner()).HasReligion(eReligion))
+			{
+				int iFollowers = GET_PLAYER(getOwner()).GetReligions()->GetNumNativeFollowers();
+				iYieldPerTurn += iHolyCityYieldPerNativeFollowers * iFollowers /100;
+			}
 		}
 		int iCityYieldPerOtherReligion = pReligion->m_Beliefs.GetCityYieldPerOtherReligion(eYield);
 		if(iCityYieldPerOtherReligion != 0)
