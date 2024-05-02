@@ -95,6 +95,7 @@ public:
 	int GetYieldPerFollowingCity(int i) const;
 	int GetYieldPerXFollowers(int i) const;
 	int GetHolyCityYieldPerForeignFollowers(int i) const;
+	int GetHolyCityYieldPerNativeFollowers(int i) const;
 	int GetCityYieldPerOtherReligion(int i) const;
 	int GetYieldPerOtherReligionFollower(int i) const;
 #endif
@@ -240,6 +241,7 @@ protected:
 	int* m_piYieldPerFollowingCity;
 	int* m_piYieldPerXFollowers;
 	int* m_piHolyCityYieldPerForeignFollowers;
+	int* m_piHolyCityYieldPerNativeFollowers;
 	int* m_piCityYieldPerOtherReligion;
 	int* m_piYieldPerOtherReligionFollower;
 #endif
@@ -509,6 +511,7 @@ public:
 	int GetYieldPerFollowingCity(YieldTypes eYield) const;
 	int GetYieldPerXFollowers(YieldTypes eYield) const;
 	int GetHolyCityYieldPerForeignFollowers(YieldTypes eYield) const;
+	int GetHolyCityYieldPerNativeFollowers(YieldTypes eYield) const;
 	int GetCityYieldPerOtherReligion(YieldTypes eYield) const;
 	int GetYieldPerOtherReligionFollower(YieldTypes eYield) const;
 #endif
