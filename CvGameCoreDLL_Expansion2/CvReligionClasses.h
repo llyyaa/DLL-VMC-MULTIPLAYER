@@ -370,6 +370,7 @@ public:
 	int GetSpyPressure() const;
 	int GetNumForeignCitiesFollowing() const;
 	int GetNumForeignFollowers(bool bAtPeace) const;
+	int GetNumNativeFollowers() const;
 
 private:
 	CvPlayer* m_pPlayer;
