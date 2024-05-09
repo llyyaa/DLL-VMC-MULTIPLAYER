@@ -3322,24 +3322,18 @@ int CvPlayerReligions::GetNumForeignFollowers(bool bAtPeace) const
 int CvPlayerReligions::GetNumNativeFollowers() const
 {
 	CvCity *pLoopCity;
-	int iCityLoop;
-	int iRtnValue = 0;
-	ReligionTypes eFounderBenefitReligion = GC.getGame().GetGameReligions()->GetFounderBenefitsReligion(m_pPlayer->GetID());
-	if (eFounderBenefitReligion > RELIGION_PANTHEON)
-	{
-		for(int iPlayerLoop = 0; iPlayerLoop < MAX_CIV_PLAYERS; iPlayerLoop++)
-		{
-			CvPlayer &kLoopPlayer = GET_PLAYER((PlayerTypes)iPlayerLoop);
-			if(kLoopPlayer.isAlive() && iPlayerLoop == m_pPlayer->GetID())
-			{
-				for(pLoopCity = GET_PLAYER((PlayerTypes)iPlayerLoop).firstCity(&iCityLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER((PlayerTypes)iPlayerLoop).nextCity(&iCityLoop))
-				{
-					iRtnValue += pLoopCity->GetCityReligions()->GetNumFollowers(eFounderBenefitReligion);
-				}
-			}
-		}
-	}
-	return iRtnValue;
+ 	int iCityLoop;
+    int iRtnValue = 0;
+    ReligionTypes eFounderBenefitReligion = GC.getGame().GetGameReligions()->GetFounderBenefitsReligion(m_pPlayer->GetID());
+    if (eFounderBenefitReligion > RELIGION_PANTHEON)
+    {
+        CvPlayer& kPlayer = GET_PLAYER(m_pPlayer->GetID());
+        for (CvCity* pLoopCity = kPlayer.firstCity(&iCityLoop); pLoopCity != NULL; pLoopCity = kPlayer.nextCity(&iCityLoop))
+        {
+            iRtnValue += pLoopCity->GetCityReligions()->GetNumFollowers(eFounderBenefitReligion);
+        }
+    }
+    return iRtnValue;
 }
 //=====================================
 // CvCityReligions
@@ -6705,14 +6699,7 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	// Yields for native followers
 	for(int iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
-		if (iI == YIELD_CULTURE)
-		{
-			iRtnValue += pEntry->GetHolyCityYieldPerNativeFollowers(iI) /5 * iFlavorCulture;
-		}
-		else
-		{
-			iRtnValue += pEntry->GetHolyCityYieldPerNativeFollowers(iI) * 2;
-		}
+		iRtnValue += pEntry->GetHolyCityYieldPerNativeFollowers(iI) * 4;
 	}
 
 	//-----------------

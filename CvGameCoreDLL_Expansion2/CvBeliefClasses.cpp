@@ -515,6 +515,8 @@ int CvBeliefEntry::GetHolyCityYieldPerForeignFollowers(int i) const
 }
 int CvBeliefEntry::GetHolyCityYieldPerNativeFollowers(int i) const
 {
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piHolyCityYieldPerNativeFollowers ? m_piHolyCityYieldPerNativeFollowers[i] : 0;
 }
 
