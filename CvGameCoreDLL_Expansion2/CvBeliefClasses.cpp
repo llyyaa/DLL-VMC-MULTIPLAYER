@@ -97,6 +97,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_piYieldPerFollowingCity(NULL),
 	m_piYieldPerXFollowers(NULL),
 	m_piHolyCityYieldPerForeignFollowers(NULL),
+	m_piHolyCityYieldPerNativeFollowers(NULL),
 	m_piCityYieldPerOtherReligion(NULL),
 	m_piYieldPerOtherReligionFollower(NULL),
 #endif
@@ -511,6 +512,12 @@ int CvBeliefEntry::GetYieldPerXFollowers(int i) const
 int CvBeliefEntry::GetHolyCityYieldPerForeignFollowers(int i) const
 {
 	return m_piHolyCityYieldPerForeignFollowers ? m_piHolyCityYieldPerForeignFollowers[i] : 0;
+}
+int CvBeliefEntry::GetHolyCityYieldPerNativeFollowers(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piHolyCityYieldPerNativeFollowers ? m_piHolyCityYieldPerNativeFollowers[i] : 0;
 }
 
 int CvBeliefEntry::GetCityYieldPerOtherReligion(int i) const
@@ -994,6 +1001,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.PopulateArrayByValue(m_piYieldPerFollowingCity, "Yields", "Belief_YieldPerFollowingCity", "YieldType", "BeliefType", szBeliefType, "Yield");
 	kUtility.PopulateArrayByValue(m_piYieldPerXFollowers, "Yields", "Belief_YieldPerXFollowers", "YieldType", "BeliefType", szBeliefType, "PerXFollowers");
 	kUtility.PopulateArrayByValue(m_piHolyCityYieldPerForeignFollowers, "Yields", "Belief_HolyCityYieldPerForeignFollowers", "YieldType", "BeliefType", szBeliefType, "PerForeignFollowers");
+	kUtility.PopulateArrayByValue(m_piHolyCityYieldPerNativeFollowers, "Yields", "Belief_HolyCityYieldPerNativeFollowers", "YieldType", "BeliefType", szBeliefType, "PerNativeFollowers");
 	kUtility.PopulateArrayByValue(m_piCityYieldPerOtherReligion, "Yields", "Belief_CityYieldPerOtherReligion", "YieldType", "BeliefType", szBeliefType, "Yield");
 	kUtility.PopulateArrayByValue(m_piYieldPerOtherReligionFollower, "Yields", "Belief_YieldPerOtherReligionFollower", "YieldType", "BeliefType", szBeliefType, "Yield");
 #endif
@@ -1902,6 +1910,19 @@ int CvReligionBeliefs::GetHolyCityYieldPerForeignFollowers(YieldTypes eYield) co
 	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
 	{
 		rtnValue += pBeliefs->GetEntry(*i)->GetHolyCityYieldPerForeignFollowers(eYield);
+	}
+
+	return rtnValue;
+}
+
+int CvReligionBeliefs::GetHolyCityYieldPerNativeFollowers(YieldTypes eYield) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetHolyCityYieldPerNativeFollowers(eYield);
 	}
 
 	return rtnValue;

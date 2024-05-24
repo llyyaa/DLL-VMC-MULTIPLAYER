@@ -13,6 +13,7 @@
 #include "CvBitfield.h"
 #include <unordered_map>
 #include "CustomMods.h"
+#include <array>
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  CLASS:      CvPromotionEntry
@@ -510,6 +511,10 @@ public:
 	int GetHeavyChargeCollateralFixed() const;
 	int GetHeavyChargeCollateralPercent() const;
 
+	int GetOutsideFriendlyLandsInflictDamageChange() const;
+
+	int GetInstantYieldPerReligionFollowerConverted(YieldTypes eIndex) const;
+
 protected:
 	int m_iLayerAnimationPath;
 	int m_iPrereqPromotion;
@@ -940,6 +945,10 @@ protected:
 	int m_iHeavyChargeExtraDamage = 0;
 	int m_iHeavyChargeCollateralFixed = 0;
 	int m_iHeavyChargeCollateralPercent = 0;
+
+	int m_iOutsideFriendlyLandsInflictDamageChange = 0;
+
+	std::tr1::array<int, NUM_YIELD_TYPES> m_aiInstantYieldPerReligionFollowerConverted;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

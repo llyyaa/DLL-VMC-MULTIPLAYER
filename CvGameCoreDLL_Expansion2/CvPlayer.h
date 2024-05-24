@@ -64,7 +64,7 @@ typedef std::list<CvPopupInfo*> CvPopupQueue;
 typedef std::vector< std::pair<UnitCombatTypes, PromotionTypes> > UnitCombatPromotionArray;
 typedef std::vector< std::pair<UnitClassTypes, PromotionTypes> > UnitClassPromotionArray;
 typedef std::vector< std::pair<CivilizationTypes, LeaderHeadTypes> > CivLeaderArray;
-typedef FStaticVector<int, 152* 96, true, c_eCiv5GameplayDLL, 0> CvPlotsVector; // allocate the size of HUGE Terra world just in case (this is max that we ship with)
+typedef FStaticVector<int, 180*92, true, c_eCiv5GameplayDLL, 0> CvPlotsVector; // allocate the size of HUGE Terra world just in case (this is max that we ship with)
 
 class CvPlayer : public CvGameObjectExtractable
 {
@@ -1750,6 +1750,7 @@ public:
 	void UpdatePlots();  // Modifies the list of plots and sets which ones the player owns
 	void AddAPlot(CvPlot* pPlot); // adds a plot at the end of the list
 	CvPlotsVector& GetPlots();  // gets the list of plots the player owns
+	void AddPlotsToList(std::list<CvPlot*>& lTargetList);
 	int GetNumPlots() const;
 
 	int GetNumPlotsBought() const;
@@ -2090,6 +2091,8 @@ public:
 	bool GetCanFoundCoastCity() const;
 #endif
 
+	int GetDishonestyCounter() const;
+	void ChangeDishonestyCounter(const int iChange);
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int GetWarCasualtiesCounter() const;
 	void ChangeWarCasualtiesCounter(const int iChange);
@@ -2221,6 +2224,8 @@ public:
 	void SetImmigrationCounter(int iIndex, int iValue);
 	int GetImmigrationRate(PlayerTypes eTargetPlayer) const;
 #endif
+	int GetNegateWarmongerTurn(int iIndex) const;
+	void SetNegateWarmongerTurn(int iIndex, int iValue);
 
 	void UpdateUCsFromCapturedOriginalCapitals();
 	std::tr1::unordered_set<UnitTypes>& GetCanTrainUnitsFromCapturedOriginalCapitals();
@@ -2250,10 +2255,19 @@ public:
 
 	void DoInstantResearchFromFriendlyGreatScientist(CvUnit* pUnit, int iX, int iY);
 
+	int GetGlobalGrowthFoodNeededModifier() const;
+	void ChangeGlobalGrowthFoodNeededModifier(int iChange);
+
 	const std::vector<int>& GetSecondCapitals() const;
 	void AddSecondCapital(int iNewSecondCapitalID);
 	void RemoveSecondCapital(int iSecondCapitalID);
 
+	int GetBossLevel() const;
+	void ChangeBossLevel(int iChange);
+	void SetBossLevel(int iValue);
+
+	int GetNumGreatPersonSincePolicy() const;
+	void ChangeNumGreatPersonSincePolicy(int iChange);
 protected:
 	class ConqueredByBoolField
 	{
@@ -2901,6 +2915,7 @@ protected:
 
 	CvPlayerAchievements m_kPlayerAchievements;
 
+	int m_iDishonestyCounter = 0;
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	int m_iWarCasualtiesCounter = 0;
 #endif
@@ -2945,6 +2960,7 @@ protected:
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiImmigrationCounter;
 #endif
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiNegateWarmongerTurn;
 
 	std::vector<int> m_viSecondCapitals;
 
@@ -2959,6 +2975,11 @@ protected:
 	std::tr1::array<unsigned long long, MAX_MAJOR_CIVS> m_aScienceTimes100FromMajorFriends; // length = MAX_MAJOR_CIVS
 
 	int m_iInstantResearchFromFriendlyGreatScientist = 0;
+
+	int m_iGlobalGrowthFoodNeededModifier = 0;
+
+	int m_iBossLevel = 0;
+	int m_iNumGreatPersonSincePolicy = 0;
 };
 
 extern bool CancelActivePlayerEndTurn();

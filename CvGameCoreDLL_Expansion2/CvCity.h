@@ -1398,6 +1398,12 @@ public:
 	int GetHurryModifierLocal(HurryTypes eIndex) const;
 	void ChangeHurryModifierLocal(HurryTypes eIndex, int iChange);
 
+	int GetTradeRouteFromTheCityYields(YieldTypes eIndex) const;
+	void ChangeTradeRouteFromTheCityYields(YieldTypes eIndex, int iChange);
+
+	int GetLastTurnWorkerDisbanded() const;
+	void SetLastTurnWorkerDisbanded(int iValue);
+
 protected:
 	FAutoArchiveClassContainer<CvCity> m_syncArchive;
 
@@ -1684,6 +1690,8 @@ protected:
 	std::vector<int> m_aiStaticCityYield;
 #endif
 
+	std::tr1::array<int, YieldTypes::NUM_YIELD_TYPES> m_aTradeRouteFromTheCityYields;
+
 	CvCityBuildings* m_pCityBuildings;
 	CvCityStrategyAI* m_pCityStrategyAI;
 	CvCityCitizens* m_pCityCitizens;
@@ -1732,6 +1740,7 @@ protected:
 	std::vector<Firaxis::Array<int, YieldFromYieldStruct::STRUCT_LENGTH>> m_ppiYieldFromOtherYield;
 	bool m_bHasYieldFromOtherYield;
 #endif
+	int m_iLastTurnWorkerDisbanded = 0;
 };
 
 namespace FSerialization

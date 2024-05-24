@@ -435,6 +435,7 @@ CvCity::CvCity() :
 		, m_aiSpecialistRateModifier()
 		, m_aiStaticCityYield()
 #endif
+	, m_iLastTurnWorkerDisbanded(0)
 {
 	OBJECT_ALLOCATED
 	FSerialization::citiesToCheck.insert(this);
@@ -1605,6 +1606,12 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	}
 	m_paiHurryModifier.clear();
 	m_paiHurryModifier.resize(GC.getNumHurryInfos(), 0);
+
+	for (int i = 0; i < NUM_YIELD_TYPES; ++i)
+	{
+		m_aTradeRouteFromTheCityYields[i] = 0;
+	}
+	m_iLastTurnWorkerDisbanded = 0;
 }
 
 
@@ -7987,7 +7994,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				}
 			}
 
-
+			ChangeTradeRouteFromTheCityYields(eYield, pBuildingInfo->GetTradeRouteFromTheCityYields(eYield) * iChange);
 
 			if ((pBuildingInfo->GetYieldFromBirth(eYield) > 0))
 			{
@@ -9219,6 +9226,39 @@ void CvCity::ChangeHurryModifierLocal(HurryTypes eIndex, int iChange)
 		CvAssertMsg(eIndex < GC.getNumHurryInfos(), "eIndex is expected to be within maximum bounds (invalid Index)");
 		m_paiHurryModifier.setAt(eIndex, m_paiHurryModifier[eIndex] + iChange);
 	}
+}
+
+int CvCity::GetTradeRouteFromTheCityYields(YieldTypes eIndex) const
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return 0;
+	}
+
+	return m_aTradeRouteFromTheCityYields[eIndex];
+}
+
+void CvCity::ChangeTradeRouteFromTheCityYields(YieldTypes eIndex, int iChange)
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return;
+	}
+	m_aTradeRouteFromTheCityYields[eIndex] += iChange;
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetLastTurnWorkerDisbanded() const
+{
+	VALIDATE_OBJECT
+	return m_iLastTurnWorkerDisbanded;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::SetLastTurnWorkerDisbanded(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iLastTurnWorkerDisbanded = iValue;
 }
 
 //	--------------------------------------------------------------------------------
@@ -12463,6 +12503,12 @@ int CvCity::GetYieldPerTurnFromReligion(ReligionTypes eReligion, YieldTypes eYie
 				int iFollowers = GET_PLAYER(getOwner()).GetReligions()->GetNumForeignFollowers(false /*bAtPeace*/);
 				iYieldPerTurn += iHolyCityYieldPerForeignFollowers * iFollowers /100;
 			}
+			int iHolyCityYieldPerNativeFollowers = pReligion->m_Beliefs.GetHolyCityYieldPerNativeFollowers(eYield);
+			if(iHolyCityYieldPerNativeFollowers > 0 && GET_PLAYER(getOwner()).HasReligion(eReligion))
+			{
+				int iFollowers = GET_PLAYER(getOwner()).GetReligions()->GetNumNativeFollowers();
+				iYieldPerTurn += iHolyCityYieldPerNativeFollowers * iFollowers /100;
+			}
 		}
 		int iCityYieldPerOtherReligion = pReligion->m_Beliefs.GetCityYieldPerOtherReligion(eYield);
 		if(iCityYieldPerOtherReligion != 0)
@@ -12512,6 +12558,14 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		iModifier += iTempMod;
 		if (iTempMod != 0 && toolTipSink)
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_FROM_INTER_TRADE_MOD", iTempMod);
+	}
+
+	if (eIndex == YIELD_TOURISM)
+	{
+		iTempMod = owner.getPolicyModifiers(POLICYMOD_TOURISM_MODIFIER_PER_GP_CREATION) * owner.GetNumGreatPersonSincePolicy();
+		iModifier += iTempMod;
+		if (iTempMod != 0 && toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_NUM_PER_GP_CREATION", iTempMod);
 	}
 
 	if (owner.getYieldModifierFromActiveSpies(eIndex) != 0)
@@ -19897,6 +19951,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iAdditionalFood;
 	kStream >> m_iBaseTourism;
 	kStream >> m_iBaseTourismBeforeModifiers;
+	kStream >> m_iLastTurnWorkerDisbanded;
 
 #ifdef MOD_API_UNIFIED_YIELDS_MORE	
 	kStream >> m_bIsColony;
@@ -19920,6 +19975,8 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_ppiYieldModifierFromImprovement;
 	kStream >> m_ppiYieldModifierFromSpecialist;
 	kStream >> m_ppiYieldModifierFromResource;
+
+	kStream >> m_aTradeRouteFromTheCityYields;
 
 	if (uiVersion >= 3)
 	{
@@ -20273,6 +20330,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iAdditionalFood;
 	kStream << m_iBaseTourism;
 	kStream << m_iBaseTourismBeforeModifiers;
+	kStream << m_iLastTurnWorkerDisbanded;
 
 #ifdef MOD_API_UNIFIED_YIELDS_MORE
 	kStream << m_bIsColony;
@@ -20296,6 +20354,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_ppiYieldModifierFromImprovement;
 	kStream << m_ppiYieldModifierFromSpecialist;
 	kStream << m_ppiYieldModifierFromResource;
+
+	kStream << m_aTradeRouteFromTheCityYields;
 
 	kStream << m_iExtraHitPoints;
 }

@@ -84,6 +84,7 @@ CvUnitEntry::CvUnitEntry(void) :
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bNoTroops(false),
+	m_bCannotBeEstablishedCorps(false),
 #endif
 	m_iSpecialCargo(0),
 	m_iDomainCargo(0),
@@ -347,6 +348,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bNoTroops = kResults.GetBool("NoTroopConsume");
+	m_bCannotBeEstablishedCorps = kResults.GetBool("CannotBeEstablishedCorps");
 #endif
 
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
@@ -892,6 +894,10 @@ int CvUnitEntry::GetTrainPopulationConsume() const
 bool CvUnitEntry::IsNoTroops() const
 {
 	return m_bNoTroops;
+}
+bool CvUnitEntry::IsCannotBeEstablishedCorps() const
+{
+	return m_bCannotBeEstablishedCorps;
 }
 #endif
 

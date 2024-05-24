@@ -401,10 +401,10 @@
 	<!-- See also: "Units - XP Times 100" -->
     <Row Class="4" Name="UNITS_XP_TIMES_100" Value="0"/>
 
-    <!-- Restricts worker suggestions to local tiles (at the limits specified - limits are distances between the unit and the plot as the crow flies, NOT path lengths) (v19) -->
+    <!-- Restricts worker to improve local tiles and reduce processing time (at the limits specified - limits are distances between the unit and the plot as the crow flies, NOT path lengths) (v19) -->
     <!-- See also: "UI - No Auto-Embark Workers" -->
     <Row Class="5" Name="UNITS_LOCAL_WORKERS" Value="0"/>
-    <Row Class="0" Name="UNITS_LOCAL_WORKERS_LANDLIMIT" Value="6"/>   <!-- How far workers will check for new tasks from where they currently are -->
+    <Row Class="0" Name="UNITS_LOCAL_WORKERS_LANDLIMIT" Value="10"/>   <!-- How far workers will check for new tasks from where they currently are -->
     <Row Class="0" Name="UNITS_LOCAL_WORKERS_WATERLIMIT" Value="10"/> <!-- How far workboats will check for new tasks from where they currently are -->
     <Row Class="0" Name="UNITS_LOCAL_WORKERS_COMBATLIMIT" Value="3"/> <!-- How far combat units with a build skill (eg Legion) will check for new tasks from where they currently are -->
 

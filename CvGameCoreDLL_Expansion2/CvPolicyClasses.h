@@ -129,6 +129,7 @@ public:
 	int GetFreeBuildingClass() const;
 	int GetDeepWaterNavalStrengthCultureModifier() const;
 	int GetSettlerPopConsume() const;
+	int GetTourismModifierPerGPCreation() const;
 
 	int GetYieldModifierFromActiveSpies(int i) const;
 	int* GetYieldModifierFromActiveSpiesArray() const;
@@ -166,6 +167,8 @@ public:
 	int GetSharedIdeologyTourismModifier() const;
 	int GetLandTradeRouteGoldChange() const;
 	int GetSeaTradeRouteGoldChange() const;
+	int GetCapitalTradeRouteGoldChange() const;
+	int GetCapitalTradeRouteRangeChange() const;
 	int GetSharedIdeologyTradeGoldChange() const;
 	int GetRiggingElectionModifier() const;
 	int GetMilitaryUnitGiftExtraInfluence() const;
@@ -441,6 +444,7 @@ private:
 	int m_iFreeBuildingClass;
 	int m_iDeepWaterNavalStrengthCultureModifier;
 	int m_iSettlerPopConsume;
+	int m_iTourismModifierPerGPCreation;
 	int m_iGoldPerUnit;
 	int m_iGoldPerMilitaryUnit;
 	int m_iCityStrengthMod;
@@ -469,6 +473,8 @@ private:
 	bool m_bRemoveOceanImpassableCombatUnit;
 	int m_iLandTradeRouteGoldChange;
 	int m_iSeaTradeRouteGoldChange;
+	int m_iCapitalTradeRouteGoldChange;
+	int m_iCapitalTradeRouteRangeChange;
 	int m_iSharedIdeologyTradeGoldChange;
 	int m_iRiggingElectionModifier;
 	int m_iMilitaryUnitGiftExtraInfluence;

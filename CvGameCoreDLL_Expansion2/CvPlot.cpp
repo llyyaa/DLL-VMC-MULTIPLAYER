@@ -7114,7 +7114,7 @@ void CvPlot::setResourceType(ResourceTypes eNewValue, int iResourceNum, bool bFo
 			{
 				GC.getMap().changeNumResourcesOnLand((ResourceTypes)m_eResourceType, -1);
 			}
-
+			SetResourceLinkedCity(NULL);
 		}
 
 		m_eResourceType = eNewValue; // !!! Here is where we actually change the value
@@ -7133,6 +7133,8 @@ void CvPlot::setResourceType(ResourceTypes eNewValue, int iResourceNum, bool bFo
 			{
 				GC.getMap().changeNumResourcesOnLand((ResourceTypes)m_eResourceType, 1);
 			}
+			CvCity *pCity = getWorkingCity();
+			if(pCity) SetResourceLinkedCity(pCity);
 		}
 
 		updateYield();

@@ -438,6 +438,26 @@ bool CvDeal::IsPossibleToTradeItem(PlayerTypes ePlayer, PlayerTypes eToPlayer, T
 			{
 				return false;
 			}
+
+			if(MOD_SP_SMART_AI)
+			{
+				// AI try to avoid human deception: never accept a not enough resource when trade done
+				int iTrueAvailable = iNumAvailable + iNumInRenewDeal - iNumInExistingDeal;
+				TradedItemList::iterator itCityLoop;
+				for(itCityLoop = m_TradedItems.begin(); itCityLoop != m_TradedItems.end(); ++itCityLoop)
+				{
+					if(itCityLoop->m_eItemType != TRADE_ITEM_CITIES) continue;
+					if(itCityLoop->m_eFromPlayer != ePlayer) continue;
+					
+					CvCity* pCity = NULL;
+					CvPlot* pPlot = GC.getMap().plot(itCityLoop->m_iData1, itCityLoop->m_iData2);
+					if(pPlot == NULL) continue;
+					pCity = pPlot->getPlotCity();
+					if(pCity == NULL) continue;
+					iTrueAvailable -= pCity->GetNumResourceLocal(eResource);
+					if(iTrueAvailable < iResourceQuantity) return false;
+				}
+			}
 		}
 	}
 	// City
@@ -2524,12 +2544,21 @@ void CvGameDeals::FinalizeDealValidAndAccepted(PlayerTypes eFromPlayer, PlayerTy
 
 			if (pLeader != nullptr && pFollower != nullptr)
 			{
+				auto* pFollowerCapital = pFollower->getCapitalCity();
+				auto* pNewSecondCapital = pLeader->acquireCity(pFollowerCapital, false, true, true, true);
+				if (pNewSecondCapital != nullptr)
+				{
+					pNewSecondCapital->SetSecondCapital(true);
+					pLeader->AddSecondCapital(pNewSecondCapital->GetID());
+				}
+
 				int iLoop = 0;
 				for (CvCity* pCity = pFollower->firstCity(&iLoop); pCity != NULL; pCity = pFollower->nextCity(&iLoop))
 				{
-					pLeader->acquireCity(pCity, false, true, true, true);
+					auto* newCity = pLeader->acquireCity(pCity, false, true, true, true);
 				}
 
+				iLoop = 0;
 				for (CvCity* pCity = pLeader->firstCity(&iLoop); pCity != NULL; pCity = pLeader->nextCity(&iLoop))
 				{
 					pCity->UpdateCorruption();
@@ -3320,6 +3349,10 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 	if(m_CurrentDeals.size() > 0)
 	{
 		bool bSomethingChanged = false;
+		int iGoldToCompensate = 0;
+		int iDealDuration = GC.getGame().GetDealDuration();
+		const PlayerTypes eAttackPlayer = eFromPlayer;
+		const PlayerTypes eDefensePlayer = eToPlayer;
 
 		// Copy the deals into a temporary container
 		for(it = m_CurrentDeals.begin(); it != m_CurrentDeals.end(); ++it)
@@ -3336,6 +3369,7 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 			{
 				// Change final turn
 				it->m_iFinalTurn = GC.getGame().getGameTurn();
+				int iDurationTurn = it->m_iFinalTurn - it->m_iStartTurn;
 
 				// Cancel individual items
 				TradedItemList::iterator itemIter;
@@ -3349,6 +3383,11 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 					eToPlayer = it->GetOtherPlayer(eFromPlayer);
 
 					DoEndTradedItem(&*itemIter, eToPlayer, true);
+
+					if(itemIter->m_eItemType == TRADE_ITEM_GOLD && eFromPlayer == eDefensePlayer)
+					{
+						iGoldToCompensate += itemIter->m_iData1 * (iDealDuration - iDurationTurn) / iDealDuration;
+					}
 				}
 				m_HistoricalDeals.push_back(*it);
 			}
@@ -3365,6 +3404,46 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 			if(eFromPlayer == eActivePlayer || eToPlayer == eActivePlayer)
 			{
 				GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
+			}
+
+			if(MOD_SP_SMART_AI && iGoldToCompensate > iDealDuration * iDealDuration)
+			{
+				CvPlayerAI& pAttackPlayer = GET_PLAYER(eAttackPlayer);
+				if(!pAttackPlayer.isHuman()) return;
+				CvPlayerAI& pDefensePlayer = GET_PLAYER(eDefensePlayer);
+				
+				int iAttackGold = pAttackPlayer.GetTreasury()->GetGold();
+				int iAttackGoldShort = iGoldToCompensate - iAttackGold;
+				if(iAttackGoldShort > 0)
+				{
+					pAttackPlayer.ChangeDishonestyCounter(iAttackGoldShort / iDealDuration);
+				}
+				pAttackPlayer.GetTreasury()->ChangeGold(-iGoldToCompensate);
+				pDefensePlayer.GetTreasury()->ChangeGold(iGoldToCompensate);
+				if (eAttackPlayer == eActivePlayer)
+				{
+					CvNotifications *pNotifications = pAttackPlayer.GetNotifications();
+					if (pNotifications)
+					{
+						Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY");
+						strMessage << pDefensePlayer.getName();
+						strMessage << iGoldToCompensate;
+						Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_SHORT");
+						pNotifications->Add(NOTIFICATION_DEAL_EXPIRED_GPT, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, -1);
+					}
+				}
+				if(eDefensePlayer == eActivePlayer)
+				{
+					CvNotifications *pNotifications = pDefensePlayer.GetNotifications();
+					if (pNotifications)
+					{
+						Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_2");
+						strMessage << pAttackPlayer.getName();
+						strMessage << iGoldToCompensate;
+						Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_CLOSE_TRANSACTION_EARLY_SHORT");
+						pNotifications->Add(NOTIFICATION_DEAL_EXPIRED_GPT, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, -1);
+					}
+				}
 			}
 		}
 	}

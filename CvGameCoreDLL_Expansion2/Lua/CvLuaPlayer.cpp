@@ -1357,6 +1357,9 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 #endif
 
 	Method(GetScienceTimes100FromFriendsTable);
+	Method(GetBossLevel);
+	Method(ChangeBossLevel);
+	Method(SetBossLevel);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -9663,15 +9666,10 @@ int CvLuaPlayer::lGetRecommendedWorkerPlots(lua_State* L)
 	bool bUseDirective[cuiDirectiveSize];
 	CvPlot* pDirectivePlots[cuiDirectiveSize] = {0};
 
-#if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_UNITS_LOCAL_WORKERS)
-	if (MOD_UNITS_LOCAL_WORKERS) {
-		pkPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pWorkerUnit, aDirective, cuiDirectiveSize, true, false, pkPlayer->isHuman());
-	} else {
-#endif
-		pkPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pWorkerUnit, aDirective, cuiDirectiveSize, true);
-#if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_UNITS_LOCAL_WORKERS)
-	}
-#endif
+	std::list<CvPlot*> lPlayerPlots;
+	pkPlayer->AddPlotsToList(lPlayerPlots);
+
+	pkPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pWorkerUnit, aDirective, cuiDirectiveSize, lPlayerPlots, true, false, MOD_UNITS_LOCAL_WORKERS);
 
 	for(uint ui = 0; ui < cuiDirectiveSize; ui++)
 	{
@@ -11273,6 +11271,15 @@ int CvLuaPlayer::lGetOpinionTable(lua_State* L)
 		aOpinions.push_back(kOpinion);
 	}
 
+	iValue = pDiploAI->GetWeBreakOurComplianceScore(eWithPlayer);
+	if (iValue != 0)
+	{
+		Opinion kOpinion;
+		kOpinion.m_iValue = iValue;
+		kOpinion.m_str = Localization::Lookup("TXT_KEY_DIPLO_BREAK_COMPLIANCE");
+		aOpinions.push_back(kOpinion);
+	}
+
 	iValue = pDiploAI->GetAngryAboutProtectedMinorKilledScore(eWithPlayer);
 	if (iValue != 0)
 	{
@@ -12309,24 +12316,18 @@ int CvLuaPlayer::lHasUnitOfClassType(lua_State* L)
 int CvLuaPlayer::lGetWarmongerPreviewString(lua_State* L)
 {
 	const PlayerTypes eOwner = (PlayerTypes) lua_tointeger(L, 2);
-#if defined(MOD_CONFIG_AI_IN_XML)
 	const bool bIsCapital = luaL_optbool(L, 3, false);
-	lua_pushstring(L, CvDiplomacyAIHelpers::GetWarmongerPreviewString(eOwner, bIsCapital));
-#else
-	lua_pushstring(L, CvDiplomacyAIHelpers::GetWarmongerPreviewString(eOwner));
-#endif
+	const PlayerTypes eConqueror = GC.getGame().getActivePlayer();
+	lua_pushstring(L, CvDiplomacyAIHelpers::GetWarmongerPreviewString(eOwner, bIsCapital, eConqueror));
 	return 1;
 }
 
 int CvLuaPlayer::lGetLiberationPreviewString(lua_State* L)
 {
 	const PlayerTypes eOriginalOwner = (PlayerTypes) lua_tointeger(L, 2);
-#if defined(MOD_CONFIG_AI_IN_XML)
 	const bool bIsCapital = luaL_optbool(L, 3, false);
-	lua_pushstring(L, CvDiplomacyAIHelpers::GetLiberationPreviewString(eOriginalOwner, bIsCapital));
-#else
-	lua_pushstring(L, CvDiplomacyAIHelpers::GetLiberationPreviewString(eOriginalOwner));
-#endif
+	const PlayerTypes eConqueror = GC.getGame().getActivePlayer();
+	lua_pushstring(L, CvDiplomacyAIHelpers::GetLiberationPreviewString(eOriginalOwner, bIsCapital, eConqueror));
 	return 1;
 }
 
@@ -12809,3 +12810,7 @@ int CvLuaPlayer::lGetImmigrationOutRateFromPolicy(lua_State* L)
 	return 1;
 }
 #endif
+
+LUAAPIIMPL(Player, GetBossLevel)
+LUAAPIIMPL(Player, ChangeBossLevel)
+LUAAPIIMPL(Player, SetBossLevel)

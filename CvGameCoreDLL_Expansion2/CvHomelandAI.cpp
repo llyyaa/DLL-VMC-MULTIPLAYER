@@ -701,6 +701,8 @@ void CvHomelandAI::AssignHomelandMoves()
 {
 	FStaticVector< CvHomelandMove, 64, true, c_eCiv5GameplayDLL >::iterator it;
 
+	m_pPlayer->AddPlotsToList(m_lPlayerPlots);
+
 	// Proceed in priority order
 	for(it = m_MovePriorityList.begin(); it != m_MovePriorityList.end() && !m_CurrentTurnUnits.empty(); ++it)
 	{
@@ -1289,13 +1291,13 @@ void CvHomelandAI::PlotOpportunisticSettlementMoves()
 #endif
 
 /// Find something for all workers to do
-#if defined(MOD_AI_SECONDARY_WORKERS)
 void CvHomelandAI::PlotWorkerMoves(bool bSecondary)
-#else
-void CvHomelandAI::PlotWorkerMoves()
-#endif
 {
 	ClearCurrentMoveUnits();
+	if (m_pPlayer->IsAtWar())
+	{
+		bSecondary = false;
+	}
 
 	// Loop through all recruited units
 	for(list<int>::iterator it = m_CurrentTurnUnits.begin(); it != m_CurrentTurnUnits.end(); ++it)
@@ -1303,15 +1305,9 @@ void CvHomelandAI::PlotWorkerMoves()
 		UnitHandle pUnit = m_pPlayer->getUnit(*it);
 		if(pUnit)
 		{
-#if defined(MOD_AI_SECONDARY_WORKERS)
 			bool bUsePrimaryUnit = (pUnit->AI_getUnitAIType() == UNITAI_WORKER || pUnit->IsAutomated() && pUnit->getDomainType() == DOMAIN_LAND && pUnit->GetAutomateType() == AUTOMATE_BUILD);
 			bool bUseSecondaryUnit = (pUnit->AI_getUnitAIType() != UNITAI_WORKER && (pUnit->getUnitInfo().GetUnitAIType(UNITAI_WORKER) || pUnit->getUnitInfo().GetUnitAIType(UNITAI_WORKER_SEA)) && pUnit->getDomainType() == DOMAIN_LAND);
-
 			if((!bSecondary && bUsePrimaryUnit) || (bSecondary && bUseSecondaryUnit))
-#else
-			if(pUnit->AI_getUnitAIType() == UNITAI_WORKER  ||
-			        pUnit->IsAutomated() && pUnit->getDomainType() == DOMAIN_LAND && pUnit->GetAutomateType() == AUTOMATE_BUILD)
-#endif
 			{
 				CvHomelandUnit unit;
 				unit.SetID(pUnit->GetID());
@@ -1322,11 +1318,7 @@ void CvHomelandAI::PlotWorkerMoves()
 
 	if(m_CurrentMoveUnits.size() > 0)
 	{
-#if defined(MOD_AI_SECONDARY_WORKERS)
 		ExecuteWorkerMoves(bSecondary);
-#else
-		ExecuteWorkerMoves();
-#endif
 	}
 }
 
@@ -2813,16 +2805,13 @@ void CvHomelandAI::ExecuteExplorerMoves()
 	}
 }
 
-/// Moves units to explore the map
-#if defined(MOD_AI_SECONDARY_WORKERS)
+/// Moves Workers to build
 void CvHomelandAI::ExecuteWorkerMoves(bool bSecondary)
-#else
-void CvHomelandAI::ExecuteWorkerMoves()
-#endif
 {
 	CvString strLogString;
 
 	FStaticVector< CvHomelandUnit, 64, true, c_eCiv5GameplayDLL >::iterator it;
+	UnitClassTypes eWorkerClassType = (UnitClassTypes)GC.getInfoTypeForString("UNITCLASS_WORKER");
 	for(it = m_CurrentMoveUnits.begin(); it != m_CurrentMoveUnits.end(); ++it)
 	{
 		UnitHandle pUnit = m_pPlayer->getUnit(it->GetID());
@@ -2873,11 +2862,7 @@ void CvHomelandAI::ExecuteWorkerMoves()
 				}
 			}
 
-#if defined(MOD_AI_SECONDARY_WORKERS)
 			bool bActionPerformed = ExecuteWorkerMove(pUnit.pointer(), bSecondary);
-#else
-			bool bActionPerformed = ExecuteWorkerMove(pUnit.pointer());
-#endif
 			if(bActionPerformed)
 			{
 				continue;
@@ -2933,9 +2918,54 @@ void CvHomelandAI::ExecuteWorkerMoves()
 				continue;
 			}
 
-			pUnit->PushMission(CvTypes::getMISSION_SKIP());
-			pUnit->finishMoves();
-			UnitProcessed(pUnit->GetID());
+			// For SP, Worker is cheap, so disband it when AI cannot find a MISSION
+			if(MOD_SP_SMART_AI && MOD_UNITS_LOCAL_WORKERS && !m_pPlayer->isHuman() && pUnit->getUnitClassType() == eWorkerClassType && (m_pPlayer->getUnitClassCount(pUnit->getUnitClassType()) > (m_pPlayer->isMinorCiv() ? 2 : 6)))
+			{
+				CvString strLogString;
+				strLogString.Format("UnitID: %d Disbanding or Moving Worker, X: %d, Y: %d", pUnit->GetID(), pUnit->getX(), pUnit->getY());
+				LogHomelandMessage(strLogString);
+
+				UnitProcessed(pUnit->GetID());
+				// roll and find a another city to send worker;
+				CvCity *pCity = pUnit->plot()->getWorkingCity();
+				if(pCity)
+				{
+					int iCapitalArea = m_pPlayer->getCapitalCity()->getArea();
+					int iNowArea = pCity->getArea();
+					std::vector<CvCity*> vCityList;
+					vCityList.clear();
+					int iCityLoop = 0;
+					CvCity* pLoopCity = NULL;
+					for(pLoopCity = m_pPlayer->firstCity(&iCityLoop); pLoopCity != NULL; pLoopCity = m_pPlayer->nextCity(&iCityLoop))
+					{
+						if(plotDistance(pCity->getX(), pCity->getY(), pLoopCity->getX(), pLoopCity->getY()) <= 9)
+						{
+							pLoopCity->SetLastTurnWorkerDisbanded(GC.getGame().getElapsedGameTurns());
+						}
+						else if(pLoopCity->getArea() != iCapitalArea)
+						{
+							vCityList.push_back(pLoopCity);
+						}
+					}
+					if(vCityList.size() > 0)
+					{
+						pLoopCity = vCityList[GC.getGame().getJonRandNum(vCityList.size(), "Find a city to send worker")];
+						if(pLoopCity->getArea() != iNowArea)
+						{
+							pUnit->PushMission(CvTypes::getMISSION_MOVE_TO(), pLoopCity->getX(), pLoopCity->getY());
+							pUnit->finishMoves();
+							continue;
+						}
+					}
+				}
+				pUnit->scrap();
+			}
+			else
+			{
+				pUnit->PushMission(CvTypes::getMISSION_SKIP());
+				pUnit->finishMoves();
+				UnitProcessed(pUnit->GetID());
+			}
 		}
 	}
 }
@@ -5952,11 +5982,7 @@ void CvHomelandAI::UnitProcessed(int iID)
 	pUnit->SetTurnProcessed(true);
 }
 
-#if defined(MOD_AI_SECONDARY_WORKERS)
 bool CvHomelandAI::ExecuteWorkerMove(CvUnit* pUnit, bool bSecondary)
-#else
-bool CvHomelandAI::ExecuteWorkerMove(CvUnit* pUnit)
-#endif
 {
 #if defined(MOD_AI_SECONDARY_WORKERS)
 	// if (bSecondary) CUSTOMLOG("ExecuteWorkerMove(secondary) for %s at (%i, %i)", pUnit->getName().c_str(), pUnit->plot()->getX(), pUnit->plot()->getY());
@@ -5965,11 +5991,8 @@ bool CvHomelandAI::ExecuteWorkerMove(CvUnit* pUnit)
 	BuilderDirective aDirective[ ciDirectiveSize ];
 
 	// evaluator
-#if defined(MOD_AI_SECONDARY_WORKERS)
-	bool bHasDirective = m_pPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pUnit, aDirective, ciDirectiveSize, false, false, bSecondary);
-#else
-	bool bHasDirective = m_pPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pUnit, aDirective, ciDirectiveSize);
-#endif
+	bool bHasDirective = m_pPlayer->GetBuilderTaskingAI()->EvaluateBuilder(pUnit, aDirective, ciDirectiveSize, m_lPlayerPlots, false, false, MOD_UNITS_LOCAL_WORKERS);
+	
 	if(bHasDirective)
 	{
 		switch(aDirective[0].m_eDirective)

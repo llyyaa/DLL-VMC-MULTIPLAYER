@@ -100,6 +100,7 @@ public:
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool IsNoTroops() const;
+	bool IsCannotBeEstablishedCorps() const;
 #endif
 
 	int GetSpecialCargo() const;
@@ -292,6 +293,7 @@ private:
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool m_bNoTroops;
+	bool m_bCannotBeEstablishedCorps;
 #endif
 
 	int m_iSpecialCargo;

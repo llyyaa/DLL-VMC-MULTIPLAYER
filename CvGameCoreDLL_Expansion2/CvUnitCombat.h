@@ -15,6 +15,8 @@
 
 struct InflictDamageContext
 {
+	CvCombatInfo* pCombatInfo = nullptr;
+
 	CvUnit* pAttackerUnit = nullptr;
 	CvCity* pAttackerCity = nullptr;
 	CvUnit* pDefenderUnit = nullptr;

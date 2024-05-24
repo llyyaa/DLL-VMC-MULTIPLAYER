@@ -1011,6 +1011,11 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		kPlayer.GetCulture()->AddTourismAllKnownCivs(iTourism);
 	}
 
+	if(IsGreatPerson() && kPlayer.getPolicyModifiers(POLICYMOD_TOURISM_MODIFIER_PER_GP_CREATION) != 0)
+	{
+		kPlayer.ChangeNumGreatPersonSincePolicy(1);
+	}
+
 	// Recon unit? If so, he sees what's around him
 	if(IsRecon())
 	{
@@ -1604,10 +1609,18 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	m_iHeavyChargeCollateralFixed = 0;
 	m_iHeavyChargeCollateralPercent = 0;
 
+	m_iOutsideFriendlyLandsInflictDamageChange = 0;
+
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	m_bIsNewCapture = false;
 #endif
 	m_bIsBatchMark = false;
+	m_bIsCheat = false;
+
+	for (int i = 0; i < NUM_YIELD_TYPES; ++i)
+	{
+		m_aiInstantYieldPerReligionFollowerConverted[i] = 0;
+	}
 
 	if(!bConstructorCall)
 	{
@@ -2561,6 +2574,7 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 	// If we have a great person, use their details
 	if (pkCapturedUnit->IsGreatPerson())
 	{
+		kCapturingPlayer.ChangeNumGreatPersonSincePolicy(-1);
 #if defined(MOD_GLOBAL_NO_LOST_GREATWORKS)
 		if (MOD_GLOBAL_NO_LOST_GREATWORKS && pkCapturedUnit->HasUnusedGreatWork())
 		{
@@ -3053,7 +3067,10 @@ bool CvUnit::isActionRecommended(int iAction)
 		const int ciDirectiveSize = 1;
 		BuilderDirective aDirective[ ciDirectiveSize ];
 
-		GET_PLAYER(getOwner()).GetBuilderTaskingAI()->EvaluateBuilder(this, aDirective, ciDirectiveSize, false, true);
+		std::list<CvPlot*> lPlayerPlots;
+		lPlayerPlots.clear();
+		if(plot()->getOwner() == getOwner()) lPlayerPlots.push_back(plot());
+		GET_PLAYER(getOwner()).GetBuilderTaskingAI()->EvaluateBuilder(this, aDirective, ciDirectiveSize, lPlayerPlots, false, true);
 
 		if(aDirective[0].m_eDirective != BuilderDirective::NUM_DIRECTIVES && aDirective[0].m_eBuild == eBuild)
 		{
@@ -7272,7 +7289,8 @@ bool CvUnit::IsCanBeEstablishedCorps() const
 	return 
 		m_iCannotBeEstablishedCorps <= 0
 		&& IsCombatUnit() && canMove()
-		&& m_pUnitInfo->GetDomainType() == DOMAIN_LAND && !isEmbarked();
+		&& m_pUnitInfo->GetDomainType() == DOMAIN_LAND && !isEmbarked()
+		&& !m_pUnitInfo->IsCannotBeEstablishedCorps();
 }
 
 #endif
@@ -10693,6 +10711,8 @@ bool CvUnit::DoSpreadReligion()
 								iYieldBonus += pReligion->m_Beliefs.GetSciencePerOtherReligionFollower();
 							}
 
+							iYieldBonus += this->GetInstantYieldPerReligionFollowerConverted(eYield);
+
 							if (iYieldBonus > 0)
 							{
 								iYieldBonus *= iOtherFollowers;
@@ -13605,12 +13625,17 @@ CvUnit* CvUnit::DoUpgradeTo(UnitTypes eUnitType, bool bFree)
 		pNewUnit->setupGraphical();
 	
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && pNewUnit->GetRemovePromotionUpgrade() > NO_PROMOTION)
+		if(pNewUnit->GetRemovePromotionUpgrade() > NO_PROMOTION)
 		{
 			if(pNewUnit->HasPromotion((PromotionTypes)pNewUnit->GetRemovePromotionUpgrade()))
 			{
 				pNewUnit->setHasPromotion((PromotionTypes)pNewUnit->GetRemovePromotionUpgrade(),false);
 			}
+		}
+		if(pNewUnit->IsCombatUnit() && thisPlayer.IsRemoveOceanImpassableCombatUnit())
+		{
+			PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
+			pNewUnit->setHasPromotion(ePromotionOceanImpassable, false);
 		}
 #endif
 		
@@ -25170,6 +25195,15 @@ void CvUnit::SetIsBatchMark(bool value)
 }
 
 //	--------------------------------------------------------------------------------
+bool CvUnit::IsCheat() const
+{
+	return m_bIsCheat;
+}
+void CvUnit::SetIsCheat(bool value)
+{
+	m_bIsCheat = value;
+}
+//	--------------------------------------------------------------------------------
 std::string CvUnit::getScriptData() const
 {
 	VALIDATE_OBJECT
@@ -26278,6 +26312,11 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeNoSupply(thisPromotion.IsNoSupply() ? iChange : 0);
 #endif
 
+		for (int i = 0; i < NUM_YIELD_TYPES; ++i)
+		{
+			ChangeInstantYieldPerReligionFollowerConverted((YieldTypes) i, thisPromotion.GetInstantYieldPerReligionFollowerConverted((YieldTypes) i) * iChange);
+		}
+
 #if defined(MOD_UNITS_MAX_HP)
 		changeMaxHitPointsChange(thisPromotion.GetMaxHitPointsChange() * iChange);
 		changeMaxHitPointsModifier(thisPromotion.GetMaxHitPointsModifier() * iChange);
@@ -26506,6 +26545,8 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeHeavyChargeExtraDamage(iChange * thisPromotion.GetHeavyChargeExtraDamage());
 		ChangeHeavyChargeCollateralFixed(iChange * thisPromotion.GetHeavyChargeCollateralFixed());
 		ChangeHeavyChargeCollateralPercent(iChange * thisPromotion.GetHeavyChargeCollateralPercent());
+
+		ChangeOutsideFriendlyLandsInflictDamageChange(iChange * thisPromotion.GetOutsideFriendlyLandsInflictDamageChange());
 
 #if defined(MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 		if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
@@ -27046,6 +27087,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iHeavyChargeCollateralFixed;
 	kStream >> m_iHeavyChargeCollateralPercent;
 
+	kStream >> m_iOutsideFriendlyLandsInflictDamageChange;
+
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	kStream >> m_bIsNewCapture;
 #endif
@@ -27053,6 +27096,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCombatStrengthChangeFromKilledUnits;
 	kStream >> m_iRangedCombatStrengthChangeFromKilledUnits;
 
+	kStream >> m_aiInstantYieldPerReligionFollowerConverted;
 	//  Read mission queue
 	UINT uSize;
 	kStream >> uSize;
@@ -27367,12 +27411,16 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iHeavyChargeCollateralFixed;
 	kStream << m_iHeavyChargeCollateralPercent;
 
+	kStream << m_iOutsideFriendlyLandsInflictDamageChange;
+
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE
 	kStream << m_bIsNewCapture;
 #endif
 
 	kStream << m_iCombatStrengthChangeFromKilledUnits;
 	kStream << m_iRangedCombatStrengthChangeFromKilledUnits;
+
+	kStream << m_aiInstantYieldPerReligionFollowerConverted;
 
 	//  Write mission list
 	kStream << m_missionQueue.getLength();
@@ -31987,7 +32035,14 @@ void CvUnit::ChangeHeavyChargeCollateralPercent(int iChange)
 	m_iHeavyChargeCollateralPercent += iChange;
 }
 
-
+int CvUnit::GetOutsideFriendlyLandsInflictDamageChange() const
+{
+	return m_iOutsideFriendlyLandsInflictDamageChange;
+}
+void CvUnit::ChangeOutsideFriendlyLandsInflictDamageChange(int iChange)
+{
+	m_iOutsideFriendlyLandsInflictDamageChange += iChange;
+}
 
 
 
@@ -32104,4 +32159,23 @@ int CvUnit::GetNumTimesAttackedThisTurn(PlayerTypes ePlayer) const
 	CvAssertMsg(ePlayer >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(ePlayer < REALLY_MAX_PLAYERS, "eIndex expected to be < NUM_DOMAIN_TYPES");
 	return m_aiNumTimesAttackedThisTurn[ePlayer];
+}
+
+int CvUnit::GetInstantYieldPerReligionFollowerConverted(YieldTypes eIndex) const
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return 0;
+	}
+
+	return m_aiInstantYieldPerReligionFollowerConverted[eIndex];
+}
+void CvUnit::ChangeInstantYieldPerReligionFollowerConverted(YieldTypes eIndex, int iChange)
+{
+	if (eIndex < 0 || eIndex >= NUM_YIELD_TYPES)
+	{
+		return;
+	}
+
+	m_aiInstantYieldPerReligionFollowerConverted[eIndex] += iChange;
 }

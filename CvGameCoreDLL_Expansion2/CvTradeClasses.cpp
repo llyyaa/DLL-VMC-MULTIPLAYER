@@ -2433,11 +2433,24 @@ int CvPlayerTrade::GetTradeConnectionPolicyValueTimes100(const TradeConnection& 
 		// domain type bonuses
 		if (kTradeConnection.m_eDomain == DOMAIN_LAND)
 		{
-			iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_LAND_TRADE_GOLD_CHANGE);
+			iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).getPolicyModifiers(POLICYMOD_LAND_TRADE_GOLD_CHANGE);
 		}
 		else if (kTradeConnection.m_eDomain == DOMAIN_SEA)
 		{
-			iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_SEA_TRADE_GOLD_CHANGE);
+			iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).getPolicyModifiers(POLICYMOD_SEA_TRADE_GOLD_CHANGE);
+		}
+		int iCapitalPolicyChanges = GET_PLAYER(kTradeConnection.m_eOriginOwner).getPolicyModifiers(POLICYMOD_CAPITAL_TRADE_GOLD_CHANGE);
+		if(iCapitalPolicyChanges != 0)
+		{
+			CvPlot* pOriginPlot = GC.getMap().plot(kTradeConnection.m_iOriginX, kTradeConnection.m_iOriginY);
+			if(pOriginPlot)
+			{
+				CvCity* pOriginCity = pOriginPlot->getPlotCity();
+				if(pOriginCity && pOriginCity->isCapital())
+				{
+					iValue += iCapitalPolicyChanges;
+				}
+			}
 		}
 
 		// policy tree bonuses
@@ -2714,6 +2727,8 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 				break;
 			}
 		}
+
+		iValue += pOriginCity->GetTradeRouteFromTheCityYields(eYield) * 100;
 	}
 	else
 	{
@@ -3832,7 +3847,11 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 		break;
 	}
 
-	int iExtendedRange = GET_PLAYER(m_pPlayer->GetID()).getTradeRouteDomainExtraRange(eDomain);
+	int iExtendedRange = m_pPlayer->getTradeRouteDomainExtraRange(eDomain);
+	if(pOriginCity->isCapital())
+	{
+		iExtendedRange += m_pPlayer->getPolicyModifiers(POLICYMOD_CAPITAL_TRADE_RANGE_CHANGE);
+	}
 
 	int iRangeModifier = pOriginCity->getTradeRouteDomainRangeModifier(eDomain);
 

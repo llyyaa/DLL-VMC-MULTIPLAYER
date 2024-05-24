@@ -6,3 +6,5 @@ alter table UnitPromotions add column 'DefenseInflictDamageChangeMaxHPPercent' i
 
 alter table UnitPromotions add column 'SiegeInflictDamageChange' integer not null default 0;
 alter table UnitPromotions add column 'SiegeInflictDamageChangeMaxHPPercent' integer not null default 0;
+
+ALTER TABLE UnitPromotions add column 'OutsideFriendlyLandsInflictDamageChange' INTEGER DEFAULT 0;

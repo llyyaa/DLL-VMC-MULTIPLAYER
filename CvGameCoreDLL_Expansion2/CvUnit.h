@@ -220,6 +220,9 @@ public:
 	bool IsBatchMark() const;
 	void SetIsBatchMark(bool value);
 
+	bool IsCheat() const;
+	void SetIsCheat(bool value);
+
 	bool canScrap(bool bTestVisible = false) const;
 	void scrap();
 	int GetScrapGold() const;
@@ -1066,6 +1069,9 @@ public:
 	void ChangeHeavyChargeExtraDamage(int iChange);
 	void ChangeHeavyChargeCollateralFixed(int iChange);
 	void ChangeHeavyChargeCollateralPercent(int iChange);
+
+	int GetOutsideFriendlyLandsInflictDamageChange() const;
+	void ChangeOutsideFriendlyLandsInflictDamageChange(int iChange);
 
 	int getAmphibCount() const;
 	bool isAmphib() const;
@@ -2082,6 +2088,9 @@ public:
 	CvString GetPlotCorruptionScoreReport() const;
 #endif
 
+	int GetInstantYieldPerReligionFollowerConverted(YieldTypes eIndex) const;
+	void ChangeInstantYieldPerReligionFollowerConverted(YieldTypes eIndex, int iChange);
+
 protected:
 	const MissionQueueNode* HeadMissionQueueNode() const;
 	MissionQueueNode* HeadMissionQueueNode();
@@ -2594,6 +2603,8 @@ protected:
 	int m_iHeavyChargeExtraDamage = 0;
 	int m_iHeavyChargeCollateralFixed = 0;
 	int m_iHeavyChargeCollateralPercent = 0;
+
+	int m_iOutsideFriendlyLandsInflictDamageChange = 0;
 	
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	CvString m_strUnitName;
@@ -2609,6 +2620,7 @@ protected:
 	bool m_bIsNewCapture = false;
 #endif
 	bool m_bIsBatchMark = false;
+	bool m_bIsCheat = false;
 
 	mutable CvPathNodeArray m_kLastPath;
 	mutable uint m_uiLastPathCacheDest;
@@ -2632,6 +2644,8 @@ protected:
 
 	int m_iCombatStrengthChangeFromKilledUnits = 0;
 	int m_iRangedCombatStrengthChangeFromKilledUnits = 0;
+
+	std::tr1::array<int, NUM_YIELD_TYPES> m_aiInstantYieldPerReligionFollowerConverted;
 
 private:
 

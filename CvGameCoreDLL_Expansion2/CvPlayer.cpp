@@ -470,6 +470,7 @@ CvPlayer::CvPlayer() :
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	, m_aiImmigrationCounter("CvPlayer::m_aiImmigrationCounter", m_syncArchive)
 #endif
+	, m_aiNegateWarmongerTurn("CvPlayer::m_aiNegateWarmongerTurn", m_syncArchive)
 	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
 
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
@@ -1324,6 +1325,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiImmigrationCounter.clear();
 	m_aiImmigrationCounter.resize(MAX_MAJOR_CIVS, 0);
 #endif
+	m_aiNegateWarmongerTurn.clear();
+	m_aiNegateWarmongerTurn.resize(MAX_CIV_PLAYERS, 0);
 
 	m_ownedNaturalWonders.clear();
 
@@ -2902,11 +2905,6 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	{
 		GET_PLAYER(eOldOwner).RemoveSecondCapital(pOldCity->GetID());
 	}
-	pNewCity->SetSecondCapital(bCapital && bIsMajorCivBuyout); // for major buyout, we treat the capital as the second capital (new Austria UA)
-	if (pNewCity->IsSecondCapital())
-	{
-		this->AddSecondCapital(pNewCity->GetID());
-	}
 
 	if(bCapital)
 	{
@@ -4072,6 +4070,9 @@ void CvPlayer::DoLiberatePlayer(PlayerTypes ePlayer, int iOldCityID)
 
 	// slewis
 	// negate warmonger
+	int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(ePlayer, pNewCity->isCapital(), GetID(), true);
+	int iWarmongerModifier = 100;
+
 	for(int iMajorLoop = 0; iMajorLoop < MAX_MAJOR_CIVS; iMajorLoop++)
 	{
 		PlayerTypes eMajor = (PlayerTypes)iMajorLoop;
@@ -4080,17 +4081,15 @@ void CvPlayer::DoLiberatePlayer(PlayerTypes ePlayer, int iOldCityID)
 			// Have I met the player who conquered the city?
 			if(GET_TEAM(GET_PLAYER(eMajor).getTeam()).isHasMet(getTeam()))
 			{
-#if defined(MOD_CONFIG_AI_IN_XML)
-				int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(ePlayer, pNewCity->isCapital());
-				int iWarmongerModifier = 100;
 				GET_PLAYER(eMajor).GetDiplomacyAI()->ChangeOtherPlayerWarmongerAmountTimes100(GetID(), -iWarmongerOffset * iWarmongerModifier);
-#else
-				int iNumCities = max(GET_PLAYER(ePlayer).getNumCities(), 1);
-				int iWarmongerOffset = CvDiplomacyAIHelpers::GetWarmongerOffset(iNumCities, GET_PLAYER(ePlayer).isMinorCiv());
-				GET_PLAYER(eMajor).GetDiplomacyAI()->ChangeOtherPlayerWarmongerAmount(GetID(), -iWarmongerOffset);
-#endif
 			}
 		}
+	}
+
+	// increase Turn counters when we can get Negate Warmonger from liberating them
+	if(MOD_SP_SMART_AI && GET_PLAYER(ePlayer).isMinorCiv())
+	{
+		SetNegateWarmongerTurn(ePlayer, GC.getGame().getElapsedGameTurns() + (GC.getGame().GetDealDuration() / 2));
 	}
 
 	// Move Units from player that don't belong here
@@ -10177,6 +10176,8 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	ChangeExtraLeagueVotes(pBuildingInfo->GetExtraLeagueVotes() * iChange);
 
 	ChangeInstantResearchFromFriendlyGreatScientist(pBuildingInfo->GetInstantResearchFromFriendlyGreatScientist() * iChange);
+
+	ChangeGlobalGrowthFoodNeededModifier(pBuildingInfo->GetGlobalGrowthFoodNeededModifier() * iChange);
 
 	// Loop through Cities
 	int iLoop = 0;
@@ -17985,6 +17986,21 @@ int CvPlayer::GetImmigrationRate(PlayerTypes eTargetPlayer) const
 	return iRtnValue;
 }
 #endif
+
+int CvPlayer::GetNegateWarmongerTurn(int iIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_CIV_PLAYERS, "iIndex expected to be < MAX_CIV_PLAYERS");
+	return m_aiNegateWarmongerTurn[iIndex];
+}
+void CvPlayer::SetNegateWarmongerTurn(int iIndex, int iValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
+	CvAssertMsg(iIndex < MAX_CIV_PLAYERS, "iIndex expected to be < MAX_CIV_PLAYERS");
+	m_aiNegateWarmongerTurn.setAt(iIndex, iValue);
+}
 
 #if defined(MOD_ROG_CORE)
 int CvPlayer::getWorldWonderCityYieldRateModifier(YieldTypes eIndex) const
@@ -26624,6 +26640,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changePolicyModifiers(POLICYMOD_BUILDING_PURCHASE_COST_MODIFIER, pPolicy->GetBuildingPurchaseCostModifier() * iChange);
 	changePolicyModifiers(POLICYMOD_LAND_TRADE_GOLD_CHANGE, pPolicy->GetLandTradeRouteGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_SEA_TRADE_GOLD_CHANGE, pPolicy->GetSeaTradeRouteGoldChange() * iChange);
+	changePolicyModifiers(POLICYMOD_CAPITAL_TRADE_GOLD_CHANGE, pPolicy->GetCapitalTradeRouteGoldChange() * iChange);
+	changePolicyModifiers(POLICYMOD_CAPITAL_TRADE_RANGE_CHANGE, pPolicy->GetCapitalTradeRouteRangeChange() * iChange);
 	changePolicyModifiers(POLICYMOD_SHARED_IDEOLOGY_TRADE_CHANGE, pPolicy->GetSharedIdeologyTradeGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_RIGGING_ELECTION_MODIFIER, pPolicy->GetRiggingElectionModifier() * iChange);
 	changePolicyModifiers(POLICYMOD_MILITARY_UNIT_GIFT_INFLUENCE, pPolicy->GetMilitaryUnitGiftExtraInfluence() * iChange);
@@ -26646,6 +26664,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changePolicyModifiers(POLICYMOD_CONVERSION_MODIFIER, pPolicy->GetConversionModifier() * iChange);
 #endif
 	changePolicyModifiers(POLICYMOD_SETTLER_POPULATION_CONSUME, pPolicy->GetSettlerPopConsume() * iChange);
+	changePolicyModifiers(POLICYMOD_TOURISM_MODIFIER_PER_GP_CREATION, pPolicy->GetTourismModifierPerGPCreation() * iChange);
 	changePolicyModifiers(POLICYMOD_DEEP_WATER_NAVAL_CULTURE_STRENGTH_MODIFIER, pPolicy->GetDeepWaterNavalStrengthCultureModifier() * iChange);
 
 	if(pPolicy->GetFreeBuildingClass() != NO_BUILDINGCLASS)
@@ -28503,6 +28522,7 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	m_kPlayerAchievements.Read(kStream);
 
+	kStream >> m_iDishonestyCounter;
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	kStream >> m_iWarCasualtiesCounter;
 	kStream >> m_iWarCasualtiesModifier;
@@ -28555,6 +28575,7 @@ void CvPlayer::Read(FDataStream& kStream)
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream >> m_aiImmigrationCounter;
 #endif
+	kStream >> m_aiNegateWarmongerTurn;
 
 	kStream >> m_viSecondCapitals;
 
@@ -28569,6 +28590,11 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aScienceTimes100FromMajorFriends;
 
 	kStream >> m_iInstantResearchFromFriendlyGreatScientist;
+
+	kStream >> m_iGlobalGrowthFoodNeededModifier;
+
+	kStream >> m_iBossLevel;
+	kStream >> m_iNumGreatPersonSincePolicy;
 
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
@@ -29162,6 +29188,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	m_kPlayerAchievements.Write(kStream);
 
+	kStream << m_iDishonestyCounter;
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 	kStream << m_iWarCasualtiesCounter;
 	kStream << m_iWarCasualtiesModifier;
@@ -29214,6 +29241,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream << m_aiImmigrationCounter;
 #endif
+	kStream << m_aiNegateWarmongerTurn;
 
 	kStream << m_viSecondCapitals;
 
@@ -29228,6 +29256,11 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aScienceTimes100FromMajorFriends;
 
 	kStream << m_iInstantResearchFromFriendlyGreatScientist;
+
+	kStream << m_iGlobalGrowthFoodNeededModifier;
+
+	kStream << m_iBossLevel;
+	kStream << m_iNumGreatPersonSincePolicy;
 }
 
 //	--------------------------------------------------------------------------------
@@ -29656,6 +29689,9 @@ int CvPlayer::getGrowthThreshold(int iPopulation) const
 		iThreshold /= 100;
 	}
 
+	iThreshold *= this->GetGlobalGrowthFoodNeededModifier() + 100;
+	iThreshold /= 100;
+
 	return std::max(1, iThreshold);
 }
 
@@ -29743,6 +29779,28 @@ CvPlotsVector& CvPlayer::GetPlots(void)
 	return m_aiPlots;
 }
 
+//	--------------------------------------------------------------------------------
+void CvPlayer::AddPlotsToList(std::list<CvPlot*>& lTargetList)
+{
+	lTargetList.clear();
+	CvPlot *pPlot = NULL;
+	for(uint uiPlotIndex = 0; uiPlotIndex < m_aiPlots.size(); uiPlotIndex++)
+	{
+		// when we encounter the first plot that is invalid, the rest of the list will be invalid
+		if(m_aiPlots[uiPlotIndex] == -1) return;
+		pPlot = GC.getMap().plotByIndex(m_aiPlots[uiPlotIndex]);
+		// if plot is impassable, bail!
+		if(pPlot->isImpassable() || pPlot->isMountain())
+		{
+			continue;
+		}
+		if(GetPlotDanger(*pPlot) > 0)
+		{
+			continue;
+		} 
+		lTargetList.push_back(pPlot);
+	}
+}
 //	--------------------------------------------------------------------------------
 /// How many plots does this player own?
 int CvPlayer::GetNumPlots() const
@@ -32367,6 +32425,15 @@ int CvPlayer::GetNumWorldWonders()
 }
 #endif
 
+int CvPlayer::GetDishonestyCounter() const
+{
+	return m_iDishonestyCounter;
+}
+void CvPlayer::ChangeDishonestyCounter(const int iChange)
+{
+	m_iDishonestyCounter += iChange;
+}
+
 #ifdef MOD_GLOBAL_WAR_CASUALTIES
 int CvPlayer::GetWarCasualtiesCounter() const
 {
@@ -33197,6 +33264,15 @@ void CvPlayer::DoInstantResearchFromFriendlyGreatScientist(CvUnit* pUnit, int iX
 	}
 }
 
+int CvPlayer::GetGlobalGrowthFoodNeededModifier() const
+{
+	return m_iGlobalGrowthFoodNeededModifier;
+}
+void CvPlayer::ChangeGlobalGrowthFoodNeededModifier(int iChange)
+{
+	m_iGlobalGrowthFoodNeededModifier += iChange;
+}
+
 const std::vector<int>& CvPlayer::GetSecondCapitals() const
 {
 	return m_viSecondCapitals;
@@ -33220,4 +33296,27 @@ void CvPlayer::RemoveSecondCapital(int iSecondCapitalID)
 	}
 
 	m_viSecondCapitals.erase(it);
+}
+
+int CvPlayer::GetBossLevel() const
+{
+	if(isHuman()) return 0;
+	return m_iBossLevel;
+}
+void CvPlayer::ChangeBossLevel(int iChange)
+{
+	m_iBossLevel += iChange;
+}
+void CvPlayer::SetBossLevel(int iValue)
+{
+	m_iBossLevel = iValue;
+}
+
+int CvPlayer::GetNumGreatPersonSincePolicy() const
+{
+	return m_iNumGreatPersonSincePolicy;
+}
+void CvPlayer::ChangeNumGreatPersonSincePolicy(int iChange)
+{
+	m_iNumGreatPersonSincePolicy += iChange;
 }

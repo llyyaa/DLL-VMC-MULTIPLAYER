@@ -62,6 +62,7 @@ ALTER TABLE Policies ADD 'ReligionProductionModifier' INTEGER DEFAULT 0;
 
 ALTER TABLE Policies ADD 'NullifyInfluenceModifier' BOOLEAN DEFAULT 0;
 ALTER TABLE Policies ADD 'SettlerPopConsume' BOOLEAN DEFAULT 0;
+ALTER TABLE Policies ADD 'TourismModifierPerGPCreation' BOOLEAN DEFAULT 0;
 
 ALTER TABLE Policies ADD 'DeepWaterNavalStrengthCultureModifier' INTEGER DEFAULT 0;
 ALTER TABLE Policies ADD 'FreeBuildingClass' text default null references BuildingClasses(Type);
@@ -91,3 +92,6 @@ CREATE TABLE Policy_GreatPersonOutputModifierPerGWs (
 	foreign key (PolicyType) references Policies(Type),
 	foreign key (GreatPersonType) references GreatPersons(Type)
 );
+
+alter table Policies add column CapitalTradeRouteGoldChange integer default 0;
+alter table Policies add column CapitalTradeRouteRangeChange integer default 0;
