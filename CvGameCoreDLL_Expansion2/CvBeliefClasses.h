@@ -144,6 +144,7 @@ public:
 	bool AllowYieldPerBirth() const;
 	int GetYieldPerBirth(int i) const;
 	int GetLakePlotYieldChange(int i) const;
+	int GetRiverPlotYieldChange(int i) const;
 #endif
 	int GetResourceHappiness(int i) const;
 	int GetYieldChangeAnySpecialist(int i) const;
@@ -215,6 +216,7 @@ protected:
 	bool m_bAllowYieldPerBirth;
 	int* m_piYieldPerBirth;
 	int* m_piLakePlotYieldChange;
+	int* m_piRiverPlotYieldChange;
 #endif
 
 	bool m_bPantheon;
@@ -548,6 +550,7 @@ public:
 	int GetTerrainCityFoodConsumption(TerrainTypes eTerrain) const;
 	int GetYieldPerBirth(YieldTypes eYieldType) const;
 	int GetLakePlotYieldChange(YieldTypes eYieldType) const;
+	int GetRiverPlotYieldChange(YieldTypes eYieldType) const;
 #endif
 	int GetResourceHappiness(ResourceTypes eResource) const;
 	int GetYieldChangeAnySpecialist(YieldTypes eYieldType) const;

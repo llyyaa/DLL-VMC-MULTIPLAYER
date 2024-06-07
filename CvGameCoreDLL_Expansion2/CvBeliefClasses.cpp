@@ -74,6 +74,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_bAllowYieldPerBirth(false),
 	m_piYieldPerBirth(NULL),
 	m_piLakePlotYieldChange(NULL),
+	m_piRiverPlotYieldChange(NULL),
 #endif
 
 	m_bPantheon(false),
@@ -815,6 +816,14 @@ int CvBeliefEntry::GetLakePlotYieldChange(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piLakePlotYieldChange ? m_piLakePlotYieldChange[i] : -1;
 }
+
+//River Yield
+int CvBeliefEntry::GetRiverPlotYieldChange(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piRiverPlotYieldChange ? m_piRiverPlotYieldChange[i] : -1;
+}
 #endif
 
 /// Happiness from a resource
@@ -978,6 +987,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	kUtility.SetYields(m_piYieldPerBirth, "Belief_YieldPerBirth", "BeliefType", szBeliefType);
 	kUtility.SetYields(m_piLakePlotYieldChange, "Belief_LakePlotYieldChanges", "BeliefType", szBeliefType);
+	kUtility.SetYields(m_piRiverPlotYieldChange, "Belief_RiverPlotYieldChanges", "BeliefType", szBeliefType);
 #endif
 	kUtility.SetYields(m_paiCityYieldChange, "Belief_CityYieldChanges", "BeliefType", szBeliefType);
 	kUtility.SetYields(m_paiHolyCityYieldChange, "Belief_HolyCityYieldChanges", "BeliefType", szBeliefType);
@@ -2342,6 +2352,20 @@ int CvReligionBeliefs::GetLakePlotYieldChange(YieldTypes eYieldType) const
 
 	return rtnValue;
 }
+/// Get river yield from beliefs
+int CvReligionBeliefs::GetRiverPlotYieldChange(YieldTypes eYieldType) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for (BeliefList::const_iterator i = m_ReligionBeliefs.begin(); i != m_ReligionBeliefs.end(); i++)
+	{
+		rtnValue += pBeliefs->GetEntry(*i)->GetRiverPlotYieldChange(eYieldType);
+	}
+
+	return rtnValue;
+}
+
 #endif
 
 // Get happiness boost from a resource

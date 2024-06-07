@@ -8965,6 +8965,14 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 				iReligionChange += pSecondaryPantheon->GetLakePlotYieldChange(eYield);
 			}
 		}
+		if(isRiver())
+		{
+			iReligionChange += pReligion->m_Beliefs.GetRiverPlotYieldChange(eYield);
+			if (pSecondaryPantheon)
+			{
+				iReligionChange += pSecondaryPantheon->GetRiverPlotYieldChange(eYield);
+			}
+		}
 		iYield += iReligionChange;
 	}
 
