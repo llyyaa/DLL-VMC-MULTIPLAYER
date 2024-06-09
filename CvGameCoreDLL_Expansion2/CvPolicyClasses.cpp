@@ -154,6 +154,8 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iCapitalTradeRouteRangeChange(0),
 	m_iSharedIdeologyTradeGoldChange(0),
 	m_iRiggingElectionModifier(0),
+	m_iRiggingElectionInfluenceModifier(0),
+	m_bSpyLevelUpWhenRigging(false),
 	m_iMilitaryUnitGiftExtraInfluence(0),
 	m_iProtectedMinorPerTurnInfluence(0),
 	m_iAfraidMinorPerTurnInfluence(0),
@@ -477,6 +479,8 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iSharedIdeologyTradeGoldChange = kResults.GetInt("SharedIdeologyTradeGoldChange");
 
 	m_iRiggingElectionModifier = kResults.GetInt("RiggingElectionModifier");
+	m_iRiggingElectionInfluenceModifier = kResults.GetInt("RiggingElectionInfluenceModifier");
+	m_bSpyLevelUpWhenRigging = kResults.GetBool("SpyLevelUpWhenRigging");
 	m_iMilitaryUnitGiftExtraInfluence = kResults.GetInt("MilitaryUnitGiftExtraInfluence");
 	m_iProtectedMinorPerTurnInfluence = kResults.GetInt("ProtectedMinorPerTurnInfluence");
 	m_iAfraidMinorPerTurnInfluence = kResults.GetInt("AfraidMinorPerTurnInfluence");
@@ -2073,6 +2077,18 @@ int CvPolicyEntry::GetSharedIdeologyTradeGoldChange() const
 int CvPolicyEntry::GetRiggingElectionModifier() const
 {
 	return m_iRiggingElectionModifier;
+}
+
+/// Boost to Influence of rigging an election
+int CvPolicyEntry::GetRiggingElectionInfluenceModifier() const
+{
+	return m_iRiggingElectionInfluenceModifier;
+}
+
+/// Spy can level up when rigging election
+bool CvPolicyEntry::IsSpyLevelUpWhenRigging() const
+{
+	return m_bSpyLevelUpWhenRigging;
 }
 
 ///Influence boost upon gifting a military unit

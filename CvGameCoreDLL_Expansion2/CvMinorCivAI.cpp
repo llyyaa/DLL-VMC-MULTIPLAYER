@@ -9819,6 +9819,10 @@ void CvMinorCivAI::DoElection()
 			int iGoal = pPlayerEspionage->CalcRequired(SPY_STATE_RIG_ELECTION, pCity, iSpyID);
 			pCityEspionage->SetActivity(eEspionagePlayer, 0, iRate, iGoal);
 			pCityEspionage->SetLastProgress(eEspionagePlayer, iRate);
+			if (GET_PLAYER(eEspionagePlayer).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_SPY_LEVEL_UP_WHEN_RIGGING))
+			{
+				pPlayerEspionage->LevelUpSpy(iSpyID);
+			}
 		}
 
 		if(iVotes > 0)
@@ -9854,8 +9858,10 @@ void CvMinorCivAI::DoElection()
 					strNotification << pCapital->getNameKey();
 					pNotifications->Add(NOTIFICATION_SPY_RIG_ELECTION_SUCCESS, strNotification.toUTF8(), strSummary.toUTF8(), pCapital->getX(), pCapital->getY(), -1);
 				}
-
-				ChangeFriendshipWithMajor(ePlayer, GC.getESPIONAGE_INFLUENCE_GAINED_FOR_RIGGED_ELECTION(), false);
+				PlayerTypes eEspionagePlayer = (PlayerTypes)ui;
+				int iChange = GC.getESPIONAGE_INFLUENCE_GAINED_FOR_RIGGED_ELECTION();
+				iChange = (iChange*(100 + GET_PLAYER(eEspionagePlayer).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_RIGGING_ELECTION_INFLUENCE_MODIFIER))) / 100;
+				ChangeFriendshipWithMajor(ePlayer, iChange, false);
 
 #if !defined(NO_ACHIEVEMENTS)
 				//Achievements!

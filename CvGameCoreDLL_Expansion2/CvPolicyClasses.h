@@ -171,6 +171,8 @@ public:
 	int GetCapitalTradeRouteRangeChange() const;
 	int GetSharedIdeologyTradeGoldChange() const;
 	int GetRiggingElectionModifier() const;
+	int GetRiggingElectionInfluenceModifier() const;
+	bool IsSpyLevelUpWhenRigging() const;
 	int GetMilitaryUnitGiftExtraInfluence() const;
 	int GetProtectedMinorPerTurnInfluence() const;
 	int GetAfraidMinorPerTurnInfluence() const;
@@ -477,6 +479,8 @@ private:
 	int m_iCapitalTradeRouteRangeChange;
 	int m_iSharedIdeologyTradeGoldChange;
 	int m_iRiggingElectionModifier;
+	int m_iRiggingElectionInfluenceModifier;
+	bool m_bSpyLevelUpWhenRigging;
 	int m_iMilitaryUnitGiftExtraInfluence;
 	int m_iProtectedMinorPerTurnInfluence;
 	int m_iAfraidMinorPerTurnInfluence;
