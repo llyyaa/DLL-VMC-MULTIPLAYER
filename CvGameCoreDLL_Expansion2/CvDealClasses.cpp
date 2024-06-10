@@ -898,6 +898,11 @@ bool CvDeal::IsPossibleToTradeItem(PlayerTypes ePlayer, PlayerTypes eToPlayer, T
 			return false;
 		}
 
+		if (follower->GetDiplomacyAI()->GetMajorCivApproach(leader->GetID(), false) <= MAJOR_CIV_APPROACH_HOSTILE)
+		{
+			return false;
+		}
+
 		if (leader->getTotalPopulation() < follower->getTotalPopulation() * 2
 			|| leader->getNumCities() < follower->getNumCities() * 2)
 		{
@@ -2555,7 +2560,14 @@ void CvGameDeals::FinalizeDealValidAndAccepted(PlayerTypes eFromPlayer, PlayerTy
 				int iLoop = 0;
 				for (CvCity* pCity = pFollower->firstCity(&iLoop); pCity != NULL; pCity = pFollower->nextCity(&iLoop))
 				{
-					auto* newCity = pLeader->acquireCity(pCity, false, true, true, true);
+					if(pCity->getOriginalOwner() == eAcceptedToPlayer)
+					{
+						pLeader->acquireCity(pCity, false, true, true, true, true);
+					}
+					else
+					{
+						pLeader->acquireCity(pCity, false, true, true, false, true);
+					}
 				}
 
 				iLoop = 0;

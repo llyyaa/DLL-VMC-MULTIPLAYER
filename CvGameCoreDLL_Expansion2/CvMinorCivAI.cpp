@@ -8958,11 +8958,7 @@ void CvMinorCivAI::DoAcquire(PlayerTypes eMajor, int &iNumUnits, int& iCapitalX,
 				iCapitalX = pCity->getX();
 				iCapitalY = pCity->getY();
 			}
-#if defined(MOD_GLOBAL_VENICE_KEEPS_RESOURCES) || defined(MOD_GLOBAL_CS_MARRIAGE_KEEPS_RESOURCES)
 			GET_PLAYER(eMajor).acquireCity(pCity, false, true, bKeepResources); // deletes pCity, don't reuse the pointer
-#else
-			GET_PLAYER(eMajor).acquireCity(pCity, false, true); // deletes pCity, don't reuse the pointer
-#endif
 		}
 	}
 	SetDisableNotifications(false);
