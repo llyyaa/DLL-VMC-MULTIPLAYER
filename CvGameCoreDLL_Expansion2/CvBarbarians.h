@@ -19,6 +19,7 @@ public:
 	static bool ShouldSpawnBarbFromCamp(CvPlot* pPlot);
 	static void DoCampAttacked(CvPlot* pPlot);
 	static void BeginTurn();
+	static void DoCities();
 	static void DoCamps();
 	static void DoUnits();
 
@@ -38,6 +39,9 @@ private:
 #else
 	static UnitTypes GetRandomBarbarianUnitType(CvArea* pArea, UnitAITypes eUnitAI);
 #endif
+
+	static UnitTypes GetRandomBarbarianKingType(CvPlot* pPlot);
+
 #if defined(MOD_BUGFIX_BARB_CAMP_SPAWNING)
 public:
 #endif

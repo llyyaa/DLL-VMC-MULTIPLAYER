@@ -7652,7 +7652,7 @@ void CvGame::doTurn()
 	GC.GetEngineUserInterface()->doTurn();
 
 	CvBarbarians::DoCamps();
-
+	CvBarbarians::DoCities();
 	CvBarbarians::DoUnits();
 
 	GetGameReligions()->DoTurn();

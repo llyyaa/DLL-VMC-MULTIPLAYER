@@ -99,6 +99,8 @@ const char* ConvertGameOptionTypeToString(GameOptionTypes eOption)
 		return "GAMEOPTION_HUMAN_ALL_UC";
 	case GAMEOPTION_PROJECT_CAPTURE:
 		return "GAMEOPTION_PROJECT_CAPTURE";
+	case GAMEOPTION_BARBARIAN_KING:
+		return "GAMEOPTION_BARBARIAN_KING";
 	default:
 		return NULL;
 	}

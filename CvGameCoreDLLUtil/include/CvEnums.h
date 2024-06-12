@@ -1095,9 +1095,10 @@ enum GameOptionTypes
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	GAMEOPTION_SP_IMMIGRATION_OFF,
 #endif
-	GAMEOPTION_CIV_CONQUER,
+	GAMEOPTION_BARBARIAN_KING,
 	GAMEOPTION_HUMAN_ALL_UC,
 	GAMEOPTION_PROJECT_CAPTURE,
+	GAMEOPTION_CIV_CONQUER,
 	// KWG: Please do add anymore enums.  Use the CvPreGame::GetGameOption which uses a text key.
 	//      These enums are shared between DLLs and would diverge if each added their own.
 	NUM_GAMEOPTION_TYPES

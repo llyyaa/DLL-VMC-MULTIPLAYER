@@ -261,6 +261,7 @@ int CvLuaEnums::pRegister(lua_State* L)
 	RegisterEnum(GAMEOPTION_SP_IMMIGRATION_OFF);
 #endif
 	RegisterEnum(GAMEOPTION_CIV_CONQUER);
+	RegisterEnum(GAMEOPTION_BARBARIAN_KING);
 	RegisterEnum(GAMEOPTION_HUMAN_ALL_UC);
 	RegisterEnum(GAMEOPTION_PROJECT_CAPTURE);
 	RegisterEnum(NUM_GAMEOPTION_TYPES);

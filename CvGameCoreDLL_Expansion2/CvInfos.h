@@ -2461,6 +2461,40 @@ private:
 	CvVoteSourceInfo& operator=(const CvVoteSourceInfo&);
 };
 
+class CvBarbarianKingInfo : public CvBaseInfo
+{
+public:
+	CvBarbarianKingInfo() = default;
+	virtual ~CvBarbarianKingInfo() = default;
+
+	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+protected:
+	UnitTypes m_iUnitType = UnitTypes::NO_UNIT;
+	int m_iLandWeight = 0;
+	int m_iSeaWeight = 0;
+
+private:
+	CvBarbarianKingInfo(const CvBarbarianKingInfo&) = default;
+	CvBarbarianKingInfo& operator=(const CvBarbarianKingInfo&) = default;
+};
+
+class CvBarbarianCityFreeBuildingInfo : public CvBaseInfo
+{
+public:
+	CvBarbarianCityFreeBuildingInfo() = default;
+	virtual ~CvBarbarianCityFreeBuildingInfo() = default;
+
+	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+protected:
+	BuildingTypes m_iBuildingType = BuildingTypes::NO_BUILDING;
+
+private:
+	CvBarbarianCityFreeBuildingInfo(const CvBarbarianCityFreeBuildingInfo&) = default;
+	CvBarbarianCityFreeBuildingInfo& operator=(const CvBarbarianCityFreeBuildingInfo&) = default;
+};
+
 struct PolicyYieldInfo
 {
 	PolicyTypes ePolicy;

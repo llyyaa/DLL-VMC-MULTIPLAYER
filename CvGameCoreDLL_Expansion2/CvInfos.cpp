@@ -7754,3 +7754,33 @@ void TerrainArrayHelpers::WriteYieldArray(FDataStream& kStream, int** ppaaiTerra
 	}
 }
 #endif
+
+bool CvBarbarianKingInfo::CacheResults(Database::Results &kResults, CvDatabaseUtility &kUtility)
+{
+	if (!CvBaseInfo::CacheResults(kResults, kUtility))
+		return false;
+
+	const char* szTextVal = kResults.GetText("UnitType");
+	m_iUnitType = static_cast<UnitTypes>(GC.getInfoTypeForString(szTextVal));
+	if (m_iUnitType == UnitTypes::NO_UNIT)
+	{
+		return false;
+	}
+	m_iLandWeight = kResults.GetInt("LandWeight");
+	m_iSeaWeight = kResults.GetInt("SeaWeight");
+	return true;
+}
+
+bool CvBarbarianCityFreeBuildingInfo::CacheResults(Database::Results &kResults, CvDatabaseUtility &kUtility)
+{
+	if (!CvBaseInfo::CacheResults(kResults, kUtility))
+		return false;
+
+	const char* szTextVal = kResults.GetText("BuildingType");
+	m_iBuildingType = static_cast<BuildingTypes>(GC.getInfoTypeForString(szTextVal));
+	if (m_iBuildingType == BuildingTypes::NO_BUILDING)
+	{
+		return false;
+	}
+	return true;
+}

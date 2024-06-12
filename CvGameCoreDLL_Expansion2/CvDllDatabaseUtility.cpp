@@ -335,6 +335,8 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	PrefetchCollection(GC.getVoteInfo(), "Votes");
 	PrefetchCollection(GC.getVoteSourceInfo(), "VoteSources");
 	PrefetchCollection(GC.getUnitDomainInfo(), "Domains");
+	PrefetchCollection(GC.getBarbarianKingInfo(), "BarbarianKings");
+	PrefetchCollection(GC.getBarbarianCityFreeBuildingInfo(), "BarbarianCityFreeBuildings");
 
 #if defined(MOD_EVENTS_DIPLO_MODIFIERS)
 	PrefetchCollection(GC.getDiploModifierInfo(), "DiploModifiers");

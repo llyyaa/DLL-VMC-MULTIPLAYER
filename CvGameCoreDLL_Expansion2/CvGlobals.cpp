@@ -1786,6 +1786,8 @@ CvGlobals::CvGlobals() :
 	m_fLEAGUE_PROJECT_REWARD_TIER_1_THRESHOLD(0.5f),
 	m_fLEAGUE_PROJECT_REWARD_TIER_2_THRESHOLD(1.0f),
 
+	m_iBARBARIAN_CITY_SPAWN_PROBABLITY(0),
+
 // -- post defines --
 
 	m_iLAND_TERRAIN(0),
@@ -4230,6 +4232,16 @@ CvEraInfo* CvGlobals::getEraInfo(EraTypes eEraNum)
 	return m_aEraInfo[eEraNum];
 }
 
+std::vector<CvBarbarianKingInfo*>& CvGlobals::getBarbarianKingInfo()
+{
+	return m_paBarbarianKingInfo;
+}
+
+std::vector<CvBarbarianCityFreeBuildingInfo*>& CvGlobals::getBarbarianCityFreeBuildingInfo()
+{
+	return m_paBarbarianCityFreeBuildingInfo;
+}
+
 int CvGlobals::getNumHurryInfos()
 {
 	return (int)m_paHurryInfo.size();
@@ -6258,6 +6270,8 @@ void CvGlobals::cacheGlobals()
 	m_iLEAGUE_MEMBER_VOTES_PER_CITY_STATE_ALLY = getDefineINT("LEAGUE_MEMBER_VOTES_PER_CITY_STATE_ALLY");
 	m_fLEAGUE_PROJECT_REWARD_TIER_1_THRESHOLD = getDefineFLOAT("LEAGUE_PROJECT_REWARD_TIER_1_THRESHOLD");
 	m_fLEAGUE_PROJECT_REWARD_TIER_2_THRESHOLD = getDefineFLOAT("LEAGUE_PROJECT_REWARD_TIER_2_THRESHOLD");
+
+	m_iBARBARIAN_CITY_SPAWN_PROBABLITY = getDefineINT("BARBARIAN_CITY_SPAWN_PROBABLITY");
 
 	// -- post defines --
 

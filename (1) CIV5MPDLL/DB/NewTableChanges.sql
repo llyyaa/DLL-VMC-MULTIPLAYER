@@ -255,3 +255,16 @@ CREATE TABLE IF NOT EXISTS UnitPromotions_InstantYieldPerReligionFollowerConvert
     `YieldType` TEXT DEFAULT '' references Yields(Type),
     `Yield` INTEGER DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS BarbarianKings (
+    `ID` integer primary key autoincrement,
+    `UnitType` text not null references Units(Type),
+    `LandWeight` integer not null default 0, -- Probability weight of being born in a land city
+    `SeaWeight` integer not null default 0 -- Probability weight of being born in a seaside city
+);
+
+CREATE TABLE IF NOT EXISTS BarbarianCityFreeBuildings (
+    `ID` integer primary key autoincrement,
+    `BuildingType` text not null references Buildings(Type)
+);
+
+INSERT INTO Defines(Name, Value) VALUES('BARBARIAN_CITY_SPAWN_PROBABLITY', 0);

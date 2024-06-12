@@ -285,270 +285,333 @@ void CvBarbarians::Write(FDataStream& kStream)
 	kStream << ArrayWrapper<short>(iWorldNumPlots, m_aiPlotBarbCampNumUnitsSpawned);
 }
 
+template <typename T>
+static void shuffleVector(std::vector<T>& vec) {
+    for (int i = vec.size() - 1; i > 0; --i) {
+        int j = kGame.getJonRandNum((i + 1))
+
+        std::swap(vec[i], vec[j]);
+    }
+}
+
+void CvBarbarians::DoCities()
+{
+	CvGame &kGame = GC.getGame();
+	if (kGame.isOption(GAMEOPTION_NO_BARBARIANS))
+	{
+		return;
+	}
+	// if (!kGame.isOption(GAMEOPTION_BARBARIAN_KING))
+	// {
+	// 	return;
+	// }
+
+	ImprovementTypes eCamp = (ImprovementTypes)GC.getBARBARIAN_CAMP_IMPROVEMENT();
+	if (eCamp == NO_IMPROVEMENT) // barbarian camp is not avaiable. skip.
+	{
+		return;
+	}
+
+	CvMap &kMap = GC.getMap();
+	std::vector<CvPlot *> candidatePlotsToSpawnCity;
+	// Figure out how many Nonvisible tiles we have to base # of cities to spawn on
+	for (int iI = 0; iI < kMap.numPlots(); iI++)
+	{
+		CvPlot *pLoopPlot = kMap.plotByIndexUnchecked(iI);
+		if (pLoopPlot && pLoopPlot->getImprovementType() == eCamp && !pLoopPlot->isVisibleToCivTeam())
+		{
+			candidatePlotsToSpawnCity.push_back(pLoopPlot);
+		}
+	}
+
+	CvPlayerAI& kBarbarianPlayer = GET_PLAYER(BARBARIAN_PLAYER);
+	for (CvPlot* plot : candidatePlotsToSpawnCity)
+	{
+		kBarbarianPlayer.initCity(plot->getX(), plot->getY());
+	}
+}
+
 //	--------------------------------------------------------------------------------
 void CvBarbarians::DoCamps()
 {
-	CvGame& kGame = GC.getGame();
+	CvGame &kGame = GC.getGame();
 
-	if(kGame.isOption(GAMEOPTION_NO_BARBARIANS))
+	if (kGame.isOption(GAMEOPTION_NO_BARBARIANS))
 	{
 		return;
 	}
 
 	int iNumNotVisiblePlots = 0;
 	int iNumCampsInExistence = 0;
-	CvPlot* pLoopPlot;
+	CvPlot *pLoopPlot;
 
 	ImprovementTypes eCamp = (ImprovementTypes)GC.getBARBARIAN_CAMP_IMPROVEMENT();
 
 	bool bAlwaysRevealedBarbCamp = false;
 
 	// Is there an appropriate Improvement to place as a Barb Camp?
-	if(eCamp != NO_IMPROVEMENT)
+	if (eCamp == NO_IMPROVEMENT)
 	{
-		CvMap& kMap = GC.getMap();
-		// Figure out how many Nonvisible tiles we have to base # of camps to spawn on
-		for(int iI = 0; iI < kMap.numPlots(); iI++)
+		return;
+	}
+
+	CvMap &kMap = GC.getMap();
+	// Figure out how many Nonvisible tiles we have to base # of camps to spawn on
+	for (int iI = 0; iI < kMap.numPlots(); iI++)
+	{
+		pLoopPlot = kMap.plotByIndexUnchecked(iI);
+
+		// See how many camps we already have
+		if (pLoopPlot->getImprovementType() == eCamp)
 		{
-			pLoopPlot = kMap.plotByIndexUnchecked(iI);
-
-			// See how many camps we already have
-			if(pLoopPlot->getImprovementType() == eCamp)
-			{
-				iNumCampsInExistence++;
-			}
-
-			if(!pLoopPlot->isWater())
-			{
-				if(!pLoopPlot->isVisibleToCivTeam())
-				{
-					iNumNotVisiblePlots++;
-				}
-			}
+			iNumCampsInExistence++;
 		}
 
-		int iNumValidCampPlots;
-
-		iNumValidCampPlots = iNumNotVisiblePlots;
-
-		int iFogTilesPerBarbarianCamp = kMap.getWorldInfo().getFogTilesPerBarbarianCamp();
-		int iCampTargetNum = (iFogTilesPerBarbarianCamp != 0)? iNumValidCampPlots / iFogTilesPerBarbarianCamp : 0;//getHandicapInfo().getFogTilesPerBarbarianCamp();
-		int iNumCampsToAdd = iCampTargetNum - iNumCampsInExistence;
-
-		int iMaxCampsThisArea;
-
-		if(iNumCampsToAdd > 0 && GC.getBARBARIAN_CAMP_ODDS_OF_NEW_CAMP_SPAWNING() > 0) // slewis - added the barbarian chance for the FoR scenario
+		if (!pLoopPlot->isWater())
 		{
-			// First turn of the game add 1/3 of the Target number of Camps
-			if(kGame.getElapsedGameTurns() == 0)
+			if (!pLoopPlot->isVisibleToCivTeam())
 			{
-				iNumCampsToAdd *= /*33*/ GC.getBARBARIAN_CAMP_FIRST_TURN_PERCENT_OF_TARGET_TO_ADD();
-				iNumCampsToAdd /= 100;
+				iNumNotVisiblePlots++;
 			}
-			// Every other turn of the game there's a 1 in 2 chance of adding a new camp if we're still below the target
-			else
-			{
-				if(kGame.getJonRandNum(/*2*/ GC.getBARBARIAN_CAMP_ODDS_OF_NEW_CAMP_SPAWNING(), "Random roll to see if Barb Camp spawns this turn") > 0)
-				{
-					iNumCampsToAdd = 1;
-				}
-				else
-				{
-					iNumCampsToAdd = 0;
-				}
-			}
-
-			// Don't want to get stuck in an infinite or almost so loop
-			int iCount = 0;
-			int iPlotIndex = -1;
-			int iNumPlots = kMap.numPlots();
-
-			UnitTypes eBestUnit;
-
-			int iNumLandPlots = kMap.getLandPlots();
-
-			// Do a random roll to bias in favor of Coastal land Tiles so that the Barbs will spawn Boats :) - required 1/6 of the time
-			bool bWantsCoastal = kGame.getJonRandNum(/*6*/ GC.getBARBARIAN_CAMP_COASTAL_SPAWN_ROLL(), "Barb Camp Plot-Finding Roll - Coastal Bias 1") == 0 ? true : false;
-
-			int iPlayerCapitalMinDistance = /*4*/ GC.getBARBARIAN_CAMP_MINIMUM_DISTANCE_CAPITAL();
-			int iBarbCampMinDistance = /*7*/ GC.getBARBARIAN_CAMP_MINIMUM_DISTANCE_ANOTHER_CAMP();
-			int iMaxDistanceToLook = iPlayerCapitalMinDistance > iBarbCampMinDistance ? iPlayerCapitalMinDistance : iBarbCampMinDistance;
-			int iPlotDistance;
-
-			int iDX, iDY;
-			CvPlot* pNearbyCampPlot;
-			bool bSomethingTooClose;
-
-			CvString strBuffer;
-
-			int iPlayerLoop;
-
-			// Find Plots to put the Camps
-			do
-			{
-				iCount++;
-
-				iPlotIndex = kGame.getJonRandNum(iNumPlots, "Barb Camp Plot-Finding Roll");
-
-				pLoopPlot = kMap.plotByIndex(iPlotIndex);
-
-				// Plot must be valid (not Water, nonvisible)
-				if(!pLoopPlot->isWater())
-				{
-					if(!pLoopPlot->isImpassable() && !pLoopPlot->isMountain())
-					{
-#if defined(MOD_BUGFIX_BARB_CAMP_TERRAINS)
-						CvImprovementEntry* pkImprovementInfo = GC.getImprovementInfo(eCamp);
-						if(MOD_BUGFIX_BARB_CAMP_TERRAINS == false || pkImprovementInfo == NULL || (pkImprovementInfo->GetTerrainMakesValid(pLoopPlot->getTerrainType()) && pkImprovementInfo->GetFeatureMakesValid(pLoopPlot->getFeatureType()))) {
-#endif
-						if(!pLoopPlot->isOwned() && !pLoopPlot->isVisibleToCivTeam())
-						{
-							// JON: NO RESOURCES FOR NOW, MAY REPLACE WITH SOMETHING COOLER
-							if(pLoopPlot->getResourceType() == NO_RESOURCE)
-							{
-								// No camps on 1-tile islands
-								if(kMap.getArea(pLoopPlot->getArea())->getNumTiles() > 1)
-								{
-									if(pLoopPlot->isCoastalLand() || !bWantsCoastal)
-									{
-										// Max Camps for this area
-										iMaxCampsThisArea = iCampTargetNum * pLoopPlot->area()->getNumTiles() / iNumLandPlots;
-										// Add 1 just in case the above algorithm rounded something off
-										iMaxCampsThisArea++;
-
-										// Already enough Camps in this Area?
-										if(pLoopPlot->area()->getNumImprovements(eCamp) <= iMaxCampsThisArea)
-										{
-											// Don't look at Tiles that already have a Camp
-											if(pLoopPlot->getImprovementType() == NO_IMPROVEMENT)
-											{
-												// Don't look at Tiles that can't have an improvement
-												if(pLoopPlot->getFeatureType() == NO_FEATURE || !GC.getFeatureInfo(pLoopPlot->getFeatureType())->isNoImprovement())
-												{
-													bSomethingTooClose = false;
-
-													// Look at nearby Plots to make sure another camp isn't too close
-													for(iDX = -(iMaxDistanceToLook); iDX <= iMaxDistanceToLook; iDX++)
-													{
-														for(iDY = -(iMaxDistanceToLook); iDY <= iMaxDistanceToLook; iDY++)
-														{
-															pNearbyCampPlot = plotXY(pLoopPlot->getX(), pLoopPlot->getY(), iDX, iDY);
-
-															if(pNearbyCampPlot != NULL)
-															{
-																iPlotDistance = plotDistance(pNearbyCampPlot->getX(), pNearbyCampPlot->getY(), pLoopPlot->getX(), pLoopPlot->getY());
-
-																// Can't be too close to a player
-																if(iPlotDistance <= iPlayerCapitalMinDistance)
-																{
-																	if(pNearbyCampPlot->isCity())
-																	{
-																		if(pNearbyCampPlot->getPlotCity()->isCapital())
-																		{
-																			// Only care about Majors' capitals
-																			if(pNearbyCampPlot->getPlotCity()->getOwner() < MAX_MAJOR_CIVS)
-																			{
-																				bSomethingTooClose = true;
-																				break;
-																			}
-																		}
-																	}
-																}
-
-																// Can't be too close to another Camp
-																if(iPlotDistance <= iBarbCampMinDistance)
-																{
-																	if(pNearbyCampPlot->getImprovementType() == eCamp)
-																	{
-																		bSomethingTooClose = true;
-																		break;
-																	}
-																}
-															}
-														}
-														if(bSomethingTooClose)
-														{
-															break;
-														}
-													}
-
-													// Found a camp too close, check another Plot
-													if(bSomethingTooClose)
-														continue;
-
-													// Last check
-													if(!CvBarbarians::IsPlotValidForBarbCamp(pLoopPlot))
-														continue;
-
-													pLoopPlot->setImprovementType(eCamp);
-#if !defined(MOD_BUGFIX_BARB_CAMP_SPAWNING)
-													// The notification has been moved into the CvPlot::setImprovementType() method
-													DoCampActivationNotice(pLoopPlot);
-#endif
-
-#if defined(MOD_EVENTS_BARBARIANS)
-													eBestUnit = GetRandomBarbarianUnitType(pLoopPlot, UNITAI_DEFENSE);
-#else
-													eBestUnit = GetRandomBarbarianUnitType(kMap.getArea(pLoopPlot->getArea()), UNITAI_DEFENSE);
-#endif
-
-													CvUnit* pNewBarbarianUnit = NULL;
-
-													if(eBestUnit != NO_UNIT)
-													{												
-														pNewBarbarianUnit = GET_PLAYER(BARBARIAN_PLAYER).initUnit(eBestUnit, pLoopPlot->getX(), pLoopPlot->getY(), (UnitAITypes) GC.getUnitInfo(eBestUnit)->GetDefaultUnitAIType());
-
-#if defined(MOD_EVENTS_BARBARIANS)
-														if (MOD_EVENTS_BARBARIANS) {
-															GAMEEVENTINVOKE_HOOK(GAMEEVENT_BarbariansSpawnedUnit, pNewBarbarianUnit->getOwner(), pNewBarbarianUnit->GetID(), pLoopPlot->getX(), pLoopPlot->getY(), eBestUnit);
-														}
-#endif
-													}
-
-													// If we should update Camp visibility (for Policy), do so
-													PlayerTypes ePlayer;
-													TeamTypes eTeam;
-													for(iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
-													{
-														ePlayer = (PlayerTypes) iPlayerLoop;
-														eTeam = GET_PLAYER(ePlayer).getTeam();
-
-														if(GET_PLAYER(ePlayer).IsAlwaysSeeBarbCamps())
-														{
-															if(pLoopPlot->isRevealed(eTeam))
-															{
-																pLoopPlot->setRevealedImprovementType(eTeam, eCamp);
-																if(GC.getGame().getActivePlayer() == ePlayer)
-																	bAlwaysRevealedBarbCamp = true;
-															}
-														}
-													}
-
-													// Add another Unit adjacent to the Camp to stir up some trouble (JON: Disabled for now 09/12/09)
-													//doSpawnBarbarianUnit(pLoopPlot);
-
-													iNumCampsToAdd--;
-
-													// Seed the next Camp for Coast or not
-													bWantsCoastal = kGame.getJonRandNum(/*5*/ GC.getBARBARIAN_CAMP_COASTAL_SPAWN_ROLL(), "Barb Camp Plot-Finding Roll - Coastal Bias 2") == 0 ? true : false;
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-#if defined(MOD_BUGFIX_BARB_CAMP_TERRAINS)
-						}
-#endif
-					}
-				}
-			}
-			while(iNumCampsToAdd > 0 && iCount < iNumLandPlots);
 		}
 	}
 
-	if(bAlwaysRevealedBarbCamp)
+	int iNumValidCampPlots;
+
+	iNumValidCampPlots = iNumNotVisiblePlots;
+
+	int iFogTilesPerBarbarianCamp = kMap.getWorldInfo().getFogTilesPerBarbarianCamp();
+	int iCampTargetNum = (iFogTilesPerBarbarianCamp != 0) ? iNumValidCampPlots / iFogTilesPerBarbarianCamp : 0; // getHandicapInfo().getFogTilesPerBarbarianCamp();
+	int iNumCampsToAdd = iCampTargetNum - iNumCampsInExistence;
+
+	int iMaxCampsThisArea;
+
+	if (iNumCampsToAdd <= 0 || GC.getBARBARIAN_CAMP_ODDS_OF_NEW_CAMP_SPAWNING() <= 0) // slewis - added the barbarian chance for the FoR scenario
+	{
+		return;
+	}
+	// First turn of the game add 1/3 of the Target number of Camps
+	if (kGame.getElapsedGameTurns() == 0)
+	{
+		iNumCampsToAdd *= /*33*/ GC.getBARBARIAN_CAMP_FIRST_TURN_PERCENT_OF_TARGET_TO_ADD();
+		iNumCampsToAdd /= 100;
+	}
+	// Every other turn of the game there's a 1 in 2 chance of adding a new camp if we're still below the target
+	else
+	{
+		if (kGame.getJonRandNum(/*2*/ GC.getBARBARIAN_CAMP_ODDS_OF_NEW_CAMP_SPAWNING(), "Random roll to see if Barb Camp spawns this turn") > 0)
+		{
+			iNumCampsToAdd = 1;
+		}
+		else
+		{
+			iNumCampsToAdd = 0;
+		}
+	}
+
+	// Don't want to get stuck in an infinite or almost so loop
+	int iCount = 0;
+	int iPlotIndex = -1;
+	int iNumPlots = kMap.numPlots();
+
+	UnitTypes eBestUnit;
+
+	int iNumLandPlots = kMap.getLandPlots();
+
+	// Do a random roll to bias in favor of Coastal land Tiles so that the Barbs will spawn Boats :) - required 1/6 of the time
+	bool bWantsCoastal = kGame.getJonRandNum(/*6*/ GC.getBARBARIAN_CAMP_COASTAL_SPAWN_ROLL(), "Barb Camp Plot-Finding Roll - Coastal Bias 1") == 0 ? true : false;
+
+	int iPlayerCapitalMinDistance = /*4*/ GC.getBARBARIAN_CAMP_MINIMUM_DISTANCE_CAPITAL();
+	int iBarbCampMinDistance = /*7*/ GC.getBARBARIAN_CAMP_MINIMUM_DISTANCE_ANOTHER_CAMP();
+	int iMaxDistanceToLook = iPlayerCapitalMinDistance > iBarbCampMinDistance ? iPlayerCapitalMinDistance : iBarbCampMinDistance;
+	int iPlotDistance;
+
+	int iDX, iDY;
+	CvPlot *pNearbyCampPlot;
+	bool bSomethingTooClose;
+
+	CvString strBuffer;
+
+	int iPlayerLoop;
+
+	// Find Plots to put the Camps
+	do
+	{
+		iCount++;
+
+		iPlotIndex = kGame.getJonRandNum(iNumPlots, "Barb Camp Plot-Finding Roll");
+
+		pLoopPlot = kMap.plotByIndex(iPlotIndex);
+
+		// Plot must be valid (not Water, nonvisible)
+		if (pLoopPlot->isWater())
+		{
+			continue;
+		}
+
+		if (pLoopPlot->isImpassable() || pLoopPlot->isMountain())
+		{
+			continue;
+		}
+
+#if defined(MOD_BUGFIX_BARB_CAMP_TERRAINS)
+		CvImprovementEntry *pkImprovementInfo = GC.getImprovementInfo(eCamp);
+		if (!(MOD_BUGFIX_BARB_CAMP_TERRAINS == false || pkImprovementInfo == NULL || (pkImprovementInfo->GetTerrainMakesValid(pLoopPlot->getTerrainType()) && pkImprovementInfo->GetFeatureMakesValid(pLoopPlot->getFeatureType()))))
+		{
+			continue;
+		}
+#endif
+		if (pLoopPlot->isOwned() || pLoopPlot->isVisibleToCivTeam())
+		{
+			continue;
+		}
+		// JON: NO RESOURCES FOR NOW, MAY REPLACE WITH SOMETHING COOLER
+		if (pLoopPlot->getResourceType() != NO_RESOURCE)
+		{
+			continue;
+		}
+		// No camps on 1-tile islands
+		if (kMap.getArea(pLoopPlot->getArea())->getNumTiles() <= 1)
+		{
+			continue;
+		}
+		if (!pLoopPlot->isCoastalLand() && bWantsCoastal)
+		{
+			continue;
+		}
+
+		// Max Camps for this area
+		iMaxCampsThisArea = iCampTargetNum * pLoopPlot->area()->getNumTiles() / iNumLandPlots;
+		// Add 1 just in case the above algorithm rounded something off
+		iMaxCampsThisArea++;
+		// Already enough Camps in this Area?
+		if (pLoopPlot->area()->getNumImprovements(eCamp) > iMaxCampsThisArea)
+		{
+			continue;
+		}
+
+		// Don't look at Tiles that already have a Camp
+		if (pLoopPlot->getImprovementType() != NO_IMPROVEMENT)
+		{
+			continue;
+		}
+
+		// Don't look at Tiles that can't have an improvement
+		if (pLoopPlot->getFeatureType() != NO_FEATURE && GC.getFeatureInfo(pLoopPlot->getFeatureType())->isNoImprovement())
+		{
+			continue;
+		}
+
+		bSomethingTooClose = false;
+
+		// Look at nearby Plots to make sure another camp isn't too close
+		for (iDX = -(iMaxDistanceToLook); iDX <= iMaxDistanceToLook; iDX++)
+		{
+			for (iDY = -(iMaxDistanceToLook); iDY <= iMaxDistanceToLook; iDY++)
+			{
+				pNearbyCampPlot = plotXY(pLoopPlot->getX(), pLoopPlot->getY(), iDX, iDY);
+
+				if (pNearbyCampPlot != NULL)
+				{
+					iPlotDistance = plotDistance(pNearbyCampPlot->getX(), pNearbyCampPlot->getY(), pLoopPlot->getX(), pLoopPlot->getY());
+
+					// Can't be too close to a player
+					if (iPlotDistance <= iPlayerCapitalMinDistance)
+					{
+						if (pNearbyCampPlot->isCity())
+						{
+							if (pNearbyCampPlot->getPlotCity()->isCapital())
+							{
+								// Only care about Majors' capitals
+								if (pNearbyCampPlot->getPlotCity()->getOwner() < MAX_MAJOR_CIVS)
+								{
+									bSomethingTooClose = true;
+									break;
+								}
+							}
+						}
+					}
+
+					// Can't be too close to another Camp
+					if (iPlotDistance <= iBarbCampMinDistance)
+					{
+						if (pNearbyCampPlot->getImprovementType() == eCamp)
+						{
+							bSomethingTooClose = true;
+							break;
+						}
+					}
+				}
+			}
+			if (bSomethingTooClose)
+			{
+				break;
+			}
+		}
+
+		// Found a camp too close, check another Plot
+		if (bSomethingTooClose)
+			continue;
+
+		// Last check
+		if (!CvBarbarians::IsPlotValidForBarbCamp(pLoopPlot))
+			continue;
+
+		pLoopPlot->setImprovementType(eCamp);
+#if !defined(MOD_BUGFIX_BARB_CAMP_SPAWNING)
+		// The notification has been moved into the CvPlot::setImprovementType() method
+		DoCampActivationNotice(pLoopPlot);
+#endif
+
+#if defined(MOD_EVENTS_BARBARIANS)
+		eBestUnit = GetRandomBarbarianUnitType(pLoopPlot, UNITAI_DEFENSE);
+#else
+		eBestUnit = GetRandomBarbarianUnitType(kMap.getArea(pLoopPlot->getArea()), UNITAI_DEFENSE);
+#endif
+
+		CvUnit *pNewBarbarianUnit = NULL;
+
+		if (eBestUnit != NO_UNIT)
+		{
+			pNewBarbarianUnit = GET_PLAYER(BARBARIAN_PLAYER).initUnit(eBestUnit, pLoopPlot->getX(), pLoopPlot->getY(), (UnitAITypes)GC.getUnitInfo(eBestUnit)->GetDefaultUnitAIType());
+
+#if defined(MOD_EVENTS_BARBARIANS)
+			if (MOD_EVENTS_BARBARIANS)
+			{
+				GAMEEVENTINVOKE_HOOK(GAMEEVENT_BarbariansSpawnedUnit, pNewBarbarianUnit->getOwner(), pNewBarbarianUnit->GetID(), pLoopPlot->getX(), pLoopPlot->getY(), eBestUnit);
+			}
+#endif
+		}
+
+		// If we should update Camp visibility (for Policy), do so
+		PlayerTypes ePlayer;
+		TeamTypes eTeam;
+		for (iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
+		{
+			ePlayer = (PlayerTypes)iPlayerLoop;
+			eTeam = GET_PLAYER(ePlayer).getTeam();
+
+			if (GET_PLAYER(ePlayer).IsAlwaysSeeBarbCamps())
+			{
+				if (pLoopPlot->isRevealed(eTeam))
+				{
+					pLoopPlot->setRevealedImprovementType(eTeam, eCamp);
+					if (GC.getGame().getActivePlayer() == ePlayer)
+						bAlwaysRevealedBarbCamp = true;
+				}
+			}
+		}
+
+		// Add another Unit adjacent to the Camp to stir up some trouble (JON: Disabled for now 09/12/09)
+		// doSpawnBarbarianUnit(pLoopPlot);
+
+		iNumCampsToAdd--;
+
+		// Seed the next Camp for Coast or not
+		bWantsCoastal = kGame.getJonRandNum(/*5*/ GC.getBARBARIAN_CAMP_COASTAL_SPAWN_ROLL(), "Barb Camp Plot-Finding Roll - Coastal Bias 2") == 0 ? true : false;
+	} while (iNumCampsToAdd > 0 && iCount < iNumLandPlots);
+
+	if (bAlwaysRevealedBarbCamp)
 		GC.getMap().updateDeferredFog();
 }
 

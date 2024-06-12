@@ -638,6 +638,9 @@ public:
 	CvAchievementXMLEntries* GetGameAchievements() const;
 #endif
 
+	std::vector<CvBarbarianKingInfo*>& getBarbarianKingInfo();
+	std::vector<CvBarbarianCityFreeBuildingInfo*>& getBarbarianCityFreeBuildingInfo();
+
 #ifdef MOD_SPECIALIST_RESOURCES
 	std::tr1::unordered_set<PolicyTypes>& getSpecialistResourcesPolicies();
 	std::tr1::unordered_set<TechTypes>& getSpecialistResourcesTechnologies();
@@ -7640,6 +7643,8 @@ public:
 		return m_fLEAGUE_PROJECT_REWARD_TIER_2_THRESHOLD;
 	}
 
+	GD_INT_DEF(BARBARIAN_CITY_SPAWN_PROBABLITY);
+
 #if defined(MOD_PROMOTIONS_DEEP_WATER_EMBARKATION)
 	GD_INT_DEF(PROMOTION_DEEPWATER_EMBARKATION)
 	GD_INT_DEF(PROMOTION_DEFENSIVE_DEEPWATER_EMBARKATION)
@@ -7975,6 +7980,8 @@ protected:
 	std::vector<CvSmallAwardInfo*> m_paSmallAwardInfo;
 	std::vector<CvEntityEventInfo*> m_paEntityEventInfo;
 	std::vector<CvDomainInfo*> m_paUnitDomainInfo;
+	std::vector<CvBarbarianKingInfo*> m_paBarbarianKingInfo;
+	std::vector<CvBarbarianCityFreeBuildingInfo*> m_paBarbarianCityFreeBuildingInfo;
 
 	std::vector<CvMultiUnitFormationInfo*> m_paMultiUnitFormationInfo;
 
@@ -9753,6 +9760,8 @@ protected:
 	int   m_iLEAGUE_MEMBER_VOTES_PER_CITY_STATE_ALLY;
 	float m_fLEAGUE_PROJECT_REWARD_TIER_1_THRESHOLD;
 	float m_fLEAGUE_PROJECT_REWARD_TIER_2_THRESHOLD;
+
+	int	  m_iBARBARIAN_CITY_SPAWN_PROBABLITY = 0;
 	int   m_iPROMOTION_GOODY_HUT_PICKER;
 	int   m_iIDEOLOGY_PERCENT_CLEAR_VICTORY_PREF;
 	int   m_iIDEOLOGY_SCORE_GRAND_STRATS;
