@@ -21502,10 +21502,12 @@ int CvPlayer::GetScienceFromHappinessTimes100(int iScienceFromCities) const
 /// Where is our Science coming from?
 int CvPlayer::GetScienceFromResearchAgreementsTimes100(int iScienceFromCities) const
 {
-	if (GC.getRESEARCH_AGREEMENT_MOD() == 0) return 0;
+	// RAs currently do not have default effect
+	int iModifier = /*0*/ GC.getRESEARCH_AGREEMENT_MOD() + getPolicyModifiers(POLICYMOD_SCIENCE_MODIFIER_FROM_RA_NUM);
+	if (iModifier == 0) return 0;
 
 	int iScience = iScienceFromCities;
-	int iResearchAgreementBonus = /*0*/ GC.getRESEARCH_AGREEMENT_MOD() * GET_TEAM(getTeam()).GetTotalNumResearchAgreements(); // RAs currently do not have this effect
+	int iResearchAgreementBonus = iModifier * GET_TEAM(getTeam()).GetTotalNumResearchAgreements();
 	iScience *= iResearchAgreementBonus;	// Apply to the % to the current value
 	iScience /= 100;
 
@@ -26650,6 +26652,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 #endif
 	changePolicyModifiers(POLICYMOD_SETTLER_POPULATION_CONSUME, pPolicy->GetSettlerPopConsume() * iChange);
 	changePolicyModifiers(POLICYMOD_TOURISM_MODIFIER_PER_GP_CREATION, pPolicy->GetTourismModifierPerGPCreation() * iChange);
+	changePolicyModifiers(POLICYMOD_SCIENCE_MODIFIER_FROM_RA_NUM, pPolicy->GetScienceModifierFromRANum() * iChange);
 	changePolicyModifiers(POLICYMOD_DEEP_WATER_NAVAL_CULTURE_STRENGTH_MODIFIER, pPolicy->GetDeepWaterNavalStrengthCultureModifier() * iChange);
 
 	if(pPolicy->GetFreeBuildingClass() != NO_BUILDINGCLASS)
