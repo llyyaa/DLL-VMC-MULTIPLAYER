@@ -316,7 +316,7 @@ public:
 	int GetPurchaseCost(BuildingTypes eBuilding);
 	int GetFaithPurchaseCost(BuildingTypes eBuilding);
 	int GetPurchaseCost(ProjectTypes eProject);
-	int GetPurchaseCostFromProduction(int iProduction);
+	int GetPurchaseCostFromProduction(int iProduction, bool bIsNoHurry = false);
 
 	int getProductionTurnsLeft(int iProductionNeeded, int iProduction, int iFirstProductionDifference, int iProductionDifference) const;
 	void setProduction(int iNewValue);

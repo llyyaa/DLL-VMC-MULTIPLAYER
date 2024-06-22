@@ -28584,6 +28584,7 @@ void CvPlayer::Read(FDataStream& kStream)
 
 	kStream >> m_iBossLevel;
 	kStream >> m_iNumGreatPersonSincePolicy;
+	kStream >> m_iNumSpaceshipPartPurchased;
 
 	if(GetID() < MAX_MAJOR_CIVS)
 	{
@@ -29251,6 +29252,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 
 	kStream << m_iBossLevel;
 	kStream << m_iNumGreatPersonSincePolicy;
+	kStream << m_iNumSpaceshipPartPurchased;
 }
 
 //	--------------------------------------------------------------------------------
@@ -33309,4 +33311,13 @@ int CvPlayer::GetNumGreatPersonSincePolicy() const
 void CvPlayer::ChangeNumGreatPersonSincePolicy(int iChange)
 {
 	m_iNumGreatPersonSincePolicy += iChange;
+}
+
+int CvPlayer::GetNumSpaceshipPartPurchased() const
+{
+	return m_iNumSpaceshipPartPurchased;
+}
+void CvPlayer::ChangeNumSpaceshipPartPurchased(int iChange)
+{
+	m_iNumSpaceshipPartPurchased += iChange;
 }

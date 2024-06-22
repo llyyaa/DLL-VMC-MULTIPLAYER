@@ -2254,6 +2254,9 @@ public:
 
 	int GetNumGreatPersonSincePolicy() const;
 	void ChangeNumGreatPersonSincePolicy(int iChange);
+
+	int GetNumSpaceshipPartPurchased() const;
+	void ChangeNumSpaceshipPartPurchased(int iChange);
 protected:
 	class ConqueredByBoolField
 	{
@@ -2967,6 +2970,7 @@ protected:
 
 	int m_iBossLevel = 0;
 	int m_iNumGreatPersonSincePolicy = 0;
+	int m_iNumSpaceshipPartPurchased = 0;
 };
 
 extern bool CancelActivePlayerEndTurn();

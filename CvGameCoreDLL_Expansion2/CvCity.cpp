@@ -5828,7 +5828,6 @@ int CvCity::GetPurchaseCost(UnitTypes eUnit)
 
 	bool bIsSpaceshipPart = pkUnitInfo->GetSpaceshipProject() != NO_PROJECT;
 
-	int iCost = GetPurchaseCostFromProduction(getProductionNeeded(eUnit));
 	if (iModifier == -1 && (!bIsSpaceshipPart || !GET_PLAYER(getOwner()).IsEnablesSSPartPurchase()))
 	{
 #ifdef MOD_API_BUILDING_ENABLE_PURCHASE_UNITS
@@ -5860,13 +5859,24 @@ int CvCity::GetPurchaseCost(UnitTypes eUnit)
 		if(iModifier == -1) return -1;
 	}
 
-	
-	iCost *= (100 + iModifier);
-	iCost /= 100;
+	int iCost = 0;
 
-	// Cost of purchasing units modified?
-	iCost *= (100 + GET_PLAYER(getOwner()).GetUnitPurchaseCostModifier());
-	iCost /= 100;
+	if(MOD_GLOBAL_INCREASE_SS_PART_PURCHASE_COST && bIsSpaceshipPart)
+	{
+		// for SP, Space Ship should not get any discount
+		iCost = GetPurchaseCostFromProduction(getProductionNeeded(eUnit), true);
+		iCost *= (int)pow(2.0, (double)GET_PLAYER(getOwner()).GetNumSpaceshipPartPurchased());
+	}
+	else
+	{
+		iCost = GetPurchaseCostFromProduction(getProductionNeeded(eUnit));
+		iCost *= (100 + iModifier);
+		iCost /= 100;
+
+		// Cost of purchasing units modified?
+		iCost *= (100 + GET_PLAYER(getOwner()).GetUnitPurchaseCostModifier());
+		iCost /= 100;
+	}
 
 	// Make the number not be funky
 	int iDivisor = /*10*/ GC.getGOLD_PURCHASE_VISIBLE_DIVISOR();
@@ -6214,7 +6224,7 @@ int CvCity::GetPurchaseCost(ProjectTypes eProject)
 
 //	--------------------------------------------------------------------------------
 /// Cost of Purchasing something based on the amount of Production it requires to construct
-int CvCity::GetPurchaseCostFromProduction(int iProduction)
+int CvCity::GetPurchaseCostFromProduction(int iProduction, bool bIsNoHurry)
 {
 	VALIDATE_OBJECT
 	int iPurchaseCost;
@@ -6227,7 +6237,7 @@ int CvCity::GetPurchaseCostFromProduction(int iProduction)
 	// Hurry Mod (Policies, etc.)
 	HurryTypes eHurry = (HurryTypes) GC.getInfoTypeForString("HURRY_GOLD");
 
-	if(eHurry != NO_HURRY)
+	if(eHurry != NO_HURRY && !bIsNoHurry)
 	{
 		iPurchaseCost *= GetHurryModifier(eHurry);
 		iPurchaseCost /= 100;
@@ -18453,7 +18463,7 @@ void CvCity::Purchase(UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectT
 			kPlayer.GetTreasury()->LogExpenditure((CvString)GC.getProjectInfo(eProjectType)->GetText(), iGoldCost, 2);
 		}
 
-		GET_PLAYER(getOwner()).GetTreasury()->ChangeGold(-iGoldCost);
+		kPlayer.GetTreasury()->ChangeGold(-iGoldCost);
 
 		bool bResult = false;
 		if(eUnitType >= 0)
@@ -18463,6 +18473,11 @@ void CvCity::Purchase(UnitTypes eUnitType, BuildingTypes eBuildingType, ProjectT
 			if (iResult != FFreeList::INVALID_INDEX)
 			{
 				CvUnit* pUnit = kPlayer.getUnit(iResult);
+				if(pUnit->getUnitInfo().GetSpaceshipProject() != NO_PROJECT)
+				{
+					kPlayer.ChangeNumSpaceshipPartPurchased(1);
+				}
+				
 				if (!pUnit->getUnitInfo().CanMoveAfterPurchase() && !kPlayer.IsPlayerMoveAfterCreated())
 				{
 					pUnit->setMoves(0);
