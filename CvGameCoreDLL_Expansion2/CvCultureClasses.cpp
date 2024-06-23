@@ -3236,7 +3236,8 @@ int CvPlayerCulture::GetTourismModifierWith(PlayerTypes ePlayer) const
 
 		if (m_pPlayer->GetEspionage()->IsMyDiplomatVisitingThem(ePlayer))
 		{
-			iMultiplier += GC.getTOURISM_MODIFIER_DIPLOMAT();
+			int iDiplomatPropagandaModifier = GC.getTOURISM_MODIFIER_DIPLOMAT() + m_pPlayer->getPolicyModifiers(POLICYMOD_DIPLOMAT_PROPAGANDA_MODIFIER);
+			iMultiplier += iDiplomatPropagandaModifier;
 		}
 	}
 
@@ -3317,12 +3318,15 @@ CvString CvPlayerCulture::GetTourismModifierWithTooltip(PlayerTypes ePlayer) con
 	{
 		szRtnValue += "[COLOR_POSITIVE_TEXT]" + GetLocalizedText("TXT_KEY_CO_PLAYER_TOURISM_RELIGION_NOTE", GetTourismModifierSharedReligion()) + "[ENDCOLOR]";
 	}
+
 	if (eMyIdeology != NO_POLICY_BRANCH_TYPE && eTheirIdeology != NO_POLICY_BRANCH_TYPE && eMyIdeology != eTheirIdeology)
 	{
 		if (m_pPlayer->GetEspionage()->IsMyDiplomatVisitingThem(ePlayer))
 		{
-			szRtnValue += "[COLOR_POSITIVE_TEXT]" + GetLocalizedText("TXT_KEY_CO_PLAYER_TOURISM_PROPAGANDA", GC.getTOURISM_MODIFIER_DIPLOMAT()) + "[ENDCOLOR]";
+			int iDiplomatPropagandaModifier = GC.getTOURISM_MODIFIER_DIPLOMAT() + m_pPlayer->getPolicyModifiers(POLICYMOD_DIPLOMAT_PROPAGANDA_MODIFIER);
+			szRtnValue += "[COLOR_POSITIVE_TEXT]" + GetLocalizedText("TXT_KEY_CO_PLAYER_TOURISM_PROPAGANDA", iDiplomatPropagandaModifier) + "[ENDCOLOR]";
 		}
+
 		int iDifferentSharedIdeologyMod = m_pPlayer->getDifferentIdeologyTourismModifier();
 		if (iDifferentSharedIdeologyMod > 0)
 		{
@@ -3339,7 +3343,7 @@ CvString CvPlayerCulture::GetTourismModifierWithTooltip(PlayerTypes ePlayer) con
 		}
 	}
 
-	int iCommonFoeMod = m_pPlayer->GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_COMMON_FOE);
+	int iCommonFoeMod = m_pPlayer->getPolicyModifiers(POLICYMOD_TOURISM_MOD_COMMON_FOE);
 	if (iCommonFoeMod > 0)
 	{
 		PlayerTypes eLoopPlayer;
@@ -3358,7 +3362,7 @@ CvString CvPlayerCulture::GetTourismModifierWithTooltip(PlayerTypes ePlayer) con
 		}
 	}
 
-	int iLessHappyMod = m_pPlayer->GetPlayerPolicies()->GetNumericModifier(POLICYMOD_TOURISM_MOD_LESS_HAPPY);
+	int iLessHappyMod = m_pPlayer->getPolicyModifiers(POLICYMOD_TOURISM_MOD_LESS_HAPPY);
 	if (iLessHappyMod > 0)
 	{
 		if (m_pPlayer->GetExcessHappiness() > kPlayer.GetExcessHappiness())
@@ -4796,7 +4800,8 @@ int CvCityCulture::GetTourismMultiplier(PlayerTypes ePlayer, bool bIgnoreReligio
 			iMultiplier += kCityPlayer.getDifferentIdeologyTourismModifier();
 			if (kCityPlayer.GetEspionage()->IsMyDiplomatVisitingThem(ePlayer))
 			{
-				iMultiplier += GC.getTOURISM_MODIFIER_DIPLOMAT();
+				int iDiplomatPropagandaModifier = GC.getTOURISM_MODIFIER_DIPLOMAT() + kCityPlayer.getPolicyModifiers(POLICYMOD_DIPLOMAT_PROPAGANDA_MODIFIER);
+				iMultiplier += iDiplomatPropagandaModifier;
 			}
 		}
 	}
