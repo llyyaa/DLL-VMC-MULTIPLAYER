@@ -8607,6 +8607,9 @@ void CvDiplomacyAI::DoUpdateOnePlayerExpansionAggressivePosture(PlayerTypes ePla
 	eMostAggressiveCityPosture = AGGRESSIVE_POSTURE_NONE;
 	iNumMostAggressiveCities = 0;
 
+	int iGameTurn = GC.getGame().getGameTurn();
+	int iDealDuration = GC.getGame().GetDealDuration();
+
 	// Loop through all of this player's Cities
 	for(pLoopCity = GET_PLAYER(ePlayer).firstCity(&iCityLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(ePlayer).nextCity(&iCityLoop))
 	{
@@ -8616,6 +8619,10 @@ void CvDiplomacyAI::DoUpdateOnePlayerExpansionAggressivePosture(PlayerTypes ePla
 
 		// Don't look at Cities they've captured
 		if(pLoopCity->getOriginalOwner() != pLoopCity->getOwner())
+			continue;
+
+		// For SP, don't loot at Cities founded for a long time
+		if(MOD_SP_SMART_AI && iGameTurn - pLoopCity->getGameTurnAcquired() > iDealDuration)
 			continue;
 
 		eAggressivePosture = AGGRESSIVE_POSTURE_NONE;
