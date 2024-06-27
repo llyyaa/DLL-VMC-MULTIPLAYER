@@ -473,6 +473,7 @@ CvUnit::CvUnit() :
 	, m_iExtraMoveTimesXX(0)
 	, m_iRangeAttackCostModifier(100)
 	, m_iOriginalCapitalDamageFix(0)
+	, m_iOriginalCapitalSpecialDamageFix(0)
 	, m_iMultipleInitExperence(0)
 	, m_iLostAllMovesAttackCity(0)
 	, m_iUnitAttackFaithBonus(0)
@@ -1458,6 +1459,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraMoveTimesXX = 0;
 	m_iRangeAttackCostModifier = 100;
 	m_iOriginalCapitalDamageFix = 0;
+	m_iOriginalCapitalSpecialDamageFix = 0;
 	m_iMultipleInitExperence = 0;
 	m_iLostAllMovesAttackCity = 0;
 	m_iUnitAttackFaithBonus = 0;
@@ -7121,8 +7123,38 @@ const int CvUnit::GetOriginalCapitalDamageFix() const
 }
 const int CvUnit::GetOriginalCapitalDamageFixTotal() const
 {
+	if (m_iOriginalCapitalDamageFix == 0) return 0;
 	int OriginalCapitalFixTotal = m_iOriginalCapitalDamageFix * (GET_MY_PLAYER().CountAllOriginalCapitalCity() -1);
 	return OriginalCapitalFixTotal > 0 ? OriginalCapitalFixTotal : 0;
+}
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeOriginalCapitalSpecialDamageFix(int iValue)
+{
+	m_iOriginalCapitalSpecialDamageFix += iValue;
+}
+const int CvUnit::GetOriginalCapitalSpecialDamageFix() const
+{
+	return m_iOriginalCapitalSpecialDamageFix;
+}
+const int CvUnit::GetOriginalCapitalSpecialDamageFixTotal() const
+{
+	if (m_iOriginalCapitalSpecialDamageFix == 0) return 0;
+
+	CvPlayerAI &kPlayer = GET_MY_PLAYER();
+	int iCount = 0;
+	int iLoop;
+	for (CvCity* pLoopCity = kPlayer.firstCity(&iLoop); pLoopCity != NULL; pLoopCity = kPlayer.nextCity(&iLoop))
+	{
+		if (pLoopCity->IsOriginalCapital())
+		{
+			iCount += pLoopCity->getOriginalOwner() < MAX_MAJOR_CIVS ? 2 : 1;
+		}
+	}
+	iCount -= 2;
+	iCount /= 2;
+
+	int res = m_iOriginalCapitalSpecialDamageFix * iCount;
+	return res > 0 ? res : 0;
 }
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeMultipleInitExperence(int iValue)
@@ -26219,6 +26251,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeExtraMoveTimesXX((thisPromotion.GetExtraMoveTimesXX()) * iChange);
 		ChangeRangeAttackCostModifier((thisPromotion.GetRangeAttackCostModifier()) * iChange);
 		ChangeOriginalCapitalDamageFix((thisPromotion.GetOriginalCapitalDamageFix()) * iChange);
+		ChangeOriginalCapitalSpecialDamageFix((thisPromotion.GetOriginalCapitalSpecialDamageFix()) * iChange);
 		ChangeMultipleInitExperence((thisPromotion.GetMultipleInitExperence()) * iChange);
 		ChangeLostAllMovesAttackCity((thisPromotion.GetLostAllMovesAttackCity()) * iChange);
 		ChangeUnitAttackFaithBonus((thisPromotion.GetUnitAttackFaithBonus()) * iChange);
@@ -26785,6 +26818,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iExtraMoveTimesXX;
 	kStream >> m_iRangeAttackCostModifier;
 	kStream >> m_iOriginalCapitalDamageFix;
+	kStream >> m_iOriginalCapitalSpecialDamageFix;
 	kStream >> m_iMultipleInitExperence;
 	kStream >> m_iLostAllMovesAttackCity;
 	kStream >> m_iUnitAttackFaithBonus;
@@ -27184,6 +27218,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iExtraMoveTimesXX;
 	kStream << m_iRangeAttackCostModifier;
 	kStream << m_iOriginalCapitalDamageFix;
+	kStream << m_iOriginalCapitalSpecialDamageFix;
 	kStream << m_iMultipleInitExperence;
 	kStream << m_iLostAllMovesAttackCity;
 	kStream << m_iUnitAttackFaithBonus;

@@ -4742,14 +4742,15 @@ void UnitAttackInflictDamageIntervene(InflictDamageContext* ctx)
 	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr && ctx->pDefenderCity == nullptr)
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && ctx->pAttackerUnit->GetOriginalCapitalDamageFix() !=0)
-		{
-			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
-		}
+		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
 #endif
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetAttackInflictDamageChange();
 		if (ctx->pDefenderUnit != nullptr)
 		{
+#if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
+			int iSpecialDamageFix = ctx->pAttackerUnit->GetOriginalCapitalSpecialDamageFixTotal();
+			*ctx->piAttackInflictDamage += ctx->pDefenderUnit->getDomainType() == DOMAIN_LAND ? iSpecialDamageFix : iSpecialDamageFix / 2;
+#endif		
 			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetAttackInflictDamageChangeMaxHPPercent() * ctx->pDefenderUnit->GetMaxHitPoints() / 100;
 		}
 	}
@@ -4774,10 +4775,8 @@ void SiegeInflictDamageIntervene(InflictDamageContext* ctx)
 	if (ctx->pAttackerUnit != nullptr && ctx->piAttackInflictDamage != nullptr && ctx->pDefenderCity != nullptr)
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
-		if(MOD_PROMOTION_NEW_EFFECT_FOR_SP && ctx->pAttackerUnit->GetOriginalCapitalDamageFix() !=0)
-		{
-			*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
-		}
+		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
+		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalSpecialDamageFixTotal();
 #endif
 		
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetSiegeInflictDamageChange();

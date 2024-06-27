@@ -278,6 +278,7 @@ public:
 	int GetExtraMoveTimesXX() const;
 	int GetRangeAttackCostModifier() const;
 	int GetOriginalCapitalDamageFix() const;
+	int GetOriginalCapitalSpecialDamageFix() const;
 	int GetMultipleInitExperence() const;
 	int GetLostAllMovesAttackCity() const;
 	int GetUnitAttackFaithBonus() const;
@@ -643,6 +644,7 @@ protected:
 	int m_iExtraMoveTimesXX;
 	int m_iRangeAttackCostModifier;
 	int m_iOriginalCapitalDamageFix;
+	int m_iOriginalCapitalSpecialDamageFix;
 	int m_iMultipleInitExperence;
 	int m_iLostAllMovesAttackCity;
 	int m_iUnitAttackFaithBonus;

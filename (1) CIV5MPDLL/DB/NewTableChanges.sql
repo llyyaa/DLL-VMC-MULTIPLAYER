@@ -166,6 +166,7 @@ ALTER TABLE UnitPromotions ADD 'NumSpyStayAttackMod' INTEGER DEFAULT 0;
 ALTER TABLE Features ADD PseudoNaturalWonder INTEGER DEFAULT 0;
 
 ALTER TABLE UnitPromotions ADD 'OriginalCapitalDamageFix' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD 'OriginalCapitalSpecialDamageFix' INTEGER DEFAULT 0;
 
 ALTER TABLE Technologies ADD BombardRange INTEGER DEFAULT 0;
 ALTER TABLE Technologies ADD BombardIndirect INTEGER DEFAULT 0;

@@ -1910,6 +1910,10 @@ public:
 	const int GetOriginalCapitalDamageFix() const;
 	void ChangeOriginalCapitalDamageFix(int iValue);
 
+	const int GetOriginalCapitalSpecialDamageFixTotal() const;
+	const int GetOriginalCapitalSpecialDamageFix() const;
+	void ChangeOriginalCapitalSpecialDamageFix(int iValue);
+
 	const int GetMultipleInitExperence() const;
 	void ChangeMultipleInitExperence(int iValue);
 
@@ -2567,6 +2571,7 @@ protected:
 	int m_iExtraMoveTimesXX;
 	int m_iRangeAttackCostModifier;
 	int m_iOriginalCapitalDamageFix;
+	int m_iOriginalCapitalSpecialDamageFix;
 	int m_iMultipleInitExperence;
 	int m_iLostAllMovesAttackCity;
 	int m_iUnitAttackFaithBonus;
