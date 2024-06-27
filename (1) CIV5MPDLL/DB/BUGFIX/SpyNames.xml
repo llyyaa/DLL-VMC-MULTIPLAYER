@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GameData>
 	<!-- Text moved to AllText_en_US.xml -->
-
-
-	<Table name="UnitPromotions_CombatModPerAdjacentUnitCombat">
-		<Column name="PromotionType" type="text" reference="UnitPromotions(Type)"/>
-		<Column name="UnitCombatType" type="text" reference="UnitCombatInfos(Type)"/>
-		<Column name="Modifier" type="integer"/>
-		<Column name="Attack" type="integer"/>
-		<Column name="Defense" type="integer"/> <!-- note the American spelling -->
-	</Table>
-
-
+	<!-- note the American spelling -->
 </GameData>

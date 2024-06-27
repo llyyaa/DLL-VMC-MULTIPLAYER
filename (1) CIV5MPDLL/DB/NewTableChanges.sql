@@ -256,3 +256,11 @@ CREATE TABLE IF NOT EXISTS UnitPromotions_InstantYieldPerReligionFollowerConvert
     `YieldType` TEXT DEFAULT '' references Yields(Type),
     `Yield` INTEGER DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS UnitPromotions_CombatModPerAdjacentUnitCombat (
+    `PromotionType` TEXT DEFAULT '' references UnitPromotions(Type),
+    `UnitCombatType` TEXT DEFAULT '' references UnitCombatInfos(Type),
+    `Modifier` INTEGER DEFAULT 0,
+    `Attack` INTEGER DEFAULT 0,
+    `Defense` INTEGER DEFAULT 0
+);
