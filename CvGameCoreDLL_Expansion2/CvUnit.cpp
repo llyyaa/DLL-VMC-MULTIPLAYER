@@ -7140,21 +7140,20 @@ const int CvUnit::GetOriginalCapitalSpecialDamageFixTotal() const
 {
 	if (m_iOriginalCapitalSpecialDamageFix == 0) return 0;
 
+	int iMajorCapitalBonus = m_iOriginalCapitalSpecialDamageFix;
+	int iMinorCapitalBonus = iMajorCapitalBonus / 2;
+
 	CvPlayerAI &kPlayer = GET_MY_PLAYER();
 	int iCount = 0;
 	int iLoop;
 	for (CvCity* pLoopCity = kPlayer.firstCity(&iLoop); pLoopCity != NULL; pLoopCity = kPlayer.nextCity(&iLoop))
 	{
-		if (pLoopCity->IsOriginalCapital())
-		{
-			iCount += pLoopCity->getOriginalOwner() < MAX_MAJOR_CIVS ? 2 : 1;
-		}
+		if (!pLoopCity->IsOriginalCapital()) continue;
+		iCount += pLoopCity->getOriginalOwner() < MAX_MAJOR_CIVS ? iMajorCapitalBonus : iMinorCapitalBonus;
 	}
-	iCount -= 2;
-	iCount /= 2;
 
-	int res = m_iOriginalCapitalSpecialDamageFix * iCount;
-	return res > 0 ? res : 0;
+	iCount -= iMajorCapitalBonus;
+	return iCount > 0 ? iCount : 0;
 }
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeMultipleInitExperence(int iValue)

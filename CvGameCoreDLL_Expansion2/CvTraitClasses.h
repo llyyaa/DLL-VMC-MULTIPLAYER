@@ -141,6 +141,7 @@ public:
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	int GetExceedingHappinessImmigrationModifier() const;
+	int GetNumCityYieldPerAdjacentFeature() const;
 	int GetNumCityAdjacentFeatureModifier() const;
 	int GetPromotionWhenKilledUnit() const;
 	int GetPromotionRadiusWhenKilledUnit() const;
@@ -249,6 +250,7 @@ public:
 #endif
 	int GetUnimprovedFeatureYieldChanges(FeatureTypes eIndex1, YieldTypes eIndex2) const;
 	int GetCityYieldModifierFromAdjacentFeature(FeatureTypes eIndex1, YieldTypes eIndex2) const;
+	int GetCityYieldPerAdjacentFeature(FeatureTypes eIndex1, YieldTypes eIndex2) const;
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool IsFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
@@ -413,6 +415,7 @@ protected:
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	int m_iExceedingHappinessImmigrationModifier;
 	int m_iNumCityAdjacentFeatureModifier;
+	int m_iNumCityYieldPerAdjacentFeature;
 	int m_iPromotionWhenKilledUnit;
 	int m_iPromotionRadiusWhenKilledUnit;
 	int m_iAttackBonusAdjacentWhenUnitKilled;
@@ -518,6 +521,7 @@ protected:
 #endif
 	int** m_ppiUnimprovedFeatureYieldChanges;
 	int** m_ppiCityYieldModifierFromAdjacentFeature;
+	int** m_ppiCityYieldPerAdjacentFeature;
 
 	std::multimap<int, int> m_FreePromotionUnitCombats;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
@@ -943,6 +947,10 @@ public:
 	{
 		return m_iExceedingHappinessImmigrationModifier;
 	}
+	bool IsHasCityYieldPerAdjacentFeature() const
+	{
+		return m_bHasCityYieldPerAdjacentFeature;
+	}
 	bool IsHasCityAdjacentFeatureModifier() const
 	{
 		return m_bHasCityAdjacentFeatureModifier;
@@ -1206,6 +1214,7 @@ public:
 #endif
 	int GetUnimprovedFeatureYieldChange(FeatureTypes eFeature, YieldTypes eYield) const;
 	int GetCityYieldModifierFromAdjacentFeature(FeatureTypes eFeature, YieldTypes eYield) const;
+	int GetCityYieldPerAdjacentFeature(FeatureTypes eFeature, YieldTypes eYield) const;
 	FreeResourceXCities GetFreeResourceXCities(ResourceTypes eResource) const;
 
 	bool HasFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
@@ -1413,6 +1422,7 @@ private:
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	int m_iExceedingHappinessImmigrationModifier;
+	bool m_bHasCityYieldPerAdjacentFeature = false;
 	bool m_bHasCityAdjacentFeatureModifier = false;
 	int m_iPromotionWhenKilledUnit;
 	int m_iPromotionRadiusWhenKilledUnit;
@@ -1532,6 +1542,7 @@ private:
 #endif
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppaaiUnimprovedFeatureYieldChange;
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiCityYieldModifierFromAdjacentFeature;
+	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiCityYieldPerAdjacentFeature;
 
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
 

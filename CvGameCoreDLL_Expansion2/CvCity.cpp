@@ -10180,6 +10180,7 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 #if defined(MOD_API_UNIFIED_YIELDS)
 	iCulturePerTurn += GetYieldPerTurnFromUnimprovedFeatures(YIELD_CULTURE);
 #endif
+	iCulturePerTurn += GetYieldPerTurnFromAdjacentFeatures(YIELD_CULTURE);
 	iCulturePerTurn += GetJONSCulturePerTurnFromTraits();
 	iCulturePerTurn += GetBaseYieldRateFromReligion(YIELD_CULTURE);
 	iCulturePerTurn += GetJONSCulturePerTurnFromLeagues();
@@ -10377,6 +10378,7 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 #else
 	iFaith += GetFaithPerTurnFromTraits();
 #endif
+	iFaith += GetYieldPerTurnFromAdjacentFeatures(YIELD_FAITH);
 	iFaith += GetFaithPerTurnFromReligion();
 
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -10536,6 +10538,33 @@ int CvCity::GetFaithPerTurnFromTraits() const
 #endif
 
 
+//	--------------------------------------------------------------------------------
+int CvCity::GetYieldPerTurnFromAdjacentFeatures(YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eYield >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eYield< NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	CvPlayerTraits* pTraits = GET_PLAYER(m_eOwner).GetPlayerTraits();
+	if(!pTraits->IsHasCityYieldPerAdjacentFeature()) return 0;
+
+	int iRtnValue = 0;
+	CvPlot* pAdjacentPlot = NULL;
+	int iMaxValue = 0;
+	for (int iI = 0; iI < NUM_DIRECTION_TYPES; iI++)
+	{
+		pAdjacentPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+		if (!pAdjacentPlot) continue;
+		FeatureTypes eFeature = pAdjacentPlot->getFeatureType();
+		if (eFeature == NO_FEATURE) continue;
+		int iTempMax = pTraits->GetCityYieldPerAdjacentFeature(eFeature, eYield);
+		if(iTempMax <= 0) continue;
+		iRtnValue++;
+		iMaxValue = iTempMax > iMaxValue ? iTempMax : iMaxValue;
+	}
+	iRtnValue = iRtnValue > iMaxValue ? iMaxValue : iRtnValue;
+	return iRtnValue;
+}
 
 
 //	--------------------------------------------------------------------------------
@@ -13203,6 +13232,7 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 #if defined(MOD_API_UNIFIED_YIELDS)
 	iValue += GetYieldPerTurnFromUnimprovedFeatures(eIndex);
 #endif
+	iValue += GetYieldPerTurnFromAdjacentFeatures(eIndex);
 
 #if defined(MOD_ROG_CORE)
 	iValue += GetBaseYieldRateFromCSAlliance(eIndex);
@@ -13490,6 +13520,12 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_UNIMPROVEMENT_FEATURES", iBaseValue, YieldIcon);
 	}
 #endif
+	iBaseValue = GetYieldPerTurnFromAdjacentFeatures(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PER_ADJACENT_FEATURES", iBaseValue, YieldIcon);
+	}
+
 	//Special case: Yield from trait
 	iBaseValue = GetBaseYieldRateFromTrait(eIndex);
 	if(iBaseValue != 0)

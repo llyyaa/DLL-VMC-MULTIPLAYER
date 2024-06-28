@@ -552,6 +552,9 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_UNIMPROVEMENT_FEATURES">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自无改良地貌</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PER_ADJACENT_FEATURES">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自邻近地貌</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_BUILDINGS">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 来自建筑</Text>
 		</Row>

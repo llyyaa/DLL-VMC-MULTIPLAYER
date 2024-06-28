@@ -3064,14 +3064,16 @@ int CvLuaCity::lGetFaithPerTurnFromPolicies(lua_State* L)
 //int GetFaithPerTurnFromTraits() const;
 int CvLuaCity::lGetFaithPerTurnFromTraits(lua_State* L)
 {
-#if defined(MOD_API_UNIFIED_YIELDS)
+
 	CvCity* pkCity = GetInstance(L);
-	const int iBonus = pkCity->GetYieldPerTurnFromUnimprovedFeatures(YIELD_FAITH);
+#if defined(MOD_API_UNIFIED_YIELDS)
+	int iBonus = pkCity->GetYieldPerTurnFromUnimprovedFeatures(YIELD_FAITH);
+#else
+	int iBonus = pkCity->GetFaithPerTurnFromTraits();
+#endif
+	iBonus += pkCity->GetYieldPerTurnFromAdjacentFeatures(YIELD_FAITH);
 	lua_pushinteger(L, iBonus);
 	return 1;
-#else
-	return BasicLuaMethod(L, &CvCity::GetFaithPerTurnFromTraits);
-#endif
 }
 //------------------------------------------------------------------------------
 //int GetFaithPerTurnFromReligion() const;

@@ -568,6 +568,7 @@ public:
 #else
 	int GetFaithPerTurnFromTraits() const;
 #endif
+	int GetYieldPerTurnFromAdjacentFeatures(YieldTypes eYield) const;
 
 	int GetFaithPerTurnFromReligion() const;
 

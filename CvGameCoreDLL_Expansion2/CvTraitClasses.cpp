@@ -122,6 +122,7 @@ CvTraitEntry::CvTraitEntry() :
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	m_iExceedingHappinessImmigrationModifier(0),
 	m_iNumCityAdjacentFeatureModifier(0),
+	m_iNumCityYieldPerAdjacentFeature(0),
 	m_iPromotionWhenKilledUnit(NO_PROMOTION),
 	m_iPromotionRadiusWhenKilledUnit(0),
 	m_iAttackBonusAdjacentWhenUnitKilled(0),
@@ -214,7 +215,8 @@ CvTraitEntry::CvTraitEntry() :
 	m_ppiCityYieldFromUnimprovedFeature(NULL),
 #endif
 	m_ppiUnimprovedFeatureYieldChanges(NULL),
-	m_ppiCityYieldModifierFromAdjacentFeature(NULL)
+	m_ppiCityYieldModifierFromAdjacentFeature(NULL),
+	m_ppiCityYieldPerAdjacentFeature(NULL)
 {
 }
 
@@ -239,6 +241,7 @@ CvTraitEntry::~CvTraitEntry()
 #endif
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiUnimprovedFeatureYieldChanges);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiCityYieldModifierFromAdjacentFeature);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppiCityYieldPerAdjacentFeature);
 }
 
 /// Accessor:: Modifier to experience needed for new level
@@ -692,6 +695,10 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 int CvTraitEntry::GetExceedingHappinessImmigrationModifier() const
 {
 	return m_iExceedingHappinessImmigrationModifier;
+}
+int CvTraitEntry::GetNumCityYieldPerAdjacentFeature() const
+{
+	return m_iNumCityYieldPerAdjacentFeature;
 }
 int CvTraitEntry::GetNumCityAdjacentFeatureModifier() const
 {
@@ -1186,6 +1193,16 @@ int CvTraitEntry::GetCityYieldModifierFromAdjacentFeature(FeatureTypes eIndex1, 
 	CvAssertMsg(eIndex2 < NUM_YIELD_TYPES, "Index out of bounds");
 	CvAssertMsg(eIndex2 > -1, "Index out of bounds");
 	return m_ppiCityYieldModifierFromAdjacentFeature ? m_ppiCityYieldModifierFromAdjacentFeature[eIndex1][eIndex2] : 0;
+}
+
+/// Accessor:: City Yield from per Adjacent Feature
+int CvTraitEntry::GetCityYieldPerAdjacentFeature(FeatureTypes eIndex1, YieldTypes eIndex2) const
+{
+	CvAssertMsg(eIndex1 < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(eIndex1 > -1, "Index out of bounds");
+	CvAssertMsg(eIndex2 < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(eIndex2 > -1, "Index out of bounds");
+	return m_ppiCityYieldPerAdjacentFeature ? m_ppiCityYieldPerAdjacentFeature[eIndex1][eIndex2] : 0;
 }
 
 /// Accessor:: Additional moves for a class of combat unit
@@ -2195,6 +2212,30 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		}
 	}
 
+	//CityYieldPerAdjacentFeature
+	{
+		kUtility.Initialize2DArray(m_ppiCityYieldPerAdjacentFeature, "Features", "Yields");
+
+		std::string strKey("Trait_CityYieldPerAdjacentFeature");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Features.ID as FeatureID, Yields.ID as YieldID, MaxValue from Trait_CityYieldPerAdjacentFeature inner join Features on Features.Type = FeatureType inner join Yields on Yields.Type = YieldType where TraitType = ?");
+		}
+
+		pResults->Bind(1, szTraitType);
+
+		while(pResults->Step())
+		{
+			const int FeatureID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int maxValue = pResults->GetInt(2);
+
+			m_ppiCityYieldPerAdjacentFeature[FeatureID][YieldID] = maxValue;
+			m_iNumCityYieldPerAdjacentFeature++;
+		}
+	}
+
 	// NoTrain
 	{
 		int iUnitClassLoop;
@@ -2486,6 +2527,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 			m_iExceedingHappinessImmigrationModifier += trait->GetExceedingHappinessImmigrationModifier();
+			m_bHasCityYieldPerAdjacentFeature = trait->GetNumCityYieldPerAdjacentFeature() > 0;
 			m_bHasCityAdjacentFeatureModifier = trait->GetNumCityAdjacentFeatureModifier() > 0;
 			if(trait->GetPromotionWhenKilledUnit() != NO_PROMOTION)
 			{
@@ -2719,6 +2761,14 @@ void CvPlayerTraits::InitPlayerTraits()
 						yields[iYield] = (m_ppiCityYieldModifierFromAdjacentFeature[iFeatureLoop][iYield] + iChange);
 						m_ppiCityYieldModifierFromAdjacentFeature[iFeatureLoop] = yields;
 					}
+
+					iChange = trait->GetCityYieldPerAdjacentFeature((FeatureTypes)iFeatureLoop, (YieldTypes)iYield);
+					if(iChange > 0)
+					{
+						Firaxis::Array<int, NUM_YIELD_TYPES> yields = m_ppiCityYieldPerAdjacentFeature[iFeatureLoop];
+						yields[iYield] = (m_ppiCityYieldPerAdjacentFeature[iFeatureLoop][iYield] + iChange);
+						m_ppiCityYieldPerAdjacentFeature[iFeatureLoop] = yields;
+					}
 				}
 
 				for(int iImprovementLoop = 0; iImprovementLoop < GC.getNumImprovementInfos(); iImprovementLoop++)
@@ -2915,6 +2965,7 @@ void CvPlayerTraits::Uninit()
 #endif
 	m_ppaaiUnimprovedFeatureYieldChange.clear();
 	m_ppiCityYieldModifierFromAdjacentFeature.clear();
+	m_ppiCityYieldPerAdjacentFeature.clear();
 	m_aFreeResourceXCities.clear();
 }
 
@@ -3008,6 +3059,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	m_iExceedingHappinessImmigrationModifier = 0;
+	m_bHasCityYieldPerAdjacentFeature = false;
 	m_bHasCityAdjacentFeatureModifier = false;
 	m_iPromotionWhenKilledUnit = NO_PROMOTION;
 	m_iPromotionRadiusWhenKilledUnit = 0;
@@ -3088,6 +3140,8 @@ void CvPlayerTraits::Reset()
 	m_ppaaiUnimprovedFeatureYieldChange.resize(GC.getNumFeatureInfos());
 	m_ppiCityYieldModifierFromAdjacentFeature.clear();
 	m_ppiCityYieldModifierFromAdjacentFeature.resize(GC.getNumFeatureInfos());
+	m_ppiCityYieldPerAdjacentFeature.clear();
+	m_ppiCityYieldPerAdjacentFeature.resize(GC.getNumFeatureInfos());
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	for (int i = 0; i < NUM_YIELD_TYPES; i++)
@@ -3170,6 +3224,7 @@ void CvPlayerTraits::Reset()
 #endif
 			m_ppaaiUnimprovedFeatureYieldChange[iFeature] = yield;
 			m_ppiCityYieldModifierFromAdjacentFeature[iFeature] = yield;
+			m_ppiCityYieldPerAdjacentFeature[iFeature] = yield;
 		}
 	}
 
@@ -3510,6 +3565,20 @@ int CvPlayerTraits::GetCityYieldModifierFromAdjacentFeature(FeatureTypes eFeatur
 	}
 
 	return m_ppiCityYieldModifierFromAdjacentFeature[(int)eFeature][(int)eYield];
+}
+
+/// City Yield per Adjacent Feature
+int CvPlayerTraits::GetCityYieldPerAdjacentFeature(FeatureTypes eFeature, YieldTypes eYield) const
+{
+	CvAssertMsg(eFeature < GC.getNumFeatureInfos(),  "Invalid eFeature parameter in call to CvPlayerTraits::GetUnimprovedFeatureYieldChange()");
+	CvAssertMsg(eYield < NUM_YIELD_TYPES,  "Invalid eYield parameter in call to CvPlayerTraits::GetUnimprovedFeatureYieldChange()");
+
+	if(eFeature == NO_FEATURE)
+	{
+		return 0;
+	}
+
+	return m_ppiCityYieldPerAdjacentFeature[(int)eFeature][(int)eYield];
 }
 
 /// Do all new units get a specific promotion?
@@ -4461,6 +4530,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	kStream >> m_iExceedingHappinessImmigrationModifier;
+	kStream >> m_bHasCityYieldPerAdjacentFeature;
 	kStream >> m_bHasCityAdjacentFeatureModifier;
 	kStream >> m_iPromotionWhenKilledUnit;
 	kStream >> m_iPromotionRadiusWhenKilledUnit;
@@ -4710,6 +4780,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 #endif
 	kStream >> m_ppaaiUnimprovedFeatureYieldChange;
 	kStream >> m_ppiCityYieldModifierFromAdjacentFeature;
+	kStream >> m_ppiCityYieldPerAdjacentFeature;
 
 	if (uiVersion >= 11)
 	{
@@ -4861,6 +4932,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	kStream << m_iExceedingHappinessImmigrationModifier;
+	kStream << m_bHasCityYieldPerAdjacentFeature;
 	kStream << m_bHasCityAdjacentFeatureModifier;
 	kStream << m_iPromotionWhenKilledUnit;
 	kStream << m_iPromotionRadiusWhenKilledUnit;
@@ -5002,6 +5074,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 #endif
 	kStream << m_ppaaiUnimprovedFeatureYieldChange;
 	kStream << m_ppiCityYieldModifierFromAdjacentFeature;
+	kStream << m_ppiCityYieldPerAdjacentFeature;
 
 	kStream << (int)m_aUniqueLuxuryAreas.size();
 	for (unsigned int iI = 0; iI < m_aUniqueLuxuryAreas.size(); iI++)

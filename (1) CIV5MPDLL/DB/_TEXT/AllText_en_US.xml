@@ -549,6 +549,9 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_UNIMPROVEMENT_FEATURES">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Unimprovement Feature</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_PER_ADJACENT_FEATURES">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from adjacent Feature</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_BUILDINGS">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} from Buildings</Text>
 		</Row>

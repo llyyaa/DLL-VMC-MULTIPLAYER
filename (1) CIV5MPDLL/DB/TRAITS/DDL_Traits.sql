@@ -57,6 +57,13 @@ create table Trait_CityYieldModifierFromAdjacentFeature (
     Yield int default 0
 );
 
+create table Trait_CityYieldPerAdjacentFeature (
+    TraitType text references Traits(Type),
+    FeatureType text references Features(Type),
+    YieldType text references Yields(Type),
+    MaxValue int default 0
+);
+
 ALTER TABLE Traits ADD COLUMN 'ExceedingHappinessImmigrationModifier' INTEGER DEFAULT 0;
 
 alter table Traits add column `CanDiplomaticMarriage` boolean not null default 0;
