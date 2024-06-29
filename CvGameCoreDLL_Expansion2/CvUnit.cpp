@@ -17652,26 +17652,26 @@ void CvUnit::ChangeIsFightWellDamaged(int iChange)
 int CvUnit::getAoEDamageOnMove() const
 {
 	VALIDATE_OBJECT
-		return m_iAoEDamageOnMove;
+	return m_iAoEDamageOnMove;
 }
 //	--------------------------------------------------------------------------------
 int CvUnit::attackFullyHealedModifier() const
 {
 	VALIDATE_OBJECT
-		return (getExtraAttackFullyHealedMod());
+	return (getExtraAttackFullyHealedMod());
 }
 
 //	--------------------------------------------------------------------------------
 int CvUnit::attackAbove50HealthModifier() const
 {
 	VALIDATE_OBJECT
-		return (getExtraAttackAboveHealthMod());
+	return (getExtraAttackAboveHealthMod());
 }
 //	--------------------------------------------------------------------------------
 int CvUnit::attackBelow50HealthModifier() const
 {
 	VALIDATE_OBJECT
-		return (getExtraAttackBelowHealthMod());
+	return (getExtraAttackBelowHealthMod());
 }
 //	--------------------------------------------------------------------------------
 
@@ -17679,7 +17679,7 @@ int CvUnit::attackBelow50HealthModifier() const
 int CvUnit::getExtraAttackFullyHealedMod() const
 {
 	VALIDATE_OBJECT
-		return m_iExtraFullyHealedMod;
+	return m_iExtraFullyHealedMod;
 }
 
 
@@ -17687,12 +17687,12 @@ int CvUnit::getExtraAttackFullyHealedMod() const
 void CvUnit::changeExtraAttackFullyHealedMod(int iChange)
 {
 	VALIDATE_OBJECT
-		if (iChange != 0)
-		{
-			m_iExtraFullyHealedMod = (m_iExtraFullyHealedMod + iChange);
+	if (iChange != 0)
+	{
+		m_iExtraFullyHealedMod = (m_iExtraFullyHealedMod + iChange);
 
-			setInfoBarDirty(true);
-		}
+		setInfoBarDirty(true);
+	}
 }
 
 
@@ -17700,7 +17700,7 @@ void CvUnit::changeExtraAttackFullyHealedMod(int iChange)
 int CvUnit::getExtraAttackAboveHealthMod() const
 {
 	VALIDATE_OBJECT
-		return m_iExtraAttackAboveHealthMod;
+	return m_iExtraAttackAboveHealthMod;
 }
 
 
@@ -17708,12 +17708,12 @@ int CvUnit::getExtraAttackAboveHealthMod() const
 void CvUnit::changeExtraAttackAboveHealthMod(int iChange)
 {
 	VALIDATE_OBJECT
-		if (iChange != 0)
-		{
-			m_iExtraAttackAboveHealthMod = (m_iExtraAttackAboveHealthMod + iChange);
+	if (iChange != 0)
+	{
+		m_iExtraAttackAboveHealthMod = (m_iExtraAttackAboveHealthMod + iChange);
 
-			setInfoBarDirty(true);
-		}
+		setInfoBarDirty(true);
+	}
 }
 
 
@@ -17721,7 +17721,7 @@ void CvUnit::changeExtraAttackAboveHealthMod(int iChange)
 int CvUnit::getExtraAttackBelowHealthMod() const
 {
 	VALIDATE_OBJECT
-		return m_iExtraAttackBelowHealthMod;
+	return m_iExtraAttackBelowHealthMod;
 }
 
 
@@ -17729,50 +17729,50 @@ int CvUnit::getExtraAttackBelowHealthMod() const
 void CvUnit::changeExtraAttackBelowHealthMod(int iChange)
 {
 	VALIDATE_OBJECT
-		if (iChange != 0)
-		{
-			m_iExtraAttackBelowHealthMod = (m_iExtraAttackBelowHealthMod + iChange);
+	if (iChange != 0)
+	{
+		m_iExtraAttackBelowHealthMod = (m_iExtraAttackBelowHealthMod + iChange);
 
-			setInfoBarDirty(true);
-		}
+		setInfoBarDirty(true);
+	}
 }
 
 //	--------------------------------------------------------------------------------
 void CvUnit::changeAoEDamageOnMove(int iChange)
 {
 	VALIDATE_OBJECT
-		m_iAoEDamageOnMove = (m_iAoEDamageOnMove + iChange);
+	m_iAoEDamageOnMove = (m_iAoEDamageOnMove + iChange);
 	CvAssert(getAoEDamageOnMove() >= 0);
 }
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeForcedDamageValue(int iChange)
 {
 	VALIDATE_OBJECT
-		if (iChange != 0)
-		{
-			m_iForcedDamage += iChange;
-		}
+	if (iChange != 0)
+	{
+		m_iForcedDamage += iChange;
+	}
 }
 //	--------------------------------------------------------------------------------
 int CvUnit::getForcedDamageValue()
 {
 	VALIDATE_OBJECT
-		return m_iForcedDamage;
+	return m_iForcedDamage;
 }
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeChangeDamageValue(int iChange)
 {
 	VALIDATE_OBJECT
-		if (iChange != 0)
-		{
-			m_iChangeDamage += iChange;
-		}
+	if (iChange != 0)
+	{
+		m_iChangeDamage += iChange;
+	}
 }
 //	--------------------------------------------------------------------------------
 int CvUnit::getChangeDamageValue()
 {
 	VALIDATE_OBJECT
-		return m_iChangeDamage;
+	return m_iChangeDamage;
 }
 
 #endif

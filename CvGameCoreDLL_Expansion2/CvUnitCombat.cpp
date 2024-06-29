@@ -4776,7 +4776,7 @@ void SiegeInflictDamageIntervene(InflictDamageContext* ctx)
 	{
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalDamageFixTotal();
-		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalSpecialDamageFixTotal();
+		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetOriginalCapitalSpecialDamageFixTotal() / 2;
 #endif
 		
 		*ctx->piAttackInflictDamage += ctx->pAttackerUnit->GetSiegeInflictDamageChange();

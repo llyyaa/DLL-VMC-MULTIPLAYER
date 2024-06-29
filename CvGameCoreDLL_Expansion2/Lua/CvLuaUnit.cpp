@@ -461,6 +461,8 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetNearNumEnemyDefenseMod);
 	Method(GetNumEnemyAdjacent);
 #endif
+	Method(GetDamageFixValueToUnit);
+	Method(GetDamageFixValueToCity);
 
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_PROMOTIONS_IMPROVEMENT_BONUS)
 	Method(GetNearbyImprovementCombatBonus);
@@ -3836,6 +3838,72 @@ int CvLuaUnit::lGetChangeDamageValue(lua_State* L)
 }
 #endif
 
+int CvLuaUnit::lGetDamageFixValueToUnit(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	CvUnit* pkOtherUnit = CvLuaUnit::GetInstance(L, 2);
+	const bool bIsAttack = luaL_optbool(L, 3, true);
+	if(!pkOtherUnit)
+	{
+		lua_pushinteger(L, 0);
+		return 1;
+	}
+	CvPlayerAI& kAttacker = GET_PLAYER(pkUnit->getOwner());
+
+	int iResult = 0;
+	iResult += pkUnit->GetAttackInflictDamageChange();
+	iResult += pkUnit->GetOriginalCapitalDamageFixTotal();
+
+	int iSpecialDamageFix = pkUnit->GetOriginalCapitalSpecialDamageFixTotal();
+	iSpecialDamageFix = pkOtherUnit->getDomainType() == DOMAIN_LAND ? iSpecialDamageFix : iSpecialDamageFix / 2;
+	iResult += iSpecialDamageFix;
+
+	auto* targetPlot = bIsAttack ? pkOtherUnit->plot() : pkUnit->plot();
+	if (!targetPlot->IsFriendlyTerritory(pkUnit->getOwner()))
+	{
+		iResult += pkUnit->GetOutsideFriendlyLandsInflictDamageChange();
+	}
+
+	int iInflictDamagePerCapturedHolyCity = kAttacker.GetPlayerTraits()->GetInflictDamageChangePerCapturedHolyCity();
+	if(iInflictDamagePerCapturedHolyCity != 0)
+		iResult += iInflictDamagePerCapturedHolyCity * kAttacker.GetCachedCapturedHolyCity();
+
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+int CvLuaUnit::lGetDamageFixValueToCity(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	CvCity* pkOtherCity = CvLuaCity::GetInstance(L, 2, false);
+	if(!pkOtherCity)
+	{
+		lua_pushinteger(L, 0);
+		return 1;
+	}
+	CvPlayerAI& kAttacker = GET_PLAYER(pkUnit->getOwner());
+
+	int iResult = 0;
+	iResult += pkUnit->GetSiegeInflictDamageChange();
+		iResult += pkUnit->GetOriginalCapitalDamageFixTotal();
+	iResult += pkUnit->GetOriginalCapitalSpecialDamageFixTotal() / 2;
+	iResult += pkUnit->GetOutsideFriendlyLandsInflictDamageChange();
+
+	int iInflictDamagePerCapturedHolyCity = kAttacker.GetPlayerTraits()->GetInflictDamageChangePerCapturedHolyCity();
+	if(iInflictDamagePerCapturedHolyCity != 0)
+		iResult += iInflictDamagePerCapturedHolyCity * kAttacker.GetCachedCapturedHolyCity();
+
+	iResult += pkUnit->GetSiegeInflictDamageChangeMaxHPPercent() * pkOtherCity->GetMaxHitPoints() / 100;
+
+	int iSiegeDamagePercentIfSameReligion = kAttacker.GetPlayerTraits()->GetSiegeDamagePercentIfSameReligion();
+	const auto kReligion = kAttacker.GetReligions()->GetReligionCreatedByPlayer();
+	if (iSiegeDamagePercentIfSameReligion != 0 && kReligion != NO_RELIGION && kReligion != RELIGION_PANTHEON && pkOtherCity->GetCityReligions()->GetReligiousMajority() == kReligion)
+	{
+		iResult += iSiegeDamagePercentIfSameReligion * pkOtherCity->GetMaxHitPoints() / 100;
+	}
+
+	lua_pushinteger(L, iResult);
+	return 1;
+}
 
 //------------------------------------------------------------------------------
 int CvLuaUnit::lGetDamageCombatModifier(lua_State* L)

@@ -355,11 +355,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 
 
 #if defined(MOD_ROG_CORE)
-	if (MOD_ROG_CORE)
-	{
-		Method(GetForcedDamageValue);
-		Method(GetChangeDamageValue);
-	}
+	Method(GetForcedDamageValue);
+	Method(GetChangeDamageValue);
 #endif
 
 	Method(GetHighestPopulation);

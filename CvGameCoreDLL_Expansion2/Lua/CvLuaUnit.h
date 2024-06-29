@@ -473,7 +473,8 @@ protected:
 	static int lGetOnCapitalLandDefenseMod(lua_State* L);
 	static int lGetOutsideCapitalLandDefenseMod(lua_State* L);
 #endif
-
+	static int lGetDamageFixValueToUnit(lua_State* L);
+	static int lGetDamageFixValueToCity(lua_State* L);
 	static int lGetDamageCombatModifier(lua_State* L);
 	static int lDomainAttack(lua_State* L);
 	static int lDomainDefense(lua_State* L);
