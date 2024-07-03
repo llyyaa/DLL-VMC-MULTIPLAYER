@@ -19,6 +19,9 @@ alter table Policies add column CorruptionScoreModifier integer not null default
 alter table Resources add column CorruptionScoreChange integer not null default 0;
 alter table Buildings add column CorruptionScoreChange integer not null default 0;
 
+ALTER TABLE Buildings ADD 'MinCorruptionLevelNeeded' INTEGER DEFAULT -1;
+ALTER TABLE Buildings ADD 'MaxCorruptionLevelNeeded' INTEGER DEFAULT -1;
+
 alter table Policies add column CorruptionLevelReduceByOne boolean not null default 0;
 alter table Traits add column CorruptionLevelReduceByOne boolean not null default 0;
 alter table Traits add column MaxCorruptionLevel integer not null default -1;

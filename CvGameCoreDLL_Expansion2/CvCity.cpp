@@ -20479,6 +20479,16 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 			return false;
 	}
 #endif
+#ifdef MOD_GLOBAL_CORRUPTION
+	if(GET_PLAYER(getOwner()).EnableCorruption())
+	{
+		int iCorruptionLevel = GetCorruptionLevel();
+		int iMinLevel = pkBuildingInfo->GetMinCorruptionLevelNeeded();
+		if(iMinLevel >= 0 && iCorruptionLevel < iMinLevel) return false;
+		int iMaxLevel = pkBuildingInfo->GetMaxCorruptionLevelNeeded();
+		if(iMaxLevel >= 0 && iCorruptionLevel > iMinLevel) return false;
+	}
+#endif
 
 	// Requires adjacent Mountain
 	if(pkBuildingInfo->IsMountain())

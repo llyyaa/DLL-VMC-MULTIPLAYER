@@ -564,6 +564,8 @@ public:
 	int GetCorruptionScoreChange() const;
 	int GetCorruptionLevelChange() const;
 	int GetCorruptionPolicyCostModifier() const;
+	int GetMinCorruptionLevelNeeded() const;
+	int GetMaxCorruptionLevelNeeded() const;
 #endif
 
 	int GetGlobalProductionNeededUnitModifier() const;
@@ -969,6 +971,8 @@ private:
 	int m_iCorruptionScoreChange = 0;
 	int m_iCorruptionLevelChange = 0;
 	int m_iCorruptionPolicyCostModifier = 0;
+	int m_iMinCorruptionLevelNeeded = -1;
+	int m_iMaxCorruptionLevelNeeded = -1;
 #endif
 
 	int m_iGlobalProductionNeededUnitModifier = 0;
