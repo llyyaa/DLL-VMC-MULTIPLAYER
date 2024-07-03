@@ -726,6 +726,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iInstantResearchFromFriendlyGreatScientist = kResults.GetInt("InstantResearchFromFriendlyGreatScientist");
 
 	m_iGlobalGrowthFoodNeededModifier = kResults.GetInt("GlobalGrowthFoodNeededModifier");
+	m_iSecondCapitalsExtraScore = kResults.GetInt("SecondCapitalsExtraScore");
 
 	//References
 	const char* szTextVal;
@@ -2467,6 +2468,10 @@ int CvBuildingEntry::GetInstantResearchFromFriendlyGreatScientist() const {
 
 int CvBuildingEntry::GetGlobalGrowthFoodNeededModifier() const {
 	return m_iGlobalGrowthFoodNeededModifier;
+}
+
+int CvBuildingEntry::GetSecondCapitalsExtraScore() const {
+	return m_iSecondCapitalsExtraScore;
 }
 
 int CvBuildingEntry::GetExtraAttacks() const

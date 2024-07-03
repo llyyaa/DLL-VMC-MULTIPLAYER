@@ -596,6 +596,8 @@ public:
 	void changePlotBuyCostModifier(int iChange);
 	int GetUnitMaxExperienceLocal() const;
 	void ChangeUnitMaxExperienceLocal(int iChange);
+	int GetSecondCapitalsExtraScore() const;
+	void ChangeSecondCapitalsExtraScore(int iChange);
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	int GetCityWorkingChange() const;
 	void changeCityWorkingChange(int iChange);
@@ -1443,6 +1445,7 @@ protected:
 	FAutoVariable<int, CvCity> m_iPlotCultureCostModifier;
 	int m_iPlotBuyCostModifier;
 	int m_iUnitMaxExperienceLocal;
+	int m_iSecondCapitalsExtraScore;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	int m_iCityWorkingChange;
 #endif

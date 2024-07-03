@@ -268,6 +268,7 @@ CvCity::CvCity() :
 	, m_iPlotCultureCostModifier("CvCity::m_iPlotCultureCostModifier", m_syncArchive)
 	, m_iPlotBuyCostModifier(0)
 	, m_iUnitMaxExperienceLocal(0)
+	, m_iSecondCapitalsExtraScore(0)
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	, m_iCityWorkingChange(0)
 #endif
@@ -1114,6 +1115,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iPlotCultureCostModifier = 0;
 	m_iPlotBuyCostModifier = 0;
 	m_iUnitMaxExperienceLocal = 0;
+	m_iSecondCapitalsExtraScore = 0;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	m_iCityWorkingChange = 0;
 #endif
@@ -7692,6 +7694,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		changePlotCultureCostModifier(pBuildingInfo->GetPlotCultureCostModifier() * iChange);
 		changePlotBuyCostModifier(pBuildingInfo->GetPlotBuyCostModifier() * iChange);
 		ChangeUnitMaxExperienceLocal(pBuildingInfo->GetUnitMaxExperienceLocal() * iChange);
+		ChangeSecondCapitalsExtraScore(pBuildingInfo->GetSecondCapitalsExtraScore() * iChange);
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 		changeCityWorkingChange(pBuildingInfo->GetCityWorkingChange() * iChange);
 #endif
@@ -10912,6 +10915,26 @@ void CvCity::ChangeUnitMaxExperienceLocal(int iChange)
 }
 
 
+//	--------------------------------------------------------------------------------
+int CvCity::GetSecondCapitalsExtraScore() const
+{
+	VALIDATE_OBJECT
+	return m_iSecondCapitalsExtraScore;
+}
+void CvCity::ChangeSecondCapitalsExtraScore(int iChange)
+{
+	VALIDATE_OBJECT
+	if(iChange == 0) return;
+	m_iSecondCapitalsExtraScore += iChange;
+	if(m_iSecondCapitalsExtraScore > 0 && !IsSecondCapital())
+	{
+		GET_PLAYER(getOwner()).AddSecondCapital(GetID());
+	}
+	if(m_iSecondCapitalsExtraScore <= 0 && IsSecondCapital())
+	{
+		GET_PLAYER(getOwner()).RemoveSecondCapital(GetID());
+	}
+}
 //	--------------------------------------------------------------------------------
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 //	--------------------------------------------------------------------------------
@@ -19614,6 +19637,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iPlotCultureCostModifier;
 	kStream >> m_iPlotBuyCostModifier;
 	kStream >> m_iUnitMaxExperienceLocal;
+	kStream >> m_iSecondCapitalsExtraScore;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	MOD_SERIALIZE_READ(23, kStream, m_iCityWorkingChange, 0);
 #endif
@@ -20101,6 +20125,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iPlotCultureCostModifier; // Added for Version 3
 	kStream << m_iPlotBuyCostModifier; // Added for Version 12
 	kStream << m_iUnitMaxExperienceLocal;
+	kStream << m_iSecondCapitalsExtraScore;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	MOD_SERIALIZE_WRITE(kStream, m_iCityWorkingChange);
 #endif
@@ -23227,6 +23252,7 @@ int CvCity::CalculateCorruptionScoreFromDistance() const
 		}
 
 		int scoreBySecondCapital = plotDistance(pSecondCapital->plot()->getX(), pSecondCapital->plot()->getY(), this->plot()->getX(), this->plot()->getY()) * GC.getCORRUPTION_SCORE_PER_DISTANCE();
+		scoreBySecondCapital += pSecondCapital->GetSecondCapitalsExtraScore();
 		score = std::min(scoreBySecondCapital, score);
 	}
 

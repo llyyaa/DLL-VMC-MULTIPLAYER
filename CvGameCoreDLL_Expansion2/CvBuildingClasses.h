@@ -574,6 +574,7 @@ public:
 
 	int GetInstantResearchFromFriendlyGreatScientist() const;
 	int GetGlobalGrowthFoodNeededModifier() const;
+	int GetSecondCapitalsExtraScore() const;
 
 	int GetTradeRouteFromTheCityYields(YieldTypes eYieldTypes) const;
 
@@ -979,6 +980,7 @@ private:
 	int m_iInstantResearchFromFriendlyGreatScientist = 0;
 
 	int m_iGlobalGrowthFoodNeededModifier = 0;
+	int m_iSecondCapitalsExtraScore = 0;
 
 	std::tr1::array<int, YieldTypes::NUM_YIELD_TYPES> m_aTradeRouteFromTheCityYields;
 };
