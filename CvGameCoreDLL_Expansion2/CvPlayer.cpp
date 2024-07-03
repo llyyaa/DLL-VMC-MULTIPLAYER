@@ -33289,6 +33289,11 @@ void CvPlayer::RemoveSecondCapital(int iSecondCapitalID)
 	}
 
 	m_viSecondCapitals.erase(it);
+	int iLoop = 0;
+	for (CvCity* pCity = firstCity(&iLoop); pCity != NULL; pCity = nextCity(&iLoop))
+	{
+		pCity->UpdateCorruption();
+	}
 }
 
 int CvPlayer::GetBossLevel() const

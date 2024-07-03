@@ -13419,7 +13419,22 @@ int CvPlot::CalculateCorruptionScoreFromDistance(const CvCity& capitalCity) cons
 {
 	int capX = capitalCity.plot()->getX();
 	int capY = capitalCity.plot()->getY();
-	return plotDistance(capX, capY, getX(), getY()) * GC.getCORRUPTION_SCORE_PER_DISTANCE();
+	int score = plotDistance(capX, capY, getX(), getY()) * GC.getCORRUPTION_SCORE_PER_DISTANCE();
+	CvPlayerAI &kPlayer = GET_PLAYER(capitalCity.getOwner());
+	for (const int cityId : kPlayer.GetSecondCapitals()) // calculate by second capitals
+	{
+		CvCity* pSecondCapital = kPlayer.getCity(cityId);
+		if (pSecondCapital == nullptr)
+		{
+			continue;
+		}
+
+		int scoreBySecondCapital = plotDistance(pSecondCapital->plot()->getX(), pSecondCapital->plot()->getY(), getX(), getY()) * GC.getCORRUPTION_SCORE_PER_DISTANCE();
+		scoreBySecondCapital += pSecondCapital->GetSecondCapitalsExtraScore();
+		score = std::min(scoreBySecondCapital, score);
+	}
+	return score;
+
 }
 int CvPlot::CalculateCorruptionScoreFromCoastalBonus(const CvCity& capitalCity) const
 {

@@ -10924,14 +10924,24 @@ int CvCity::GetSecondCapitalsExtraScore() const
 void CvCity::ChangeSecondCapitalsExtraScore(int iChange)
 {
 	VALIDATE_OBJECT
-	if(iChange == 0) return;
+	if(iChange == 0 || !MOD_GLOBAL_CORRUPTION) return;
+	CvPlayerAI &kPlayer = GET_PLAYER(getOwner());
+	if(!kPlayer.EnableCorruption()) return;
+
 	m_iSecondCapitalsExtraScore += iChange;
 	if(m_iSecondCapitalsExtraScore > 0 && !IsSecondCapital())
 	{
-		GET_PLAYER(getOwner()).AddSecondCapital(GetID());
+		SetSecondCapital(true);
+		kPlayer.AddSecondCapital(GetID());
+		int iLoop = 0;
+		for (CvCity* pCity = kPlayer.firstCity(&iLoop); pCity != NULL; pCity = kPlayer.nextCity(&iLoop))
+		{
+			pCity->UpdateCorruption();
+		}
 	}
 	if(m_iSecondCapitalsExtraScore <= 0 && IsSecondCapital())
 	{
+		SetSecondCapital(false);
 		GET_PLAYER(getOwner()).RemoveSecondCapital(GetID());
 	}
 }
@@ -20480,9 +20490,9 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 	}
 #endif
 #ifdef MOD_GLOBAL_CORRUPTION
-	if(GET_PLAYER(getOwner()).EnableCorruption())
+	if(MOD_GLOBAL_CORRUPTION && GET_PLAYER(getOwner()).EnableCorruption())
 	{
-		int iCorruptionLevel = GetCorruptionLevel();
+		int iCorruptionLevel = GetCorruptionLevel() - GC.getInfoTypeForString("CORRUPTION_LV0", true);
 		int iMinLevel = pkBuildingInfo->GetMinCorruptionLevelNeeded();
 		if(iMinLevel >= 0 && iCorruptionLevel < iMinLevel) return false;
 		int iMaxLevel = pkBuildingInfo->GetMaxCorruptionLevelNeeded();
