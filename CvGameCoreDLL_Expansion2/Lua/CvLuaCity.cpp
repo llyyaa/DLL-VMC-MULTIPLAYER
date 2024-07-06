@@ -795,6 +795,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetHurryModifierLocal);
 	Method(GetUnitMaxExperienceLocal);
 	Method(IsSecondCapital);
+	Method(GetFoodConsumptionPerPopTimes100);
 }
 //------------------------------------------------------------------------------
 void CvLuaCity::HandleMissingInstance(lua_State* L)
@@ -5255,3 +5256,33 @@ LUAAPIIMPL(City, GetUnitMaxExperienceLocal);
 #endif
 
 LUAAPIIMPL(City, IsSecondCapital);
+
+int CvLuaCity::lGetFoodConsumptionPerPopTimes100(lua_State* L)
+{
+	CvCity* pCity = GetInstance(L);
+
+	int iResult = GC.getFOOD_CONSUMPTION_PER_POPULATION() * 100;
+	
+	TerrainTypes eTerrain = pCity->plot()->getTerrainType();
+	if(eTerrain == NO_TERRAIN)
+	{
+		lua_pushinteger(L, iResult);
+		return 1;
+	}
+	
+	int iConsumptionModifier = 100;
+	ReligionTypes eMajority = pCity->GetCityReligions()->GetReligiousMajority();
+	if(eMajority != NO_RELIGION)
+	{
+		iConsumptionModifier += GC.getGame().GetGameReligions()->GetReligion(eMajority, pCity->getOwner())->m_Beliefs.GetTerrainCityFoodConsumption(eTerrain);
+	}	
+	BeliefTypes eSecondaryPantheon = pCity->GetCityReligions()->GetSecondaryReligionPantheonBelief();
+	if(eSecondaryPantheon != NO_BELIEF)
+	{
+		iConsumptionModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetTerrainCityFoodConsumption(eTerrain);
+	}
+	iResult = iResult * iConsumptionModifier;
+	iResult /= 100;
+	lua_pushinteger(L, iResult);
+	return 1;
+}

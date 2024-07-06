@@ -725,6 +725,7 @@ protected:
 	LUAAPIEXTN(GetUnitMaxExperienceLocal, int);
 
 	LUAAPIEXTN(IsSecondCapital, bool);
+	LUAAPIEXTN(GetFoodConsumptionPerPopTimes100, bool);
 };
 
 #endif //CVLUACITY_H
