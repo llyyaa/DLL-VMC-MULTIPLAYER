@@ -3031,7 +3031,7 @@ void CvTacticalAI::PlotCampDefenseMoves()
 	while(pTarget != NULL)
 	{
 		CvPlot* pPlot = GC.getMap().plot(pTarget->GetTargetX(), pTarget->GetTargetY());
-		if(FindUnitsWithinStrikingDistance(pPlot, 1, 0, true /* bNoRangedUnits */, false /*bNavalOnly*/, false /*bMustMoveThrough*/))
+		if(FindUnitsWithinStrikingDistance(pPlot, 1, 0, true /* bNoRangedUnits */, false /*bNavalOnly*/, false /*bMustMoveThrough*/, false, false, false, true /*bIsDefenseCamp*/))
 		{
 			ExecuteMoveToPlot(pPlot);
 
@@ -9033,7 +9033,7 @@ bool CvTacticalAI::FindUnitsForThisMove(TacticalAIMoveTypes eMove, CvPlot* pTarg
 }
 
 /// Fills m_CurrentMoveUnits with all units within X turns of a target (returns TRUE if 1 or more found)
-bool CvTacticalAI::FindUnitsWithinStrikingDistance(CvPlot* pTarget, int iNumTurnsAway, int iPreferredDamageLevel, bool bNoRangedUnits, bool bNavalOnly, bool bMustMoveThrough, bool bIncludeBlockedUnits, bool bWillPillage, bool bTargetUndefended)
+bool CvTacticalAI::FindUnitsWithinStrikingDistance(CvPlot* pTarget, int iNumTurnsAway, int iPreferredDamageLevel, bool bNoRangedUnits, bool bNavalOnly, bool bMustMoveThrough, bool bIncludeBlockedUnits, bool bWillPillage, bool bTargetUndefended, bool bIsDefenseCamp)
 {
 	list<int>::iterator it;
 	UnitHandle pLoopUnit;
@@ -9077,16 +9077,19 @@ bool CvTacticalAI::FindUnitsWithinStrikingDistance(CvPlot* pTarget, int iNumTurn
 				
 #if defined(MOD_AI_SMART_V3)
 				//Don't pull melee units out of camps to attack.
-				if(MOD_AI_SMART_V3 && pLoopUnit->isBarbarian() && !pLoopUnit->isRanged() && (pLoopUnit->plot()->getImprovementType() == GC.getBARBARIAN_CAMP_IMPROVEMENT()))
+				//QY: don't skip when Barbarians defanse camp
+				if(!bIsDefenseCamp)
 				{
-					continue;
-				}
-
-				//AMS: To effectively skip all ranged units...
-				//QY: don't skip unit can do melee attack
-				if (MOD_AI_SMART_V3 && bNoRangedUnits && pLoopUnit->IsCanAttackRanged() && pLoopUnit->isOnlyDefensive())
-				{
-					continue;
+					if(MOD_AI_SMART_V3 && pLoopUnit->isBarbarian() && !pLoopUnit->isRanged() && (pLoopUnit->plot()->getImprovementType() == GC.getBARBARIAN_CAMP_IMPROVEMENT()))
+					{
+						continue;
+					}
+					//AMS: To effectively skip all ranged units...
+					//QY: only skip unit cannot do melee attack
+					if (MOD_AI_SMART_V3 && bNoRangedUnits && pLoopUnit->isOnlyDefensive() /*&& pLoopUnit->IsCanAttackRanged()*/)
+					{
+						continue;
+					}
 				}
 #endif
 
