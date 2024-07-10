@@ -7392,6 +7392,21 @@ void CvTeam::SetCurrentEra(EraTypes eNewValue)
 			}
 		}
 
+		// Trait to provide free great people on era change?
+		for(int iPlayerLoop = 0; iPlayerLoop < MAX_CIV_PLAYERS; iPlayerLoop++)
+		{
+			ePlayer = (PlayerTypes) iPlayerLoop;
+			CvPlayerAI& kPlayer = GET_PLAYER(ePlayer);
+			if(kPlayer.isAlive() && kPlayer.getTeam() == GetID() && !kPlayer.isMinorCiv() && !kPlayer.isBarbarian())
+			{
+				int iNumFreeGreatPeople = kPlayer.GetPlayerTraits()->GetFreeGreatPeoplePerEra();
+				if (iNumFreeGreatPeople > 0)
+				{
+					kPlayer.ChangeNumFreeGreatPeople(iNumFreeGreatPeople);
+				}
+			}
+		}
+
 		m_eCurrentEra = eNewValue;
 
 		if(GC.getGame().getActiveTeam() != NO_TEAM)

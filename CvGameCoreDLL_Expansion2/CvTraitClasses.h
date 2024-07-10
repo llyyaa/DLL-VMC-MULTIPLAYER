@@ -122,6 +122,7 @@ public:
 	int GetUnresearchedTechBonusFromKills() const;
 	int GetExtraFoundedCityTerritoryClaimRange() const;
 	int GetFreeSocialPoliciesPerEra() const;
+	int GetFreeGreatPeoplePerEra() const;
 	int GetNumTradeRoutesModifier() const;
 	int GetTradeRouteResourceModifier() const;
 	int GetUniqueLuxuryCities() const;
@@ -395,6 +396,7 @@ protected:
 	int m_iUnresearchedTechBonusFromKills;
 	int m_iExtraFoundedCityTerritoryClaimRange;
 	int m_iFreeSocialPoliciesPerEra;
+	int m_iFreeGreatPeoplePerEra;
 	int m_iNumTradeRoutesModifier;
 	int m_iTradeRouteResourceModifier;
 	int m_iUniqueLuxuryCities;
@@ -878,6 +880,10 @@ public:
 	int GetFreeSocialPoliciesPerEra() const
 	{
 		return m_iFreeSocialPoliciesPerEra;
+	}
+	int GetFreeGreatPeoplePerEra() const
+	{
+		return m_iFreeGreatPeoplePerEra;
 	}
 	int GetNumTradeRoutesModifier() const
 	{
@@ -1402,6 +1408,7 @@ private:
 	int m_iUnresearchedTechBonusFromKills;
 	int m_iExtraFoundedCityTerritoryClaimRange;
 	int m_iFreeSocialPoliciesPerEra;
+	int m_iFreeGreatPeoplePerEra;
 	int m_iNumTradeRoutesModifier;
 	int m_iTradeRouteResourceModifier;
 	int m_iUniqueLuxuryCities;
