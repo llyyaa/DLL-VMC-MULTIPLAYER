@@ -83,6 +83,8 @@ CvTraitEntry::CvTraitEntry() :
 	m_iNearbyImprovementBonusRange(0),
 	m_iCultureBuildingYieldChange(0),
 	m_iCombatBonusVsHigherTech(0),
+	m_iAwayFromCapitalCombatModifier(0),
+	m_iAwayFromCapitalCombatModifierMax(0),
 	m_iCombatBonusVsLargerCiv(0),
 	m_iLandUnitMaintenanceModifier(0),
 	m_iNavalUnitMaintenanceModifier(0),
@@ -535,6 +537,18 @@ int CvTraitEntry::GetCultureBuildingYieldChange() const
 int CvTraitEntry::GetCombatBonusVsHigherTech() const
 {
 	return m_iCombatBonusVsHigherTech;
+}
+
+/// combat bonus away from capital
+int CvTraitEntry::GetAwayFromCapitalCombatModifier() const
+{
+	return m_iAwayFromCapitalCombatModifier;
+}
+
+/// max combat bonus away from capital
+int CvTraitEntry::GetAwayFromCapitalCombatModifierMax() const
+{
+	return m_iAwayFromCapitalCombatModifierMax;
 }
 
 /// Accessor: combat bonus vs. civ with more cities
@@ -1587,6 +1601,8 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iNearbyImprovementBonusRange			= kResults.GetInt("NearbyImprovementBonusRange");
 	m_iCultureBuildingYieldChange			= kResults.GetInt("CultureBuildingYieldChange");
 	m_iCombatBonusVsHigherTech				= kResults.GetInt("CombatBonusVsHigherTech");
+	m_iAwayFromCapitalCombatModifier				= kResults.GetInt("AwayFromCapitalCombatModifier");
+	m_iAwayFromCapitalCombatModifierMax				= kResults.GetInt("AwayFromCapitalCombatModifierMax");
 	m_iCombatBonusVsLargerCiv				= kResults.GetInt("CombatBonusVsLargerCiv");
 	m_iLandUnitMaintenanceModifier          = kResults.GetInt("LandUnitMaintenanceModifier");
 	m_iNavalUnitMaintenanceModifier         = kResults.GetInt("NavalUnitMaintenanceModifier");
@@ -2500,6 +2516,8 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iNearbyImprovementBonusRange += trait->GetNearbyImprovementBonusRange();
 			m_iCultureBuildingYieldChange += trait->GetCultureBuildingYieldChange();
 			m_iCombatBonusVsHigherTech += trait->GetCombatBonusVsHigherTech();
+			m_iAwayFromCapitalCombatModifier += trait->GetAwayFromCapitalCombatModifier();
+			m_iAwayFromCapitalCombatModifierMax += trait->GetAwayFromCapitalCombatModifierMax();
 			m_iCombatBonusVsLargerCiv += trait->GetCombatBonusVsLargerCiv();
 			m_iLandUnitMaintenanceModifier += trait->GetLandUnitMaintenanceModifier();
 			m_iNavalUnitMaintenanceModifier += trait->GetNavalUnitMaintenanceModifier();
@@ -3034,6 +3052,8 @@ void CvPlayerTraits::Reset()
 	m_iNearbyImprovementBonusRange = 0;
 	m_iCultureBuildingYieldChange = 0;
 	m_iCombatBonusVsHigherTech = 0;
+	m_iAwayFromCapitalCombatModifier = 0;
+	m_iAwayFromCapitalCombatModifierMax = 0;
 	m_iCombatBonusVsLargerCiv = 0;
 	m_iLandUnitMaintenanceModifier = 0;
 	m_iNavalUnitMaintenanceModifier = 0;
@@ -4412,6 +4432,10 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_iCultureBuildingYieldChange;
 
 	kStream >> m_iCombatBonusVsHigherTech;
+	
+	kStream >> m_iAwayFromCapitalCombatModifier;
+	
+	kStream >> m_iAwayFromCapitalCombatModifierMax;
 
 	kStream >> m_iCombatBonusVsLargerCiv;
 
@@ -4918,6 +4942,8 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iNearbyImprovementBonusRange;
 	kStream << m_iCultureBuildingYieldChange;
 	kStream << m_iCombatBonusVsHigherTech;
+	kStream << m_iAwayFromCapitalCombatModifier;
+	kStream << m_iAwayFromCapitalCombatModifierMax;
 	kStream << m_iCombatBonusVsLargerCiv;
 	kStream << m_iLandUnitMaintenanceModifier;
 	kStream << m_iNavalUnitMaintenanceModifier;

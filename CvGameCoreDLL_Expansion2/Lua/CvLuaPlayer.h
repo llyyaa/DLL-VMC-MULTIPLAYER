@@ -370,6 +370,8 @@ protected:
 	static int lSetBarbarianCombatBonus(lua_State* L);
 	static int lChangeBarbarianCombatBonus(lua_State* L);
 	static int lGetCombatBonusVsHigherTech(lua_State* L);
+	static int lGetAwayFromCapitalCombatModifier(lua_State* L);
+	static int lGetAwayFromCapitalCombatModifierMax(lua_State* L);
 	static int lGetCombatBonusVsLargerCiv(lua_State* L);
 
 	static int lGetGarrisonedCityRangeStrikeModifier(lua_State* L);

@@ -473,6 +473,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(SetBarbarianCombatBonus);
 	Method(ChangeBarbarianCombatBonus);
 	Method(GetCombatBonusVsHigherTech);
+	Method(GetAwayFromCapitalCombatModifier);
+	Method(GetAwayFromCapitalCombatModifierMax);
 	Method(GetCombatBonusVsLargerCiv);
 
 	Method(GetGarrisonedCityRangeStrikeModifier);
@@ -5288,6 +5290,25 @@ int CvLuaPlayer::lGetCombatBonusVsHigherTech(lua_State* L)
 	if(pkPlayer)
 	{
 		lua_pushinteger(L, pkPlayer->GetPlayerTraits()->GetCombatBonusVsHigherTech());
+	}
+	return 1;
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetAwayFromCapitalCombatModifier(lua_State* L)
+{
+	CvPlayer* pkPlayer = GetInstance(L);
+	if(pkPlayer)
+	{
+		lua_pushinteger(L, pkPlayer->GetPlayerTraits()->GetAwayFromCapitalCombatModifier());
+	}
+	return 1;
+}
+int CvLuaPlayer::lGetAwayFromCapitalCombatModifierMax(lua_State* L)
+{
+	CvPlayer* pkPlayer = GetInstance(L);
+	if(pkPlayer)
+	{
+		lua_pushinteger(L, pkPlayer->GetPlayerTraits()->GetAwayFromCapitalCombatModifierMax());
 	}
 	return 1;
 }

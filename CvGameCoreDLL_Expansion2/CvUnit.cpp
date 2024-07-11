@@ -14838,6 +14838,24 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 			}
 		}
 
+		// Far Away from Capital Combat Bonus
+		iTempModifier = kPlayer.GetPlayerTraits()->GetAwayFromCapitalCombatModifier();
+		int iTempModifierMax = kPlayer.GetPlayerTraits()->GetAwayFromCapitalCombatModifierMax();
+		if(iTempModifier > 0)
+		{
+			CvCity* pCapital = kPlayer.getCapitalCity();
+			if(pCapital)
+			{
+				int iDistanceToCapital = plotDistance(pBattlePlot->getX(), pBattlePlot->getY(), pCapital->getX(), pCapital->getY());
+				iTempModifier = iDistanceToCapital * iTempModifier;
+				if(iTempModifier > iTempModifierMax)
+				{
+					iTempModifier = iTempModifierMax;
+				}
+				iModifier += iTempModifier;
+			}
+		}
+
 		// Trait (player level) bonus against higher tech units
 		iTempModifier = kPlayer.GetPlayerTraits()->GetCombatBonusVsHigherTech();
 		if(iTempModifier > 0)
@@ -15816,6 +15834,24 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 	iModifier += GetAttackBonusFromDeathUnit();
 
 	iModifier += GetAttackModifierFromWorldCongress();
+
+	// Far Away from Capital Combat Bonus
+	iTempModifier = kPlayer.GetPlayerTraits()->GetAwayFromCapitalCombatModifier();
+	int iTempModifierMax = kPlayer.GetPlayerTraits()->GetAwayFromCapitalCombatModifierMax();
+	if(iTempModifier > 0)
+	{
+		CvCity* pCapital = kPlayer.getCapitalCity();
+		if(pCapital)
+		{
+			int iDistanceToCapital = plotDistance(getX(),getY(), pCapital->getX(), pCapital->getY());
+			iTempModifier = iDistanceToCapital * iTempModifier;
+			if(iTempModifier > iTempModifierMax)
+			{
+				iTempModifier = iTempModifierMax;
+			}
+			iModifier += iTempModifier;
+		}
+	}
 
 	// If the empire is unhappy, then Units get a combat penalty
 #if defined(MOD_GLOBAL_CS_RAZE_RARELY)

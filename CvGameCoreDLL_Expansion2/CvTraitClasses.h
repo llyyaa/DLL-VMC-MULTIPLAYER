@@ -107,6 +107,8 @@ public:
 	int GetNearbyImprovementBonusRange() const;
 	int GetCultureBuildingYieldChange() const;
 	int GetCombatBonusVsHigherTech() const;
+	int GetAwayFromCapitalCombatModifier() const;
+	int GetAwayFromCapitalCombatModifierMax() const;
 	int GetCombatBonusVsLargerCiv() const;
 	int GetLandUnitMaintenanceModifier() const;
 	int GetNavalUnitMaintenanceModifier() const;
@@ -381,6 +383,8 @@ protected:
 	int m_iNearbyImprovementBonusRange;
 	int m_iCultureBuildingYieldChange;
 	int m_iCombatBonusVsHigherTech;
+	int m_iAwayFromCapitalCombatModifier;
+	int m_iAwayFromCapitalCombatModifierMax;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
 	int m_iNavalUnitMaintenanceModifier;
@@ -826,6 +830,14 @@ public:
 	int GetCombatBonusVsHigherTech() const
 	{
 		return m_iCombatBonusVsHigherTech;
+	};
+	int GetAwayFromCapitalCombatModifier() const
+	{
+		return m_iAwayFromCapitalCombatModifier;
+	};
+	int GetAwayFromCapitalCombatModifierMax() const
+	{
+		return m_iAwayFromCapitalCombatModifierMax;
 	};
 	int GetCombatBonusVsLargerCiv() const
 	{
@@ -1393,6 +1405,8 @@ private:
 	int m_iNearbyImprovementBonusRange;
 	int m_iCultureBuildingYieldChange;
 	int m_iCombatBonusVsHigherTech;
+	int m_iAwayFromCapitalCombatModifier;
+	int m_iAwayFromCapitalCombatModifierMax;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
 	int m_iNavalUnitMaintenanceModifier;

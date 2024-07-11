@@ -69,3 +69,5 @@ ALTER TABLE Traits ADD COLUMN 'ExceedingHappinessImmigrationModifier' INTEGER DE
 alter table Traits add column `CanDiplomaticMarriage` boolean not null default 0;
 alter table Traits add column `AbleToDualEmpire` boolean not null default 0;
 alter table Traits add column `FreeGreatPeoplePerEra` INTEGER DEFAULT 0;
+alter table Traits add column `AwayFromCapitalCombatModifier` INTEGER DEFAULT 0;
+alter table Traits add column `AwayFromCapitalCombatModifierMax` INTEGER DEFAULT 0;
