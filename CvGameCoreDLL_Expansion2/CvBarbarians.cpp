@@ -78,7 +78,14 @@ void CvBarbarians::DoBarbCampCleared(CvPlot* pPlot, PlayerTypes ePlayer)
 bool CvBarbarians::CanBarbariansSpawn()
 {
 	CvGame& kGame = GC.getGame();
-	if (kGame.getElapsedGameTurns() < 10)
+	int iMinTurn = 10;
+	if(MOD_GLOBAL_SP_BARBARIAN_ENHANCE)
+	{
+		iMinTurn /= 2;
+		if (kGame.isOption(GAMEOPTION_RAGING_BARBARIANS)) iMinTurn /= 2;
+	}
+
+	if (kGame.getElapsedGameTurns() < iMinTurn)
 	{
 		return false;
 	}
@@ -112,7 +119,9 @@ void CvBarbarians::DoCampActivationNotice(CvPlot* pPlot)
 {
 	CvGame& kGame = GC.getGame();
 	// Default to between 8 and 12 turns per spawn
-	int iNumTurnsToSpawn = 8 + kGame.getJonRandNum(5, "Barb Spawn Rand call");
+	int iBaseTurnToSpawn = 8;
+	if(MOD_GLOBAL_SP_BARBARIAN_ENHANCE) iBaseTurnToSpawn = 6;
+	int iNumTurnsToSpawn = iBaseTurnToSpawn + kGame.getJonRandNum(5, "Barb Spawn Rand call");
 
 	// Raging
 	if (kGame.isOption(GAMEOPTION_RAGING_BARBARIANS))

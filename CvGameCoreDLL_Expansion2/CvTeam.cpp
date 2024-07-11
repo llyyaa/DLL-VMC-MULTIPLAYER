@@ -7399,11 +7399,7 @@ void CvTeam::SetCurrentEra(EraTypes eNewValue)
 			CvPlayerAI& kPlayer = GET_PLAYER(ePlayer);
 			if(kPlayer.isAlive() && kPlayer.getTeam() == GetID() && !kPlayer.isMinorCiv() && !kPlayer.isBarbarian())
 			{
-#if defined(MOD_BUGFIX_MINOR)
 				int iNumFreeGreatPeople = kPlayer.GetPlayerTraits()->GetFreeGreatPeoplePerEra();
-#else
-				int iNumFreeGreatPeople = kPlayer.GetPlayerTraits()->GetFreeGreatPeoplePerEra() > 0;
-#endif
 				if (iNumFreeGreatPeople > 0)
 				{
 					kPlayer.ChangeNumFreeGreatPeople(iNumFreeGreatPeople);

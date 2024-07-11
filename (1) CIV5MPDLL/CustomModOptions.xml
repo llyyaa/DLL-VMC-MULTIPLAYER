@@ -1191,6 +1191,7 @@
     <Row Class="6" Name="GLOBAL_CORRUPTION_POLICY_COST_MIN_ZERO" Value="0"/>
 
     <Row Class="6" Name="GLOBAL_UNIT_BARBARIAN_CAN_TRAIN" Value="0"/>
+    <Row Class="6" Name="GLOBAL_SP_BARBARIAN_ENHANCE" Value="0"/>
 
     <Row Class="6" Name="GLOBAL_UNIQUE_PROJECT_CAPTURE" Value="0"/>
 
