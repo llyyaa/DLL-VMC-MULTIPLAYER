@@ -197,6 +197,7 @@ CvPlayer::CvPlayer() :
 	, m_iHappinessFromLeagues(0)
 	, m_iEspionageModifier(0)
 	, m_iSpyStartingRank(0)
+	, m_iSpyLevelUpWhenRiggingCount(0)
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	, m_iConversionModifier(0)
 #endif
@@ -981,6 +982,7 @@ void CvPlayer::uninit()
 	m_iHappinessFromLeagues = 0;
 	m_iEspionageModifier = 0;
 	m_iSpyStartingRank = 0;
+	m_iSpyLevelUpWhenRiggingCount = 0;
 
 	m_iCSAllies = 0;
 	m_iCSFriends = 0;
@@ -2206,11 +2208,7 @@ CvPlot* CvPlayer::addFreeUnit(UnitTypes eUnit, UnitAITypes eUnitAI)
 
 
 //	--------------------------------------------------------------------------------
-#if defined(MOD_API_EXTENSIONS)
 CvCity* CvPlayer::initCity(int iX, int iY, bool bBumpUnits, bool bInitialFounding, ReligionTypes eInitialReligion, const char* szName)
-#else
-CvCity* CvPlayer::initCity(int iX, int iY, bool bBumpUnits, bool bInitialFounding)
-#endif
 {
 	CvCity* pCity = addCity();
 
@@ -2231,26 +2229,9 @@ CvCity* CvPlayer::initCity(int iX, int iY, bool bBumpUnits, bool bInitialFoundin
 
 //	--------------------------------------------------------------------------------
 // NOTE: bGift set to true if the city is given as a gift, as in the case for trades and Austria UA of annexing city-states
-#if defined(MOD_API_EXTENSIONS)
-#if defined(MOD_GLOBAL_VENICE_KEEPS_RESOURCES) || defined(MOD_GLOBAL_CS_MARRIAGE_KEEPS_RESOURCES)
-CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool bKeepResources, bool bIsMajorCivBuyout)
-#else
-CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
-#endif
-#else
-#if defined(MOD_GLOBAL_VENICE_KEEPS_RESOURCES) || defined(MOD_GLOBAL_CS_MARRIAGE_KEEPS_RESOURCES)
-void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool bKeepResources)
-#else
-void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
-#endif
-#endif
+CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool bKeepResources, bool bIsMajorCivBuyout, bool bNoKillPunishment)
 {
-	if(pOldCity == NULL)
-#if defined(MOD_API_EXTENSIONS)
-		return NULL;
-#else
-		return;
-#endif
+	if(pOldCity == NULL) return NULL;
 
 	IDInfo* pUnitNode;
 	CvCity* pNewCity;
@@ -2276,6 +2257,7 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	FFastSmallFixedList<IDInfo, 25, true, c_eCiv5GameplayDLL > oldUnits;
 	CvCityReligions tempReligions;
 	bool bIsMinorCivBuyout = (pOldCity->GetPlayer()->isMinorCiv() && bGift && (IsAbleToAnnexCityStates() || GetPlayerTraits()->IsNoAnnexing())); // Austria and Venice UA
+	bNoKillPunishment |= bIsMinorCivBuyout;
 
 	pCityPlot = pOldCity->plot();
 
@@ -2824,11 +2806,7 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	GC.GetEngineUserInterface()->setDirty(NationalBorders_DIRTY_BIT, true);
 	// end adapted from PostKill()
 
-#if defined(MOD_API_EXTENSIONS)
 	pNewCity = initCity(pCityPlot->getX(), pCityPlot->getY(), !bConquest, (!bConquest && !bGift), NO_RELIGION, strName.c_str());
-#else
-	pNewCity = initCity(pCityPlot->getX(), pCityPlot->getY(), !bConquest, (!bConquest && !bGift));
-#endif
 
 	CvAssertMsg(pNewCity != NULL, "NewCity is not assigned a valid value");
 
@@ -3316,7 +3294,7 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	pCityPlot->setRevealed(GET_PLAYER(eOldOwner).getTeam(), true);
 
 	// If the old owner is "killed," then notify everyone's Grand Strategy AI
-	if(GET_PLAYER(eOldOwner).getNumCities() == 0 && !GET_PLAYER(eOldOwner).GetPlayerTraits()->IsStaysAliveZeroCities() && !bIsMinorCivBuyout && !bIsMajorCivBuyout)
+	if(!bNoKillPunishment && GET_PLAYER(eOldOwner).getNumCities() == 0 && !GET_PLAYER(eOldOwner).GetPlayerTraits()->IsStaysAliveZeroCities())
 	{
 		if(!isMinorCiv() && !isBarbarian())
 		{
@@ -3458,6 +3436,8 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 						// We are adding a popup that the player must make a choice in, make sure they are not in the end-turn phase.
 						CancelActivePlayerEndTurn();
 					}
+					// for dual empire, others cities should no be Resistant
+					if(bNoKillPunishment) pNewCity->ChangeResistanceTurns(-pNewCity->GetResistanceTurns());
 				}
 				else
 				{
@@ -3994,11 +3974,7 @@ void CvPlayer::DoLiberatePlayer(PlayerTypes ePlayer, int iOldCityID)
 	}
 
 	// Give the city back to the liberated player
-#if defined(MOD_API_EXTENSIONS)
 	CvCity* pNewCity = GET_PLAYER(ePlayer).acquireCity(pCity, false, true);
-#else
-	GET_PLAYER(ePlayer).acquireCity(pCity, false, true);
-#endif
 
 	if (!GET_PLAYER(ePlayer).isMinorCiv())
 	{
@@ -8155,11 +8131,7 @@ void CvPlayer::found(int iX, int iY)
 
 	SetTurnsSinceSettledLastCity(0);
 
-#if defined(MOD_GLOBAL_RELIGIOUS_SETTLERS) && defined(MOD_API_EXTENSIONS)
 	CvCity* pCity = initCity(iX, iY, true, true, eReligion);
-#else
-	CvCity* pCity = initCity(iX, iY);
-#endif
 	CvAssertMsg(pCity != NULL, "City is not assigned a valid value");
 	if(pCity == NULL)
 		return;
@@ -14287,6 +14259,17 @@ int CvPlayer::GetStartingSpyRank() const
 void CvPlayer::ChangeStartingSpyRank(int iChange)
 {
 	m_iSpyStartingRank = (m_iSpyStartingRank + iChange);
+}
+
+//Can spy level up when after rigging
+int CvPlayer::GetSpyLevelUpWhenRiggingCount() const
+{
+	return m_iSpyLevelUpWhenRiggingCount;
+}
+
+bool CvPlayer::IsSpyLevelUpWhenRigging() const
+{
+	return (GetSpyLevelUpWhenRiggingCount() > 0);
 }
 
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -26644,6 +26627,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changePolicyModifiers(POLICYMOD_CAPITAL_TRADE_RANGE_CHANGE, pPolicy->GetCapitalTradeRouteRangeChange() * iChange);
 	changePolicyModifiers(POLICYMOD_SHARED_IDEOLOGY_TRADE_CHANGE, pPolicy->GetSharedIdeologyTradeGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_RIGGING_ELECTION_MODIFIER, pPolicy->GetRiggingElectionModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_RIGGING_ELECTION_INFLUENCE_MODIFIER, pPolicy->GetRiggingElectionInfluenceModifier() * iChange);
+	changePolicyModifiers(POLICYMOD_SPY_LEVEL_UP_WHEN_RIGGING, pPolicy->IsSpyLevelUpWhenRigging() * iChange);
 	changePolicyModifiers(POLICYMOD_MILITARY_UNIT_GIFT_INFLUENCE, pPolicy->GetMilitaryUnitGiftExtraInfluence() * iChange);
 	changePolicyModifiers(POLICYMOD_PROTECTED_MINOR_INFLUENCE, pPolicy->GetProtectedMinorPerTurnInfluence() * iChange);
 	changePolicyModifiers(POLICYMOD_AFRAID_INFLUENCE, pPolicy->GetAfraidMinorPerTurnInfluence() * iChange);
@@ -27864,6 +27849,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	}
 	kStream >> m_iEspionageModifier;
 	kStream >> m_iSpyStartingRank;
+	kStream >> m_iSpyLevelUpWhenRiggingCount;
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	MOD_SERIALIZE_READ(23, kStream, m_iConversionModifier, 0);
 #endif
@@ -28658,6 +28644,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iHappinessFromLeagues;
 	kStream << m_iEspionageModifier;
 	kStream << m_iSpyStartingRank;
+	kStream << m_iSpyLevelUpWhenRiggingCount;
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	MOD_SERIALIZE_WRITE(kStream, m_iConversionModifier);
 #endif

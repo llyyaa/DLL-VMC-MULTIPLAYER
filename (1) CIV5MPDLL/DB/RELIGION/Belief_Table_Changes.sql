@@ -49,3 +49,9 @@ CREATE TABLE Belief_LakePlotYieldChanges (
     YieldType TEXT REFERENCES Yields(Type),
     Yield INTEGER DEFAULT 0
 );
+
+CREATE TABLE Belief_RiverPlotYieldChanges (
+    BeliefType TEXT REFERENCES Beliefs(Type),
+    YieldType TEXT REFERENCES Yields(Type),
+    Yield INTEGER DEFAULT 0
+);

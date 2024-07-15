@@ -94,24 +94,8 @@ public:
 	void addFreeUnitAI(UnitAITypes eUnitAI, int iCount);
 	CvPlot* addFreeUnit(UnitTypes eUnit, UnitAITypes eUnitAI = NO_UNITAI);
 
-#if defined(MOD_API_EXTENSIONS)
 	CvCity* initCity(int iX, int iY, bool bBumpUnits = true, bool bInitialFounding = true, ReligionTypes eInitialReligion = NO_RELIGION, const char* szName = NULL);
-#else
-	CvCity* initCity(int iX, int iY, bool bBumpUnits = true, bool bInitialFounding = true);
-#endif
-#if defined(MOD_API_EXTENSIONS)
-#if defined(MOD_GLOBAL_VENICE_KEEPS_RESOURCES) || defined(MOD_GLOBAL_CS_MARRIAGE_KEEPS_RESOURCES)
-	CvCity* acquireCity(CvCity* pCity, bool bConquest, bool bGift, bool bKeepResources = false, bool bIsMajorCivBuyout = false);
-#else
-	CvCity* acquireCity(CvCity* pCity, bool bConquest, bool bGift);
-#endif
-#else
-#if defined(MOD_GLOBAL_VENICE_KEEPS_RESOURCES) || defined(MOD_GLOBAL_CS_MARRIAGE_KEEPS_RESOURCES)
-	void acquireCity(CvCity* pCity, bool bConquest, bool bGift, bool bKeepResources = false);
-#else
-	void acquireCity(CvCity* pCity, bool bConquest, bool bGift);
-#endif
-#endif
+	CvCity* acquireCity(CvCity* pCity, bool bConquest, bool bGift, bool bKeepResources = false, bool bIsMajorCivBuyout = false, bool bNoKillPunishment = false);
 	void killCities();
 	CvString getNewCityName() const;
 	CvString GetBorrowedCityName(CivilizationTypes eCivToBorrowFrom) const;
@@ -607,6 +591,8 @@ public:
 	void ChangeEspionageModifier(int iChange);
 	int GetStartingSpyRank() const;
 	void ChangeStartingSpyRank(int iChange);
+	int GetSpyLevelUpWhenRiggingCount() const;
+	bool IsSpyLevelUpWhenRigging() const;
 	// END Espionage
 
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -2365,6 +2351,7 @@ protected:
 	int m_iHappinessPerXPolicies;
 	int m_iEspionageModifier;
 	int m_iSpyStartingRank;
+	int m_iSpyLevelUpWhenRiggingCount;
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int m_iConversionModifier;
 #endif

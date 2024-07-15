@@ -8965,6 +8965,14 @@ int CvPlot::calculateNatureYield(YieldTypes eYield, TeamTypes eTeam, bool bIgnor
 				iReligionChange += pSecondaryPantheon->GetLakePlotYieldChange(eYield);
 			}
 		}
+		if(isRiver())
+		{
+			iReligionChange += pReligion->m_Beliefs.GetRiverPlotYieldChange(eYield);
+			if (pSecondaryPantheon)
+			{
+				iReligionChange += pSecondaryPantheon->GetRiverPlotYieldChange(eYield);
+			}
+		}
 		iYield += iReligionChange;
 	}
 
@@ -13396,7 +13404,7 @@ void CvPlot::ClearUnitPromotions(bool bOnlyFriendUnit)
 		CvUnit* pLoopUnit = getUnitByIndex(i);
 		if (!pLoopUnit || (bOnlyFriendUnit && getOwner() != pLoopUnit->getOwner())) continue;
 
-		auto& candidatePromotionToClear = pLoopUnit->GetPromotionsThatCanBeActionCleared();
+		std::vector<PromotionTypes> candidatePromotionToClear(pLoopUnit->GetPromotionsThatCanBeActionCleared().begin(), pLoopUnit->GetPromotionsThatCanBeActionCleared().end());
 		if (candidatePromotionToClear.empty()) continue;
 		for (auto it = candidatePromotionToClear.begin(); it != candidatePromotionToClear.end(); ++it)
 		{

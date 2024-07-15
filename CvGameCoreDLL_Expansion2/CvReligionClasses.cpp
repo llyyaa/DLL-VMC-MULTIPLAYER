@@ -6312,6 +6312,11 @@ int CvReligionAI::ScoreBeliefAtPlot(CvBeliefEntry* pEntry, CvPlot* pPlot)
 		{
 			iRtnValue += pEntry->GetLakePlotYieldChange(iI) * 2;
 		}
+		//River
+		if (pPlot->isRiver())
+		{
+			iRtnValue += pEntry->GetRiverPlotYieldChange(iI) * 1;
+		}
 	}
 
 	return iRtnValue;
