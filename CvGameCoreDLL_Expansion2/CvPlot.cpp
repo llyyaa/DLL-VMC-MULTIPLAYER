@@ -2867,7 +2867,11 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 		CvImprovementEntry* pkImprovement = GC.getImprovementInfo(eImprovement);
 #if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
 		// Can not create resource in a plot where already has one
-		if(MOD_IMPROVEMENTS_CREATE_ITEMS && getResourceType() != NO_RESOURCE && pkImprovement->GetCreateItemMod() > 2)
+		if(pkImprovement->GetCreateItemMod() > 2 && getResourceType() != NO_RESOURCE)
+		{
+			return false;
+		}
+		if(pkImprovement->GetNewImprovement() != NO_IMPROVEMENT && pkImprovement->GetNewImprovement() == getImprovementType())
 		{
 			return false;
 		}
@@ -10926,38 +10930,35 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 #if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
 				CvImprovementEntry& tImprovementEntry = *GC.getImprovementInfo(eImprovement);
 				int eCreateItemMod = tImprovementEntry.GetCreateItemMod();
-				if(MOD_IMPROVEMENTS_CREATE_ITEMS)
+				//enable create resource mod
+				if(eCreateItemMod > 2)
 				{
-					//enable create resource mod
-					if(eCreateItemMod > 2)
+					ResourceTypes cResource = (ResourceTypes)tImprovementEntry.GetCreateResource(this);
+					int cResourceQuantity = tImprovementEntry.GetCreatedResourceQuantity();
+					if (cResource != NO_RESOURCE && cResourceQuantity != 0)
 					{
-						ResourceTypes cResource = (ResourceTypes)tImprovementEntry.GetCreateResource(this);
-						int cResourceQuantity = tImprovementEntry.GetCreatedResourceQuantity();
-						if (cResource != NO_RESOURCE && cResourceQuantity != 0)
-						{
-							cResourceQuantity = cResourceQuantity > 0 ? cResourceQuantity : GC.getGame().getJonRandNum(-cResourceQuantity, "Get random source quantity when constructed ") + 1;
-							setResourceType(cResource, cResourceQuantity);
-						}
+						cResourceQuantity = cResourceQuantity > 0 ? cResourceQuantity : GC.getGame().getJonRandNum(-cResourceQuantity, "Get random source quantity when constructed ") + 1;
+						setResourceType(cResource, cResourceQuantity);
 					}
-					if(eCreateItemMod >1)
+				}
+				if(eCreateItemMod > 1)
+				{
+					FeatureTypes cFeature = (FeatureTypes)tImprovementEntry.GetNewFeature();
+					if(cFeature != NO_FEATURE)
 					{
-						FeatureTypes cFeature = (FeatureTypes)tImprovementEntry.GetNewFeature();
-						if(cFeature != NO_FEATURE)
-						{
-							setFeatureType(cFeature);
-						}
+						setFeatureType(cFeature);
 					}
-					if(eCreateItemMod >0)
+				}
+				if(eCreateItemMod > 0)
+				{
+					ImprovementTypes cImprovement = (ImprovementTypes)tImprovementEntry.GetNewImprovement();
+					if(cImprovement != NO_IMPROVEMENT)
 					{
-						ImprovementTypes cImprovement = (ImprovementTypes)tImprovementEntry.GetNewImprovement();
-						if(cImprovement != NO_IMPROVEMENT)
-						{
-							eImprovement = cImprovement;
-						}
-						else 
-						{
-							eClearImprovement = true;
-						}
+						eImprovement = cImprovement;
+					}
+					else 
+					{
+						eClearImprovement = true;
 					}
 				}
 				if(!eClearImprovement)
