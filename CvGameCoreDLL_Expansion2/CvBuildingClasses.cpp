@@ -91,6 +91,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iHappinessPerXPolicies(0),
 	m_iCityCountUnhappinessMod(0),
 	m_bNoOccupiedUnhappiness(false),
+	m_bNotNeedOccupied(false),
 	m_iGlobalPopulationChange(0),
 	m_iTechShare(0),
 	m_iFreeTechs(0),
@@ -629,6 +630,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iHappinessPerXPolicies = kResults.GetInt("HappinessPerXPolicies");
 	m_iCityCountUnhappinessMod = kResults.GetInt("CityCountUnhappinessMod");
 	m_bNoOccupiedUnhappiness = kResults.GetBool("NoOccupiedUnhappiness");
+	m_bNotNeedOccupied = kResults.GetBool("NotNeedOccupied");
 	m_iWorkerSpeedModifier = kResults.GetInt("WorkerSpeedModifier");
 	m_iMilitaryProductionModifier = kResults.GetInt("MilitaryProductionModifier");
 	m_iSpaceProductionModifier = kResults.GetInt("SpaceProductionModifier");
@@ -2531,6 +2533,12 @@ int CvBuildingEntry::GetCityCountUnhappinessMod() const
 bool CvBuildingEntry::IsNoOccupiedUnhappiness() const
 {
 	return m_bNoOccupiedUnhappiness;
+}
+
+/// NotNeedOccupied
+bool CvBuildingEntry::IsNotNeedOccupied() const
+{
+	return m_bNotNeedOccupied;
 }
 
 /// Population added to every City in the player's empire

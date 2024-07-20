@@ -3449,7 +3449,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 	int iNumBuildingClassInfos = GC.getNumBuildingClassInfos();
 
 	// Can't construct a building to reduce occupied unhappiness if the city isn't occupied
-	if(pkBuildingInfo->IsNoOccupiedUnhappiness() && !IsOccupied())
+	if(pkBuildingInfo->IsNoOccupiedUnhappiness() && !pkBuildingInfo->IsNotNeedOccupied() &&!IsOccupied())
 		return false;
 
 	// Does this city have prereq buildings?
