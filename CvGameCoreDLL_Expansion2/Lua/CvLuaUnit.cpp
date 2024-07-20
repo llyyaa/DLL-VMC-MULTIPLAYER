@@ -3851,12 +3851,15 @@ int CvLuaUnit::lGetDamageFixValueToUnit(lua_State* L)
 	CvPlayerAI& kAttacker = GET_PLAYER(pkUnit->getOwner());
 
 	int iResult = 0;
-	iResult += pkUnit->GetAttackInflictDamageChange();
-	iResult += pkUnit->GetOriginalCapitalDamageFixTotal();
+	if(bIsAttack)
+	{
+		iResult += pkUnit->GetAttackInflictDamageChange();
+		iResult += pkUnit->GetOriginalCapitalDamageFixTotal();
 
-	int iSpecialDamageFix = pkUnit->GetOriginalCapitalSpecialDamageFixTotal();
-	iSpecialDamageFix = pkOtherUnit->getDomainType() == DOMAIN_LAND ? iSpecialDamageFix : iSpecialDamageFix / 2;
-	iResult += iSpecialDamageFix;
+		int iSpecialDamageFix = pkUnit->GetOriginalCapitalSpecialDamageFixTotal();
+		iSpecialDamageFix = pkOtherUnit->getDomainType() == DOMAIN_LAND ? iSpecialDamageFix : iSpecialDamageFix / 2;
+		iResult += iSpecialDamageFix;
+	}
 
 	auto* targetPlot = bIsAttack ? pkOtherUnit->plot() : pkUnit->plot();
 	if (!targetPlot->IsFriendlyTerritory(pkUnit->getOwner()))
