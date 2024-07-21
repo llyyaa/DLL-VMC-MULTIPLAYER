@@ -122,58 +122,14 @@ bool CvGameTrade::CanCreateTradeRoute(CvCity* pOriginCity, CvCity* pDestCity, Do
 
 		if (eConnectionType == TRADE_CONNECTION_FOOD)
 		{
-			bool bAllowsFoodConnection = false;
-			for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
-			{
-				BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
-				if(eBuilding != NO_BUILDING)
-				{
-					CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(eBuilding);
-					if (!pBuildingEntry)
-					{
-						continue;
-					}
-
-					if (pBuildingEntry && pBuildingEntry->AllowsFoodTradeRoutes())
-					{
-						if (pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID()) > 0)
-						{
-							bAllowsFoodConnection = true;
-						}
-					}
-				}
-			}
-
-			if (!bAllowsFoodConnection)
+			if (!pOriginCity->IsAllowsFoodTradeRoutes())
 			{
 				return false;
 			}
 		}
 		else if (eConnectionType == TRADE_CONNECTION_PRODUCTION)
 		{
-			bool bAllowsProductionConnection = false;
-			for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
-			{
-				BuildingTypes eBuilding = (BuildingTypes)GET_PLAYER(pOriginCity->getOwner()).getCivilizationInfo().getCivilizationBuildings(iI);
-				if(eBuilding != NO_BUILDING)
-				{
-					CvBuildingEntry* pBuildingEntry = GC.GetGameBuildings()->GetEntry(eBuilding);
-					if (!pBuildingEntry)
-					{
-						continue;
-					}
-
-					if (pBuildingEntry && pBuildingEntry->AllowsProductionTradeRoutes())
-					{
-						if (pOriginCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)pBuildingEntry->GetID()) > 0)
-						{
-							bAllowsProductionConnection = true;
-						}
-					}
-				}
-			}
-
-			if (!bAllowsProductionConnection)
+			if (!pOriginCity->IsAllowsProductionTradeRoutes())
 			{
 				return false;
 			}

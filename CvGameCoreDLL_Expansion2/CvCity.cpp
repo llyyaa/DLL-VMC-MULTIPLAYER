@@ -269,6 +269,8 @@ CvCity::CvCity() :
 	, m_iPlotBuyCostModifier(0)
 	, m_iUnitMaxExperienceLocal(0)
 	, m_iSecondCapitalsExtraScore(0)
+	, m_iNumAllowsFoodTradeRoutes(0)
+	, m_iNumAllowsProductionTradeRoutes(0)
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	, m_iCityWorkingChange(0)
 #endif
@@ -1116,6 +1118,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iPlotBuyCostModifier = 0;
 	m_iUnitMaxExperienceLocal = 0;
 	m_iSecondCapitalsExtraScore = 0;
+	m_iNumAllowsFoodTradeRoutes = 0;
+	m_iNumAllowsProductionTradeRoutes = 0;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	m_iCityWorkingChange = 0;
 #endif
@@ -7695,6 +7699,8 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		changePlotBuyCostModifier(pBuildingInfo->GetPlotBuyCostModifier() * iChange);
 		ChangeUnitMaxExperienceLocal(pBuildingInfo->GetUnitMaxExperienceLocal() * iChange);
 		ChangeSecondCapitalsExtraScore(pBuildingInfo->GetSecondCapitalsExtraScore() * iChange);
+		ChangeNumAllowsFoodTradeRoutes(pBuildingInfo->AllowsFoodTradeRoutes() ? iChange : 0);
+		ChangeNumAllowsProductionTradeRoutes(pBuildingInfo->AllowsProductionTradeRoutes() ? iChange : 0);
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 		changeCityWorkingChange(pBuildingInfo->GetCityWorkingChange() * iChange);
 #endif
@@ -10945,6 +10951,24 @@ void CvCity::ChangeSecondCapitalsExtraScore(int iChange)
 		GET_PLAYER(getOwner()).RemoveSecondCapital(GetID());
 	}
 }
+//	--------------------------------------------------------------------------------
+bool CvCity::IsAllowsFoodTradeRoutes()
+{
+	return m_iNumAllowsFoodTradeRoutes > 0;
+}
+void CvCity::ChangeNumAllowsFoodTradeRoutes(int iChange)
+{
+	m_iNumAllowsFoodTradeRoutes += iChange;
+}
+bool CvCity::IsAllowsProductionTradeRoutes()
+{
+	return m_iNumAllowsProductionTradeRoutes > 0;
+}
+void CvCity::ChangeNumAllowsProductionTradeRoutes(int iChange)
+{
+	m_iNumAllowsProductionTradeRoutes += iChange;
+}
+
 //	--------------------------------------------------------------------------------
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 //	--------------------------------------------------------------------------------
@@ -19648,6 +19672,8 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iPlotBuyCostModifier;
 	kStream >> m_iUnitMaxExperienceLocal;
 	kStream >> m_iSecondCapitalsExtraScore;
+	kStream >> m_iNumAllowsFoodTradeRoutes;
+	kStream >> m_iNumAllowsProductionTradeRoutes;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	MOD_SERIALIZE_READ(23, kStream, m_iCityWorkingChange, 0);
 #endif
@@ -20136,6 +20162,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iPlotBuyCostModifier; // Added for Version 12
 	kStream << m_iUnitMaxExperienceLocal;
 	kStream << m_iSecondCapitalsExtraScore;
+	kStream << m_iNumAllowsFoodTradeRoutes;
+	kStream << m_iNumAllowsProductionTradeRoutes;
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	MOD_SERIALIZE_WRITE(kStream, m_iCityWorkingChange);
 #endif
