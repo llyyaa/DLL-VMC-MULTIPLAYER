@@ -13382,11 +13382,8 @@ int CvCity::getCrimeFromGarrisonedUnit() const
 	CvUnit* pGarrisonedUnit = GetGarrisonedUnit();
 	if (pGarrisonedUnit)
 	{
-		int iGarrisonedStrength = pGarrisonedUnit->GetBaseCombatStrength()/10;
-		if (iGarrisonedStrength < 6)
-		{
-			iGarrisonedStrength=5;
-		}
+		int iGarrisonedStrength = pGarrisonedUnit->GetBaseCombatStrength()/5;
+		iGarrisonedStrength = std::min(200, (std::max(5, iGarrisonedStrength)));
 		iCrimeFromGarrisonedUnit -= iGarrisonedStrength;
 	}
 	return iCrimeFromGarrisonedUnit;
