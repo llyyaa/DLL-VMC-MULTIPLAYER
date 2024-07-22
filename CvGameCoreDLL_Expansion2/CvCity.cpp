@@ -3277,19 +3277,15 @@ bool CvCity::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool b
 			}
 
 			// Requires Building
-			if(thisUnitInfo.GetBuildingClassRequireds(eBuildingClass))
+			if(thisUnitInfo.GetBuildingClassRequireds(eBuildingClass) && GetNumBuildingClass(eBuildingClass) <= 0)
 			{
 				const BuildingTypes ePrereqBuilding = (BuildingTypes)(thisCivilization.getCivilizationBuildings(eBuildingClass));
-
-				if(GetCityBuildings()->GetNumBuilding(ePrereqBuilding) == 0)
+				CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(ePrereqBuilding);
+				if(pkBuildingInfo)
 				{
-					CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(ePrereqBuilding);
-					if(pkBuildingInfo)
-					{
-						GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_UNIT_REQUIRES_BUILDING", pkBuildingInfo->GetDescriptionKey());
-						if(toolTipSink == NULL)
-							return false;
-					}
+					GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_UNIT_REQUIRES_BUILDING", pkBuildingInfo->GetDescriptionKey());
+					if(toolTipSink == NULL)
+						return false;
 				}
 			}
 		}
@@ -3378,7 +3374,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 #endif
 {
 	VALIDATE_OBJECT
-	BuildingTypes ePrereqBuilding;
+	BuildingTypes ePrereqBuilding = NO_BUILDING;
 	int iI;
 
 	if(eBuilding == NO_BUILDING)
@@ -3472,32 +3468,14 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 			continue;
 		}
 
-		if(pkBuildingInfo->IsBuildingClassNeededInCity(iI))
+		if(pkBuildingInfo->IsBuildingClassNeededInCity(iI) && GetNumBuildingClass((BuildingClassTypes)iI) <= 0)
 		{
-			ePrereqBuilding = ((BuildingTypes)(thisCivInfo.getCivilizationBuildings(iI)));
-
-			if(ePrereqBuilding != NO_BUILDING)
-			{
-				if(0 == m_pCityBuildings->GetNumBuilding(ePrereqBuilding) /* && (bContinue || (getFirstBuildingOrder(ePrereqBuilding) == -1))*/)
-				{
-					return false;
-				}
-			}
-			else return false;
+			return false;
 		}
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
-		if(pkBuildingInfo->IsBuildingClassNeededGlobal(iI))
+		if(pkBuildingInfo->IsBuildingClassNeededGlobal(iI) && kPlayer.getBuildingClassCount((BuildingClassTypes)iI) <= 0)
 		{
-			ePrereqBuilding = ((BuildingTypes)(thisCivInfo.getCivilizationBuildings(iI)));
-
-			if(ePrereqBuilding != NO_BUILDING)
-			{
-				if(0 == kPlayer.getNumBuildings(ePrereqBuilding))
-				{
-					return false;
-				}
-			}
-			else return false;
+			return false;
 		}
 #endif
 	}
@@ -5944,7 +5922,13 @@ int CvCity::GetFaithPurchaseCost(UnitTypes eUnit, bool bIncludeBeliefDiscounts)
 						iCost = kPlayer.GetReligions()->GetCostNextProphet(true /*bIncludeBeliefDiscounts*/, false /*bAdjustForSpeedDifficulty*/);
 					}
 				}
-				else if (eThisPlayersUnitType == eUnit)
+				else if (eThisPlayersUnitType == eUnit
+					|| (MOD_TRAIN_ALL_CORE && kPlayer.GetPlayerTraits()->IsTrainedAll())
+					|| kPlayer.GetCanTrainUnitsFromCapturedOriginalCapitals().count(eUnit) > 0
+					|| kPlayer.GetUUFromDualEmpire().count(eUnit) > 0
+					|| kPlayer.GetUUFromExtra().count(eUnit) > 0
+					|| kPlayer.CanAllUc()
+				)
 				{
 					PolicyBranchTypes eBranch = NO_POLICY_BRANCH_TYPE;
 					int iNum = 0;
@@ -7537,7 +7521,24 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			BuildingClassTypes eFreeBuildingClassThisCity = (BuildingClassTypes)pBuildingInfo->GetFreeBuildingThisCity();
 			if(eFreeBuildingClassThisCity != NO_BUILDINGCLASS)
 			{
-				BuildingTypes eFreeBuildingThisCity = (BuildingTypes)(thisCiv.getCivilizationBuildings(eFreeBuildingClassThisCity));
+				BuildingTypes eFreeBuildingThisCity = NO_BUILDING;
+				BuildingTypes eDefaultBuilding = (BuildingTypes)GC.getBuildingClassInfo(eFreeBuildingClassThisCity)->getDefaultBuildingIndex();
+				if(owningPlayer.IsLostUC()) eFreeBuildingThisCity = eDefaultBuilding;
+				else eFreeBuildingThisCity = (BuildingTypes)(thisCiv.getCivilizationBuildings(eFreeBuildingClassThisCity));
+				
+				// if this player has a Unique Building, choose it, or try to find a Unique Building
+				if(eFreeBuildingThisCity == eDefaultBuilding)
+				{
+					std::vector<BuildingTypes> vFreeBuildings;
+					for (auto iBuilding : owningPlayer.GetUBFromExtra())
+					{
+						if (GC.getBuildingInfo(iBuilding)->GetBuildingClassType() != eFreeBuildingClassThisCity) continue;
+						if (iBuilding == eDefaultBuilding) continue;
+						vFreeBuildings.push_back(iBuilding);
+					}
+					vFreeBuildings.push_back(eDefaultBuilding);
+					eFreeBuildingThisCity = vFreeBuildings[0];
+				}
 
 				if (eFreeBuildingThisCity != NO_BUILDING)
 				{
@@ -18174,7 +18175,8 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 	// slewis - The Venetian Exception
 	bool bIsPuppet = IsPuppet();
 	bool bVenetianException = false;
-	if (GET_PLAYER(m_eOwner).GetPlayerTraits()->IsNoAnnexing() && bIsPuppet)
+	CvPlayerAI &kPlayer = GET_PLAYER(m_eOwner);
+	if (kPlayer.GetPlayerTraits()->IsNoAnnexing() && bIsPuppet)
 	{
 		bVenetianException = true;
 	}
@@ -18397,7 +18399,7 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 
 				// Does this city have prereq buildings?
 				int iNumBuildingClassInfos = GC.getNumBuildingClassInfos();
-				BuildingTypes ePrereqBuilding;
+				BuildingTypes ePrereqBuilding = NO_BUILDING;
 				for(int iI = 0; iI < iNumBuildingClassInfos; iI++)
 				{
 					CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo((BuildingClassTypes)iI);
@@ -18406,34 +18408,14 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 						continue;
 					}
 
-					if(pkBuildingInfo->IsBuildingClassNeededInCity(iI))
+					if(pkBuildingInfo->IsBuildingClassNeededInCity(iI) && GetNumBuildingClass((BuildingClassTypes)iI) <= 0)
 					{
-						CvCivilizationInfo& thisCivInfo = getCivilizationInfo();
-						ePrereqBuilding = ((BuildingTypes)(thisCivInfo.getCivilizationBuildings(iI)));
-
-						if(ePrereqBuilding != NO_BUILDING)
-						{
-							if(0 == m_pCityBuildings->GetNumBuilding(ePrereqBuilding))
-							{
-								return false;
-							}
-						}
-						else return false;
+						return false;
 					}
 #if defined(MOD_BUILDING_NEW_EFFECT_FOR_SP)
-					if(pkBuildingInfo->IsBuildingClassNeededGlobal(iI))
+					if(pkBuildingInfo->IsBuildingClassNeededGlobal(iI) && kPlayer.getBuildingClassCount((BuildingClassTypes)iI) <= 0)
 					{
-						CvCivilizationInfo& thisCivInfo = getCivilizationInfo();
-						ePrereqBuilding = ((BuildingTypes)(thisCivInfo.getCivilizationBuildings(iI)));
-						
-						if(ePrereqBuilding != NO_BUILDING)
-						{
-							if(0 == GET_PLAYER(getOwner()).getNumBuildings(ePrereqBuilding))
-							{
-								return false;
-							}
-						}
-						else return false;
+						return false;
 					}
 #endif
 				}
@@ -18450,7 +18432,7 @@ bool CvCity::IsCanPurchase(bool bTestPurchaseCost, bool bTestTrainable, UnitType
 			if(bTestPurchaseCost)
 			{
 				// Trying to buy something when you don't have enough faith!!
-				if(iFaithCost > GET_PLAYER(getOwner()).GetFaith())
+				if(iFaithCost > kPlayer.GetFaith())
 				{
 					return false;
 				}

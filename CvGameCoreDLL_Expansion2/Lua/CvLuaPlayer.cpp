@@ -122,7 +122,12 @@ void CvLuaPlayer::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetNumMayaBoosts);
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetNumFaithGreatPeople);
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetEmbarkedGraphicOverride);
+	
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeUUFromExtra);
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeUBFromExtra);
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeUIFromExtra);
 
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetLostUC);
 }
 
 //------------------------------------------------------------------------------
@@ -1362,6 +1367,16 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetBossLevel);
 	Method(ChangeBossLevel);
 	Method(SetBossLevel);
+
+	Method(GetUUFromExtra);
+	Method(GetUBFromExtra);
+	Method(GetUIFromExtra);
+	Method(ChangeUUFromExtra);
+	Method(ChangeUBFromExtra);
+	Method(ChangeUIFromExtra);
+
+	Method(IsLostUC);
+	Method(SetLostUC);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12831,3 +12846,52 @@ int CvLuaPlayer::lGetImmigrationOutRateFromPolicy(lua_State* L)
 LUAAPIIMPL(Player, GetBossLevel)
 LUAAPIIMPL(Player, ChangeBossLevel)
 LUAAPIIMPL(Player, SetBossLevel)
+
+int CvLuaPlayer::lGetUUFromExtra(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	UnitTypes eUnitTypes = (UnitTypes)lua_tointeger(L, 2);
+	lua_pushinteger(L, pkPlayer->GetUUFromExtra().count(eUnitTypes));
+	return 1;
+}
+int CvLuaPlayer::lGetUBFromExtra(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	BuildingTypes eBuildingTypes = (BuildingTypes)lua_tointeger(L, 2);
+	lua_pushinteger(L, pkPlayer->GetUBFromExtra().count(eBuildingTypes));
+	return 1;
+}
+int CvLuaPlayer::lGetUIFromExtra(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	ImprovementTypes eImprovementTypes = (ImprovementTypes)lua_tointeger(L, 2);
+	lua_pushinteger(L, pkPlayer->GetUIFromExtra().count(eImprovementTypes));
+	return 1;
+}
+int CvLuaPlayer::lChangeUUFromExtra(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	UnitTypes eUnitTypes = (UnitTypes)lua_tointeger(L, 2);
+	bool bIsAdd = luaL_optbool(L, 3, true);
+	pkPlayer->ChangeUUFromExtra(eUnitTypes, bIsAdd);
+	return 0;
+}
+int CvLuaPlayer::lChangeUBFromExtra(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	BuildingTypes eBuildingTypes = (BuildingTypes)lua_tointeger(L, 2);
+	bool bIsAdd = luaL_optbool(L, 3, true);
+	pkPlayer->ChangeUBFromExtra(eBuildingTypes, bIsAdd);
+	return 0;
+}
+int CvLuaPlayer::lChangeUIFromExtra(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	ImprovementTypes eImprovementTypes = (ImprovementTypes)lua_tointeger(L, 2);
+	bool bIsAdd = luaL_optbool(L, 3, true);
+	pkPlayer->ChangeUIFromExtra(eImprovementTypes, bIsAdd);
+	return 0;
+}
+
+LUAAPIIMPL(Player, IsLostUC)
+LUAAPIIMPL(Player, SetLostUC)

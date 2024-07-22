@@ -13439,55 +13439,70 @@ UnitTypes CvUnit::GetUpgradeUnitType() const
 {
 	VALIDATE_OBJECT
 	UnitTypes eUpgradeUnitType = NO_UNIT;
+	CvPlayerAI &kPlayer = GET_PLAYER(getOwner());
 
-	CvCivilizationInfo& kCiv = GET_PLAYER(getOwner()).getCivilizationInfo();
+	CvCivilizationInfo& kCiv = kPlayer.getCivilizationInfo();
 
 	// Determine what we're going to upgrade into
 	for(int iI = 0; iI < GC.getNumUnitClassInfos(); iI++)
 	{
 		const UnitClassTypes eUnitClass = static_cast<UnitClassTypes>(iI);
 		CvUnitClassInfo* pkUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
-		if(pkUnitClassInfo)
+		if(pkUnitClassInfo && m_pUnitInfo->GetUpgradeUnitClass(iI))
 		{
-			if(m_pUnitInfo->GetUpgradeUnitClass(iI))
+			if(kPlayer.IsLostUC()) eUpgradeUnitType = (UnitTypes)pkUnitClassInfo->getDefaultUnitIndex();
+			else eUpgradeUnitType = (UnitTypes) kCiv.getCivilizationUnits(iI);
+
+			std::vector<UnitTypes> vUpgradeUnitTypes;
+			for (auto iUnit : kPlayer.GetUUFromExtra())
 			{
-				eUpgradeUnitType = (UnitTypes) kCiv.getCivilizationUnits(iI);
-
-#if defined(MOD_EVENTS_UNIT_UPGRADES)
-				if (MOD_EVENTS_UNIT_UPGRADES) {
-					if (GAMEEVENTINVOKE_TESTALL(GAMEEVENT_CanHaveUpgrade, getOwner(), GetID(), iI, eUpgradeUnitType) == GAMEEVENTRETURN_FALSE) {
-						continue;
-					}
-
-					if (GAMEEVENTINVOKE_TESTALL(GAMEEVENT_UnitCanHaveUpgrade, getOwner(), GetID(), iI, eUpgradeUnitType) == GAMEEVENTRETURN_FALSE) {
-						continue;
-					}
-				} else {
-#endif
-				ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
-				if (pkScriptSystem) 
-				{
-					CvLuaArgsHandle args;
-					args->Push(((int)getOwner()));
-					args->Push(GetID());
-					args->Push(iI);
-					args->Push(eUpgradeUnitType);
-
-					bool bResult = false;
-					if (LuaSupport::CallTestAll(pkScriptSystem, "CanHaveUpgrade", args.get(), bResult)) 
-					{
-						if (bResult == false) 
-						{
-							continue;
-						}
-					}
-				}
-#if defined(MOD_EVENTS_UNIT_UPGRADES)
-				}
-#endif
-
-				break;
+				if (GC.getUnitInfo(iUnit)->GetUnitClassType() != iI) continue;
+				if (iUnit == eUpgradeUnitType) continue;
+				vUpgradeUnitTypes.push_back(iUnit);
 			}
+			if(kPlayer.GetUUFromExtra().count(eUpgradeUnitType) == 0) vUpgradeUnitTypes.push_back(eUpgradeUnitType);
+			if (vUpgradeUnitTypes.size() > 1)
+			{
+				if(!plot()) return NO_UNIT;
+				int iExtraSeed = plot()->GetPlotIndex() + GetID();
+				eUpgradeUnitType = vUpgradeUnitTypes[GC.getGame().getSmallFakeRandNum(vUpgradeUnitTypes.size(), iExtraSeed)];
+			}
+			else if(vUpgradeUnitTypes.size() == 1) eUpgradeUnitType = vUpgradeUnitTypes[0];
+			else eUpgradeUnitType = NO_UNIT;
+
+#if defined(MOD_EVENTS_UNIT_UPGRADES)
+			if (MOD_EVENTS_UNIT_UPGRADES) {
+				if (GAMEEVENTINVOKE_TESTALL(GAMEEVENT_CanHaveUpgrade, getOwner(), GetID(), iI, eUpgradeUnitType) == GAMEEVENTRETURN_FALSE) {
+					continue;
+				}
+
+				if (GAMEEVENTINVOKE_TESTALL(GAMEEVENT_UnitCanHaveUpgrade, getOwner(), GetID(), iI, eUpgradeUnitType) == GAMEEVENTRETURN_FALSE) {
+					continue;
+				}
+			} else {
+#endif
+			ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
+			if (pkScriptSystem) 
+			{
+				CvLuaArgsHandle args;
+				args->Push(((int)getOwner()));
+				args->Push(GetID());
+				args->Push(iI);
+				args->Push(eUpgradeUnitType);
+
+				bool bResult = false;
+				if (LuaSupport::CallTestAll(pkScriptSystem, "CanHaveUpgrade", args.get(), bResult)) 
+				{
+					if (bResult == false) 
+					{
+						continue;
+					}
+				}
+			}
+#if defined(MOD_EVENTS_UNIT_UPGRADES)
+			}
+#endif
+			break;
 		}
 	}
 
