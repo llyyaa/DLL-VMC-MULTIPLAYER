@@ -3466,7 +3466,12 @@ bool CityStrategyAIHelpers::IsTestCityStrategy_GoodAirliftCity(CvCity *pCity)
 
 	CvPlayer &kPlayer = GET_PLAYER(pCity->getOwner());
 	CvCity *pCapital = kPlayer.getCapitalCity();
-	if (pCapital && pCity->getArea() != pCapital->getArea())
+	if(!pCapital)
+	{
+		return false;
+	}
+	
+	if (pCity->getArea() != pCapital->getArea())
 	{
 		return true;
 	}
