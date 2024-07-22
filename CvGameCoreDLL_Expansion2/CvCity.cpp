@@ -439,6 +439,7 @@ CvCity::CvCity() :
 		, m_aiStaticCityYield()
 #endif
 	, m_iLastTurnWorkerDisbanded(0)
+	, m_paiNumBuildingClasses()
 {
 	OBJECT_ALLOCATED
 	FSerialization::citiesToCheck.insert(this);
@@ -1618,6 +1619,12 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aTradeRouteFromTheCityYields[i] = 0;
 	}
 	m_iLastTurnWorkerDisbanded = 0;
+	m_paiNumBuildingClasses.clear();
+	m_paiNumBuildingClasses.resize(GC.getNumBuildingClassInfos());
+	for (int i = 0; i < m_paiNumBuildingClasses.size(); ++i)
+	{
+		m_paiNumBuildingClasses[i] = 0;
+	}
 }
 
 
@@ -8273,6 +8280,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 		owningTeam.changeBuildingClassCount(eBuildingClass, iChange);
 		owningPlayer.changeBuildingClassCount(eBuildingClass, iChange);
+		ChangeNumBuildingClass(eBuildingClass, iChange);
 	}
 
 	UpdateReligion(GetCityReligions()->GetReligiousMajority());
@@ -20115,6 +20123,7 @@ void CvCity::read(FDataStream& kStream)
 		// Change all at once, rather than one by one, else the clamping might adjust the current damage.
 		ChangeExtraHitPoints(iTotalExtraHitPoints);
 	}
+	kStream >> m_paiNumBuildingClasses;
 
 	CvCityManager::OnCityCreated(this);
 }
@@ -20472,6 +20481,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aTradeRouteFromTheCityYields;
 
 	kStream << m_iExtraHitPoints;
+	kStream << m_paiNumBuildingClasses;
 }
 
 
@@ -22106,6 +22116,16 @@ bool CvCity::HasBuilding(BuildingTypes iBuildingType) const
 bool CvCity::HasBuildingClass(BuildingClassTypes iBuildingClassType) const
 {
 	return HasBuilding((BuildingTypes) getCivilizationInfo().getCivilizationBuildings(iBuildingClassType));
+
+}
+
+int CvCity::GetNumBuildingClass(BuildingClassTypes iBuildingClassType) const
+{
+	return m_paiNumBuildingClasses[iBuildingClassType];
+}
+void CvCity::ChangeNumBuildingClass(BuildingClassTypes iBuildingClassType, int iValue)
+{
+	m_paiNumBuildingClasses[iBuildingClassType] += iValue;
 }
 
 bool CvCity::HasAnyWonder() const

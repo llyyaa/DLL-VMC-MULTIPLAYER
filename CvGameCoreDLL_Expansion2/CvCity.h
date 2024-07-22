@@ -1236,6 +1236,8 @@ public:
 	bool HasBelief(BeliefTypes iBeliefType) const;
 	bool HasBuilding(BuildingTypes iBuildingType) const;
 	bool HasBuildingClass(BuildingClassTypes iBuildingClassType) const;
+	int GetNumBuildingClass(BuildingClassTypes iBuildingClassType) const;
+	void ChangeNumBuildingClass(BuildingClassTypes iBuildingClassType, int iValue);
 	bool HasAnyWonder() const;
 	bool HasWonder(BuildingTypes iBuildingType) const;
 	bool IsCivilization(CivilizationTypes iCivilizationType) const;
@@ -1751,6 +1753,7 @@ protected:
 	bool m_bHasYieldFromOtherYield;
 #endif
 	int m_iLastTurnWorkerDisbanded = 0;
+	std::vector<int> m_paiNumBuildingClasses;
 };
 
 namespace FSerialization
