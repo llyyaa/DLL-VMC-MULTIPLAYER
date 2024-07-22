@@ -214,6 +214,11 @@
 		<Column name="YieldType" type="text" reference="Yields(Type)"/>
 		<Column name="Yield" type="integer" default="0"/>
 	</Table>
+	<Table name="Policy_YieldPerPopChanges">
+		<Column name="PolicyType" type="text" reference="Policies(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer" notnull="true"/>
+	</Table>
 	<Table name="Policy_TradeRouteYieldChange">
 		<!-- Refer to Policies.Land/SeaTradeRouteGoldChange -->
 		<Column name="PolicyType" type="text" reference="Policies(Type)"/>

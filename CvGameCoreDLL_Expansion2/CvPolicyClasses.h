@@ -235,6 +235,8 @@ public:
 	int* GetCapitalYieldChangeArray() const;
 	int GetCapitalYieldPerPopChange(int i) const;
 	int* GetCapitalYieldPerPopChangeArray() const;
+	int GetYieldPerPopChange(int i) const;
+	int* GetYieldPerPopChangeArray() const;
 	int GetCapitalYieldModifier(int i) const;
 	int* GetCapitalYieldModifierArray() const;
 	int GetGreatWorkYieldChange(int i) const;
@@ -565,6 +567,7 @@ private:
 	int* m_piCoastalCityYieldChange;
 	int* m_piCapitalYieldChange;
 	int* m_piCapitalYieldPerPopChange;
+	int* m_piYieldPerPopChange;
 	int* m_piCapitalYieldModifier;
 	int* m_piGreatWorkYieldChange;
 	int* m_piSpecialistExtraYield;

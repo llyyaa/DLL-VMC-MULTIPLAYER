@@ -477,6 +477,7 @@ CvPlayer::CvPlayer() :
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
 	, m_aiCapitalYieldChange("CvPlayer::m_aiCapitalYieldChange", m_syncArchive)
 	, m_aiCapitalYieldPerPopChange("CvPlayer::m_aiCapitalYieldPerPopChange", m_syncArchive)
+	, m_aiYieldPerPopChange("CvPlayer::m_aiYieldPerPopChange", m_syncArchive)
 	, m_aiSeaPlotYield("CvPlayer::m_aiSeaPlotYield", m_syncArchive)
 	, m_aiYieldFromProcessModifierGlobal("CvPlayer::m_aiYieldFromProcessModifierGlobal", m_syncArchive)
 	, m_aiCityLoveKingDayYieldMod("CvPlayer::m_aiCityLoveKingDayYieldMod", m_syncArchive)
@@ -1360,6 +1361,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	m_aiCapitalYieldPerPopChange.clear();
 	m_aiCapitalYieldPerPopChange.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiYieldPerPopChange.clear();
+	m_aiYieldPerPopChange.resize(NUM_YIELD_TYPES, 0);
 
 	m_aiSeaPlotYield.clear();
 	m_aiSeaPlotYield.resize(NUM_YIELD_TYPES, 0);
@@ -11061,7 +11065,25 @@ void CvPlayer::ChangeCapitalYieldPerPopChange(YieldTypes eYield, int iChange)
 	}
 }
 
+int CvPlayer::GetYieldPerPopChange(YieldTypes eYield) const
+{
+	CvAssertMsg(eYield >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiYieldPerPopChange[eYield];
+}
 
+//	--------------------------------------------------------------------------------
+/// Changes how much additional Yield the Capital produces per pop
+void CvPlayer::ChangeYieldPerPopChange(YieldTypes eYield, int iChange)
+{
+	CvAssertMsg(eYield >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiYieldPerPopChange.setAt(eYield, m_aiYieldPerPopChange[eYield] + iChange);
+	}
+}
 
 //	--------------------------------------------------------------------------------
 /// process Extra yield from building
@@ -26853,6 +26875,10 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		if(iMod != 0)
 			ChangeCapitalYieldPerPopChange(eYield, iMod);
 
+		iMod = pPolicy->GetYieldPerPopChange(iI) * iChange;
+		if (iMod != 0)
+			ChangeYieldPerPopChange(eYield, iMod);
+
 		iMod = pPolicy->GetCapitalYieldModifier(iI) * iChange;
 		if(iMod != 0)
 			changeCapitalYieldRateModifier(eYield, iMod);
@@ -28223,6 +28249,7 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiCoastalCityYieldChange;
 	kStream >> m_aiCapitalYieldChange;
 	kStream >> m_aiCapitalYieldPerPopChange;
+	kStream >> m_aiYieldPerPopChange;
 	kStream >> m_aiSeaPlotYield;
 	kStream >> m_aiCityLoveKingDayYieldMod;
 	kStream >> m_aiYieldRateModifier;
@@ -28943,6 +28970,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiCoastalCityYieldChange;
 	kStream << m_aiCapitalYieldChange;
 	kStream << m_aiCapitalYieldPerPopChange;
+	kStream << m_aiYieldPerPopChange;
 	kStream << m_aiSeaPlotYield;
 	kStream << m_aiCityLoveKingDayYieldMod;
 	kStream << m_aiYieldRateModifier;
