@@ -9584,6 +9584,7 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 		iYield += GET_PLAYER(getOwner()).GetPlayerTraits()->GetCityYieldChanges(eYield);
 #endif
 
+
 		// Coastal City Mod
 		if(pCity->isCoastal())
 		{
