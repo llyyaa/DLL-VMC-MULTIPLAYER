@@ -11084,8 +11084,6 @@ void CvPlayer::ChangeYieldPerPopChange(YieldTypes eYield, int iChange)
 	if (iChange != 0)
 	{
 		m_aiYieldPerPopChange.setAt(eYield, m_aiYieldPerPopChange[eYield] + iChange);
-
-		updateYield();
 	}
 }
 
