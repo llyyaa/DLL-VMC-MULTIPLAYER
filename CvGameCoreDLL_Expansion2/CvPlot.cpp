@@ -9584,6 +9584,11 @@ int CvPlot::calculateYield(YieldTypes eYield, bool bDisplay)
 		iYield += GET_PLAYER(getOwner()).GetPlayerTraits()->GetCityYieldChanges(eYield);
 #endif
 
+		// pop Mod
+		int iPerPopYieldCity = pCity->getPopulation() * GET_PLAYER(getOwner()).GetYieldPerPopChange(eYield);
+		iPerPopYieldCity /= 100;
+		iYield += iPerPopYieldCity;
+
 		// Coastal City Mod
 		if(pCity->isCoastal())
 		{
