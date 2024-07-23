@@ -592,6 +592,8 @@ public:
 	// Espionage
 	int GetEspionageModifier() const;
 	void ChangeEspionageModifier(int iChange);
+	int GetEspionageSpeedModifier() const;
+	void ChangeEspionageSpeedModifier(int iChange);
 	int GetStartingSpyRank() const;
 	void ChangeStartingSpyRank(int iChange);
 	int GetSpyLevelUpWhenRiggingCount() const;
@@ -1698,6 +1700,9 @@ public:
 	void SetGlobalRangedStrikeModifier(int iValue);
 	void ChangeGlobalRangedStrikeModifier(int iChange);
 
+	int GetResearchTotalCostModifier() const;
+	void ChangeResearchTotalCostModifier(int iChange);
+
 	int GetLiberatedInfluence() const;
 	void SetLiberatedInfluence(int iValue);
 	void ChangeLiberatedInfluence(int iChange);
@@ -2356,6 +2361,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iHappinessPerCity;
 	int m_iHappinessPerXPolicies;
 	int m_iEspionageModifier;
+	int m_iEspionageSpeedModifier;
 	int m_iSpyStartingRank;
 	int m_iSpyLevelUpWhenRiggingCount;
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -2565,6 +2571,7 @@ protected:
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvPlayer> m_iGlobalCityStrengthMod;
 	FAutoVariable<int, CvPlayer> m_iGlobalRangedStrikeModifier;
+	FAutoVariable<int, CvPlayer> m_iResearchTotalCostModifier;
 	FAutoVariable<int, CvPlayer> m_iLiberatedInfluence;
 
 	FAutoVariable<int, CvPlayer> m_iWaterTileDamageGlobal;

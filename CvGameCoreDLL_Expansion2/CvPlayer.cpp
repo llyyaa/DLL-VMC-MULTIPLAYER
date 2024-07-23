@@ -196,6 +196,7 @@ CvPlayer::CvPlayer() :
 	, m_iHappinessPerXPopulation(0)
 	, m_iHappinessFromLeagues(0)
 	, m_iEspionageModifier(0)
+	, m_iEspionageSpeedModifier(0)
 	, m_iSpyStartingRank(0)
 	, m_iSpyLevelUpWhenRiggingCount(0)
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -392,6 +393,7 @@ CvPlayer::CvPlayer() :
 	, m_aiYieldFromPillage()
 	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
 	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
+	, m_iResearchTotalCostModifier("CvPlayer::m_iResearchTotalCostModifier", m_syncArchive)
 	, m_iLiberatedInfluence("CvPlayer::m_iLiberatedInfluence", m_syncArchive)
 	, m_iWaterTileDamageGlobal("CvPlayer::m_iWaterTileDamageGlobal", m_syncArchive)
 	, m_iWaterTileMovementReduceGlobal("CvPlayer::m_iWaterTileMovementReduceGlobal", m_syncArchive)
@@ -982,6 +984,7 @@ void CvPlayer::uninit()
 	m_iHappinessPerXPopulation = 0;
 	m_iHappinessFromLeagues = 0;
 	m_iEspionageModifier = 0;
+	m_iEspionageSpeedModifier = 0;
 	m_iSpyStartingRank = 0;
 	m_iSpyLevelUpWhenRiggingCount = 0;
 
@@ -1187,6 +1190,7 @@ void CvPlayer::uninit()
 #if defined(MOD_ROG_CORE)
 	m_iGlobalCityStrengthMod = 0;
 	m_iGlobalRangedStrikeModifier = 0;
+	m_iResearchTotalCostModifier = 0;
 	m_iLiberatedInfluence = 0;
 	m_iWaterTileDamageGlobal = 0;
 	m_iWaterTileMovementReduceGlobal = 0;
@@ -9926,6 +9930,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 #if defined(MOD_ROG_CORE)
 	ChangeCityStrengthMod(pBuildingInfo->GetGlobalCityStrengthMod()* iChange);
 	ChangeGlobalRangedStrikeModifier(pBuildingInfo->GetGlobalRangedStrikeModifier()* iChange);
+	ChangeResearchTotalCostModifier(pBuildingInfo->GetResearchTotalCostModifier()* iChange);
 	ChangeLiberatedInfluence(pBuildingInfo->GetLiberatedInfluence()* iChange);
 
 	ChangeWaterTileDamageGlobal(pBuildingInfo->GetWaterTileDamageGlobal()* iChange);
@@ -10119,7 +10124,6 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 	}
 
-
 	int iOldEspionageModifier = GetEspionageModifier();
 	ChangeEspionageModifier(pBuildingInfo->GetGlobalEspionageModifier() * iChange);
 	if(iOldEspionageModifier != GetEspionageModifier())
@@ -10136,6 +10140,20 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 		}
 	}
 
+	int iOldEspionageSpeedModifier = GetEspionageSpeedModifier();
+	ChangeEspionageSpeedModifier(pBuildingInfo->GetGlobalEspionageSpeedModifier() * iChange);
+	if (iOldEspionageSpeedModifier != GetEspionageSpeedModifier())
+	{
+		int iLoop;
+			for (uint ui = 0; ui < MAX_MAJOR_CIVS; ui++)
+			{
+				PlayerTypes ePlayer = (PlayerTypes)ui;
+				for (CvCity* pLoopCity = GET_PLAYER(ePlayer).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(ePlayer).nextCity(&iLoop))
+				{
+					GetEspionage()->UpdateCity(pLoopCity);
+				}
+			}
+	}
 
 
 
@@ -14267,6 +14285,21 @@ int CvPlayer::GetEspionageModifier() const
 void CvPlayer::ChangeEspionageModifier(int iChange)
 {
 	m_iEspionageModifier = (m_iEspionageModifier + iChange);
+}
+
+
+//	--------------------------------------------------------------------------------
+/// Get the global modifier on the espionage progress rate
+int CvPlayer::GetEspionageSpeedModifier() const
+{
+	return m_iEspionageSpeedModifier;
+}
+
+//	--------------------------------------------------------------------------------
+/// Change the global modifier on the espionage progress rate
+void CvPlayer::ChangeEspionageSpeedModifier(int iChange)
+{
+	m_iEspionageSpeedModifier = (m_iEspionageSpeedModifier + iChange);
 }
 
 //	--------------------------------------------------------------------------------
@@ -27878,6 +27911,7 @@ void CvPlayer::Read(FDataStream& kStream)
 		m_iHappinessFromLeagues = 0;
 	}
 	kStream >> m_iEspionageModifier;
+	kStream >> m_iEspionageSpeedModifier;
 	kStream >> m_iSpyStartingRank;
 	kStream >> m_iSpyLevelUpWhenRiggingCount;
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -28675,6 +28709,7 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iHappinessPerXPolicies;
 	kStream << m_iHappinessFromLeagues;
 	kStream << m_iEspionageModifier;
+	kStream << m_iEspionageSpeedModifier;
 	kStream << m_iSpyStartingRank;
 	kStream << m_iSpyLevelUpWhenRiggingCount;
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -29896,6 +29931,20 @@ void CvPlayer::ChangeGlobalRangedStrikeModifier(int iChange)
 	}
 }
 
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetResearchTotalCostModifier() const
+{
+	return m_iResearchTotalCostModifier;
+}
+
+void CvPlayer::ChangeResearchTotalCostModifier(int iChange)
+{
+	if (iChange != 0)
+	{
+		m_iResearchTotalCostModifier += iChange;
+	}
+}
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetLiberatedInfluence() const

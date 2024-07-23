@@ -34,7 +34,7 @@ ALTER TABLE Buildings ADD 'GlobalProductionNeededBuildingModifier' INTEGER DEFAU
 ALTER TABLE Buildings ADD 'GlobalProductionNeededProjectModifier' INTEGER DEFAULT 0;
 
 ALTER TABLE Buildings ADD 'DummyBuilding' BOOLEAN DEFAULT 0;
-
+ALTER TABLE Buildings ADD COLUMN 'GlobalEspionageSpeedModifier' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'InstantResearchFromFriendlyGreatScientist' INTEGER DEFAULT 0;
 
 ALTER TABLE Buildings ADD 'NoPuppet' BOOLEAN DEFAULT 0;
