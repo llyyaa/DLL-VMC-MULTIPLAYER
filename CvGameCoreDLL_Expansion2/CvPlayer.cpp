@@ -1284,6 +1284,11 @@ void CvPlayer::uninit()
 	m_bAlliesGreatPersonBiasApplied = false;
 	m_lastGameTurnInitialAIProcessed = -1;
 
+	m_sUUFromExtra.clear();
+	m_sUBFromExtra.clear();
+	m_sUIFromExtra.clear();
+	m_bLostUC = false;
+
 	m_eID = NO_PLAYER;
 }
 
@@ -8286,17 +8291,27 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 		return false;
 	}
 
+	// if this unit is default unit and was marked, forbid it
+	if(const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eUnit) > 0 && (UnitTypes)pkUnitClassInfo->getDefaultUnitIndex() == eUnit)
+	{
+		return false;
+	}
+
 
 	// Should we check whether this Unit has been blocked out by the civ XML?
 	if(!bIgnoreUniqueUnitStatus)
 	{
-		UnitTypes eThisPlayersUnitType = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);	
+		UnitTypes eThisPlayersUnitType = NO_UNIT;
+		// if this player lost uu, he can trait default one
+		if(IsLostUC()) eThisPlayersUnitType = (UnitTypes)pkUnitClassInfo->getDefaultUnitIndex();
+		else eThisPlayersUnitType = (UnitTypes)getCivilizationInfo().getCivilizationUnits(eUnitClass);
 
 #if defined(MOD_TRAIN_ALL_CORE)
 		if (eThisPlayersUnitType != eUnit) {
 			bool bCivFilter = (MOD_TRAIN_ALL_CORE && GetPlayerTraits()->IsTrainedAll())
 				|| const_cast<CvPlayer*>(this)->GetCanTrainUnitsFromCapturedOriginalCapitals().count(eUnit) > 0
 				|| const_cast<CvPlayer*>(this)->GetUUFromDualEmpire().count(eUnit) > 0
+				|| const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eUnit) > 0
 				|| this->CanAllUc();
 			if (!bCivFilter) return false;
 
@@ -8613,11 +8628,21 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 	const BuildingClassTypes eBuildingClass = ((BuildingClassTypes)(pBuildingInfo.GetBuildingClassType()));
 	const CvBuildingClassInfo& kBuildingClass = pkBuildingInfo->GetBuildingClassInfo();
 
+	// if this building is default building and was marked, forbid it
+	BuildingTypes eDefaultBuildingType = (BuildingTypes)kBuildingClass.getDefaultBuildingIndex();
+	if(eDefaultBuildingType == eBuilding && const_cast<CvPlayer*>(this)->GetUBFromExtra().count(eBuilding) == 1) return false;
+	
 	// Checks to make sure civilization doesn't have an override that prevents construction of this building
-	if(getCivilizationInfo().getCivilizationBuildings(eBuildingClass) != eBuilding)
+	BuildingTypes eThisPlayersBuildingType = NO_BUILDING;
+	// if this player lost UB, he can construct default one
+	if(IsLostUC()) eThisPlayersBuildingType = eDefaultBuildingType;
+	else eThisPlayersBuildingType = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(eBuildingClass);
+
+	if(eThisPlayersBuildingType != eBuilding)
 	{
 		if (const_cast<CvPlayer*>(this)->GetCanConstructBuildingsFromCapturedOriginalCapitals().count(eBuilding) == 0
 			&& const_cast<CvPlayer*>(this)->GetUBFromDualEmpire().count(eBuilding) == 0
+			&& const_cast<CvPlayer*>(this)->GetUBFromExtra().count(eBuilding) == 0
 			&& !this->CanAllUc())
 			return false;
 	}
@@ -8809,53 +8834,49 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 		}
 
 		// How does this differ from the check above?
-		BuildingTypes ePrereqBuilding;
+		BuildingTypes ePrereqBuilding = NO_BUILDING;
 		int iNumNeeded;
 		for(iI = 0; iI < numBuildingClassInfos; iI++)
 		{
 			iNumNeeded = getBuildingClassPrereqBuilding(eBuilding, ((BuildingClassTypes)iI), bContinue);
-			//int iNumHave = getBuildingClassCount((BuildingClassTypes)iI);
-			ePrereqBuilding = (BuildingTypes) civilizationInfo.getCivilizationBuildings(iI);
-			if(NO_BUILDING != ePrereqBuilding)
+			if (iNumNeeded <= 0) continue;
+
+			CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo((BuildingClassTypes)iI);
+			if(!pkBuildingClassInfo) return false;
+
+			if(IsLostUC()) ePrereqBuilding  = (BuildingTypes)pkBuildingClassInfo->getDefaultBuildingIndex();
+			else ePrereqBuilding = (BuildingTypes) civilizationInfo.getCivilizationBuildings(iI);
+
+			if(NO_BUILDING == ePrereqBuilding) continue;
+			CvBuildingEntry* pkPrereqBuilding = GC.getBuildingInfo(ePrereqBuilding);
+			if(!pkPrereqBuilding) continue;
+
+			int iNumHave = 0;
+			const CvCity* pLoopCity = NULL;
+			int iLoop;
+			for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 			{
-				CvBuildingEntry* pkPrereqBuilding = GC.getBuildingInfo(ePrereqBuilding);
-				if(pkPrereqBuilding)
+				if(!pLoopCity || pLoopCity->IsPuppet()) continue;
+				if(pLoopCity->GetNumBuildingClass((BuildingClassTypes)iI) > 0) iNumHave++;
+			}
+
+			if(iNumHave >= iNumNeeded) continue;
+
+			GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_COUNT_NEEDED", pkPrereqBuilding->GetTextKey(), "", iNumNeeded - iNumHave);
+			if(toolTipSink == NULL) return false;
+
+			// If we have less than 5 to go, list what cities need them
+			int iNonPuppetCities = getNumCities() - GetNumPuppetCities();
+			if(iNumNeeded == iNonPuppetCities && iNumNeeded - iNumHave < 5)
+			{
+				(*toolTipSink) += "[NEWLINE]";
+
+				for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 				{
-					int iNumHave = 0;
-					const CvCity* pLoopCity = NULL;
-					int iLoop;
-					for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+					if (pLoopCity->GetNumBuildingClass((BuildingClassTypes)iI) <= 0)
 					{
-						if(pLoopCity && !pLoopCity->IsPuppet() && pLoopCity->GetCityBuildings()->GetNumBuilding(ePrereqBuilding) > 0)
-						{
-							iNumHave++;
-						}
-					}
-
-					if(iNumHave < iNumNeeded)
-					{
-						ePrereqBuilding = (BuildingTypes) civilizationInfo.getCivilizationBuildings(iI);
-
-						GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_COUNT_NEEDED", pkPrereqBuilding->GetTextKey(), "", iNumNeeded - iNumHave);
-
-						if(toolTipSink == NULL)
-							return false;
-
-						// If we have less than 5 to go, list what cities need them
-						int iNonPuppetCities = getNumCities() - GetNumPuppetCities();
-						if(iNumNeeded == iNonPuppetCities && iNumNeeded - iNumHave < 5)
-						{
-							(*toolTipSink) += "[NEWLINE]";
-
-							for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
-							{
-								if(pLoopCity && !pLoopCity->IsPuppet() && pLoopCity->GetCityBuildings()->GetNumBuilding(ePrereqBuilding) == 0)
-								{
-									(*toolTipSink) += pLoopCity->getName();
-									(*toolTipSink) += " ";
-								}
-							}
-						}
+						(*toolTipSink) += pLoopCity->getName();
+						(*toolTipSink) += " ";
 					}
 				}
 			}
@@ -9687,6 +9708,9 @@ int CvPlayer::getBuildingClassPrereqBuilding(BuildingTypes eBuilding, BuildingCl
 		return -1;
 	}
 
+	CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo((BuildingClassTypes)ePrereqBuildingClass);
+	if(!pkBuildingClassInfo) return 0;
+
 	int iPrereqs = pkBuilding->GetPrereqNumOfBuildingClass(ePrereqBuildingClass);
 
 	// dont bother with the rest of the calcs if we have no prereqs
@@ -9697,22 +9721,20 @@ int CvPlayer::getBuildingClassPrereqBuilding(BuildingTypes eBuilding, BuildingCl
 	// -1 means Building is needed in all Cities
 	else if(iPrereqs == -1)
 	{
-#if defined(MOD_BUILDINGS_NW_EXCLUDE_RAZING)
-		BuildingTypes ePrereqBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(ePrereqBuildingClass);
-#endif
 		int iNonPuppetCities = 0;
 		int iLoop = 0;
 		const CvCity* pLoopCity = NULL;
 		for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 		{
-			if(pLoopCity && !pLoopCity->IsPuppet())
-			{
+			if(!pLoopCity || pLoopCity->IsPuppet()) continue;
 #if defined(MOD_BUILDINGS_NW_EXCLUDE_RAZING)
-				// Don't count this city if it is being razed and doesn't already have the pre-req building
-				if (!(MOD_BUILDINGS_NW_EXCLUDE_RAZING && pLoopCity->IsRazing() && pLoopCity->GetCityBuildings()->GetNumBuilding(ePrereqBuilding) == 0))
-#endif
-				iNonPuppetCities++;
+			// Don't count this city if it is being razed and doesn't already have the pre-req building
+			if (MOD_BUILDINGS_NW_EXCLUDE_RAZING && pLoopCity->IsRazing())
+			{
+				if(pLoopCity->GetNumBuildingClass(ePrereqBuildingClass) <= 0) continue;
 			}
+#endif
+			iNonPuppetCities++;
 		}
 
 		return iNonPuppetCities;
@@ -9960,9 +9982,26 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	}
 #endif
 
-	if(pBuildingInfo->GetFreeBuildingClass() != NO_BUILDINGCLASS)
+	BuildingClassTypes eFreeBuildingClass = (BuildingClassTypes)pBuildingInfo->GetFreeBuildingClass();
+	if(eFreeBuildingClass != NO_BUILDINGCLASS)
 	{
-		BuildingTypes eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(pBuildingInfo->GetFreeBuildingClass());
+		BuildingTypes eFreeBuilding = NO_BUILDING;
+		BuildingTypes eDefaultBuilding = (BuildingTypes)GC.getBuildingClassInfo(eFreeBuildingClass)->getDefaultBuildingIndex();
+		if(IsLostUC()) eFreeBuilding = eDefaultBuilding;
+		else eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(eFreeBuildingClass);
+		if(eFreeBuilding == eDefaultBuilding)
+		{
+			std::vector<BuildingTypes> vFreeBuildings;
+			for (auto iBuilding : GetUBFromExtra())
+			{
+				if (GC.getBuildingInfo(iBuilding)->GetBuildingClassType() != eFreeBuildingClass) continue;
+				if (iBuilding == eDefaultBuilding) continue;
+				vFreeBuildings.push_back(iBuilding);
+			}
+			vFreeBuildings.push_back(eDefaultBuilding);
+			eFreeBuilding = vFreeBuildings[0];
+		}
+		
 		changeFreeBuildingCount(eFreeBuilding, iChange);
 	}
 
@@ -10397,10 +10436,11 @@ bool CvPlayer::canBuild(const CvPlot* pPlot, BuildTypes eBuild, bool bTestEra, b
 		if(pkEntry->IsSpecificCivRequired())
 		{
 			CivilizationTypes eCiv = pkEntry->GetRequiredCivilization();
-			if(eCiv != getCivilizationType())
+			if(eCiv != getCivilizationType() || IsLostUC())
 			{
 				if (const_cast<CvPlayer*>(this)->GetCanBuildImprovementsFromCapturedOriginalCapitals().count(eImprovement) == 0
 					&& const_cast<CvPlayer*>(this)->GetUIFromDualEmpire().count(eImprovement) == 0
+					&& const_cast<CvPlayer*>(this)->GetUIFromExtra().count(eImprovement) == 0
 					&& !CanAllUc())
 					return false;
 			}
@@ -28638,6 +28678,11 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_sUBFromDualEmpire;
 	kStream >> m_sUIFromDualEmpire;
 
+	kStream >> m_sUUFromExtra;
+	kStream >> m_sUBFromExtra;
+	kStream >> m_sUIFromExtra;
+	kStream >> m_bLostUC;
+
 	kStream >> m_aScienceTimes100FromMajorFriends;
 
 	kStream >> m_iInstantResearchFromFriendlyGreatScientist;
@@ -29307,6 +29352,11 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_sUUFromDualEmpire;
 	kStream << m_sUBFromDualEmpire;
 	kStream << m_sUIFromDualEmpire;
+
+	kStream << m_sUUFromExtra;
+	kStream << m_sUBFromExtra;
+	kStream << m_sUIFromExtra;
+	kStream << m_bLostUC;
 
 	kStream << m_aScienceTimes100FromMajorFriends;
 
@@ -33228,6 +33278,57 @@ std::tr1::unordered_set<ImprovementTypes>& CvPlayer::GetUIFromDualEmpire()
 	return m_sUIFromDualEmpire;
 }
 
+std::tr1::unordered_set<UnitTypes>& CvPlayer::GetUUFromExtra()
+{
+	return m_sUUFromExtra;
+}
+std::tr1::unordered_set<BuildingTypes>& CvPlayer::GetUBFromExtra()
+{
+	return m_sUBFromExtra;
+}
+std::tr1::unordered_set<ImprovementTypes>& CvPlayer::GetUIFromExtra()
+{
+	return m_sUIFromExtra;
+}
+
+void CvPlayer::ChangeUUFromExtra(UnitTypes eUnitTypes, bool bIsAdd)
+{
+	if(eUnitTypes < 0 || eUnitTypes >= GC.getNumUnitInfos()) return;
+	if(bIsAdd)
+	{
+		m_sUUFromExtra.insert(eUnitTypes);
+	}
+	else
+	{
+		m_sUUFromExtra.erase(eUnitTypes);
+	}
+	
+}
+void CvPlayer::ChangeUBFromExtra(BuildingTypes eBuildingTypes, bool bIsAdd)
+{
+	if(eBuildingTypes < 0 || eBuildingTypes >= GC.getNumBuildingInfos()) return;
+	if (bIsAdd)
+	{
+		m_sUBFromExtra.insert(eBuildingTypes);
+	}
+	else
+	{
+		m_sUBFromExtra.erase(eBuildingTypes);
+	}
+}
+void CvPlayer::ChangeUIFromExtra(ImprovementTypes eImprovementTypes, bool bIsAdd)
+{
+	if (eImprovementTypes < 0 || eImprovementTypes >= GC.getNumImprovementInfos()) return;
+	if (bIsAdd)
+	{
+		m_sUIFromExtra.insert(eImprovementTypes);
+	}
+	else
+	{
+		m_sUIFromExtra.erase(eImprovementTypes);
+	}
+}
+
 void CvPlayer::SetInstantResearchFromFriendlyGreatScientist(int value) {
 	m_iInstantResearchFromFriendlyGreatScientist = value;
 }
@@ -33385,6 +33486,15 @@ void CvPlayer::ChangeBossLevel(int iChange)
 void CvPlayer::SetBossLevel(int iValue)
 {
 	m_iBossLevel = iValue;
+}
+
+bool CvPlayer::IsLostUC() const
+{
+	return m_bLostUC;
+}
+void CvPlayer::SetLostUC(bool bValue)
+{
+	m_bLostUC = bValue;
 }
 
 int CvPlayer::GetNumGreatPersonSincePolicy() const
