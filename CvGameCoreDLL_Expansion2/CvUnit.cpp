@@ -1425,6 +1425,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iIgnoreZOC = 0;
 	m_iPillageReplenishAttck = 0;
 	m_iCanDoFallBackDamage = 0;
+	m_iCanPlunderWithoutWar = 0;
 	m_iCanParadropAnyWhere = 0;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	m_iNoSupply = 0;
@@ -9730,115 +9731,129 @@ bool CvUnit::rebase(int iX, int iY)
 bool CvUnit::canPillage(const CvPlot* pPlot) const
 {
 	VALIDATE_OBJECT
-	if(isEmbarked())
-	{
-		return false;
-	}
 
-#if defined(MOD_BUGFIX_MINOR)
 	// Bail early if the unit has no moves left
 	if (getMoves() <= 0)
 	{
 		return false;
 	}
-#endif
 
-	if(!(getUnitInfo().IsPillage()))
+	if(isEmbarked())
 	{
 		return false;
 	}
-	else
+
+	if (!(getUnitInfo().IsPillage()))
 	{
-		TechTypes ePillagePrereq = (TechTypes) getUnitInfo().GetPrereqPillageTech();
-		if(ePillagePrereq != NO_TECH)
+		return false;
+	}
+
+	if (pPlot->isOwned())
+	{
+		//if (! isEnemy(pPlot->getTeam(), pPlot))
+		if (pPlot->getOwner()==getOwner())		
+		   return false;
+
+		if (pPlot->getOwner() != getOwner() && !(atWar(getTeam(), GET_PLAYER(pPlot->getOwner()).getTeam())) && !(IsCanPlunderWithoutWar()))
+			return false;
+	}
+
+	if (!(pPlot->isValidDomainForAction(*this)))
+	{
+		return false;
+	}
+
+
+	if(isBarbarian())
+	{
+		// barbarian boats not allowed to pillage, as they're too annoying :)
+		if (getDomainType() == DOMAIN_SEA)
+			return false;
+
+		// barbs can't pillage camps yo
+		if (pPlot->getImprovementType() == GD_INT_GET(BARBARIAN_CAMP_IMPROVEMENT))
+			return false;
+	}
+
+	if (pPlot->getOwner() == NO_PLAYER && pPlot->isRoute())
+	{
+		PlayerTypes eRouteOwner = pPlot->GetPlayerResponsibleForRoute();
+		if (eRouteOwner != NO_PLAYER && GET_PLAYER(eRouteOwner).isAlive())
 		{
-			if(!GET_TEAM(GET_PLAYER(getOwner()).getTeam()).GetTeamTechs()->HasTech(ePillagePrereq))
+			if (!atWar(getTeam(), GET_PLAYER(eRouteOwner).getTeam()))
 			{
 				return false;
 			}
 		}
 	}
 
-	// Barbarian boats not allowed to pillage, as they're too annoying :)
-	if(isBarbarian() && getDomainType() == DOMAIN_SEA)
+	TechTypes ePillagePrereq = (TechTypes)getUnitInfo().GetPrereqPillageTech();
+	if (ePillagePrereq != NO_TECH)
 	{
-		return false;
+		if (!GET_TEAM(GET_PLAYER(getOwner()).getTeam()).GetTeamTechs()->HasTech(ePillagePrereq))
+		{
+			return false;
+		}
 	}
 
-	if(pPlot->isCity())
+	if (pPlot->isCity())
 	{
 		return false;
 	}
 
 	ImprovementTypes eImprovementType = pPlot->getImprovementType();
-	if(eImprovementType == NO_IMPROVEMENT)
+
+	// Either nothing to pillage or everything is pillaged to its max
+	if ((eImprovementType == NO_IMPROVEMENT || pPlot->IsImprovementPillaged()) &&
+		(pPlot->getRouteType() == NO_ROUTE || pPlot->IsRoutePillaged() /* == GC.getPILLAGE_NUM_TURNS_DISABLED()*/))
 	{
-		if(!(pPlot->isRoute()))
-		{
-			return false;
-		}
+		return false;
 	}
-	else if(eImprovementType == (ImprovementTypes)GC.getRUINS_IMPROVEMENT())
+
+	
+	if(eImprovementType == (ImprovementTypes)GC.getRUINS_IMPROVEMENT())
 	{
 		return false;
 	}
 	else
 	{
-		CvImprovementEntry* pImprovementInfo = GC.getImprovementInfo(pPlot->getImprovementType());
-		if(pImprovementInfo->IsPermanent())
-		{
-			return false;
-		}
-		else if(pImprovementInfo->IsGoody())
-		{
-			return false;
-		}
+		//can't pillage what we built ourselves unless at war with the new owner ... stops exploits
+		PlayerTypes eBuilder = pPlot->GetPlayerThatBuiltImprovement();
+		if (eBuilder != NO_PLAYER && GET_PLAYER(eBuilder).getTeam() == getTeam())
+			if (!GET_PLAYER(getOwner()).IsAtWarWith(pPlot->getOwner()))
+				return false;
 
-		// Special case: Feitoria can be in a city-state's lands, don't allow pillaging unless at war with its owner
-		if(pImprovementInfo->GetLuxuryCopiesSiphonedFromMinor() > 0)
+		//some improvements cannot be pillaged
+		CvImprovementEntry* pImprovementInfo = GC.getImprovementInfo(pPlot->getImprovementType());
+		if (pImprovementInfo)
 		{
-			PlayerTypes eOwner = pPlot->getOwner();
-			PlayerTypes eSiphoner = pPlot->GetPlayerThatBuiltImprovement();
-			if (eOwner != NO_PLAYER && GET_PLAYER(eOwner).isMinorCiv())
+			if (pImprovementInfo->IsPermanent())
 			{
-				if (eSiphoner != NO_PLAYER && GET_PLAYER(eSiphoner).isAlive())
+				return false;
+			}
+
+			if (pImprovementInfo->IsGoody())
+			{
+				return false;
+			}
+
+			// Special case: Feitoria can be in a city-state's lands, don't allow pillaging unless at war with its owner
+			if (pImprovementInfo->GetLuxuryCopiesSiphonedFromMinor() > 0)
+			{
+				PlayerTypes eOwner = pPlot->getOwner();
+				PlayerTypes eSiphoner = pPlot->GetPlayerThatBuiltImprovement();
+				if (eOwner != NO_PLAYER && GET_PLAYER(eOwner).isMinorCiv())
 				{
-					if (!atWar(getTeam(), GET_PLAYER(eSiphoner).getTeam()))
+					if (eSiphoner != NO_PLAYER && GET_PLAYER(eSiphoner).isAlive())
 					{
-						return false;
+						if (!atWar(getTeam(), GET_PLAYER(eSiphoner).getTeam()))
+						{
+							return false;
+						}
 					}
 				}
 			}
 		}
-	}
-
-	// Either nothing to pillage or everything is pillaged to its max
-	if((eImprovementType == NO_IMPROVEMENT || pPlot->IsImprovementPillaged()) &&
-	        (pPlot->getRouteType() == NO_ROUTE || pPlot->IsRoutePillaged() /* == GC.getPILLAGE_NUM_TURNS_DISABLED()*/))
-	{
-		return false;
-	}
-
-	if(pPlot->isOwned())
-	{
-		if(!potentialWarAction(pPlot))
-		{
-			if((eImprovementType == NO_IMPROVEMENT && !pPlot->isRoute()) || (pPlot->getOwner() != getOwner()))
-			{
-				return false;
-			}
-		}
-	}
-
-	// can no longer pillage our tiles
-	if(pPlot->getOwner() == getOwner())
-	{
-		return false;
-	}
-
-	if(!(pPlot->isValidDomainForAction(*this)))
-	{
-		return false;
 	}
 	
 #if defined(MOD_EVENTS_UNIT_ACTIONS)
@@ -9873,7 +9888,7 @@ bool CvUnit::pillage()
 		// we should not be calling this without declaring war first, so do not declare war here
 		if(!isEnemy(pPlot->getTeam(), pPlot))
 		{
-			if((pPlot->getImprovementType() == NO_IMPROVEMENT && !pPlot->isRoute()) || (pPlot->getOwner() != getOwner()))
+			if((pPlot->getImprovementType() == NO_IMPROVEMENT && !pPlot->isRoute()) || (pPlot->getOwner() != getOwner() && !(IsCanPlunderWithoutWar())))
 			{
 				return false;
 			}
@@ -24200,7 +24215,17 @@ void CvUnit::ChangeIsCanParadropUnLimitCount(int iChange)
 }
 
 
+//	--------------------------------------------------------------------------------
+bool CvUnit::IsCanPlunderWithoutWar() const
+{
+	return m_iCanPlunderWithoutWar > 0;
+}
 
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeCanPlunderWithoutWarCount(int iChange)
+{
+	m_iCanPlunderWithoutWar += iChange;
+}
 
 //	--------------------------------------------------------------------------------
 bool CvUnit::IsCanParadropAnyWhere() const
@@ -26388,6 +26413,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeIgnoreGreatGeneralBenefitCount(thisPromotion.IsIgnoreGreatGeneralBenefit() ? iChange: 0);
 		ChangeIgnoreZOCCount(thisPromotion.IsIgnoreZOC() ? iChange: 0);
 		ChangeCanDoFallBackDamageCount(thisPromotion.IsCanDoFallBackDamage() ? iChange : 0);
+		ChangeCanPlunderWithoutWarCount(thisPromotion.IsCanPlunderWithoutWar() ? iChange : 0);
 		ChangeCanParadropAnyWhereCount(thisPromotion.IsCanParadropAnyWhere() ? iChange : 0);
 		ChangeIsCanParadropUnLimitCount(thisPromotion.IsCanParadropUnLimit() ? iChange : 0);
 		ChangeImmueMeleeAttackCount(thisPromotion.IsImmueMeleeAttack() ? iChange : 0);
@@ -26925,6 +26951,7 @@ void CvUnit::read(FDataStream& kStream)
 	}
 	kStream >> m_iPillageReplenishAttck;
 	kStream >> m_iCanDoFallBackDamage;
+	kStream >> m_iCanPlunderWithoutWar;
 	kStream >> m_iCanParadropAnyWhere;
 	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCannotBeCapturedCount;
@@ -27311,6 +27338,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iIgnoreZOC;
 	kStream << m_iPillageReplenishAttck;
 	kStream << m_iCanDoFallBackDamage;
+	kStream << m_iCanPlunderWithoutWar;
 	kStream << m_iCanParadropAnyWhere;
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;

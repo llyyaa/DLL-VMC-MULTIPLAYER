@@ -1323,6 +1323,8 @@ public:
 	void ChangeIgnoreZOCCount(int iChange);
 	bool IsCanDoFallBackDamage() const;
 	void ChangeCanDoFallBackDamageCount(int iChange);
+	bool IsCanPlunderWithoutWar() const;
+	void ChangeCanPlunderWithoutWarCount(int iChange);
 	bool IsCanParadropAnyWhere() const;
 	void ChangeCanParadropAnyWhereCount(int iChange);
 	bool IsCanParadropUnLimit() const;
@@ -2372,6 +2374,7 @@ protected:
 	int m_iIgnoreGreatGeneralBenefit;
 	int m_iIgnoreZOC;
 	int m_iCanDoFallBackDamage;
+	int m_iCanPlunderWithoutWar;
 	int m_iCanParadropAnyWhere;
 	FAutoVariable<int, CvUnit> m_iIsCanParadropUnLimit;
 	int m_iImmueMeleeAttack;

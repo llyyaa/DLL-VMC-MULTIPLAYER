@@ -385,6 +385,7 @@ public:
 	bool IsIgnoreZOC() const;
 	bool IsCanDoFallBackDamage() const;
 	bool IsCanParadropAnyWhere() const;
+	bool IsCanPlunderWithoutWar() const;
 	bool IsCanParadropUnLimit() const;
 	bool IsImmueMeleeAttack() const;
 	bool IsSapper() const;
@@ -851,6 +852,7 @@ protected:
 	bool m_bIgnoreZOC;
 	bool m_bCanDoFallBackDamage;
 	bool m_bCanParadropAnyWhere;
+	bool m_bCanPlunderWithoutWar;
 	bool m_bIsCanParadropUnLimit;
 	bool m_bImmueMeleeAttack;
 	bool m_bHasPostCombatPromotions;
