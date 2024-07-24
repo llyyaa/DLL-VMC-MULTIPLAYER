@@ -55,3 +55,5 @@ CREATE TABLE Belief_RiverPlotYieldChanges (
     YieldType TEXT REFERENCES Yields(Type),
     Yield INTEGER DEFAULT 0
 );
+
+ALTER TABLE Beliefs ADD COLUMN 'CuttingBonusModifier' INTEGER DEFAULT 0;

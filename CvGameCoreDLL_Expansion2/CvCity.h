@@ -664,6 +664,7 @@ public:
 	int GetGreatPersonPointsFromReligion(GreatPersonTypes eGreatPersonTypes);
 	int GetReligionExtraMissionarySpreads(ReligionTypes eReligion);
 	int GetBeliefExtraMissionarySpreads(BeliefTypes eBelief);
+	int GetCuttingBonusModifier() const;
 #endif	
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
@@ -1465,6 +1466,7 @@ protected:
 	FAutoVariable<int, CvCity> m_iNoOccupiedUnhappinessCount;
 	FAutoVariable<int, CvCity> m_iFood;
 	FAutoVariable<int, CvCity> m_iFoodKept;
+	FAutoVariable<int, CvCity> m_iCuttingBonusModifier;
 	FAutoVariable<int, CvCity> m_iMaxFoodKeptPercent;
 	FAutoVariable<int, CvCity> m_iOverflowProduction;
 	FAutoVariable<int, CvCity> m_iFeatureProduction;
