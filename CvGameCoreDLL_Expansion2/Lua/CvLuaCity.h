@@ -500,7 +500,7 @@ protected:
 	static int lChangeDamage(lua_State* L);
 	static int lGetMaxHitPoints(lua_State* L);
 
-#if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_EVENTS_CITY_BOMBARD)
+#if defined(MOD_EVENTS_CITY_BOMBARD)
 	LUAAPIEXTN(GetBombardRange, int); // returns iRange, bIndirectFire
 #endif
 	static int lCanRangeStrike(lua_State* L);

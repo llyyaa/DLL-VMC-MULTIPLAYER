@@ -20970,11 +20970,7 @@ bool CvCity::CanRangeStrikeNow() const
 		return false;
 	}
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 	int iRange = getBombardRange();
-#else
-	int iRange = /*2*/ GD_INT_GET(CITY_ATTACK_RANGE);
-#endif
 
 	CvPlot* pPlot = plot();
 	for (int iRing = 1; iRing <= min(5, iRange); iRing++)
@@ -21038,53 +21034,28 @@ bool CvCity::canRangeStrikeAt(int iX, int iY) const
 	const CvPlot* pTargetPlot = GC.getMap().plot(iX, iY);
 
 	if(NULL == pTargetPlot)
-	{
 		return false;
-	}
 
 	if(!pTargetPlot->isVisible(getTeam()))
-	{
 		return false;
-	}
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
-	bool bIndirectFireAllowed = false; // By reference, yuck!!!
-	int iAttackRange = getBombardRange(bIndirectFireAllowed);
-#else
-	int iAttackRange = /*2*/ GD_INT_GET(CITY_ATTACK_RANGE);
-#endif
+	bool bIndirectFire = false;
+	int iAttackRange = getBombardRange(bIndirectFire);
 
 
 	if(plotDistance(plot()->getX(), plot()->getY(), pTargetPlot->getX(), pTargetPlot->getY()) > iAttackRange)
-	{
 		return false;
-	}
 
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
-	if (!bIndirectFireAllowed)
-#else
-	if (/*1*/ GD_INT_GET(CAN_CITY_USE_INDIRECT_FIRE) > 0)
-#endif
-	{
-		if (!plot()->canSeePlot(pTargetPlot, getTeam(), iAttackRange, NO_DIRECTION, DOMAIN_LAND))
-		{
-			return false;
-		}
-	}
-
-	// If it's NOT a city, see if there are any units to aim for
-	if(!pTargetPlot->isCity())
-	{
-		if(!canRangedStrikeTarget(*pTargetPlot))
-		{
-			return false;
-		}
-	}
-	else // I don't want cities attacking each other directly
-	{
+	if (!bIndirectFire && !plot()->canSeePlot(pTargetPlot, getTeam(), iAttackRange, NO_DIRECTION))
 		return false;
-	}
+
+	// Can't attack other cities directly
+	if (pTargetPlot->isCity())
+		return false;
+
+	if (!canRangedStrikeTarget(*pTargetPlot))
+		return false;
 
 	return true;
 }
