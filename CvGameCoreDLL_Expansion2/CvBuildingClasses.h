@@ -234,7 +234,7 @@ public:
 	int GetLiberatedInfluence() const;
 	int GetGlobalCityStrengthMod() const;
 	int GetGlobalRangedStrikeModifier() const;
-
+	int GetResearchTotalCostModifier() const;
 	int GetResetDamageValue() const;
 	int GetReduceDamageValue() const;
 
@@ -323,6 +323,7 @@ public:
 	int GetReligiousPressureModifier() const;
 	int GetEspionageModifier() const;
 	int GetGlobalEspionageModifier() const;
+	int GetGlobalEspionageSpeedModifier() const;
 	int GetExtraSpies() const;
 	int GetSpyRankChange() const;
 	int GetTradeRouteRecipientBonus() const;
@@ -678,7 +679,7 @@ private:
 
 	int m_iGlobalCityStrengthMod;
 	int m_iGlobalRangedStrikeModifier;
-
+	int m_iResearchTotalCostModifier;
 	int m_iWaterTileDamage;
 	int m_iWaterTileMovementReduce;
 	int m_iWaterTileTurnDamage;
@@ -761,6 +762,7 @@ private:
 	int m_iReligiousPressureModifier;
 	int m_iEspionageModifier;
 	int m_iGlobalEspionageModifier;
+	int m_iGlobalEspionageSpeedModifier;
 	int m_iExtraSpies;
 	int m_iSpyRankChange;
 	int m_iInstantSpyRankChange;
