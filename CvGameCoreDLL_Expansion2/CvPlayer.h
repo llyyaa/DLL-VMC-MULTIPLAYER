@@ -592,6 +592,8 @@ public:
 	// Espionage
 	int GetEspionageModifier() const;
 	void ChangeEspionageModifier(int iChange);
+	int GetEspionageSpeedModifier() const;
+	void ChangeEspionageSpeedModifier(int iChange);
 	int GetStartingSpyRank() const;
 	void ChangeStartingSpyRank(int iChange);
 	int GetSpyLevelUpWhenRiggingCount() const;
@@ -1698,6 +1700,9 @@ public:
 	void SetGlobalRangedStrikeModifier(int iValue);
 	void ChangeGlobalRangedStrikeModifier(int iChange);
 
+	int GetResearchTotalCostModifier() const;
+	void ChangeResearchTotalCostModifier(int iChange);
+
 	int GetLiberatedInfluence() const;
 	void SetLiberatedInfluence(int iValue);
 	void ChangeLiberatedInfluence(int iChange);
@@ -2225,6 +2230,13 @@ public:
 	std::tr1::unordered_set<BuildingTypes>& GetUBFromDualEmpire();
 	std::tr1::unordered_set<ImprovementTypes>& GetUIFromDualEmpire();
 
+	std::tr1::unordered_set<UnitTypes>& GetUUFromExtra();
+	std::tr1::unordered_set<BuildingTypes>& GetUBFromExtra();
+	std::tr1::unordered_set<ImprovementTypes>& GetUIFromExtra();
+	void ChangeUUFromExtra(UnitTypes eUnitTypes, bool bIsAdd = true);
+	void ChangeUBFromExtra(BuildingTypes eBuildingTypes, bool bIsAdd = true);
+	void ChangeUIFromExtra(ImprovementTypes eImprovementTypes, bool bIsAdd = true);
+
 	static void GetUCTypesFromPlayer(const CvPlayer& player,
 		std::tr1::unordered_set<UnitTypes>* m_sUU,
 		std::tr1::unordered_set<BuildingTypes>* m_sUB,
@@ -2254,6 +2266,9 @@ public:
 	int GetBossLevel() const;
 	void ChangeBossLevel(int iChange);
 	void SetBossLevel(int iValue);
+
+	bool IsLostUC() const;
+	void SetLostUC(bool bValue);
 
 	int GetNumGreatPersonSincePolicy() const;
 	void ChangeNumGreatPersonSincePolicy(int iChange);
@@ -2356,6 +2371,7 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iHappinessPerCity;
 	int m_iHappinessPerXPolicies;
 	int m_iEspionageModifier;
+	int m_iEspionageSpeedModifier;
 	int m_iSpyStartingRank;
 	int m_iSpyLevelUpWhenRiggingCount;
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
@@ -2565,6 +2581,7 @@ protected:
 #if defined(MOD_ROG_CORE)
 	FAutoVariable<int, CvPlayer> m_iGlobalCityStrengthMod;
 	FAutoVariable<int, CvPlayer> m_iGlobalRangedStrikeModifier;
+	FAutoVariable<int, CvPlayer> m_iResearchTotalCostModifier;
 	FAutoVariable<int, CvPlayer> m_iLiberatedInfluence;
 
 	FAutoVariable<int, CvPlayer> m_iWaterTileDamageGlobal;
@@ -2965,6 +2982,12 @@ protected:
 	std::tr1::unordered_set<UnitTypes> m_sUUFromDualEmpire;
 	std::tr1::unordered_set<BuildingTypes> m_sUBFromDualEmpire;
 	std::tr1::unordered_set<ImprovementTypes> m_sUIFromDualEmpire;
+
+	std::tr1::unordered_set<UnitTypes> m_sUUFromExtra;
+	std::tr1::unordered_set<BuildingTypes> m_sUBFromExtra;
+	std::tr1::unordered_set<ImprovementTypes> m_sUIFromExtra;
+
+	bool m_bLostUC = false;
 
 	std::tr1::array<unsigned long long, MAX_MAJOR_CIVS> m_aScienceTimes100FromMajorFriends; // length = MAX_MAJOR_CIVS
 

@@ -111,6 +111,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iReligiousPressureModifier(0),
 	m_iEspionageModifier(0),
 	m_iGlobalEspionageModifier(0),
+	m_iGlobalEspionageSpeedModifier(0),
 	m_iExtraSpies(0),
 	m_iSpyRankChange(0),
 	m_iTradeRouteRecipientBonus(0),
@@ -168,7 +169,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 
 	m_iGlobalCityStrengthMod(0),
 	m_iGlobalRangedStrikeModifier(0),
-
+	m_iResearchTotalCostModifier(0),
 	m_iWaterTileDamage(0),
 	m_iWaterTileMovementReduce(0),
 	m_iWaterTileTurnDamage(0),
@@ -538,7 +539,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 	m_iGlobalCityStrengthMod = kResults.GetInt("GlobalCityStrengthMod");
 	m_iGlobalRangedStrikeModifier = kResults.GetInt("GlobalRangedStrikeModifier");
-
+	m_iResearchTotalCostModifier = kResults.GetInt("ResearchTotalCostModifier");
 	m_iWaterTileDamage = kResults.GetInt("WaterTileDamage");
 	m_iWaterTileMovementReduce = kResults.GetInt("WaterTileMovementReduce");
 	m_iWaterTileTurnDamage = kResults.GetInt("WaterTileTurnDamage");
@@ -672,6 +673,7 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iReligiousPressureModifier = kResults.GetInt("ReligiousPressureModifier");
 	m_iEspionageModifier = kResults.GetInt("EspionageModifier");
 	m_iGlobalEspionageModifier = kResults.GetInt("GlobalEspionageModifier");
+	m_iGlobalEspionageSpeedModifier = kResults.GetInt("GlobalEspionageSpeedModifier");
 	m_iExtraSpies = kResults.GetInt("ExtraSpies");
 	m_iSpyRankChange = kResults.GetInt("SpyRankChange");
 	m_iTradeRouteRecipientBonus = kResults.GetInt("TradeRouteRecipientBonus");
@@ -2310,6 +2312,10 @@ int CvBuildingEntry::GetGlobalRangedStrikeModifier() const
 	return m_iGlobalRangedStrikeModifier;
 }
 
+int CvBuildingEntry::GetResearchTotalCostModifier() const
+{
+	return m_iResearchTotalCostModifier;
+}
 
 /// Does this Building allow us to Range Strike?
 int CvBuildingEntry::CityRangedStrikeModifier() const
@@ -2657,6 +2663,11 @@ int CvBuildingEntry::GetEspionageModifier() const
 int CvBuildingEntry::GetGlobalEspionageModifier() const
 {
 	return m_iGlobalEspionageModifier;
+}
+
+int CvBuildingEntry::GetGlobalEspionageSpeedModifier() const
+{
+	return m_iGlobalEspionageSpeedModifier;
 }
 
 /// Extra spies after this is built
