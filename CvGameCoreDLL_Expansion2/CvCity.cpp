@@ -929,25 +929,6 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 		iProduction /= 100;
 
 		iProduction *= GC.getGame().getGameSpeedInfo().getFeatureProductionPercent();
-		// ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
-		// 	if(eMajority != NO_RELIGION)
-		// 	{
-		// 		const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner());
-		// 		if(pReligion)
-		// 		{
-		// 			int iCuttingBonusModifier = pReligion->m_Beliefs.GetCuttingBonusModifier();
-		// 			BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
-		// 			if (eSecondaryPantheon != NO_BELIEF)
-		// 			{
-		// 				iCuttingBonusModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCuttingBonusModifier();
-		// 			}
-		// 			if(iCuttingBonusModifier > 0)
-		// 			{
-		// 				iProduction *=(100+iCuttingBonusModifier);
-		// 				iProduction /= 100;
-		// 			}
-		// 		}
-		// 	}
 		iProduction *= (100+GetCuttingBonusModifier());
 		iProduction /= 10000;
 
@@ -955,7 +936,6 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 			// Make the production higher than a "ring-1 chop"
 			iProduction *= gCustomMods.getOption("GLOBAL_CITY_FOREST_BONUS_PERCENT", 125);
 			iProduction /= 100;
-			iProduction = 100;
 			changeFeatureProduction(iProduction);
 			CUSTOMLOG("Founding of %s on a forest created %d initial production", getName().GetCString(), iProduction);
 
@@ -982,25 +962,6 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 		iProduction /= 100;
 
 		iProduction *= GC.getGame().getGameSpeedInfo().getFeatureProductionPercent();
-		// ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
-		// 	if(eMajority != NO_RELIGION)
-		// 	{
-		// 		const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner());
-		// 		if(pReligion)
-		// 		{
-		// 			int iCuttingBonusModifier = pReligion->m_Beliefs.GetCuttingBonusModifier();
-		// 			BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
-		// 			if (eSecondaryPantheon != NO_BELIEF)
-		// 			{
-		// 				iCuttingBonusModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCuttingBonusModifier();
-		// 			}
-		// 			if(iCuttingBonusModifier > 0)
-		// 			{
-		// 				iProduction *=(100+iCuttingBonusModifier);
-		// 				iProduction /= 100;
-		// 			}
-		// 		}
-		// 	}
 		iProduction *= (100+GetCuttingBonusModifier());
 		iProduction /= 10000;
 
@@ -1008,7 +969,6 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 			// Make the production higher than a "ring-1 chop"
 			iProduction *= gCustomMods.getOption("GLOBAL_CITY_JUNGLE_BONUS_PERCENT", 125);
 			iProduction /= 100;
-			iProduction = 100;
 			changeFeatureProduction(iProduction);
 			CUSTOMLOG("Founding of %s on a jungle created %d initial production", getName().GetCString(), iProduction);
 

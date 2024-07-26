@@ -11096,8 +11096,9 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 					CvAssertMsg(ePlayer != NO_PLAYER, "ePlayer should be valid");
 
 					iProduction = getFeatureProduction(eBuild, ePlayer, &pCity);
-
-					if(iProduction > 0)
+					iProduction *= (100+pCity->GetCuttingBonusModifier())
+					iProduction /= 100;
+					if(iProduction > 0);
 					{
 						pCity->changeFeatureProduction(iProduction);
 						if(pCity->getOwner() == GC.getGame().getActivePlayer())
