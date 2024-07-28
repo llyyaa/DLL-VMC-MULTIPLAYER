@@ -540,6 +540,19 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 				if (pLoopPlot->getOwner() == getOwner())
 				{
 					pLoopPlot->SetCityPurchaseID(m_iID);
+#if defined(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT)
+					// Relink resource
+					if(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT && pLoopPlot->getResourceType() != NO_RESOURCE)
+					{
+						pLoopPlot->SetResourceLinkedCity(NULL);
+						pLoopPlot->SetResourceLinkedCity(this);
+						// Already have a valid improvement here?
+						if(pLoopPlot->getImprovementType() != NO_IMPROVEMENT && GC.getImprovementInfo(pLoopPlot->getImprovementType())->IsImprovementResourceTrade(pLoopPlot->getResourceType()))
+						{
+							pLoopPlot->SetResourceLinkedCityActive(true);
+						}
+					}
+#endif
 				}
 			}
 		}
