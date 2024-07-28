@@ -259,6 +259,7 @@ CvUnit::CvUnit() :
 	, m_iExtraRoughRangedAttackMod("CvUnit::m_iExtraRoughRangedAttackMod", m_syncArchive)
 	, m_iExtraAttackFortifiedMod("CvUnit::m_iExtraAttackFortifiedMod", m_syncArchive)
 	, m_iExtraAttackWoundedMod("CvUnit::m_iExtraAttackWoundedMod", m_syncArchive)
+	, m_iExtraWoundedMod("CvUnit::m_iExtraWoundedMod", m_syncArchive)
 	, m_iFlankAttackModifier(0)
 	, m_iRangedFlankAttackModifier(0)
 	, m_iRangedFlankAttackModifierPercent(0)
@@ -1247,6 +1248,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraRoughRangedAttackMod= 0;
 	m_iExtraAttackFortifiedMod= 0;
 	m_iExtraAttackWoundedMod= 0;
+	m_iExtraWoundedMod= 0;
 	m_iFlankAttackModifier=0;
 	m_iRangedFlankAttackModifier = 0;
 	m_iRangedFlankAttackModifierPercent = 0;
@@ -15350,7 +15352,10 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 
 		// Bonus VS wounded
 		if (pDefender->getDamage() > 0)
+		{
 			iModifier += attackWoundedModifier();
+			iModifier += getExtraWoundedMod();
+		}
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -15682,7 +15687,7 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 
 		// Bonus VS wounded
 		if (pAttacker->getDamage() > 0)
-			iModifier += attackWoundedModifier();
+			iModifier += getExtraWoundedMod();
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -15992,8 +15997,10 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 			iModifier += attackFortifiedModifier();
 
 		// Bonus VS wounded
-		if(pOtherUnit->getDamage() > 0)
-			iModifier += attackWoundedModifier();
+		if (pOtherUnit->getDamage() > 0)
+		{
+			iModifier += getExtraWoundedMod();
+		}
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -16046,14 +16053,18 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 			// Promotion-Promotion Modifier
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-		if (MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-		{
-			iModifier += otherPromotionAttackModifierByUnit(pOtherUnit);
-		}
+			if (MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
+			{
+				iModifier += otherPromotionAttackModifierByUnit(pOtherUnit);
+			}
 #endif
 
-		// Unit Ranged Flanking Attack Mod	
-
+			// Bonus VS wounded
+			if (pOtherUnit->getDamage() > 0)
+			{
+				iModifier += attackWoundedModifier();
+			}
+			// Unit Ranged Flanking Attack Mod	
 			int iNumAdjacentEnemys = pOtherUnit->GetNumEnemyUnitsAdjacent(this);
 			if (iNumAdjacentEnemys > 0)
 			{
@@ -23294,6 +23305,21 @@ void CvUnit::changeExtraAttackWoundedMod(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+int CvUnit::getExtraWoundedMod() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraWoundedMod;
+}
+void CvUnit::changeExtraWoundedMod(int iChange)
+{
+	VALIDATE_OBJECT
+	if(iChange != 0)
+	{
+		m_iExtraWoundedMod = (m_iExtraWoundedMod + iChange);
+		setInfoBarDirty(true);
+	}
+}
+//	--------------------------------------------------------------------------------
 int CvUnit::GetFlankAttackModifier() const
 {
 	VALIDATE_OBJECT
@@ -26367,6 +26393,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraRoughRangedAttackMod(thisPromotion.GetRoughRangedAttackMod() * iChange);
 		changeExtraAttackFortifiedMod(thisPromotion.GetAttackFortifiedMod() * iChange);
 		changeExtraAttackWoundedMod(thisPromotion.GetAttackWoundedMod() * iChange);
+		changeExtraWoundedMod(thisPromotion.GetWoundedMod() * iChange);
 		ChangeFlankAttackModifier(thisPromotion.GetFlankAttackModifier() * iChange);
 		ChangeRangedFlankAttackModifier(thisPromotion.GetRangedFlankAttackModifier() * iChange);
 		ChangeRangedFlankAttackModifierPercent(thisPromotion.GetRangedFlankAttackModifierPercent() * iChange);
@@ -30541,6 +30568,11 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 
 		if (iValue == 0)
 		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetWoundedMod(), getExtraWoundedMod(), iFlavorOffDef, mediumPriority);
+		}
+
+		if (iValue == 0)
+		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetNumAttacksMadeThisTurnAttackMod(), GetNumAttacksMadeThisTurnAttackMod(), iFlavorOffense, mediumPriority);
 		}
 
@@ -31035,6 +31067,15 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 	if(iTemp != 0 && isRanged())
 	{
 		iExtra = getExtraAttackWoundedMod() * 2;
+		iTemp *= (100 + iExtra);
+		iTemp /= 100;
+		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;
+	}
+
+	iTemp = pkPromotionInfo->GetWoundedMod();
+	if(iTemp != 0 && isRanged())
+	{
+		iExtra = getExtraWoundedMod() * 2;
 		iTemp *= (100 + iExtra);
 		iTemp /= 100;
 		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;

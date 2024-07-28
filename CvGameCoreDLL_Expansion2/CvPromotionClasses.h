@@ -107,6 +107,7 @@ public:
 	int  GetRoughRangedAttackMod() const;
 	int  GetAttackFortifiedMod() const;
 	int  GetAttackWoundedMod() const;
+	int  GetWoundedMod() const;
 	int  GetFlankAttackModifier() const;
 	int  GetRangedFlankAttackModifier() const;
 	int  GetRangedFlankAttackModifierPercent() const;
@@ -577,6 +578,7 @@ protected:
 	int m_iRoughRangedAttackMod;
 	int m_iAttackFortifiedMod;
 	int m_iAttackWoundedMod;
+	int m_iWoundedMod;
 	int m_iFlankAttackModifier;
 	int m_iRangedFlankAttackModifier;
 	int m_iRangedFlankAttackModifierPercent;

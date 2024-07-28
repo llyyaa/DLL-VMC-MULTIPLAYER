@@ -72,6 +72,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iRoughRangedAttackMod(0),
 	m_iAttackFortifiedMod(0),
 	m_iAttackWoundedMod(0),
+	m_iWoundedMod(0),
 	m_iFlankAttackModifier(0),
 	m_iRangedFlankAttackModifier(0),
 	m_iRangedFlankAttackModifierPercent(0),
@@ -666,6 +667,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iRoughRangedAttackMod = kResults.GetInt("RoughRangedAttackMod");
 	m_iAttackFortifiedMod = kResults.GetInt("AttackFortifiedMod");
 	m_iAttackWoundedMod = kResults.GetInt("AttackWoundedMod");
+	m_iWoundedMod = kResults.GetInt("WoundedMod");
 	m_iFlankAttackModifier = kResults.GetInt("FlankAttackModifier");
 	m_iRangedFlankAttackModifier = kResults.GetInt("RangedFlankAttackModifier");
 	m_iRangedFlankAttackModifierPercent = kResults.GetInt("RangedFlankAttackModifierPercent");
@@ -1883,6 +1885,11 @@ int CvPromotionEntry::GetAttackFortifiedMod() const
 int CvPromotionEntry::GetAttackWoundedMod() const
 {
 	return m_iAttackWoundedMod;
+}
+
+int CvPromotionEntry::GetWoundedMod() const
+{
+	return m_iWoundedMod;
 }
 
 /// Accessor: Bonus when making a flank attack
