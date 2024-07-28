@@ -1466,7 +1466,6 @@ protected:
 	FAutoVariable<int, CvCity> m_iNoOccupiedUnhappinessCount;
 	FAutoVariable<int, CvCity> m_iFood;
 	FAutoVariable<int, CvCity> m_iFoodKept;
-	FAutoVariable<int, CvCity> m_iCuttingBonusModifier;
 	FAutoVariable<int, CvCity> m_iMaxFoodKeptPercent;
 	FAutoVariable<int, CvCity> m_iOverflowProduction;
 	FAutoVariable<int, CvCity> m_iFeatureProduction;
