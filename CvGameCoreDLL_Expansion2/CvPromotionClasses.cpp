@@ -72,6 +72,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iRoughRangedAttackMod(0),
 	m_iAttackFortifiedMod(0),
 	m_iAttackWoundedMod(0),
+	m_iWoundedMod(0),
 	m_iFlankAttackModifier(0),
 	m_iRangedFlankAttackModifier(0),
 	m_iRangedFlankAttackModifierPercent(0),
@@ -311,6 +312,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_bIgnoreZOC(false),
 	m_bCanDoFallBackDamage(false),
 	m_bCanParadropAnyWhere(false),
+	m_bCanPlunderWithoutWar(false),
 	m_bIsCanParadropUnLimit(false),
 	m_bImmueMeleeAttack(false),
 	m_bHasPostCombatPromotions(false),
@@ -615,6 +617,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_bIgnoreZOC = kResults.GetBool("IgnoreZOC");
 	m_bCanDoFallBackDamage = kResults.GetBool("CanDoFallBackDamage");
 	m_bCanParadropAnyWhere = kResults.GetBool("CanParadropAnyWhere");
+	m_bCanPlunderWithoutWar = kResults.GetBool("CanPlunderWithoutWar");
 	m_bIsCanParadropUnLimit = kResults.GetBool("IsCanParadropUnLimit");
 	m_bImmueMeleeAttack = kResults.GetBool("ImmueMeleeAttack");
 	m_bHasPostCombatPromotions = kResults.GetBool("HasPostCombatPromotions");
@@ -666,6 +669,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iRoughRangedAttackMod = kResults.GetInt("RoughRangedAttackMod");
 	m_iAttackFortifiedMod = kResults.GetInt("AttackFortifiedMod");
 	m_iAttackWoundedMod = kResults.GetInt("AttackWoundedMod");
+	m_iWoundedMod = kResults.GetInt("WoundedMod");
 	m_iFlankAttackModifier = kResults.GetInt("FlankAttackModifier");
 	m_iRangedFlankAttackModifier = kResults.GetInt("RangedFlankAttackModifier");
 	m_iRangedFlankAttackModifierPercent = kResults.GetInt("RangedFlankAttackModifierPercent");
@@ -1885,6 +1889,11 @@ int CvPromotionEntry::GetAttackWoundedMod() const
 	return m_iAttackWoundedMod;
 }
 
+int CvPromotionEntry::GetWoundedMod() const
+{
+	return m_iWoundedMod;
+}
+
 /// Accessor: Bonus when making a flank attack
 int CvPromotionEntry::GetFlankAttackModifier() const
 {
@@ -3024,6 +3033,11 @@ bool CvPromotionEntry::IsCanDoFallBackDamage() const
 bool CvPromotionEntry::IsCanParadropAnyWhere() const
 {
 	return m_bCanParadropAnyWhere;
+}
+
+bool CvPromotionEntry::IsCanPlunderWithoutWar() const
+{
+	return m_bCanPlunderWithoutWar;
 }
 
 bool CvPromotionEntry::IsCanParadropUnLimit() const

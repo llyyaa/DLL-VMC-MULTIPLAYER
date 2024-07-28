@@ -663,6 +663,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetExtraRoughRangedAttackMod);
 	Method(GetExtraAttackFortifiedMod);
 	Method(GetExtraAttackWoundedMod);
+	Method(GetExtraWoundedMod);
 	Method(GetExtraOpenDefensePercent);
 
 	Method(GetPillageChange);
@@ -5609,6 +5610,16 @@ int CvLuaUnit::lGetExtraAttackWoundedMod(lua_State* L)
 	CvUnit* pkUnit = GetInstance(L);
 
 	const int iResult = pkUnit->getExtraAttackWoundedMod();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+//------------------------------------------------------------------------------
+//int getExtraWoundedMod();
+int CvLuaUnit::lGetExtraWoundedMod(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+
+	const int iResult = pkUnit->getExtraWoundedMod();
 	lua_pushinteger(L, iResult);
 	return 1;
 }

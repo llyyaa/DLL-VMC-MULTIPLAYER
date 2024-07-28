@@ -259,6 +259,7 @@ CvUnit::CvUnit() :
 	, m_iExtraRoughRangedAttackMod("CvUnit::m_iExtraRoughRangedAttackMod", m_syncArchive)
 	, m_iExtraAttackFortifiedMod("CvUnit::m_iExtraAttackFortifiedMod", m_syncArchive)
 	, m_iExtraAttackWoundedMod("CvUnit::m_iExtraAttackWoundedMod", m_syncArchive)
+	, m_iExtraWoundedMod("CvUnit::m_iExtraWoundedMod", m_syncArchive)
 	, m_iFlankAttackModifier(0)
 	, m_iRangedFlankAttackModifier(0)
 	, m_iRangedFlankAttackModifierPercent(0)
@@ -1247,6 +1248,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraRoughRangedAttackMod= 0;
 	m_iExtraAttackFortifiedMod= 0;
 	m_iExtraAttackWoundedMod= 0;
+	m_iExtraWoundedMod= 0;
 	m_iFlankAttackModifier=0;
 	m_iRangedFlankAttackModifier = 0;
 	m_iRangedFlankAttackModifierPercent = 0;
@@ -1425,6 +1427,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iIgnoreZOC = 0;
 	m_iPillageReplenishAttck = 0;
 	m_iCanDoFallBackDamage = 0;
+	m_iCanPlunderWithoutWar = 0;
 	m_iCanParadropAnyWhere = 0;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	m_iNoSupply = 0;
@@ -9730,115 +9733,129 @@ bool CvUnit::rebase(int iX, int iY)
 bool CvUnit::canPillage(const CvPlot* pPlot) const
 {
 	VALIDATE_OBJECT
-	if(isEmbarked())
-	{
-		return false;
-	}
 
-#if defined(MOD_BUGFIX_MINOR)
 	// Bail early if the unit has no moves left
 	if (getMoves() <= 0)
 	{
 		return false;
 	}
-#endif
 
-	if(!(getUnitInfo().IsPillage()))
+	if(isEmbarked())
 	{
 		return false;
 	}
-	else
+
+	if (!(getUnitInfo().IsPillage()))
 	{
-		TechTypes ePillagePrereq = (TechTypes) getUnitInfo().GetPrereqPillageTech();
-		if(ePillagePrereq != NO_TECH)
+		return false;
+	}
+
+	if (pPlot->isOwned())
+	{
+		//if (! isEnemy(pPlot->getTeam(), pPlot))
+		if (pPlot->getOwner()==getOwner())		
+		   return false;
+
+		if (pPlot->getOwner() != getOwner() && !(atWar(getTeam(), GET_PLAYER(pPlot->getOwner()).getTeam())) && !(IsCanPlunderWithoutWar()))
+			return false;
+	}
+
+	if (!(pPlot->isValidDomainForAction(*this)))
+	{
+		return false;
+	}
+
+
+	if(isBarbarian())
+	{
+		// barbarian boats not allowed to pillage, as they're too annoying :)
+		if (getDomainType() == DOMAIN_SEA)
+			return false;
+
+		// barbs can't pillage camps yo
+		if (pPlot->getImprovementType() == GD_INT_GET(BARBARIAN_CAMP_IMPROVEMENT))
+			return false;
+	}
+
+	if (pPlot->getOwner() == NO_PLAYER && pPlot->isRoute())
+	{
+		PlayerTypes eRouteOwner = pPlot->GetPlayerResponsibleForRoute();
+		if (eRouteOwner != NO_PLAYER && GET_PLAYER(eRouteOwner).isAlive())
 		{
-			if(!GET_TEAM(GET_PLAYER(getOwner()).getTeam()).GetTeamTechs()->HasTech(ePillagePrereq))
+			if (!atWar(getTeam(), GET_PLAYER(eRouteOwner).getTeam()))
 			{
 				return false;
 			}
 		}
 	}
 
-	// Barbarian boats not allowed to pillage, as they're too annoying :)
-	if(isBarbarian() && getDomainType() == DOMAIN_SEA)
+	TechTypes ePillagePrereq = (TechTypes)getUnitInfo().GetPrereqPillageTech();
+	if (ePillagePrereq != NO_TECH)
 	{
-		return false;
+		if (!GET_TEAM(GET_PLAYER(getOwner()).getTeam()).GetTeamTechs()->HasTech(ePillagePrereq))
+		{
+			return false;
+		}
 	}
 
-	if(pPlot->isCity())
+	if (pPlot->isCity())
 	{
 		return false;
 	}
 
 	ImprovementTypes eImprovementType = pPlot->getImprovementType();
-	if(eImprovementType == NO_IMPROVEMENT)
+
+	// Either nothing to pillage or everything is pillaged to its max
+	if ((eImprovementType == NO_IMPROVEMENT || pPlot->IsImprovementPillaged()) &&
+		(pPlot->getRouteType() == NO_ROUTE || pPlot->IsRoutePillaged() /* == GC.getPILLAGE_NUM_TURNS_DISABLED()*/))
 	{
-		if(!(pPlot->isRoute()))
-		{
-			return false;
-		}
+		return false;
 	}
-	else if(eImprovementType == (ImprovementTypes)GC.getRUINS_IMPROVEMENT())
+
+	
+	if(eImprovementType == (ImprovementTypes)GC.getRUINS_IMPROVEMENT())
 	{
 		return false;
 	}
 	else
 	{
-		CvImprovementEntry* pImprovementInfo = GC.getImprovementInfo(pPlot->getImprovementType());
-		if(pImprovementInfo->IsPermanent())
-		{
-			return false;
-		}
-		else if(pImprovementInfo->IsGoody())
-		{
-			return false;
-		}
+		//can't pillage what we built ourselves unless at war with the new owner ... stops exploits
+		PlayerTypes eBuilder = pPlot->GetPlayerThatBuiltImprovement();
+		if (eBuilder != NO_PLAYER && GET_PLAYER(eBuilder).getTeam() == getTeam())
+			if (!GET_PLAYER(getOwner()).IsAtWarWith(pPlot->getOwner()))
+				return false;
 
-		// Special case: Feitoria can be in a city-state's lands, don't allow pillaging unless at war with its owner
-		if(pImprovementInfo->GetLuxuryCopiesSiphonedFromMinor() > 0)
+		//some improvements cannot be pillaged
+		CvImprovementEntry* pImprovementInfo = GC.getImprovementInfo(pPlot->getImprovementType());
+		if (pImprovementInfo)
 		{
-			PlayerTypes eOwner = pPlot->getOwner();
-			PlayerTypes eSiphoner = pPlot->GetPlayerThatBuiltImprovement();
-			if (eOwner != NO_PLAYER && GET_PLAYER(eOwner).isMinorCiv())
+			if (pImprovementInfo->IsPermanent())
 			{
-				if (eSiphoner != NO_PLAYER && GET_PLAYER(eSiphoner).isAlive())
+				return false;
+			}
+
+			if (pImprovementInfo->IsGoody())
+			{
+				return false;
+			}
+
+			// Special case: Feitoria can be in a city-state's lands, don't allow pillaging unless at war with its owner
+			if (pImprovementInfo->GetLuxuryCopiesSiphonedFromMinor() > 0)
+			{
+				PlayerTypes eOwner = pPlot->getOwner();
+				PlayerTypes eSiphoner = pPlot->GetPlayerThatBuiltImprovement();
+				if (eOwner != NO_PLAYER && GET_PLAYER(eOwner).isMinorCiv())
 				{
-					if (!atWar(getTeam(), GET_PLAYER(eSiphoner).getTeam()))
+					if (eSiphoner != NO_PLAYER && GET_PLAYER(eSiphoner).isAlive())
 					{
-						return false;
+						if (!atWar(getTeam(), GET_PLAYER(eSiphoner).getTeam()))
+						{
+							return false;
+						}
 					}
 				}
 			}
 		}
-	}
-
-	// Either nothing to pillage or everything is pillaged to its max
-	if((eImprovementType == NO_IMPROVEMENT || pPlot->IsImprovementPillaged()) &&
-	        (pPlot->getRouteType() == NO_ROUTE || pPlot->IsRoutePillaged() /* == GC.getPILLAGE_NUM_TURNS_DISABLED()*/))
-	{
-		return false;
-	}
-
-	if(pPlot->isOwned())
-	{
-		if(!potentialWarAction(pPlot))
-		{
-			if((eImprovementType == NO_IMPROVEMENT && !pPlot->isRoute()) || (pPlot->getOwner() != getOwner()))
-			{
-				return false;
-			}
-		}
-	}
-
-	// can no longer pillage our tiles
-	if(pPlot->getOwner() == getOwner())
-	{
-		return false;
-	}
-
-	if(!(pPlot->isValidDomainForAction(*this)))
-	{
-		return false;
 	}
 	
 #if defined(MOD_EVENTS_UNIT_ACTIONS)
@@ -9873,7 +9890,7 @@ bool CvUnit::pillage()
 		// we should not be calling this without declaring war first, so do not declare war here
 		if(!isEnemy(pPlot->getTeam(), pPlot))
 		{
-			if((pPlot->getImprovementType() == NO_IMPROVEMENT && !pPlot->isRoute()) || (pPlot->getOwner() != getOwner()))
+			if((pPlot->getImprovementType() == NO_IMPROVEMENT && !pPlot->isRoute()) || (pPlot->getOwner() != getOwner() && !(IsCanPlunderWithoutWar())))
 			{
 				return false;
 			}
@@ -15352,7 +15369,10 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 
 		// Bonus VS wounded
 		if (pDefender->getDamage() > 0)
+		{
 			iModifier += attackWoundedModifier();
+			iModifier += getExtraWoundedMod();
+		}
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -15684,7 +15704,7 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 
 		// Bonus VS wounded
 		if (pAttacker->getDamage() > 0)
-			iModifier += attackWoundedModifier();
+			iModifier += getExtraWoundedMod();
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -15994,8 +16014,10 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 			iModifier += attackFortifiedModifier();
 
 		// Bonus VS wounded
-		if(pOtherUnit->getDamage() > 0)
-			iModifier += attackWoundedModifier();
+		if (pOtherUnit->getDamage() > 0)
+		{
+			iModifier += getExtraWoundedMod();
+		}
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -16048,14 +16070,18 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 			// Promotion-Promotion Modifier
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-		if (MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-		{
-			iModifier += otherPromotionAttackModifierByUnit(pOtherUnit);
-		}
+			if (MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
+			{
+				iModifier += otherPromotionAttackModifierByUnit(pOtherUnit);
+			}
 #endif
 
-		// Unit Ranged Flanking Attack Mod	
-
+			// Bonus VS wounded
+			if (pOtherUnit->getDamage() > 0)
+			{
+				iModifier += attackWoundedModifier();
+			}
+			// Unit Ranged Flanking Attack Mod	
 			int iNumAdjacentEnemys = pOtherUnit->GetNumEnemyUnitsAdjacent(this);
 			if (iNumAdjacentEnemys > 0)
 			{
@@ -20809,12 +20835,8 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 	setInfoBarDirty(true);
 
 	// if there is an enemy city nearby, alert any scripts to this
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 	int iAttackRange = (MOD_EVENTS_CITY_BOMBARD ? GC.getMAX_CITY_ATTACK_RANGE() : GC.getCITY_ATTACK_RANGE());
-#else
-	int iAttackRange = /*2*/ GD_INT_GET(CITY_ATTACK_RANGE);
-#endif
-	
+
 	for(int iDX = -iAttackRange; iDX <= iAttackRange; iDX++)
 	{
 		for(int iDY = -iAttackRange; iDY <= iAttackRange; iDY++)
@@ -20826,15 +20848,12 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 				{
 					// do it
 					CvCity* pkPlotCity = pTargetPlot->getPlotCity();
-#if defined(MOD_EVENTS_CITY_BOMBARD)
+
 					if (!MOD_EVENTS_CITY_BOMBARD || plotXYWithRangeCheck(getX(), getY(), iDX, iDY, pkPlotCity->getBombardRange()))
 					{
-#endif
 						auto_ptr<ICvCity1> pPlotCity = GC.WrapCityPointer(pkPlotCity);
 						DLLUI->SetSpecificCityInfoDirty(pPlotCity.get(), CITY_UPDATE_TYPE_ENEMY_IN_RANGE);
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 					}
-#endif
 				}
 			}
 		}
@@ -23296,6 +23315,21 @@ void CvUnit::changeExtraAttackWoundedMod(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+int CvUnit::getExtraWoundedMod() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraWoundedMod;
+}
+void CvUnit::changeExtraWoundedMod(int iChange)
+{
+	VALIDATE_OBJECT
+	if(iChange != 0)
+	{
+		m_iExtraWoundedMod = (m_iExtraWoundedMod + iChange);
+		setInfoBarDirty(true);
+	}
+}
+//	--------------------------------------------------------------------------------
 int CvUnit::GetFlankAttackModifier() const
 {
 	VALIDATE_OBJECT
@@ -24202,7 +24236,17 @@ void CvUnit::ChangeIsCanParadropUnLimitCount(int iChange)
 }
 
 
+//	--------------------------------------------------------------------------------
+bool CvUnit::IsCanPlunderWithoutWar() const
+{
+	return m_iCanPlunderWithoutWar > 0;
+}
 
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeCanPlunderWithoutWarCount(int iChange)
+{
+	m_iCanPlunderWithoutWar += iChange;
+}
 
 //	--------------------------------------------------------------------------------
 bool CvUnit::IsCanParadropAnyWhere() const
@@ -26369,6 +26413,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraRoughRangedAttackMod(thisPromotion.GetRoughRangedAttackMod() * iChange);
 		changeExtraAttackFortifiedMod(thisPromotion.GetAttackFortifiedMod() * iChange);
 		changeExtraAttackWoundedMod(thisPromotion.GetAttackWoundedMod() * iChange);
+		changeExtraWoundedMod(thisPromotion.GetWoundedMod() * iChange);
 		ChangeFlankAttackModifier(thisPromotion.GetFlankAttackModifier() * iChange);
 		ChangeRangedFlankAttackModifier(thisPromotion.GetRangedFlankAttackModifier() * iChange);
 		ChangeRangedFlankAttackModifierPercent(thisPromotion.GetRangedFlankAttackModifierPercent() * iChange);
@@ -26390,6 +26435,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeIgnoreGreatGeneralBenefitCount(thisPromotion.IsIgnoreGreatGeneralBenefit() ? iChange: 0);
 		ChangeIgnoreZOCCount(thisPromotion.IsIgnoreZOC() ? iChange: 0);
 		ChangeCanDoFallBackDamageCount(thisPromotion.IsCanDoFallBackDamage() ? iChange : 0);
+		ChangeCanPlunderWithoutWarCount(thisPromotion.IsCanPlunderWithoutWar() ? iChange : 0);
 		ChangeCanParadropAnyWhereCount(thisPromotion.IsCanParadropAnyWhere() ? iChange : 0);
 		ChangeIsCanParadropUnLimitCount(thisPromotion.IsCanParadropUnLimit() ? iChange : 0);
 		ChangeImmueMeleeAttackCount(thisPromotion.IsImmueMeleeAttack() ? iChange : 0);
@@ -26927,6 +26973,7 @@ void CvUnit::read(FDataStream& kStream)
 	}
 	kStream >> m_iPillageReplenishAttck;
 	kStream >> m_iCanDoFallBackDamage;
+	kStream >> m_iCanPlunderWithoutWar;
 	kStream >> m_iCanParadropAnyWhere;
 	kStream >> m_iCaptureDefeatedEnemyChance;
 	kStream >> m_iCannotBeCapturedCount;
@@ -27313,6 +27360,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iIgnoreZOC;
 	kStream << m_iPillageReplenishAttck;
 	kStream << m_iCanDoFallBackDamage;
+	kStream << m_iCanPlunderWithoutWar;
 	kStream << m_iCanParadropAnyWhere;
 	kStream << m_iCaptureDefeatedEnemyChance;
 	kStream << m_iCannotBeCapturedCount;
@@ -30543,6 +30591,11 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 
 		if (iValue == 0)
 		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetWoundedMod(), getExtraWoundedMod(), iFlavorOffDef, mediumPriority);
+		}
+
+		if (iValue == 0)
+		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetNumAttacksMadeThisTurnAttackMod(), GetNumAttacksMadeThisTurnAttackMod(), iFlavorOffense, mediumPriority);
 		}
 
@@ -31037,6 +31090,15 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 	if(iTemp != 0 && isRanged())
 	{
 		iExtra = getExtraAttackWoundedMod() * 2;
+		iTemp *= (100 + iExtra);
+		iTemp /= 100;
+		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;
+	}
+
+	iTemp = pkPromotionInfo->GetWoundedMod();
+	if(iTemp != 0 && isRanged())
+	{
+		iExtra = getExtraWoundedMod() * 2;
 		iTemp *= (100 + iExtra);
 		iTemp /= 100;
 		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;

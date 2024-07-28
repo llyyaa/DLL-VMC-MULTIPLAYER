@@ -107,6 +107,7 @@ public:
 	int  GetRoughRangedAttackMod() const;
 	int  GetAttackFortifiedMod() const;
 	int  GetAttackWoundedMod() const;
+	int  GetWoundedMod() const;
 	int  GetFlankAttackModifier() const;
 	int  GetRangedFlankAttackModifier() const;
 	int  GetRangedFlankAttackModifierPercent() const;
@@ -385,6 +386,7 @@ public:
 	bool IsIgnoreZOC() const;
 	bool IsCanDoFallBackDamage() const;
 	bool IsCanParadropAnyWhere() const;
+	bool IsCanPlunderWithoutWar() const;
 	bool IsCanParadropUnLimit() const;
 	bool IsImmueMeleeAttack() const;
 	bool IsSapper() const;
@@ -577,6 +579,7 @@ protected:
 	int m_iRoughRangedAttackMod;
 	int m_iAttackFortifiedMod;
 	int m_iAttackWoundedMod;
+	int m_iWoundedMod;
 	int m_iFlankAttackModifier;
 	int m_iRangedFlankAttackModifier;
 	int m_iRangedFlankAttackModifierPercent;
@@ -851,6 +854,7 @@ protected:
 	bool m_bIgnoreZOC;
 	bool m_bCanDoFallBackDamage;
 	bool m_bCanParadropAnyWhere;
+	bool m_bCanPlunderWithoutWar;
 	bool m_bIsCanParadropUnLimit;
 	bool m_bImmueMeleeAttack;
 	bool m_bHasPostCombatPromotions;

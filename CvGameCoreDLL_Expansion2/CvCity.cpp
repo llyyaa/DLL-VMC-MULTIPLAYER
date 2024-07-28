@@ -540,6 +540,19 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 				if (pLoopPlot->getOwner() == getOwner())
 				{
 					pLoopPlot->SetCityPurchaseID(m_iID);
+#if defined(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT)
+					// Relink resource
+					if(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT && pLoopPlot->getResourceType() != NO_RESOURCE)
+					{
+						pLoopPlot->SetResourceLinkedCity(NULL);
+						pLoopPlot->SetResourceLinkedCity(this);
+						// Already have a valid improvement here?
+						if(pLoopPlot->getImprovementType() != NO_IMPROVEMENT && GC.getImprovementInfo(pLoopPlot->getImprovementType())->IsImprovementResourceTrade(pLoopPlot->getResourceType()))
+						{
+							pLoopPlot->SetResourceLinkedCityActive(true);
+						}
+					}
+#endif
 				}
 			}
 		}
@@ -11183,21 +11196,21 @@ void CvCity::changeFoodKept(int iChange)
 int CvCity::GetCuttingBonusModifier() const
 {
 	ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
-	int m_iCuttingBonusModifier = 0;
+	int iCuttingBonusModifier = 0;
 	if(eMajority != NO_RELIGION)
 	{
 		const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner());
 		if(pReligion)
 		{
-			m_iCuttingBonusModifier = pReligion->m_Beliefs.GetCuttingBonusModifier();
+			iCuttingBonusModifier = pReligion->m_Beliefs.GetCuttingBonusModifier();
 			BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
 			if (eSecondaryPantheon != NO_BELIEF)
 			{
-				m_iCuttingBonusModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCuttingBonusModifier();
+				iCuttingBonusModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCuttingBonusModifier();
 			}
 		}
 	}
-	return m_iCuttingBonusModifier;
+	return iCuttingBonusModifier;
 }
 //	--------------------------------------------------------------------------------
 int CvCity::getMaxFoodKeptPercent() const
@@ -20994,11 +21007,7 @@ bool CvCity::CanRangeStrikeNow() const
 		return false;
 	}
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
 	int iRange = getBombardRange();
-#else
-	int iRange = /*2*/ GD_INT_GET(CITY_ATTACK_RANGE);
-#endif
 
 	CvPlot* pPlot = plot();
 	for (int iRing = 1; iRing <= min(5, iRange); iRing++)
@@ -21062,53 +21071,28 @@ bool CvCity::canRangeStrikeAt(int iX, int iY) const
 	const CvPlot* pTargetPlot = GC.getMap().plot(iX, iY);
 
 	if(NULL == pTargetPlot)
-	{
 		return false;
-	}
 
 	if(!pTargetPlot->isVisible(getTeam()))
-	{
 		return false;
-	}
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
-	bool bIndirectFireAllowed = false; // By reference, yuck!!!
-	int iAttackRange = getBombardRange(bIndirectFireAllowed);
-#else
-	int iAttackRange = /*2*/ GD_INT_GET(CITY_ATTACK_RANGE);
-#endif
+	bool bIndirectFire = false;
+	int iAttackRange = getBombardRange(bIndirectFire);
 
 
 	if(plotDistance(plot()->getX(), plot()->getY(), pTargetPlot->getX(), pTargetPlot->getY()) > iAttackRange)
-	{
 		return false;
-	}
 
 
-#if defined(MOD_EVENTS_CITY_BOMBARD)
-	if (!bIndirectFireAllowed)
-#else
-	if (/*1*/ GD_INT_GET(CAN_CITY_USE_INDIRECT_FIRE) > 0)
-#endif
-	{
-		if (!plot()->canSeePlot(pTargetPlot, getTeam(), iAttackRange, NO_DIRECTION, DOMAIN_LAND))
-		{
-			return false;
-		}
-	}
-
-	// If it's NOT a city, see if there are any units to aim for
-	if(!pTargetPlot->isCity())
-	{
-		if(!canRangedStrikeTarget(*pTargetPlot))
-		{
-			return false;
-		}
-	}
-	else // I don't want cities attacking each other directly
-	{
+	if (!bIndirectFire && !plot()->canSeePlot(pTargetPlot, getTeam(), iAttackRange, NO_DIRECTION))
 		return false;
-	}
+
+	// Can't attack other cities directly
+	if (pTargetPlot->isCity())
+		return false;
+
+	if (!canRangedStrikeTarget(*pTargetPlot))
+		return false;
 
 	return true;
 }

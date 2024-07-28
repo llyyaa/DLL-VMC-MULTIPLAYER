@@ -626,7 +626,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(SetDamage);
 	Method(ChangeDamage);
 	Method(GetMaxHitPoints);
-#if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_EVENTS_CITY_BOMBARD)
+#if defined(MOD_EVENTS_CITY_BOMBARD)
 	Method(GetBombardRange);
 #endif
 	Method(CanRangeStrike);
@@ -4506,7 +4506,7 @@ int CvLuaCity::lGetMaxHitPoints(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
-#if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_EVENTS_CITY_BOMBARD)
+#if defined(MOD_EVENTS_CITY_BOMBARD)
 //int, bool GetBombardRange();
 int CvLuaCity::lGetBombardRange(lua_State* L)
 {

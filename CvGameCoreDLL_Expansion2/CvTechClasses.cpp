@@ -1620,7 +1620,7 @@ long long CvPlayerTechs::GetResearchCost(TechTypes eTech) const
 		iResearchCost = iResearchCost * (m_pPlayer->GetPlayerTraits()->GetGoldenAgeResearchTotalCostModifier() + 100) / 100;
 
 	// some Building may reduce the modifier.
-	iResearchCost = iResearchCost * ((m_pPlayer->GetResearchTotalCostModifier()/100) + 1); 
+	iResearchCost = iResearchCost * (m_pPlayer->GetResearchTotalCostModifier() + 100) / 100;
 
 	// We're going to round up so that the user wont get confused when the research progress seems to be equal to the research cost, but it is not acutally done.
 	// This is because the 'real' calculations use the GameCore's fixed point math where things are multiplied by 100

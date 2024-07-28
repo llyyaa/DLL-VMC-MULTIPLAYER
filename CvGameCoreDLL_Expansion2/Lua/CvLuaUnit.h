@@ -591,6 +591,7 @@ protected:
 	static int lGetExtraRoughRangedAttackMod(lua_State* L);
 	static int lGetExtraAttackFortifiedMod(lua_State* L);
 	static int lGetExtraAttackWoundedMod(lua_State* L);
+	static int lGetExtraWoundedMod(lua_State* L);
 	static int lGetExtraOpenDefensePercent(lua_State* L);
 	static int lGetPillageChange(lua_State* L);
 	static int lGetUpgradeDiscount(lua_State* L);

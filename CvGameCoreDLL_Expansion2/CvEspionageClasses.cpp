@@ -1825,8 +1825,10 @@ int CvPlayerEspionage::CalcPerTurn(int iSpyState, CvCity* pCity, int iSpyIndex)
 			{
 				int iSpyRank = m_aSpyList[iSpyIndex].m_eRank;
 				iSpyRank += m_pPlayer->GetCulture()->GetInfluenceMajorCivSpyRankBonus(eCityOwner);
-				iResult *= 1 + (GC.getESPIONAGE_GATHERING_INTEL_RATE_BY_SPY_RANK_PERCENT() * iSpyRank) / 100;
-				iResult = iResult* (1 + GET_PLAYER(m_pPlayer->GetID()).GetEspionageSpeedModifier() / 100);
+				iResult *= 100 + (GC.getESPIONAGE_GATHERING_INTEL_RATE_BY_SPY_RANK_PERCENT() * iSpyRank);
+				iResult /= 100;
+				iResult *= 100 + (GET_PLAYER(m_pPlayer->GetID()).GetEspionageSpeedModifier());
+				iResult /= 100;
 			}
 
 			return iResult;

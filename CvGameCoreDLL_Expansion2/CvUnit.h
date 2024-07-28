@@ -1226,6 +1226,9 @@ public:
 	int getExtraAttackWoundedMod() const;
 	void changeExtraAttackWoundedMod(int iChange);
 
+	int getExtraWoundedMod() const;
+	void changeExtraWoundedMod(int iChange);
+
 	int GetFlankAttackModifier() const;
 	void ChangeFlankAttackModifier(int iChange);
 
@@ -1323,6 +1326,8 @@ public:
 	void ChangeIgnoreZOCCount(int iChange);
 	bool IsCanDoFallBackDamage() const;
 	void ChangeCanDoFallBackDamageCount(int iChange);
+	bool IsCanPlunderWithoutWar() const;
+	void ChangeCanPlunderWithoutWarCount(int iChange);
 	bool IsCanParadropAnyWhere() const;
 	void ChangeCanParadropAnyWhereCount(int iChange);
 	bool IsCanParadropUnLimit() const;
@@ -2212,6 +2217,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iExtraRoughRangedAttackMod;
 	FAutoVariable<int, CvUnit> m_iExtraAttackFortifiedMod;
 	FAutoVariable<int, CvUnit> m_iExtraAttackWoundedMod;
+	FAutoVariable<int, CvUnit> m_iExtraWoundedMod;
 	int m_iFlankAttackModifier;
 	int m_iRangedFlankAttackModifier;
 	int m_iRangedFlankAttackModifierPercent;
@@ -2372,6 +2378,7 @@ protected:
 	int m_iIgnoreGreatGeneralBenefit;
 	int m_iIgnoreZOC;
 	int m_iCanDoFallBackDamage;
+	int m_iCanPlunderWithoutWar;
 	int m_iCanParadropAnyWhere;
 	FAutoVariable<int, CvUnit> m_iIsCanParadropUnLimit;
 	int m_iImmueMeleeAttack;
