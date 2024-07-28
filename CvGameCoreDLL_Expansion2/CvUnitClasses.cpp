@@ -131,6 +131,7 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_iFreePolicies(0),
 	m_iOneShotTourism(0),
 	m_iOneShotTourismPercentOthers(0),
+	m_iGoldFromTourismModifier(0),
 	m_bIgnoreBuildingDefense(false),
 	m_bPrereqResources(false),
 	m_bMechanized(false),
@@ -307,6 +308,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_iFreePolicies = kResults.GetInt("FreePolicies");
 	m_iOneShotTourism = kResults.GetInt("OneShotTourism");
 	m_iOneShotTourismPercentOthers = kResults.GetInt("OneShotTourismPercentOthers");
+	m_iGoldFromTourismModifier = kResults.GetInt("GoldFromTourismModifier");
 	m_bIgnoreBuildingDefense = kResults.GetBool("IgnoreBuildingDefense");
 	m_bPrereqResources = kResults.GetBool("PrereqResources");
 	m_bMechanized = kResults.GetBool("Mechanized");
@@ -1141,6 +1143,12 @@ int CvUnitEntry::GetOneShotTourismPercentOthers() const
 {
 	return m_iOneShotTourismPercentOthers;
 }
+/// Gold from one-shot tourism
+int CvUnitEntry::GetGoldFromTourismModifier() const
+{
+	return m_iGoldFromTourismModifier;
+}
+
 
 /// Not affected by walls?
 bool CvUnitEntry::IsIgnoreBuildingDefense() const
