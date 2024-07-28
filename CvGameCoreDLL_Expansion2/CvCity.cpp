@@ -280,7 +280,7 @@ CvCity::CvCity() :
 
 	, m_iNukeInterceptionChance(0)
 
-	, m_iCuttingBonusModifier("CvCity::m_iCuttingBonusModifier", m_syncArchive)
+
 	, m_iMaintenance("CvCity::m_iMaintenance", m_syncArchive)
 	, m_iHealRate("CvCity::m_iHealRate", m_syncArchive)
 	, m_iNoOccupiedUnhappinessCount("CvCity::m_iNoOccupiedUnhappinessCount", m_syncArchive)
@@ -937,6 +937,7 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 			// Make the production higher than a "ring-1 chop"
 			iProduction *= gCustomMods.getOption("GLOBAL_CITY_FOREST_BONUS_PERCENT", 125);
 			iProduction /= 100;
+
 			changeFeatureProduction(iProduction);
 			CUSTOMLOG("Founding of %s on a forest created %d initial production", getName().GetCString(), iProduction);
 
@@ -971,6 +972,7 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 			// Make the production higher than a "ring-1 chop"
 			iProduction *= gCustomMods.getOption("GLOBAL_CITY_JUNGLE_BONUS_PERCENT", 125);
 			iProduction /= 100;
+
 			changeFeatureProduction(iProduction);
 			CUSTOMLOG("Founding of %s on a jungle created %d initial production", getName().GetCString(), iProduction);
 
@@ -1142,7 +1144,6 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iFood = 0;
 	m_iFoodKept = 0;
 	m_iMaxFoodKeptPercent = 0;
-	m_iCuttingBonusModifier = 0;
 	m_iOverflowProduction = 0;
 	m_iFeatureProduction = 0;
 	m_iMilitaryProductionModifier = 0;
@@ -11183,21 +11184,21 @@ void CvCity::changeFoodKept(int iChange)
 int CvCity::GetCuttingBonusModifier() const
 {
 	ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
-	int m_iCuttingBonusModifier = 0;
+	int iCuttingBonusModifier = 0;
 	if(eMajority != NO_RELIGION)
 	{
 		const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner());
 		if(pReligion)
 		{
-			m_iCuttingBonusModifier = pReligion->m_Beliefs.GetCuttingBonusModifier();
+			iCuttingBonusModifier = pReligion->m_Beliefs.GetCuttingBonusModifier();
 			BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
 			if (eSecondaryPantheon != NO_BELIEF)
 			{
-				m_iCuttingBonusModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCuttingBonusModifier();
+				iCuttingBonusModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCuttingBonusModifier();
 			}
 		}
 	}
-	return m_iCuttingBonusModifier;
+	return iCuttingBonusModifier;
 }
 //	--------------------------------------------------------------------------------
 int CvCity::getMaxFoodKeptPercent() const
@@ -19731,7 +19732,6 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iNoOccupiedUnhappinessCount;
 	kStream >> m_iFood;
 	kStream >> m_iFoodKept;
-	kStream >> m_iCuttingBonusModifier;
 	kStream >> m_iMaxFoodKeptPercent;
 	kStream >> m_iOverflowProduction;
 	kStream >> m_iFeatureProduction;
@@ -20225,7 +20225,6 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iNoOccupiedUnhappinessCount;
 	kStream << m_iFood;
 	kStream << m_iFoodKept;
-	kStream << m_iCuttingBonusModifier;
 	kStream << m_iMaxFoodKeptPercent;
 	kStream << m_iOverflowProduction;
 	kStream << m_iFeatureProduction;

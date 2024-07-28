@@ -3332,6 +3332,8 @@ int CvPlot::getFeatureProduction(BuildTypes eBuild, PlayerTypes ePlayer, CvCity*
 		iProduction *= GC.getDIFFERENT_TEAM_FEATURE_PRODUCTION_PERCENT();
 		iProduction /= 100;
 	}
+	iProduction *= (100 + (*ppCity)->GetCuttingBonusModifier());
+	iProduction /= 100;
 
 	return std::max(0, iProduction);
 }
@@ -11096,8 +11098,6 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 					CvAssertMsg(ePlayer != NO_PLAYER, "ePlayer should be valid");
 
 					iProduction = getFeatureProduction(eBuild, ePlayer, &pCity);
-					iProduction *= (100+pCity->GetCuttingBonusModifier())
-					iProduction /= 100;
 					if(iProduction > 0);
 					{
 						pCity->changeFeatureProduction(iProduction);
