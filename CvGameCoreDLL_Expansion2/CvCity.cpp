@@ -929,8 +929,9 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 		iProduction /= 100;
 
 		iProduction *= GC.getGame().getGameSpeedInfo().getFeatureProductionPercent();
+		iProduction /= 100;
 		iProduction *= (100+GetCuttingBonusModifier());
-		iProduction /= 10000;
+		iProduction /= 100;
 
 		if (iProduction > 0) {
 			// Make the production higher than a "ring-1 chop"
@@ -962,8 +963,9 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 		iProduction /= 100;
 
 		iProduction *= GC.getGame().getGameSpeedInfo().getFeatureProductionPercent();
+		iProduction /= 100;
 		iProduction *= (100+GetCuttingBonusModifier());
-		iProduction /= 10000;
+		iProduction /= 100;
 
 		if (iProduction > 0) {
 			// Make the production higher than a "ring-1 chop"
