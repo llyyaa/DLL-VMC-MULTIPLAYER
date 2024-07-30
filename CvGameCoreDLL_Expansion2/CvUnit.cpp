@@ -26901,13 +26901,13 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 	kStream >> m_iExtraPopConsume;
-	kStream >> m_iAttackBonusFromDeathUnit;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream >> m_iMeleeAttackModifier;
 	kStream >> m_iCaptureEmenyExtraMax;
 	kStream >> m_iCaptureEmenyPercent;
 	kStream >> m_iMovePercentCaptureCity;
 	kStream >> m_iHealPercentCaptureCity;
+	kStream >> m_iAttackBonusFromDeathUnit;
 	kStream >> m_iInsightEnemyDamageModifier;
 	kStream >> m_iHeightModPerX;
 	kStream >> m_iHeightModLimited;
