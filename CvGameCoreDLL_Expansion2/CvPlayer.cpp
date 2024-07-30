@@ -2270,7 +2270,7 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 	FFastSmallFixedList<IDInfo, 25, true, c_eCiv5GameplayDLL > oldUnits;
 	CvCityReligions tempReligions;
 	bool bIsMinorCivBuyout = (pOldCity->GetPlayer()->isMinorCiv() && bGift && (IsAbleToAnnexCityStates() || GetPlayerTraits()->IsNoAnnexing())); // Austria and Venice UA
-	bNoKillPunishment |= bIsMinorCivBuyout;
+	if(bIsMinorCivBuyout) bNoKillPunishment = true;
 
 	pCityPlot = pOldCity->plot();
 
@@ -3367,8 +3367,8 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 		if(pNewCity->getOriginalOwner() != GetID())
 		{
 			pNewCity->SetOccupied(true);
-
-			if ( (!GET_PLAYER(GetID()).CanNoResistance()) && !GET_PLAYER(GetID()).GetPlayerTraits()->IsNoResistance() )
+			// for dual empire or Minor Civ buyout, others cities should no be Resistant
+			if ( !bNoKillPunishment && (!GET_PLAYER(GetID()).CanNoResistance()) && !GET_PLAYER(GetID()).GetPlayerTraits()->IsNoResistance() )
 			{
 				int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
 				int iOriginalResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
@@ -3449,8 +3449,6 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 						// We are adding a popup that the player must make a choice in, make sure they are not in the end-turn phase.
 						CancelActivePlayerEndTurn();
 					}
-					// for dual empire, others cities should no be Resistant
-					if(bNoKillPunishment) pNewCity->ChangeResistanceTurns(-pNewCity->GetResistanceTurns());
 				}
 				else
 				{
