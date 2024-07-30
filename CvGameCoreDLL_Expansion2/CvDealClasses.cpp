@@ -439,7 +439,7 @@ bool CvDeal::IsPossibleToTradeItem(PlayerTypes ePlayer, PlayerTypes eToPlayer, T
 				return false;
 			}
 
-			if(MOD_SP_SMART_AI)
+			if(MOD_SP_SMART_AI_DEAL)
 			{
 				// AI try to avoid human deception: never accept a not enough resource when trade done
 				int iTrueAvailable = iNumAvailable + iNumInRenewDeal - iNumInExistingDeal;
@@ -3418,7 +3418,7 @@ void CvGameDeals::DoCancelDealsBetweenPlayers(PlayerTypes eFromPlayer, PlayerTyp
 				GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
 			}
 
-			if(MOD_SP_SMART_AI && iGoldToCompensate > iDealDuration * iDealDuration)
+			if(MOD_SP_SMART_AI_DEAL && iGoldToCompensate > iDealDuration * iDealDuration)
 			{
 				CvPlayerAI& pAttackPlayer = GET_PLAYER(eAttackPlayer);
 				if(!pAttackPlayer.isHuman()) return;
