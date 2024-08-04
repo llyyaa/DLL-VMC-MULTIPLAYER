@@ -12340,6 +12340,13 @@ int CvPlot::getYieldWithBuild(BuildTypes eBuild, YieldTypes eYield, bool bWithUp
 
 	if(eImprovement != NO_IMPROVEMENT)
 	{
+#if defined(MOD_IMPROVEMENTS_CREATE_ITEMS)
+		ImprovementTypes eNewImprovement = (ImprovementTypes)GC.getImprovementInfo(eImprovement)->GetNewImprovement();
+		if(GC.getImprovementInfo(eImprovement)->GetCreateItemMod() <= 2 && eNewImprovement != NO_IMPROVEMENT)
+		{
+			eImprovement = eNewImprovement;
+		}
+#endif
 		if(bWithUpgrade)
 		{
 			//in the case that improvements upgrade, use 2 upgrade levels higher for the
