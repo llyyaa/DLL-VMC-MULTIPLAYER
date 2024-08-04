@@ -20091,7 +20091,7 @@ BuildingTypes CvPlayer::GetCivBuilding(BuildingClassTypes eBuildingClass) const
 	if (eBuildingClass == NO_BUILDINGCLASS || eBuildingClass >= GC.getNumBuildingClassInfos())
 		return NO_BUILDING;
 
-	if (!isMajorCiv())
+	if (!isMajorCiv() || IsLostUC())
 	{
 		return (BuildingTypes)GC.getBuildingClassInfo(eBuildingClass)->getDefaultBuildingIndex();
 	}
@@ -20105,7 +20105,7 @@ UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass) const
 	if (eUnitClass == NO_UNITCLASS || eUnitClass >= GC.getNumUnitClassInfos())
 		return NO_UNIT;
 
-	if (!isMajorCiv())
+	if (!isMajorCiv() || IsLostUC())
 	{
 		return (UnitTypes)GC.getUnitClassInfo(eUnitClass)->getDefaultUnitIndex();
 	}
