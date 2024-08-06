@@ -229,7 +229,7 @@ CvCity::CvCity() :
 	, m_iExtraAttackOnKill("CvCity::m_iExtraAttackOnKill", m_syncArchive)
 	, m_iForbiddenForeignSpyCount(0)
 #if defined(MOD_ROG_CORE)
-	, m_aiNumTimesAttackedThisTurn("CvCity::m_aiNumTimesAttackedThisTurn", m_syncArchive)
+	, m_aiNumTimesAttackedThisTurn()
 	, m_aiYieldPerAlly()
 	, m_aiYieldPerFriend()
 	, m_aiBaseYieldRateFromCSAlliance()
@@ -242,7 +242,7 @@ CvCity::CvCity() :
 	, m_aiYieldFromBorderGrowth()
 	, m_aiYieldFromPillage()
 	, m_aiYieldPerPopInEmpire()
-	, m_aiResourceQuantityFromPOP("CvCity::m_aiResourceQuantityFromPOP", m_syncArchive)
+	, m_aiResourceQuantityFromPOP()
 #endif
 
 	, m_iPopulation("CvCity::m_iPopulation", m_syncArchive)
@@ -1230,7 +1230,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 
 	for (iI = 0; iI < REALLY_MAX_PLAYERS; iI++)
 	{
-		m_aiNumTimesAttackedThisTurn.setAt(iI, 0);
+		m_aiNumTimesAttackedThisTurn[iI] = 0;
 	}
 
 	m_aiYieldPerAlly.resize(NUM_YIELD_TYPES);
@@ -1397,7 +1397,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 			m_paiFreeResource.setAt(iI, 0);
 			m_paiNumResourcesLocal.setAt(iI, 0);
 #if defined(MOD_ROG_CORE)
-			m_aiResourceQuantityFromPOP.setAt(iI, 0);
+			m_aiResourceQuantityFromPOP[iI] = 0;
 #endif
 		}
 
@@ -13293,7 +13293,7 @@ void CvCity::ChangeResourceQuantityFromPOP(ResourceTypes eResource, int iChange)
 
 	if (iChange != 0)
 	{
-		m_aiResourceQuantityFromPOP.setAt(eResource, m_aiResourceQuantityFromPOP[eResource] + iChange);
+		m_aiResourceQuantityFromPOP[eResource] += iChange;
 	}
 }
 
@@ -19834,6 +19834,7 @@ void CvCity::read(FDataStream& kStream)
 #if defined(MOD_ROG_CORE)
 	kStream >> m_aiYieldPerAlly;
 	kStream >> m_aiYieldPerFriend;
+	kStream >> m_aiNumTimesAttackedThisTurn;
 	kStream >> m_aiBaseYieldRateFromCSAlliance;
 	kStream >> m_aiBaseYieldRateFromCSFriendship;
 	kStream >> m_aiSpecialistRateModifier;
@@ -19844,6 +19845,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiYieldFromBirth;
 	kStream >> m_aiYieldFromBorderGrowth;
 	kStream >> m_aiYieldFromPillage;
+	kStream >> m_aiResourceQuantityFromPOP;
 #endif
 
 	if (uiVersion >= 4)
@@ -20304,6 +20306,7 @@ void CvCity::write(FDataStream& kStream) const
 #if defined(MOD_ROG_CORE)
 	kStream << m_aiYieldPerAlly;
 	kStream << m_aiYieldPerFriend;
+	kStream << m_aiNumTimesAttackedThisTurn;
 	kStream << m_aiBaseYieldRateFromCSAlliance;
 	kStream << m_aiBaseYieldRateFromCSFriendship;
 	kStream << m_aiSpecialistRateModifier;
@@ -20314,6 +20317,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiYieldFromBirth;
 	kStream << m_aiYieldFromBorderGrowth;
 	kStream << m_aiYieldFromPillage;
+	kStream << m_aiResourceQuantityFromPOP;
 #endif
 	kStream << m_aiYieldPerReligion;
 	kStream << m_aiYieldRateModifier;
@@ -20748,7 +20752,7 @@ void CvCity::ChangeNumTimesAttackedThisTurn(PlayerTypes ePlayer, int iValue)
 	VALIDATE_OBJECT
 	CvAssertMsg(ePlayer >= 0, "ePlayer expected to be >= 0");
 	CvAssertMsg(ePlayer < REALLY_MAX_PLAYERS, "ePlayer expected to be < NUM_DOMAIN_TYPES");
-	m_aiNumTimesAttackedThisTurn.setAt(ePlayer, m_aiNumTimesAttackedThisTurn[ePlayer] + iValue);
+	m_aiNumTimesAttackedThisTurn[ePlayer] += iValue;
 }
 int CvCity::GetNumTimesAttackedThisTurn(PlayerTypes ePlayer) const
 {

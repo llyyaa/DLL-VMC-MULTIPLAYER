@@ -1566,7 +1566,7 @@ protected:
 
 
 #if defined(MOD_ROG_CORE)
-	FAutoVariable<std::vector<int>, CvCity> m_aiNumTimesAttackedThisTurn;
+	std::vector<int> m_aiNumTimesAttackedThisTurn;
 	std::vector<int> m_aiBaseYieldRateFromCSAlliance;
 	std::vector<int> m_aiBaseYieldRateFromCSFriendship;
 	std::vector<int> m_aiYieldPerAlly;
@@ -1581,7 +1581,7 @@ protected:
 	std::vector<int> m_aiYieldFromPillage;
 
 	std::map<int, int> m_aiYieldPerPopInEmpire;
-	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
+	std::vector<int> m_aiResourceQuantityFromPOP;
 	std::vector<int> m_aiSpecialistRateModifier;
 #endif
 

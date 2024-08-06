@@ -2403,8 +2403,8 @@ protected:
 	int m_iFreeGreatArtistsCreated;
 	int m_iFreeGreatMusiciansCreated;
 
-	FAutoVariable<int, CvPlayer> m_iGreatPeopleCreated;
-	FAutoVariable<int, CvPlayer> m_iGreatGeneralsCreated;
+	int m_iGreatPeopleCreated;
+	int m_iGreatGeneralsCreated;
 	int m_iGreatAdmiralsCreated;
 #if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
 	int m_iGreatMerchantsCreated;
@@ -2579,17 +2579,17 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iPlotGoldCostMod;
 
 #if defined(MOD_ROG_CORE)
-	FAutoVariable<int, CvPlayer> m_iGlobalCityStrengthMod;
-	FAutoVariable<int, CvPlayer> m_iGlobalRangedStrikeModifier;
-	FAutoVariable<int, CvPlayer> m_iResearchTotalCostModifier;
-	FAutoVariable<int, CvPlayer> m_iLiberatedInfluence;
+	int m_iGlobalCityStrengthMod;
+	int m_iGlobalRangedStrikeModifier;
+	int m_iResearchTotalCostModifier;
+	int m_iLiberatedInfluence;
 
-	FAutoVariable<int, CvPlayer> m_iWaterTileDamageGlobal;
-	FAutoVariable<int, CvPlayer> m_iWaterTileMovementReduceGlobal;
-	FAutoVariable<int, CvPlayer> m_iWaterTileTurnDamageGlobal;
-	FAutoVariable<int, CvPlayer> m_iLandTileDamageGlobal;
-	FAutoVariable<int, CvPlayer> m_iLandTileMovementReduceGlobal;
-	FAutoVariable<int, CvPlayer> m_iLandTileTurnDamageGlobal;
+	int m_iWaterTileDamageGlobal;
+	int m_iWaterTileMovementReduceGlobal;
+	int m_iWaterTileTurnDamageGlobal;
+	int m_iLandTileDamageGlobal;
+	int m_iLandTileMovementReduceGlobal;
+	int m_iLandTileTurnDamageGlobal;
 #endif
 
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING) || defined(MOD_TECHS_CITY_WORKING)
@@ -2686,7 +2686,7 @@ protected:
 #if defined(MOD_ROG_CORE)
 	std::vector<int> m_aiWorldWonderCityYieldRateModifier;
 
-	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainFreeExperiencePerGreatWorkGlobal;
+	std::vector<int> m_aiDomainFreeExperiencePerGreatWorkGlobal;
 
 	std::map<int, int> m_piDomainFreeExperience;
 	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
@@ -2959,8 +2959,8 @@ protected:
 	int m_iProductionNeededProjectModifier = 0;
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsTotal;
-	FAutoVariable<std::vector<int>, CvPlayer> m_aiDomainTroopsUsed;
+	std::vector<int> m_aiDomainTroopsTotal;
+	std::vector<int> m_aiDomainTroopsUsed;
 
 	int m_iNumCropsTotal = 0;
 	int m_iNumCropsUsed = 0;
@@ -2969,9 +2969,9 @@ protected:
 #endif
 
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	FAutoVariable<std::vector<int>, CvPlayer> m_aiImmigrationCounter;
+	std::vector<int> m_aiImmigrationCounter;
 #endif
-	FAutoVariable<std::vector<int>, CvPlayer> m_aiNegateWarmongerTurn;
+	std::vector<int> m_aiNegateWarmongerTurn;
 
 	std::vector<int> m_viSecondCapitals;
 

@@ -236,8 +236,8 @@ CvPlayer::CvPlayer() :
 	, m_iFreeGreatArtistsCreated(0)
 	, m_iFreeGreatMusiciansCreated(0)
 
-	, m_iGreatPeopleCreated("CvPlayer::m_iGreatPeopleCreated", m_syncArchive)
-	, m_iGreatGeneralsCreated("CvPlayer::m_iGreatGeneralsCreated", m_syncArchive)
+	, m_iGreatPeopleCreated(0)
+	, m_iGreatGeneralsCreated(0)
 	, m_iGreatAdmiralsCreated(0)
 #if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
 	, m_iGreatMerchantsCreated(0)
@@ -391,16 +391,16 @@ CvPlayer::CvPlayer() :
 #if defined(MOD_ROG_CORE)
 	, m_aiYieldFromPillageGlobal()
 	, m_aiYieldFromPillage()
-	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
-	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
-	, m_iResearchTotalCostModifier("CvPlayer::m_iResearchTotalCostModifier", m_syncArchive)
-	, m_iLiberatedInfluence("CvPlayer::m_iLiberatedInfluence", m_syncArchive)
-	, m_iWaterTileDamageGlobal("CvPlayer::m_iWaterTileDamageGlobal", m_syncArchive)
-	, m_iWaterTileMovementReduceGlobal("CvPlayer::m_iWaterTileMovementReduceGlobal", m_syncArchive)
-	, m_iWaterTileTurnDamageGlobal("CvPlayer::m_iWaterTileTurnDamageGlobal", m_syncArchive)
-	, m_iLandTileDamageGlobal("CvPlayer::m_iLandTileDamageGlobal", m_syncArchive)
-	, m_iLandTileMovementReduceGlobal("CvPlayer::m_iLandTileMovementReduceGlobal", m_syncArchive)
-	, m_iLandTileTurnDamageGlobal("CvPlayer::m_iLandTileTurnDamageGlobal", m_syncArchive)
+	, m_iGlobalCityStrengthMod(0)
+	, m_iGlobalRangedStrikeModifier(0)
+	, m_iResearchTotalCostModifier(0)
+	, m_iLiberatedInfluence(0)
+	, m_iWaterTileDamageGlobal(0)
+	, m_iWaterTileMovementReduceGlobal(0)
+	, m_iWaterTileTurnDamageGlobal(0)
+	, m_iLandTileDamageGlobal(0)
+	, m_iLandTileMovementReduceGlobal(0)
+	, m_iLandTileTurnDamageGlobal(0)
 #endif
 
 	, m_iPopRushHurryCount("CvPlayer::m_iPopRushHurryCount", m_syncArchive)
@@ -461,19 +461,19 @@ CvPlayer::CvPlayer() :
 	, m_aiCityYieldChange("CvPlayer::m_aiCityYieldChange", m_syncArchive)
 
 #if defined(MOD_ROG_CORE)
-	, m_aiDomainFreeExperiencePerGreatWorkGlobal("CvPlayer::m_aiDomainFreeExperiencePerGreatWorkGlobal", m_syncArchive)
+	, m_aiDomainFreeExperiencePerGreatWorkGlobal()
 	, m_piDomainFreeExperience()
 	, m_piUnitTypePrmoteHealGlobal()
 #endif
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	, m_aiDomainTroopsTotal("CvPlayer::m_aiDomainTroopsTotal", m_syncArchive)
-	, m_aiDomainTroopsUsed("CvPlayer::m_aiDomainTroopsUsed", m_syncArchive)
+	, m_aiDomainTroopsTotal()
+	, m_aiDomainTroopsUsed()
 #endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	, m_aiImmigrationCounter("CvPlayer::m_aiImmigrationCounter", m_syncArchive)
+	, m_aiImmigrationCounter()
 #endif
-	, m_aiNegateWarmongerTurn("CvPlayer::m_aiNegateWarmongerTurn", m_syncArchive)
+	, m_aiNegateWarmongerTurn()
 	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
 
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
@@ -17754,7 +17754,7 @@ void CvPlayer::ChangeDomainFreeExperiencePerGreatWorkGlobal(DomainTypes eIndex, 
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainFreeExperiencePerGreatWorkGlobal.setAt(eIndex, m_aiDomainFreeExperiencePerGreatWorkGlobal[eIndex] + iChange);
+	m_aiDomainFreeExperiencePerGreatWorkGlobal[eIndex] += iChange;
 }
 
 //	--------------------------------------------------------------------------------
@@ -17822,14 +17822,14 @@ void CvPlayer::ChangeDomainTroopsTotalTimes100(int iChange, DomainTypes eIndex)
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainTroopsTotal.setAt(eIndex, m_aiDomainTroopsTotal[eIndex] + iChange);
+	m_aiDomainTroopsTotal[eIndex] += iChange;
 }
 void CvPlayer::SetDomainTroopsTotalTimes100(int iValue, DomainTypes eIndex)
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainTroopsTotal.setAt(eIndex, iValue);
+	m_aiDomainTroopsTotal[eIndex] = iValue;
 }
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetDomainTroopsUsed(DomainTypes eIndex) const
@@ -17844,14 +17844,14 @@ void CvPlayer::ChangeDomainTroopsUsed(int iChange, DomainTypes eIndex)
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainTroopsUsed.setAt(eIndex, m_aiDomainTroopsUsed[eIndex] + iChange);
+	m_aiDomainTroopsUsed[eIndex] +=  iChange;
 }
 void CvPlayer::SetDomainTroopsUsed(int iValue, DomainTypes eIndex)
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainTroopsUsed.setAt(eIndex, iValue);
+	m_aiDomainTroopsUsed[eIndex] = iValue;
 }
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetTroopsRateTimes100() const
@@ -17944,14 +17944,14 @@ void CvPlayer::ChangeImmigrationCounter(int iIndex, int iChange)
 	VALIDATE_OBJECT
 	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
 	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
-	m_aiImmigrationCounter.setAt(iIndex, m_aiImmigrationCounter[iIndex] + iChange);
+	m_aiImmigrationCounter[iIndex] += iChange;
 }
 void CvPlayer::SetImmigrationCounter(int iIndex, int iValue)
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
 	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
-	m_aiImmigrationCounter.setAt(iIndex, iValue);
+	m_aiImmigrationCounter[iIndex] = iValue;
 }
 int CvPlayer::GetImmigrationRate(PlayerTypes eTargetPlayer) const
 {
@@ -18075,7 +18075,7 @@ void CvPlayer::SetNegateWarmongerTurn(int iIndex, int iValue)
 	VALIDATE_OBJECT
 	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
 	CvAssertMsg(iIndex < MAX_CIV_PLAYERS, "iIndex expected to be < MAX_CIV_PLAYERS");
-	m_aiNegateWarmongerTurn.setAt(iIndex, iValue);
+	m_aiNegateWarmongerTurn[iIndex] = iValue;
 }
 
 #if defined(MOD_ROG_CORE)
@@ -28214,6 +28214,19 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iCapitalGrowthMod;
 	kStream >> m_iNumPlotsBought;
 	kStream >> m_iPlotGoldCostMod;
+#if defined(MOD_ROG_CORE)
+	kStream >> m_iGlobalCityStrengthMod;
+	kStream >> m_iGlobalRangedStrikeModifier;
+	kStream >> m_iResearchTotalCostModifier;
+	kStream >> m_iLiberatedInfluence;
+
+	kStream >> m_iWaterTileDamageGlobal;
+	kStream >> m_iWaterTileMovementReduceGlobal;
+	kStream >> m_iWaterTileTurnDamageGlobal;
+	kStream >> m_iLandTileDamageGlobal;
+	kStream >> m_iLandTileMovementReduceGlobal;
+	kStream >> m_iLandTileTurnDamageGlobal;
+#endif
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING) || defined(MOD_TECHS_CITY_WORKING)
 	MOD_SERIALIZE_READ(23, kStream, m_iCityWorkingChange, 0);
 #endif
@@ -28959,6 +28972,19 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iCapitalGrowthMod;
 	kStream << m_iNumPlotsBought;
 	kStream << m_iPlotGoldCostMod;
+#if defined(MOD_ROG_CORE)
+	kStream << m_iGlobalCityStrengthMod;
+	kStream << m_iGlobalRangedStrikeModifier;
+	kStream << m_iResearchTotalCostModifier;
+	kStream << m_iLiberatedInfluence;
+
+	kStream << m_iWaterTileDamageGlobal;
+	kStream << m_iWaterTileMovementReduceGlobal;
+	kStream << m_iWaterTileTurnDamageGlobal;
+	kStream << m_iLandTileDamageGlobal;
+	kStream << m_iLandTileMovementReduceGlobal;
+	kStream << m_iLandTileTurnDamageGlobal;
+#endif
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING) || defined(MOD_TECHS_CITY_WORKING)
 	MOD_SERIALIZE_WRITE(kStream, m_iCityWorkingChange);
 #endif
