@@ -1230,7 +1230,7 @@ public:
 #if defined(MOD_API_EXTENSIONS)
 	bool isMajorCiv() const;
 	BuildingTypes GetCivBuilding(BuildingClassTypes eBuildingClass) const;
-	UnitTypes GetCivUnit(UnitClassTypes eUnitClass) const;
+	UnitTypes GetCivUnit(UnitClassTypes eUnitClass, int iFakeSeed = 0) const;
 #endif
 	bool IsHasBetrayedMinorCiv() const;
 	void SetHasBetrayedMinorCiv(bool bValue);

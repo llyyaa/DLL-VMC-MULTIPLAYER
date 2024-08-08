@@ -9983,24 +9983,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	BuildingClassTypes eFreeBuildingClass = (BuildingClassTypes)pBuildingInfo->GetFreeBuildingClass();
 	if(eFreeBuildingClass != NO_BUILDINGCLASS)
 	{
-		BuildingTypes eFreeBuilding = NO_BUILDING;
-		BuildingTypes eDefaultBuilding = (BuildingTypes)GC.getBuildingClassInfo(eFreeBuildingClass)->getDefaultBuildingIndex();
-		if(IsLostUC()) eFreeBuilding = eDefaultBuilding;
-		else eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(eFreeBuildingClass);
-		if(eFreeBuilding == eDefaultBuilding)
-		{
-			std::vector<BuildingTypes> vFreeBuildings;
-			for (auto iBuilding : GetUBFromExtra())
-			{
-				if (GC.getBuildingInfo(iBuilding)->GetBuildingClassType() != eFreeBuildingClass) continue;
-				if (iBuilding == eDefaultBuilding) continue;
-				vFreeBuildings.push_back(iBuilding);
-			}
-			vFreeBuildings.push_back(eDefaultBuilding);
-			eFreeBuilding = vFreeBuildings[0];
-		}
-		
-		changeFreeBuildingCount(eFreeBuilding, iChange);
+		changeFreeBuildingCount(GetCivBuilding(eFreeBuildingClass), iChange);
 	}
 
 	// Unit upgrade cost mod
@@ -20091,27 +20074,57 @@ BuildingTypes CvPlayer::GetCivBuilding(BuildingClassTypes eBuildingClass) const
 	if (eBuildingClass == NO_BUILDINGCLASS || eBuildingClass >= GC.getNumBuildingClassInfos())
 		return NO_BUILDING;
 
-	if (!isMajorCiv() || IsLostUC())
+	BuildingTypes eCivBuilding = NO_BUILDING;
+	BuildingTypes eDefaultBuilding = (BuildingTypes)GC.getBuildingClassInfo(eBuildingClass)->getDefaultBuildingIndex();
+	if(IsLostUC() || !isMajorCiv()) eCivBuilding = eDefaultBuilding;
+	else eCivBuilding = (BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(eBuildingClass));
+
+	if(!MOD_GLOBAL_OPTIONAL_UC) return eCivBuilding;
+	
+	// if this player has a Unique Building, choose it, or try to find a Unique Building
+	if(eCivBuilding == eDefaultBuilding)
 	{
-		return (BuildingTypes)GC.getBuildingClassInfo(eBuildingClass)->getDefaultBuildingIndex();
+		std::vector<BuildingTypes> vBuildings;
+		for (auto iBuilding : const_cast<CvPlayer*>(this)->GetUBFromExtra())
+		{
+			if (GC.getBuildingInfo(iBuilding)->GetBuildingClassType() != eBuildingClass) continue;
+			if (iBuilding == eDefaultBuilding) continue;
+			vBuildings.push_back(iBuilding);
+		}
+		vBuildings.push_back(eDefaultBuilding);
+		eCivBuilding = vBuildings[0];
 	}
 
-	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
-	return (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
+	return eCivBuilding;
 }
 
-UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass) const
+UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass, int iFakeSeed) const
 {
 	if (eUnitClass == NO_UNITCLASS || eUnitClass >= GC.getNumUnitClassInfos())
 		return NO_UNIT;
 
-	if (!isMajorCiv() || IsLostUC())
-	{
-		return (UnitTypes)GC.getUnitClassInfo(eUnitClass)->getDefaultUnitIndex();
-	}
+	UnitTypes eCivUnit = NO_UNIT;
+	if(IsLostUC() || !isMajorCiv()) eCivUnit = (UnitTypes)GC.getUnitClassInfo(eUnitClass)->getDefaultUnitIndex();
+	else eCivUnit = (UnitTypes)getCivilizationInfo().getCivilizationUnits(eUnitClass);
 
-	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
-	return (UnitTypes)playerCivilizationInfo.getCivilizationUnits(eUnitClass);
+	if(!MOD_GLOBAL_OPTIONAL_UC) return eCivUnit;
+
+	std::vector<UnitTypes> vUnitTypes;
+	for (auto iUnit : const_cast<CvPlayer*>(this)->GetUUFromExtra())
+	{
+		if (GC.getUnitInfo(iUnit)->GetUnitClassType() != eUnitClass) continue;
+		if (iUnit == eCivUnit) continue;
+		vUnitTypes.push_back(iUnit);
+	}
+	if(const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eCivUnit) == 0) vUnitTypes.push_back(eCivUnit);
+	if (vUnitTypes.size() > 1)
+	{
+		eCivUnit = vUnitTypes[GC.getGame().getSmallFakeRandNum(vUnitTypes.size(), iFakeSeed)];
+	}
+	else if(vUnitTypes.size() == 1) eCivUnit = vUnitTypes[0];
+	else eCivUnit = NO_UNIT;
+
+	return eCivUnit;
 }
 
 #endif

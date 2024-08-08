@@ -13469,25 +13469,8 @@ UnitTypes CvUnit::GetUpgradeUnitType() const
 		CvUnitClassInfo* pkUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
 		if(pkUnitClassInfo && m_pUnitInfo->GetUpgradeUnitClass(iI))
 		{
-			if(kPlayer.IsLostUC()) eUpgradeUnitType = (UnitTypes)pkUnitClassInfo->getDefaultUnitIndex();
-			else eUpgradeUnitType = (UnitTypes) kCiv.getCivilizationUnits(iI);
-
-			std::vector<UnitTypes> vUpgradeUnitTypes;
-			for (auto iUnit : kPlayer.GetUUFromExtra())
-			{
-				if (GC.getUnitInfo(iUnit)->GetUnitClassType() != iI) continue;
-				if (iUnit == eUpgradeUnitType) continue;
-				vUpgradeUnitTypes.push_back(iUnit);
-			}
-			if(kPlayer.GetUUFromExtra().count(eUpgradeUnitType) == 0) vUpgradeUnitTypes.push_back(eUpgradeUnitType);
-			if (vUpgradeUnitTypes.size() > 1)
-			{
-				if(!plot()) return NO_UNIT;
-				int iExtraSeed = plot()->GetPlotIndex() + GetID();
-				eUpgradeUnitType = vUpgradeUnitTypes[GC.getGame().getSmallFakeRandNum(vUpgradeUnitTypes.size(), iExtraSeed)];
-			}
-			else if(vUpgradeUnitTypes.size() == 1) eUpgradeUnitType = vUpgradeUnitTypes[0];
-			else eUpgradeUnitType = NO_UNIT;
+			if(!plot()) return NO_UNIT;
+			eUpgradeUnitType = kPlayer.GetCivUnit(eUnitClass, plot()->GetPlotIndex() + GetID())
 
 #if defined(MOD_EVENTS_UNIT_UPGRADES)
 			if (MOD_EVENTS_UNIT_UPGRADES) {
