@@ -4417,16 +4417,7 @@ UnitTypes CvPlayer::GetSpecificUnitType(const char* szUnitClass, bool hideAssert
 	
 	if (pkUnitClassInfo)
 	{
-		CvCivilizationInfo* pCivilizationInfo = GC.getCivilizationInfo(getCivilizationType());
-		
-		if (pCivilizationInfo != NULL)
-		{
-			eUnitType = (UnitTypes) pCivilizationInfo->getCivilizationUnits(eUnitClassType);
-		}
-		else
-		{
-			eUnitType = (UnitTypes) pkUnitClassInfo->getDefaultUnitIndex();
-		}
+		eUnitType = GetCivUnit(eUnitClassType);
 	}
 	
 	if (!isMinorCiv() && !isBarbarian()) {
@@ -19631,7 +19622,7 @@ void CvPlayer::setCombatExperience(int iExperience)
 								if(pkUnitInfo->GetFreePromotions(eGreatGeneralPromotion))
 								{
 									// Is this the right unit of this class for this civ?
-									const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
+									const UnitTypes eUnit = GetCivUnit((UnitClassTypes)pkUnitInfo->GetUnitClassType());
 
 									if(eUnit == eLoopUnit)
 									{
@@ -19843,7 +19834,7 @@ void CvPlayer::setNavalCombatExperience(int iExperience)
 								if(pkUnitInfo->GetFreePromotions(eGreatAdmiralPromotion))
 								{
 									// Is this the right unit of this class for this civ?
-									const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
+									const UnitTypes eUnit = GetCivUnit((UnitClassTypes)pkUnitInfo->GetUnitClassType());
 
 									if(eUnit == eLoopUnit)
 									{
@@ -22135,7 +22126,7 @@ void CvPlayer::DoCivilianReturnLogic(bool bReturn, PlayerTypes eToPlayer, int iU
 	UnitTypes eNewUnitType = pUnit->getUnitType();
 
 	if(!bReturn)
-		eNewUnitType = pUnit->getCaptureUnitType(getCivilizationType());
+		eNewUnitType = pUnit->getCaptureUnitType(GetID());
 
 	int iX = pUnit->getX();
 	int iY = pUnit->getY();
@@ -27551,7 +27542,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 							int iNumFreeUnits = pFreeUnitClasses[iI].second;
 							if(iNumFreeUnits > 0)
 							{
-								const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);
+								const UnitTypes eUnit = GetCivUnit(eUnitClass);
 								CvUnitEntry* pUnitEntry = GC.getUnitInfo(eUnit);
 								getCapitalCity()->initFreeUnit(*this, eUnit, iNumFreeUnits, false);
 							}

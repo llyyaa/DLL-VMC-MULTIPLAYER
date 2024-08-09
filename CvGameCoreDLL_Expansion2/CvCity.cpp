@@ -793,7 +793,7 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 		if(owningPlayer.getNumCities() == 1)
 		{
 #if defined(MOD_EVENTS_CITY_CAPITAL)
-			int eCapitalBuilding = thisCiv.getCivilizationBuildings(GC.getCAPITAL_BUILDINGCLASS());
+			int eCapitalBuilding = owningPlayer.GetCivBuilding((BuildingClassTypes)GC.getCAPITAL_BUILDINGCLASS());
 #endif
 			
 			for(iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
@@ -806,7 +806,7 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 
 				if(thisCiv.isCivilizationFreeBuildingClass(iI))
 				{
-					eLoopBuilding = ((BuildingTypes)(thisCiv.getCivilizationBuildings(iI)));
+					eLoopBuilding = owningPlayer.GetCivBuilding((BuildingClassTypes)iI);
 
 					if(eLoopBuilding != NO_BUILDING)
 					{
@@ -8379,7 +8379,7 @@ void CvCity::initFreeUnit(CvPlayer& owningPlayer, UnitTypes eUnit, int iCount, b
 		if(bToCivType)
 		{
 			// Get the right unit of this class for this civ
-			eUnit = (UnitTypes)getCivilizationInfo().getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
+			eUnit = owningPlayer.GetCivUnit((UnitClassTypes)pkUnitInfo->GetUnitClassType());
 		}
 	}
 	pkUnitInfo = GC.getUnitInfo(eUnit);

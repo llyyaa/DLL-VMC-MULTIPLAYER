@@ -2424,11 +2424,9 @@ void CvCityCitizens::DoSpecialists()
 
 						// Now... actually create the GP!
 						const UnitClassTypes eUnitClass = (UnitClassTypes) pkSpecialistInfo->getGreatPeopleUnitClass();
-						const CivilizationTypes eCivilization = GetCity()->getCivilizationType();
-						CvCivilizationInfo* pCivilizationInfo = GC.getCivilizationInfo(eCivilization);
-						if(pCivilizationInfo != NULL)
+						UnitTypes eUnit = GET_PLAYER(GetCity()->getOwner()).GetCivUnit(eUnitClass);
+						if(eUnit != NO_UNIT)
 						{
-							UnitTypes eUnit = (UnitTypes) pCivilizationInfo->getCivilizationUnits(eUnitClass);
 							DoSpawnGreatPerson(eUnit, true, false, false);
 						}
 					}

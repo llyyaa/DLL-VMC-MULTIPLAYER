@@ -2485,7 +2485,7 @@ bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerT
 	else if(isBarbarian() || (kCaptureDef.eCapturingPlayer != NO_PLAYER && GET_PLAYER(kCaptureDef.eCapturingPlayer).isBarbarian()))
 	{
 		// Must be able to capture this unit normally... don't want the barbs picking up Workboats, Generals, etc.
-		if(kCaptureDef.eCapturingPlayer != NO_PLAYER && getCaptureUnitType(GET_PLAYER(kCaptureDef.eCapturingPlayer).getCivilizationType()) != NO_UNIT)
+		if(kCaptureDef.eCapturingPlayer != NO_PLAYER && getCaptureUnitType(kCaptureDef.eCapturingPlayer) != NO_UNIT)
 			// Unit type is the same as what it was
 			kCaptureDef.eCaptureUnitType = getUnitType();
 	}
@@ -2494,7 +2494,7 @@ bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerT
 	else
 	{
 		if(kCaptureDef.eCapturingPlayer != NO_PLAYER)
-			kCaptureDef.eCaptureUnitType = getCaptureUnitType(GET_PLAYER(kCaptureDef.eCapturingPlayer).getCivilizationType());
+			kCaptureDef.eCaptureUnitType = getCaptureUnitType(kCaptureDef.eCapturingPlayer);
 	}
 
 	CvPlot* pkPlot = plot();
@@ -13470,7 +13470,7 @@ UnitTypes CvUnit::GetUpgradeUnitType() const
 		if(pkUnitClassInfo && m_pUnitInfo->GetUpgradeUnitClass(iI))
 		{
 			if(!plot()) return NO_UNIT;
-			eUpgradeUnitType = kPlayer.GetCivUnit(eUnitClass, plot()->GetPlotIndex() + GetID())
+			eUpgradeUnitType = kPlayer.GetCivUnit(eUnitClass, plot()->GetPlotIndex() + GetID());
 
 #if defined(MOD_EVENTS_UNIT_UPGRADES)
 			if (MOD_EVENTS_UNIT_UPGRADES) {
@@ -13794,6 +13794,23 @@ UnitTypes CvUnit::getCaptureUnitType(CivilizationTypes eCivilization) const
 }
 
 
+//	--------------------------------------------------------------------------------
+UnitTypes CvUnit::getCaptureUnitType(PlayerTypes ePlayer)
+{
+	VALIDATE_OBJECT
+#if defined(MOD_EVENTS_UNIT_CAPTURE)
+	if (MOD_EVENTS_UNIT_CAPTURE) {
+		int iValue = 0;
+		if (GAMEEVENTINVOKE_VALUE(iValue, GAMEEVENT_UnitCaptureType, getOwner(), GetID(), getUnitType(), GET_PLAYER(ePlayer).getCivilizationType()) == GAMEEVENTRETURN_VALUE) {
+			// Defend against modder stupidity!
+			if (iValue >= NO_UNIT && (iValue == NO_UNIT || GC.getUnitInfo((UnitTypes) iValue) != NULL)) {
+				return (UnitTypes) iValue;
+			}
+		}
+	}
+#endif
+	return ((m_pUnitInfo->GetUnitCaptureClassType() == NO_UNITCLASS) ? NO_UNIT : GET_PLAYER(ePlayer).GetCivUnit((UnitClassTypes)getUnitInfo().GetUnitCaptureClassType()));
+}
 //	--------------------------------------------------------------------------------
 UnitCombatTypes CvUnit::getUnitCombatType() const
 {
@@ -20139,7 +20156,7 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 										// slewis - removed the capture clause so that helicopter gunships could capture workers. The promotion says that No Capture only effects cities.
 										//if(!isNoCapture() && (!pLoopUnit->isEmbarked() || pLoopUnit->getUnitInfo().IsCaptureWhileEmbarked()) && pLoopUnit->getCaptureUnitType(GET_PLAYER(pLoopUnit->getOwner()).getCivilizationType()) != NO_UNIT)
 										if((!pLoopUnit->isEmbarked() || pLoopUnit->getUnitInfo().IsCaptureWhileEmbarked()) && 
-											pLoopUnit->getCaptureUnitType(GET_PLAYER(pLoopUnit->getOwner()).getCivilizationType()) != NO_UNIT &&
+											pLoopUnit->getCaptureUnitType(pLoopUnit->getOwner()) != NO_UNIT &&
 											!bDoEvade)
 										{
 											bDoCapture = true;

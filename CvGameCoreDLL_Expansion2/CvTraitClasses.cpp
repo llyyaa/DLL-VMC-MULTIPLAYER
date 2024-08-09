@@ -4299,7 +4299,7 @@ bool CvPlayerTraits::IsFreeMayaGreatPersonChoice() const
 		CvUnitClassInfo* pkUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
 		if(pkUnitClassInfo)
 		{
-			const UnitTypes eUnit = (UnitTypes)m_pPlayer->getCivilizationInfo().getCivilizationUnits(eUnitClass);
+			const UnitTypes eUnit = m_pPlayer->GetCivUnit(eUnitClass);
 			if (eUnit != NO_UNIT)
 			{
 				CvUnitEntry* pUnitEntry = GC.getUnitInfo(eUnit);

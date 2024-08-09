@@ -482,6 +482,7 @@ public:
 	SpecialUnitTypes getSpecialUnitType() const;
 	bool IsGreatPerson() const;
 	UnitTypes getCaptureUnitType(CivilizationTypes eCivilization) const;
+	UnitTypes getCaptureUnitType(PlayerTypes ePlayer);
 	UnitCombatTypes getUnitCombatType() const;
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
 	UnitCombatTypes getUnitPromotionType() const;
