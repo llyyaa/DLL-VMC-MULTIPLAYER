@@ -2476,9 +2476,10 @@ int CvPlayerTrade::GetTradeConnectionOtherTraitValueTimes100(const TradeConnecti
 int CvPlayerTrade::GetTradeConnectionTraitValueTimes100(const TradeConnection& kTradeConnection, YieldTypes eYield, bool bAsOriginPlayer)
 {
 	int iValue = 0;
+	if(!bAsOriginPlayer) return iValue;
 	if (kTradeConnection.m_eConnectionType == TRADE_CONNECTION_INTERNATIONAL)
 	{
-		if (bAsOriginPlayer && eYield == YIELD_GOLD)
+		if (eYield == YIELD_GOLD)
 		{
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 			switch (kTradeConnection.m_eDomain)
@@ -2595,6 +2596,8 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 		return 0; // Yields not applicable to trade.
 #endif
 	}
+	const CvPlayerAI &kOriginPlayer = GET_PLAYER(kTradeConnection.m_eOriginOwner);
+	const CvPlayerAI &kDestPlayer = GET_PLAYER(kTradeConnection.m_eDestOwner);
 
 
 	CvGameTrade* pTrade = GC.getGame().GetGameTrade();
@@ -2685,6 +2688,8 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 		}
 
 		iValue += pOriginCity->GetTradeRouteFromTheCityYields(eYield) * 100;
+		if(kTradeConnection.m_eDomain == DOMAIN_SEA) iValue += kOriginPlayer.GetPlayerTraits()->GetSeaTradeRouteYieldPerEraTimes100(eYield) * (kOriginPlayer.GetCurrentEra() + 1);
+		if(kTradeConnection.m_eDomain == DOMAIN_SEA) iValue += kOriginPlayer.GetPlayerTraits()->GetSeaTradeRouteYieldTimes100(eYield);
 	}
 	else
 	{
@@ -2773,7 +2778,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 						iValue += (pOriginCity->getYieldRate(YIELD_FOOD, true) * GD_INT_GET(INTERNAL_TRADE_ROUTE_FOOD_BONUS_BASE_FROM_ORIGIN));
 					}
 #endif
-					iValue += GC.getEraInfo(GET_PLAYER(kTradeConnection.m_eDestOwner).GetCurrentEra())->getTradeRouteFoodBonusTimes100();
+					iValue += GC.getEraInfo(kDestPlayer.GetCurrentEra())->getTradeRouteFoodBonusTimes100();
 					iValue *= GC.getEraInfo(GC.getGame().getStartEra())->getGrowthPercent();
 					iValue /= 100;
 
@@ -2785,7 +2790,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 					int iModifier = 100;
 					int iDomainModifier = GetTradeConnectionDomainValueModifierTimes100(kTradeConnection, eYield);
 					iModifier += iDomainModifier;
-					iModifier += GET_PLAYER(kTradeConnection.m_eDestOwner).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_INTERNAL_TRADE_MODIFIER);
+					iModifier += kDestPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_INTERNAL_TRADE_MODIFIER);
 #if defined(MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY)
 					if (MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY) {
 						iModifier += pOriginCity->getYieldRate(YIELD_FOOD, true) * GD_INT_GET(INTERNAL_TRADE_ROUTE_FOOD_BONUS_MOD_FROM_ORIGIN);
@@ -2797,8 +2802,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 				if (MOD_API_TRADE_ROUTE_YIELD_RATE)
 				{
-					const CvPlayerAI& pOriginalPlayer = GET_PLAYER(kTradeConnection.m_eOriginOwner);
-					const int iRate = pOriginalPlayer.GetInternalTradeRouteDestYieldRate(eYield);
+					const int iRate = kOriginPlayer.GetInternalTradeRouteDestYieldRate(eYield);
 					if (iRate != 0)
 					{
 						iValue += pOriginCity->getYieldRateTimes100(eYield, true) * iRate / 100;
@@ -2824,7 +2828,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 						iValue += (pOriginCity->getYieldRate(YIELD_PRODUCTION, true) * GD_INT_GET(INTERNAL_TRADE_ROUTE_PRODUCTION_BONUS_BASE_FROM_ORIGIN));
 					}
 #endif
-					iValue += GC.getEraInfo(GET_PLAYER(kTradeConnection.m_eDestOwner).GetCurrentEra())->getTradeRouteProductionBonusTimes100();
+					iValue += GC.getEraInfo(kDestPlayer.GetCurrentEra())->getTradeRouteProductionBonusTimes100();
 					iValue *= (GC.getEraInfo(GC.getGame().getStartEra())->getConstructPercent() + GC.getEraInfo(GC.getGame().getStartEra())->getTrainPercent()) / 2;
 					iValue /= 100;
 
@@ -2838,7 +2842,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 					int iModifier = 100;
 					int iDomainModifier = GetTradeConnectionDomainValueModifierTimes100(kTradeConnection, eYield);
 					iModifier += iDomainModifier;
-					iModifier += GET_PLAYER(kTradeConnection.m_eDestOwner).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_INTERNAL_TRADE_MODIFIER);
+					iModifier += kDestPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_INTERNAL_TRADE_MODIFIER);
 #if defined(MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY)
 					if (MOD_GLOBAL_INTERNAL_TRADE_ROUTE_BONUS_FROM_ORIGIN_CITY) {
 						iModifier += pOriginCity->getYieldRate(YIELD_PRODUCTION, true) * GD_INT_GET(INTERNAL_TRADE_ROUTE_PRODUCTION_BONUS_MOD_FROM_ORIGIN);
@@ -2851,8 +2855,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 				if (MOD_API_TRADE_ROUTE_YIELD_RATE)
 				{
-					const CvPlayerAI& pOriginalPlayer = GET_PLAYER(kTradeConnection.m_eOriginOwner);
-					const int iRate = pOriginalPlayer.GetInternalTradeRouteDestYieldRate(eYield);
+					const int iRate = kOriginPlayer.GetInternalTradeRouteDestYieldRate(eYield);
 					if (iRate != 0)
 					{
 						iValue += pOriginCity->getYieldRateTimes100(eYield, true) * iRate / 100;

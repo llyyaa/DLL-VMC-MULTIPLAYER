@@ -1438,6 +1438,15 @@ bool CvTraitEntry::IsCanFoundCoastCity() const
 }
 #endif
 
+int CvTraitEntry::GetSeaTradeRouteYieldPerEraTimes100(const YieldTypes eYield) const
+{
+	return m_piSeaTradeRouteYieldPerEraTimes100[eYield];
+}
+int CvTraitEntry::GetSeaTradeRouteYieldTimes100(const YieldTypes eYield) const
+{
+	return m_piSeaTradeRouteYieldTimes100[eYield];
+}
+
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 int CvTraitEntry::GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYield) const
 {
@@ -2318,6 +2327,52 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	{
 		for (int i = 0; i < NUM_YIELD_TYPES; i++)
 		{
+			m_piSeaTradeRouteYieldPerEraTimes100[i] = 0;
+		}
+
+		std::string strKey("Trait_SeaTradeRouteYieldPerEraTimes100");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select t2.ID, t1.Yield from Trait_SeaTradeRouteYieldPerEraTimes100 t1 inner join Yields t2 on t1.YieldType = t2.Type where t1.TraitType = ?");
+		}
+
+		pResults->Bind(1, szTraitType);
+
+		while (pResults->Step())
+		{
+			const int eYieldType = pResults->GetInt(0);
+			const int iModifier = pResults->GetInt(1);
+			m_piSeaTradeRouteYieldPerEraTimes100[eYieldType] += iModifier;
+		}
+	}
+
+	{
+		for (int i = 0; i < NUM_YIELD_TYPES; i++)
+		{
+			m_piSeaTradeRouteYieldTimes100[i] = 0;
+		}
+
+		std::string strKey("Trait_SeaTradeRouteYieldTimes100");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select t2.ID, t1.Yield from Trait_SeaTradeRouteYieldTimes100 t1 inner join Yields t2 on t1.YieldType = t2.Type where t1.TraitType = ?");
+		}
+
+		pResults->Bind(1, szTraitType);
+
+		while (pResults->Step())
+		{
+			const int eYieldType = pResults->GetInt(0);
+			const int iModifier = pResults->GetInt(1);
+			m_piSeaTradeRouteYieldTimes100[eYieldType] += iModifier;
+		}
+	}
+
+	{
+		for (int i = 0; i < NUM_YIELD_TYPES; i++)
+		{
 			m_piPerMajorReligionFollowerYieldModifier[i] = 0;
 		}
 
@@ -2580,6 +2635,11 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeRouteSeaGoldBonus += trait->GetTradeRouteSeaGoldBonus();
 #endif
 
+			for (int i = 0; i < NUM_YIELD_TYPES; i++)
+			{
+				m_piSeaTradeRouteYieldPerEraTimes100[i] += trait->GetSeaTradeRouteYieldPerEraTimes100(static_cast<YieldTypes>(i));
+				m_piSeaTradeRouteYieldTimes100[i] += trait->GetSeaTradeRouteYieldTimes100(static_cast<YieldTypes>(i));
+			}
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 			if (MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS)
 			{
@@ -3172,6 +3232,12 @@ void CvPlayerTraits::Reset()
 	m_ppiCityYieldModifierFromAdjacentFeature.resize(GC.getNumFeatureInfos());
 	m_ppiCityYieldPerAdjacentFeature.clear();
 	m_ppiCityYieldPerAdjacentFeature.resize(GC.getNumFeatureInfos());
+
+	for (int i = 0; i < NUM_YIELD_TYPES; i++)
+	{
+		m_piSeaTradeRouteYieldPerEraTimes100[i] = 0;
+		m_piSeaTradeRouteYieldTimes100[i] = 0;
+	}
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	for (int i = 0; i < NUM_YIELD_TYPES; i++)
@@ -4844,6 +4910,8 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_aUniqueLuxuryAreas.clear();
 	}
 
+	kStream >> m_piSeaTradeRouteYieldPerEraTimes100;
+	kStream >> m_piSeaTradeRouteYieldTimes100;
 	kStream >> m_piPerMajorReligionFollowerYieldModifier;
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING
@@ -5127,6 +5195,8 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 		kStream << m_aUniqueLuxuryAreas[iI];
 	}
 
+	kStream << m_piSeaTradeRouteYieldPerEraTimes100;
+	kStream << m_piSeaTradeRouteYieldTimes100;
 	kStream << m_piPerMajorReligionFollowerYieldModifier;
 
 #ifdef MOD_TRAITS_SPREAD_RELIGION_AFTER_KILLING

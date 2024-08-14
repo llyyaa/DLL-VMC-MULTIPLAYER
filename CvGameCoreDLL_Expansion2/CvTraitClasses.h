@@ -278,6 +278,8 @@ public:
 
 	bool NoTrain(UnitClassTypes eUnitClassType);
 
+	int GetSeaTradeRouteYieldPerEraTimes100(const YieldTypes eYield) const;
+	int GetSeaTradeRouteYieldTimes100(const YieldTypes eYield) const;
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYield) const;
 #endif
@@ -535,6 +537,9 @@ protected:
 #endif
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
 	std::vector<bool> m_abNoTrainUnitClass;
+
+	int m_piSeaTradeRouteYieldPerEraTimes100[NUM_YIELD_TYPES];
+	int m_piSeaTradeRouteYieldTimes100[NUM_YIELD_TYPES];
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
@@ -1273,6 +1278,15 @@ public:
 
 	bool NoTrain(UnitClassTypes eUnitClassType);
 
+	int GetSeaTradeRouteYieldPerEraTimes100(const YieldTypes eYieldType) const
+	{
+		return m_piSeaTradeRouteYieldPerEraTimes100[eYieldType];
+	}
+	int GetSeaTradeRouteYieldTimes100(const YieldTypes eYieldType) const
+	{
+		return m_piSeaTradeRouteYieldTimes100[eYieldType];
+	}
+
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType) const
 	{
@@ -1566,6 +1580,9 @@ private:
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiCityYieldPerAdjacentFeature;
 
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
+
+	int m_piSeaTradeRouteYieldPerEraTimes100[NUM_YIELD_TYPES];
+	int m_piSeaTradeRouteYieldTimes100[NUM_YIELD_TYPES];
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
