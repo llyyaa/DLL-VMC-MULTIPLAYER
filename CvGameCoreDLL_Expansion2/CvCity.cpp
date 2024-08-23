@@ -3550,17 +3550,9 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 	{
 		BuildingClassTypes eLockedBuildingClass = (BuildingClassTypes) pkBuildingInfo->GetLockedBuildingClasses(iI);
 
-		if(eLockedBuildingClass != NO_BUILDINGCLASS)
+		if(eLockedBuildingClass != NO_BUILDINGCLASS && GetNumBuildingClass(eLockedBuildingClass) > 0)
 		{
-			BuildingTypes eLockedBuilding = (BuildingTypes)(thisCivInfo.getCivilizationBuildings(eLockedBuildingClass));
-
-			if(eLockedBuilding != NO_BUILDING)
-			{
-				if(m_pCityBuildings->GetNumBuilding(eLockedBuilding) > 0)
-				{
-					return false;
-				}
-			}
+			return false;
 		}
 	}
 
@@ -11529,6 +11521,7 @@ bool CvCity::CanAirlift() const
 	for(iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
 	{
 		eBuildingClass = (BuildingClassTypes) iBuildingClassLoop;
+		if(GetNumBuildingClass(eBuildingClass) <= 0) continue;
 
 		CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
 		if(!pkBuildingClassInfo)
@@ -11536,7 +11529,7 @@ bool CvCity::CanAirlift() const
 			continue;
 		}
 
-		BuildingTypes eBuilding = (BuildingTypes)kPlayer.getCivilizationInfo().getCivilizationBuildings(eBuildingClass);
+		BuildingTypes eBuilding = kPlayer.GetCivBuilding(eBuildingClass);
 		if(eBuilding != NO_BUILDING && GetCityBuildings()->GetNumBuilding(eBuilding) > 0) // slewis - added the NO_BUILDING check for the ConquestDLX scenario which has civ specific wonders
 		{
 			CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
@@ -19237,56 +19230,33 @@ bool CvCity::doCheckProduction()
 	{
 		AI_PERF_FORMAT_NESTED("City-AI-perf.csv", ("CvCity::doCheckProduction_UpgradeBuilding, Turn %03d, %s, %s", GC.getGame().getElapsedGameTurns(), GetPlayer()->getCivilizationShortDescription(), getName().c_str()) );
 		// Can now construct an Upgraded version of this Building
-		for(iI = 0; iI < iNumBuildingInfos; iI++)
+		for (OrderData* pOrderNode = headOrderQueueNode(); pOrderNode != NULL; pOrderNode = nextOrderQueueNode(pOrderNode))
 		{
-			const BuildingTypes eBuilding = static_cast<BuildingTypes>(iI);
+			if(pOrderNode->eOrderType != ORDER_CONSTRUCT) continue;
+
+			const BuildingTypes eBuilding = (BuildingTypes)pOrderNode->iData1;
 			CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
-			if(pkBuildingInfo)
+			if(!pkBuildingInfo) continue;
+
+			BuildingClassTypes eBuildingClass = (BuildingClassTypes) pkBuildingInfo->GetReplacementBuildingClass();
+			if(eBuildingClass == NO_BUILDINGCLASS) continue;
+			BuildingTypes eUpgradeBuilding = thisPlayer.GetCivBuilding(eBuildingClass);
+
+			if(!canConstruct(eUpgradeBuilding)) continue;
+			CvAssertMsg(eUpgradeBuilding != eBuilding, "Trying to upgrade a Building to itself");
+			iUpgradeProduction = m_pCityBuildings->GetBuildingProduction(eBuilding);
+			m_pCityBuildings->SetBuildingProduction((eBuilding), 0);
+			m_pCityBuildings->SetBuildingProduction(eUpgradeBuilding, iUpgradeProduction);
+
+			CvBuildingEntry* pkUpgradeBuildingInfo = GC.getBuildingInfo(eUpgradeBuilding);
+			if(NULL != pkUpgradeBuildingInfo)
 			{
-				if(getFirstBuildingOrder(eBuilding) != -1)
-				{
-					BuildingClassTypes eBuildingClass = (BuildingClassTypes) pkBuildingInfo->GetReplacementBuildingClass();
+				const BuildingClassTypes eOrderBuildingClass = (BuildingClassTypes)pkBuildingInfo->GetBuildingClassType();
+				const BuildingClassTypes eUpgradeBuildingClass = (BuildingClassTypes)pkUpgradeBuildingInfo->GetBuildingClassType();
 
-					if(eBuildingClass != NO_BUILDINGCLASS)
-					{
-						BuildingTypes eUpgradeBuilding = ((BuildingTypes)(thisPlayer.getCivilizationInfo().getCivilizationBuildings(eBuildingClass)));
-
-						if(canConstruct(eUpgradeBuilding))
-						{
-							CvAssertMsg(eUpgradeBuilding != iI, "Trying to upgrade a Building to itself");
-							iUpgradeProduction = m_pCityBuildings->GetBuildingProduction(eBuilding);
-							m_pCityBuildings->SetBuildingProduction((eBuilding), 0);
-							m_pCityBuildings->SetBuildingProduction(eUpgradeBuilding, iUpgradeProduction);
-
-							pOrderNode = headOrderQueueNode();
-
-							while(pOrderNode != NULL)
-							{
-								if(pOrderNode->eOrderType == ORDER_CONSTRUCT)
-								{
-									if(pOrderNode->iData1 == iI)
-									{
-										CvBuildingEntry* pkOrderBuildingInfo = GC.getBuildingInfo((BuildingTypes)pOrderNode->iData1);
-										CvBuildingEntry* pkUpgradeBuildingInfo = GC.getBuildingInfo(eUpgradeBuilding);
-
-										if(NULL != pkOrderBuildingInfo && NULL != pkUpgradeBuildingInfo)
-										{
-											const BuildingClassTypes eOrderBuildingClass = (BuildingClassTypes)pkOrderBuildingInfo->GetBuildingClassType();
-											const BuildingClassTypes eUpgradeBuildingClass = (BuildingClassTypes)pkUpgradeBuildingInfo->GetBuildingClassType();
-
-											thisPlayer.changeBuildingClassMaking(eOrderBuildingClass, -1);
-											pOrderNode->iData1 = eUpgradeBuilding;
-											thisPlayer.changeBuildingClassMaking(eUpgradeBuildingClass, 1);
-
-										}
-									}
-								}
-
-								pOrderNode = nextOrderQueueNode(pOrderNode);
-							}
-						}
-					}
-				}
+				thisPlayer.changeBuildingClassMaking(eOrderBuildingClass, -1);
+				pOrderNode->iData1 = eUpgradeBuilding;
+				thisPlayer.changeBuildingClassMaking(eUpgradeBuildingClass, 1);
 			}
 		}
 	}

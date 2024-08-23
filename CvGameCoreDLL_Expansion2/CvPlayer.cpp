@@ -8862,7 +8862,7 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 
 				for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 				{
-					if (pLoopCity->GetNumBuildingClass((BuildingClassTypes)iI) <= 0)
+					if (pLoopCity && !pLoopCity->IsPuppet() && pLoopCity->GetNumBuildingClass((BuildingClassTypes)iI) <= 0)
 					{
 						(*toolTipSink) += pLoopCity->getName();
 						(*toolTipSink) += " ";
