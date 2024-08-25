@@ -20062,16 +20062,16 @@ bool CvPlayer::isMajorCiv() const
 
 BuildingTypes CvPlayer::GetCivBuilding(BuildingClassTypes eBuildingClass) const
 {
-	if (eBuildingClass == NO_BUILDINGCLASS || eBuildingClass >= GC.getNumBuildingClassInfos())
-		return NO_BUILDING;
+	CvBuildingClassInfo* pBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
+	if(!pBuildingClassInfo) return NO_BUILDING;
 
 	BuildingTypes eCivBuilding = NO_BUILDING;
-	BuildingTypes eDefaultBuilding = (BuildingTypes)GC.getBuildingClassInfo(eBuildingClass)->getDefaultBuildingIndex();
-	if(IsLostUC() || !isMajorCiv()) eCivBuilding = eDefaultBuilding;
+	if(IsLostUC()) eCivBuilding = (BuildingTypes)pBuildingClassInfo->getDefaultBuildingIndex();
 	else eCivBuilding = (BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(eBuildingClass));
 
 	if(!MOD_GLOBAL_OPTIONAL_UC) return eCivBuilding;
-	
+
+	BuildingTypes eDefaultBuilding = (BuildingTypes)pBuildingClassInfo->getDefaultBuildingIndex();;
 	// if this player has a Unique Building, choose it, or try to find a Unique Building
 	if(eCivBuilding == eDefaultBuilding)
 	{
@@ -20091,11 +20091,11 @@ BuildingTypes CvPlayer::GetCivBuilding(BuildingClassTypes eBuildingClass) const
 
 UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass, int iFakeSeed) const
 {
-	if (eUnitClass == NO_UNITCLASS || eUnitClass >= GC.getNumUnitClassInfos())
-		return NO_UNIT;
+	CvUnitClassInfo* pUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
+	if(!pUnitClassInfo) return NO_UNIT;
 
 	UnitTypes eCivUnit = NO_UNIT;
-	if(IsLostUC() || !isMajorCiv()) eCivUnit = (UnitTypes)GC.getUnitClassInfo(eUnitClass)->getDefaultUnitIndex();
+	if(IsLostUC()) eCivUnit = (UnitTypes)pUnitClassInfo->getDefaultUnitIndex();
 	else eCivUnit = (UnitTypes)getCivilizationInfo().getCivilizationUnits(eUnitClass);
 
 	if(!MOD_GLOBAL_OPTIONAL_UC) return eCivUnit;
