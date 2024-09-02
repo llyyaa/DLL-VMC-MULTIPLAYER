@@ -79,7 +79,9 @@ void CvLuaGame::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaGame::lSetHolyCity);
 	REGIST_STATIC_FUNCTION(CvLuaGame::lSetFounder);
 	
-	
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	REGIST_STATIC_FUNCTION(CvLuaGame::lChangeNuclearWinterProcess);
+#endif
 
 }
 //------------------------------------------------------------------------------
@@ -510,6 +512,10 @@ void CvLuaGame::RegisterMembers(lua_State* L)
 	
 #endif
 	Method(GetAuthenticatedSeed);
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	Method(GetNuclearWinterProcess);
+	Method(ChangeNuclearWinterProcess);
+#endif
 }
 //------------------------------------------------------------------------------
 
@@ -3503,5 +3509,17 @@ int CvLuaGame::lAnyoneHasUnitClass(lua_State* L)
 	const UnitClassTypes iUnitClassType = static_cast<UnitClassTypes>(luaL_checkint(L, 1));
 	lua_pushboolean(L, GC.getGame().AnyoneHasUnitClass(iUnitClassType));
 	return 1;
+}
+#endif
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+LUAAPIIMPL(Game, GetNuclearWinterProcess)
+int CvLuaGame::lChangeNuclearWinterProcess(lua_State* L)
+{
+	const int iChange = luaL_optint(L, 1, 0);
+	const bool bUpdate = luaL_optbool(L, 2, false);
+	const bool bAllowLevelReduce = luaL_optbool(L, 3, false);
+	GC.getGame().ChangeNuclearWinterProcess(iChange, bUpdate, bAllowLevelReduce);
+	return 0;
 }
 #endif

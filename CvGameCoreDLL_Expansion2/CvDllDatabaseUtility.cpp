@@ -417,6 +417,11 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	GC.initCityCorruptionLevelsByCityType();
 #endif
 
+#ifdef MOD_NUCLEAR_WINTER_FOR_SP
+	PrefetchCollection(GC.getNuclearWinterLevelInfo(), "NuclearWinterLevels");
+	GC.initGlobalNuclearWinterLevels();
+#endif
+
 #ifdef MOD_PROMOTION_COLLECTIONS
 	PrefetchCollection(GC.GetPromotionCollections(), "PromotionCollections");
 	GC.InitPromotion2CollectionMapping();

@@ -3070,7 +3070,7 @@ void CvUnitCombat::GenerateNuclearCombatInfo(CvUnit& kAttacker, CvPlot& plot, Cv
 
 			return;
 		}
-		}
+	}
 
 	int iNukeDamageLevel = bPartialInterception ? 1 : kAttacker.GetNukeDamageLevel();
 
@@ -3087,7 +3087,10 @@ void CvUnitCombat::GenerateNuclearCombatInfo(CvUnit& kAttacker, CvPlot& plot, Cv
 	pkCombatInfo->setDamageMemberCount(iDamageMembers);
 
 	GC.GetEngineUserInterface()->setDirty(UnitInfo_DIRTY_BIT, true);
-	}
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	GC.getGame().ChangeNuclearWinterProcess(kAttacker.getUnitInfo().GetNuclearWinterProcess(), true, false);
+#endif
+}
 
 //	-------------------------------------------------------------------------------------
 uint CvUnitCombat::ApplyNuclearExplosionDamage(CvPlot* pkTargetPlot, int iDamageLevel, CvUnit* /* pkAttacker = NULL*/)

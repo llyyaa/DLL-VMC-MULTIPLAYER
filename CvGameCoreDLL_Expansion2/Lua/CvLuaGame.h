@@ -449,6 +449,10 @@ protected:
 	LUAAPIEXTN(AnyoneHasUnit, bool, iUnitType);
 	LUAAPIEXTN(AnyoneHasUnitClass, bool, iUnitClassType);
 #endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	LUAAPIEXTN(GetNuclearWinterProcess, int);
+	LUAAPIEXTN(ChangeNuclearWinterProcess, void, iChange, bUpdate, bAllowLevelReduce);
+#endif
 };
 
 #endif //CVLUAGAME_H

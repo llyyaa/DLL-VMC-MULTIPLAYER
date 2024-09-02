@@ -86,6 +86,9 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_bNoTroops(false),
 	m_bCannotBeEstablishedCorps(false),
 #endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_iNuclearWinterProcess(0),
+#endif
 	m_iSpecialCargo(0),
 	m_iDomainCargo(0),
 	m_iConscriptionValue(0),
@@ -351,6 +354,9 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bNoTroops = kResults.GetBool("NoTroopConsume");
 	m_bCannotBeEstablishedCorps = kResults.GetBool("CannotBeEstablishedCorps");
+#endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_iNuclearWinterProcess = kResults.GetInt("NuclearWinterProcess");
 #endif
 
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
@@ -901,6 +907,13 @@ bool CvUnitEntry::IsNoTroops() const
 bool CvUnitEntry::IsCannotBeEstablishedCorps() const
 {
 	return m_bCannotBeEstablishedCorps;
+}
+#endif
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+int CvUnitEntry::GetNuclearWinterProcess() const
+{
+	return m_iNuclearWinterProcess;
 }
 #endif
 

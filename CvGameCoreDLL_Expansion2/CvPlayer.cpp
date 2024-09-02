@@ -22823,8 +22823,8 @@ void CvPlayer::DoTestOverResourceNotification(ResourceTypes eIndex, bool bIsDoTu
 			CvNotifications* pNotifications = GetNotifications();
 			if(pNotifications && strText.length() > 0)
 			{
-				strText = GetLocalizedText("TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1",pkResourceInfo->GetTextKey()) + strText;
-				Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OVER_RESOURCE_LIMIT");
+				strText = GetLocalizedText("TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1", pkResourceInfo->GetTextKey()) + strText;
+				Localization::String strSummary;
 				strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OVER_RESOURCE_LIMIT");
 				strSummary << pkResourceInfo->GetTextKey();
 				pNotifications->Add(NOTIFICATION_DEMAND_RESOURCE, strText, strSummary.toUTF8(), -1, -1, eIndex);

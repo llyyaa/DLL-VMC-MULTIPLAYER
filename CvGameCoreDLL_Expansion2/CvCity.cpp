@@ -10237,6 +10237,10 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 		iCulturePerTurn += GetYieldFromCrime(YIELD_CULTURE);
 	}
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	iCulturePerTurn += GC.getGame().GetYieldFromNuclearWinter(YIELD_CULTURE);
+#endif
+
 	return iCulturePerTurn;
 }
 
@@ -10380,6 +10384,10 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 		iFaith += GetYieldFromHealth(YIELD_FAITH);
 		iFaith += GetYieldFromCrime(YIELD_FAITH);
 	}
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	iFaith += GC.getGame().GetYieldFromNuclearWinter(YIELD_FAITH);
+#endif
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES) || defined(MOD_API_UNIFIED_YIELDS)
 	iFaith += GetBaseYieldRateFromGreatWorks(YIELD_FAITH);
@@ -13101,6 +13109,17 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		}
 	}
 
+	// Yield Modifier from Nuclear Winter
+	iTempMod = GC.getGame().GetNuclearWinterYieldMultiplier(eIndex);
+	if(iTempMod != 0)
+	{	
+		iModifier *= (iTempMod + 100);
+		iModifier /= 100;
+		if(iTempMod != 0 && toolTipSink){
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_NUCLERA_WINTER_YIELD", iTempMod);
+		}
+	}
+
 	// note: player->invalidateYieldRankCache() must be called for anything that is checked here
 	// so if any extra checked things are added here, the cache needs to be invalidated
 
@@ -13406,6 +13425,10 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 	{
 		iValue += GetYieldFromCrime(eIndex);
 	}
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	iValue += GC.getGame().GetYieldFromNuclearWinter(eIndex);
+#endif
 
 	if (MOD_DISEASE_BREAK)
 	{
@@ -13778,6 +13801,14 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		{
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CRIME", iBaseValue, YieldIcon);
 		}
+	}
+#endif
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	iBaseValue = GC.getGame().GetYieldFromNuclearWinter(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_NUCLEAR_WINTER", iBaseValue, YieldIcon);
 	}
 #endif
 

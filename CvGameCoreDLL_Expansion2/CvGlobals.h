@@ -159,6 +159,10 @@ class ICvUnit1;
 #include "CvCorruption.h"
 #endif
 
+#ifdef MOD_NUCLEAR_WINTER_FOR_SP
+#include "CvNuclearWinter.h"
+#endif
+
 #ifdef MOD_PROMOTION_COLLECTIONS
 #include "CvPromotionCollectionClasses.h"
 #endif
@@ -438,6 +442,14 @@ public:
 
 	CvCorruptionLevel* getPuppetCityCorruptionLevel() const;
 	CvCorruptionLevel* getCapitalCityCorruptionLevel() const;
+#endif
+
+#ifdef MOD_NUCLEAR_WINTER_FOR_SP
+	int getNumNuclearWinterLevel();
+	std::vector<CvNuclearWinterLevel*>& getNuclearWinterLevelInfo();
+	CvNuclearWinterLevel* getNuclearWinterLevelInfo(NuclearWinterLevelTypes eLevel);
+	void initGlobalNuclearWinterLevels();
+	std::vector<CvNuclearWinterLevel*>& CvGlobals::getOrderedNuclearWinterLevels();
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS
@@ -8013,6 +8025,11 @@ protected:
 	std::vector<CvCorruptionLevel*> m_vOrderedNormalCityCorruptionLevels; // order by score lower bound.
 	CvCorruptionLevel* m_pPuppetCityCorruptionLevel = nullptr;
 	CvCorruptionLevel* m_pCapitalCityCorruptionLevel = nullptr;
+#endif
+
+#ifdef MOD_NUCLEAR_WINTER_FOR_SP
+	CvNuclearWinterLevelXMLEntries* m_pNuclearWinterInfo;
+	std::vector<CvNuclearWinterLevel*> m_vOrderedNuclearWinterLevels; // order by Trigger Threshold lower bound.
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS

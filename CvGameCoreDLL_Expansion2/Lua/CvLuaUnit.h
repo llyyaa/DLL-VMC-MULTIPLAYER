@@ -770,6 +770,9 @@ protected:
 	LUAAPIEXTN(IsCanBeEstablishedCorps, bool);
 	LUAAPIEXTN(ChangeNumCannotBeEstablishedCorps, void, iValue);
 #endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	LUAAPIEXTN(GetNuclearWinterProcess, int);
+#endif
 #ifdef MOD_GLOBAL_CORRUPTION
 	static int lGetPlotCorruptionScoreReport(lua_State* L);
 #endif

@@ -557,6 +557,9 @@
     <ClCompile Include="CvCorruption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CvNuclearWinter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="CvPromotionCollectionClasses.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1367,6 +1370,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CvCorruption.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CvNuclearWinter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CvPromotionCollectionClasses.h">

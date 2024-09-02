@@ -102,6 +102,9 @@ public:
 	bool IsNoTroops() const;
 	bool IsCannotBeEstablishedCorps() const;
 #endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	int GetNuclearWinterProcess() const;
+#endif
 
 	int GetSpecialCargo() const;
 	int GetDomainCargo() const;
@@ -295,6 +298,9 @@ private:
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool m_bNoTroops;
 	bool m_bCannotBeEstablishedCorps;
+#endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	int m_iNuclearWinterProcess;
 #endif
 
 	int m_iSpecialCargo;
