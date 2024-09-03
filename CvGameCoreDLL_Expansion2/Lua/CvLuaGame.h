@@ -452,6 +452,8 @@ protected:
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
 	LUAAPIEXTN(GetNuclearWinterProcess, int);
 	LUAAPIEXTN(ChangeNuclearWinterProcess, void, iChange, bUpdate, bAllowLevelReduce);
+	LUAAPIEXTN(GetNuclearWinterNaturalReduction, int);
+	LUAAPIEXTN(ChangeNuclearWinterNaturalReduction, void, iChange);
 #endif
 };
 

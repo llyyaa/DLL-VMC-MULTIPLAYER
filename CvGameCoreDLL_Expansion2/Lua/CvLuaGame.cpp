@@ -515,6 +515,8 @@ void CvLuaGame::RegisterMembers(lua_State* L)
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
 	Method(GetNuclearWinterProcess);
 	Method(ChangeNuclearWinterProcess);
+	Method(GetNuclearWinterNaturalReduction);
+	Method(ChangeNuclearWinterNaturalReduction);
 #endif
 }
 //------------------------------------------------------------------------------
@@ -3522,4 +3524,6 @@ int CvLuaGame::lChangeNuclearWinterProcess(lua_State* L)
 	GC.getGame().ChangeNuclearWinterProcess(iChange, bUpdate, bAllowLevelReduce);
 	return 0;
 }
+LUAAPIIMPL(Game, GetNuclearWinterNaturalReduction)
+LUAAPIIMPL(Game, ChangeNuclearWinterNaturalReduction)
 #endif
