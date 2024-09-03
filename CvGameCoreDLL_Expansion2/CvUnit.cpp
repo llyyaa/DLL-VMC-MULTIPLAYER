@@ -1017,6 +1017,19 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	{
 		kPlayer.ChangeNumGreatPersonSincePolicy(1);
 	}
+	//influence from GreatPeople's birth
+	if(IsGreatPerson() && kPlayer.GetPlayerTraits()->GetInfluenceFromGreatPeopleBirth() != 0)
+	{
+		int iInfluenceFromGreatPeopleBirth = kPlayer.GetPlayerTraits()->GetInfluenceFromGreatPeopleBirth();
+		for (int iMinorLoop = MAX_MAJOR_CIVS; iMinorLoop < MAX_CIV_PLAYERS; iMinorLoop++)
+		{
+			TeamTypes eTeam = GET_PLAYER((PlayerTypes)iMinorLoop).getTeam();
+			if (getTeam() != eTeam && GET_TEAM(eTeam).isHasMet(getTeam()))
+			{
+				GET_PLAYER((PlayerTypes)iMinorLoop).GetMinorCivAI()->ChangeFriendshipWithMajor(getOwner(), iInfluenceFromGreatPeopleBirth);
+			}
+		}
+	}
 
 	// Recon unit? If so, he sees what's around him
 	if(IsRecon())

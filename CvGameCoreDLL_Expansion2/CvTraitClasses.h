@@ -109,6 +109,7 @@ public:
 	int GetCombatBonusVsHigherTech() const;
 	int GetAwayFromCapitalCombatModifier() const;
 	int GetAwayFromCapitalCombatModifierMax() const;
+	int GetInfluenceFromGreatPeopleBirth() const;
 	int GetCombatBonusVsLargerCiv() const;
 	int GetLandUnitMaintenanceModifier() const;
 	int GetNavalUnitMaintenanceModifier() const;
@@ -387,6 +388,7 @@ protected:
 	int m_iCombatBonusVsHigherTech;
 	int m_iAwayFromCapitalCombatModifier;
 	int m_iAwayFromCapitalCombatModifierMax;
+	int m_iInfluenceFromGreatPeopleBirth;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
 	int m_iNavalUnitMaintenanceModifier;
@@ -843,6 +845,10 @@ public:
 	int GetAwayFromCapitalCombatModifierMax() const
 	{
 		return m_iAwayFromCapitalCombatModifierMax;
+	};
+	int GetInfluenceFromGreatPeopleBirth() const
+	{
+		return m_iInfluenceFromGreatPeopleBirth;
 	};
 	int GetCombatBonusVsLargerCiv() const
 	{
@@ -1421,6 +1427,7 @@ private:
 	int m_iCombatBonusVsHigherTech;
 	int m_iAwayFromCapitalCombatModifier;
 	int m_iAwayFromCapitalCombatModifierMax;
+	int m_iInfluenceFromGreatPeopleBirth;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
 	int m_iNavalUnitMaintenanceModifier;
