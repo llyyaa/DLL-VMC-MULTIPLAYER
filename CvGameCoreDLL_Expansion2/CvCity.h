@@ -1303,6 +1303,10 @@ public:
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	bool IsCanDoImmigration() const;
 	void SetCanDoImmigration(bool iValue);
+	bool CanImmigrantIn() const;
+	bool CanImmigrantOut() const;
+	bool CanAllScaleImmigrantIn() const;
+	void ChangeNumAllScaleImmigrantIn(int iChange);
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes GetScale() const { return m_eCityScale; }
@@ -1310,6 +1314,8 @@ public:
 	void SetScale(CityScaleTypes eScale);
 	void UpdateScaleBuildings();
 	bool CanGrowNormally() const;
+	bool CanScaleImmigrantIn() const;
+	bool CanScaleImmigrantOut() const;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
@@ -1650,7 +1656,8 @@ protected:
 	int** m_aaiBuildingSpecialistUpgradeProgresses;
 
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	bool m_iCanDoImmigration = true;
+	bool m_bCanDoImmigration = true;
+	int m_iNumAllScaleImmigrantIn = 0;
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eCityScale = NO_CITY_SCALE;

@@ -562,6 +562,10 @@ public:
 	int GetSiegeKillCitizensModifier() const;
 #endif
 
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	bool CanAllScaleImmigrantIn() const;
+#endif
+
 #ifdef MOD_GLOBAL_CORRUPTION
 	int GetCorruptionScoreChange() const;
 	int GetCorruptionLevelChange() const;
@@ -969,6 +973,10 @@ private:
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eEnableCityScaleGrowth = NO_CITY_SCALE;
 	bool m_bEnableAllCityScaleGrowth = false;
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	bool m_bCanAllScaleImmigrantIn = false;
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION

@@ -715,6 +715,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iSiegeKillCitizensModifier = kResults.GetInt("SiegeKillCitizensModifier");
 #endif
 
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	m_bCanAllScaleImmigrantIn = kResults.GetBool("EnableAlwaysImmigrantIn");
+#endif
+
 #ifdef MOD_GLOBAL_CORRUPTION
 	m_iCorruptionScoreChange = kResults.GetInt("CorruptionScoreChange");
 	m_iCorruptionLevelChange = kResults.GetInt("CorruptionLevelChange");
@@ -2434,6 +2438,13 @@ int CvBuildingEntry::GetLandTileTurnDamageGlobal() const
 int CvBuildingEntry::GetSiegeKillCitizensModifier() const
 {
 	return m_iSiegeKillCitizensModifier;
+}
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+bool CvBuildingEntry::CanAllScaleImmigrantIn() const
+{
+	return m_bCanAllScaleImmigrantIn;
 }
 #endif
 

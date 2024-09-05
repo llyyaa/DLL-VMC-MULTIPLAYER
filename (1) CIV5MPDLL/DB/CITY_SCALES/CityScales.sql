@@ -3,7 +3,9 @@ create table CityScales (
     Type text unique,
     MinPopulation integer not null,
 
-    NeedGrowthBuilding boolean not null default 0
+    NeedGrowthBuilding boolean not null default 0,
+    CanImmigrantIn boolean not null default 1,
+    CanImmigrantOut boolean not null default 1
 );
 
 create table CityScale_FreeBuildingClass (

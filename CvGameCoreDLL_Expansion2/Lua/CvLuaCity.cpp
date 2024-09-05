@@ -767,6 +767,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	Method(IsCanDoImmigration);
 	Method(SetCanDoImmigration);
+	Method(CanImmigrantIn);
+	Method(CanImmigrantOut);
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	Method(GetScale);
@@ -5209,6 +5211,8 @@ int CvLuaCity::lIsSecondaryReligionActive(lua_State* L)
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 LUAAPIIMPL(City, IsCanDoImmigration)
 LUAAPIIMPL(City, SetCanDoImmigration)
+LUAAPIIMPL(City, CanImmigrantIn)
+LUAAPIIMPL(City, CanImmigrantOut)
 #endif
 
 #ifdef MOD_GLOBAL_CITY_SCALES

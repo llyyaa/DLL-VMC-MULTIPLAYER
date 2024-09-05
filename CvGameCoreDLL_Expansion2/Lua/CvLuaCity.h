@@ -696,6 +696,8 @@ protected:
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	LUAAPIEXTN(IsCanDoImmigration, bool);
 	LUAAPIEXTN(SetCanDoImmigration, void);
+	LUAAPIEXTN(CanImmigrantIn, bool);
+	LUAAPIEXTN(CanImmigrantOut, bool);
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	LUAAPIEXTN(GetScale, int);

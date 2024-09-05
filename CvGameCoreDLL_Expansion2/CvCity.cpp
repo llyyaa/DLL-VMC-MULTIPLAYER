@@ -1583,7 +1583,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #endif
 
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	m_iCanDoImmigration = true;
+	m_bCanDoImmigration = true;
+	m_iNumAllScaleImmigrantIn = 0;
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	m_eCityScale = NO_CITY_SCALE;
@@ -7778,6 +7779,10 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 		ChangeSiegeKillCitizensModifier(pBuildingInfo->GetSiegeKillCitizensModifier() * iChange);
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+		ChangeNumAllScaleImmigrantIn(pBuildingInfo->CanAllScaleImmigrantIn() ? iChange : 0);
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION
@@ -20042,7 +20047,8 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> *m_pCityEspionage;
 
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	kStream >> m_iCanDoImmigration;
+	kStream >> m_bCanDoImmigration;
+	kStream >> m_iNumAllScaleImmigrantIn;
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	int iCityScale;
@@ -20429,7 +20435,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << *m_pCityEspionage;
 
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	kStream << m_iCanDoImmigration;
+	kStream << m_bCanDoImmigration;
+	kStream << m_iNumAllScaleImmigrantIn;
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	kStream << (int) m_eCityScale;
@@ -23026,11 +23033,29 @@ bool CvCity::HasYieldFromOtherYield() const
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 bool CvCity::IsCanDoImmigration() const
 {
-	return m_iCanDoImmigration;
+	return m_bCanDoImmigration;
 }
-void CvCity::SetCanDoImmigration(bool iValue)
+void CvCity::SetCanDoImmigration(bool bValue)
 {
-	m_iCanDoImmigration = iValue;
+	m_bCanDoImmigration = bValue;
+}
+bool CvCity::CanImmigrantIn() const
+{
+	return !IsPuppet() && !IsRazing() && !IsResistance() && !GetCityCitizens()->IsForcedAvoidGrowth()
+		&& IsCanDoImmigration() && CanGrowNormally() && (CanScaleImmigrantIn() || CanAllScaleImmigrantIn())
+		&& GetCityCitizens()->GetSpecialistCount((SpecialistTypes)GC.getInfoTypeForString("SPECIALIST_CITIZEN")) <= 0;
+}
+bool CvCity::CanImmigrantOut() const
+{
+	return IsCanDoImmigration() && CanScaleImmigrantOut();
+}
+bool CvCity::CanAllScaleImmigrantIn() const
+{
+	return m_iNumAllScaleImmigrantIn > 0;
+}
+void CvCity::ChangeNumAllScaleImmigrantIn(int iChange)
+{
+	m_iNumAllScaleImmigrantIn += iChange;
 }
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
@@ -23138,6 +23163,18 @@ bool CvCity::CanGrowNormally() const
 	return false;
 }
 
+bool CvCity::CanScaleImmigrantIn() const
+{
+	auto* info = GetScaleInfo();
+	if (info == nullptr) return true;
+	return info->CanImmigrantIn();
+}
+bool CvCity::CanScaleImmigrantOut() const
+{
+	auto* info = GetScaleInfo();
+	if (info == nullptr) return true;
+	return info->CanImmigrantOut();
+}
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER

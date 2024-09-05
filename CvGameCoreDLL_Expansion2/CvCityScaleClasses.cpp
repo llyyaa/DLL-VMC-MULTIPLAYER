@@ -113,6 +113,8 @@ bool CvCityScaleEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		}
 	}
 	m_bNeedGrowthBuilding = kResults.GetBool("NeedGrowthBuilding");
+	m_bCanImmigrantIn = kResults.GetBool("CanImmigrantIn");
+	m_bCanImmigrantOut = kResults.GetBool("CanImmigrantOut");
 
 #ifdef DEBUG_CvCityScaleEntry
 	CUSTOMLOG("CvCityScaleEntry::CacheResults end!");
