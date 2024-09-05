@@ -1582,6 +1582,9 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	}
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_iNumNoNuclearWinterLocal = 0;
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	m_bCanDoImmigration = true;
 	m_iNumAllScaleImmigrantIn = 0;
@@ -7781,6 +7784,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		ChangeSiegeKillCitizensModifier(pBuildingInfo->GetSiegeKillCitizensModifier() * iChange);
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+		ChangeNumNoNuclearWinterLocal(pBuildingInfo->IsNoNuclearWinterLocal() ? iChange : 0);
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 		ChangeNumAllScaleImmigrantIn(pBuildingInfo->CanAllScaleImmigrantIn() ? iChange : 0);
 #endif
@@ -10243,7 +10249,7 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 	}
 
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
-	iCulturePerTurn += GC.getGame().GetYieldFromNuclearWinter(YIELD_CULTURE);
+	if(!IsNoNuclearWinterLocal()) iCulturePerTurn += GC.getGame().GetYieldFromNuclearWinter(YIELD_CULTURE);
 #endif
 
 	return iCulturePerTurn;
@@ -10391,7 +10397,7 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 	}
 
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
-	iFaith += GC.getGame().GetYieldFromNuclearWinter(YIELD_FAITH);
+	if(!IsNoNuclearWinterLocal()) iFaith += GC.getGame().GetYieldFromNuclearWinter(YIELD_FAITH);
 #endif
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES) || defined(MOD_API_UNIFIED_YIELDS)
@@ -13114,8 +13120,10 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		}
 	}
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
 	// Yield Modifier from Nuclear Winter
-	iTempMod = GC.getGame().GetNuclearWinterYieldMultiplier(eIndex);
+	iTempMod = 0;
+	if(!IsNoNuclearWinterLocal()) iTempMod = GC.getGame().GetNuclearWinterYieldMultiplier(eIndex);
 	if(iTempMod != 0)
 	{	
 		iModifier *= (iTempMod + 100);
@@ -13124,6 +13132,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_NUCLERA_WINTER_YIELD", iTempMod);
 		}
 	}
+#endif
 
 	// note: player->invalidateYieldRankCache() must be called for anything that is checked here
 	// so if any extra checked things are added here, the cache needs to be invalidated
@@ -13432,7 +13441,7 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 	}
 
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
-	iValue += GC.getGame().GetYieldFromNuclearWinter(eIndex);
+	if(!IsNoNuclearWinterLocal()) iValue += GC.getGame().GetYieldFromNuclearWinter(eIndex);
 #endif
 
 	if (MOD_DISEASE_BREAK)
@@ -13810,7 +13819,8 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 #endif
 
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
-	iBaseValue = GC.getGame().GetYieldFromNuclearWinter(eIndex);
+	iBaseValue = 0;
+	if(!IsNoNuclearWinterLocal()) iBaseValue = GC.getGame().GetYieldFromNuclearWinter(eIndex);
 	if(iBaseValue != 0)
 	{
 		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_NUCLEAR_WINTER", iBaseValue, YieldIcon);
@@ -20046,6 +20056,9 @@ void CvCity::read(FDataStream& kStream)
 
 	kStream >> *m_pCityEspionage;
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	kStream >> m_iNumNoNuclearWinterLocal;
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream >> m_bCanDoImmigration;
 	kStream >> m_iNumAllScaleImmigrantIn;
@@ -20434,6 +20447,9 @@ void CvCity::write(FDataStream& kStream) const
 	m_pEmphases->Write(kStream);
 	kStream << *m_pCityEspionage;
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	kStream << m_iNumNoNuclearWinterLocal;
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream << m_bCanDoImmigration;
 	kStream << m_iNumAllScaleImmigrantIn;
@@ -23030,6 +23046,16 @@ bool CvCity::HasYieldFromOtherYield() const
 }
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+bool CvCity::IsNoNuclearWinterLocal() const
+{
+	return m_iNumNoNuclearWinterLocal > 0;
+}
+void CvCity::ChangeNumNoNuclearWinterLocal(int iChange)
+{
+	m_iNumNoNuclearWinterLocal += iChange;
+}
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 bool CvCity::IsCanDoImmigration() const
 {

@@ -457,6 +457,10 @@ public:
 	int GetUnitTypePrmoteHealGlobal(int i) const;
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	bool IsNoNuclearWinterLocal() const;
+#endif
+
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	int GetDomainTroops(int i) const;
 	int GetNumCrops() const;
@@ -894,6 +898,10 @@ private:
 	int* m_piDomainFreeExperiencePerGreatWorkGlobal;
 	std::map<int, int> m_piDomainFreeExperienceGlobal;
 	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
+#endif
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	bool m_bNoNuclearWinterLocal = false;
 #endif
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)

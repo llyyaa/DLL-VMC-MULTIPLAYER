@@ -287,6 +287,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiSpecificGreatPersonRateModifier(NULL),
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_bNoNuclearWinterLocal(false),
+#endif
+
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_piDomainTroops(NULL),
 	m_iNumCrops(0),
@@ -701,6 +705,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iExtraLeagueVotes = kResults.GetInt("ExtraLeagueVotes");
 	m_iPreferredDisplayPosition = kResults.GetInt("DisplayPosition");
 	m_iPortraitIndex = kResults.GetInt("PortraitIndex");
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_bNoNuclearWinterLocal = kResults.GetBool("NoNuclearWinterLocal");
+#endif
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iNumCrops = kResults.GetInt("NumCrops");
@@ -2801,6 +2809,13 @@ int CvBuildingEntry::GetPortraitIndex() const
 {
 	return m_iPortraitIndex;
 }
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+bool CvBuildingEntry::IsNoNuclearWinterLocal() const
+{
+	return m_bNoNuclearWinterLocal;
+}
+#endif
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 int CvBuildingEntry::GetNumCrops() const
