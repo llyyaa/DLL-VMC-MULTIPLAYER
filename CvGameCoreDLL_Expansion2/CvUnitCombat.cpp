@@ -3070,7 +3070,7 @@ void CvUnitCombat::GenerateNuclearCombatInfo(CvUnit& kAttacker, CvPlot& plot, Cv
 
 			return;
 		}
-		}
+	}
 
 	int iNukeDamageLevel = bPartialInterception ? 1 : kAttacker.GetNukeDamageLevel();
 
@@ -3087,7 +3087,10 @@ void CvUnitCombat::GenerateNuclearCombatInfo(CvUnit& kAttacker, CvPlot& plot, Cv
 	pkCombatInfo->setDamageMemberCount(iDamageMembers);
 
 	GC.GetEngineUserInterface()->setDirty(UnitInfo_DIRTY_BIT, true);
-	}
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	GC.getGame().ChangeNuclearWinterProcess(kAttacker.getUnitInfo().GetNuclearWinterProcess(), true, false);
+#endif
+}
 
 //	-------------------------------------------------------------------------------------
 uint CvUnitCombat::ApplyNuclearExplosionDamage(CvPlot* pkTargetPlot, int iDamageLevel, CvUnit* /* pkAttacker = NULL*/)
@@ -3795,7 +3798,7 @@ CvUnitCombat::ATTACK_RESULT CvUnitCombat::Attack(CvUnit& kAttacker, CvPlot& targ
 		Localization::String strSummary;
 
 		// Some units can't capture civilians. Embarked units are also not captured, they're simply killed. And some aren't a type that gets captured.
-		if(!kAttacker.isNoCapture() && (!pDefender->isEmbarked() || pDefender->getUnitInfo().IsCaptureWhileEmbarked()) && pDefender->getCaptureUnitType(GET_PLAYER(pDefender->getOwner()).getCivilizationType()) != NO_UNIT)
+		if(!kAttacker.isNoCapture() && (!pDefender->isEmbarked() || pDefender->getUnitInfo().IsCaptureWhileEmbarked()) && pDefender->getCaptureUnitType(pDefender->getOwner()) != NO_UNIT)
 		{
 			pDefender->setCapturingPlayer(kAttacker.getOwner());
 #ifdef MOD_BATTLE_CAPTURE_NEW_RULE

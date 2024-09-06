@@ -3072,10 +3072,9 @@ int CvLuaPlayer::lGetBuildingOfClosestGreatWorkSlot(lua_State* L)
 	BuildingClassTypes eBuildingClass;
 	int iSlot;
 	CvCity* pkCity = pkPlayer->GetCulture()->GetClosestAvailableGreatWorkSlot(iX, iY, eGreatWorkSlot, &eBuildingClass, &iSlot);
-	CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(pkPlayer->getCivilizationType());
-	if (pkCity && pkCivInfo)
+	if (pkCity)
 	{
-		int iBuilding = pkCivInfo->getCivilizationBuildings(eBuildingClass);
+		int iBuilding = pkPlayer->GetCivBuilding(eBuildingClass);
 		lua_pushinteger(L, iBuilding);
 		return 1;
 	}
@@ -5088,8 +5087,8 @@ int CvLuaPlayer::lGetGreatWorks(lua_State* L)
 	{
 		for(int iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
 		{
-			CvCivilizationInfo& playerCivilizationInfo = pkPlayer->getCivilizationInfo();
-			BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings((BuildingClassTypes)iBuildingClassLoop);
+			if(pCity->GetNumBuildingClass((BuildingClassTypes)iBuildingClassLoop) <= 0) continue;
+			BuildingTypes eBuilding = pkPlayer->GetCivBuilding((BuildingClassTypes)iBuildingClassLoop);
 			if (eBuilding != NO_BUILDING)
 			{
 				CvBuildingEntry *pkBuilding = GC.getBuildingInfo(eBuilding);

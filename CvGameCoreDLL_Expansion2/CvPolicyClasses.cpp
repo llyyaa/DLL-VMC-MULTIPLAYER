@@ -5197,32 +5197,31 @@ bool CvPlayerPolicies::IsTimeToChooseIdeology() const
 	else
 	{
 		CvBuildingXMLEntries* pkGameBuildings = GC.GetGameBuildings();
-		CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(m_pPlayer->getCivilizationType());
-		if(pkInfo)
+
+		// Find a building that triggers an ideology
+		// Loop through all building classes
+		for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
-			// Find a building that triggers an ideology
-			// Loop through all building classes
-			for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+			if (m_pPlayer->getBuildingClassCount((BuildingClassTypes)iI) <= 0) continue;
+			const BuildingTypes eBuilding = static_cast<BuildingTypes>(m_pPlayer->GetCivBuilding((BuildingClassTypes)iI));
+			CvBuildingEntry* pkBuildingInfo = NULL;
+			if(eBuilding != -1)
 			{
-				const BuildingTypes eBuilding = static_cast<BuildingTypes>(pkInfo->getCivilizationBuildings(iI));
-				CvBuildingEntry* pkBuildingInfo = NULL;
-				if(eBuilding != -1)
+				pkBuildingInfo = pkGameBuildings->GetEntry(eBuilding);
+				if (pkBuildingInfo)
 				{
-					pkBuildingInfo = pkGameBuildings->GetEntry(eBuilding);
-					if (pkBuildingInfo)
+					int iIdeologyTriggerCount = pkBuildingInfo->GetXBuiltTriggersIdeologyChoice();
+					if (iIdeologyTriggerCount > 0)
 					{
-						int iIdeologyTriggerCount = pkBuildingInfo->GetXBuiltTriggersIdeologyChoice();
-						if (iIdeologyTriggerCount > 0)
+						if (m_pPlayer->getBuildingClassCount((BuildingClassTypes)iI) >= iIdeologyTriggerCount)
 						{
-							if (m_pPlayer->getBuildingClassCount((BuildingClassTypes)iI) >= iIdeologyTriggerCount)
-							{
-								return true;
-							}
+							return true;
 						}
 					}
 				}
 			}
 		}
+
 		int iTraitsTriggerTech = m_pPlayer->GetPlayerTraits()->GetTriggersIdeologyTech();
 		if (iTraitsTriggerTech != NO_TECH && m_pPlayer->HasTech((TechTypes)iTraitsTriggerTech))
 		{

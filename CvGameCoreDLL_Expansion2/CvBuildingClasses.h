@@ -457,6 +457,10 @@ public:
 	int GetUnitTypePrmoteHealGlobal(int i) const;
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	bool IsNoNuclearWinterLocal() const;
+#endif
+
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	int GetDomainTroops(int i) const;
 	int GetNumCrops() const;
@@ -560,6 +564,10 @@ public:
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 	int GetSiegeKillCitizensModifier() const;
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	bool CanAllScaleImmigrantIn() const;
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION
@@ -892,6 +900,10 @@ private:
 	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	bool m_bNoNuclearWinterLocal = false;
+#endif
+
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	int* m_piDomainTroops;
 	int  m_iNumCrops;
@@ -969,6 +981,10 @@ private:
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eEnableCityScaleGrowth = NO_CITY_SCALE;
 	bool m_bEnableAllCityScaleGrowth = false;
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	bool m_bCanAllScaleImmigrantIn = false;
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION

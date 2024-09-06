@@ -482,6 +482,7 @@ public:
 	SpecialUnitTypes getSpecialUnitType() const;
 	bool IsGreatPerson() const;
 	UnitTypes getCaptureUnitType(CivilizationTypes eCivilization) const;
+	UnitTypes getCaptureUnitType(PlayerTypes ePlayer);
 	UnitCombatTypes getUnitCombatType() const;
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
 	UnitCombatTypes getUnitPromotionType() const;
@@ -1225,6 +1226,9 @@ public:
 
 	int getExtraAttackWoundedMod() const;
 	void changeExtraAttackWoundedMod(int iChange);
+
+	int getExtraWoundedMod() const;
+	void changeExtraWoundedMod(int iChange);
 
 	int GetFlankAttackModifier() const;
 	void ChangeFlankAttackModifier(int iChange);
@@ -2214,6 +2218,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iExtraRoughRangedAttackMod;
 	FAutoVariable<int, CvUnit> m_iExtraAttackFortifiedMod;
 	FAutoVariable<int, CvUnit> m_iExtraAttackWoundedMod;
+	FAutoVariable<int, CvUnit> m_iExtraWoundedMod;
 	int m_iFlankAttackModifier;
 	int m_iRangedFlankAttackModifier;
 	int m_iRangedFlankAttackModifierPercent;

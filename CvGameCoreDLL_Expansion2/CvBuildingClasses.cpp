@@ -287,6 +287,10 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_paiSpecificGreatPersonRateModifier(NULL),
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_bNoNuclearWinterLocal(false),
+#endif
+
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_piDomainTroops(NULL),
 	m_iNumCrops(0),
@@ -702,6 +706,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iPreferredDisplayPosition = kResults.GetInt("DisplayPosition");
 	m_iPortraitIndex = kResults.GetInt("PortraitIndex");
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_bNoNuclearWinterLocal = kResults.GetBool("NoNuclearWinterLocal");
+#endif
+
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iNumCrops = kResults.GetInt("NumCrops");
 	m_iNumArmee = kResults.GetInt("NumArmee");
@@ -713,6 +721,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 	m_iSiegeKillCitizensModifier = kResults.GetInt("SiegeKillCitizensModifier");
+#endif
+
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+	m_bCanAllScaleImmigrantIn = kResults.GetBool("EnableAlwaysImmigrantIn");
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION
@@ -2437,6 +2449,13 @@ int CvBuildingEntry::GetSiegeKillCitizensModifier() const
 }
 #endif
 
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+bool CvBuildingEntry::CanAllScaleImmigrantIn() const
+{
+	return m_bCanAllScaleImmigrantIn;
+}
+#endif
+
 #ifdef MOD_GLOBAL_CORRUPTION
 int CvBuildingEntry::GetCorruptionScoreChange() const
 {
@@ -2790,6 +2809,13 @@ int CvBuildingEntry::GetPortraitIndex() const
 {
 	return m_iPortraitIndex;
 }
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+bool CvBuildingEntry::IsNoNuclearWinterLocal() const
+{
+	return m_bNoNuclearWinterLocal;
+}
+#endif
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 int CvBuildingEntry::GetNumCrops() const
@@ -5351,14 +5377,14 @@ bool CvCityBuildings::HasAvailableGreatWorkSlot(GreatWorkSlotType eSlotType) con
 int CvCityBuildings::GetNumAvailableGreatWorkSlots() const
 {
 	int iCount = 0;
+	CvPlayerAI &kPlayer = GET_PLAYER(m_pCity->getOwner());
 
 	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 	{
 		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-		CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
-		if (pkCivInfo)
+		if(m_pCity->GetNumBuildingClass(eLoopBuildingClass) > 0)
 		{
-			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eLoopBuildingClass);
+			BuildingTypes eBuilding = kPlayer.GetCivBuilding(eLoopBuildingClass);
 			if(NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)
@@ -5385,14 +5411,14 @@ int CvCityBuildings::GetNumAvailableGreatWorkSlots() const
 int CvCityBuildings::GetNumAvailableGreatWorkSlots(GreatWorkSlotType eSlotType) const
 {
 	int iCount = 0;
+	CvPlayerAI &kPlayer = GET_PLAYER(m_pCity->getOwner());
 
 	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 	{
 		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-		CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
-		if (pkCivInfo)
+		if(m_pCity->GetNumBuildingClass(eLoopBuildingClass) > 0)
 		{
-			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eLoopBuildingClass);
+			BuildingTypes eBuilding = kPlayer.GetCivBuilding(eLoopBuildingClass);
 			if(NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)
@@ -5423,10 +5449,12 @@ bool CvCityBuildings::GetNextAvailableGreatWorkSlot(BuildingClassTypes *eBuildin
 {
 	if (eBuildingClass && iSlot)
 	{
+		CvPlayerAI &kPlayer = GET_PLAYER(m_pCity->getOwner());
 		for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
 			BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-			BuildingTypes eBuilding = (BuildingTypes)GC.getCivilizationInfo(m_pCity->getCivilizationType())->getCivilizationBuildings(eLoopBuildingClass);
+			if(m_pCity->GetNumBuildingClass(eLoopBuildingClass) <= 0) continue;
+			BuildingTypes eBuilding = kPlayer.GetCivBuilding(eLoopBuildingClass);
 			if(NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)
@@ -5454,10 +5482,12 @@ bool CvCityBuildings::GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWork
 {
 	if (eBuildingClass && iSlot)
 	{
+		CvPlayerAI &kPlayer = GET_PLAYER(m_pCity->getOwner());
 		for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 		{
 			BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-			BuildingTypes eBuilding = (BuildingTypes)GC.getCivilizationInfo(m_pCity->getCivilizationType())->getCivilizationBuildings(eLoopBuildingClass);
+			if(m_pCity->GetNumBuildingClass(eLoopBuildingClass) <= 0) continue;
+			BuildingTypes eBuilding = kPlayer.GetCivBuilding(eLoopBuildingClass);
 			if(NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)
@@ -5487,9 +5517,10 @@ bool CvCityBuildings::GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWork
 /// Accessor: How much of this yield are we generating from Great Works in our buildings?
 int CvCityBuildings::GetYieldFromGreatWorks(YieldTypes eYield) const
 {
+	CvPlayerAI &kPlayer = GET_PLAYER(m_pCity->getOwner());
 	int iYieldPerBuilding = GC.getBASE_CULTURE_PER_GREAT_WORK();
-	int iYieldPerWork = GET_PLAYER(m_pCity->getOwner()).GetGreatWorkYieldChange(eYield);
-	iYieldPerWork += GET_PLAYER(m_pCity->getOwner()).GetPlayerTraits()->GetGreatWorkYieldChanges(eYield);
+	int iYieldPerWork = kPlayer.GetGreatWorkYieldChange(eYield);
+	iYieldPerWork += kPlayer.GetPlayerTraits()->GetGreatWorkYieldChanges(eYield);
 
 	ReligionTypes eMajority = m_pCity->GetCityReligions()->GetReligiousMajority();
 	if(eMajority >= RELIGION_PANTHEON)
@@ -5509,25 +5540,21 @@ int CvCityBuildings::GetYieldFromGreatWorks(YieldTypes eYield) const
 	int iWorkCount = 0;
 	int iBuildingCount = 0;
 
-	CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
-	if (pkCivInfo)
+	for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 	{
-		for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
+		BuildingClassTypes eBldgClass = (*it).eBuildingClass;
+		CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
+		if (pkClassInfo)
 		{
-			BuildingClassTypes eBldgClass = (*it).eBuildingClass;
-			CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
-			if (pkClassInfo)
+			BuildingTypes eBuilding = kPlayer.GetCivBuilding(eBldgClass);
+			CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
+			if (pkInfo)
 			{
-				BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
-				CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
-				if (pkInfo)
+				iWorkCount++;
+				
+				if ((MOD_GLOBAL_GREATWORK_YIELDTYPES && eYield == pkInfo->GetGreatWorkYieldType()) || (!MOD_GLOBAL_GREATWORK_YIELDTYPES && eYield == YIELD_CULTURE))
 				{
-					iWorkCount++;
-					
-					if ((MOD_GLOBAL_GREATWORK_YIELDTYPES && eYield == pkInfo->GetGreatWorkYieldType()) || (!MOD_GLOBAL_GREATWORK_YIELDTYPES && eYield == YIELD_CULTURE))
-					{
-						iBuildingCount++;
-					}
+					iBuildingCount++;
 				}
 			}
 		}
@@ -5569,27 +5596,24 @@ int CvCityBuildings::GetNumGreatWorks(bool bIgnoreYield, bool bIncludeArtifact, 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
 	int iRtnValue = 0;
 
-	CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
-	if (pkCivInfo)
+	GreatWorkClass eArtifactClass = (GreatWorkClass)GC.getInfoTypeForString("GREAT_WORK_ARTIFACT");
+	GreatWorkClass eArtClass = (GreatWorkClass)GC.getInfoTypeForString("GREAT_WORK_ART");
+	CvPlayerAI &kPlayer = GET_PLAYER(m_pCity->getOwner());
+	for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 	{
-		GreatWorkClass eArtifactClass = (GreatWorkClass)GC.getInfoTypeForString("GREAT_WORK_ARTIFACT");
-		GreatWorkClass eArtClass = (GreatWorkClass)GC.getInfoTypeForString("GREAT_WORK_ART");
-		for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
-		{
-			BuildingClassTypes eBldgClass = (*it).eBuildingClass;
-			CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
-			if(!pkClassInfo) continue;
-			
-			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
-			CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
-			if(!pkInfo) continue;
-			
-			if(!bIgnoreYield && pkInfo->GetGreatWorkYieldType() == NO_YIELD) continue;
-			if(!bIncludeArtifact && GC.getGame().GetGameCulture()->GetGreatWorkClass((*it).iGreatWorkIndex) == eArtifactClass) continue;
-			if(!bIncludeGreatWork && GC.getGame().GetGameCulture()->GetGreatWorkClass((*it).iGreatWorkIndex) == eArtClass) continue;
+		BuildingClassTypes eBldgClass = (*it).eBuildingClass;
+		CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
+		if(!pkClassInfo) continue;
+		
+		BuildingTypes eBuilding = kPlayer.GetCivBuilding(eBldgClass);
+		CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
+		if(!pkInfo) continue;
+		
+		if(!bIgnoreYield && pkInfo->GetGreatWorkYieldType() == NO_YIELD) continue;
+		if(!bIncludeArtifact && GC.getGame().GetGameCulture()->GetGreatWorkClass((*it).iGreatWorkIndex) == eArtifactClass) continue;
+		if(!bIncludeGreatWork && GC.getGame().GetGameCulture()->GetGreatWorkClass((*it).iGreatWorkIndex) == eArtClass) continue;
 
-			iRtnValue++;
-		}
+		iRtnValue++;
 	}
 	return iRtnValue;
 #else
@@ -5602,28 +5626,26 @@ int CvCityBuildings::GetNumGreatWorks(bool bIgnoreYield, bool bIncludeArtifact, 
 int CvCityBuildings::GetNumGreatWorks(GreatWorkSlotType eGreatWorkSlot) const
 {
 	int iRtnValue = 0;
+	CvPlayerAI &kPlayer = GET_PLAYER(m_pCity->getOwner());
 
-	CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
-	if (pkCivInfo)
+	for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
 	{
-		for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
+		BuildingClassTypes eBldgClass = (*it).eBuildingClass;
+		CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
+		if (pkClassInfo)
 		{
-			BuildingClassTypes eBldgClass = (*it).eBuildingClass;
-			CvBuildingClassInfo *pkClassInfo = GC.getBuildingClassInfo(eBldgClass);
-			if (pkClassInfo)
+			BuildingTypes eBuilding = kPlayer.GetCivBuilding(eBldgClass);;
+			CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
+			if (pkInfo)
 			{
-				BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eBldgClass);
-				CvBuildingEntry *pkInfo = GC.getBuildingInfo(eBuilding);
-				if (pkInfo)
+				if (pkInfo->GetGreatWorkSlotType() == eGreatWorkSlot)
 				{
-					if (pkInfo->GetGreatWorkSlotType() == eGreatWorkSlot)
-					{
-						iRtnValue++;
-					}
+					iRtnValue++;
 				}
 			}
 		}
 	}
+
 	return iRtnValue;
 }
 
@@ -5698,14 +5720,14 @@ int CvCityBuildings::GetThemingBonuses() const
 #endif
 {
 	int iBonus = 0;
+	CvPlayerAI &kPlayer = GET_PLAYER(m_pCity->getOwner());
 
 	for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
 	{
 		BuildingClassTypes eLoopBuildingClass = (BuildingClassTypes) iI;
-		CvCivilizationInfo *pkCivInfo = GC.getCivilizationInfo(m_pCity->getCivilizationType());
-		if (pkCivInfo)
+		if(m_pCity->GetNumBuildingClass(eLoopBuildingClass) > 0)
 		{
-			BuildingTypes eBuilding = (BuildingTypes)pkCivInfo->getCivilizationBuildings(eLoopBuildingClass);
+			BuildingTypes eBuilding = kPlayer.GetCivBuilding(eLoopBuildingClass);
 			if(NO_BUILDING != eBuilding)
 			{
 				if (GetNumBuilding(eBuilding) > 0)

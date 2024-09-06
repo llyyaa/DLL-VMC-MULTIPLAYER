@@ -1023,6 +1023,12 @@ void CvGame::uninit()
 	m_iVotesNeededForDiploVictory = 0;
 	m_iMapScoreMod = 0;
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_iNuclearWinterProcess = 0;
+	m_iNuclearWinterNaturalReduction = 1;
+	m_iNuclearWinterLevelIndex = NO_NUCLEAR_WINTER;
+#endif
+
 	m_uiInitialTime = 0;
 
 	m_bScoreDirty = false;
@@ -1814,6 +1820,119 @@ void CvGame::DoCacheMapScoreMod()
 }
 
 
+//	--------------------------------------------------------------------------------
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+int CvGame::GetNuclearWinterProcess() const
+{
+	return m_iNuclearWinterProcess;
+}
+void CvGame::ChangeNuclearWinterProcess(int iChange, bool bUpdate, bool bAllowLevelReduce)
+{
+	m_iNuclearWinterProcess += iChange;
+	int iMinValue = 0;
+	if(!bAllowLevelReduce)
+	{
+		iMinValue = GC.getOrderedNuclearWinterLevels()[m_iNuclearWinterLevelIndex]->GetTriggerThreshold();
+	}
+	if(m_iNuclearWinterProcess < iMinValue) m_iNuclearWinterProcess = iMinValue;
+	if(bUpdate) UpdateNuclearWinterLevel();
+}
+int CvGame::GetNuclearWinterNaturalReduction() const
+{
+	return m_iNuclearWinterNaturalReduction;
+}
+void CvGame::ChangeNuclearWinterNaturalReduction(int iChange)
+{
+	m_iNuclearWinterNaturalReduction += iChange;
+}
+int CvGame::GetNowNuclearWinterLevelIndex()
+{
+	return m_iNuclearWinterLevelIndex;
+}
+void CvGame::DoNuclearWinterTurn()
+{
+	if(GetNuclearWinterProcess() > 0) ChangeNuclearWinterProcess(-GetNuclearWinterNaturalReduction());
+	UpdateNuclearWinterLevel();
+}
+void CvGame::UpdateNuclearWinterLevel()
+{
+	std::vector<CvNuclearWinterLevel*>& vOrderedNuclearWinterLevels = GC.getOrderedNuclearWinterLevels();
+	if(GC.getGame().isOption(GAMEOPTION_SP_NUCLEARWINTER_OFF) || vOrderedNuclearWinterLevels.size() < 1)
+	{
+		m_iNuclearWinterLevelIndex = NO_NUCLEAR_WINTER;
+		return;
+	}
+	
+	int iNewLevel = NO_NUCLEAR_WINTER;
+	for (int index = 0; index < vOrderedNuclearWinterLevels.size(); index++)
+	{
+		auto* level = vOrderedNuclearWinterLevels[index];
+		if (level->GetTriggerThreshold() > GetNuclearWinterProcess())
+		{
+			break;
+		}
+		iNewLevel = index;
+	}
+	if(iNewLevel != m_iNuclearWinterLevelIndex)
+	{
+		m_iNuclearWinterLevelIndex = iNewLevel;
+		PlayerTypes activePlayerID = getActivePlayer();
+		CvPlayer& activePlayer = GET_PLAYER(activePlayerID);
+		CvNotifications* pNotifications = activePlayer.GetNotifications();
+		if(pNotifications)
+		{
+			CvNuclearWinterLevel *pNewLevel = GC.getOrderedNuclearWinterLevels()[m_iNuclearWinterLevelIndex];
+			Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_NUCLEAR_WINTER_PROCESS_CHANGED");
+			strSummary << pNewLevel->GetDescription();
+			CvString strText;
+			for (uint uiYield = 0; uiYield < NUM_YIELD_TYPES; uiYield++)
+			{
+				YieldTypes eYield = (YieldTypes)uiYield;
+				int iYield = pNewLevel->GetYieldTimes100(eYield);
+				int iYieldModifier = pNewLevel->GetYieldModifierTimes100(eYield);
+				if(iYield != 0 || iYieldModifier != 0)
+				{
+					strText += "[NEWLINE][ICON_BULLET]";
+				}
+				if(iYield != 0)
+				{
+					strText += GetLocalizedText("TXT_KEY_NOTIFICATION_NUCLEAR_WINTER_DEBUFF_YIELD", GC.getYieldInfo(eYield)->getIconString(), GC.getYieldInfo(eYield)->GetDescription(), iYield);
+				}
+				if(iYieldModifier != 0)
+				{
+					strText += GetLocalizedText("TXT_KEY_NOTIFICATION_NUCLEAR_WINTER_DEBUFF_YIELD_MULTIPLIER", GC.getYieldInfo(eYield)->getIconString(), GC.getYieldInfo(eYield)->GetDescription(), iYieldModifier);
+				}
+			}
+			if(strText.length() > 0)
+			{
+				strText = GetLocalizedText("TXT_KEY_NOTIFICATION_SUMMARY_NUCLEAR_WINTER_GLOBAL_EFFECT") + strText;
+			}
+			strText = GetLocalizedText(pNewLevel->GetHelp()) + strText;
+			pNotifications->Add(NOTIFICATION_GENERIC, strText, strSummary.toUTF8(), -1, -1, -1);
+		}
+	}
+}
+int CvGame::GetNuclearWinterYieldMultiplier(YieldTypes eIndex)
+{
+	int iModifier = GC.getOrderedNuclearWinterLevels()[m_iNuclearWinterLevelIndex]->GetYieldModifierTimes100(eIndex);
+	if(iModifier != 0)
+	{
+		iModifier *= m_iNuclearWinterProcess;
+		iModifier /= 100;
+	}
+	return std::max(iModifier, -100);
+}
+int CvGame::GetYieldFromNuclearWinter(YieldTypes eIndex)
+{
+	int iYield = GC.getOrderedNuclearWinterLevels()[m_iNuclearWinterLevelIndex]->GetYieldTimes100(eIndex);
+	if(iYield != 0)
+	{
+		iYield *= m_iNuclearWinterProcess;
+		iYield /= 100;
+	}
+	return iYield;
+}
+#endif
 //	--------------------------------------------------------------------------------
 void CvGame::updateCitySight(bool bIncrement)
 {
@@ -7755,6 +7874,10 @@ void CvGame::doTurn()
 	}
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	DoNuclearWinterTurn();
+#endif
+
 	// Victory stuff
 	testVictory();
 
@@ -9655,6 +9778,11 @@ void CvGame::Read(FDataStream& kStream)
 	kStream >> m_iVotesNeededForDiploVictory;
 	kStream >> m_iMapScoreMod;
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	kStream >> m_iNuclearWinterProcess;
+	kStream >> m_iNuclearWinterLevelIndex;
+#endif
+
 	// m_uiInitialTime not saved
 
 	kStream >> m_bScoreDirty;
@@ -9891,6 +10019,11 @@ void CvGame::Write(FDataStream& kStream) const
 	kStream << m_iNumVictoryVotesExpected;
 	kStream << m_iVotesNeededForDiploVictory;
 	kStream << m_iMapScoreMod;
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	kStream << m_iNuclearWinterProcess;
+	kStream << m_iNuclearWinterLevelIndex;
+#endif
 
 	// m_uiInitialTime not saved
 

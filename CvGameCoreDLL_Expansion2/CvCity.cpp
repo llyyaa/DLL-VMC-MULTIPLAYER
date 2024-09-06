@@ -229,7 +229,7 @@ CvCity::CvCity() :
 	, m_iExtraAttackOnKill("CvCity::m_iExtraAttackOnKill", m_syncArchive)
 	, m_iForbiddenForeignSpyCount(0)
 #if defined(MOD_ROG_CORE)
-	, m_aiNumTimesAttackedThisTurn("CvCity::m_aiNumTimesAttackedThisTurn", m_syncArchive)
+	, m_aiNumTimesAttackedThisTurn()
 	, m_aiYieldPerAlly()
 	, m_aiYieldPerFriend()
 	, m_aiBaseYieldRateFromCSAlliance()
@@ -242,7 +242,7 @@ CvCity::CvCity() :
 	, m_aiYieldFromBorderGrowth()
 	, m_aiYieldFromPillage()
 	, m_aiYieldPerPopInEmpire()
-	, m_aiResourceQuantityFromPOP("CvCity::m_aiResourceQuantityFromPOP", m_syncArchive)
+	, m_aiResourceQuantityFromPOP()
 #endif
 
 	, m_iPopulation("CvCity::m_iPopulation", m_syncArchive)
@@ -280,7 +280,7 @@ CvCity::CvCity() :
 
 	, m_iNukeInterceptionChance(0)
 
-
+	
 	, m_iMaintenance("CvCity::m_iMaintenance", m_syncArchive)
 	, m_iHealRate("CvCity::m_iHealRate", m_syncArchive)
 	, m_iNoOccupiedUnhappinessCount("CvCity::m_iNoOccupiedUnhappinessCount", m_syncArchive)
@@ -540,6 +540,19 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 				if (pLoopPlot->getOwner() == getOwner())
 				{
 					pLoopPlot->SetCityPurchaseID(m_iID);
+#if defined(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT)
+					// Relink resource
+					if(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT && pLoopPlot->getResourceType() != NO_RESOURCE)
+					{
+						pLoopPlot->SetResourceLinkedCity(NULL);
+						pLoopPlot->SetResourceLinkedCity(this);
+						// Already have a valid improvement here?
+						if(pLoopPlot->getImprovementType() != NO_IMPROVEMENT && GC.getImprovementInfo(pLoopPlot->getImprovementType())->IsImprovementResourceTrade(pLoopPlot->getResourceType()))
+						{
+							pLoopPlot->SetResourceLinkedCityActive(true);
+						}
+					}
+#endif
 				}
 			}
 		}
@@ -780,7 +793,7 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 		if(owningPlayer.getNumCities() == 1)
 		{
 #if defined(MOD_EVENTS_CITY_CAPITAL)
-			int eCapitalBuilding = thisCiv.getCivilizationBuildings(GC.getCAPITAL_BUILDINGCLASS());
+			int eCapitalBuilding = owningPlayer.GetCivBuilding((BuildingClassTypes)GC.getCAPITAL_BUILDINGCLASS());
 #endif
 			
 			for(iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
@@ -793,7 +806,7 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 
 				if(thisCiv.isCivilizationFreeBuildingClass(iI))
 				{
-					eLoopBuilding = ((BuildingTypes)(thisCiv.getCivilizationBuildings(iI)));
+					eLoopBuilding = owningPlayer.GetCivBuilding((BuildingClassTypes)iI);
 
 					if(eLoopBuilding != NO_BUILDING)
 					{
@@ -930,6 +943,8 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 
 		iProduction *= GC.getGame().getGameSpeedInfo().getFeatureProductionPercent();
 		iProduction /= 100;
+		iProduction *= (100+GetCuttingBonusModifier());
+		iProduction /= 100;
 
 		if (iProduction > 0) {
 			// Make the production higher than a "ring-1 chop"
@@ -962,6 +977,8 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 		iProduction /= 100;
 
 		iProduction *= GC.getGame().getGameSpeedInfo().getFeatureProductionPercent();
+		iProduction /= 100;
+		iProduction *= (100+GetCuttingBonusModifier());
 		iProduction /= 100;
 
 		if (iProduction > 0) {
@@ -1213,7 +1230,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 
 	for (iI = 0; iI < REALLY_MAX_PLAYERS; iI++)
 	{
-		m_aiNumTimesAttackedThisTurn.setAt(iI, 0);
+		m_aiNumTimesAttackedThisTurn[iI] = 0;
 	}
 
 	m_aiYieldPerAlly.resize(NUM_YIELD_TYPES);
@@ -1380,7 +1397,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 			m_paiFreeResource.setAt(iI, 0);
 			m_paiNumResourcesLocal.setAt(iI, 0);
 #if defined(MOD_ROG_CORE)
-			m_aiResourceQuantityFromPOP.setAt(iI, 0);
+			m_aiResourceQuantityFromPOP[iI] = 0;
 #endif
 		}
 
@@ -1565,8 +1582,12 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	}
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_iNumNoNuclearWinterLocal = 0;
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	m_iCanDoImmigration = true;
+	m_bCanDoImmigration = true;
+	m_iNumAllScaleImmigrantIn = 0;
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	m_eCityScale = NO_CITY_SCALE;
@@ -3533,17 +3554,9 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 	{
 		BuildingClassTypes eLockedBuildingClass = (BuildingClassTypes) pkBuildingInfo->GetLockedBuildingClasses(iI);
 
-		if(eLockedBuildingClass != NO_BUILDINGCLASS)
+		if(eLockedBuildingClass != NO_BUILDINGCLASS && GetNumBuildingClass(eLockedBuildingClass) > 0)
 		{
-			BuildingTypes eLockedBuilding = (BuildingTypes)(thisCivInfo.getCivilizationBuildings(eLockedBuildingClass));
-
-			if(eLockedBuilding != NO_BUILDING)
-			{
-				if(m_pCityBuildings->GetNumBuilding(eLockedBuilding) > 0)
-				{
-					return false;
-				}
-			}
+			return false;
 		}
 	}
 
@@ -7521,24 +7534,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			BuildingClassTypes eFreeBuildingClassThisCity = (BuildingClassTypes)pBuildingInfo->GetFreeBuildingThisCity();
 			if(eFreeBuildingClassThisCity != NO_BUILDINGCLASS)
 			{
-				BuildingTypes eFreeBuildingThisCity = NO_BUILDING;
-				BuildingTypes eDefaultBuilding = (BuildingTypes)GC.getBuildingClassInfo(eFreeBuildingClassThisCity)->getDefaultBuildingIndex();
-				if(owningPlayer.IsLostUC()) eFreeBuildingThisCity = eDefaultBuilding;
-				else eFreeBuildingThisCity = (BuildingTypes)(thisCiv.getCivilizationBuildings(eFreeBuildingClassThisCity));
-				
-				// if this player has a Unique Building, choose it, or try to find a Unique Building
-				if(eFreeBuildingThisCity == eDefaultBuilding)
-				{
-					std::vector<BuildingTypes> vFreeBuildings;
-					for (auto iBuilding : owningPlayer.GetUBFromExtra())
-					{
-						if (GC.getBuildingInfo(iBuilding)->GetBuildingClassType() != eFreeBuildingClassThisCity) continue;
-						if (iBuilding == eDefaultBuilding) continue;
-						vFreeBuildings.push_back(iBuilding);
-					}
-					vFreeBuildings.push_back(eDefaultBuilding);
-					eFreeBuildingThisCity = vFreeBuildings[0];
-				}
+				BuildingTypes eFreeBuildingThisCity = owningPlayer.GetCivBuilding(eFreeBuildingClassThisCity);
 
 				if (eFreeBuildingThisCity != NO_BUILDING)
 				{
@@ -7786,6 +7782,13 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
 		ChangeSiegeKillCitizensModifier(pBuildingInfo->GetSiegeKillCitizensModifier() * iChange);
+#endif
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+		ChangeNumNoNuclearWinterLocal(pBuildingInfo->IsNoNuclearWinterLocal() ? iChange : 0);
+#endif
+#if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
+		ChangeNumAllScaleImmigrantIn(pBuildingInfo->CanAllScaleImmigrantIn() ? iChange : 0);
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION
@@ -8379,7 +8382,7 @@ void CvCity::initFreeUnit(CvPlayer& owningPlayer, UnitTypes eUnit, int iCount, b
 		if(bToCivType)
 		{
 			// Get the right unit of this class for this civ
-			eUnit = (UnitTypes)getCivilizationInfo().getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
+			eUnit = owningPlayer.GetCivUnit((UnitClassTypes)pkUnitInfo->GetUnitClassType());
 		}
 	}
 	pkUnitInfo = GC.getUnitInfo(eUnit);
@@ -10245,6 +10248,10 @@ int CvCity::GetBaseJONSCulturePerTurn() const
 		iCulturePerTurn += GetYieldFromCrime(YIELD_CULTURE);
 	}
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	if(!IsNoNuclearWinterLocal()) iCulturePerTurn += GC.getGame().GetYieldFromNuclearWinter(YIELD_CULTURE);
+#endif
+
 	return iCulturePerTurn;
 }
 
@@ -10388,6 +10395,10 @@ int CvCity::GetFaithPerTurn(bool bStatic) const
 		iFaith += GetYieldFromHealth(YIELD_FAITH);
 		iFaith += GetYieldFromCrime(YIELD_FAITH);
 	}
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	if(!IsNoNuclearWinterLocal()) iFaith += GC.getGame().GetYieldFromNuclearWinter(YIELD_FAITH);
+#endif
 
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES) || defined(MOD_API_UNIFIED_YIELDS)
 	iFaith += GetBaseYieldRateFromGreatWorks(YIELD_FAITH);
@@ -11176,7 +11187,26 @@ void CvCity::changeFoodKept(int iChange)
 	setFoodKept(getFoodKept() + iChange);
 }
 
-
+//	--------------------------------------------------------------------------------
+int CvCity::GetCuttingBonusModifier() const
+{
+	ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
+	int iCuttingBonusModifier = 0;
+	if(eMajority != NO_RELIGION)
+	{
+		const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner());
+		if(pReligion)
+		{
+			iCuttingBonusModifier = pReligion->m_Beliefs.GetCuttingBonusModifier();
+			BeliefTypes eSecondaryPantheon = GetCityReligions()->GetSecondaryReligionPantheonBelief();
+			if (eSecondaryPantheon != NO_BELIEF)
+			{
+				iCuttingBonusModifier += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCuttingBonusModifier();
+			}
+		}
+	}
+	return iCuttingBonusModifier;
+}
 //	--------------------------------------------------------------------------------
 int CvCity::getMaxFoodKeptPercent() const
 {
@@ -11510,6 +11540,7 @@ bool CvCity::CanAirlift() const
 	for(iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
 	{
 		eBuildingClass = (BuildingClassTypes) iBuildingClassLoop;
+		if(GetNumBuildingClass(eBuildingClass) <= 0) continue;
 
 		CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
 		if(!pkBuildingClassInfo)
@@ -11517,7 +11548,7 @@ bool CvCity::CanAirlift() const
 			continue;
 		}
 
-		BuildingTypes eBuilding = (BuildingTypes)kPlayer.getCivilizationInfo().getCivilizationBuildings(eBuildingClass);
+		BuildingTypes eBuilding = kPlayer.GetCivBuilding(eBuildingClass);
 		if(eBuilding != NO_BUILDING && GetCityBuildings()->GetNumBuilding(eBuilding) > 0) // slewis - added the NO_BUILDING check for the ConquestDLX scenario which has civ specific wonders
 		{
 			CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
@@ -13089,6 +13120,20 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		}
 	}
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	// Yield Modifier from Nuclear Winter
+	iTempMod = 0;
+	if(!IsNoNuclearWinterLocal()) iTempMod = GC.getGame().GetNuclearWinterYieldMultiplier(eIndex);
+	if(iTempMod != 0)
+	{	
+		iModifier *= (iTempMod + 100);
+		iModifier /= 100;
+		if(iTempMod != 0 && toolTipSink){
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_NUCLERA_WINTER_YIELD", iTempMod);
+		}
+	}
+#endif
+
 	// note: player->invalidateYieldRankCache() must be called for anything that is checked here
 	// so if any extra checked things are added here, the cache needs to be invalidated
 
@@ -13257,7 +13302,7 @@ void CvCity::ChangeResourceQuantityFromPOP(ResourceTypes eResource, int iChange)
 
 	if (iChange != 0)
 	{
-		m_aiResourceQuantityFromPOP.setAt(eResource, m_aiResourceQuantityFromPOP[eResource] + iChange);
+		m_aiResourceQuantityFromPOP[eResource] += iChange;
 	}
 }
 
@@ -13394,6 +13439,10 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex, const bool bIgnoreFromOtherYield
 	{
 		iValue += GetYieldFromCrime(eIndex);
 	}
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	if(!IsNoNuclearWinterLocal()) iValue += GC.getGame().GetYieldFromNuclearWinter(eIndex);
+#endif
 
 	if (MOD_DISEASE_BREAK)
 	{
@@ -13766,6 +13815,15 @@ CvString CvCity::getYieldRateInfoTool(YieldTypes eIndex, bool bIgnoreTrade) cons
 		{
 			szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CRIME", iBaseValue, YieldIcon);
 		}
+	}
+#endif
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	iBaseValue = 0;
+	if(!IsNoNuclearWinterLocal()) iBaseValue = GC.getGame().GetYieldFromNuclearWinter(eIndex);
+	if(iBaseValue != 0)
+	{
+		szRtnValue += GetLocalizedText("TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_NUCLEAR_WINTER", iBaseValue, YieldIcon);
 	}
 #endif
 
@@ -19218,56 +19276,33 @@ bool CvCity::doCheckProduction()
 	{
 		AI_PERF_FORMAT_NESTED("City-AI-perf.csv", ("CvCity::doCheckProduction_UpgradeBuilding, Turn %03d, %s, %s", GC.getGame().getElapsedGameTurns(), GetPlayer()->getCivilizationShortDescription(), getName().c_str()) );
 		// Can now construct an Upgraded version of this Building
-		for(iI = 0; iI < iNumBuildingInfos; iI++)
+		for (OrderData* pOrderNode = headOrderQueueNode(); pOrderNode != NULL; pOrderNode = nextOrderQueueNode(pOrderNode))
 		{
-			const BuildingTypes eBuilding = static_cast<BuildingTypes>(iI);
+			if(pOrderNode->eOrderType != ORDER_CONSTRUCT) continue;
+
+			const BuildingTypes eBuilding = (BuildingTypes)pOrderNode->iData1;
 			CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
-			if(pkBuildingInfo)
+			if(!pkBuildingInfo) continue;
+
+			BuildingClassTypes eBuildingClass = (BuildingClassTypes) pkBuildingInfo->GetReplacementBuildingClass();
+			if(eBuildingClass == NO_BUILDINGCLASS) continue;
+			BuildingTypes eUpgradeBuilding = thisPlayer.GetCivBuilding(eBuildingClass);
+
+			if(!canConstruct(eUpgradeBuilding)) continue;
+			CvAssertMsg(eUpgradeBuilding != eBuilding, "Trying to upgrade a Building to itself");
+			iUpgradeProduction = m_pCityBuildings->GetBuildingProduction(eBuilding);
+			m_pCityBuildings->SetBuildingProduction((eBuilding), 0);
+			m_pCityBuildings->SetBuildingProduction(eUpgradeBuilding, iUpgradeProduction);
+
+			CvBuildingEntry* pkUpgradeBuildingInfo = GC.getBuildingInfo(eUpgradeBuilding);
+			if(NULL != pkUpgradeBuildingInfo)
 			{
-				if(getFirstBuildingOrder(eBuilding) != -1)
-				{
-					BuildingClassTypes eBuildingClass = (BuildingClassTypes) pkBuildingInfo->GetReplacementBuildingClass();
+				const BuildingClassTypes eOrderBuildingClass = (BuildingClassTypes)pkBuildingInfo->GetBuildingClassType();
+				const BuildingClassTypes eUpgradeBuildingClass = (BuildingClassTypes)pkUpgradeBuildingInfo->GetBuildingClassType();
 
-					if(eBuildingClass != NO_BUILDINGCLASS)
-					{
-						BuildingTypes eUpgradeBuilding = ((BuildingTypes)(thisPlayer.getCivilizationInfo().getCivilizationBuildings(eBuildingClass)));
-
-						if(canConstruct(eUpgradeBuilding))
-						{
-							CvAssertMsg(eUpgradeBuilding != iI, "Trying to upgrade a Building to itself");
-							iUpgradeProduction = m_pCityBuildings->GetBuildingProduction(eBuilding);
-							m_pCityBuildings->SetBuildingProduction((eBuilding), 0);
-							m_pCityBuildings->SetBuildingProduction(eUpgradeBuilding, iUpgradeProduction);
-
-							pOrderNode = headOrderQueueNode();
-
-							while(pOrderNode != NULL)
-							{
-								if(pOrderNode->eOrderType == ORDER_CONSTRUCT)
-								{
-									if(pOrderNode->iData1 == iI)
-									{
-										CvBuildingEntry* pkOrderBuildingInfo = GC.getBuildingInfo((BuildingTypes)pOrderNode->iData1);
-										CvBuildingEntry* pkUpgradeBuildingInfo = GC.getBuildingInfo(eUpgradeBuilding);
-
-										if(NULL != pkOrderBuildingInfo && NULL != pkUpgradeBuildingInfo)
-										{
-											const BuildingClassTypes eOrderBuildingClass = (BuildingClassTypes)pkOrderBuildingInfo->GetBuildingClassType();
-											const BuildingClassTypes eUpgradeBuildingClass = (BuildingClassTypes)pkUpgradeBuildingInfo->GetBuildingClassType();
-
-											thisPlayer.changeBuildingClassMaking(eOrderBuildingClass, -1);
-											pOrderNode->iData1 = eUpgradeBuilding;
-											thisPlayer.changeBuildingClassMaking(eUpgradeBuildingClass, 1);
-
-										}
-									}
-								}
-
-								pOrderNode = nextOrderQueueNode(pOrderNode);
-							}
-						}
-					}
-				}
+				thisPlayer.changeBuildingClassMaking(eOrderBuildingClass, -1);
+				pOrderNode->iData1 = eUpgradeBuilding;
+				thisPlayer.changeBuildingClassMaking(eUpgradeBuildingClass, 1);
 			}
 		}
 	}
@@ -19798,6 +19833,7 @@ void CvCity::read(FDataStream& kStream)
 #if defined(MOD_ROG_CORE)
 	kStream >> m_aiYieldPerAlly;
 	kStream >> m_aiYieldPerFriend;
+	kStream >> m_aiNumTimesAttackedThisTurn;
 	kStream >> m_aiBaseYieldRateFromCSAlliance;
 	kStream >> m_aiBaseYieldRateFromCSFriendship;
 	kStream >> m_aiSpecialistRateModifier;
@@ -19808,6 +19844,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiYieldFromBirth;
 	kStream >> m_aiYieldFromBorderGrowth;
 	kStream >> m_aiYieldFromPillage;
+	kStream >> m_aiResourceQuantityFromPOP;
 #endif
 
 	if (uiVersion >= 4)
@@ -20019,8 +20056,12 @@ void CvCity::read(FDataStream& kStream)
 
 	kStream >> *m_pCityEspionage;
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	kStream >> m_iNumNoNuclearWinterLocal;
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	kStream >> m_iCanDoImmigration;
+	kStream >> m_bCanDoImmigration;
+	kStream >> m_iNumAllScaleImmigrantIn;
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	int iCityScale;
@@ -20268,6 +20309,7 @@ void CvCity::write(FDataStream& kStream) const
 #if defined(MOD_ROG_CORE)
 	kStream << m_aiYieldPerAlly;
 	kStream << m_aiYieldPerFriend;
+	kStream << m_aiNumTimesAttackedThisTurn;
 	kStream << m_aiBaseYieldRateFromCSAlliance;
 	kStream << m_aiBaseYieldRateFromCSFriendship;
 	kStream << m_aiSpecialistRateModifier;
@@ -20278,6 +20320,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiYieldFromBirth;
 	kStream << m_aiYieldFromBorderGrowth;
 	kStream << m_aiYieldFromPillage;
+	kStream << m_aiResourceQuantityFromPOP;
 #endif
 	kStream << m_aiYieldPerReligion;
 	kStream << m_aiYieldRateModifier;
@@ -20404,8 +20447,12 @@ void CvCity::write(FDataStream& kStream) const
 	m_pEmphases->Write(kStream);
 	kStream << *m_pCityEspionage;
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	kStream << m_iNumNoNuclearWinterLocal;
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	kStream << m_iCanDoImmigration;
+	kStream << m_bCanDoImmigration;
+	kStream << m_iNumAllScaleImmigrantIn;
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	kStream << (int) m_eCityScale;
@@ -20712,7 +20759,7 @@ void CvCity::ChangeNumTimesAttackedThisTurn(PlayerTypes ePlayer, int iValue)
 	VALIDATE_OBJECT
 	CvAssertMsg(ePlayer >= 0, "ePlayer expected to be >= 0");
 	CvAssertMsg(ePlayer < REALLY_MAX_PLAYERS, "ePlayer expected to be < NUM_DOMAIN_TYPES");
-	m_aiNumTimesAttackedThisTurn.setAt(ePlayer, m_aiNumTimesAttackedThisTurn[ePlayer] + iValue);
+	m_aiNumTimesAttackedThisTurn[ePlayer] += iValue;
 }
 int CvCity::GetNumTimesAttackedThisTurn(PlayerTypes ePlayer) const
 {
@@ -22999,14 +23046,42 @@ bool CvCity::HasYieldFromOtherYield() const
 }
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+bool CvCity::IsNoNuclearWinterLocal() const
+{
+	return m_iNumNoNuclearWinterLocal > 0;
+}
+void CvCity::ChangeNumNoNuclearWinterLocal(int iChange)
+{
+	m_iNumNoNuclearWinterLocal += iChange;
+}
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 bool CvCity::IsCanDoImmigration() const
 {
-	return m_iCanDoImmigration;
+	return m_bCanDoImmigration;
 }
-void CvCity::SetCanDoImmigration(bool iValue)
+void CvCity::SetCanDoImmigration(bool bValue)
 {
-	m_iCanDoImmigration = iValue;
+	m_bCanDoImmigration = bValue;
+}
+bool CvCity::CanImmigrantIn() const
+{
+	return !IsPuppet() && !IsRazing() && !IsResistance() && !GetCityCitizens()->IsForcedAvoidGrowth()
+		&& IsCanDoImmigration() && CanGrowNormally() && (CanScaleImmigrantIn() || CanAllScaleImmigrantIn())
+		&& GetCityCitizens()->GetSpecialistCount((SpecialistTypes)GC.getInfoTypeForString("SPECIALIST_CITIZEN")) <= 0;
+}
+bool CvCity::CanImmigrantOut() const
+{
+	return IsCanDoImmigration() && CanScaleImmigrantOut();
+}
+bool CvCity::CanAllScaleImmigrantIn() const
+{
+	return m_iNumAllScaleImmigrantIn > 0;
+}
+void CvCity::ChangeNumAllScaleImmigrantIn(int iChange)
+{
+	m_iNumAllScaleImmigrantIn += iChange;
 }
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
@@ -23114,6 +23189,18 @@ bool CvCity::CanGrowNormally() const
 	return false;
 }
 
+bool CvCity::CanScaleImmigrantIn() const
+{
+	auto* info = GetScaleInfo();
+	if (info == nullptr) return true;
+	return info->CanImmigrantIn();
+}
+bool CvCity::CanScaleImmigrantOut() const
+{
+	auto* info = GetScaleInfo();
+	if (info == nullptr) return true;
+	return info->CanImmigrantOut();
+}
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER

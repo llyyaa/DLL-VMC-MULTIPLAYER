@@ -236,8 +236,8 @@ CvPlayer::CvPlayer() :
 	, m_iFreeGreatArtistsCreated(0)
 	, m_iFreeGreatMusiciansCreated(0)
 
-	, m_iGreatPeopleCreated("CvPlayer::m_iGreatPeopleCreated", m_syncArchive)
-	, m_iGreatGeneralsCreated("CvPlayer::m_iGreatGeneralsCreated", m_syncArchive)
+	, m_iGreatPeopleCreated(0)
+	, m_iGreatGeneralsCreated(0)
 	, m_iGreatAdmiralsCreated(0)
 #if defined(MOD_GLOBAL_SEPARATE_GP_COUNTERS)
 	, m_iGreatMerchantsCreated(0)
@@ -391,16 +391,16 @@ CvPlayer::CvPlayer() :
 #if defined(MOD_ROG_CORE)
 	, m_aiYieldFromPillageGlobal()
 	, m_aiYieldFromPillage()
-	, m_iGlobalCityStrengthMod("CvPlayer::m_iGlobalCityStrengthMod", m_syncArchive)
-	, m_iGlobalRangedStrikeModifier("CvPlayer::m_iGlobalRangedStrikeModifier", m_syncArchive)
-	, m_iResearchTotalCostModifier("CvPlayer::m_iResearchTotalCostModifier", m_syncArchive)
-	, m_iLiberatedInfluence("CvPlayer::m_iLiberatedInfluence", m_syncArchive)
-	, m_iWaterTileDamageGlobal("CvPlayer::m_iWaterTileDamageGlobal", m_syncArchive)
-	, m_iWaterTileMovementReduceGlobal("CvPlayer::m_iWaterTileMovementReduceGlobal", m_syncArchive)
-	, m_iWaterTileTurnDamageGlobal("CvPlayer::m_iWaterTileTurnDamageGlobal", m_syncArchive)
-	, m_iLandTileDamageGlobal("CvPlayer::m_iLandTileDamageGlobal", m_syncArchive)
-	, m_iLandTileMovementReduceGlobal("CvPlayer::m_iLandTileMovementReduceGlobal", m_syncArchive)
-	, m_iLandTileTurnDamageGlobal("CvPlayer::m_iLandTileTurnDamageGlobal", m_syncArchive)
+	, m_iGlobalCityStrengthMod(0)
+	, m_iGlobalRangedStrikeModifier(0)
+	, m_iResearchTotalCostModifier(0)
+	, m_iLiberatedInfluence(0)
+	, m_iWaterTileDamageGlobal(0)
+	, m_iWaterTileMovementReduceGlobal(0)
+	, m_iWaterTileTurnDamageGlobal(0)
+	, m_iLandTileDamageGlobal(0)
+	, m_iLandTileMovementReduceGlobal(0)
+	, m_iLandTileTurnDamageGlobal(0)
 #endif
 
 	, m_iPopRushHurryCount("CvPlayer::m_iPopRushHurryCount", m_syncArchive)
@@ -461,19 +461,19 @@ CvPlayer::CvPlayer() :
 	, m_aiCityYieldChange("CvPlayer::m_aiCityYieldChange", m_syncArchive)
 
 #if defined(MOD_ROG_CORE)
-	, m_aiDomainFreeExperiencePerGreatWorkGlobal("CvPlayer::m_aiDomainFreeExperiencePerGreatWorkGlobal", m_syncArchive)
+	, m_aiDomainFreeExperiencePerGreatWorkGlobal()
 	, m_piDomainFreeExperience()
 	, m_piUnitTypePrmoteHealGlobal()
 #endif
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	, m_aiDomainTroopsTotal("CvPlayer::m_aiDomainTroopsTotal", m_syncArchive)
-	, m_aiDomainTroopsUsed("CvPlayer::m_aiDomainTroopsUsed", m_syncArchive)
+	, m_aiDomainTroopsTotal()
+	, m_aiDomainTroopsUsed()
 #endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	, m_aiImmigrationCounter("CvPlayer::m_aiImmigrationCounter", m_syncArchive)
+	, m_aiImmigrationCounter()
 #endif
-	, m_aiNegateWarmongerTurn("CvPlayer::m_aiNegateWarmongerTurn", m_syncArchive)
+	, m_aiNegateWarmongerTurn()
 	, m_aiPolicyModifiers("CvPlayer::m_aiPolicyModifiers", m_syncArchive)
 
 	, m_aiCoastalCityYieldChange("CvPlayer::m_aiCoastalCityYieldChange", m_syncArchive)
@@ -2270,7 +2270,7 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 	FFastSmallFixedList<IDInfo, 25, true, c_eCiv5GameplayDLL > oldUnits;
 	CvCityReligions tempReligions;
 	bool bIsMinorCivBuyout = (pOldCity->GetPlayer()->isMinorCiv() && bGift && (IsAbleToAnnexCityStates() || GetPlayerTraits()->IsNoAnnexing())); // Austria and Venice UA
-	bNoKillPunishment |= bIsMinorCivBuyout;
+	if(bIsMinorCivBuyout) bNoKillPunishment = true;
 
 	pCityPlot = pOldCity->plot();
 
@@ -3367,8 +3367,8 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 		if(pNewCity->getOriginalOwner() != GetID())
 		{
 			pNewCity->SetOccupied(true);
-
-			if ( (!GET_PLAYER(GetID()).CanNoResistance()) && !GET_PLAYER(GetID()).GetPlayerTraits()->IsNoResistance() )
+			// for dual empire or Minor Civ buyout, others cities should no be Resistant
+			if ( !bNoKillPunishment && (!GET_PLAYER(GetID()).CanNoResistance()) && !GET_PLAYER(GetID()).GetPlayerTraits()->IsNoResistance() )
 			{
 				int iInfluenceReduction = GetCulture()->GetInfluenceCityConquestReduction(eOldOwner);
 				int iOriginalResistanceTurns = pNewCity->getPopulation() * (100 - iInfluenceReduction) / 100;
@@ -3449,8 +3449,6 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 						// We are adding a popup that the player must make a choice in, make sure they are not in the end-turn phase.
 						CancelActivePlayerEndTurn();
 					}
-					// for dual empire, others cities should no be Resistant
-					if(bNoKillPunishment) pNewCity->ChangeResistanceTurns(-pNewCity->GetResistanceTurns());
 				}
 				else
 				{
@@ -4419,16 +4417,7 @@ UnitTypes CvPlayer::GetSpecificUnitType(const char* szUnitClass, bool hideAssert
 	
 	if (pkUnitClassInfo)
 	{
-		CvCivilizationInfo* pCivilizationInfo = GC.getCivilizationInfo(getCivilizationType());
-		
-		if (pCivilizationInfo != NULL)
-		{
-			eUnitType = (UnitTypes) pCivilizationInfo->getCivilizationUnits(eUnitClassType);
-		}
-		else
-		{
-			eUnitType = (UnitTypes) pkUnitClassInfo->getDefaultUnitIndex();
-		}
+		eUnitType = GetCivUnit(eUnitClassType);
 	}
 	
 	if (!isMinorCiv() && !isBarbarian()) {
@@ -8873,7 +8862,7 @@ bool CvPlayer::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestV
 
 				for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 				{
-					if (pLoopCity->GetNumBuildingClass((BuildingClassTypes)iI) <= 0)
+					if (pLoopCity && !pLoopCity->IsPuppet() && pLoopCity->GetNumBuildingClass((BuildingClassTypes)iI) <= 0)
 					{
 						(*toolTipSink) += pLoopCity->getName();
 						(*toolTipSink) += " ";
@@ -9985,24 +9974,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	BuildingClassTypes eFreeBuildingClass = (BuildingClassTypes)pBuildingInfo->GetFreeBuildingClass();
 	if(eFreeBuildingClass != NO_BUILDINGCLASS)
 	{
-		BuildingTypes eFreeBuilding = NO_BUILDING;
-		BuildingTypes eDefaultBuilding = (BuildingTypes)GC.getBuildingClassInfo(eFreeBuildingClass)->getDefaultBuildingIndex();
-		if(IsLostUC()) eFreeBuilding = eDefaultBuilding;
-		else eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(eFreeBuildingClass);
-		if(eFreeBuilding == eDefaultBuilding)
-		{
-			std::vector<BuildingTypes> vFreeBuildings;
-			for (auto iBuilding : GetUBFromExtra())
-			{
-				if (GC.getBuildingInfo(iBuilding)->GetBuildingClassType() != eFreeBuildingClass) continue;
-				if (iBuilding == eDefaultBuilding) continue;
-				vFreeBuildings.push_back(iBuilding);
-			}
-			vFreeBuildings.push_back(eDefaultBuilding);
-			eFreeBuilding = vFreeBuildings[0];
-		}
-		
-		changeFreeBuildingCount(eFreeBuilding, iChange);
+		changeFreeBuildingCount(GetCivBuilding(eFreeBuildingClass), iChange);
 	}
 
 	// Unit upgrade cost mod
@@ -17756,7 +17728,7 @@ void CvPlayer::ChangeDomainFreeExperiencePerGreatWorkGlobal(DomainTypes eIndex, 
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainFreeExperiencePerGreatWorkGlobal.setAt(eIndex, m_aiDomainFreeExperiencePerGreatWorkGlobal[eIndex] + iChange);
+	m_aiDomainFreeExperiencePerGreatWorkGlobal[eIndex] += iChange;
 }
 
 //	--------------------------------------------------------------------------------
@@ -17824,14 +17796,14 @@ void CvPlayer::ChangeDomainTroopsTotalTimes100(int iChange, DomainTypes eIndex)
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainTroopsTotal.setAt(eIndex, m_aiDomainTroopsTotal[eIndex] + iChange);
+	m_aiDomainTroopsTotal[eIndex] += iChange;
 }
 void CvPlayer::SetDomainTroopsTotalTimes100(int iValue, DomainTypes eIndex)
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainTroopsTotal.setAt(eIndex, iValue);
+	m_aiDomainTroopsTotal[eIndex] = iValue;
 }
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetDomainTroopsUsed(DomainTypes eIndex) const
@@ -17846,14 +17818,14 @@ void CvPlayer::ChangeDomainTroopsUsed(int iChange, DomainTypes eIndex)
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainTroopsUsed.setAt(eIndex, m_aiDomainTroopsUsed[eIndex] + iChange);
+	m_aiDomainTroopsUsed[eIndex] +=  iChange;
 }
 void CvPlayer::SetDomainTroopsUsed(int iValue, DomainTypes eIndex)
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_DOMAIN_TYPES, "eIndex expected to be < NUM_DOMAIN_TYPES");
-	m_aiDomainTroopsUsed.setAt(eIndex, iValue);
+	m_aiDomainTroopsUsed[eIndex] = iValue;
 }
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetTroopsRateTimes100() const
@@ -17946,14 +17918,14 @@ void CvPlayer::ChangeImmigrationCounter(int iIndex, int iChange)
 	VALIDATE_OBJECT
 	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
 	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
-	m_aiImmigrationCounter.setAt(iIndex, m_aiImmigrationCounter[iIndex] + iChange);
+	m_aiImmigrationCounter[iIndex] += iChange;
 }
 void CvPlayer::SetImmigrationCounter(int iIndex, int iValue)
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
 	CvAssertMsg(iIndex < MAX_MAJOR_CIVS, "iIndex expected to be < MAX_MAJOR_CIVS");
-	m_aiImmigrationCounter.setAt(iIndex, iValue);
+	m_aiImmigrationCounter[iIndex] = iValue;
 }
 int CvPlayer::GetImmigrationRate(PlayerTypes eTargetPlayer) const
 {
@@ -18077,7 +18049,7 @@ void CvPlayer::SetNegateWarmongerTurn(int iIndex, int iValue)
 	VALIDATE_OBJECT
 	CvAssertMsg(iIndex >= 0, "iIndex expected to be >= 0");
 	CvAssertMsg(iIndex < MAX_CIV_PLAYERS, "iIndex expected to be < MAX_CIV_PLAYERS");
-	m_aiNegateWarmongerTurn.setAt(iIndex, iValue);
+	m_aiNegateWarmongerTurn[iIndex] = iValue;
 }
 
 #if defined(MOD_ROG_CORE)
@@ -19650,7 +19622,7 @@ void CvPlayer::setCombatExperience(int iExperience)
 								if(pkUnitInfo->GetFreePromotions(eGreatGeneralPromotion))
 								{
 									// Is this the right unit of this class for this civ?
-									const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
+									const UnitTypes eUnit = GetCivUnit((UnitClassTypes)pkUnitInfo->GetUnitClassType());
 
 									if(eUnit == eLoopUnit)
 									{
@@ -19862,7 +19834,7 @@ void CvPlayer::setNavalCombatExperience(int iExperience)
 								if(pkUnitInfo->GetFreePromotions(eGreatAdmiralPromotion))
 								{
 									// Is this the right unit of this class for this civ?
-									const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits((UnitClassTypes)pkUnitInfo->GetUnitClassType());
+									const UnitTypes eUnit = GetCivUnit((UnitClassTypes)pkUnitInfo->GetUnitClassType());
 
 									if(eUnit == eLoopUnit)
 									{
@@ -20090,30 +20062,60 @@ bool CvPlayer::isMajorCiv() const
 
 BuildingTypes CvPlayer::GetCivBuilding(BuildingClassTypes eBuildingClass) const
 {
-	if (eBuildingClass == NO_BUILDINGCLASS || eBuildingClass >= GC.getNumBuildingClassInfos())
-		return NO_BUILDING;
+	CvBuildingClassInfo* pBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
+	if(!pBuildingClassInfo) return NO_BUILDING;
 
-	if (!isMajorCiv())
+	BuildingTypes eCivBuilding = NO_BUILDING;
+	if(IsLostUC()) eCivBuilding = (BuildingTypes)pBuildingClassInfo->getDefaultBuildingIndex();
+	else eCivBuilding = (BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(eBuildingClass));
+
+	if(!MOD_GLOBAL_OPTIONAL_UC) return eCivBuilding;
+
+	BuildingTypes eDefaultBuilding = (BuildingTypes)pBuildingClassInfo->getDefaultBuildingIndex();;
+	// if this player has a Unique Building, choose it, or try to find a Unique Building
+	if(eCivBuilding == eDefaultBuilding)
 	{
-		return (BuildingTypes)GC.getBuildingClassInfo(eBuildingClass)->getDefaultBuildingIndex();
+		std::vector<BuildingTypes> vBuildings;
+		for (auto iBuilding : const_cast<CvPlayer*>(this)->GetUBFromExtra())
+		{
+			if (GC.getBuildingInfo(iBuilding)->GetBuildingClassType() != eBuildingClass) continue;
+			if (iBuilding == eDefaultBuilding) continue;
+			vBuildings.push_back(iBuilding);
+		}
+		vBuildings.push_back(eDefaultBuilding);
+		eCivBuilding = vBuildings[0];
 	}
 
-	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
-	return (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
+	return eCivBuilding;
 }
 
-UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass) const
+UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass, int iFakeSeed) const
 {
-	if (eUnitClass == NO_UNITCLASS || eUnitClass >= GC.getNumUnitClassInfos())
-		return NO_UNIT;
+	CvUnitClassInfo* pUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
+	if(!pUnitClassInfo) return NO_UNIT;
 
-	if (!isMajorCiv())
+	UnitTypes eCivUnit = NO_UNIT;
+	if(IsLostUC()) eCivUnit = (UnitTypes)pUnitClassInfo->getDefaultUnitIndex();
+	else eCivUnit = (UnitTypes)getCivilizationInfo().getCivilizationUnits(eUnitClass);
+
+	if(!MOD_GLOBAL_OPTIONAL_UC) return eCivUnit;
+
+	std::vector<UnitTypes> vUnitTypes;
+	for (auto iUnit : const_cast<CvPlayer*>(this)->GetUUFromExtra())
 	{
-		return (UnitTypes)GC.getUnitClassInfo(eUnitClass)->getDefaultUnitIndex();
+		if (GC.getUnitInfo(iUnit)->GetUnitClassType() != eUnitClass) continue;
+		if (iUnit == eCivUnit) continue;
+		vUnitTypes.push_back(iUnit);
 	}
+	if(const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eCivUnit) == 0) vUnitTypes.push_back(eCivUnit);
+	if (vUnitTypes.size() > 1)
+	{
+		eCivUnit = vUnitTypes[GC.getGame().getSmallFakeRandNum(vUnitTypes.size(), iFakeSeed)];
+	}
+	else if(vUnitTypes.size() == 1) eCivUnit = vUnitTypes[0];
+	else eCivUnit = NO_UNIT;
 
-	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
-	return (UnitTypes)playerCivilizationInfo.getCivilizationUnits(eUnitClass);
+	return eCivUnit;
 }
 
 #endif
@@ -22124,7 +22126,7 @@ void CvPlayer::DoCivilianReturnLogic(bool bReturn, PlayerTypes eToPlayer, int iU
 	UnitTypes eNewUnitType = pUnit->getUnitType();
 
 	if(!bReturn)
-		eNewUnitType = pUnit->getCaptureUnitType(getCivilizationType());
+		eNewUnitType = pUnit->getCaptureUnitType(GetID());
 
 	int iX = pUnit->getX();
 	int iY = pUnit->getY();
@@ -22821,8 +22823,8 @@ void CvPlayer::DoTestOverResourceNotification(ResourceTypes eIndex, bool bIsDoTu
 			CvNotifications* pNotifications = GetNotifications();
 			if(pNotifications && strText.length() > 0)
 			{
-				strText = GetLocalizedText("TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1",pkResourceInfo->GetTextKey()) + strText;
-				Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OVER_RESOURCE_LIMIT");
+				strText = GetLocalizedText("TXT_KEY_NOTIFICATION_RESOURCE_LIMIT_GLOBAL_1", pkResourceInfo->GetTextKey()) + strText;
+				Localization::String strSummary;
 				strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OVER_RESOURCE_LIMIT");
 				strSummary << pkResourceInfo->GetTextKey();
 				pNotifications->Add(NOTIFICATION_DEMAND_RESOURCE, strText, strSummary.toUTF8(), -1, -1, eIndex);
@@ -27540,7 +27542,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 							int iNumFreeUnits = pFreeUnitClasses[iI].second;
 							if(iNumFreeUnits > 0)
 							{
-								const UnitTypes eUnit = (UnitTypes) getCivilizationInfo().getCivilizationUnits(eUnitClass);
+								const UnitTypes eUnit = GetCivUnit(eUnitClass);
 								CvUnitEntry* pUnitEntry = GC.getUnitInfo(eUnit);
 								getCapitalCity()->initFreeUnit(*this, eUnit, iNumFreeUnits, false);
 							}
@@ -28216,6 +28218,19 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iCapitalGrowthMod;
 	kStream >> m_iNumPlotsBought;
 	kStream >> m_iPlotGoldCostMod;
+#if defined(MOD_ROG_CORE)
+	kStream >> m_iGlobalCityStrengthMod;
+	kStream >> m_iGlobalRangedStrikeModifier;
+	kStream >> m_iResearchTotalCostModifier;
+	kStream >> m_iLiberatedInfluence;
+
+	kStream >> m_iWaterTileDamageGlobal;
+	kStream >> m_iWaterTileMovementReduceGlobal;
+	kStream >> m_iWaterTileTurnDamageGlobal;
+	kStream >> m_iLandTileDamageGlobal;
+	kStream >> m_iLandTileMovementReduceGlobal;
+	kStream >> m_iLandTileTurnDamageGlobal;
+#endif
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING) || defined(MOD_TECHS_CITY_WORKING)
 	MOD_SERIALIZE_READ(23, kStream, m_iCityWorkingChange, 0);
 #endif
@@ -28961,6 +28976,19 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iCapitalGrowthMod;
 	kStream << m_iNumPlotsBought;
 	kStream << m_iPlotGoldCostMod;
+#if defined(MOD_ROG_CORE)
+	kStream << m_iGlobalCityStrengthMod;
+	kStream << m_iGlobalRangedStrikeModifier;
+	kStream << m_iResearchTotalCostModifier;
+	kStream << m_iLiberatedInfluence;
+
+	kStream << m_iWaterTileDamageGlobal;
+	kStream << m_iWaterTileMovementReduceGlobal;
+	kStream << m_iWaterTileTurnDamageGlobal;
+	kStream << m_iLandTileDamageGlobal;
+	kStream << m_iLandTileMovementReduceGlobal;
+	kStream << m_iLandTileTurnDamageGlobal;
+#endif
 #if defined(MOD_TRAITS_CITY_WORKING) || defined(MOD_BUILDINGS_CITY_WORKING) || defined(MOD_POLICIES_CITY_WORKING) || defined(MOD_TECHS_CITY_WORKING)
 	MOD_SERIALIZE_WRITE(kStream, m_iCityWorkingChange);
 #endif

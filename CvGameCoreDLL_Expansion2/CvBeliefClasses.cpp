@@ -70,6 +70,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iHolyCityUnitExperence(0),
 	m_iHolyCityPressureModifier(0),
 	m_iSameReligionMinorRecoveryModifier(0),
+	m_iCuttingBonusModifier(0),
 	m_iCityExtraMissionarySpreads(0),
 	m_bAllowYieldPerBirth(false),
 	m_piYieldPerBirth(NULL),
@@ -793,6 +794,11 @@ int CvBeliefEntry::GetSameReligionMinorRecoveryModifier() const
 {
 	return m_iSameReligionMinorRecoveryModifier;
 }
+//Extra Production Bonus When Remove Forest/Jungle
+int CvBeliefEntry::GetCuttingBonusModifier() const
+{
+	return m_iCuttingBonusModifier;
+}
 //Extra Missionary Spreads
 int CvBeliefEntry::GetCityExtraMissionarySpreads() const
 {
@@ -953,6 +959,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iCityExtraMissionarySpreads	  = kResults.GetInt("CityExtraMissionarySpreads");
 	m_iHolyCityPressureModifier	  	  = kResults.GetInt("HolyCityPressureModifier");
 	m_iSameReligionMinorRecoveryModifier = kResults.GetInt("SameReligionMinorRecoveryModifier");
+	m_iCuttingBonusModifier = kResults.GetInt("CuttingBonusModifier");
 #endif
 
 	m_bPantheon						  = kResults.GetBool("Pantheon");
@@ -1429,6 +1436,7 @@ CvReligionBeliefs::CvReligionBeliefs(const CvReligionBeliefs& source)
 	m_iHolyCityUnitExperence = source.m_iHolyCityUnitExperence;
 	m_iHolyCityPressureModifier = source.m_iHolyCityPressureModifier;
 	m_iSameReligionMinorRecoveryModifier = source.m_iSameReligionMinorRecoveryModifier;
+	m_iCuttingBonusModifier = source.m_iCuttingBonusModifier;
 	m_iCityExtraMissionarySpreads = source.m_iCityExtraMissionarySpreads;
 	m_bAllowYieldPerBirth = source.m_bAllowYieldPerBirth;
 #endif
@@ -1494,6 +1502,7 @@ void CvReligionBeliefs::Reset()
 	m_iHolyCityUnitExperence = 0;
 	m_iHolyCityPressureModifier = 0;
 	m_iSameReligionMinorRecoveryModifier = 0;
+	m_iCuttingBonusModifier = 0;
 	m_iCityExtraMissionarySpreads = 0;
 	m_bAllowYieldPerBirth = false;
 #endif
@@ -1586,6 +1595,7 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief, PlayerTypes ePlayer)
 	m_iHolyCityUnitExperence += belief->GetHolyCityUnitExperence();
 	m_iHolyCityPressureModifier += belief->GetHolyCityPressureModifier();
 	m_iSameReligionMinorRecoveryModifier += belief->GetSameReligionMinorRecoveryModifier();
+	m_iCuttingBonusModifier += belief->GetCuttingBonusModifier();
 	m_iCityExtraMissionarySpreads += belief->GetCityExtraMissionarySpreads();
 	m_bAllowYieldPerBirth = m_bAllowYieldPerBirth || belief->AllowYieldPerBirth();
 #endif
@@ -2568,6 +2578,7 @@ void CvReligionBeliefs::Read(FDataStream& kStream)
 	kStream >> m_iHolyCityUnitExperence;
 	kStream >> m_iHolyCityPressureModifier;
 	kStream >> m_iSameReligionMinorRecoveryModifier;
+	kStream >> m_iCuttingBonusModifier;
 	kStream >> m_iCityExtraMissionarySpreads;
 	kStream >> m_bAllowYieldPerBirth;
 #endif
@@ -2629,6 +2640,7 @@ void CvReligionBeliefs::Write(FDataStream& kStream) const
 	kStream << m_iHolyCityUnitExperence;
 	kStream << m_iHolyCityPressureModifier;
 	kStream << m_iSameReligionMinorRecoveryModifier;
+	kStream << m_iCuttingBonusModifier;
 	kStream << m_iCityExtraMissionarySpreads;
 	kStream << m_bAllowYieldPerBirth;
 #endif

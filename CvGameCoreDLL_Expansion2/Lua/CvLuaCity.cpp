@@ -767,6 +767,8 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	Method(IsCanDoImmigration);
 	Method(SetCanDoImmigration);
+	Method(CanImmigrantIn);
+	Method(CanImmigrantOut);
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	Method(GetScale);
@@ -2343,12 +2345,8 @@ int CvLuaCity::lGetNumBuildingClass(lua_State* L)
 	{
 		lua_pushinteger(L, 0);
 		return 1;
-
 	}
-
-	CvPlayerAI& pkPlayer = GET_PLAYER(pkCity->getOwner());
-	BuildingTypes eBuilding = pkPlayer.GetCivBuilding(eBuildingClassType);
-	lua_pushinteger(L, eBuilding == NO_BUILDING? 0 : pkCity->GetCityBuildings()->GetNumBuilding(eBuilding));
+	lua_pushinteger(L, pkCity->GetNumBuildingClass(eBuildingClassType));
 
 	return 1;
 }
@@ -2363,10 +2361,7 @@ int CvLuaCity::lIsHasBuildingClass(lua_State* L)
 		lua_pushboolean(L, false);
 		return 1;
 	}
-
-	CvPlayerAI& pkPlayer = GET_PLAYER(pkCity->getOwner());
-	BuildingTypes eBuilding = pkPlayer.GetCivBuilding(eBuildingClassType);
-	lua_pushboolean(L, eBuilding == NO_BUILDING ? false : pkCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0);
+	lua_pushboolean(L, pkCity->GetNumBuildingClass(eBuildingClassType) > 0);
 
 	return 1;
 }
@@ -5216,6 +5211,8 @@ int CvLuaCity::lIsSecondaryReligionActive(lua_State* L)
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 LUAAPIIMPL(City, IsCanDoImmigration)
 LUAAPIIMPL(City, SetCanDoImmigration)
+LUAAPIIMPL(City, CanImmigrantIn)
+LUAAPIIMPL(City, CanImmigrantOut)
 #endif
 
 #ifdef MOD_GLOBAL_CITY_SCALES

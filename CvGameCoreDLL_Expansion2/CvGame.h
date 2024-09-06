@@ -69,6 +69,18 @@ public:
 
 	int GetMapScoreMod() const;
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	int GetNuclearWinterProcess() const;
+	void ChangeNuclearWinterProcess(int iChange, bool bUpdate = false, bool bAllowLevelReduce = false);
+	int GetNuclearWinterNaturalReduction() const;
+	void ChangeNuclearWinterNaturalReduction(int iChange);
+	int GetNowNuclearWinterLevelIndex();
+	void DoNuclearWinterTurn();
+	void UpdateNuclearWinterLevel();
+	int GetNuclearWinterYieldMultiplier(YieldTypes eIndex);
+	int GetYieldFromNuclearWinter(YieldTypes eIndex);
+#endif
+
 	void updateCitySight(bool bIncrement);
 	void updateSelectionList();
 	void updateTestEndTurn();
@@ -686,6 +698,12 @@ protected:
 	int m_iNumVictoryVotesExpected;
 	int m_iVotesNeededForDiploVictory;
 	int m_iMapScoreMod;
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	int m_iNuclearWinterProcess;
+	int m_iNuclearWinterNaturalReduction;
+	int m_iNuclearWinterLevelIndex;
+#endif
 
 	unsigned int m_uiInitialTime;
 

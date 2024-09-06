@@ -32,6 +32,8 @@ protected:
     std::vector<BuildingTypes> m_vBuildingsSupportGrowth;
 
     bool m_bNeedGrowthBuilding = false;
+    bool m_bCanImmigrantIn = true;
+    bool m_bCanImmigrantOut =  true;
 
 public:
     inline int GetMinPopulation() const { return m_iMinPopulation; }
@@ -40,6 +42,8 @@ public:
     inline auto GetFreeBuildingClassInfoFromTraits() -> decltype(m_vFreeBuildingClassInfoFromTraits)& { return m_vFreeBuildingClassInfoFromTraits; }
     inline auto GetBuildingsSupportGrowth() -> decltype(m_vBuildingsSupportGrowth)& { return m_vBuildingsSupportGrowth; }
     inline bool NeedGrowthBuilding() { return m_bNeedGrowthBuilding; }
+    inline bool CanImmigrantIn() { return m_bCanImmigrantIn; }
+    inline bool CanImmigrantOut() { return m_bCanImmigrantOut; }
 };
 
 class CvCityScaleXMLEntries

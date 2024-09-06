@@ -109,6 +109,7 @@ public:
 	int GetCombatBonusVsHigherTech() const;
 	int GetAwayFromCapitalCombatModifier() const;
 	int GetAwayFromCapitalCombatModifierMax() const;
+	int GetInfluenceFromGreatPeopleBirth() const;
 	int GetCombatBonusVsLargerCiv() const;
 	int GetLandUnitMaintenanceModifier() const;
 	int GetNavalUnitMaintenanceModifier() const;
@@ -278,6 +279,8 @@ public:
 
 	bool NoTrain(UnitClassTypes eUnitClassType);
 
+	int GetSeaTradeRouteYieldPerEraTimes100(const YieldTypes eYield) const;
+	int GetSeaTradeRouteYieldTimes100(const YieldTypes eYield) const;
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYield) const;
 #endif
@@ -385,6 +388,7 @@ protected:
 	int m_iCombatBonusVsHigherTech;
 	int m_iAwayFromCapitalCombatModifier;
 	int m_iAwayFromCapitalCombatModifierMax;
+	int m_iInfluenceFromGreatPeopleBirth;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
 	int m_iNavalUnitMaintenanceModifier;
@@ -535,6 +539,9 @@ protected:
 #endif
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
 	std::vector<bool> m_abNoTrainUnitClass;
+
+	int m_piSeaTradeRouteYieldPerEraTimes100[NUM_YIELD_TYPES];
+	int m_piSeaTradeRouteYieldTimes100[NUM_YIELD_TYPES];
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];
@@ -838,6 +845,10 @@ public:
 	int GetAwayFromCapitalCombatModifierMax() const
 	{
 		return m_iAwayFromCapitalCombatModifierMax;
+	};
+	int GetInfluenceFromGreatPeopleBirth() const
+	{
+		return m_iInfluenceFromGreatPeopleBirth;
 	};
 	int GetCombatBonusVsLargerCiv() const
 	{
@@ -1273,6 +1284,15 @@ public:
 
 	bool NoTrain(UnitClassTypes eUnitClassType);
 
+	int GetSeaTradeRouteYieldPerEraTimes100(const YieldTypes eYieldType) const
+	{
+		return m_piSeaTradeRouteYieldPerEraTimes100[eYieldType];
+	}
+	int GetSeaTradeRouteYieldTimes100(const YieldTypes eYieldType) const
+	{
+		return m_piSeaTradeRouteYieldTimes100[eYieldType];
+	}
+
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int GetPerMajorReligionFollowerYieldModifier(const YieldTypes eYieldType) const
 	{
@@ -1407,6 +1427,7 @@ private:
 	int m_iCombatBonusVsHigherTech;
 	int m_iAwayFromCapitalCombatModifier;
 	int m_iAwayFromCapitalCombatModifierMax;
+	int m_iInfluenceFromGreatPeopleBirth;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
 	int m_iNavalUnitMaintenanceModifier;
@@ -1566,6 +1587,9 @@ private:
 	std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > > m_ppiCityYieldPerAdjacentFeature;
 
 	std::vector<FreeResourceXCities> m_aFreeResourceXCities;
+
+	int m_piSeaTradeRouteYieldPerEraTimes100[NUM_YIELD_TYPES];
+	int m_piSeaTradeRouteYieldTimes100[NUM_YIELD_TYPES];
 
 #ifdef MOD_TRAIT_RELIGION_FOLLOWER_EFFECTS
 	int m_piPerMajorReligionFollowerYieldModifier[NUM_YIELD_TYPES];

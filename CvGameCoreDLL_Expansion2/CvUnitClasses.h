@@ -102,6 +102,9 @@ public:
 	bool IsNoTroops() const;
 	bool IsCannotBeEstablishedCorps() const;
 #endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	int GetNuclearWinterProcess() const;
+#endif
 
 	int GetSpecialCargo() const;
 	int GetDomainCargo() const;
@@ -151,6 +154,7 @@ public:
 	int GetFreePolicies() const;
 	int GetOneShotTourism() const;
 	int GetOneShotTourismPercentOthers() const;
+	int GetGoldFromTourismModifier() const;
 	bool IsIgnoreBuildingDefense() const;
 	bool IsPrereqResources() const;
 	bool IsMechUnit() const;
@@ -295,6 +299,9 @@ private:
 	bool m_bNoTroops;
 	bool m_bCannotBeEstablishedCorps;
 #endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	int m_iNuclearWinterProcess;
+#endif
 
 	int m_iSpecialCargo;
 
@@ -344,6 +351,7 @@ private:
 	int m_iFreePolicies;
 	int m_iOneShotTourism;
 	int m_iOneShotTourismPercentOthers;
+	int m_iGoldFromTourismModifier;
 	bool m_bIgnoreBuildingDefense;
 	bool m_bPrereqResources;
 	bool m_bMechanized;

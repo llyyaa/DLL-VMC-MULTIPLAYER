@@ -5949,7 +5949,7 @@ void CvTeam::setHasTech(TechTypes eIndex, bool bNewValue, PlayerTypes ePlayer, b
 				{
 					bFirstResource = true;
 
-					eFreeUnit = ((UnitTypes)(GET_PLAYER(ePlayer).getCivilizationInfo().getCivilizationUnits(GC.getTechInfo(eIndex)->GetFirstFreeUnitClass())));
+					eFreeUnit = GET_PLAYER(ePlayer).GetCivUnit((UnitClassTypes)GC.getTechInfo(eIndex)->GetFirstFreeUnitClass());
 
 					if (eFreeUnit != NULL)
 					{
@@ -6892,8 +6892,7 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 			int iUnitClass = kPlayer.GetPlayerTraits()->GetFirstFreeUnit(eTech);
 			while(iUnitClass != NO_UNITCLASS)
 			{
-				CvCivilizationInfo& playerCivilization = kPlayer.getCivilizationInfo();
-				eLoopUnit = (UnitTypes)playerCivilization.getCivilizationUnits(iUnitClass);
+				eLoopUnit = kPlayer.GetCivUnit((UnitClassTypes)iUnitClass);
 				iDefaultAI = GC.GetGameUnits()->GetEntry(eLoopUnit)->GetDefaultUnitAIType();
 				pNewUnitPlot = kPlayer.addFreeUnit(eLoopUnit,(UnitAITypes)iDefaultAI);
 

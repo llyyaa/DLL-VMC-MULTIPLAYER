@@ -1130,6 +1130,8 @@
 
     <Row Class="6" Name="INTERNATIONAL_IMMIGRATION_FOR_SP" Value="0"/>
 
+    <Row Class="6" Name="NUCLEAR_WINTER_FOR_SP" Value="0"/>
+
     <Row Class="6" Name="UNIT_COST_DONOT_INCTEASE_WITH_TURN" Value="0"/> 
 
     <!-- Enabled option may influence Game -->
@@ -1194,6 +1196,7 @@
     <Row Class="6" Name="GLOBAL_SP_BARBARIAN_ENHANCE" Value="0"/>
 
     <Row Class="6" Name="GLOBAL_UNIQUE_PROJECT_CAPTURE" Value="0"/>
+    <Row Class="6" Name="GLOBAL_OPTIONAL_UC" Value="0"/>
 
     <Row Class="6" Name="DISABLE_AI_DO_TURN_DIPLOMACY_TO_HUMAN" Value="0"/>
   </CustomModOptions>

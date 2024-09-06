@@ -590,6 +590,9 @@
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_CRIME">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自犯罪率</Text>
 		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_NUCLEAR_WINTER">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自核冬天</Text>
+		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_SPIES">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自間諜</Text>
 		</Row>
@@ -730,6 +733,10 @@
 			<Text>[NEWLINE][ICON_BULLET]城市級總值修正: {1_Num}%</Text>
 		</Row>
 
+		<Row Tag="TXT_KEY_NUCLERA_WINTER_YIELD">
+			<Text>[NEWLINE][ICON_BULLET]核冬天總值修正: {1_Num}%</Text>
+		</Row>
+
 		<Row Tag="TXT_KEY_DIPLO_MARRIAGE">
 			<Text>外交聯姻</Text>
 		</Row>
@@ -758,5 +765,23 @@
 			<Text>{1_CivName:textkey}與{2_CivName:textkey}現在達成二元帝國協定了！ </Text>
 		</Row>
 
+		<Row Tag="TXT_KEY_NUCLEAR_LEVEL_NONE">
+			<Text>天朗氣清</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NUCLEAR_LEVEL_NONE_HELP">
+			<Text>星球上現有的核煙雲和輻射塵已被完全清除，全球城市的產出不再受到核冬天影響！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_NUCLEAR_WINTER_PROCESS_CHANGED">
+			<Text>核冬天階段已改變：{1_ProcessName}！</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_NUCLEAR_WINTER_GLOBAL_EFFECT">
+			<Text>基於當前核冬天階段，每100點核冬天點數將使全球城市受到以下影響：</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUCLEAR_WINTER_DEBUFF_YIELD">
+			<Text>{1_IconString}{2_Description}[COLOR_NEGATIVE_TEXT]{3_Num}[ENDCOLOR]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_NUCLEAR_WINTER_DEBUFF_YIELD_MULTIPLIER">
+			<Text>{1_IconString}{2_Description}總值[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

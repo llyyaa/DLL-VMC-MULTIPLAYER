@@ -403,7 +403,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 	int iOrderTotal = 0;
 
 	// For SP, different victory priority are given different weights in different Ideology
-	if(MOD_SP_SMART_AI)
+	if(!MOD_SP_SMART_AI)
 	{
 		iFreedomTotal = iDiploPriority + iTechPriority + iCulturePriority;
 		iAutocracyTotal = iDiploPriority + iConquestPriority + iCulturePriority;

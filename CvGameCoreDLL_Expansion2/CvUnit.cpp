@@ -259,6 +259,7 @@ CvUnit::CvUnit() :
 	, m_iExtraRoughRangedAttackMod("CvUnit::m_iExtraRoughRangedAttackMod", m_syncArchive)
 	, m_iExtraAttackFortifiedMod("CvUnit::m_iExtraAttackFortifiedMod", m_syncArchive)
 	, m_iExtraAttackWoundedMod("CvUnit::m_iExtraAttackWoundedMod", m_syncArchive)
+	, m_iExtraWoundedMod("CvUnit::m_iExtraWoundedMod", m_syncArchive)
 	, m_iFlankAttackModifier(0)
 	, m_iRangedFlankAttackModifier(0)
 	, m_iRangedFlankAttackModifierPercent(0)
@@ -1016,6 +1017,19 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	{
 		kPlayer.ChangeNumGreatPersonSincePolicy(1);
 	}
+	//influence from GreatPeople's birth
+	if(IsGreatPerson() && kPlayer.GetPlayerTraits()->GetInfluenceFromGreatPeopleBirth() != 0)
+	{
+		int iInfluenceFromGreatPeopleBirth = kPlayer.GetPlayerTraits()->GetInfluenceFromGreatPeopleBirth();
+		for (int iMinorLoop = MAX_MAJOR_CIVS; iMinorLoop < MAX_CIV_PLAYERS; iMinorLoop++)
+		{
+			TeamTypes eTeam = GET_PLAYER((PlayerTypes)iMinorLoop).getTeam();
+			if (getTeam() != eTeam && GET_TEAM(eTeam).isHasMet(getTeam()))
+			{
+				GET_PLAYER((PlayerTypes)iMinorLoop).GetMinorCivAI()->ChangeFriendshipWithMajor(getOwner(), iInfluenceFromGreatPeopleBirth);
+			}
+		}
+	}
 
 	// Recon unit? If so, he sees what's around him
 	if(IsRecon())
@@ -1247,6 +1261,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraRoughRangedAttackMod= 0;
 	m_iExtraAttackFortifiedMod= 0;
 	m_iExtraAttackWoundedMod= 0;
+	m_iExtraWoundedMod= 0;
 	m_iFlankAttackModifier=0;
 	m_iRangedFlankAttackModifier = 0;
 	m_iRangedFlankAttackModifierPercent = 0;
@@ -2483,7 +2498,7 @@ bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerT
 	else if(isBarbarian() || (kCaptureDef.eCapturingPlayer != NO_PLAYER && GET_PLAYER(kCaptureDef.eCapturingPlayer).isBarbarian()))
 	{
 		// Must be able to capture this unit normally... don't want the barbs picking up Workboats, Generals, etc.
-		if(kCaptureDef.eCapturingPlayer != NO_PLAYER && getCaptureUnitType(GET_PLAYER(kCaptureDef.eCapturingPlayer).getCivilizationType()) != NO_UNIT)
+		if(kCaptureDef.eCapturingPlayer != NO_PLAYER && getCaptureUnitType(kCaptureDef.eCapturingPlayer) != NO_UNIT)
 			// Unit type is the same as what it was
 			kCaptureDef.eCaptureUnitType = getUnitType();
 	}
@@ -2492,7 +2507,7 @@ bool CvUnit::getCaptureDefinition(CvUnitCaptureDefinition* pkCaptureDef, PlayerT
 	else
 	{
 		if(kCaptureDef.eCapturingPlayer != NO_PLAYER)
-			kCaptureDef.eCaptureUnitType = getCaptureUnitType(GET_PLAYER(kCaptureDef.eCapturingPlayer).getCivilizationType());
+			kCaptureDef.eCaptureUnitType = getCaptureUnitType(kCaptureDef.eCapturingPlayer);
 	}
 
 	CvPlot* pkPlot = plot();
@@ -12497,12 +12512,14 @@ bool CvUnit::blastTourism()
 	int iTourismBlast = getBlastTourism();
 
 	int iTourismBlastPercentOthers = m_pUnitInfo->GetOneShotTourismPercentOthers();
+	int iGoldFromTourismModifier = m_pUnitInfo->GetGoldFromTourismModifier();
 	PlayerTypes eOwner = pPlot->getOwner();
 	CvPlayer &kUnitOwner = GET_PLAYER(getOwner());
 
 	// Apply to target
 	kUnitOwner.GetCulture()->ChangeInfluenceOn(eOwner, iTourismBlast);
-
+	// Get Gold from tourism
+	kUnitOwner.GetTreasury()->ChangeGold( iTourismBlast * iGoldFromTourismModifier / 100);
 	// Apply lesser amount to other civs
 	int iTourismBlastOthers = iTourismBlast * iTourismBlastPercentOthers / 100;
 	PlayerTypes eLoopPlayer;
@@ -13465,25 +13482,8 @@ UnitTypes CvUnit::GetUpgradeUnitType() const
 		CvUnitClassInfo* pkUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
 		if(pkUnitClassInfo && m_pUnitInfo->GetUpgradeUnitClass(iI))
 		{
-			if(kPlayer.IsLostUC()) eUpgradeUnitType = (UnitTypes)pkUnitClassInfo->getDefaultUnitIndex();
-			else eUpgradeUnitType = (UnitTypes) kCiv.getCivilizationUnits(iI);
-
-			std::vector<UnitTypes> vUpgradeUnitTypes;
-			for (auto iUnit : kPlayer.GetUUFromExtra())
-			{
-				if (GC.getUnitInfo(iUnit)->GetUnitClassType() != iI) continue;
-				if (iUnit == eUpgradeUnitType) continue;
-				vUpgradeUnitTypes.push_back(iUnit);
-			}
-			if(kPlayer.GetUUFromExtra().count(eUpgradeUnitType) == 0) vUpgradeUnitTypes.push_back(eUpgradeUnitType);
-			if (vUpgradeUnitTypes.size() > 1)
-			{
-				if(!plot()) return NO_UNIT;
-				int iExtraSeed = plot()->GetPlotIndex() + GetID();
-				eUpgradeUnitType = vUpgradeUnitTypes[GC.getGame().getSmallFakeRandNum(vUpgradeUnitTypes.size(), iExtraSeed)];
-			}
-			else if(vUpgradeUnitTypes.size() == 1) eUpgradeUnitType = vUpgradeUnitTypes[0];
-			else eUpgradeUnitType = NO_UNIT;
+			if(!plot()) return NO_UNIT;
+			eUpgradeUnitType = kPlayer.GetCivUnit(eUnitClass, plot()->GetPlotIndex() + GetID());
 
 #if defined(MOD_EVENTS_UNIT_UPGRADES)
 			if (MOD_EVENTS_UNIT_UPGRADES) {
@@ -13807,6 +13807,23 @@ UnitTypes CvUnit::getCaptureUnitType(CivilizationTypes eCivilization) const
 }
 
 
+//	--------------------------------------------------------------------------------
+UnitTypes CvUnit::getCaptureUnitType(PlayerTypes ePlayer)
+{
+	VALIDATE_OBJECT
+#if defined(MOD_EVENTS_UNIT_CAPTURE)
+	if (MOD_EVENTS_UNIT_CAPTURE) {
+		int iValue = 0;
+		if (GAMEEVENTINVOKE_VALUE(iValue, GAMEEVENT_UnitCaptureType, getOwner(), GetID(), getUnitType(), GET_PLAYER(ePlayer).getCivilizationType()) == GAMEEVENTRETURN_VALUE) {
+			// Defend against modder stupidity!
+			if (iValue >= NO_UNIT && (iValue == NO_UNIT || GC.getUnitInfo((UnitTypes) iValue) != NULL)) {
+				return (UnitTypes) iValue;
+			}
+		}
+	}
+#endif
+	return ((m_pUnitInfo->GetUnitCaptureClassType() == NO_UNITCLASS) ? NO_UNIT : GET_PLAYER(ePlayer).GetCivUnit((UnitClassTypes)getUnitInfo().GetUnitCaptureClassType()));
+}
 //	--------------------------------------------------------------------------------
 UnitCombatTypes CvUnit::getUnitCombatType() const
 {
@@ -15365,7 +15382,10 @@ int CvUnit::GetMaxAttackStrength(const CvPlot* pFromPlot, const CvPlot* pToPlot,
 
 		// Bonus VS wounded
 		if (pDefender->getDamage() > 0)
+		{
 			iModifier += attackWoundedModifier();
+			iModifier += getExtraWoundedMod();
+		}
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -15697,7 +15717,7 @@ int CvUnit::GetMaxDefenseStrength(const CvPlot* pInPlot, const CvUnit* pAttacker
 
 		// Bonus VS wounded
 		if (pAttacker->getDamage() > 0)
-			iModifier += attackWoundedModifier();
+			iModifier += getExtraWoundedMod();
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -16007,8 +16027,10 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 			iModifier += attackFortifiedModifier();
 
 		// Bonus VS wounded
-		if(pOtherUnit->getDamage() > 0)
-			iModifier += attackWoundedModifier();
+		if (pOtherUnit->getDamage() > 0)
+		{
+			iModifier += getExtraWoundedMod();
+		}
 		else
 			iModifier += attackFullyHealedModifier();
 
@@ -16061,14 +16083,18 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 
 			// Promotion-Promotion Modifier
 #if defined(MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-		if (MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
-		{
-			iModifier += otherPromotionAttackModifierByUnit(pOtherUnit);
-		}
+			if (MOD_API_PROMOTION_TO_PROMOTION_MODIFIERS)
+			{
+				iModifier += otherPromotionAttackModifierByUnit(pOtherUnit);
+			}
 #endif
 
-		// Unit Ranged Flanking Attack Mod	
-
+			// Bonus VS wounded
+			if (pOtherUnit->getDamage() > 0)
+			{
+				iModifier += attackWoundedModifier();
+			}
+			// Unit Ranged Flanking Attack Mod	
 			int iNumAdjacentEnemys = pOtherUnit->GetNumEnemyUnitsAdjacent(this);
 			if (iNumAdjacentEnemys > 0)
 			{
@@ -20143,7 +20169,7 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 										// slewis - removed the capture clause so that helicopter gunships could capture workers. The promotion says that No Capture only effects cities.
 										//if(!isNoCapture() && (!pLoopUnit->isEmbarked() || pLoopUnit->getUnitInfo().IsCaptureWhileEmbarked()) && pLoopUnit->getCaptureUnitType(GET_PLAYER(pLoopUnit->getOwner()).getCivilizationType()) != NO_UNIT)
 										if((!pLoopUnit->isEmbarked() || pLoopUnit->getUnitInfo().IsCaptureWhileEmbarked()) && 
-											pLoopUnit->getCaptureUnitType(GET_PLAYER(pLoopUnit->getOwner()).getCivilizationType()) != NO_UNIT &&
+											pLoopUnit->getCaptureUnitType(pLoopUnit->getOwner()) != NO_UNIT &&
 											!bDoEvade)
 										{
 											bDoCapture = true;
@@ -23302,6 +23328,21 @@ void CvUnit::changeExtraAttackWoundedMod(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+int CvUnit::getExtraWoundedMod() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraWoundedMod;
+}
+void CvUnit::changeExtraWoundedMod(int iChange)
+{
+	VALIDATE_OBJECT
+	if(iChange != 0)
+	{
+		m_iExtraWoundedMod = (m_iExtraWoundedMod + iChange);
+		setInfoBarDirty(true);
+	}
+}
+//	--------------------------------------------------------------------------------
 int CvUnit::GetFlankAttackModifier() const
 {
 	VALIDATE_OBJECT
@@ -26385,6 +26426,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraRoughRangedAttackMod(thisPromotion.GetRoughRangedAttackMod() * iChange);
 		changeExtraAttackFortifiedMod(thisPromotion.GetAttackFortifiedMod() * iChange);
 		changeExtraAttackWoundedMod(thisPromotion.GetAttackWoundedMod() * iChange);
+		changeExtraWoundedMod(thisPromotion.GetWoundedMod() * iChange);
 		ChangeFlankAttackModifier(thisPromotion.GetFlankAttackModifier() * iChange);
 		ChangeRangedFlankAttackModifier(thisPromotion.GetRangedFlankAttackModifier() * iChange);
 		ChangeRangedFlankAttackModifierPercent(thisPromotion.GetRangedFlankAttackModifierPercent() * iChange);
@@ -26874,13 +26916,13 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 	kStream >> m_iExtraPopConsume;
-	kStream >> m_iAttackBonusFromDeathUnit;
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream >> m_iMeleeAttackModifier;
 	kStream >> m_iCaptureEmenyExtraMax;
 	kStream >> m_iCaptureEmenyPercent;
 	kStream >> m_iMovePercentCaptureCity;
 	kStream >> m_iHealPercentCaptureCity;
+	kStream >> m_iAttackBonusFromDeathUnit;
 	kStream >> m_iInsightEnemyDamageModifier;
 	kStream >> m_iHeightModPerX;
 	kStream >> m_iHeightModLimited;
@@ -30562,6 +30604,11 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 
 		if (iValue == 0)
 		{
+			iValue = GetPromotionValue(pkPromotionInfo->GetWoundedMod(), getExtraWoundedMod(), iFlavorOffDef, mediumPriority);
+		}
+
+		if (iValue == 0)
+		{
 			iValue = GetPromotionValue(pkPromotionInfo->GetNumAttacksMadeThisTurnAttackMod(), GetNumAttacksMadeThisTurnAttackMod(), iFlavorOffense, mediumPriority);
 		}
 
@@ -31056,6 +31103,15 @@ int CvUnit::AI_promotionValue(PromotionTypes ePromotion)
 	if(iTemp != 0 && isRanged())
 	{
 		iExtra = getExtraAttackWoundedMod() * 2;
+		iTemp *= (100 + iExtra);
+		iTemp /= 100;
+		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;
+	}
+
+	iTemp = pkPromotionInfo->GetWoundedMod();
+	if(iTemp != 0 && isRanged())
+	{
+		iExtra = getExtraWoundedMod() * 2;
 		iTemp *= (100 + iExtra);
 		iTemp /= 100;
 		iValue += iTemp + (iFlavorOffense * iFlavorRanged) * 2;

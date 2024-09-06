@@ -2293,6 +2293,10 @@ void CvGlobals::init()
 	m_pCorruptionInfo = FNEW(CvCorruptionLevelXMLEntries, c_eCiv5GameplayDLL, 0);
 #endif
 
+#ifdef MOD_NUCLEAR_WINTER_FOR_SP
+	m_pNuclearWinterInfo= FNEW(CvNuclearWinterLevelXMLEntries, c_eCiv5GameplayDLL, 0);
+#endif
+
 #ifdef MOD_PROMOTION_COLLECTIONS
 	m_pPromotionCollections = FNEW(CvPromotionCollectionEntries, c_eCiv5GameplayDLL, 0);
 #endif
@@ -2409,6 +2413,10 @@ void CvGlobals::uninit()
 
 #ifdef MOD_GLOBAL_CORRUPTION
 	SAFE_DELETE(m_pCorruptionInfo);
+#endif
+
+#ifdef MOD_NUCLEAR_WINTER_FOR_SP
+	SAFE_DELETE(m_pNuclearWinterInfo);
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS
@@ -3437,6 +3445,44 @@ CvCorruptionLevel* CvGlobals::getCapitalCityCorruptionLevel() const
 	return m_pCapitalCityCorruptionLevel;
 }
 
+#endif
+
+#ifdef MOD_NUCLEAR_WINTER_FOR_SP
+int CvGlobals::getNumNuclearWinterLevel()
+{
+	return m_pNuclearWinterInfo->GetEntries().size();
+}
+
+std::vector<CvNuclearWinterLevel*>& CvGlobals::getNuclearWinterLevelInfo()
+{
+	return m_pNuclearWinterInfo->GetEntries();
+}
+
+CvNuclearWinterLevel* CvGlobals::getNuclearWinterLevelInfo(NuclearWinterLevelTypes eLevel)
+{
+	return m_pNuclearWinterInfo->GetEntry(eLevel);
+}
+void CvGlobals::initGlobalNuclearWinterLevels()
+{
+	m_vOrderedNuclearWinterLevels.clear();
+	auto& nuclearWinterLevels = getNuclearWinterLevelInfo();
+	for (auto* level : nuclearWinterLevels)
+	{
+		if (level == nullptr)
+		{
+			continue;
+		}
+		m_vOrderedNuclearWinterLevels.push_back(level);
+	}
+
+	std::sort(m_vOrderedNuclearWinterLevels.begin(), m_vOrderedNuclearWinterLevels.end(), [](CvNuclearWinterLevel* a, CvNuclearWinterLevel* b) {
+		return a->GetTriggerThreshold() < b->GetTriggerThreshold();
+	});
+}
+std::vector<CvNuclearWinterLevel*>& CvGlobals::getOrderedNuclearWinterLevels()
+{
+	return m_vOrderedNuclearWinterLevels;
+}
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS

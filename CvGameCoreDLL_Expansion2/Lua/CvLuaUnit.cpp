@@ -663,6 +663,7 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(GetExtraRoughRangedAttackMod);
 	Method(GetExtraAttackFortifiedMod);
 	Method(GetExtraAttackWoundedMod);
+	Method(GetExtraWoundedMod);
 	Method(GetExtraOpenDefensePercent);
 
 	Method(GetPillageChange);
@@ -841,6 +842,9 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(ChangeNumEstablishCorps);
 	Method(IsCanBeEstablishedCorps);
 	Method(ChangeNumCannotBeEstablishedCorps);
+#endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	Method(GetNuclearWinterProcess);
 #endif
 #ifdef MOD_GLOBAL_CORRUPTION
 	Method(GetPlotCorruptionScoreReport);
@@ -5613,6 +5617,16 @@ int CvLuaUnit::lGetExtraAttackWoundedMod(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
+//int getExtraWoundedMod();
+int CvLuaUnit::lGetExtraWoundedMod(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+
+	const int iResult = pkUnit->getExtraWoundedMod();
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+//------------------------------------------------------------------------------
 //int getExtraOpenDefensePercent();
 int CvLuaUnit::lGetExtraOpenDefensePercent(lua_State* L)
 {
@@ -6643,6 +6657,15 @@ LUAAPIIMPL(Unit, IsCanEstablishCorps)
 LUAAPIIMPL(Unit, ChangeNumEstablishCorps)
 LUAAPIIMPL(Unit, IsCanBeEstablishedCorps)
 LUAAPIIMPL(Unit, ChangeNumCannotBeEstablishedCorps)
+#endif
+
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+int CvLuaUnit::lGetNuclearWinterProcess(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	lua_pushinteger(L, pkUnit->getUnitInfo().GetNuclearWinterProcess());
+	return 1;
+}
 #endif
 
 #ifdef MOD_GLOBAL_CORRUPTION

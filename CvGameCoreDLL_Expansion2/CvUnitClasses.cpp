@@ -86,6 +86,9 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_bNoTroops(false),
 	m_bCannotBeEstablishedCorps(false),
 #endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_iNuclearWinterProcess(0),
+#endif
 	m_iSpecialCargo(0),
 	m_iDomainCargo(0),
 	m_iConscriptionValue(0),
@@ -131,6 +134,7 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_iFreePolicies(0),
 	m_iOneShotTourism(0),
 	m_iOneShotTourismPercentOthers(0),
+	m_iGoldFromTourismModifier(0),
 	m_bIgnoreBuildingDefense(false),
 	m_bPrereqResources(false),
 	m_bMechanized(false),
@@ -307,6 +311,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_iFreePolicies = kResults.GetInt("FreePolicies");
 	m_iOneShotTourism = kResults.GetInt("OneShotTourism");
 	m_iOneShotTourismPercentOthers = kResults.GetInt("OneShotTourismPercentOthers");
+	m_iGoldFromTourismModifier = kResults.GetInt("GoldFromTourismModifier");
 	m_bIgnoreBuildingDefense = kResults.GetBool("IgnoreBuildingDefense");
 	m_bPrereqResources = kResults.GetBool("PrereqResources");
 	m_bMechanized = kResults.GetBool("Mechanized");
@@ -349,6 +354,9 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bNoTroops = kResults.GetBool("NoTroopConsume");
 	m_bCannotBeEstablishedCorps = kResults.GetBool("CannotBeEstablishedCorps");
+#endif
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	m_iNuclearWinterProcess = kResults.GetInt("NuclearWinterProcess");
 #endif
 
 #if defined(MOD_GLOBAL_PROMOTION_CLASSES)
@@ -902,6 +910,13 @@ bool CvUnitEntry::IsCannotBeEstablishedCorps() const
 }
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+int CvUnitEntry::GetNuclearWinterProcess() const
+{
+	return m_iNuclearWinterProcess;
+}
+#endif
+
 /// Is there a special unit this unit carries (e.g. Nuclear Sub carries Nuclear missile)
 int CvUnitEntry::GetSpecialCargo() const
 {
@@ -1141,6 +1156,12 @@ int CvUnitEntry::GetOneShotTourismPercentOthers() const
 {
 	return m_iOneShotTourismPercentOthers;
 }
+/// Gold from one-shot tourism
+int CvUnitEntry::GetGoldFromTourismModifier() const
+{
+	return m_iGoldFromTourismModifier;
+}
+
 
 /// Not affected by walls?
 bool CvUnitEntry::IsIgnoreBuildingDefense() const

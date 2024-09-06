@@ -664,6 +664,7 @@ public:
 	int GetGreatPersonPointsFromReligion(GreatPersonTypes eGreatPersonTypes);
 	int GetReligionExtraMissionarySpreads(ReligionTypes eReligion);
 	int GetBeliefExtraMissionarySpreads(BeliefTypes eBelief);
+	int GetCuttingBonusModifier() const;
 #endif	
 #if defined(MOD_GLOBAL_BUILDING_INSTANT_YIELD)
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
@@ -1299,9 +1300,17 @@ public:
 	//void ChangeYieldFromOtherYield(const YieldTypes eInType, const YieldTypes eOutType, const YieldFromYield eConvertType, const int iChange);
 #endif
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	bool IsNoNuclearWinterLocal() const;
+	void ChangeNumNoNuclearWinterLocal(int iChange);
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	bool IsCanDoImmigration() const;
 	void SetCanDoImmigration(bool iValue);
+	bool CanImmigrantIn() const;
+	bool CanImmigrantOut() const;
+	bool CanAllScaleImmigrantIn() const;
+	void ChangeNumAllScaleImmigrantIn(int iChange);
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes GetScale() const { return m_eCityScale; }
@@ -1309,6 +1318,8 @@ public:
 	void SetScale(CityScaleTypes eScale);
 	void UpdateScaleBuildings();
 	bool CanGrowNormally() const;
+	bool CanScaleImmigrantIn() const;
+	bool CanScaleImmigrantOut() const;
 #endif
 
 #ifdef MOD_PROMOTION_CITY_DESTROYER
@@ -1565,7 +1576,7 @@ protected:
 
 
 #if defined(MOD_ROG_CORE)
-	FAutoVariable<std::vector<int>, CvCity> m_aiNumTimesAttackedThisTurn;
+	std::vector<int> m_aiNumTimesAttackedThisTurn;
 	std::vector<int> m_aiBaseYieldRateFromCSAlliance;
 	std::vector<int> m_aiBaseYieldRateFromCSFriendship;
 	std::vector<int> m_aiYieldPerAlly;
@@ -1580,7 +1591,7 @@ protected:
 	std::vector<int> m_aiYieldFromPillage;
 
 	std::map<int, int> m_aiYieldPerPopInEmpire;
-	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityFromPOP;
+	std::vector<int> m_aiResourceQuantityFromPOP;
 	std::vector<int> m_aiSpecialistRateModifier;
 #endif
 
@@ -1648,8 +1659,12 @@ protected:
 
 	int** m_aaiBuildingSpecialistUpgradeProgresses;
 
+#if defined(MOD_NUCLEAR_WINTER_FOR_SP)
+	int m_iNumNoNuclearWinterLocal = 0;
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
-	bool m_iCanDoImmigration = true;
+	bool m_bCanDoImmigration = true;
+	int m_iNumAllScaleImmigrantIn = 0;
 #endif
 #ifdef MOD_GLOBAL_CITY_SCALES
 	CityScaleTypes m_eCityScale = NO_CITY_SCALE;

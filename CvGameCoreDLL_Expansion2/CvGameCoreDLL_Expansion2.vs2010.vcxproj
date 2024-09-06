@@ -177,6 +177,7 @@
     <ClCompile Include="CvCityManager.cpp" />
     <ClCompile Include="CvCityScaleClasses.cpp" />
     <ClCompile Include="CvCorruption.cpp" />
+    <ClCompile Include="CvNuclearWinter.cpp" />
     <ClCompile Include="CvEventLog.cpp" />
     <ClCompile Include="CvGreatPersonInfo.cpp" />
     <ClCompile Include="CvLuaFormula.cpp" />
@@ -457,6 +458,7 @@
     <ClInclude Include="CvCityManager.h" />
     <ClInclude Include="CvCityScaleClasses.h" />
     <ClInclude Include="CvCorruption.h" />
+    <ClInclude Include="CvNuclearWinter.h" />
     <ClInclude Include="CvCitySpecializationAI.h" />
     <ClInclude Include="CvCityStrategyAI.h" />
     <ClInclude Include="CvCultureClasses.h" />
