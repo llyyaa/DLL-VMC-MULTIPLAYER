@@ -17905,10 +17905,10 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 		if(eYield == YIELD_CULTURE)
 		{
 			iTempValue = thisPlayer.GetPlayerTraits()->GetCultureBonusUnitStrengthModify();
+			iTempValue *= iStrength;
+			iTempValue /= 100;
 			if(iTempValue > 0)
 			{
-				iTempValue *= iStrength;
-				iTempValue /= 100;
 				doInstantYield(eYield, iTempValue);
 				if (thisPlayer.isHuman())
 				{
@@ -17918,10 +17918,10 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 				}
 			}
 			iTempValue = thisPlayer.getPolicyModifiers(POLICYMOD_DEEP_WATER_NAVAL_CULTURE_STRENGTH_MODIFIER);
+			iTempValue *= iStrength;
+			iTempValue /= 100;
 			if(iTempValue > 0 && pUnit->getDomainType() == DOMAIN_SEA && !pUnit->isHasPromotion(ePromotionOceanImpassable))
 			{
-				iTempValue *= iStrength;
-				iTempValue /= 100;
 				doInstantYield(eYield, iTempValue);
 				if (thisPlayer.isHuman())
 				{
