@@ -6951,7 +6951,7 @@ void CvPlot::setFeatureType(FeatureTypes eNewValue, int iVariety)
 		{
 			if(getImprovementType() != NO_IMPROVEMENT)
 			{
-				if(GC.getImprovementInfo(getImprovementType())->IsRequiresFeature())
+				if(GC.getImprovementInfo(getImprovementType())->IsRequiresFeature() || GC.getImprovementInfo(getImprovementType())->IsRemoveWhenSetNoFuture())
 				{
 					setImprovementType(NO_IMPROVEMENT);
 				}
@@ -10888,7 +10888,6 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 {
 	CvCity* pCity;
 	CvString strBuffer;
-	int iProduction;
 	bool bFinished = false;
 	CvPlayer &kPlayer = GET_PLAYER(ePlayer);
 
@@ -11110,8 +11109,8 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 				{
 					CvAssertMsg(ePlayer != NO_PLAYER, "ePlayer should be valid");
 
-					iProduction = getFeatureProduction(eBuild, ePlayer, &pCity);
-					if(iProduction > 0);
+					int iProduction = getFeatureProduction(eBuild, ePlayer, &pCity);
+					if(iProduction > 0)
 					{
 						pCity->changeFeatureProduction(iProduction);
 						if(pCity->getOwner() == GC.getGame().getActivePlayer())

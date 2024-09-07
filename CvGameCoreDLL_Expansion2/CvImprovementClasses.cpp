@@ -523,6 +523,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	const char* szRequiredAdjacentImprovement = kResults.GetText("RequiredAdjacentImprovement");
 	m_iRequiredAdjacentImprovement = (ImprovementTypes)GC.getInfoTypeForString(szRequiredAdjacentImprovement, true);
 	m_bRequiredAdjacentCity = kResults.GetBool("RequiredAdjacentCity");
+	m_bRemoveWhenSetNoFuture = kResults.GetBool("RemoveWhenSetNoFuture");
 
 	const char* szCivilizationType = kResults.GetText("CivilizationType");
 	m_eRequiredCivilization = (CivilizationTypes)GC.getInfoTypeForString(szCivilizationType, true);
@@ -1556,6 +1557,11 @@ ImprovementTypes CvImprovementEntry::GetRequiredAdjacentImprovement() const
 bool CvImprovementEntry::IsRequiredAdjacentCity() const
 {
 	return m_bRequiredAdjacentCity;
+}
+
+bool CvImprovementEntry::IsRemoveWhenSetNoFuture() const
+{
+	return m_bRemoveWhenSetNoFuture;
 }
 
 /// Does this improvement need to be built next to a luxury resource?

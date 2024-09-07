@@ -160,6 +160,7 @@ public:
 
 	ImprovementTypes GetRequiredAdjacentImprovement() const;
 	bool IsRequiredAdjacentCity() const;
+	bool IsRemoveWhenSetNoFuture() const;
 
 	CivilizationTypes GetRequiredCivilization() const;
 
@@ -386,6 +387,7 @@ protected:
 
 	ImprovementTypes m_iRequiredAdjacentImprovement = NO_IMPROVEMENT;
 	bool m_bRequiredAdjacentCity = false;
+	bool m_bRemoveWhenSetNoFuture = false;
 
 	CvString m_strArtDefineTag;
 	ImprovementUsageTypes m_eImprovementUsageType;
