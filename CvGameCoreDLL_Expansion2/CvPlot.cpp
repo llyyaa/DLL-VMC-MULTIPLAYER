@@ -2691,6 +2691,19 @@ bool CvPlot::canHaveImprovement(ImprovementTypes eImprovement, TeamTypes eTeam, 
 		bValid = true;
 	}
 
+	int iNumWaterPlotMakesValid = pkImprovementInfo->GetNumWaterPlotMakesValid();
+	if (iNumWaterPlotMakesValid > 0)
+	{
+		int iAdjacentWater = 0;
+		for(iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
+		{
+			pLoopPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+			if(pLoopPlot == NULL || !pLoopPlot->isWater()) continue;
+			iAdjacentWater++;
+		}
+		if (iAdjacentWater >= iNumWaterPlotMakesValid) bValid = true;
+	}
+
 	if(!bValid)
 	{
 		return false;

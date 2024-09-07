@@ -129,6 +129,7 @@ public:
 	bool IsRiverSideMakesValid() const;
 	bool IsNoFreshWater() const;
 	bool IsFreshWater() const;
+	int GetNumWaterPlotMakesValid() const;
 #if defined(MOD_API_EXTENSIONS)
 	bool IsAddsFreshWater() const;
 #endif
@@ -354,6 +355,7 @@ protected:
 	bool m_bRiverSideMakesValid;
 	bool m_bNoFreshWater;
 	bool m_bIsFreshWater;
+	int m_iNumWaterPlotMakesValid;
 #if defined(MOD_API_EXTENSIONS)
 	bool m_bAddsFreshWater;
 #endif

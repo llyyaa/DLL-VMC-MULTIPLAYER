@@ -142,6 +142,7 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_bRiverSideMakesValid(false),
 	m_bNoFreshWater(false),
 	m_bIsFreshWater(false),
+	m_iNumWaterPlotMakesValid(0),
 #if defined(MOD_API_EXTENSIONS)
 	m_bAddsFreshWater(false),
 #endif
@@ -348,6 +349,7 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	m_bRiverSideMakesValid = kResults.GetBool("RiverSideMakesValid");
 	m_bNoFreshWater = kResults.GetBool("NoFreshWater");
 	m_bIsFreshWater = kResults.GetBool("IsFreshWater");
+	m_iNumWaterPlotMakesValid = kResults.GetInt("NumWaterPlotMakesValid");
 #if defined(MOD_API_EXTENSIONS)
 	if (MOD_API_EXTENSIONS) {
 		m_bAddsFreshWater = kResults.GetBool("AddsFreshWater");
@@ -1417,6 +1419,11 @@ bool CvImprovementEntry::IsNoFreshWater() const
 bool CvImprovementEntry::IsFreshWater() const
 {
 	return m_bIsFreshWater;
+}
+
+int CvImprovementEntry::GetNumWaterPlotMakesValid() const
+{
+	return m_iNumWaterPlotMakesValid;
 }
 
 #if defined(MOD_API_EXTENSIONS)
