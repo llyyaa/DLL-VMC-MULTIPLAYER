@@ -477,15 +477,19 @@ void CvPlot::doTurn()
 
 				if (!IsImmueVolcanoDamage())
 				{
-					if (getImprovementType() != NULL && !isCity() && !IsImprovementPillaged())
+					if (getImprovementType() != NO_IMPROVEMENT && !isCity() && !IsImprovementPillaged())
 					{
 						CvImprovementEntry* pkImprovement = GC.getImprovementInfo(getImprovementType());
-						SetImprovementPillaged(true);
-
-						if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
+						if (pkImprovement)
 						{
-							setImprovementType(NO_IMPROVEMENT);
-							SetImprovementPillaged(false);
+							if(pkImprovement->IsDestroyedWhenPillaged())
+							{
+								setImprovementType(NO_IMPROVEMENT);
+							}
+							else
+							{
+								SetImprovementPillaged(true);
+							}
 						}
 					}
 					for (int iUnitLoop = 0; iUnitLoop < getNumUnits(); iUnitLoop++)
@@ -508,12 +512,12 @@ void CvPlot::doTurn()
 				
 			else if (bOutBreakLv2)
 			{
-				int iRange = 2;
+				int iRange = 1;
 				for (int iDX = -iRange; iDX <= iRange; iDX++)
 				{
 					for (int iDY = -iRange; iDY <= iRange; iDY++)
 					{
-						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 1);
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iRange);
 						if (pLoopPlot != NULL)
 						{
 							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
@@ -521,15 +525,19 @@ void CvPlot::doTurn()
 
 							if (!pLoopPlot->IsImmueVolcanoDamage())
 							{
-								if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
+								if (pLoopPlot->getImprovementType() != NO_IMPROVEMENT && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
 								{
 									CvImprovementEntry* pkImprovement = GC.getImprovementInfo(pLoopPlot->getImprovementType());
-									pLoopPlot->SetImprovementPillaged(true);
-
-									if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
+									if (pkImprovement)
 									{
-										pLoopPlot->setImprovementType(NO_IMPROVEMENT);
-										pLoopPlot->SetImprovementPillaged(false);
+										if(pkImprovement->IsDestroyedWhenPillaged())
+										{
+											pLoopPlot->setImprovementType(NO_IMPROVEMENT);
+										}
+										else
+										{
+											pLoopPlot->SetImprovementPillaged(true);
+										}
 									}
 								}
 
@@ -561,12 +569,12 @@ void CvPlot::doTurn()
 
 			else if (bOutBreakLv3)
 			{
-				int iRange =2;
+				int iRange = 2;
 				for (int iDX = -iRange; iDX <= iRange; iDX++)
 				{
 					for (int iDY = -iRange; iDY <= iRange; iDY++)
 					{
-						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 2);
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iRange);
 						if (pLoopPlot != NULL)
 						{
 							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
@@ -574,15 +582,19 @@ void CvPlot::doTurn()
 
 							if (!pLoopPlot->IsImmueVolcanoDamage())
 							{
-								if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
+								if (pLoopPlot->getImprovementType() != NO_IMPROVEMENT && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
 								{
 									CvImprovementEntry* pkImprovement = GC.getImprovementInfo(pLoopPlot->getImprovementType());
-									pLoopPlot->SetImprovementPillaged(true);
-
-									if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
+									if (pkImprovement)
 									{
-										pLoopPlot->setImprovementType(NO_IMPROVEMENT);
-										pLoopPlot->SetImprovementPillaged(false);
+										if(pkImprovement->IsDestroyedWhenPillaged())
+										{
+											pLoopPlot->setImprovementType(NO_IMPROVEMENT);
+										}
+										else
+										{
+											pLoopPlot->SetImprovementPillaged(true);
+										}
 									}
 								}
 
