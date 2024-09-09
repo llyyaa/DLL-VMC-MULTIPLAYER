@@ -2902,11 +2902,6 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 		GET_PLAYER(eOldOwner).SetHasLostCapital(true, m_eID);
 	}
 
-	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
-
-
-
-
 #if !defined(NO_ACHIEVEMENTS)
 	if(bConquest && !GC.getGame().isGameMultiPlayer() && isHuman())
 	{
@@ -3083,7 +3078,7 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 				if (eLoopBuilding == pkLoopBuildingInfo->GetID())
 				{
 #if defined(MOD_BUGFIX_BUILDINGCLASS_NOT_BUILDING)
-					BuildingTypes eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(pkLoopBuildingInfo->GetBuildingClassType());
+					BuildingTypes eFreeBuilding = GET_PLAYER(m_eID).GetCivBuilding((BuildingClassTypes)pkLoopBuildingInfo->GetBuildingClassType());
 					pNewCity->GetCityBuildings()->SetNumFreeBuilding(eFreeBuilding, 1);
 #else
 					pNewCity->GetCityBuildings()->SetNumFreeBuilding(eLoopBuilding, 1);
@@ -3118,7 +3113,7 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 				}
 				else
 				{
-					eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
+					eBuilding = GET_PLAYER(m_eID).GetCivBuilding(eBuildingClass);
 				}
 
 				if(eBuilding != NO_BUILDING)
@@ -3224,7 +3219,7 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 	{
 		SetHasLostCapital(false, NO_PLAYER);
 
-		const BuildingTypes eCapitalBuilding = (BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(GC.getCAPITAL_BUILDINGCLASS()));
+		const BuildingTypes eCapitalBuilding = GET_PLAYER(m_eID).GetCivBuilding((BuildingClassTypes)GC.getCAPITAL_BUILDINGCLASS());
 		if(eCapitalBuilding != NO_BUILDING)
 		{
 #if defined(MOD_EVENTS_CITY_CAPITAL)
@@ -6469,7 +6464,7 @@ void CvPlayer::findNewCapital()
 	int iLoop;
 #endif
 
-	eCapitalBuilding = ((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(GC.getCAPITAL_BUILDINGCLASS())));
+	eCapitalBuilding = GET_PLAYER(m_eID).GetCivBuilding((BuildingClassTypes)GC.getCAPITAL_BUILDINGCLASS());
 
 	if(eCapitalBuilding == NO_BUILDING)
 	{
@@ -8156,7 +8151,7 @@ void CvPlayer::found(int iX, int iY)
 		CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
 		if(pkBuildingClassInfo)
 		{
-			const BuildingTypes eLoopBuilding = ((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(iI)));
+			const BuildingTypes eLoopBuilding = GET_PLAYER(m_eID).GetCivBuilding((BuildingClassTypes)iI);
 			if(eLoopBuilding != NO_BUILDING)
 			{
 				CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eLoopBuilding);
@@ -9756,7 +9751,7 @@ void CvPlayer::removeBuildingClass(BuildingClassTypes eBuildingClass)
 	BuildingTypes eBuilding;
 	int iLoop;
 
-	eBuilding = ((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(eBuildingClass)));
+	eBuilding = GET_PLAYER(m_eID).GetCivBuilding(eBuildingClass);
 
 	if(eBuilding != NO_BUILDING)
 	{
@@ -23592,7 +23587,7 @@ void CvPlayer::changeBuildingClassMaking(BuildingClassTypes eIndex, int iChange)
 		m_paiBuildingClassMaking.setAt(eIndex, m_paiBuildingClassMaking[eIndex] + iChange);
 		CvAssert(getBuildingClassMaking(eIndex) >= 0);
 
-		const BuildingTypes eBuilding = (BuildingTypes) getCivilizationInfo().getCivilizationBuildings(eIndex);
+		const BuildingTypes eBuilding = GET_PLAYER(m_eID).GetCivBuilding(eIndex);
 		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
 		if(pkBuildingInfo)
 		{
@@ -24831,21 +24826,18 @@ void CvPlayer::deleteCity(int iID)
 //	--------------------------------------------------------------------------------
 CvCity* CvPlayer::GetFirstCityWithBuildingClass(BuildingClassTypes eBuildingClass)
 {
+	BuildingTypes eBuilding = GET_PLAYER(m_eID).GetCivBuilding(eBuildingClass);
+	if (eBuilding == NO_BUILDING) return NULL;
 	CvCity *pLoopCity;
 	int iLoop;
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 	{
-		CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
-		BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings((BuildingClassTypes)eBuildingClass);
-		if (eBuilding != NO_BUILDING)
+		if (pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
 		{
-			if (pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
-			{
-				return pLoopCity;
-			}
+			return pLoopCity;
 		}
 	}
-	return false;
+	return NULL;
 }
 
 //	--------------------------------------------------------------------------------
