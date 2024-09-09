@@ -1773,6 +1773,21 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 					}
 #endif
 				}
+#if defined(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT)
+				ResourceTypes eResourceType = pPlot->getResourceType();
+				if(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT && eResourceType != NO_RESOURCE && pPlot->GetResourceLinkedCity() != m_pCity)
+				{
+					pPlot->SetResourceLinkedCity(NULL);
+					pPlot->SetResourceLinkedCity(m_pCity);
+					// Already have a valid improvement here?
+					ImprovementTypes eImprovementType = pPlot->getImprovementType();
+					if(GetPlayer()->HasTech((TechTypes)GC.getResourceInfo(eResourceType)->getTechCityTrade()) 
+						&& (pPlot->isCity() || (eImprovementType != NO_IMPROVEMENT && !pPlot->IsImprovementPillaged() && GC.getImprovementInfo(eImprovementType)->IsImprovementResourceTrade(eResourceType))))
+					{
+						pPlot->SetResourceLinkedCityActive(true);
+					}
+				}
+#endif
 			}
 			// No longer working pPlot
 			else
@@ -1878,18 +1893,6 @@ void CvCityCitizens::DoAlterWorkingPlot(int iIndex)
 			if(pPlot->getWorkingCity() != m_pCity)
 			{
 				pPlot->getWorkingCity()->GetCityCitizens()->SetForcedWorkingPlot(pPlot,false);
-#if defined(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT)
-				if(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT && pPlot->getResourceType() != NO_RESOURCE)
-				{
-					pPlot->SetResourceLinkedCity(NULL);
-					pPlot->SetResourceLinkedCity(m_pCity);
-					// Already have a valid improvement here?
-					if(pPlot->getImprovementType() != NO_IMPROVEMENT && GC.getImprovementInfo(pPlot->getImprovementType())->IsImprovementResourceTrade(pPlot->getResourceType()))
-					{
-						pPlot->SetResourceLinkedCityActive(true);
-					}
-				}
-#endif
 			}
 			if(IsCanWork(pPlot))
 			{
