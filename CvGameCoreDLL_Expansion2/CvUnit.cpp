@@ -10719,16 +10719,13 @@ bool CvUnit::CanSpreadReligion(const CvPlot* pPlot) const
 //	--------------------------------------------------------------------------------
 bool CvUnit::DoSpreadReligion()
 {
-#if !defined(MOD_API_UNIFIED_YIELDS)
-	int iScienceBonus = 0;
-#endif
-
 	CvCity* pCity = GetSpreadReligionTargetCity();
 
 	if (pCity != NULL)
 	{
 		if(CanSpreadReligion(plot()))
 		{
+			CvPlayer &kPlayer = GET_MY_PLAYER();
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 			int iConversionStrength = GetConversionStrength(pCity);
 #else
@@ -10736,26 +10733,23 @@ bool CvUnit::DoSpreadReligion()
 #endif
 			CvGameReligions* pReligions = GC.getGame().GetGameReligions();
 			ReligionTypes eReligion = GetReligionData()->GetReligion();
+			int iNumFollowersBeforeSpread = 0;
+			int iNumFollowersSpreadAddtion = 0;
+			bool bFloatText = pCity->plot() && pCity->plot()->GetActiveFogOfWarMode() == FOGOFWARMODE_OFF;
 			if(eReligion > RELIGION_PANTHEON)
 			{
 				const CvReligion* pReligion = pReligions->GetReligion(eReligion, getOwner());
 				if(pReligion)
 				{
-#if defined(MOD_API_UNIFIED_YIELDS)
 					// Requires majority for this city to be another religion
 					ReligionTypes eCurrentReligion = pCity->GetCityReligions()->GetReligiousMajority();
 					int iOtherFollowers = pCity->GetCityReligions()->GetFollowersOtherReligions(eReligion);
+					iNumFollowersBeforeSpread = pCity->GetCityReligions()->GetNumFollowers(eReligion);
 					if (eCurrentReligion != NO_RELIGION && eCurrentReligion != eReligion && iOtherFollowers > 0)
 					{
-#if defined(MOD_BUGFIX_USE_GETTERS)
-						CvPlayer &kPlayer = GET_MY_PLAYER();
-#else
-						CvPlayer &kPlayer = GET_PLAYER(m_eOwner);
-#endif
 #if !defined(SHOW_PLOT_POPUP)
 						int iDelay = 0;
 #endif
-						bool bFloatText = pCity->plot() && pCity->plot()->GetActiveFogOfWarMode() == FOGOFWARMODE_OFF;
 						for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
 						{
 							YieldTypes eYield = (YieldTypes) iI;
@@ -10771,45 +10765,10 @@ bool CvUnit::DoSpreadReligion()
 							{
 								iYieldBonus += pReligion->m_Beliefs.GetSciencePerOtherReligionFollower();
 							}
-
-							iYieldBonus += this->GetInstantYieldPerReligionFollowerConverted(eYield);
-
 							if (iYieldBonus > 0)
 							{
 								iYieldBonus *= iOtherFollowers;
-									
-								switch(eYield)
-								{
-								case YIELD_GOLD:
-									kPlayer.GetTreasury()->ChangeGold(iYieldBonus);
-									break;
-								case YIELD_CULTURE:
-									kPlayer.changeJONSCulture(iYieldBonus);
-									break;
-								case YIELD_FAITH:
-									kPlayer.ChangeFaith(iYieldBonus);
-									break;
-								case YIELD_GOLDEN_AGE_POINTS:
-									kPlayer.ChangeGoldenAgeProgressMeter(iYieldBonus);
-									break;
-								case YIELD_SCIENCE:
-									{
-									TechTypes eCurrentTech = kPlayer.GetPlayerTechs()->GetCurrentResearch();
-									if(eCurrentTech == NO_TECH)
-									{
-										kPlayer.changeOverflowResearch(iYieldBonus);
-									}
-									else
-									{
-										GET_TEAM(kPlayer.getTeam()).GetTeamTechs()->ChangeResearchProgress(eCurrentTech, iYieldBonus, kPlayer.GetID());
-									}
-									}
-									break;
-								case YIELD_TOURISM:
-									kPlayer.GetCulture()->AddTourismAllKnownCivs(iYieldBonus);
-									break;
-								}
-
+								kPlayer.doInstantYield(eYield, iYieldBonus);
 								if (bFloatText)
 								{
 									char text[256] = {0};
@@ -10824,22 +10783,6 @@ bool CvUnit::DoSpreadReligion()
 							}
 						}
 					}
-#else
-					iScienceBonus = pReligion->m_Beliefs.GetSciencePerOtherReligionFollower();
-					if(iScienceBonus > 0)
-					{
-						// Requires majority for this city to be another religion
-						ReligionTypes eCurrentReligion = pCity->GetCityReligions()->GetReligiousMajority();
-						if (eCurrentReligion != NO_RELIGION && eCurrentReligion != eReligion)
-						{
-							iScienceBonus *= pCity->GetCityReligions()->GetFollowersOtherReligions(eReligion);
-						}
-						else
-						{
-							iScienceBonus = 0;
-						}
-					}
-#endif
 				}
 			}
 
@@ -10860,7 +10803,7 @@ bool CvUnit::DoSpreadReligion()
 			}
 			GetReligionData()->SetSpreadsLeft(GetReligionData()->GetSpreadsLeft() - 1);
 
-			if (pCity->plot() && pCity->plot()->GetActiveFogOfWarMode() == FOGOFWARMODE_OFF)
+			if (bFloatText)
 			{
 #if defined(MOD_BUGFIX_USE_GETTERS)
 				const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(GetReligionData()->GetReligion(), getOwner());
@@ -10881,39 +10824,22 @@ bool CvUnit::DoSpreadReligion()
 #endif
 			}
 
-#if !defined(MOD_API_UNIFIED_YIELDS)
-			if (iScienceBonus > 0)
+			iNumFollowersSpreadAddtion = pCity->GetCityReligions()->GetNumFollowers(eReligion) - iNumFollowersBeforeSpread;
+			if(iNumFollowersSpreadAddtion > 0)
 			{
-#if defined(MOD_BUGFIX_USE_GETTERS)
-				CvPlayer &kPlayer = GET_MY_PLAYER();
-#else
-				CvPlayer &kPlayer = GET_PLAYER(m_eOwner);
-#endif
-
-				TechTypes eCurrentTech = kPlayer.GetPlayerTechs()->GetCurrentResearch();
-				if(eCurrentTech == NO_TECH)
+				for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
 				{
-					kPlayer.changeOverflowResearch(iScienceBonus);
-				}
-				else
-				{
-					CvTeam &kTeam = GET_TEAM(kPlayer.getTeam());
-					kTeam.GetTeamTechs()->ChangeResearchProgress(eCurrentTech, iScienceBonus, kPlayer.GetID());
-				}
-
-				if (pCity->plot() && pCity->plot()->GetActiveFogOfWarMode() == FOGOFWARMODE_OFF)
-				{
+					YieldTypes eYield = (YieldTypes) iI;
+					int iYieldBonus = this->GetInstantYieldPerReligionFollowerConverted(eYield);
+					if (iYieldBonus <= 0) continue;
+					iYieldBonus *= iNumFollowersSpreadAddtion;
+					kPlayer.doInstantYield(eYield, iYieldBonus);
+					if (!bFloatText) continue;
 					char text[256] = {0};
-					sprintf_s(text, "[COLOR_BLUE]+%d[ENDCOLOR][ICON_RESEARCH]", iScienceBonus);
-					float fDelay = GC.getPOST_COMBAT_TEXT_DELAY() * 2;
-#if defined(SHOW_PLOT_POPUP)
-					SHOW_PLOT_POPUP(pCity->plot(), getOwner(), text, fDelay);
-#else
-					DLLUI->AddPopupText(pCity->getX(), pCity->getY(), text, fDelay);
-#endif
+					sprintf_s(text, "%s+%d[ENDCOLOR]%s", GC.getYieldInfo(eYield)->getColorString(), iYieldBonus, GC.getYieldInfo(eYield)->getIconString());
+					SHOW_PLOT_POPUP(pCity->plot(), getOwner(), text, 0.0f);
 				}
 			}
-#endif
 
 			bool bShow = plot()->isActiveVisible(false);
 			if(bShow)

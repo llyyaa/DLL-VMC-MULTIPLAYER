@@ -33534,3 +33534,38 @@ void CvPlayer::ChangeNumSpaceshipPartPurchased(int iChange)
 {
 	m_iNumSpaceshipPartPurchased += iChange;
 }
+
+void CvPlayer::doInstantYield(YieldTypes eYield, int iValue)
+{
+	switch(eYield)
+	{
+	case YIELD_GOLD:
+		GetTreasury()->ChangeGold(iValue);
+		break;
+	case YIELD_CULTURE:
+		changeJONSCulture(iValue);
+		break;
+	case YIELD_FAITH:
+		ChangeFaith(iValue);
+		break;
+	case YIELD_GOLDEN_AGE_POINTS:
+		ChangeGoldenAgeProgressMeter(iValue);
+		break;
+	case YIELD_SCIENCE:
+		{
+			TechTypes eCurrentTech = GetPlayerTechs()->GetCurrentResearch();
+			if(eCurrentTech == NO_TECH)
+			{
+				changeOverflowResearch(iValue);
+			}
+			else
+			{
+				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgress(eCurrentTech, iValue, GetID());
+			}
+		}
+		break;
+	case YIELD_TOURISM:
+		GetCulture()->AddTourismAllKnownCivs(iValue);
+		break;
+	}
+}
