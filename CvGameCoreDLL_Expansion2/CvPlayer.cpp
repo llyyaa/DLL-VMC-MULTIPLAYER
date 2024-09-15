@@ -26716,6 +26716,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changePolicyModifiers(POLICYMOD_SEA_TRADE_GOLD_CHANGE, pPolicy->GetSeaTradeRouteGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_CAPITAL_TRADE_GOLD_CHANGE, pPolicy->GetCapitalTradeRouteGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_CAPITAL_TRADE_RANGE_CHANGE, pPolicy->GetCapitalTradeRouteRangeChange() * iChange);
+	changePolicyModifiers(POLICYMOD_HAPPINESS_PER_RELIGION_IN_CITY, pPolicy->GetHappinessPerReligionInCity() * iChange);
 	changePolicyModifiers(POLICYMOD_SHARED_IDEOLOGY_TRADE_CHANGE, pPolicy->GetSharedIdeologyTradeGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_RIGGING_ELECTION_MODIFIER, pPolicy->GetRiggingElectionModifier() * iChange);
 	changePolicyModifiers(POLICYMOD_RIGGING_ELECTION_INFLUENCE_MODIFIER, pPolicy->GetRiggingElectionInfluenceModifier() * iChange);

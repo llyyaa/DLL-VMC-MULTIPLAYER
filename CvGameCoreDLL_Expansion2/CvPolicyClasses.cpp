@@ -75,6 +75,7 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iWaterBuildSpeedModifier(0),
 	m_iSettlerProductionEraModifier(0),
 	m_iSettlerProductionStartEra(NO_ERA),
+	m_iHappinessPerReligionInCity(0),
 #endif
 	m_iAllFeatureProduction(0),
 	m_iImprovementCostModifier(0),
@@ -390,6 +391,7 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iSettlerProductionEraModifier = kResults.GetInt("SettlerProductionEraModifier");
 	const char* szSettlerProductionStartEra = kResults.GetText("SettlerProductionStartEra");
 	m_iSettlerProductionStartEra = GC.getInfoTypeForString(szSettlerProductionStartEra, true);
+	m_iHappinessPerReligionInCity = kResults.GetInt("HappinessPerReligionInCity");
 #endif
 	m_iAllFeatureProduction = kResults.GetInt("AllFeatureProduction");
 	m_iImprovementCostModifier = kResults.GetInt("ImprovementCostModifier");
@@ -1654,6 +1656,10 @@ int CvPolicyEntry::GetSettlerProductionEraModifier() const
 int CvPolicyEntry::GetSettlerProductionStartEra() const
 {
 	return m_iSettlerProductionStartEra;
+}
+int CvPolicyEntry::GetHappinessPerReligionInCity() const
+{
+	return m_iHappinessPerReligionInCity;
 }
 #endif
 /// How much Production does removing ALL Features now give us?

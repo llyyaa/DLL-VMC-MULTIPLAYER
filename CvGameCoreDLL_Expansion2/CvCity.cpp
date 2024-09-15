@@ -11976,6 +11976,9 @@ int CvCity::GetLocalHappiness() const
 		iLocalHappiness += iHappinessFromReligion;
 	}
 
+	// Policy Num Religion Mods
+	iLocalHappiness += kPlayer.getPolicyModifiers(POLICYMOD_HAPPINESS_PER_RELIGION_IN_CITY) * GetCityReligions()->GetNumReligionsWithFollowers();
+
 	// Policy Building Mods
 	int iSpecialPolicyBuildingHappiness = 0;
 	int iBuildingClassLoop;
