@@ -1249,7 +1249,7 @@ bool CvUnitMission::CanStartMission(UnitHandle hUnit, int iMission, int iData1, 
 	}
 	else if(iMission == CvTypes::getMISSION_SPREAD_RELIGION())
 	{
-		if(hUnit->CanSpreadReligion(pPlot))
+		if(hUnit->CanSpreadReligion(pPlot, bTestVisible))
 		{
 			return true;
 		}

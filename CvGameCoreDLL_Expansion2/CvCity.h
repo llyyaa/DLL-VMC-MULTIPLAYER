@@ -1424,6 +1424,9 @@ public:
 	int GetLastTurnWorkerDisbanded() const;
 	void SetLastTurnWorkerDisbanded(int iValue);
 
+	int GetDefendedAgainstSpreadUntilTurn() const;
+	void SetDefendedAgainstSpreadUntilTurn(int iValue);
+
 protected:
 	FAutoArchiveClassContainer<CvCity> m_syncArchive;
 
@@ -1768,6 +1771,8 @@ protected:
 	bool m_bHasYieldFromOtherYield;
 #endif
 	int m_iLastTurnWorkerDisbanded = 0;
+	int m_iDefendedAgainstSpreadUntilTurn = 0;
+
 	std::vector<int> m_paiNumBuildingClasses;
 };
 

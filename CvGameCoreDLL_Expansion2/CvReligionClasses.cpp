@@ -3497,8 +3497,13 @@ bool CvCityReligions::IsReligionHereOtherThan(ReligionTypes eReligion)
 }
 
 /// Is there an inquisitor from another religion here?
-bool CvCityReligions::IsDefendedAgainstSpread(ReligionTypes eReligion)
+bool CvCityReligions::IsDefendedAgainstSpread(ReligionTypes eReligion, bool bTestVisible)
 {
+	if(!bTestVisible && GC.getGame().getGameTurn() < m_pCity->GetDefendedAgainstSpreadUntilTurn())
+	{
+		return true;
+	}
+
 	CvUnit* pLoopUnit;
 
 	CvPlot* pCityPlot = m_pCity->plot();

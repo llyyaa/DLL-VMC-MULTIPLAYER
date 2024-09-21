@@ -798,6 +798,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetUnitMaxExperienceLocal);
 	Method(IsSecondCapital);
 	Method(GetFoodConsumptionPerPopTimes100);
+	Method(GetDefendedAgainstSpreadUntilTurn);
 }
 //------------------------------------------------------------------------------
 void CvLuaCity::HandleMissingInstance(lua_State* L)
@@ -5283,3 +5284,5 @@ int CvLuaCity::lGetFoodConsumptionPerPopTimes100(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+
+LUAAPIIMPL(City, GetDefendedAgainstSpreadUntilTurn);

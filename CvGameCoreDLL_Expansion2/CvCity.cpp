@@ -439,6 +439,7 @@ CvCity::CvCity() :
 		, m_aiStaticCityYield()
 #endif
 	, m_iLastTurnWorkerDisbanded(0)
+	, m_iDefendedAgainstSpreadUntilTurn(0)
 	, m_paiNumBuildingClasses()
 {
 	OBJECT_ALLOCATED
@@ -1627,6 +1628,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aTradeRouteFromTheCityYields[i] = 0;
 	}
 	m_iLastTurnWorkerDisbanded = 0;
+	m_iDefendedAgainstSpreadUntilTurn = 0;
 	m_paiNumBuildingClasses.clear();
 	m_paiNumBuildingClasses.resize(GC.getNumBuildingClassInfos());
 	for (int i = 0; i < m_paiNumBuildingClasses.size(); ++i)
@@ -9278,6 +9280,20 @@ void CvCity::SetLastTurnWorkerDisbanded(int iValue)
 {
 	VALIDATE_OBJECT
 	m_iLastTurnWorkerDisbanded = iValue;
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetDefendedAgainstSpreadUntilTurn() const
+{
+	VALIDATE_OBJECT
+	return m_iDefendedAgainstSpreadUntilTurn;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::SetDefendedAgainstSpreadUntilTurn(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iDefendedAgainstSpreadUntilTurn = iValue;
 }
 
 //	--------------------------------------------------------------------------------
@@ -20085,6 +20101,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iBaseTourism;
 	kStream >> m_iBaseTourismBeforeModifiers;
 	kStream >> m_iLastTurnWorkerDisbanded;
+	kStream >> m_iDefendedAgainstSpreadUntilTurn;
 
 #ifdef MOD_API_UNIFIED_YIELDS_MORE	
 	kStream >> m_bIsColony;
@@ -20474,6 +20491,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iBaseTourism;
 	kStream << m_iBaseTourismBeforeModifiers;
 	kStream << m_iLastTurnWorkerDisbanded;
+	kStream << m_iDefendedAgainstSpreadUntilTurn;
 
 #ifdef MOD_API_UNIFIED_YIELDS_MORE
 	kStream << m_bIsColony;

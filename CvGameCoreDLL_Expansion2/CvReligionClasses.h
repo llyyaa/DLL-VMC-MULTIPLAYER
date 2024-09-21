@@ -408,7 +408,7 @@ public:
 	bool IsHolyCityForReligion(ReligionTypes eReligion);
 	bool IsHolyCityAnyReligion();
 	bool IsReligionHereOtherThan(ReligionTypes eReligion);
-	bool IsDefendedAgainstSpread(ReligionTypes eReligion);
+	bool IsDefendedAgainstSpread(ReligionTypes eReligion, bool bTestVisible = false);
 	ReligionTypes GetReligiousMajority() const;
 	ReligionTypes GetSimulatedReligiousMajority();
 	ReligionTypes GetSecondaryReligion() const;

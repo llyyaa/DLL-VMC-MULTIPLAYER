@@ -373,7 +373,7 @@ public:
 	bool CanEnhanceReligion(const CvPlot* pPlot) const;
 	bool DoEnhanceReligion();
 
-	bool CanSpreadReligion(const CvPlot* pPlot) const;
+	bool CanSpreadReligion(const CvPlot* pPlot, bool bTestVisible = false) const;
 	bool DoSpreadReligion();
 
 	bool CanRemoveHeresy(const CvPlot* pPlot) const;
