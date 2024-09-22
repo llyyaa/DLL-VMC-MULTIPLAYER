@@ -10969,9 +10969,20 @@ bool CvUnit::DoRemoveHeresy()
 #endif
 			
 			int iNoSpreadTurnPopModifierAfterRemovingHeresy = getUnitInfo().GetNoSpreadTurnPopModifierAfterRemovingHeresy();
+			iNoSpreadTurnPopModifierAfterRemovingHeresy *= pCity->getPopulation();
+			iNoSpreadTurnPopModifierAfterRemovingHeresy /= 100;
 			if(iNoSpreadTurnPopModifierAfterRemovingHeresy > 0)
 			{
-				pCity->SetDefendedAgainstSpreadUntilTurn(GC.getGame().getGameTurn() + iNoSpreadTurnPopModifierAfterRemovingHeresy * pCity->getPopulation() / 100);
+				const CvReligion *kReligion = GC.getGame().GetGameReligions()->GetReligion(GetReligionData()->GetReligion(), getOwner());
+				int iModifier = kReligion ? 100 + kReligion->m_Beliefs.GetInquisitionFervorTimeModifier() : 100;
+				if(iModifier != 100)
+				{
+					iNoSpreadTurnPopModifierAfterRemovingHeresy *= iModifier;
+					// Round it up
+					iNoSpreadTurnPopModifierAfterRemovingHeresy += 50;
+					iNoSpreadTurnPopModifierAfterRemovingHeresy /= 100;
+				}
+				pCity->SetDefendedAgainstSpreadUntilTurn(GC.getGame().getGameTurn() + iNoSpreadTurnPopModifierAfterRemovingHeresy);
 			}
 			kill(true);
 		}

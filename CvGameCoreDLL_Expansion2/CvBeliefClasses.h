@@ -140,6 +140,7 @@ public:
 	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
 	int GetSameReligionMinorRecoveryModifier() const;
+	int GetInquisitionFervorTimeModifier() const;
 	int GetCuttingBonusModifier() const;
 	int GetCityExtraMissionarySpreads() const;
 	bool AllowYieldPerBirth() const;
@@ -213,6 +214,7 @@ protected:
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
 	int m_iSameReligionMinorRecoveryModifier;
+	int m_iInquisitionFervorTimeModifier;
 	int m_iCuttingBonusModifier;
 	int m_iCityExtraMissionarySpreads;
 	bool m_bAllowYieldPerBirth;
@@ -471,6 +473,10 @@ public:
 	{
 		return m_iSameReligionMinorRecoveryModifier;
 	}
+	int GetInquisitionFervorTimeModifier() const
+	{
+		return m_iInquisitionFervorTimeModifier;
+	}
 	int GetCuttingBonusModifier() const
 	{
 		return m_iCuttingBonusModifier;
@@ -610,6 +616,7 @@ private:
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
 	int m_iSameReligionMinorRecoveryModifier;
+	int m_iInquisitionFervorTimeModifier;
 	int m_iCuttingBonusModifier;
 	int m_iCityExtraMissionarySpreads;
 	bool m_bAllowYieldPerBirth;
