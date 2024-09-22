@@ -63,6 +63,7 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_bGreatPersonPointsCapital(false),
 	m_bGreatPersonPointsPerCity(false),
 	m_bGreatPersonPointsHolyCity(false),
+	m_bInquisitorProhibitSpreadInAlly(false),
 	m_piGreatPersonPoints(NULL),
 	m_piTerrainCityFoodConsumption(NULL),
 	m_iFreePromotionForProphet(NO_PROMOTION),
@@ -764,6 +765,10 @@ int CvBeliefEntry::GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) co
 
 	return resValue;
 }
+bool CvBeliefEntry::IsInquisitorProhibitSpreadInAlly() const
+{
+	return m_bInquisitorProhibitSpreadInAlly;
+}
 int CvBeliefEntry::GetTerrainCityFoodConsumption(int i) const
 {
 	CvAssertMsg(i < GC.getNumTerrainInfos(), "Index out of bounds");
@@ -981,6 +986,7 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_bGreatPersonPointsPerCity	  	  = kResults.GetBool("GreatPersonPointsPerCity");
 	m_bGreatPersonPointsHolyCity	  = kResults.GetBool("GreatPersonPointsHolyCity");
 	m_bAllowYieldPerBirth	  		  = kResults.GetBool("AllowYieldPerBirth");
+	m_bInquisitorProhibitSpreadInAlly = kResults.GetBool("InquisitorProhibitSpreadInAlly");
 #endif
 	//References
 	const char* szTextVal;
@@ -1443,6 +1449,7 @@ CvReligionBeliefs::CvReligionBeliefs(const CvReligionBeliefs& source)
 	m_iHolyCityPressureModifier = source.m_iHolyCityPressureModifier;
 	m_iSameReligionMinorRecoveryModifier = source.m_iSameReligionMinorRecoveryModifier;
 	m_iInquisitionFervorTimeModifier = source.m_iInquisitionFervorTimeModifier;
+	m_iNumInquisitorProhibitSpreadInAlly = source.m_iNumInquisitorProhibitSpreadInAlly;
 	m_iCuttingBonusModifier = source.m_iCuttingBonusModifier;
 	m_iCityExtraMissionarySpreads = source.m_iCityExtraMissionarySpreads;
 	m_bAllowYieldPerBirth = source.m_bAllowYieldPerBirth;
@@ -1510,6 +1517,7 @@ void CvReligionBeliefs::Reset()
 	m_iHolyCityPressureModifier = 0;
 	m_iSameReligionMinorRecoveryModifier = 0;
 	m_iInquisitionFervorTimeModifier = 0;
+	m_iNumInquisitorProhibitSpreadInAlly = 0;
 	m_iCuttingBonusModifier = 0;
 	m_iCityExtraMissionarySpreads = 0;
 	m_bAllowYieldPerBirth = false;
@@ -1604,6 +1612,7 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief, PlayerTypes ePlayer)
 	m_iHolyCityPressureModifier += belief->GetHolyCityPressureModifier();
 	m_iSameReligionMinorRecoveryModifier += belief->GetSameReligionMinorRecoveryModifier();
 	m_iInquisitionFervorTimeModifier += belief->GetInquisitionFervorTimeModifier();
+	m_iNumInquisitorProhibitSpreadInAlly += belief->IsInquisitorProhibitSpreadInAlly() ? 1 : 0;
 	m_iCuttingBonusModifier += belief->GetCuttingBonusModifier();
 	m_iCityExtraMissionarySpreads += belief->GetCityExtraMissionarySpreads();
 	m_bAllowYieldPerBirth = m_bAllowYieldPerBirth || belief->AllowYieldPerBirth();
@@ -2588,6 +2597,7 @@ void CvReligionBeliefs::Read(FDataStream& kStream)
 	kStream >> m_iHolyCityPressureModifier;
 	kStream >> m_iSameReligionMinorRecoveryModifier;
 	kStream >> m_iInquisitionFervorTimeModifier;
+	kStream >> m_iNumInquisitorProhibitSpreadInAlly;
 	kStream >> m_iCuttingBonusModifier;
 	kStream >> m_iCityExtraMissionarySpreads;
 	kStream >> m_bAllowYieldPerBirth;
@@ -2651,6 +2661,7 @@ void CvReligionBeliefs::Write(FDataStream& kStream) const
 	kStream << m_iHolyCityPressureModifier;
 	kStream << m_iSameReligionMinorRecoveryModifier;
 	kStream << m_iInquisitionFervorTimeModifier;
+	kStream << m_iNumInquisitorProhibitSpreadInAlly;
 	kStream << m_iCuttingBonusModifier;
 	kStream << m_iCityExtraMissionarySpreads;
 	kStream << m_bAllowYieldPerBirth;

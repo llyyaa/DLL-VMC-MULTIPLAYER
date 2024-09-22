@@ -133,6 +133,7 @@ public:
 	bool IsGreatPersonPointsCapital() const;
 	bool IsGreatPersonPointsPerCity() const;
 	bool IsGreatPersonPointsHolyCity() const;
+	bool IsInquisitorProhibitSpreadInAlly() const;
 	int GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) const;
 	int GetTerrainCityFoodConsumption(int i) const;
 	int GetFreePromotionForProphet() const;
@@ -207,6 +208,7 @@ protected:
 	bool m_bGreatPersonPointsCapital;
 	bool m_bGreatPersonPointsPerCity;
 	bool m_bGreatPersonPointsHolyCity;
+	bool m_bInquisitorProhibitSpreadInAlly;
 	int* m_piGreatPersonPoints;
 	int* m_piTerrainCityFoodConsumption;
 	int m_iFreePromotionForProphet;
@@ -453,6 +455,10 @@ public:
 	{
 		return m_bGreatPersonPoints;
 	}
+	bool IsInquisitorProhibitSpreadInAlly() const
+	{
+		return m_iNumInquisitorProhibitSpreadInAlly > 0;
+	}
 	const std::vector<int>& GetFreePromotionForProphet() const
 	{
 		return m_vFreePromotionForProphet;
@@ -617,6 +623,7 @@ private:
 	int m_iHolyCityPressureModifier;
 	int m_iSameReligionMinorRecoveryModifier;
 	int m_iInquisitionFervorTimeModifier;
+	int m_iNumInquisitorProhibitSpreadInAlly;
 	int m_iCuttingBonusModifier;
 	int m_iCityExtraMissionarySpreads;
 	bool m_bAllowYieldPerBirth;

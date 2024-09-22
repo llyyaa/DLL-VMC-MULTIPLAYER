@@ -3504,71 +3504,38 @@ bool CvCityReligions::IsDefendedAgainstSpread(ReligionTypes eReligion, bool bTes
 		return true;
 	}
 
-	CvUnit* pLoopUnit;
-
 	CvPlot* pCityPlot = m_pCity->plot();
-	if(pCityPlot)
+	if(!pCityPlot) return false;
+	CvUnit* pLoopUnit = nullptr;
+	CvPlot* pLoopPlot = nullptr;
+	int iRange = 1;
+	for (int iDX = -iRange; iDX <= iRange; iDX++)
 	{
-		for(int iUnitLoop = 0; iUnitLoop < pCityPlot->getNumUnits(); iUnitLoop++)
+		for (int iDY = -iRange; iDY <= iRange; iDY++)
 		{
-			pLoopUnit = pCityPlot->getUnitByIndex(iUnitLoop);
-			CvUnitEntry* pkEntry = GC.getUnitInfo(pLoopUnit->getUnitType());
-			if(pkEntry && pkEntry->IsProhibitsSpread())
+			CvPlot* pLoopPlot = plotXYWithRangeCheck(m_pCity->getX(), m_pCity->getY(), iDX, iDY, iRange);
+			if (!pLoopPlot) continue;
+			for(int iUnitLoop = 0; iUnitLoop < pLoopPlot->getNumUnits(); iUnitLoop++)
 			{
-#if defined(MOD_RELIGION_ALLIED_INQUISITORS)
+				pLoopUnit = pLoopPlot->getUnitByIndex(iUnitLoop);
+				CvUnitEntry* pkEntry = GC.getUnitInfo(pLoopUnit->getUnitType());
+				if(!pkEntry || !pkEntry->IsProhibitsSpread()) continue;
+
 				bool bProtected = (pLoopUnit->getOwner() == m_pCity->getOwner() && pLoopUnit->GetReligionData()->GetReligion() != eReligion);
-				if (!bProtected && MOD_RELIGION_ALLIED_INQUISITORS) {
+				const CvReligion *kReligion = GC.getGame().GetGameReligions()->GetReligion(pLoopUnit->GetReligionData()->GetReligion(), pLoopUnit->getOwner());
+				if (!bProtected && (MOD_RELIGION_ALLIED_INQUISITORS || kReligion && kReligion->m_Beliefs.IsInquisitorProhibitSpreadInAlly() && kReligion->m_eFounder == pLoopUnit->getOwner())){
 					CvPlayer* pCityPlayer = &GET_PLAYER(m_pCity->getOwner());
 					if (pCityPlayer->isMinorCiv() && pCityPlayer->GetMinorCivAI()->GetAlly() == pLoopUnit->getOwner()) {
 						bProtected = true;
 					}
 				}
-				
 				if (bProtected)
-#else
-				if(pLoopUnit->getOwner() == m_pCity->getOwner() && pLoopUnit->GetReligionData()->GetReligion() != eReligion)
-#endif
 				{
 					return true;
 				}
 			}
 		}
 	}
-
-	CvPlot* pAdjacentPlot;
-	for(int iDirectionLoop = 0; iDirectionLoop < NUM_DIRECTION_TYPES; iDirectionLoop++)
-	{
-		pAdjacentPlot = plotDirection(m_pCity->getX(), m_pCity->getY(), ((DirectionTypes)iDirectionLoop));
-
-		if(pAdjacentPlot != NULL)
-		{
-			for(int iUnitLoop = 0; iUnitLoop < pAdjacentPlot->getNumUnits(); iUnitLoop++)
-			{
-				pLoopUnit = pAdjacentPlot->getUnitByIndex(iUnitLoop);
-				CvUnitEntry* pkEntry = GC.getUnitInfo(pLoopUnit->getUnitType());
-				if(pkEntry && pkEntry->IsProhibitsSpread())
-				{
-#if defined(MOD_RELIGION_ALLIED_INQUISITORS)
-					bool bProtected = (pLoopUnit->getOwner() == m_pCity->getOwner() && pLoopUnit->GetReligionData()->GetReligion() != eReligion);
-					if (!bProtected && MOD_RELIGION_ALLIED_INQUISITORS) {
-						CvPlayer* pCityPlayer = &GET_PLAYER(m_pCity->getOwner());
-						if (pCityPlayer->isMinorCiv() && pCityPlayer->GetMinorCivAI()->GetAlly() == pLoopUnit->getOwner()) {
-							bProtected = true;
-						}
-					}
-					
-					if (bProtected)
-#else
-					if(pLoopUnit->getOwner() == m_pCity->getOwner() && pLoopUnit->GetReligionData()->GetReligion() != eReligion)
-#endif
-					{
-						return true;
-					}
-				}
-			}
-		}
-	}
-
 	return false;
 }
 
