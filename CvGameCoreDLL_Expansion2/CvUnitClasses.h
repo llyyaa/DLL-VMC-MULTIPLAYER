@@ -97,6 +97,7 @@ public:
 	int GetBoundWaterImprovement() const;
 #endif
 	int GetTrainPopulationConsume() const;
+	int GetNoSpreadTurnPopModifierAfterRemovingHeresy() const;
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool IsNoTroops() const;
@@ -294,6 +295,7 @@ private:
 	int m_iBoundWaterImprovement;
 #endif
 	int m_iTrainPopulationConsume;
+	int m_iNoSpreadTurnPopModifierAfterRemovingHeresy;
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool m_bNoTroops;

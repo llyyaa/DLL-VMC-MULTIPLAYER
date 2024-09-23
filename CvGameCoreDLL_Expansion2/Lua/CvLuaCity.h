@@ -728,6 +728,7 @@ protected:
 
 	LUAAPIEXTN(IsSecondCapital, bool);
 	LUAAPIEXTN(GetFoodConsumptionPerPopTimes100, bool);
+	LUAAPIEXTN(GetDefendedAgainstSpreadUntilTurn, int);
 };
 
 #endif //CVLUACITY_H

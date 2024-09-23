@@ -10669,7 +10669,7 @@ bool CvUnit::DoEnhanceReligion()
 }
 
 //	--------------------------------------------------------------------------------
-bool CvUnit::CanSpreadReligion(const CvPlot* pPlot) const
+bool CvUnit::CanSpreadReligion(const CvPlot* pPlot, bool bTestVisible) const
 {
 	VALIDATE_OBJECT
 	CvCity* pCity;
@@ -10695,7 +10695,7 @@ bool CvUnit::CanSpreadReligion(const CvPlot* pPlot) const
 	}
 
 	// Blocked by Inquisitor?
-	if(pCity->GetCityReligions()->IsDefendedAgainstSpread(GetReligionData()->GetReligion()))
+	if(pCity->GetCityReligions()->IsDefendedAgainstSpread(GetReligionData()->GetReligion(), bTestVisible))
 	{
 		return false;
 	}
@@ -10968,6 +10968,22 @@ bool CvUnit::DoRemoveHeresy()
 			}
 #endif
 			
+			int iNoSpreadTurnPopModifierAfterRemovingHeresy = getUnitInfo().GetNoSpreadTurnPopModifierAfterRemovingHeresy();
+			iNoSpreadTurnPopModifierAfterRemovingHeresy *= pCity->getPopulation();
+			iNoSpreadTurnPopModifierAfterRemovingHeresy /= 100;
+			if(iNoSpreadTurnPopModifierAfterRemovingHeresy > 0)
+			{
+				const CvReligion *kReligion = GC.getGame().GetGameReligions()->GetReligion(GetReligionData()->GetReligion(), getOwner());
+				int iModifier = kReligion ? 100 + kReligion->m_Beliefs.GetInquisitionFervorTimeModifier() : 100;
+				if(iModifier != 100)
+				{
+					iNoSpreadTurnPopModifierAfterRemovingHeresy *= iModifier;
+					// Round it up
+					iNoSpreadTurnPopModifierAfterRemovingHeresy += 50;
+					iNoSpreadTurnPopModifierAfterRemovingHeresy /= 100;
+				}
+				pCity->SetDefendedAgainstSpreadUntilTurn(GC.getGame().getGameTurn() + iNoSpreadTurnPopModifierAfterRemovingHeresy);
+			}
 			kill(true);
 		}
 	}
