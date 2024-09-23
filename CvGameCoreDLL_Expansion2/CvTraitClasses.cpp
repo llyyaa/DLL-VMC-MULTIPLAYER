@@ -86,6 +86,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iAwayFromCapitalCombatModifier(0),
 	m_iAwayFromCapitalCombatModifierMax(0),
 	m_iInfluenceFromGreatPeopleBirth(0),
+	m_iWLKDLengthChangeModifier(0),
 	m_iCombatBonusVsLargerCiv(0),
 	m_iLandUnitMaintenanceModifier(0),
 	m_iNavalUnitMaintenanceModifier(0),
@@ -556,6 +557,12 @@ int CvTraitEntry::GetAwayFromCapitalCombatModifierMax() const
 int CvTraitEntry::GetInfluenceFromGreatPeopleBirth() const
 {
 	return m_iInfluenceFromGreatPeopleBirth;
+}
+
+/// We Love King Days Length Change
+int CvTraitEntry::GetWLKDLengthChangeModifier() const
+{
+	return m_iWLKDLengthChangeModifier;
 }
 
 /// Accessor: combat bonus vs. civ with more cities
@@ -1620,6 +1627,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iAwayFromCapitalCombatModifier		= kResults.GetInt("AwayFromCapitalCombatModifier");
 	m_iAwayFromCapitalCombatModifierMax		= kResults.GetInt("AwayFromCapitalCombatModifierMax");
 	m_iInfluenceFromGreatPeopleBirth		= kResults.GetInt("InfluenceFromGreatPeopleBirth");
+	m_iWLKDLengthChangeModifier		= kResults.GetInt("WLKDLengthChangeModifier");
 	m_iCombatBonusVsLargerCiv				= kResults.GetInt("CombatBonusVsLargerCiv");
 	m_iLandUnitMaintenanceModifier          = kResults.GetInt("LandUnitMaintenanceModifier");
 	m_iNavalUnitMaintenanceModifier         = kResults.GetInt("NavalUnitMaintenanceModifier");
@@ -2582,6 +2590,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iAwayFromCapitalCombatModifier += trait->GetAwayFromCapitalCombatModifier();
 			m_iAwayFromCapitalCombatModifierMax += trait->GetAwayFromCapitalCombatModifierMax();
 			m_iInfluenceFromGreatPeopleBirth += trait->GetInfluenceFromGreatPeopleBirth();
+			m_iWLKDLengthChangeModifier += trait->GetWLKDLengthChangeModifier();
 			m_iCombatBonusVsLargerCiv += trait->GetCombatBonusVsLargerCiv();
 			m_iLandUnitMaintenanceModifier += trait->GetLandUnitMaintenanceModifier();
 			m_iNavalUnitMaintenanceModifier += trait->GetNavalUnitMaintenanceModifier();
@@ -3124,6 +3133,7 @@ void CvPlayerTraits::Reset()
 	m_iAwayFromCapitalCombatModifier = 0;
 	m_iAwayFromCapitalCombatModifierMax = 0;
 	m_iInfluenceFromGreatPeopleBirth = 0;
+	m_iWLKDLengthChangeModifier = 0;
 	m_iCombatBonusVsLargerCiv = 0;
 	m_iLandUnitMaintenanceModifier = 0;
 	m_iNavalUnitMaintenanceModifier = 0;
@@ -4515,6 +4525,8 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	kStream >> m_iInfluenceFromGreatPeopleBirth;
 
+	kStream >> m_iWLKDLengthChangeModifier;
+
 	kStream >> m_iCombatBonusVsLargerCiv;
 
 	kStream >> m_iLandUnitMaintenanceModifier;
@@ -5025,6 +5037,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iAwayFromCapitalCombatModifier;
 	kStream << m_iAwayFromCapitalCombatModifierMax;
 	kStream << m_iInfluenceFromGreatPeopleBirth;
+	kStream << m_iWLKDLengthChangeModifier;
 	kStream << m_iCombatBonusVsLargerCiv;
 	kStream << m_iLandUnitMaintenanceModifier;
 	kStream << m_iNavalUnitMaintenanceModifier;
