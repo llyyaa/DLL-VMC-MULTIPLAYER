@@ -1945,6 +1945,7 @@ public:
 
 	void setHealPercentFromAttackDamageFormula(int iValue);
 	const int GetHealPercentFromAttackDamageFormula() const;
+	const int GetCalculateMilitaryMightMod() const;
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	const int GetCrops() const;
@@ -2589,6 +2590,7 @@ protected:
 	int m_eAttackChanceFromAttackDamageFormula;
 	int m_eMovementFromAttackDamageFormula;
 	int m_eHealPercentFromAttackDamageFormula;
+	int m_iCalculateMilitaryMightMod;
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	int m_iCrops;

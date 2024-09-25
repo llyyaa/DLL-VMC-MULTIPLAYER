@@ -219,6 +219,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_eAttackChanceFromAttackDamageFormula(NO_LUA_FORMULA),
 	m_eMovementFromAttackDamageFormula(NO_LUA_FORMULA),
 	m_eHealPercentFromAttackDamageFormula(NO_LUA_FORMULA),
+	m_iCalculateMilitaryMightMod(0),
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bCrops(false),
@@ -751,6 +752,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_eAttackChanceFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("AttackChanceFromAttackDamage")));
 	m_eMovementFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("MovementFromAttackDamage")));
 	m_eHealPercentFromAttackDamageFormula = (int)static_cast<LuaFormulaTypes>(GC.getInfoTypeForString(kResults.GetText("HealPercentFromAttackDamage")));
+	m_iCalculateMilitaryMightMod = kResults.GetInt("CalculateMilitaryMightMod");
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bCrops = kResults.GetBool("IsCrops");
@@ -2531,7 +2533,10 @@ int CvPromotionEntry::GetHeightModLimited() const
 {
 	return m_iHeightModLimited;
 }
-
+int CvPromotionEntry::GetCalculateMilitaryMightMod() const
+{
+	return m_iCalculateMilitaryMightMod;
+}
 int CvPromotionEntry::GetExtraMoveTimesXX() const
 {
 	return m_iExtraMoveTimesXX;

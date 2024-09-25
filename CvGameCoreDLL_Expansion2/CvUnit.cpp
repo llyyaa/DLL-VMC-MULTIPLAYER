@@ -484,6 +484,7 @@ CvUnit::CvUnit() :
 	, m_eAttackChanceFromAttackDamageFormula(NO_LUA_FORMULA)
 	, m_eMovementFromAttackDamageFormula(NO_LUA_FORMULA)
 	, m_eHealPercentFromAttackDamageFormula(NO_LUA_FORMULA)
+	, m_iCalculateMilitaryMightMod(0)
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	, m_iCrops(0)
@@ -1485,6 +1486,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_eAttackChanceFromAttackDamageFormula = NO_LUA_FORMULA;
 	m_eMovementFromAttackDamageFormula = NO_LUA_FORMULA;
 	m_eHealPercentFromAttackDamageFormula = NO_LUA_FORMULA;
+	m_iCalculateMilitaryMightMod = 0;
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iCrops = 0;
@@ -7109,6 +7111,10 @@ const int CvUnit::GetTotalHeightMod(CvPlot& TargetPlot) const
 		}
 	}
 	return 0;
+}
+const int CvUnit::GetCalculateMilitaryMightMod() const
+{
+	return m_iCalculateMilitaryMightMod;
 }
 //	--------------------------------------------------------------------------------
 void CvUnit::ChangeExtraMoveTimesXX(int iValue)
@@ -26868,6 +26874,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iInsightEnemyDamageModifier;
 	kStream >> m_iHeightModPerX;
 	kStream >> m_iHeightModLimited;
+	kStream >> m_iCalculateMilitaryMightMod;
 	kStream >> m_iExtraMoveTimesXX;
 	kStream >> m_iRangeAttackCostModifier;
 	kStream >> m_iOriginalCapitalDamageFix;
@@ -27269,6 +27276,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iInsightEnemyDamageModifier;
 	kStream << m_iHeightModPerX;
 	kStream << m_iHeightModLimited;
+	kStream << m_iCalculateMilitaryMightMod;
 	kStream << m_iExtraMoveTimesXX;
 	kStream << m_iRangeAttackCostModifier;
 	kStream << m_iOriginalCapitalDamageFix;

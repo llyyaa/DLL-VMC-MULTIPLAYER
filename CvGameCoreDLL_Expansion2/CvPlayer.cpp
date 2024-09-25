@@ -19443,20 +19443,27 @@ int CvPlayer::calculateMilitaryMight() const
 	{
 		// Current combat strength or bombard strength, whichever is higher
 		int iPower =  pLoopUnit->GetPower();
-		if (pLoopUnit->getDomainType() == DOMAIN_SEA)
+		int iMod = pLoopUnit->GetCalculateMilitaryMightMod();
+		iPower *= (1+iMod);
+		if (pLoopUnit->getDomainType() == DOMAIN_SEA && !MOD_SP_SMART_AI)
 		{
 			iPower /= 2;
 		}
 		rtnValue += iPower;
 	}
-
+	if(MOD_SP_SMART_AI)
+	{
+		float fGoldMultiplier = 1.0f + (sqrt((float)GetTreasury()->GetGold()/5) / 100.0f);
+		if(fGoldMultiplier > 2.0f) fGoldMultiplier = 2.0f;
+		rtnValue = (int)(rtnValue * fGoldMultiplier);
+	}
 	//Simplistic increase based on player's gold
 	//500 gold will increase might by 22%, 2000 by 45%, 8000 gold by 90%
-	float fGoldMultiplier = 1.0f + (sqrt((float)GetTreasury()->GetGold()) / 100.0f);
-	if(fGoldMultiplier > 2.0f) fGoldMultiplier = 2.0f;
-
-	rtnValue = (int)(rtnValue * fGoldMultiplier);
-
+	else{
+		float fGoldMultiplier = 1.0f + (sqrt((float)GetTreasury()->GetGold()) / 100.0f);
+		if(fGoldMultiplier > 2.0f) fGoldMultiplier = 2.0f;
+		rtnValue = (int)(rtnValue * fGoldMultiplier);
+	}
 	return rtnValue;
 }
 

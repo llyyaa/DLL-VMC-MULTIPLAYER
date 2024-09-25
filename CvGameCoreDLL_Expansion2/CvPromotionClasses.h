@@ -289,6 +289,7 @@ public:
 	int GetAttackChanceFromAttackDamageFormula() const;
 	int GetMovementFromAttackDamageFormula() const;
 	int GetHealPercentFromAttackDamageFormula() const;
+	int GetCalculateMilitaryMightMod() const;
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool IsCrops() const;
@@ -657,6 +658,7 @@ protected:
 	int m_eAttackChanceFromAttackDamageFormula;
 	int m_eMovementFromAttackDamageFormula;
 	int m_eHealPercentFromAttackDamageFormula;
+	int m_iCalculateMilitaryMightMod;
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	bool m_bCrops;
