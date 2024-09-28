@@ -12385,10 +12385,9 @@ void CvCity::SetWeLoveTheKingDayCounter(int iValue)
 #endif
 	}
 	int iWLTKmod = GET_PLAYER(getOwner()).GetPlayerTraits()->GetWLKDLengthChangeModifier();
-	if (iWLTKmod !=0 && iValue > GetWeLoveTheKingDayCounter())
+	if (iWLTKmod > 0 && iValue > GetWeLoveTheKingDayCounter())
 	{
-		iValue *=(100+iWLTKmod) ;
-		iValue /=100;
+		iValue = iValue + ((iValue - GetWeLoveTheKingDayCounter())*(100+iWLTKmod)/100);
 	}
 	m_iWeLoveTheKingDayCounter = iValue;
 }
