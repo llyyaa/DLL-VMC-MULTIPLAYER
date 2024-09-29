@@ -268,3 +268,4 @@ CREATE TABLE IF NOT EXISTS UnitPromotions_CombatModPerAdjacentUnitCombat (
     `Attack` INTEGER DEFAULT 0,
     `Defense` INTEGER DEFAULT 0
 );
+ALTER TABLE UnitPromotions ADD COLUMN 'MilitaryMightMod' INTEGER DEFAULT 0;
