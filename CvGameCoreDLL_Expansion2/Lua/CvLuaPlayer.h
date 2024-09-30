@@ -1291,6 +1291,8 @@ protected:
 
 	LUAAPIEXTN(IsLostUC, int);
 	LUAAPIEXTN(SetLostUC, void, bIsLost);
+
+	LUAAPIEXTN(GetNumTechsKnown, int);
 };
 
 #endif //CVLUAPLAYER_H
