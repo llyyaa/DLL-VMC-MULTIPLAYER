@@ -7774,7 +7774,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 #endif
 
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
-		ChangeNumNoNuclearWinterLocal(pBuildingInfo->IsNoNuclearWinterLocal() ? iChange : 0);
+		ChangeNumNoNuclearWinterLocal(pBuildingInfo->IsNoNuclearWinterLocal() && pBuildingInfo->GetID() == GC.getInfoTypeForString("BUILDING_MEGACITY_PYRAMID") ? iChange : 0);
 #endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 		ChangeNumAllScaleImmigrantIn(pBuildingInfo->CanAllScaleImmigrantIn() ? iChange : 0);
