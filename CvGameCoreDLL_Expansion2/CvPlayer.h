@@ -2275,6 +2275,8 @@ public:
 
 	int GetNumSpaceshipPartPurchased() const;
 	void ChangeNumSpaceshipPartPurchased(int iChange);
+
+	void doInstantYield(YieldTypes iYield, int iValue);
 protected:
 	class ConqueredByBoolField
 	{

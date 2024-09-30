@@ -2902,11 +2902,6 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 		GET_PLAYER(eOldOwner).SetHasLostCapital(true, m_eID);
 	}
 
-	CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
-
-
-
-
 #if !defined(NO_ACHIEVEMENTS)
 	if(bConquest && !GC.getGame().isGameMultiPlayer() && isHuman())
 	{
@@ -3083,7 +3078,7 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 				if (eLoopBuilding == pkLoopBuildingInfo->GetID())
 				{
 #if defined(MOD_BUGFIX_BUILDINGCLASS_NOT_BUILDING)
-					BuildingTypes eFreeBuilding = (BuildingTypes)getCivilizationInfo().getCivilizationBuildings(pkLoopBuildingInfo->GetBuildingClassType());
+					BuildingTypes eFreeBuilding = GET_PLAYER(m_eID).GetCivBuilding((BuildingClassTypes)pkLoopBuildingInfo->GetBuildingClassType());
 					pNewCity->GetCityBuildings()->SetNumFreeBuilding(eFreeBuilding, 1);
 #else
 					pNewCity->GetCityBuildings()->SetNumFreeBuilding(eLoopBuilding, 1);
@@ -3118,7 +3113,7 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 				}
 				else
 				{
-					eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings(eBuildingClass);
+					eBuilding = GET_PLAYER(m_eID).GetCivBuilding(eBuildingClass);
 				}
 
 				if(eBuilding != NO_BUILDING)
@@ -3224,7 +3219,7 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 	{
 		SetHasLostCapital(false, NO_PLAYER);
 
-		const BuildingTypes eCapitalBuilding = (BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(GC.getCAPITAL_BUILDINGCLASS()));
+		const BuildingTypes eCapitalBuilding = GET_PLAYER(m_eID).GetCivBuilding((BuildingClassTypes)GC.getCAPITAL_BUILDINGCLASS());
 		if(eCapitalBuilding != NO_BUILDING)
 		{
 #if defined(MOD_EVENTS_CITY_CAPITAL)
@@ -6469,7 +6464,7 @@ void CvPlayer::findNewCapital()
 	int iLoop;
 #endif
 
-	eCapitalBuilding = ((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(GC.getCAPITAL_BUILDINGCLASS())));
+	eCapitalBuilding = GET_PLAYER(m_eID).GetCivBuilding((BuildingClassTypes)GC.getCAPITAL_BUILDINGCLASS());
 
 	if(eCapitalBuilding == NO_BUILDING)
 	{
@@ -8156,7 +8151,7 @@ void CvPlayer::found(int iX, int iY)
 		CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
 		if(pkBuildingClassInfo)
 		{
-			const BuildingTypes eLoopBuilding = ((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(iI)));
+			const BuildingTypes eLoopBuilding = GET_PLAYER(m_eID).GetCivBuilding((BuildingClassTypes)iI);
 			if(eLoopBuilding != NO_BUILDING)
 			{
 				CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eLoopBuilding);
@@ -9756,7 +9751,7 @@ void CvPlayer::removeBuildingClass(BuildingClassTypes eBuildingClass)
 	BuildingTypes eBuilding;
 	int iLoop;
 
-	eBuilding = ((BuildingTypes)(getCivilizationInfo().getCivilizationBuildings(eBuildingClass)));
+	eBuilding = GET_PLAYER(m_eID).GetCivBuilding(eBuildingClass);
 
 	if(eBuilding != NO_BUILDING)
 	{
@@ -19448,16 +19443,29 @@ int CvPlayer::calculateMilitaryMight() const
 	{
 		// Current combat strength or bombard strength, whichever is higher
 		int iPower =  pLoopUnit->GetPower();
-		if (pLoopUnit->getDomainType() == DOMAIN_SEA)
+		int iMod = pLoopUnit->GetMilitaryMightMod();
+		if(iMod != 0)
+		{
+			iPower *= (100 + iMod);
+			iPower /= 100;
+		}
+		if (pLoopUnit->getDomainType() == DOMAIN_SEA && !MOD_SP_SMART_AI)
 		{
 			iPower /= 2;
 		}
 		rtnValue += iPower;
 	}
-
 	//Simplistic increase based on player's gold
 	//500 gold will increase might by 22%, 2000 by 45%, 8000 gold by 90%
-	float fGoldMultiplier = 1.0f + (sqrt((float)GetTreasury()->GetGold()) / 100.0f);
+	float fGoldMultiplier = 1.0f;
+	if(MOD_SP_SMART_AI)
+	{
+		fGoldMultiplier += sqrt((float)GetTreasury()->GetGold() / 5) / 100.0f;
+	}
+	else
+	{
+		fGoldMultiplier += sqrt((float)GetTreasury()->GetGold()) / 100.0f;
+	}
 	if(fGoldMultiplier > 2.0f) fGoldMultiplier = 2.0f;
 
 	rtnValue = (int)(rtnValue * fGoldMultiplier);
@@ -23592,7 +23600,7 @@ void CvPlayer::changeBuildingClassMaking(BuildingClassTypes eIndex, int iChange)
 		m_paiBuildingClassMaking.setAt(eIndex, m_paiBuildingClassMaking[eIndex] + iChange);
 		CvAssert(getBuildingClassMaking(eIndex) >= 0);
 
-		const BuildingTypes eBuilding = (BuildingTypes) getCivilizationInfo().getCivilizationBuildings(eIndex);
+		const BuildingTypes eBuilding = GET_PLAYER(m_eID).GetCivBuilding(eIndex);
 		CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
 		if(pkBuildingInfo)
 		{
@@ -24831,21 +24839,18 @@ void CvPlayer::deleteCity(int iID)
 //	--------------------------------------------------------------------------------
 CvCity* CvPlayer::GetFirstCityWithBuildingClass(BuildingClassTypes eBuildingClass)
 {
+	BuildingTypes eBuilding = GET_PLAYER(m_eID).GetCivBuilding(eBuildingClass);
+	if (eBuilding == NO_BUILDING) return NULL;
 	CvCity *pLoopCity;
 	int iLoop;
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 	{
-		CvCivilizationInfo& playerCivilizationInfo = getCivilizationInfo();
-		BuildingTypes eBuilding = (BuildingTypes)playerCivilizationInfo.getCivilizationBuildings((BuildingClassTypes)eBuildingClass);
-		if (eBuilding != NO_BUILDING)
+		if (pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
 		{
-			if (pLoopCity->GetCityBuildings()->GetNumBuilding(eBuilding) > 0)
-			{
-				return pLoopCity;
-			}
+			return pLoopCity;
 		}
 	}
-	return false;
+	return NULL;
 }
 
 //	--------------------------------------------------------------------------------
@@ -26724,6 +26729,7 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	changePolicyModifiers(POLICYMOD_SEA_TRADE_GOLD_CHANGE, pPolicy->GetSeaTradeRouteGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_CAPITAL_TRADE_GOLD_CHANGE, pPolicy->GetCapitalTradeRouteGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_CAPITAL_TRADE_RANGE_CHANGE, pPolicy->GetCapitalTradeRouteRangeChange() * iChange);
+	changePolicyModifiers(POLICYMOD_HAPPINESS_PER_RELIGION_IN_CITY, pPolicy->GetHappinessPerReligionInCity() * iChange);
 	changePolicyModifiers(POLICYMOD_SHARED_IDEOLOGY_TRADE_CHANGE, pPolicy->GetSharedIdeologyTradeGoldChange() * iChange);
 	changePolicyModifiers(POLICYMOD_RIGGING_ELECTION_MODIFIER, pPolicy->GetRiggingElectionModifier() * iChange);
 	changePolicyModifiers(POLICYMOD_RIGGING_ELECTION_INFLUENCE_MODIFIER, pPolicy->GetRiggingElectionInfluenceModifier() * iChange);
@@ -33541,4 +33547,39 @@ int CvPlayer::GetNumSpaceshipPartPurchased() const
 void CvPlayer::ChangeNumSpaceshipPartPurchased(int iChange)
 {
 	m_iNumSpaceshipPartPurchased += iChange;
+}
+
+void CvPlayer::doInstantYield(YieldTypes eYield, int iValue)
+{
+	switch(eYield)
+	{
+	case YIELD_GOLD:
+		GetTreasury()->ChangeGold(iValue);
+		break;
+	case YIELD_CULTURE:
+		changeJONSCulture(iValue);
+		break;
+	case YIELD_FAITH:
+		ChangeFaith(iValue);
+		break;
+	case YIELD_GOLDEN_AGE_POINTS:
+		ChangeGoldenAgeProgressMeter(iValue);
+		break;
+	case YIELD_SCIENCE:
+		{
+			TechTypes eCurrentTech = GetPlayerTechs()->GetCurrentResearch();
+			if(eCurrentTech == NO_TECH)
+			{
+				changeOverflowResearch(iValue);
+			}
+			else
+			{
+				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgress(eCurrentTech, iValue, GetID());
+			}
+		}
+		break;
+	case YIELD_TOURISM:
+		GetCulture()->AddTourismAllKnownCivs(iValue);
+		break;
+	}
 }

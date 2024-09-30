@@ -129,6 +129,7 @@ public:
 	bool IsRiverSideMakesValid() const;
 	bool IsNoFreshWater() const;
 	bool IsFreshWater() const;
+	int GetNumWaterPlotMakesValid() const;
 #if defined(MOD_API_EXTENSIONS)
 	bool IsAddsFreshWater() const;
 #endif
@@ -159,6 +160,7 @@ public:
 
 	ImprovementTypes GetRequiredAdjacentImprovement() const;
 	bool IsRequiredAdjacentCity() const;
+	bool IsRemoveWhenSetNoFuture() const;
 
 	CivilizationTypes GetRequiredCivilization() const;
 
@@ -354,6 +356,7 @@ protected:
 	bool m_bRiverSideMakesValid;
 	bool m_bNoFreshWater;
 	bool m_bIsFreshWater;
+	int m_iNumWaterPlotMakesValid;
 #if defined(MOD_API_EXTENSIONS)
 	bool m_bAddsFreshWater;
 #endif
@@ -384,6 +387,7 @@ protected:
 
 	ImprovementTypes m_iRequiredAdjacentImprovement = NO_IMPROVEMENT;
 	bool m_bRequiredAdjacentCity = false;
+	bool m_bRemoveWhenSetNoFuture = false;
 
 	CvString m_strArtDefineTag;
 	ImprovementUsageTypes m_eImprovementUsageType;

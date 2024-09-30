@@ -72,3 +72,4 @@ alter table Traits add column `FreeGreatPeoplePerEra` INTEGER DEFAULT 0;
 alter table Traits add column `AwayFromCapitalCombatModifier` INTEGER DEFAULT 0;
 alter table Traits add column `AwayFromCapitalCombatModifierMax` INTEGER DEFAULT 0;
 alter table Traits add column `InfluenceFromGreatPeopleBirth` INTEGER DEFAULT 0;
+alter table Traits add column `WLKDLengthChangeModifier` INTEGER DEFAULT 0;

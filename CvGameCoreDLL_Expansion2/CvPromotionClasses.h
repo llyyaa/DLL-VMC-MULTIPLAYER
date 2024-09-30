@@ -276,6 +276,7 @@ public:
 	int GetInsightEnemyDamageModifier() const;
 	int GetHeightModPerX() const;
 	int GetHeightModLimited() const;
+	int GetMilitaryMightMod() const;
 	int GetExtraMoveTimesXX() const;
 	int GetRangeAttackCostModifier() const;
 	int GetOriginalCapitalDamageFix() const;
@@ -644,6 +645,7 @@ protected:
 	int m_iInsightEnemyDamageModifier;
 	int m_iHeightModPerX;
 	int m_iHeightModLimited;
+	int m_iMilitaryMightMod;
 	int m_iExtraMoveTimesXX;
 	int m_iRangeAttackCostModifier;
 	int m_iOriginalCapitalDamageFix;

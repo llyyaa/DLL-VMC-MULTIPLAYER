@@ -25,3 +25,4 @@ create table Unit_InstantYieldFromTrainings (
 ALTER TABLE Units ADD COLUMN 'GivePoliciesWithSpreaded' BOOLEAN DEFAULT 0;
 ALTER TABLE Units ADD COLUMN 'GoldenAgeWithSpreaded' BOOLEAN DEFAULT 0;
 ALTER TABLE Units ADD COLUMN 'GoldFromTourismModifier' INTEGER DEFAULT 0;
+ALTER TABLE Units ADD COLUMN 'NoSpreadTurnPopModifierAfterRemovingHeresy' INTEGER DEFAULT 0;

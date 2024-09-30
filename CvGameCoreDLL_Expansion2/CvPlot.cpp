@@ -477,15 +477,19 @@ void CvPlot::doTurn()
 
 				if (!IsImmueVolcanoDamage())
 				{
-					if (getImprovementType() != NULL && !isCity() && !IsImprovementPillaged())
+					if (getImprovementType() != NO_IMPROVEMENT && !isCity() && !IsImprovementPillaged())
 					{
 						CvImprovementEntry* pkImprovement = GC.getImprovementInfo(getImprovementType());
-						SetImprovementPillaged(true);
-
-						if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
+						if (pkImprovement)
 						{
-							setImprovementType(NO_IMPROVEMENT);
-							SetImprovementPillaged(false);
+							if(pkImprovement->IsDestroyedWhenPillaged())
+							{
+								setImprovementType(NO_IMPROVEMENT);
+							}
+							else
+							{
+								SetImprovementPillaged(true);
+							}
 						}
 					}
 					for (int iUnitLoop = 0; iUnitLoop < getNumUnits(); iUnitLoop++)
@@ -508,12 +512,12 @@ void CvPlot::doTurn()
 				
 			else if (bOutBreakLv2)
 			{
-				int iRange = 2;
+				int iRange = 1;
 				for (int iDX = -iRange; iDX <= iRange; iDX++)
 				{
 					for (int iDY = -iRange; iDY <= iRange; iDY++)
 					{
-						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 1);
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iRange);
 						if (pLoopPlot != NULL)
 						{
 							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
@@ -521,15 +525,19 @@ void CvPlot::doTurn()
 
 							if (!pLoopPlot->IsImmueVolcanoDamage())
 							{
-								if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
+								if (pLoopPlot->getImprovementType() != NO_IMPROVEMENT && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
 								{
 									CvImprovementEntry* pkImprovement = GC.getImprovementInfo(pLoopPlot->getImprovementType());
-									pLoopPlot->SetImprovementPillaged(true);
-
-									if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
+									if (pkImprovement)
 									{
-										pLoopPlot->setImprovementType(NO_IMPROVEMENT);
-										pLoopPlot->SetImprovementPillaged(false);
+										if(pkImprovement->IsDestroyedWhenPillaged())
+										{
+											pLoopPlot->setImprovementType(NO_IMPROVEMENT);
+										}
+										else
+										{
+											pLoopPlot->SetImprovementPillaged(true);
+										}
 									}
 								}
 
@@ -561,12 +569,12 @@ void CvPlot::doTurn()
 
 			else if (bOutBreakLv3)
 			{
-				int iRange =2;
+				int iRange = 2;
 				for (int iDX = -iRange; iDX <= iRange; iDX++)
 				{
 					for (int iDY = -iRange; iDY <= iRange; iDY++)
 					{
-						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, 2);
+						CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iRange);
 						if (pLoopPlot != NULL)
 						{
 							GC.getGame().setPlotExtraYield(pLoopPlot->getX(), pLoopPlot->getY(), YIELD_FOOD, 1);
@@ -574,15 +582,19 @@ void CvPlot::doTurn()
 
 							if (!pLoopPlot->IsImmueVolcanoDamage())
 							{
-								if (pLoopPlot->getImprovementType() != NULL && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
+								if (pLoopPlot->getImprovementType() != NO_IMPROVEMENT && !pLoopPlot->isCity() && !pLoopPlot->IsImprovementPillaged())
 								{
 									CvImprovementEntry* pkImprovement = GC.getImprovementInfo(pLoopPlot->getImprovementType());
-									pLoopPlot->SetImprovementPillaged(true);
-
-									if (pkImprovement && pkImprovement->IsDestroyedWhenPillaged())
+									if (pkImprovement)
 									{
-										pLoopPlot->setImprovementType(NO_IMPROVEMENT);
-										pLoopPlot->SetImprovementPillaged(false);
+										if(pkImprovement->IsDestroyedWhenPillaged())
+										{
+											pLoopPlot->setImprovementType(NO_IMPROVEMENT);
+										}
+										else
+										{
+											pLoopPlot->SetImprovementPillaged(true);
+										}
 									}
 								}
 
@@ -2689,6 +2701,19 @@ bool CvPlot::canHaveImprovement(ImprovementTypes eImprovement, TeamTypes eTeam, 
 	if((getFeatureType() != NO_FEATURE) && pkImprovementInfo->GetFeatureMakesValid(getFeatureType()))
 	{
 		bValid = true;
+	}
+
+	int iNumWaterPlotMakesValid = pkImprovementInfo->GetNumWaterPlotMakesValid();
+	if (iNumWaterPlotMakesValid > 0)
+	{
+		int iAdjacentWater = 0;
+		for(iI = 0; iI < NUM_DIRECTION_TYPES; ++iI)
+		{
+			pLoopPlot = plotDirection(getX(), getY(), ((DirectionTypes)iI));
+			if(pLoopPlot == NULL || !pLoopPlot->isWater()) continue;
+			iAdjacentWater++;
+		}
+		if (iAdjacentWater >= iNumWaterPlotMakesValid) bValid = true;
 	}
 
 	if(!bValid)
@@ -6938,7 +6963,7 @@ void CvPlot::setFeatureType(FeatureTypes eNewValue, int iVariety)
 		{
 			if(getImprovementType() != NO_IMPROVEMENT)
 			{
-				if(GC.getImprovementInfo(getImprovementType())->IsRequiresFeature())
+				if(GC.getImprovementInfo(getImprovementType())->IsRequiresFeature() || GC.getImprovementInfo(getImprovementType())->IsRemoveWhenSetNoFuture())
 				{
 					setImprovementType(NO_IMPROVEMENT);
 				}
@@ -10875,7 +10900,6 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 {
 	CvCity* pCity;
 	CvString strBuffer;
-	int iProduction;
 	bool bFinished = false;
 	CvPlayer &kPlayer = GET_PLAYER(ePlayer);
 
@@ -11097,8 +11121,8 @@ bool CvPlot::changeBuildProgress(BuildTypes eBuild, int iChange, PlayerTypes ePl
 				{
 					CvAssertMsg(ePlayer != NO_PLAYER, "ePlayer should be valid");
 
-					iProduction = getFeatureProduction(eBuild, ePlayer, &pCity);
-					if(iProduction > 0);
+					int iProduction = getFeatureProduction(eBuild, ePlayer, &pCity);
+					if(iProduction > 0)
 					{
 						pCity->changeFeatureProduction(iProduction);
 						if(pCity->getOwner() == GC.getGame().getActivePlayer())

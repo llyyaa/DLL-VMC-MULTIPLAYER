@@ -250,6 +250,8 @@ ALTER TABLE HandicapInfos ADD StrategicResourceModPerEra INTEGER DEFAULT 0;
 
 ALTER TABLE Improvements ADD COLUMN 'RequiredAdjacentImprovement' TEXT DEFAULT NULL REFERENCES Improvements(Type);
 ALTER TABLE Improvements ADD COLUMN 'RequiredAdjacentCity' BOOLEAN DEFAULT 0;
+ALTER TABLE Improvements ADD COLUMN 'RemoveWhenSetNoFuture' BOOLEAN DEFAULT 0;
+ALTER TABLE Improvements ADD COLUMN 'NumWaterPlotMakesValid' INTEGER DEFAULT 0;
 ALTER TABLE Units ADD COLUMN 'BarbarianCanTrait' BOOLEAN DEFAULT false;
 ALTER TABLE Units ADD COLUMN 'BarbarianTraitTechObsolete' BOOLEAN DEFAULT false;
 
@@ -266,3 +268,4 @@ CREATE TABLE IF NOT EXISTS UnitPromotions_CombatModPerAdjacentUnitCombat (
     `Attack` INTEGER DEFAULT 0,
     `Defense` INTEGER DEFAULT 0
 );
+ALTER TABLE UnitPromotions ADD COLUMN 'MilitaryMightMod' INTEGER DEFAULT 0;

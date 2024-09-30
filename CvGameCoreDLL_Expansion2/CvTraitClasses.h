@@ -110,6 +110,7 @@ public:
 	int GetAwayFromCapitalCombatModifier() const;
 	int GetAwayFromCapitalCombatModifierMax() const;
 	int GetInfluenceFromGreatPeopleBirth() const;
+	int GetWLKDLengthChangeModifier() const;
 	int GetCombatBonusVsLargerCiv() const;
 	int GetLandUnitMaintenanceModifier() const;
 	int GetNavalUnitMaintenanceModifier() const;
@@ -389,6 +390,7 @@ protected:
 	int m_iAwayFromCapitalCombatModifier;
 	int m_iAwayFromCapitalCombatModifierMax;
 	int m_iInfluenceFromGreatPeopleBirth;
+	int m_iWLKDLengthChangeModifier;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
 	int m_iNavalUnitMaintenanceModifier;
@@ -849,6 +851,10 @@ public:
 	int GetInfluenceFromGreatPeopleBirth() const
 	{
 		return m_iInfluenceFromGreatPeopleBirth;
+	};
+	int GetWLKDLengthChangeModifier() const
+	{
+		return m_iWLKDLengthChangeModifier;
 	};
 	int GetCombatBonusVsLargerCiv() const
 	{
@@ -1428,6 +1434,7 @@ private:
 	int m_iAwayFromCapitalCombatModifier;
 	int m_iAwayFromCapitalCombatModifierMax;
 	int m_iInfluenceFromGreatPeopleBirth;
+	int m_iWLKDLengthChangeModifier;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
 	int m_iNavalUnitMaintenanceModifier;

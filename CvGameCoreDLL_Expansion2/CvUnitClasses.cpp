@@ -81,6 +81,7 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_iBoundWaterImprovement(NO_IMPROVEMENT),
 #endif
 	m_iTrainPopulationConsume(0),
+	m_iNoSpreadTurnPopModifierAfterRemovingHeresy(0),
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bNoTroops(false),
@@ -350,6 +351,7 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	m_iBoundWaterImprovement = GC.getInfoTypeForString(szTextVal, true);
 #endif
 	m_iTrainPopulationConsume = kResults.GetInt("TrainPopulationConsume");
+	m_iNoSpreadTurnPopModifierAfterRemovingHeresy = kResults.GetInt("NoSpreadTurnPopModifierAfterRemovingHeresy");
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_bNoTroops = kResults.GetBool("NoTroopConsume");
@@ -897,6 +899,11 @@ int CvUnitEntry::GetBoundWaterImprovement() const
 int CvUnitEntry::GetTrainPopulationConsume() const
 {
 	return m_iTrainPopulationConsume;
+}
+
+int CvUnitEntry::GetNoSpreadTurnPopModifierAfterRemovingHeresy() const
+{
+	return m_iNoSpreadTurnPopModifierAfterRemovingHeresy;
 }
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)

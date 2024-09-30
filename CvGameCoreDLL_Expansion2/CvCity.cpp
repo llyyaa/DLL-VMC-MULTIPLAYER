@@ -439,6 +439,7 @@ CvCity::CvCity() :
 		, m_aiStaticCityYield()
 #endif
 	, m_iLastTurnWorkerDisbanded(0)
+	, m_iDefendedAgainstSpreadUntilTurn(0)
 	, m_paiNumBuildingClasses()
 {
 	OBJECT_ALLOCATED
@@ -540,19 +541,6 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits, 
 				if (pLoopPlot->getOwner() == getOwner())
 				{
 					pLoopPlot->SetCityPurchaseID(m_iID);
-#if defined(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT)
-					// Relink resource
-					if(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT && pLoopPlot->getResourceType() != NO_RESOURCE)
-					{
-						pLoopPlot->SetResourceLinkedCity(NULL);
-						pLoopPlot->SetResourceLinkedCity(this);
-						// Already have a valid improvement here?
-						if(pLoopPlot->getImprovementType() != NO_IMPROVEMENT && GC.getImprovementInfo(pLoopPlot->getImprovementType())->IsImprovementResourceTrade(pLoopPlot->getResourceType()))
-						{
-							pLoopPlot->SetResourceLinkedCityActive(true);
-						}
-					}
-#endif
 				}
 			}
 		}
@@ -1640,6 +1628,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aTradeRouteFromTheCityYields[i] = 0;
 	}
 	m_iLastTurnWorkerDisbanded = 0;
+	m_iDefendedAgainstSpreadUntilTurn = 0;
 	m_paiNumBuildingClasses.clear();
 	m_paiNumBuildingClasses.resize(GC.getNumBuildingClassInfos());
 	for (int i = 0; i < m_paiNumBuildingClasses.size(); ++i)
@@ -9294,6 +9283,20 @@ void CvCity::SetLastTurnWorkerDisbanded(int iValue)
 }
 
 //	--------------------------------------------------------------------------------
+int CvCity::GetDefendedAgainstSpreadUntilTurn() const
+{
+	VALIDATE_OBJECT
+	return m_iDefendedAgainstSpreadUntilTurn;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::SetDefendedAgainstSpreadUntilTurn(int iValue)
+{
+	VALIDATE_OBJECT
+	m_iDefendedAgainstSpreadUntilTurn = iValue;
+}
+
+//	--------------------------------------------------------------------------------
 int CvCity::maxHurryPopulation() const
 {
 	VALIDATE_OBJECT
@@ -11989,6 +11992,9 @@ int CvCity::GetLocalHappiness() const
 		iLocalHappiness += iHappinessFromReligion;
 	}
 
+	// Policy Num Religion Mods
+	iLocalHappiness += kPlayer.getPolicyModifiers(POLICYMOD_HAPPINESS_PER_RELIGION_IN_CITY) * GetCityReligions()->GetNumReligionsWithFollowers();
+
 	// Policy Building Mods
 	int iSpecialPolicyBuildingHappiness = 0;
 	int iBuildingClassLoop;
@@ -12377,6 +12383,11 @@ void CvCity::SetWeLoveTheKingDayCounter(int iValue)
 			GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityEndsWLTKD, getOwner(), getX(), getY(), iValue);
 		}
 #endif
+	}
+	int iWLTKmod = GET_PLAYER(getOwner()).GetPlayerTraits()->GetWLKDLengthChangeModifier();
+	if (iWLTKmod > 0 && iValue > GetWeLoveTheKingDayCounter())
+	{
+		iValue = iValue + ((iValue - GetWeLoveTheKingDayCounter())*(100+iWLTKmod)/100);
 	}
 	m_iWeLoveTheKingDayCounter = iValue;
 }
@@ -17905,10 +17916,10 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 		if(eYield == YIELD_CULTURE)
 		{
 			iTempValue = thisPlayer.GetPlayerTraits()->GetCultureBonusUnitStrengthModify();
+			iTempValue *= iStrength;
+			iTempValue /= 100;
 			if(iTempValue > 0)
 			{
-				iTempValue *= iStrength;
-				iTempValue /= 100;
 				doInstantYield(eYield, iTempValue);
 				if (thisPlayer.isHuman())
 				{
@@ -17918,10 +17929,10 @@ int CvCity::CreateUnit(UnitTypes eUnitType, bool bIsGold, bool bIsFaith, UnitAIT
 				}
 			}
 			iTempValue = thisPlayer.getPolicyModifiers(POLICYMOD_DEEP_WATER_NAVAL_CULTURE_STRENGTH_MODIFIER);
+			iTempValue *= iStrength;
+			iTempValue /= 100;
 			if(iTempValue > 0 && pUnit->getDomainType() == DOMAIN_SEA && !pUnit->isHasPromotion(ePromotionOceanImpassable))
 			{
-				iTempValue *= iStrength;
-				iTempValue /= 100;
 				doInstantYield(eYield, iTempValue);
 				if (thisPlayer.isHuman())
 				{
@@ -20095,6 +20106,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iBaseTourism;
 	kStream >> m_iBaseTourismBeforeModifiers;
 	kStream >> m_iLastTurnWorkerDisbanded;
+	kStream >> m_iDefendedAgainstSpreadUntilTurn;
 
 #ifdef MOD_API_UNIFIED_YIELDS_MORE	
 	kStream >> m_bIsColony;
@@ -20484,6 +20496,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iBaseTourism;
 	kStream << m_iBaseTourismBeforeModifiers;
 	kStream << m_iLastTurnWorkerDisbanded;
+	kStream << m_iDefendedAgainstSpreadUntilTurn;
 
 #ifdef MOD_API_UNIFIED_YIELDS_MORE
 	kStream << m_bIsColony;
