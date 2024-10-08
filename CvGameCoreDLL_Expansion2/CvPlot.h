@@ -593,7 +593,7 @@ public:
 	void SetPlayerThatClearedBarbCampHere(PlayerTypes eNewValue);
 
 	CvCity* GetResourceLinkedCity() const;
-	void SetResourceLinkedCity(const CvCity* pNewValue);
+	void SetResourceLinkedCity(const CvCity* pNewValue, ResourceTypes eResource = NO_RESOURCE);
 	bool IsResourceLinkedCityActive() const;
 	void SetResourceLinkedCityActive(bool bValue);
 	void DoFindCityToLinkResourceTo(CvCity* pCityToExclude = NULL);

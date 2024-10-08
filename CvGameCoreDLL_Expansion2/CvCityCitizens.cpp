@@ -1778,14 +1778,7 @@ void CvCityCitizens::SetWorkingPlot(CvPlot* pPlot, bool bNewValue, bool bUseUnas
 				if(MOD_CHANGE_RESOURCE_LINK_AFTER_ALTER_PLOT && eResourceType != NO_RESOURCE && pPlot->GetResourceLinkedCity() != m_pCity)
 				{
 					pPlot->SetResourceLinkedCity(NULL);
-					pPlot->SetResourceLinkedCity(m_pCity);
-					// Already have a valid improvement here?
-					ImprovementTypes eImprovementType = pPlot->getImprovementType();
-					if(GetPlayer()->HasTech((TechTypes)GC.getResourceInfo(eResourceType)->getTechCityTrade()) 
-						&& (pPlot->isCity() || (eImprovementType != NO_IMPROVEMENT && !pPlot->IsImprovementPillaged() && GC.getImprovementInfo(eImprovementType)->IsImprovementResourceTrade(eResourceType))))
-					{
-						pPlot->SetResourceLinkedCityActive(true);
-					}
+					pPlot->SetResourceLinkedCity(m_pCity, eResourceType);
 				}
 #endif
 			}

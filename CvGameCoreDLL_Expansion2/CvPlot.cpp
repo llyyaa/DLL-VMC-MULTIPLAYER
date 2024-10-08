@@ -6168,6 +6168,8 @@ void CvPlot::setOwner(PlayerTypes eNewValue, int iAcquiringCityID, bool bCheckUn
 					// Should we link the Resource here with a City so special Buildings may be constructed?
 					if(GetResourceLinkedCity() == NULL)
 					{
+						// set m_bResourceLinkedCityActive = false to fix Resource link bug from changed WorkablePlots
+						m_bResourceLinkedCityActive = false;
 						DoFindCityToLinkResourceTo();
 					}
 				}
@@ -7165,7 +7167,7 @@ void CvPlot::setResourceType(ResourceTypes eNewValue, int iResourceNum, bool bFo
 				GC.getMap().changeNumResourcesOnLand((ResourceTypes)m_eResourceType, 1);
 			}
 			CvCity *pCity = getWorkingCity();
-			if(pCity) SetResourceLinkedCity(pCity);
+			if(pCity) SetResourceLinkedCity(pCity, (ResourceTypes)m_eResourceType);
 		}
 
 		updateYield();
@@ -8415,7 +8417,7 @@ CvCity* CvPlot::GetResourceLinkedCity() const
 
 //	--------------------------------------------------------------------------------
 /// Link the resource on this plot to pCity. Note that this does NOT set the link to be active - this must be done manually
-void CvPlot::SetResourceLinkedCity(const CvCity* pCity)
+void CvPlot::SetResourceLinkedCity(const CvCity* pCity, ResourceTypes eResource)
 {
 	if(GetResourceLinkedCity() != pCity)
 	{
@@ -8423,6 +8425,13 @@ void CvPlot::SetResourceLinkedCity(const CvCity* pCity)
 		{
 			CvAssertMsg(pCity->getOwner() == getOwner(), "Argument city pNewValue's owner is expected to be the same as the current instance");
 			m_ResourceLinkedCity = pCity->GetIDInfo();
+
+			if(!GET_TEAM(pCity->getTeam()).GetTeamTechs()->HasTech((TechTypes)GC.getResourceInfo(eResource)->getTechCityTrade())) return;
+			// Already have a valid improvement here?
+			if(isCity() || (getImprovementType() != NO_IMPROVEMENT && GC.getImprovementInfo(getImprovementType())->IsImprovementResourceTrade(eResource) && !IsImprovementPillaged()))
+			{
+				SetResourceLinkedCityActive(true);
+			}
 		}
 		else
 		{
@@ -8509,16 +8518,7 @@ void CvPlot::DoFindCityToLinkResourceTo(CvCity* pCityToExclude)
 
 	if(pBestCity != NULL)
 	{
-		SetResourceLinkedCity(pBestCity);
-
-		// Already have a valid improvement here?
-		if(isCity() || getImprovementType() != NO_IMPROVEMENT)
-		{
-			if(isCity() || GC.getImprovementInfo(getImprovementType())->IsImprovementResourceTrade(getResourceType()))
-			{
-				SetResourceLinkedCityActive(true);
-			}
-		}
+		SetResourceLinkedCity(pBestCity, eResource);
 	}
 }
 
