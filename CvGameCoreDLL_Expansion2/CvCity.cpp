@@ -11012,8 +11012,7 @@ void CvCity::changeCityWorkingChange(int iChange)
 	if(iChange != 0)
 	{
 		int iOldPlots = GetNumWorkablePlots();
-		m_iCityWorkingChange = (m_iCityWorkingChange + iChange);
-		int iNewPlots = GetNumWorkablePlots();
+		int iNewPlots = GetNumWorkablePlots(iChange);
 			
 		for (int iI = std::min(iOldPlots, iNewPlots); iI < std::max(iOldPlots, iNewPlots); ++iI) {
 			CvPlot* pLoopPlot = plotCity(getX(), getY(), iI);
@@ -11021,8 +11020,15 @@ void CvCity::changeCityWorkingChange(int iChange)
 			if (pLoopPlot) {
 				pLoopPlot->changeCityRadiusCount(iChange);
 				pLoopPlot->changePlayerCityRadiusCount(getOwner(), iChange);
+				// remove Citizens when Workable Plots reduce
+				if(iChange < 0)
+				{
+					GetCityCitizens()->SetWorkingPlot(pLoopPlot, false);
+					GetCityCitizens()->SetForcedWorkingPlot(pLoopPlot, false);
+				}
 			}
 		}
+		m_iCityWorkingChange = (m_iCityWorkingChange + iChange);
 	}
 }
 #endif
