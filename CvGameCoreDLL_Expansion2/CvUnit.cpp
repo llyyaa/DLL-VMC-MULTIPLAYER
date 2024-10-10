@@ -5199,6 +5199,8 @@ void CvUnit::gift(bool bTestTransport)
 		pGiftUnit->GetReligionData()->SetReligiousStrength(GetReligionData()->GetReligiousStrength());
 		pGiftUnit->GetReligionData()->SetSpreadsLeft(GetReligionData()->GetSpreadsLeft());
 
+		pGiftUnit->SetExtraPopConsume(GetExtraPopConsume());
+
 		if(pGiftUnit->getOwner() == GC.getGame().getActivePlayer())
 		{
 			strBuffer = GetLocalizedText("TXT_KEY_MISC_GIFTED_UNIT_TO_YOU", GET_PLAYER(eOwner).getNameKey(), pGiftUnit->getNameKey());
