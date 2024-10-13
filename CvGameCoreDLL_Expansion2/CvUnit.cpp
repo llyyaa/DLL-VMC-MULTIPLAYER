@@ -1003,6 +1003,9 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		}
 	}
 #endif
+	PromotionTypes ePromotionFromGameSpeed = (PromotionTypes)GC.getGame().getGameSpeedInfo().getFreePromotion();
+	if(ePromotionFromGameSpeed != NO_PROMOTION) setHasPromotion(ePromotionFromGameSpeed, true);
+
 	if (getUnitInfo().GetOneShotTourism() > 0)
 	{
 		SetTourismBlastStrength(kPlayer.GetCulture()->GetTourismBlastStrength(getUnitInfo().GetOneShotTourism()));
