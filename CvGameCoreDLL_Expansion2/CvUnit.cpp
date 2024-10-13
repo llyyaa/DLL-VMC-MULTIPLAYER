@@ -911,6 +911,8 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
 		setHasPromotion(ePromotionOceanImpassable, false);
 	}
+	PromotionTypes ePromotionFromGameSpeed = (PromotionTypes)GC.getGame().getGameSpeedInfo().getFreePromotion();
+	if(ePromotionFromGameSpeed != NO_PROMOTION) setHasPromotion(ePromotionFromGameSpeed, true);
 
 	// Any exotic goods that can be sold? (Portuguese unique unit mission)
 	if (getUnitInfo().GetNumExoticGoods() > 0)
@@ -1003,8 +1005,6 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		}
 	}
 #endif
-	PromotionTypes ePromotionFromGameSpeed = (PromotionTypes)GC.getGame().getGameSpeedInfo().getFreePromotion();
-	if(ePromotionFromGameSpeed != NO_PROMOTION) setHasPromotion(ePromotionFromGameSpeed, true);
 
 	if (getUnitInfo().GetOneShotTourism() > 0)
 	{
