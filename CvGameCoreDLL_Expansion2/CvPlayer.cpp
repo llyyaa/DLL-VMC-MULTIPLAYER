@@ -9692,6 +9692,12 @@ int CvPlayer::getBuildingClassPrereqBuilding(BuildingTypes eBuilding, BuildingCl
 		return -1;
 	}
 
+	TechTypes eTechNoPrereqClasses = (TechTypes)pkBuilding->GetTechNoPrereqClasses();
+	if(eTechNoPrereqClasses != NO_TECH && HasTech(eTechNoPrereqClasses))
+	{
+		return 0;
+	}
+
 	CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo((BuildingClassTypes)ePrereqBuildingClass);
 	if(!pkBuildingClassInfo) return 0;
 

@@ -146,6 +146,7 @@ public:
 	int GetMutuallyExclusiveGroup() const;
 	int GetReplacementBuildingClass() const;
 	int GetPrereqAndTech() const;
+	int GetTechNoPrereqClasses() const;
 	int GetPolicyBranchType() const;
 	int GetSpecialistType() const;
 	int GetSpecialistCount() const;
@@ -606,6 +607,7 @@ private:
 	int m_iMutuallyExclusiveGroup;
 	int m_iReplacementBuildingClass;
 	int m_iPrereqAndTech;
+	int m_iTechNoPrereqClasses;
 	int m_iPolicyBranchType;
 	int m_iSpecialistType;
 	int m_iSpecialistCount;
