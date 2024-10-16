@@ -13302,6 +13302,12 @@ bool CvUnit::CanUpgradeTo(UnitTypes eUpgradeUnitType, bool bOnlyTestVisible) con
 	// Show the upgrade, but don't actually allow it
 	if(!bOnlyTestVisible)
 	{
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+		if(GET_PLAYER(getOwner()).IsLackingTroops())
+		{
+			return false;
+		}
+#endif
 #if defined(MOD_GLOBAL_STACKING_RULES)
 		if(pPlot->getNumFriendlyUnitsOfType(this) > pPlot->getUnitLimit())
 #else
