@@ -1195,10 +1195,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_ePreviousOwner = NO_PLAYER;
 	m_eOriginalOwner = eOwner;
 	m_ePlayersReligion = NO_PLAYER;
-#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	m_bEnableCrops = false;
-	m_bEnableArmee = false;
-#endif
+
 
 	m_aiSeaPlotYield.resize(NUM_YIELD_TYPES);
 	m_aiRiverPlotYield.resize(NUM_YIELD_TYPES);
@@ -1575,6 +1572,10 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
 	m_iNumNoNuclearWinterLocal = 0;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	m_iCityEnableCrops = 0;
+	m_iCityEnableArmee = 0;
 #endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	m_bCanDoImmigration = true;
@@ -7780,14 +7781,8 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		ChangeNumNoNuclearWinterLocal(pBuildingInfo->IsNoNuclearWinterLocal() && pBuildingInfo->GetID() == GC.getInfoTypeForString("BUILDING_MEGACITY_PYRAMID") ? iChange : 0);
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	if (pBuildingInfo->IsEnableCrops())  
-    {  
-        m_bEnableCrops = true;  
-    }  
-	if (pBuildingInfo->IsEnableArmee())  
-    {  
-        m_bEnableArmee = true;  
-    }  
+        ChangeNumEnableCrops(pBuildingInfo->IsEnableCrops() * iChange );
+		ChangeNumEnableArmee(pBuildingInfo->IsEnableArmee() * iChange );
 #endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 		ChangeNumAllScaleImmigrantIn(pBuildingInfo->CanAllScaleImmigrantIn() ? iChange : 0);
@@ -11596,16 +11591,7 @@ bool CvCity::CanAirlift() const
 
 	return false;
 }
-//-------------------------------------------------------------------------------
-bool CvCity::IsEnableCrops() const  
-{  
-    return m_bEnableCrops;  
-}
-//----------------------------------------------------------------------------------
-bool CvCity::IsEnableArmee() const  
-{  
-    return m_bEnableArmee;  
-}
+
 //	--------------------------------------------------------------------------------
 int CvCity::GetMaxAirUnits() const
 {
@@ -20098,6 +20084,10 @@ void CvCity::read(FDataStream& kStream)
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
 	kStream >> m_iNumNoNuclearWinterLocal;
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kStream >> m_iCityEnableCrops;
+	kStream >> m_iCityEnableArmee;
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream >> m_bCanDoImmigration;
 	kStream >> m_iNumAllScaleImmigrantIn;
@@ -20489,6 +20479,10 @@ void CvCity::write(FDataStream& kStream) const
 
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
 	kStream << m_iNumNoNuclearWinterLocal;
+#endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	kStream << m_iCityEnableCrops;
+	kStream << m_iCityEnableArmee;
 #endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	kStream << m_bCanDoImmigration;
@@ -23097,6 +23091,26 @@ void CvCity::ChangeNumNoNuclearWinterLocal(int iChange)
 	m_iNumNoNuclearWinterLocal += iChange;
 }
 #endif
+//-------------------------------------------------------------------------------
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+bool CvCity::HasEnableCrops() const  
+{  
+    return m_iCityEnableCrops > 0;  
+}
+void CvCity::ChangeNumEnableCrops(int iChange)
+{
+	m_iCityEnableCrops += iChange;
+}
+bool CvCity::HasEnableArmee() const  
+{  
+    return m_iCityEnableArmee > 0;  
+}
+void CvCity::ChangeNumEnableArmee(int iChange)
+{
+	m_iCityEnableArmee += iChange;
+}
+#endif
+//-------------------------------------------------------------------------------
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 bool CvCity::IsCanDoImmigration() const
 {

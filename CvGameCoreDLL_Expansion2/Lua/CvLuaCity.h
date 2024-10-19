@@ -445,8 +445,8 @@ protected:
 
 	static int lIsEverOwned(lua_State* L);
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
-	static int lIsEnableCrops(lua_State* L);
-	static int lIsEnableArmee(lua_State* L);
+	static int lHasEnableCrops(lua_State* L);
+	static int lHasEnableArmee(lua_State* L);
 #endif
 	static int lIsRevealed(lua_State* L);
 	static int lSetRevealed(lua_State* L);

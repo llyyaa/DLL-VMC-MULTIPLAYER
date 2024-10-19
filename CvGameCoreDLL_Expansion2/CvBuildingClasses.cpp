@@ -296,8 +296,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piDomainTroops(NULL),
 	m_iNumCrops(0),
 	m_iNumArmee(0),
-	m_bEnableCrops(false),
-	m_bEnableArmee(false),
+	m_iEnableCrops(0),
+	m_iEnableArmee(0),
 #endif
 
 
@@ -716,8 +716,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iNumCrops = kResults.GetInt("NumCrops");
 	m_iNumArmee = kResults.GetInt("NumArmee");
-	m_bEnableCrops = kResults.GetBool("EnableCrops");
-	m_bEnableArmee = kResults.GetBool("EnableArmee");
+	m_iEnableCrops = kResults.GetInt("EnableCrops");
+	m_iEnableArmee = kResults.GetInt("EnableArmee");
 #endif
 
 	m_bArtInfoCulturalVariation = kResults.GetBool("ArtInfoCulturalVariation");
@@ -2840,14 +2840,14 @@ int CvBuildingEntry::GetNumArmee() const
 	return m_iNumArmee;
 }
 /// Does this building EnableCrops?
-bool CvBuildingEntry::IsEnableCrops() const
+int CvBuildingEntry::IsEnableCrops() const
 {
-	return m_bEnableCrops;
+	return m_iEnableCrops;
 }
 /// Does this building EnableArmee?
-bool CvBuildingEntry::IsEnableArmee() const
+int CvBuildingEntry::IsEnableArmee() const
 {
-	return m_bEnableArmee;
+	return m_iEnableArmee;
 }
 #endif
 
