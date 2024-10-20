@@ -292,6 +292,7 @@ CvCity::CvCity() :
 	, m_iMilitaryProductionModifier("CvCity::m_iMilitaryProductionModifier", m_syncArchive)
 	, m_iSpaceProductionModifier("CvCity::m_iSpaceProductionModifier", m_syncArchive)
 	, m_iFreeExperience("CvCity::m_iFreeExperience", m_syncArchive)
+	, m_iNumCanAirlift(0)
 	, m_iCurrAirlift("CvCity::m_iCurrAirlift", m_syncArchive) // unused
 	, m_iMaxAirUnits("CvCity::m_iMaxAirUnits", m_syncArchive)
 	, m_iAirModifier("CvCity::m_iAirModifier", m_syncArchive) // unused
@@ -1150,6 +1151,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iMilitaryProductionModifier = 0;
 	m_iSpaceProductionModifier = 0;
 	m_iFreeExperience = 0;
+	m_iNumCanAirlift = 0;
 	m_iCurrAirlift = 0; // unused
 	m_iMaxAirUnits = GC.getBASE_CITY_AIR_STACKING();
 	m_iAirModifier = 0; // unused
@@ -7635,6 +7637,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 
 		changeGreatPeopleRateModifier(pBuildingInfo->GetGreatPeopleRateModifier() * iChange);
 		changeFreeExperience(pBuildingInfo->GetFreeExperience() * iChange);
+		ChangeNumCanAirlift(pBuildingInfo->IsAirlift() ? iChange : 0);
 		ChangeMaxAirUnits(pBuildingInfo->GetAirModifier() * iChange);
 		changeNukeModifier(pBuildingInfo->GetNukeModifier() * iChange);
 		changeHealRate(pBuildingInfo->GetHealRateChange() * iChange);
@@ -11550,37 +11553,7 @@ void CvCity::doInstantYield(YieldTypes iYield, int iValue)
 //	--------------------------------------------------------------------------------
 bool CvCity::CanAirlift() const
 {
-	int iBuildingClassLoop;
-	BuildingClassTypes eBuildingClass;
-	CvPlayer &kPlayer = GET_PLAYER(getOwner());
-
-	for(iBuildingClassLoop = 0; iBuildingClassLoop < GC.getNumBuildingClassInfos(); iBuildingClassLoop++)
-	{
-		eBuildingClass = (BuildingClassTypes) iBuildingClassLoop;
-		if(GetNumBuildingClass(eBuildingClass) <= 0) continue;
-
-		CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
-		if(!pkBuildingClassInfo)
-		{
-			continue;
-		}
-
-		BuildingTypes eBuilding = kPlayer.GetCivBuilding(eBuildingClass);
-		if(eBuilding != NO_BUILDING && GetCityBuildings()->GetNumBuilding(eBuilding) > 0) // slewis - added the NO_BUILDING check for the ConquestDLX scenario which has civ specific wonders
-		{
-			CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
-			if(!pkBuildingInfo)
-			{
-				continue;
-			}
-
-			if (pkBuildingInfo->IsAirlift())
-			{
-				return true;
-			}
-		}
-	}
-
+	if(m_iNumCanAirlift > 0) return true;
 #if defined(MOD_EVENTS_CITY_AIRLIFT)
 	if (MOD_EVENTS_CITY_AIRLIFT) {
 		if (GAMEEVENTINVOKE_TESTANY(GAMEEVENT_CityCanAirlift, getOwner(), GetID()) == GAMEEVENTRETURN_TRUE) {
@@ -11590,6 +11563,11 @@ bool CvCity::CanAirlift() const
 #endif				
 
 	return false;
+}
+void CvCity::ChangeNumCanAirlift(int iChange)
+{
+	VALIDATE_OBJECT
+	m_iNumCanAirlift += iChange;
 }
 
 //	--------------------------------------------------------------------------------
@@ -19775,6 +19753,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iMilitaryProductionModifier;
 	kStream >> m_iSpaceProductionModifier;
 	kStream >> m_iFreeExperience;
+	kStream >> m_iNumCanAirlift;
 	kStream >> m_iCurrAirlift; // unused
 
 	if (uiVersion >= 6)
@@ -20279,6 +20258,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iMilitaryProductionModifier;
 	kStream << m_iSpaceProductionModifier;
 	kStream << m_iFreeExperience;
+	kStream << m_iNumCanAirlift;
 	kStream << m_iCurrAirlift; // unused
 	kStream << m_iMaxAirUnits;
 	kStream << m_iAirModifier; // unused
