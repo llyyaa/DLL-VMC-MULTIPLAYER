@@ -329,6 +329,8 @@ public:
 	void SetLastTechAcquired(TechTypes eTech);
 
 	int GetNumTechsKnown() const;
+	void ChangeNumTechsKnown(int iChange);
+
 	bool HasResearchedAllTechs() const;
 
 	void SetNoTradeTech(TechTypes eIndex, bool bNewValue);
@@ -350,6 +352,7 @@ private:
 	int GetMaxResearchOverflow(TechTypes eTech, PlayerTypes ePlayer) const;
 
 	TechTypes m_eLastTechAcquired;
+	int m_iNumTechsKnown;
 
 	bool* m_pabHasTech;
 	bool* m_pabNoTradeTech;

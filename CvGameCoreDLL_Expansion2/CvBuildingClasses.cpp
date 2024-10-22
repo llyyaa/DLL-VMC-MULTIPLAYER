@@ -37,6 +37,7 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iMutuallyExclusiveGroup(0),
 	m_iReplacementBuildingClass(NO_BUILDINGCLASS),
 	m_iPrereqAndTech(NO_TECH),
+	m_iTechNoPrereqClasses(NO_TECH),
 	m_iPolicyBranchType(NO_POLICY_BRANCH_TYPE),
 	m_iSpecialistType(NO_SPECIALIST),
 	m_iSpecialistCount(0),
@@ -295,6 +296,8 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piDomainTroops(NULL),
 	m_iNumCrops(0),
 	m_iNumArmee(0),
+	m_bEnableCrops(0),
+	m_bEnableArmee(0),
 #endif
 
 
@@ -713,6 +716,8 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iNumCrops = kResults.GetInt("NumCrops");
 	m_iNumArmee = kResults.GetInt("NumArmee");
+	m_bEnableCrops = kResults.GetBool("EnableCrops");
+	m_bEnableArmee = kResults.GetBool("EnableArmee");
 #endif
 
 	m_bArtInfoCulturalVariation = kResults.GetBool("ArtInfoCulturalVariation");
@@ -813,6 +818,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 	szTextVal = kResults.GetText("PrereqTech");
 	m_iPrereqAndTech = GC.getInfoTypeForString(szTextVal, true);
+
+	szTextVal = kResults.GetText("TechNoPrereqClasses");
+	m_iTechNoPrereqClasses = GC.getInfoTypeForString(szTextVal, true);
 
 	szTextVal = kResults.GetText("PolicyBranchType");
 	m_iPolicyBranchType = GC.getInfoTypeForString(szTextVal, true);
@@ -1958,6 +1966,11 @@ int CvBuildingEntry::GetPrereqAndTech() const
 	return m_iPrereqAndTech;
 }
 
+int CvBuildingEntry::GetTechNoPrereqClasses() const
+{
+	return m_iTechNoPrereqClasses;
+}
+
 /// Policy branch required for this building
 int CvBuildingEntry::GetPolicyBranchType() const
 {
@@ -2825,6 +2838,16 @@ int CvBuildingEntry::GetNumCrops() const
 int CvBuildingEntry::GetNumArmee() const
 {
 	return m_iNumArmee;
+}
+/// Does this building EnableCrops?
+bool CvBuildingEntry::IsEnableCrops() const
+{
+	return m_bEnableCrops;
+}
+/// Does this building EnableArmee?
+bool CvBuildingEntry::IsEnableArmee() const
+{
+	return m_bEnableArmee;
 }
 #endif
 

@@ -1021,6 +1021,7 @@ public:
 #endif
 	int getLeaguePercent() const;
 	int getNumTurnIncrements() const;
+	int getFreePromotion() const;
 
 	GameTurnInfo& getGameTurnInfo(int iIndex) const;
 	void allocateGameTurnInfos(const int iSize);
@@ -1063,6 +1064,7 @@ protected:
 	int m_iLeaguePercent;
 
 	int m_iNumTurnIncrements;
+	int m_iFreePromotion;
 
 	CvString m_strGameSpeedName;
 	GameTurnInfo* m_pGameTurnInfo;

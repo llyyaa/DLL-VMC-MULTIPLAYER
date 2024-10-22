@@ -81,6 +81,7 @@ void CvLuaGame::RegistStaticFunctions() {
 	
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
 	REGIST_STATIC_FUNCTION(CvLuaGame::lChangeNuclearWinterProcess);
+	REGIST_STATIC_FUNCTION(CvLuaGame::lChangeNuclearWinterNaturalReduction);
 #endif
 
 }

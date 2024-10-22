@@ -911,6 +911,8 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		PromotionTypes ePromotionOceanImpassable = (PromotionTypes)GC.getPROMOTION_OCEAN_IMPASSABLE();
 		setHasPromotion(ePromotionOceanImpassable, false);
 	}
+	PromotionTypes ePromotionFromGameSpeed = (PromotionTypes)GC.getGame().getGameSpeedInfo().getFreePromotion();
+	if(ePromotionFromGameSpeed != NO_PROMOTION) setHasPromotion(ePromotionFromGameSpeed, true);
 
 	// Any exotic goods that can be sold? (Portuguese unique unit mission)
 	if (getUnitInfo().GetNumExoticGoods() > 0)
@@ -1003,6 +1005,7 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 		}
 	}
 #endif
+
 	if (getUnitInfo().GetOneShotTourism() > 0)
 	{
 		SetTourismBlastStrength(kPlayer.GetCulture()->GetTourismBlastStrength(getUnitInfo().GetOneShotTourism()));
@@ -5198,6 +5201,8 @@ void CvUnit::gift(bool bTestTransport)
 		pGiftUnit->GetReligionData()->SetReligion(GetReligionData()->GetReligion());
 		pGiftUnit->GetReligionData()->SetReligiousStrength(GetReligionData()->GetReligiousStrength());
 		pGiftUnit->GetReligionData()->SetSpreadsLeft(GetReligionData()->GetSpreadsLeft());
+
+		pGiftUnit->SetExtraPopConsume(GetExtraPopConsume());
 
 		if(pGiftUnit->getOwner() == GC.getGame().getActivePlayer())
 		{
@@ -13297,6 +13302,12 @@ bool CvUnit::CanUpgradeTo(UnitTypes eUpgradeUnitType, bool bOnlyTestVisible) con
 	// Show the upgrade, but don't actually allow it
 	if(!bOnlyTestVisible)
 	{
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+		if(GET_PLAYER(getOwner()).IsLackingTroops())
+		{
+			return false;
+		}
+#endif
 #if defined(MOD_GLOBAL_STACKING_RULES)
 		if(pPlot->getNumFriendlyUnitsOfType(this) > pPlot->getUnitLimit())
 #else

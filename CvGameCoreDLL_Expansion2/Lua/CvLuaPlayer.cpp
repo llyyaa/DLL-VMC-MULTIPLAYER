@@ -1377,6 +1377,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(IsLostUC);
 	Method(SetLostUC);
+	
+	Method(GetNumTechsKnown);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12894,3 +12896,10 @@ int CvLuaPlayer::lChangeUIFromExtra(lua_State* L)
 
 LUAAPIIMPL(Player, IsLostUC)
 LUAAPIIMPL(Player, SetLostUC)
+
+int CvLuaPlayer::lGetNumTechsKnown(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	lua_pushinteger(L, GET_TEAM(pkPlayer->getTeam()).GetTeamTechs()->GetNumTechsKnown());
+	return 1;
+}

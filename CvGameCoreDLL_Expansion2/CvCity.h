@@ -675,6 +675,7 @@ public:
 	void doInstantYield(YieldTypes iYield, int iValue);
 #endif
 
+	void ChangeNumCanAirlift(int iChange);
 	bool CanAirlift() const;
 
 	int GetMaxAirUnits() const;
@@ -1304,6 +1305,12 @@ public:
 	bool IsNoNuclearWinterLocal() const;
 	void ChangeNumNoNuclearWinterLocal(int iChange);
 #endif
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	bool HasEnableCrops() const;
+	void ChangeNumEnableCrops(int iChange);
+	bool HasEnableArmee() const;
+	void ChangeNumEnableArmee(int iChange);
+#endif
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	bool IsCanDoImmigration() const;
 	void SetCanDoImmigration(bool iValue);
@@ -1485,6 +1492,7 @@ protected:
 	FAutoVariable<int, CvCity> m_iMilitaryProductionModifier;
 	FAutoVariable<int, CvCity> m_iSpaceProductionModifier;
 	FAutoVariable<int, CvCity> m_iFreeExperience;
+	int m_iNumCanAirlift;
 	FAutoVariable<int, CvCity> m_iCurrAirlift; // unused
 	FAutoVariable<int, CvCity> m_iMaxAirUnits;
 	FAutoVariable<int, CvCity> m_iAirModifier; // unused
@@ -1552,6 +1560,7 @@ protected:
 	FAutoVariable<bool, CvCity> m_bOccupied;
 	FAutoVariable<bool, CvCity> m_bPuppet;
 	bool m_bIgnoreCityForHappiness;
+
 	FAutoVariable<bool, CvCity> m_bEverCapital;
 	FAutoVariable<bool, CvCity> m_bIndustrialRouteToCapital;
 	FAutoVariable<bool, CvCity> m_bFeatureSurrounded;
@@ -1665,6 +1674,12 @@ protected:
 #if defined(MOD_NUCLEAR_WINTER_FOR_SP)
 	int m_iNumNoNuclearWinterLocal = 0;
 #endif
+
+#if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
+	int m_iCityEnableCrops = 0;
+	int m_iCityEnableArmee = 0;
+#endif
+
 #if defined(MOD_INTERNATIONAL_IMMIGRATION_FOR_SP)
 	bool m_bCanDoImmigration = true;
 	int m_iNumAllScaleImmigrantIn = 0;

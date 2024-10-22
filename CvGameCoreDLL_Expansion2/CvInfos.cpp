@@ -3552,6 +3552,11 @@ int CvGameSpeedInfo::getNumTurnIncrements() const
 	return m_iNumTurnIncrements;
 }
 //------------------------------------------------------------------------------
+int CvGameSpeedInfo::getFreePromotion() const
+{
+	return m_iFreePromotion;
+}
+//------------------------------------------------------------------------------
 GameTurnInfo& CvGameSpeedInfo::getGameTurnInfo(int iIndex) const
 {
 	return m_pGameTurnInfo[iIndex];
@@ -3602,6 +3607,9 @@ bool CvGameSpeedInfo::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	}
 #endif
 	m_iLeaguePercent				= kResults.GetInt("LeaguePercent");
+
+	const char* szFreePromotion		= kResults.GetText("FreePromotion");
+	m_iFreePromotion				= GC.getInfoTypeForString(szFreePromotion, true);
 
 	//GameTurnInfos
 	{
