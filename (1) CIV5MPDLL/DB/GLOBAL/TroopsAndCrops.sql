@@ -23,5 +23,5 @@ ALTER TABLE UnitPromotions ADD COLUMN 'IsArmee' BOOLEAN DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'NumEstablishCorps' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'CannotBeEstablishedCorps' BOOLEAN DEFAULT 0;
 
-ALTER TABLE Buildings ADD 'EnableCrops' INTEGER DEFAULT 0;
-ALTER TABLE Buildings ADD 'EnableArmee' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'EnableCrops' boolean DEFAULT 0;
+ALTER TABLE Buildings ADD 'EnableArmee' boolean DEFAULT 0;

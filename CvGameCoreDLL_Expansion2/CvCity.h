@@ -675,6 +675,7 @@ public:
 	void doInstantYield(YieldTypes iYield, int iValue);
 #endif
 
+	void ChangeNumCanAirlift(int iChange);
 	bool CanAirlift() const;
 
 	int GetMaxAirUnits() const;
@@ -1491,6 +1492,7 @@ protected:
 	FAutoVariable<int, CvCity> m_iMilitaryProductionModifier;
 	FAutoVariable<int, CvCity> m_iSpaceProductionModifier;
 	FAutoVariable<int, CvCity> m_iFreeExperience;
+	int m_iNumCanAirlift;
 	FAutoVariable<int, CvCity> m_iCurrAirlift; // unused
 	FAutoVariable<int, CvCity> m_iMaxAirUnits;
 	FAutoVariable<int, CvCity> m_iAirModifier; // unused

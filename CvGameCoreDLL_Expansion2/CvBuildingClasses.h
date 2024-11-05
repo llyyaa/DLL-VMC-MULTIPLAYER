@@ -466,8 +466,8 @@ public:
 	int GetDomainTroops(int i) const;
 	int GetNumCrops() const;
 	int GetNumArmee() const;
-	int IsEnableCrops() const;
-	int IsEnableArmee() const;
+	bool IsEnableCrops() const;
+	bool IsEnableArmee() const;
 #endif
 
 	int GetDomainProductionModifier(int i) const;
@@ -912,8 +912,8 @@ private:
 	int* m_piDomainTroops;
 	int  m_iNumCrops;
 	int  m_iNumArmee;
-	int  m_iEnableCrops;
-	int  m_iEnableArmee;
+	int  m_bEnableCrops;
+	int  m_bEnableArmee;
 #endif
 
 
