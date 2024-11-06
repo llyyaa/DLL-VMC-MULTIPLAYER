@@ -355,6 +355,7 @@ public:
 #if defined(MOD_PROMOTIONS_GG_FROM_BARBARIANS)
 	bool IsGGFromBarbarians() const;
 #endif
+	int GetRangeSuppressModifier() const;
 	bool IsRoughTerrainEndsTurn() const;
 	bool IsHoveringUnit() const;
 	bool IsFlatMovementCost() const;
@@ -824,6 +825,7 @@ protected:
 #if defined(MOD_PROMOTIONS_GG_FROM_BARBARIANS)
 	bool m_bGGFromBarbarians;
 #endif
+	int m_iRangeSuppressModifier;
 	bool m_bRoughTerrainEndsTurn;
 	bool m_bHoveringUnit;
 	bool m_bFlatMovementCost;

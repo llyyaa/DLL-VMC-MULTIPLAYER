@@ -281,6 +281,7 @@ CvPromotionEntry::CvPromotionEntry():
 #if defined(MOD_PROMOTIONS_GG_FROM_BARBARIANS)
 	m_bGGFromBarbarians(false),
 #endif
+	m_iRangeSuppressModifier(0),
 	m_bRoughTerrainEndsTurn(false),
 	m_bHoveringUnit(false),
 	m_bFlatMovementCost(false),
@@ -585,7 +586,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iNearNumEnemyAttackMod = kResults.GetInt("NearNumEnemyAttackMod");
 	m_iNearNumEnemyDefenseMod = kResults.GetInt("NearNumEnemyDefenseMod");
 #endif
-
+	m_iRangeSuppressModifier = kResults.GetInt("RangeSuppressModifier");
 	m_bRoughTerrainEndsTurn = kResults.GetBool("RoughTerrainEndsTurn");
 	m_bHoveringUnit = kResults.GetBool("HoveringUnit");
 	m_bFlatMovementCost = kResults.GetBool("FlatMovementCost");
@@ -2797,7 +2798,11 @@ int CvPromotionEntry::GetAllyCityStateCombatModifierMax() const
 	return m_iAllyCityStateCombatModifierMax;
 }
 #endif
-
+///Combat Bonus From Range Suppress
+int CvPromotionEntry::GetRangeSuppressModifier() const
+{
+	return m_iRangeSuppressModifier;
+}
 #if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
 // Permits units to receive a combat bonus from Extra Resourses/Hapiness
 ResourceTypes CvPromotionEntry::GetExtraResourceType() const
