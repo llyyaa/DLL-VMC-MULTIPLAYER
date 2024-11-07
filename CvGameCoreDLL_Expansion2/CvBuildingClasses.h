@@ -151,6 +151,7 @@ public:
 	int GetSpecialistType() const;
 	int GetSpecialistCount() const;
 	int GetSpecialistExtraCulture() const;
+	int GetTourism() const;
 	int GetGreatPeopleRateChange() const;
 	GreatWorkSlotType GetGreatWorkSlotType() const;
 #if defined(MOD_GLOBAL_GREATWORK_YIELDTYPES)
@@ -760,6 +761,7 @@ private:
 	int m_iFreeGreatPeople;
 	int m_iMedianTechPercentChange;
 	int m_iGold;
+	int m_iTourism;
 	bool m_bNearbyMountainRequired;
 	bool m_bAllowsRangeStrike;
 	int m_iDefenseModifier;

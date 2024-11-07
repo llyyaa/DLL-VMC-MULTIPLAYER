@@ -9875,6 +9875,27 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 		if(pBuildingInfo->GetGold() > 0)
 			GetTreasury()->ChangeGold(pBuildingInfo->GetGold());
 
+        // New code for Tourism  
+		CvPlayer& thisPlayer = *this;
+		// 遍历所有主要文明  
+		for (int i = 0; i < MAX_MAJOR_CIVS; i++)
+		{
+			PlayerTypes otherPlayer = (PlayerTypes)i;
+			// 确保不是自身，且已经相遇  
+			if (otherPlayer!= thisPlayer.GetID() &&
+				thisPlayer.GetDiplomacyAI()->IsPlayerValid(otherPlayer))
+			{
+				CvPlayer* pOtherPlayer = &GET_PLAYER(otherPlayer);
+				// 检查是否与当前玩家相遇  
+				if (GET_TEAM(pOtherPlayer->getTeam()).isHasMet(GET_PLAYER(thisPlayer.GetID()).getTeam()))
+				{
+					// 直接从建筑信息中获取 Tourism 值
+					int tourismValue = pBuildingInfo->GetTourism();
+					// 修改对其他玩家的影响  
+					thisPlayer.GetCulture()->ChangeInfluenceOn(otherPlayer, tourismValue);
+				}
+			}
+		}
 		// Instant Friendship change with all Minors
 		int iMinorFriendshipChange = pBuildingInfo->GetMinorFriendshipChange();
 		if(iMinorFriendshipChange != 0)
