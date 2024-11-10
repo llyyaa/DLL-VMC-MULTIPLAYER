@@ -43,6 +43,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iMoveDiscountChange(0),
 	m_iRangeChange(0),
 	m_iRangedAttackModifier(0),
+	m_iRangeSuppressModifier(0),
 	m_iInterceptionCombatModifier(0),
 	m_iInterceptionDefenseDamageModifier(0),
 	m_iAirSweepCombatModifier(0),
@@ -281,7 +282,7 @@ CvPromotionEntry::CvPromotionEntry():
 #if defined(MOD_PROMOTIONS_GG_FROM_BARBARIANS)
 	m_bGGFromBarbarians(false),
 #endif
-	m_iRangeSuppressModifier(0),
+
 	m_bRoughTerrainEndsTurn(false),
 	m_bHoveringUnit(false),
 	m_bFlatMovementCost(false),
@@ -586,7 +587,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iNearNumEnemyAttackMod = kResults.GetInt("NearNumEnemyAttackMod");
 	m_iNearNumEnemyDefenseMod = kResults.GetInt("NearNumEnemyDefenseMod");
 #endif
-	m_iRangeSuppressModifier = kResults.GetInt("RangeSuppressModifier");
+	
 	m_bRoughTerrainEndsTurn = kResults.GetBool("RoughTerrainEndsTurn");
 	m_bHoveringUnit = kResults.GetBool("HoveringUnit");
 	m_bFlatMovementCost = kResults.GetBool("FlatMovementCost");
@@ -642,6 +643,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iMoveDiscountChange = kResults.GetInt("MoveDiscountChange");
 	m_iRangeChange = kResults.GetInt("RangeChange");
 	m_iRangedAttackModifier = kResults.GetInt("RangedAttackModifier");
+	m_iRangeSuppressModifier = kResults.GetInt("RangeSuppressModifier");
 	m_iInterceptionCombatModifier = kResults.GetInt("InterceptionCombatModifier");
 	m_iInterceptionDefenseDamageModifier = kResults.GetInt("InterceptionDefenseDamageModifier");
 	m_iAirSweepCombatModifier = kResults.GetInt("AirSweepCombatModifier");
@@ -1716,6 +1718,12 @@ int CvPromotionEntry::GetRangeChange() const
 int CvPromotionEntry::GetRangedAttackModifier() const
 {
 	return m_iRangedAttackModifier;
+}
+
+///Combat Bonus From Range Suppress
+int CvPromotionEntry::GetRangeSuppressModifier() const
+{
+	return m_iRangeSuppressModifier;
 }
 
 /// Accessor: How much the strength of the unit is modified when intercepting
@@ -2798,11 +2806,7 @@ int CvPromotionEntry::GetAllyCityStateCombatModifierMax() const
 	return m_iAllyCityStateCombatModifierMax;
 }
 #endif
-///Combat Bonus From Range Suppress
-int CvPromotionEntry::GetRangeSuppressModifier() const
-{
-	return m_iRangeSuppressModifier;
-}
+
 #if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
 // Permits units to receive a combat bonus from Extra Resourses/Hapiness
 ResourceTypes CvPromotionEntry::GetExtraResourceType() const

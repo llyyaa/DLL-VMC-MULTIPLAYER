@@ -78,6 +78,7 @@ public:
 	int  GetMoveDiscountChange() const;
 	int  GetRangeChange() const;
 	int  GetRangedAttackModifier() const;
+	int  GetRangeSuppressModifier() const;
 	int  GetInterceptionCombatModifier() const;
 	int  GetInterceptionDefenseDamageModifier() const;
 	int  GetAirSweepCombatModifier() const;
@@ -355,7 +356,7 @@ public:
 #if defined(MOD_PROMOTIONS_GG_FROM_BARBARIANS)
 	bool IsGGFromBarbarians() const;
 #endif
-	int GetRangeSuppressModifier() const;
+	
 	bool IsRoughTerrainEndsTurn() const;
 	bool IsHoveringUnit() const;
 	bool IsFlatMovementCost() const;
@@ -552,6 +553,7 @@ protected:
 	int m_iMoveDiscountChange;
 	int m_iRangeChange;
 	int m_iRangedAttackModifier;
+	int m_iRangeSuppressModifier;
 	int m_iInterceptionCombatModifier;
 	int m_iInterceptionDefenseDamageModifier;
 	int m_iAirSweepCombatModifier;
@@ -825,7 +827,7 @@ protected:
 #if defined(MOD_PROMOTIONS_GG_FROM_BARBARIANS)
 	bool m_bGGFromBarbarians;
 #endif
-	int m_iRangeSuppressModifier;
+	
 	bool m_bRoughTerrainEndsTurn;
 	bool m_bHoveringUnit;
 	bool m_bFlatMovementCost;

@@ -240,6 +240,7 @@ CvUnit::CvUnit() :
 	, m_iNumExoticGoods(0)
 	, m_iAdjacentModifier("CvUnit::m_iAdjacentModifier", m_syncArchive)
 	, m_iRangedAttackModifier("CvUnit::m_iRangedAttackModifier", m_syncArchive)
+	, m_iRangeSuppressModifier("CvUnit::m_iRangeSuppressModifier", m_syncArchive)
 	, m_iInterceptionCombatModifier("CvUnit::m_iInterceptionCombatModifier", m_syncArchive)
 	, m_iInterceptionDefenseDamageModifier("CvUnit::m_iInterceptionDefenseDamageModifier", m_syncArchive)
 	, m_iAirSweepCombatModifier("CvUnit::m_iAirSweepCombatModifier", m_syncArchive)
@@ -312,7 +313,7 @@ CvUnit::CvUnit() :
 		, m_iStrongerDamaged("CvUnit::m_iStrongerDamaged", m_syncArchive)
 		, m_iFightWellDamaged("CvUnit::m_iFightWellDamaged", m_syncArchive)
 
-		, m_iUnitRangeSuppressModifier("CvUnit::m_iUnitRangeSuppressModifier", m_syncArchive)
+		
 #if defined(MOD_ROG_CORE)
 		, m_iMeleeDefenseModifier("CvUnit::m_iMeleeDefenseModifier", m_syncArchive)
 		, m_iAoEDamageOnMove("CvUnit::m_iAoEDamageOnMove", m_syncArchive)
@@ -1248,6 +1249,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraCombatPercent = 0;
 	m_iAdjacentModifier = 0;
 	m_iRangedAttackModifier = 0;
+	m_iRangeSuppressModifier = 0;
 	m_iInterceptionCombatModifier = 0;
 	m_iInterceptionDefenseDamageModifier = 0;
 	m_iAirSweepCombatModifier = 0;
@@ -1297,7 +1299,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iAllyCityStateCombatModifier = 0;
 	m_iAllyCityStateCombatModifierMax = 0;
 #endif
-	m_iUnitRangeSuppressModifier = 0;
+	
 #if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
 	m_eExtraResourceType = NO_RESOURCE;
 	m_iExtraResourceCombatModifier = 0;
@@ -14965,16 +14967,6 @@ int CvUnit::GetGenericMaxStrengthModifier(const CvUnit* pOtherUnit, const CvPlot
 		{
 			iModifier += GetBarbarianCombatBonusTotal();
 		}
-		int iRange  = GetRange();
-		int pRange  = pOtherUnit->GetRange();
-		if(iRange>0 && pRange>0 && pOtherUnit && pOtherUnit->getUnitCombatType() == getUnitCombatType())
-		{
-			iTempModifier = (iRange - pRange) * GetUnitRangeSuppressModifier();
-			if(iTempModifier > 0)
-			{
-				iModifier += iTempModifier;
-			}
-		}
 	}
 
 	iModifier += kPlayer.GetStrengthModifierFromAlly();
@@ -16666,7 +16658,7 @@ if(pOtherUnit != NULL)
 	int pRange  = pOtherUnit->GetRange();
 	if(iRange>0 && pRange>0 && pOtherUnit && pOtherUnit->getUnitCombatType() == getUnitCombatType())
 	{
-		iTempModifier = (iRange - pRange) * GetUnitRangeSuppressModifier();
+		iTempModifier = (iRange - pRange) * GetRangeSuppressModifier();
 		if(iTempModifier > 0)
 		{
 			iModifier += iTempModifier;
@@ -18053,19 +18045,7 @@ int CvUnit::GetStrengthModifierFromAlly() const
 	return mod;
 }
 #endif
-int CvUnit::GetUnitRangeSuppressModifier() const
-{
-	VALIDATE_OBJECT
-	return 100*m_iUnitRangeSuppressModifier;
-}
-void CvUnit::ChangeUnitRangeSuppressModifier(int iValue)
-{
-	VALIDATE_OBJECT
-	if(iValue != 0)
-	{
-		m_iUnitRangeSuppressModifier += iValue;
-	}
-}
+
 #if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
 ResourceTypes CvUnit::GetExtraResourceType() const
 {
@@ -19174,6 +19154,23 @@ void CvUnit::ChangeRangedAttackModifier(int iValue)
 	if(iValue != 0)
 	{
 		m_iRangedAttackModifier += iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetRangeSuppressModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iRangeSuppressModifier;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeRangeSuppressModifier(int iValue)
+{
+	VALIDATE_OBJECT
+	if(iValue != 0)
+	{
+		m_iRangeSuppressModifier += iValue;
 	}
 }
 
@@ -26312,7 +26309,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 			changeGGFromBarbariansCount((thisPromotion.IsGGFromBarbarians()) ? iChange : 0);
 		}
 #endif
-		ChangeUnitRangeSuppressModifier((thisPromotion.GetRangeSuppressModifier()) ? iChange : 0);
+		
 		ChangeRoughTerrainEndsTurnCount((thisPromotion.IsRoughTerrainEndsTurn()) ? iChange : 0);
 		ChangeHoveringUnitCount((thisPromotion.IsHoveringUnit()) ? iChange : 0);
 		changeFlatMovementCostCount((thisPromotion.IsFlatMovementCost()) ? iChange : 0);
@@ -26394,6 +26391,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraWithdrawal(thisPromotion.GetExtraWithdrawal() * iChange);
 		changeExtraRange(thisPromotion.GetRangeChange() * iChange);
 		ChangeRangedAttackModifier(thisPromotion.GetRangedAttackModifier() * iChange);
+		ChangeRangeSuppressModifier(thisPromotion.GetRangeSuppressModifier() * iChange);
 		ChangeInterceptionCombatModifier(thisPromotion.GetInterceptionCombatModifier() * iChange);
 		ChangeInterceptionDefenseDamageModifier(thisPromotion.GetInterceptionDefenseDamageModifier() * iChange);
 		ChangeAirSweepCombatModifier(thisPromotion.GetAirSweepCombatModifier() * iChange);
@@ -27211,7 +27209,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iAllyCityStateCombatModifier;
 	kStream >> m_iAllyCityStateCombatModifierMax;
 #endif
-	kStream >> m_iUnitRangeSuppressModifier;
+	kStream >> m_iRangeSuppressModifier;
 #ifdef MOD_PROMOTIONS_EXTRARES_BONUS
 
 	kStream >> m_eExtraResourceType;
@@ -27539,7 +27537,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iAllyCityStateCombatModifier;
 	kStream << m_iAllyCityStateCombatModifierMax;
 #endif
-	kStream << m_iUnitRangeSuppressModifier;
+	kStream << m_iRangeSuppressModifier;
 #ifdef MOD_PROMOTIONS_EXTRARES_BONUS
 	kStream << m_eExtraResourceType;
 	kStream << m_iExtraResourceCombatModifier;

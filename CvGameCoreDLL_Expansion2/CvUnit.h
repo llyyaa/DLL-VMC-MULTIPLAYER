@@ -670,8 +670,7 @@ public:
 	void SetAllyCityStateCombatModifierMax(int iCombatBonusMax);
 	int GetStrengthModifierFromAlly() const;
 #endif
-	int GetUnitRangeSuppressModifier() const;
-	void ChangeUnitRangeSuppressModifier(int iCombatBonus);
+	
 #if defined(MOD_PROMOTIONS_EXTRARES_BONUS)
 	ResourceTypes GetExtraResourceType() const;
 	void SetExtraResourceType(ResourceTypes m_eResourceType);
@@ -804,6 +803,8 @@ public:
 	void ChangeAdjacentModifier(int iValue);
 	int GetRangedAttackModifier() const;
 	void ChangeRangedAttackModifier(int iValue);
+	int GetRangeSuppressModifier() const;
+	void ChangeRangeSuppressModifier(int iValue);
 	int GetInterceptionCombatModifier() const;
 	void ChangeInterceptionCombatModifier(int iValue);
 	int GetInterceptionDefenseDamageModifier() const;
@@ -1321,7 +1322,7 @@ public:
 	void changeMaxHitPointsChangeFromRazedCityPop(int iValue);
 	void setMaxHitPointsChangeFromRazedCityPop(int iChange);
 	int getMaxHitPointsModifier() const;
-	void changeMaxHitPointsModifier(int iChange);
+	void changeMaxHitPointsModifier(int iCombatBonus);
 #endif
 
 	bool IsIgnoreZOC() const;
@@ -2203,6 +2204,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iAdjacentTileHeal;
 	FAutoVariable<int, CvUnit> m_iAdjacentModifier;
 	FAutoVariable<int, CvUnit> m_iRangedAttackModifier;
+	FAutoVariable<int, CvUnit> m_iRangeSuppressModifier;
 	FAutoVariable<int, CvUnit> m_iInterceptionCombatModifier;
 	FAutoVariable<int, CvUnit> m_iInterceptionDefenseDamageModifier;
 	FAutoVariable<int, CvUnit> m_iAirSweepCombatModifier;
@@ -2563,7 +2565,7 @@ protected:
 	int m_iSiegeKillCitizensPercent = 0;
 	int m_iSiegeKillCitizensFixed = 0;
 #endif
-	int m_iUnitRangeSuppressModifier;
+
 	int m_iEmbarkExtraVisibility;
 	int m_iEmbarkDefensiveModifier;
 	int m_iCapitalDefenseModifier;

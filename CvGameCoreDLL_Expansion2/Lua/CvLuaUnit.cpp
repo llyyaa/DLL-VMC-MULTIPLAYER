@@ -4109,7 +4109,7 @@ int CvLuaUnit::lGetUnitRangeSuppressModifier(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
 
-	const int iResult = pkUnit->GetUnitRangeSuppressModifier();
+	const int iResult = pkUnit->GetRangeSuppressModifier();
 	lua_pushinteger(L, iResult);
 	return 1;
 }
