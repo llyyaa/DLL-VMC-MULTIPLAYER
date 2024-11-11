@@ -169,6 +169,7 @@ public:
 	BuildingTypes GetFreeBuildingOnConquest() const;
 
 	bool IsTrainedAll() const;
+	bool IsWLKDCityNoResearchCost() const;
 	bool IsFightWellDamaged() const;
 	bool IsBuyOwnedTiles() const;
 	bool IsMoveFriendlyWoodsAsRoad() const;
@@ -461,6 +462,7 @@ protected:
 	bool m_bTechBoostFromCapitalScienceBuildings;
 	bool m_bStaysAliveZeroCities;
 	bool m_bFaithFromUnimprovedForest;
+	bool m_bWLKDCityNoResearchCost;
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool m_bAnyBelief;
 #endif
@@ -1362,6 +1364,7 @@ public:
 	int GetShareAllyResearchPercent() const;
 
 	bool CanDiplomaticMarriage() const;
+	bool IsWLKDCityNoResearchCost() const;
 
 	// Serialization
 	void Read(FDataStream& kStream);
@@ -1639,6 +1642,7 @@ private:
 	int m_iShareAllyResearchPercent = 0;
 
 	bool m_bCanDiplomaticMarriage = false;
+	bool m_bWLKDCityNoResearchCost = false;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H

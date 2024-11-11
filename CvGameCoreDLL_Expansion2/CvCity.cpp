@@ -12366,6 +12366,8 @@ void CvCity::SetWeLoveTheKingDayCounter(int iValue)
 #if defined(MOD_EVENTS_WLKD_DAY)
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityBeginsWLTKD, getOwner(), getX(), getY(), iValue);
 #endif
+         if (GET_PLAYER(getOwner()).GetPlayerTraits()->IsWLKDCityNoResearchCost())  
+        {ChangeNoResearchCost(1);}  
 	}
 	else if (iValue == 0)
 	{
@@ -12375,6 +12377,8 @@ void CvCity::SetWeLoveTheKingDayCounter(int iValue)
 			GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityEndsWLTKD, getOwner(), getX(), getY(), iValue);
 		}
 #endif
+	    if (GET_PLAYER(getOwner()).GetPlayerTraits()->IsWLKDCityNoResearchCost())  
+        {ChangeNoResearchCost(-1);}  
 	}
 	int iWLTKmod = GET_PLAYER(getOwner()).GetPlayerTraits()->GetWLKDLengthChangeModifier();
 	if (iWLTKmod > 0 && iValue > GetWeLoveTheKingDayCounter())
@@ -12392,6 +12396,24 @@ void CvCity::ChangeWeLoveTheKingDayCounter(int iChange)
 	SetWeLoveTheKingDayCounter(GetWeLoveTheKingDayCounter() + iChange);
 }
 
+//WLTKD city counter
+void CvCity::ChangeNoResearchCost(int change)  
+{  
+    m_iNoResearchCost += change;  
+    CvPlayer& owner = GET_PLAYER(getOwner());  
+    if (change > 0)  
+    {  
+        owner.ChangeNumCitiesNoResearchCost(1);  
+    }  
+    else if (change < 0 && m_iNoResearchCost > 0) 
+    {  
+        owner.ChangeNumCitiesNoResearchCost(-1);  
+    }  
+}
+void CvPlayer::ChangeNumCitiesNoResearchCost(int change)  
+{  
+    m_iNumCitiesNoResearchCost += change;   
+}
 //	--------------------------------------------------------------------------------
 /// Turn number when AI placed a garrison here
 int CvCity::GetLastTurnGarrisonAssigned() const
