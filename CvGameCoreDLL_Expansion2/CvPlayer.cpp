@@ -16547,6 +16547,21 @@ void CvPlayer::SetGreatPeopleSpawnCounter(int iValue)
 	m_iGreatPeopleSpawnCounter = iValue;
 }
 
+//City's King - respect Day Counter 
+void CvPlayer::ChangeNumCitiesNoResearchCost(int change)  
+{  
+    m_iNumCitiesNoResearchCost += change;   
+}
+bool CvPlayerTraits::IsWLKDCityNoResearchCost() const  
+{  
+   
+    return m_bWLKDCityNoResearchCost;  
+}
+
+int CvPlayer::GetNumCitiesNoResearchCost() const  
+{  
+    return m_iNumCitiesNoResearchCost; 
+}  
 //	--------------------------------------------------------------------------------
 // Changes how long before we spawn a free GreatPeople for ePlayer
 void CvPlayer::ChangeGreatPeopleSpawnCounter(int iChange)

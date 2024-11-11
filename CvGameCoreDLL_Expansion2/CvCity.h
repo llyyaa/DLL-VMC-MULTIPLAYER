@@ -77,6 +77,7 @@ public:
 	static void PushToLua(lua_State* L, BasicArguments* arg);
 	static void RegistInstanceFunctions();
 	static void RegistStaticFunctions();
+	void ChangeNoResearchCost(int change);
 	static CvCity* Provide(PlayerTypes player, int cityID);
 
 #if defined(MOD_API_EXTENSIONS)
@@ -1475,6 +1476,7 @@ protected:
 	int m_iSecondCapitalsExtraScore;
 	int m_iNumAllowsFoodTradeRoutes;
 	int m_iNumAllowsProductionTradeRoutes;
+	int m_iNoResearchCost; 
 #if defined(MOD_BUILDINGS_CITY_WORKING)
 	int m_iCityWorkingChange;
 #endif

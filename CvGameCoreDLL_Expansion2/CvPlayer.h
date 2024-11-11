@@ -1791,6 +1791,8 @@ public:
 	int GetNumNaturalWondersDiscoveredInArea() const;
 	void SetNumNaturalWondersDiscoveredInArea(int iValue);
 	void ChangeNumNaturalWondersDiscoveredInArea(int iChange);
+	void ChangeNumCitiesNoResearchCost(int change); 
+	int GetNumCitiesNoResearchCost() const;   
 
 	int GetNumNaturalWondersInOwnedPlots();
 
@@ -2376,6 +2378,7 @@ protected:
 	int m_iEspionageSpeedModifier;
 	int m_iSpyStartingRank;
 	int m_iSpyLevelUpWhenRiggingCount;
+	int m_iNumCitiesNoResearchCost;
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	int m_iConversionModifier;
 #endif

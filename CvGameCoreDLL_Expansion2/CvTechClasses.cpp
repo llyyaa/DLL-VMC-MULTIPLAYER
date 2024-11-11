@@ -1610,7 +1610,7 @@ long long CvPlayerTechs::GetResearchCost(TechTypes eTech) const
 
 	// Mod for City Count
 	int iMod = GC.getMap().getWorldInfo().GetNumCitiesTechCostMod();	// Default is 40, gets smaller on larger maps
-	iMod = iMod * m_pPlayer->GetMaxEffectiveCities(/*bIncludePuppets*/ true);
+	iMod = iMod * (m_pPlayer->GetMaxEffectiveCities(/*bIncludePuppets*/ true)- m_pPlayer->GetNumCitiesNoResearchCost());
 	if (m_pPlayer->isGoldenAge())
 		iMod = iMod * (m_pPlayer->GetPlayerTraits()->GetGoldenAgeResearchCityCountCostModifier() + 100) / 100; // some UA may reduce the modifier from the city count.
 
