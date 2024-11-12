@@ -240,6 +240,7 @@ CvUnit::CvUnit() :
 	, m_iNumExoticGoods(0)
 	, m_iAdjacentModifier("CvUnit::m_iAdjacentModifier", m_syncArchive)
 	, m_iRangedAttackModifier("CvUnit::m_iRangedAttackModifier", m_syncArchive)
+	, m_iRangeSuppressModifier("CvUnit::m_iRangeSuppressModifier", m_syncArchive)
 	, m_iInterceptionCombatModifier("CvUnit::m_iInterceptionCombatModifier", m_syncArchive)
 	, m_iInterceptionDefenseDamageModifier("CvUnit::m_iInterceptionDefenseDamageModifier", m_syncArchive)
 	, m_iAirSweepCombatModifier("CvUnit::m_iAirSweepCombatModifier", m_syncArchive)
@@ -1247,6 +1248,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraCombatPercent = 0;
 	m_iAdjacentModifier = 0;
 	m_iRangedAttackModifier = 0;
+	m_iRangeSuppressModifier = 0;
 	m_iInterceptionCombatModifier = 0;
 	m_iInterceptionDefenseDamageModifier = 0;
 	m_iAirSweepCombatModifier = 0;
@@ -15866,6 +15868,20 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 			iModifier += iTempModifier;
 		}
 	}
+	// Range Suppress
+	if(pOtherUnit != NULL)
+	{
+		int iRange  = GetRange();
+		int pRange  = pOtherUnit->GetRange();
+		if(iRange>0 && pRange>0 && pOtherUnit && pOtherUnit->getDomainType() == getDomainType())
+		{
+			iTempModifier = (iRange - pRange) * GetRangeSuppressModifier();
+			if(iTempModifier > 0)
+			{
+				iModifier += iTempModifier;
+			}
+		}
+	}
 
 	// If the empire is unhappy, then Units get a combat penalty
 #if defined(MOD_GLOBAL_CS_RAZE_RARELY)
@@ -19139,6 +19155,23 @@ void CvUnit::ChangeRangedAttackModifier(int iValue)
 	if(iValue != 0)
 	{
 		m_iRangedAttackModifier += iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetRangeSuppressModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iRangeSuppressModifier;
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::ChangeRangeSuppressModifier(int iValue)
+{
+	VALIDATE_OBJECT
+	if(iValue != 0)
+	{
+		m_iRangeSuppressModifier += iValue;
 	}
 }
 
@@ -26358,6 +26391,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraWithdrawal(thisPromotion.GetExtraWithdrawal() * iChange);
 		changeExtraRange(thisPromotion.GetRangeChange() * iChange);
 		ChangeRangedAttackModifier(thisPromotion.GetRangedAttackModifier() * iChange);
+		ChangeRangeSuppressModifier(thisPromotion.GetRangeSuppressModifier() * iChange);
 		ChangeInterceptionCombatModifier(thisPromotion.GetInterceptionCombatModifier() * iChange);
 		ChangeInterceptionDefenseDamageModifier(thisPromotion.GetInterceptionDefenseDamageModifier() * iChange);
 		ChangeAirSweepCombatModifier(thisPromotion.GetAirSweepCombatModifier() * iChange);
@@ -27175,7 +27209,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iAllyCityStateCombatModifier;
 	kStream >> m_iAllyCityStateCombatModifierMax;
 #endif
-
+	kStream >> m_iRangeSuppressModifier;
 #ifdef MOD_PROMOTIONS_EXTRARES_BONUS
 
 	kStream >> m_eExtraResourceType;
@@ -27503,7 +27537,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iAllyCityStateCombatModifier;
 	kStream << m_iAllyCityStateCombatModifierMax;
 #endif
-
+	kStream << m_iRangeSuppressModifier;
 #ifdef MOD_PROMOTIONS_EXTRARES_BONUS
 	kStream << m_eExtraResourceType;
 	kStream << m_iExtraResourceCombatModifier;
