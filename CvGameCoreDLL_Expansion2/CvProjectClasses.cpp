@@ -107,7 +107,7 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	kUtility.SetYields(m_piYieldChange, "Project_YieldChanges", "ProjectType", szProjectType);
 	kUtility.SetYields(m_piYieldModifier, "Project_YieldModifiers", "ProjectType", szProjectType);
-	szTextVal = kResults.GetText("FreePromotion");
+	const char* szTextVal = kResults.GetText("FreePromotion");
 	m_iFreePromotion = GC.getInfoTypeForString(szTextVal, true);
 
 	return true;
