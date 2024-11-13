@@ -18,7 +18,7 @@ CvProjectEntry::CvProjectEntry(void):
 	m_piVictoryMinThreshold(NULL),
 	m_piProjectsNeeded(NULL),
 	m_piFlavorValue(NULL),
-
+	m_iFreePromotion(NO_PROMOTION),
 	m_piYieldChange(NULL),
 	m_piYieldModifier(NULL)
 {
@@ -107,6 +107,8 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	kUtility.SetYields(m_piYieldChange, "Project_YieldChanges", "ProjectType", szProjectType);
 	kUtility.SetYields(m_piYieldModifier, "Project_YieldModifiers", "ProjectType", szProjectType);
+	szTextVal = kResults.GetText("FreePromotion");
+	m_iFreePromotion = GC.getInfoTypeForString(szTextVal, true);
 
 	return true;
 }
@@ -246,6 +248,11 @@ void CvProjectEntry::SetCreateSound(const char* szVal)
 	m_strCreateSound = szVal;
 }
 
+/// Does this Project give all units a promotion for free instantly?
+int CvProjectEntry::GetFreePromotion() const
+{
+	return m_iFreePromotion;
+}
 // ARRAYS
 
 /// Resources consumed to construct
