@@ -30561,11 +30561,17 @@ int CvPlayer::GetMaxEffectiveCities(bool bIncludePuppets)
 	int iNumLimboCities = 0;
 	const CvCity* pLoopCity;
 	int iLoop;
+	bool bIsNoResearchCostWLKDCity = GetPlayerTraits()->IsWLKDCityNoResearchCost();
+	int iNumNoResearchCostWLKDCity = 0;
 	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
 	{
 		if(pLoopCity->IsIgnoreCityForHappiness() || pLoopCity->IsRazing())
 		{
 			iNumLimboCities++;
+		}
+		else if(bIsNoResearchCostWLKDCity && pLoopCity->GetWeLoveTheKingDayCounter() > 0)
+		{
+			iNumNoResearchCostWLKDCity++;
 		}
 	}
 	iNumCities -= iNumLimboCities;
@@ -30578,7 +30584,7 @@ int CvPlayer::GetMaxEffectiveCities(bool bIncludePuppets)
 
 	if (bIncludePuppets)
 	{
-		return m_iMaxEffectiveCities + iNumPuppetCities;
+		return m_iMaxEffectiveCities + iNumPuppetCities - iNumNoResearchCostWLKDCity;
 	}
 
 	return m_iMaxEffectiveCities;
