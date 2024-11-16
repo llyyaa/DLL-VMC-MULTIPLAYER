@@ -10010,7 +10010,7 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	if (eFreePromotion2 != NO_PROMOTION)
 		ChangeFreePromotionCount(eFreePromotion2, iChange);
 
-	PromotionTypes eFreePromotion3 = (PromotionTypes)pBuildingInfo->GetFreePromotion2();
+	PromotionTypes eFreePromotion3 = (PromotionTypes)pBuildingInfo->GetFreePromotion3();
 	if (eFreePromotion3 != NO_PROMOTION)
 		ChangeFreePromotionCount(eFreePromotion3, iChange);
 
