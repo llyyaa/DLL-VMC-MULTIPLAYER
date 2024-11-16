@@ -240,6 +240,7 @@ CvUnit::CvUnit() :
 	, m_iNumExoticGoods(0)
 	, m_iAdjacentModifier("CvUnit::m_iAdjacentModifier", m_syncArchive)
 	, m_iRangedAttackModifier("CvUnit::m_iRangedAttackModifier", m_syncArchive)
+	, m_iRangeSuppressModifier("CvUnit::m_iRangeSuppressModifier", m_syncArchive)
 	, m_iInterceptionCombatModifier("CvUnit::m_iInterceptionCombatModifier", m_syncArchive)
 	, m_iInterceptionDefenseDamageModifier("CvUnit::m_iInterceptionDefenseDamageModifier", m_syncArchive)
 	, m_iAirSweepCombatModifier("CvUnit::m_iAirSweepCombatModifier", m_syncArchive)
@@ -1247,6 +1248,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iExtraCombatPercent = 0;
 	m_iAdjacentModifier = 0;
 	m_iRangedAttackModifier = 0;
+	m_iRangeSuppressModifier = 0;
 	m_iInterceptionCombatModifier = 0;
 	m_iInterceptionDefenseDamageModifier = 0;
 	m_iAirSweepCombatModifier = 0;
@@ -16023,6 +16025,7 @@ int CvUnit::GetMaxRangedCombatStrength(const CvUnit* pOtherUnit, const CvCity* p
 				iModifier += iTempModifier;
 			}
 #endif
+		iModifier += GetRangeSuppressModifier(pOtherUnit);
 
 		// Bonus against city states?
 		if(GET_PLAYER(pOtherUnit->getOwner()).isMinorCiv())
@@ -19140,6 +19143,39 @@ void CvUnit::ChangeRangedAttackModifier(int iValue)
 	{
 		m_iRangedAttackModifier += iValue;
 	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::GetRangeSuppressModifier() const
+{
+	VALIDATE_OBJECT
+	return m_iRangeSuppressModifier;
+}
+void CvUnit::ChangeRangeSuppressModifier(int iValue)
+{
+	VALIDATE_OBJECT
+	if(iValue != 0)
+	{
+		m_iRangeSuppressModifier += iValue;
+	}
+}
+int CvUnit::GetRangeSuppressModifier(const CvUnit* pOtherUnit) const
+{
+	if(!pOtherUnit) return 0;
+
+	int res = 0;
+	int iRangeSuppressModifier = GetRangeSuppressModifier();
+	if(iRangeSuppressModifier != 0)
+	{
+		int iThisRange = GetRange();
+		int iOtherRange = pOtherUnit->GetRange();
+		if(iThisRange > 0 && iOtherRange > 0 && pOtherUnit->getDomainType() == getDomainType())
+		{
+			int iTempModifier = (iThisRange - iOtherRange) * iRangeSuppressModifier;
+			if(iTempModifier > 0) res += iTempModifier;
+		}
+	}
+	return res;
 }
 
 //	--------------------------------------------------------------------------------
@@ -26358,6 +26394,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraWithdrawal(thisPromotion.GetExtraWithdrawal() * iChange);
 		changeExtraRange(thisPromotion.GetRangeChange() * iChange);
 		ChangeRangedAttackModifier(thisPromotion.GetRangedAttackModifier() * iChange);
+		ChangeRangeSuppressModifier(thisPromotion.GetRangeSuppressModifier() * iChange);
 		ChangeInterceptionCombatModifier(thisPromotion.GetInterceptionCombatModifier() * iChange);
 		ChangeInterceptionDefenseDamageModifier(thisPromotion.GetInterceptionDefenseDamageModifier() * iChange);
 		ChangeAirSweepCombatModifier(thisPromotion.GetAirSweepCombatModifier() * iChange);
@@ -27175,7 +27212,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iAllyCityStateCombatModifier;
 	kStream >> m_iAllyCityStateCombatModifierMax;
 #endif
-
+	kStream >> m_iRangeSuppressModifier;
 #ifdef MOD_PROMOTIONS_EXTRARES_BONUS
 
 	kStream >> m_eExtraResourceType;
@@ -27503,7 +27540,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iAllyCityStateCombatModifier;
 	kStream << m_iAllyCityStateCombatModifierMax;
 #endif
-
+	kStream << m_iRangeSuppressModifier;
 #ifdef MOD_PROMOTIONS_EXTRARES_BONUS
 	kStream << m_eExtraResourceType;
 	kStream << m_iExtraResourceCombatModifier;

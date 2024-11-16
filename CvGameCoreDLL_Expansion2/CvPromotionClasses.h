@@ -78,6 +78,7 @@ public:
 	int  GetMoveDiscountChange() const;
 	int  GetRangeChange() const;
 	int  GetRangedAttackModifier() const;
+	int  GetRangeSuppressModifier() const;
 	int  GetInterceptionCombatModifier() const;
 	int  GetInterceptionDefenseDamageModifier() const;
 	int  GetAirSweepCombatModifier() const;
@@ -551,6 +552,7 @@ protected:
 	int m_iMoveDiscountChange;
 	int m_iRangeChange;
 	int m_iRangedAttackModifier;
+	int m_iRangeSuppressModifier;
 	int m_iInterceptionCombatModifier;
 	int m_iInterceptionDefenseDamageModifier;
 	int m_iAirSweepCombatModifier;
