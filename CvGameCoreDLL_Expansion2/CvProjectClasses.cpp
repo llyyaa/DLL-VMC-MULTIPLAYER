@@ -13,6 +13,7 @@
 #include "LintFree.h"
 
 CvProjectEntry::CvProjectEntry(void):
+	m_iFreePromotion(NO_PROMOTION),
 	m_piResourceQuantityRequirements(NULL),
 	m_piVictoryThreshold(NULL),
 	m_piVictoryMinThreshold(NULL),
@@ -70,6 +71,9 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	const char* szAnyonePrereqProject = kResults.GetText("AnyonePrereqProject");
 	m_iAnyoneProjectPrereq = GC.getInfoTypeForString(szAnyonePrereqProject, true);
+
+	const char* szTextVal = kResults.GetText("FreePromotion");
+	m_iFreePromotion = GC.getInfoTypeForString(szTextVal, true);
 
 	//Arrays
 	const char* szProjectType = GetType();
@@ -244,6 +248,12 @@ const char* CvProjectEntry::GetCreateSound() const
 void CvProjectEntry::SetCreateSound(const char* szVal)
 {
 	m_strCreateSound = szVal;
+}
+
+/// Does this Project give units a promotion for free instantly?
+int CvProjectEntry::GetFreePromotion() const
+{
+	return m_iFreePromotion;
 }
 
 // ARRAYS
