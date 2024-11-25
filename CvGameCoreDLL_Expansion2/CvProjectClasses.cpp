@@ -73,6 +73,7 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	//Arrays
 	const char* szProjectType = GetType();
+	const char* szTextVal;
 	kUtility.PopulateArrayByValue(m_piResourceQuantityRequirements, "Resources", "Project_ResourceQuantityRequirements", "ResourceType", "ProjectType", szProjectType, "Quantity");
 
 	//Victory Thresholds
