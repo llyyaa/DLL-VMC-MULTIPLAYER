@@ -241,6 +241,7 @@ CvUnit::CvUnit() :
 	, m_iAdjacentModifier("CvUnit::m_iAdjacentModifier", m_syncArchive)
 	, m_iRangedAttackModifier("CvUnit::m_iRangedAttackModifier", m_syncArchive)
 	, m_iRangeSuppressModifier("CvUnit::m_iRangeSuppressModifier", m_syncArchive)
+	, m_iPromotionMaintenanceCost("CvUnit::m_iPromotionMaintenanceCost", m_syncArchive)
 	, m_iInterceptionCombatModifier("CvUnit::m_iInterceptionCombatModifier", m_syncArchive)
 	, m_iInterceptionDefenseDamageModifier("CvUnit::m_iInterceptionDefenseDamageModifier", m_syncArchive)
 	, m_iAirSweepCombatModifier("CvUnit::m_iAirSweepCombatModifier", m_syncArchive)
@@ -1249,6 +1250,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iAdjacentModifier = 0;
 	m_iRangedAttackModifier = 0;
 	m_iRangeSuppressModifier = 0;
+	m_iPromotionMaintenanceCost = 0;
 	m_iInterceptionCombatModifier = 0;
 	m_iInterceptionDefenseDamageModifier = 0;
 	m_iAirSweepCombatModifier = 0;
@@ -2339,7 +2341,7 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 		GET_PLAYER(getOwner()).ChangeUnhappinessFromUnits(-getUnitInfo().GetUnhappiness());
 	}
 
-	GET_PLAYER(getOwner()).changeExtraUnitCost(-(getUnitInfo().GetExtraMaintenanceCost()));
+	GET_PLAYER(getOwner()).changeExtraUnitCost(-(getUnitInfo().GetExtraMaintenanceCost() + GetPromotionMaintenanceCost()));
 
 	if(getUnitInfo().GetNukeDamageLevel() != -1)
 	{
@@ -19179,6 +19181,25 @@ int CvUnit::GetRangeSuppressModifier(const CvUnit* pOtherUnit) const
 }
 
 //	--------------------------------------------------------------------------------
+/// Get extra cost for unit maintenance in Gold from promotions
+int CvUnit::GetPromotionMaintenanceCost() const
+{
+	VALIDATE_OBJECT
+	return m_iPromotionMaintenanceCost;
+}
+
+/// Change extra cost for unit maintenance in Gold from promotions
+void CvUnit::ChangePromotionMaintenanceCost(int iValue)
+{
+	VALIDATE_OBJECT
+	if(iValue != 0)
+	{
+		m_iPromotionMaintenanceCost += iValue;
+		GET_PLAYER(getOwner()).changeExtraUnitCost(iValue);
+	}
+}
+
+//	--------------------------------------------------------------------------------
 int CvUnit::GetInterceptionCombatModifier() const
 {
 	VALIDATE_OBJECT
@@ -26395,6 +26416,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		changeExtraRange(thisPromotion.GetRangeChange() * iChange);
 		ChangeRangedAttackModifier(thisPromotion.GetRangedAttackModifier() * iChange);
 		ChangeRangeSuppressModifier(thisPromotion.GetRangeSuppressModifier() * iChange);
+		if(thisPromotion.GetMaintenanceCost() > 0) ChangePromotionMaintenanceCost(thisPromotion.GetMaintenanceCost() * iChange);
 		ChangeInterceptionCombatModifier(thisPromotion.GetInterceptionCombatModifier() * iChange);
 		ChangeInterceptionDefenseDamageModifier(thisPromotion.GetInterceptionDefenseDamageModifier() * iChange);
 		ChangeAirSweepCombatModifier(thisPromotion.GetAirSweepCombatModifier() * iChange);
@@ -27213,6 +27235,7 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iAllyCityStateCombatModifierMax;
 #endif
 	kStream >> m_iRangeSuppressModifier;
+	kStream >> m_iPromotionMaintenanceCost;
 #ifdef MOD_PROMOTIONS_EXTRARES_BONUS
 
 	kStream >> m_eExtraResourceType;
@@ -27541,6 +27564,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iAllyCityStateCombatModifierMax;
 #endif
 	kStream << m_iRangeSuppressModifier;
+	kStream << m_iPromotionMaintenanceCost;
 #ifdef MOD_PROMOTIONS_EXTRARES_BONUS
 	kStream << m_eExtraResourceType;
 	kStream << m_iExtraResourceCombatModifier;
