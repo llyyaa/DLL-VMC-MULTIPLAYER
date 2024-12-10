@@ -270,3 +270,7 @@ CREATE TABLE IF NOT EXISTS UnitPromotions_CombatModPerAdjacentUnitCombat (
 );
 ALTER TABLE UnitPromotions ADD COLUMN 'MilitaryMightMod' INTEGER DEFAULT 0;
 ALTER TABLE GameSpeeds ADD FreePromotion TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
+
+ALTER TABLE UnitPromotions ADD COLUMN 'RangeSuppressModifier' INTEGER DEFAULT 0;
+ALTER TABLE Projects ADD COLUMN 'FreePromotion' TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
+ALTER TABLE UnitPromotions ADD COLUMN 'MaintenanceCost' INTEGER DEFAULT 0;

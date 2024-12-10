@@ -50,6 +50,7 @@ public:
 
 	const char* GetCreateSound() const;
 	void SetCreateSound(const char* szVal);
+	int GetFreePromotion() const;
 
 	// Arrays
 	int GetResourceQuantityRequirement(int i) const;
@@ -83,6 +84,7 @@ protected:
 	int m_iCostScalerNumRepeats;
 	CvString m_strCreateSound;
 	CvString m_strMovieArtDef;
+	int m_iFreePromotion;
 
 	// Arrays
 	int* m_piResourceQuantityRequirements;

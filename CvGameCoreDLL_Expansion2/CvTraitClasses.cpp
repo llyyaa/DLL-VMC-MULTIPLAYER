@@ -158,6 +158,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_bTechBoostFromCapitalScienceBuildings(false),
 	m_bStaysAliveZeroCities(false),
 	m_bFaithFromUnimprovedForest(false),
+	m_bWLKDCityNoResearchCost(false),
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	m_bAnyBelief(false),
 #endif
@@ -1562,6 +1563,11 @@ bool CvTraitEntry::CanDiplomaticMarriage() const
 	return m_bCanDiplomaticMarriage;
 }
 
+bool CvTraitEntry::IsWLKDCityNoResearchCost() const
+{
+	return m_bWLKDCityNoResearchCost;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2443,6 +2449,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iGoldenAgeGrowThresholdModifier = kResults.GetInt("GoldenAgeGrowThresholdModifier");
 	m_iShareAllyResearchPercent = kResults.GetInt("ShareAllyResearchPercent");
 	m_bCanDiplomaticMarriage = kResults.GetBool("CanDiplomaticMarriage");
+	m_bWLKDCityNoResearchCost = kResults.GetBool("WLKDCityNoResearchCost");
 
 	return true;
 }
@@ -2823,6 +2830,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iGoldenAgeGrowThresholdModifier = trait->GetGoldenAgeGrowThresholdModifier();
 			m_iShareAllyResearchPercent = trait->GetShareAllyResearchPercent();
 			m_bCanDiplomaticMarriage = trait->CanDiplomaticMarriage();
+			m_bWLKDCityNoResearchCost = trait->IsWLKDCityNoResearchCost();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -3197,6 +3205,7 @@ void CvPlayerTraits::Reset()
 	m_bTechBoostFromCapitalScienceBuildings = false;
 	m_bStaysAliveZeroCities = false;
 	m_bFaithFromUnimprovedForest = false;
+	m_bWLKDCityNoResearchCost = false;
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	m_bAnyBelief = false;
 #endif
@@ -4973,6 +4982,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_iShareAllyResearchPercent;
 
 	kStream >> m_bCanDiplomaticMarriage;
+	kStream >> m_bWLKDCityNoResearchCost;
 }
 
 /// Serialization write
@@ -5260,6 +5270,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iShareAllyResearchPercent;
 
 	kStream << m_bCanDiplomaticMarriage;
+	kStream << m_bWLKDCityNoResearchCost;
 }
 
 // PRIVATE METHODS
@@ -5507,4 +5518,8 @@ int CvPlayerTraits::GetShareAllyResearchPercent() const
 bool CvPlayerTraits::CanDiplomaticMarriage() const
 {
 	return m_bCanDiplomaticMarriage;
+}
+bool CvPlayerTraits::IsWLKDCityNoResearchCost() const
+{
+	return m_bWLKDCityNoResearchCost;
 }

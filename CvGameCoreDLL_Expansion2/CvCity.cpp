@@ -18095,6 +18095,9 @@ bool CvCity::CreateProject(ProjectTypes eProjectType, bool bIsCapture)
 	if (pProject)
 	{
 		GET_PLAYER(getOwner()).GetTreasury()->ChangeBaseBuildingGoldMaintenance(pProject->GetGoldMaintenance()); // Maintenance cost
+		
+		PromotionTypes eFreePromotion = (PromotionTypes)pProject->GetFreePromotion();
+		if (eFreePromotion != NO_PROMOTION) GET_PLAYER(getOwner()).ChangeFreePromotionCount(eFreePromotion, 1);
 	}
 
 	GAMEEVENTINVOKE_HOOK(GAMEEVENT_CityProjectComplete, getOwner(), GetID(), eProjectType);
