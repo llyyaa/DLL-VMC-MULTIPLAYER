@@ -7615,6 +7615,10 @@ void CvPlayer::receiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit)
 			CvUnit* pNewUnit = initUnit(eUpgradeUnit, pPlot->getX(), pPlot->getY(), newAIDefault, NO_DIRECTION, false, false, 0, pUnit->GetNumGoodyHutsPopped());
 			pUnit->finishMoves();
 			pUnit->SetBeenPromotedFromGoody(true);
+			if(GetPlayerTraits()->IsGoodyUnitUpgradeFirst())
+			{
+				pUnit->SetBeenPromotedFromGoody(false);
+			}
 
 			CvAssert(pNewUnit);
 			if (pNewUnit != NULL)
@@ -7899,6 +7903,7 @@ void CvPlayer::doGoody(CvPlot* pPlot, CvUnit* pUnit)
 	CvHandicapInfo& playerHandicapInfo = getHandicapInfo();
 
 	GoodyTypes eGoody;
+	GoodyTypes uGoody;
 
 	CvAssertMsg(pPlot->isGoody(), "pPlot->isGoody is expected to be true");
 
@@ -7919,7 +7924,9 @@ void CvPlayer::doGoody(CvPlot* pPlot, CvUnit* pUnit)
 			// Make a list of valid Goodies to pick randomly from
 			int iValidGoodiesLoop;
 			bool bValid;
-
+			bool bCanUpgradeUnit;
+			bCanUpgradeUnit = false;
+			int iUpgradeUnit = 0;
 			std::vector<GoodyTypes> avValidGoodies;
 			for(int iGoodyLoop = 0; iGoodyLoop < playerHandicapInfo.getNumGoodies(); iGoodyLoop++)
 			{
@@ -7943,6 +7950,24 @@ void CvPlayer::doGoody(CvPlot* pPlot, CvUnit* pUnit)
 				if(canReceiveGoody(pPlot, eGoody, pUnit))
 				{
 					avValidGoodies.push_back(eGoody);
+					
+					if(GetPlayerTraits()->IsGoodyUnitUpgradeFirst())
+					{
+						Database::SingleResult kResult;  
+						const bool bResult = DB.SelectAt(kResult, "GoodyHuts", eGoody);  
+						DEBUG_VARIABLE(bResult);  
+						CvAssertMsg(bResult, "Cannot find goody info.");  
+
+						CvGoodyInfo kGoodyInfo;  
+						kGoodyInfo.CacheResult(kResult);  
+
+						if (kGoodyInfo.isUpgradeUnit())  
+						{  
+							bCanUpgradeUnit = true;
+							iUpgradeUnit = iGoodyLoop;
+						}
+					}
+						
 				}
 			}
 
@@ -7986,7 +8011,15 @@ void CvPlayer::doGoody(CvPlot* pPlot, CvUnit* pUnit)
 				{
 					int iRand = GC.getGame().getJonRandNum(avValidGoodies.size(), "Picking a Goody result");
 					eGoody = (GoodyTypes) avValidGoodies[iRand];
+					if (GetPlayerTraits()->IsGoodyUnitUpgradeFirst() && bCanUpgradeUnit)  
+                    {  
+						uGoody = (GoodyTypes) playerHandicapInfo.getGoodies(iUpgradeUnit);
+                        receiveGoody(pPlot, uGoody, pUnit);  
+                    }  
+                    else  
+                    {  
 					receiveGoody(pPlot, eGoody, pUnit);
+                    }
 				}
 				
 #if !defined(NO_ACHIEVEMENTS)

@@ -170,6 +170,7 @@ public:
 
 	bool IsTrainedAll() const;
 	bool IsWLKDCityNoResearchCost() const;
+	bool IsGoodyUnitUpgradeFirst() const;
 	bool IsFightWellDamaged() const;
 	bool IsBuyOwnedTiles() const;
 	bool IsMoveFriendlyWoodsAsRoad() const;
@@ -463,6 +464,7 @@ protected:
 	bool m_bStaysAliveZeroCities;
 	bool m_bFaithFromUnimprovedForest;
 	bool m_bWLKDCityNoResearchCost;
+	bool m_bGoodyUnitUpgradeFirst;
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	bool m_bAnyBelief;
 #endif
@@ -1365,6 +1367,7 @@ public:
 
 	bool CanDiplomaticMarriage() const;
 	bool IsWLKDCityNoResearchCost() const;
+	bool IsGoodyUnitUpgradeFirst() const;
 
 	// Serialization
 	void Read(FDataStream& kStream);
@@ -1643,6 +1646,7 @@ private:
 
 	bool m_bCanDiplomaticMarriage = false;
 	bool m_bWLKDCityNoResearchCost = false;
+	bool m_bGoodyUnitUpgradeFirst = false;
 };
 
 #endif //CIV5_TRAIT_CLASSES_H
