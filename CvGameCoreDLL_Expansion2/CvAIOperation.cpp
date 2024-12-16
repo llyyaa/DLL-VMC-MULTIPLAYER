@@ -5759,7 +5759,6 @@ CvPlot* CvAIOperationNukeAttack::FindBestTarget()
 									if (pLoopPlot->getFeatureType() == FEATURE_FALLOUT)  
 									{  
 										bCityIsRadiated = true;  
-										break;  
 									} 
 								}
 							}
@@ -5768,7 +5767,7 @@ CvPlot* CvAIOperationNukeAttack::FindBestTarget()
 						// if this is the capital
 						if(pLoopCity->isCapital())
 						{
-							if (ownerPlayer.GetDiplomacyAI()->GetNumTimesNuked(pLoopCity->getOwner()) == 0 || pLoopUnit->GetNukeDamageLevel() < 3)  
+							if (ownerPlayer.GetDiplomacyAI()->GetNumTimesNuked(pLoopCity->getOwner()) == 0 || pLoopUnit->GetNukeDamageLevel() < 3 || !bCityIsRadiated)  
 							{  
 								iThisCityValue *= 2;  
 							}
