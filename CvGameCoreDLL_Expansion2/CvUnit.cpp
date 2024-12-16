@@ -9034,7 +9034,8 @@ bool CvUnit::canChangeAdmiralPort(const CvPlot* pPlot) const
 		return false;
 	}
 
-	if (!pCity->isCoastal())
+	// In some case, Admiral born in a coastal city with full units will be move to a lake city
+	if (!pCity->isCoastal(1))
 	{
 		return false;
 	}
