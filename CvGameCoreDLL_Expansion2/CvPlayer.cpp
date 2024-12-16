@@ -7614,7 +7614,7 @@ void CvPlayer::receiveGoody(CvPlot* pPlot, GoodyTypes eGoody, CvUnit* pUnit)
 
 			CvUnit* pNewUnit = initUnit(eUpgradeUnit, pPlot->getX(), pPlot->getY(), newAIDefault, NO_DIRECTION, false, false, 0, pUnit->GetNumGoodyHutsPopped());
 			pUnit->finishMoves();
-			pUnit->SetBeenPromotedFromGoody(true);
+			if(!GetPlayerTraits()->IsGoodyUnitUpgradeFirst()) pUnit->SetBeenPromotedFromGoody(true);
 
 			CvAssert(pNewUnit);
 			if (pNewUnit != NULL)
@@ -7919,7 +7919,7 @@ void CvPlayer::doGoody(CvPlot* pPlot, CvUnit* pUnit)
 			// Make a list of valid Goodies to pick randomly from
 			int iValidGoodiesLoop;
 			bool bValid;
-
+			bool bIsUpgradeFirst = GetPlayerTraits()->IsGoodyUnitUpgradeFirst();
 			std::vector<GoodyTypes> avValidGoodies;
 			for(int iGoodyLoop = 0; iGoodyLoop < playerHandicapInfo.getNumGoodies(); iGoodyLoop++)
 			{
@@ -7943,6 +7943,20 @@ void CvPlayer::doGoody(CvPlot* pPlot, CvUnit* pUnit)
 				if(canReceiveGoody(pPlot, eGoody, pUnit))
 				{
 					avValidGoodies.push_back(eGoody);
+					
+					if (!bIsUpgradeFirst) continue;
+
+					// If player is prioritizing unit upgrades
+					Database::SingleResult kResult;  
+					const bool bResult = DB.SelectAt(kResult, "GoodyHuts", eGoody);  
+					DEBUG_VARIABLE(bResult);  
+					CvAssertMsg(bResult, "Cannot find goody info.");  
+					CvGoodyInfo kGoodyInfo;  
+					kGoodyInfo.CacheResult(kResult);  
+					if (!kGoodyInfo.isUpgradeUnit()) continue;
+
+					avValidGoodies.erase(avValidGoodies.begin(), avValidGoodies.end() - 1);
+					break;
 				}
 			}
 

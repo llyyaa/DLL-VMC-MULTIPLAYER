@@ -159,6 +159,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_bStaysAliveZeroCities(false),
 	m_bFaithFromUnimprovedForest(false),
 	m_bWLKDCityNoResearchCost(false),
+	m_bGoodyUnitUpgradeFirst(false),
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	m_bAnyBelief(false),
 #endif
@@ -1568,6 +1569,11 @@ bool CvTraitEntry::IsWLKDCityNoResearchCost() const
 	return m_bWLKDCityNoResearchCost;
 }
 
+bool CvTraitEntry::IsGoodyUnitUpgradeFirst() const
+{
+	return m_bGoodyUnitUpgradeFirst;
+}
+
 /// Load XML data
 bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -2450,6 +2456,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iShareAllyResearchPercent = kResults.GetInt("ShareAllyResearchPercent");
 	m_bCanDiplomaticMarriage = kResults.GetBool("CanDiplomaticMarriage");
 	m_bWLKDCityNoResearchCost = kResults.GetBool("WLKDCityNoResearchCost");
+	m_bGoodyUnitUpgradeFirst = kResults.GetBool("GoodyUnitUpgradeFirst");
 
 	return true;
 }
@@ -2831,6 +2838,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iShareAllyResearchPercent = trait->GetShareAllyResearchPercent();
 			m_bCanDiplomaticMarriage = trait->CanDiplomaticMarriage();
 			m_bWLKDCityNoResearchCost = trait->IsWLKDCityNoResearchCost();
+			m_bGoodyUnitUpgradeFirst = trait->IsGoodyUnitUpgradeFirst();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -3206,6 +3214,7 @@ void CvPlayerTraits::Reset()
 	m_bStaysAliveZeroCities = false;
 	m_bFaithFromUnimprovedForest = false;
 	m_bWLKDCityNoResearchCost = false;
+	m_bGoodyUnitUpgradeFirst = false;
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	m_bAnyBelief = false;
 #endif
@@ -4983,6 +4992,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	kStream >> m_bCanDiplomaticMarriage;
 	kStream >> m_bWLKDCityNoResearchCost;
+	kStream >> m_bGoodyUnitUpgradeFirst;
 }
 
 /// Serialization write
@@ -5271,6 +5281,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 
 	kStream << m_bCanDiplomaticMarriage;
 	kStream << m_bWLKDCityNoResearchCost;
+	kStream << m_bGoodyUnitUpgradeFirst;
 }
 
 // PRIVATE METHODS
@@ -5522,4 +5533,8 @@ bool CvPlayerTraits::CanDiplomaticMarriage() const
 bool CvPlayerTraits::IsWLKDCityNoResearchCost() const
 {
 	return m_bWLKDCityNoResearchCost;
+}
+bool CvPlayerTraits::IsGoodyUnitUpgradeFirst() const
+{
+	return m_bGoodyUnitUpgradeFirst;
 }
