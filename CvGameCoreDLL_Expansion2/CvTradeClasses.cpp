@@ -2073,7 +2073,24 @@ int CvPlayerTrade::GetTradeConnectionBaseValueTimes100(const TradeConnection& kT
 			iResult += iAdjustedTechDifference * 100;
 		}
 	}
-
+// Check if the connected player has a specific trait and adjust the payoff
+    if (!bAsOriginPlayer)
+    {
+        int iTraitValue = pDestPlayer.GetPlayerTraits()->GetInternationalConnectionYieldChange();
+        if (iTraitValue != 0)
+        {
+            if (eYield == YIELD_GOLD)
+            {
+                int iBase = GC.getINTERNATIONAL_TRADE_BASE();
+                iResult += (iBase * iTraitValue) / 100;
+            }
+            else if (eYield == YIELD_SCIENCE)
+            {
+                int iAdjustedTechDifference = iResult / 100;
+                iResult += (iAdjustedTechDifference * iTraitValue) / 100;
+            }
+        }
+    }
 #ifdef MOD_API_TRADE_ROUTE_YIELD_RATE
 	if (MOD_API_TRADE_ROUTE_YIELD_RATE)
 	{
