@@ -76,3 +76,5 @@ alter table Traits add column `WLKDLengthChangeModifier` INTEGER DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN `WLKDCityNoResearchCost` BOOLEAN NOT NULL DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN `GoodyUnitUpgradeFirst` BOOLEAN NOT NULL DEFAULT 0;
 alter table Traits add column `InternationalConnectionYieldChange` int not null default 0;
+alter table Civilization add column `SpecialGAShortDesc` TEXT DEFAULT 'TXT_KEY_GOLDEN_AGE_ANNOUNCE';
+alter table Civilization add column `SpecialGAText` TEXT DEFAULT 'TXT_KEY_TP_GOLDEN_AGE_EFFECT';
