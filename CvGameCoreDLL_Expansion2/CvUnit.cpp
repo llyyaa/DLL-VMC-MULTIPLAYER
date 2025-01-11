@@ -2653,6 +2653,8 @@ CvUnit *CvUnit::createCaptureUnit(const CvUnitCaptureDefinition &kCaptureDef)
 		{
 			pkCapturedUnit->finishMoves();
 		}
+		PromotionTypes eNewCapturedPromotion = (PromotionTypes)GC.getPROMOTION_NEW_UNIT_CAPTURED();
+		if (eNewCapturedPromotion != NO_PROMOTION) pkCapturedUnit->setHasPromotion(eNewCapturedPromotion, true);
 #else
 		pkCapturedUnit->finishMoves();
 #endif
