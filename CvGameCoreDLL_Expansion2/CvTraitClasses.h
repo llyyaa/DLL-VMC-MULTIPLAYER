@@ -319,6 +319,7 @@ public:
 
 	int GetGoldenAgeResearchTotalCostModifier() const;
 	int GetGoldenAgeResearchCityCountCostModifier() const;
+	int GetInternationalConnectionModifier() const;
 
 	int GetGoldenAgeGrowThresholdModifier() const;
 
@@ -584,6 +585,7 @@ protected:
 
 	int m_iGoldenAgeResearchTotalCostModifier= 0;
 	int m_iGoldenAgeResearchCityCountCostModifier = 0;
+	int m_iInternationalConnectionModifier = 0;
 
 	int m_iGoldenAgeGrowThresholdModifier = 0;
 
@@ -1360,6 +1362,7 @@ public:
 
 	int GetGoldenAgeResearchTotalCostModifier() const;
 	int GetGoldenAgeResearchCityCountCostModifier() const;
+	int GetInternationalConnectionModifier() const;
 
 	int GetGoldenAgeGrowThresholdModifier() const;
 
@@ -1639,6 +1642,7 @@ private:
 
 	int m_iGoldenAgeResearchTotalCostModifier= 0;
 	int m_iGoldenAgeResearchCityCountCostModifier = 0;
+	int m_iInternationalConnectionModifier = 0;
 
 	int m_iGoldenAgeGrowThresholdModifier = 0;
 

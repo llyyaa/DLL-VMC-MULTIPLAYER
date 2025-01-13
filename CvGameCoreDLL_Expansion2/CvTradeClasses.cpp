@@ -2721,6 +2721,13 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 
 						iValue *= iModifier;
 						iValue /= 100;
+						// Changes in the income of recipients of international trade
+						int iTraitValue = kDestPlayer.GetPlayerTraits()->GetInternationalConnectionModifier();
+						if (iTraitValue!= 0)
+						{
+							int iBase = GC.getINTERNATIONAL_TRADE_BASE();
+							iValue += (iBase * iTraitValue) / 100;
+						}
 					}
 					break;
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -2749,7 +2756,14 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #endif
 
 						iValue *= iModifier;
-						iValue /= 100;						
+						iValue /= 100;
+						// Changes in the income of recipients of international trade
+						int iTraitValue = kDestPlayer.GetPlayerTraits()->GetInternationalConnectionModifier();
+						if (iTraitValue!= 0)
+						{
+							int iAdjustedTechDifference = iValue / 100;
+							iValue += (iAdjustedTechDifference * iTraitValue) / 100;
+						}							
 					}
 					break;
 				}

@@ -1549,6 +1549,10 @@ int CvTraitEntry::GetGoldenAgeResearchCityCountCostModifier() const
 {
 	return m_iGoldenAgeResearchCityCountCostModifier;
 }
+int CvTraitEntry::GetInternationalConnectionModifier() const
+{
+	return m_iInternationalConnectionModifier;
+}
 int CvTraitEntry::GetGoldenAgeGrowThresholdModifier() const
 {
 	return m_iGoldenAgeGrowThresholdModifier;
@@ -2452,6 +2456,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 
 	m_iGoldenAgeResearchTotalCostModifier = kResults.GetInt("GoldenAgeResearchTotalCostModifier");
 	m_iGoldenAgeResearchCityCountCostModifier = kResults.GetInt("GoldenAgeResearchCityCountCostModifier");
+	m_iInternationalConnectionModifier = kResults.GetInt("InternationalConnectionModifier");
 	m_iGoldenAgeGrowThresholdModifier = kResults.GetInt("GoldenAgeGrowThresholdModifier");
 	m_iShareAllyResearchPercent = kResults.GetInt("ShareAllyResearchPercent");
 	m_bCanDiplomaticMarriage = kResults.GetBool("CanDiplomaticMarriage");
@@ -2834,6 +2839,7 @@ void CvPlayerTraits::InitPlayerTraits()
 
 			m_iGoldenAgeResearchTotalCostModifier = trait->GetGoldenAgeResearchTotalCostModifier();
 			m_iGoldenAgeResearchCityCountCostModifier = trait->GetGoldenAgeResearchCityCountCostModifier();
+			m_iInternationalConnectionModifier = trait->GetInternationalConnectionModifier();
 			m_iGoldenAgeGrowThresholdModifier = trait->GetGoldenAgeGrowThresholdModifier();
 			m_iShareAllyResearchPercent = trait->GetShareAllyResearchPercent();
 			m_bCanDiplomaticMarriage = trait->CanDiplomaticMarriage();
@@ -4987,6 +4993,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	kStream >> m_iGoldenAgeResearchTotalCostModifier;
 	kStream >> m_iGoldenAgeResearchCityCountCostModifier;
+	kStream >> m_iInternationalConnectionModifier;
 	kStream >> m_iGoldenAgeGrowThresholdModifier;
 	kStream >> m_iShareAllyResearchPercent;
 
@@ -5276,6 +5283,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 
 	kStream << m_iGoldenAgeResearchTotalCostModifier;
 	kStream << m_iGoldenAgeResearchCityCountCostModifier;
+	kStream << m_iInternationalConnectionModifier;
 	kStream << m_iGoldenAgeGrowThresholdModifier;
 	kStream << m_iShareAllyResearchPercent;
 
@@ -5517,6 +5525,10 @@ int CvPlayerTraits::GetGoldenAgeResearchTotalCostModifier() const
 int CvPlayerTraits::GetGoldenAgeResearchCityCountCostModifier() const
 {
 	return m_iGoldenAgeResearchCityCountCostModifier;
+}
+int CvPlayerTraits::GetInternationalConnectionModifier() const
+{
+	return m_iInternationalConnectionModifier;
 }
 int CvPlayerTraits::GetGoldenAgeGrowThresholdModifier() const
 {
