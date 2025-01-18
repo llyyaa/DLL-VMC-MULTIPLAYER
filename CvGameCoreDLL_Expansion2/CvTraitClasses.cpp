@@ -159,6 +159,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_bStaysAliveZeroCities(false),
 	m_bFaithFromUnimprovedForest(false),
 	m_bWLKDCityNoResearchCost(false),
+	m_bGoodyUnitUpgradeFirst(false),
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	m_bAnyBelief(false),
 #endif
@@ -1548,6 +1549,10 @@ int CvTraitEntry::GetGoldenAgeResearchCityCountCostModifier() const
 {
 	return m_iGoldenAgeResearchCityCountCostModifier;
 }
+int CvTraitEntry::GetInternationalConnectionModifier() const
+{
+	return m_iInternationalConnectionModifier;
+}
 int CvTraitEntry::GetGoldenAgeGrowThresholdModifier() const
 {
 	return m_iGoldenAgeGrowThresholdModifier;
@@ -1566,6 +1571,11 @@ bool CvTraitEntry::CanDiplomaticMarriage() const
 bool CvTraitEntry::IsWLKDCityNoResearchCost() const
 {
 	return m_bWLKDCityNoResearchCost;
+}
+
+bool CvTraitEntry::IsGoodyUnitUpgradeFirst() const
+{
+	return m_bGoodyUnitUpgradeFirst;
 }
 
 /// Load XML data
@@ -2446,10 +2456,12 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 
 	m_iGoldenAgeResearchTotalCostModifier = kResults.GetInt("GoldenAgeResearchTotalCostModifier");
 	m_iGoldenAgeResearchCityCountCostModifier = kResults.GetInt("GoldenAgeResearchCityCountCostModifier");
+	m_iInternationalConnectionModifier = kResults.GetInt("InternationalConnectionModifier");
 	m_iGoldenAgeGrowThresholdModifier = kResults.GetInt("GoldenAgeGrowThresholdModifier");
 	m_iShareAllyResearchPercent = kResults.GetInt("ShareAllyResearchPercent");
 	m_bCanDiplomaticMarriage = kResults.GetBool("CanDiplomaticMarriage");
 	m_bWLKDCityNoResearchCost = kResults.GetBool("WLKDCityNoResearchCost");
+	m_bGoodyUnitUpgradeFirst = kResults.GetBool("GoodyUnitUpgradeFirst");
 
 	return true;
 }
@@ -2827,10 +2839,12 @@ void CvPlayerTraits::InitPlayerTraits()
 
 			m_iGoldenAgeResearchTotalCostModifier = trait->GetGoldenAgeResearchTotalCostModifier();
 			m_iGoldenAgeResearchCityCountCostModifier = trait->GetGoldenAgeResearchCityCountCostModifier();
+			m_iInternationalConnectionModifier = trait->GetInternationalConnectionModifier();
 			m_iGoldenAgeGrowThresholdModifier = trait->GetGoldenAgeGrowThresholdModifier();
 			m_iShareAllyResearchPercent = trait->GetShareAllyResearchPercent();
 			m_bCanDiplomaticMarriage = trait->CanDiplomaticMarriage();
 			m_bWLKDCityNoResearchCost = trait->IsWLKDCityNoResearchCost();
+			m_bGoodyUnitUpgradeFirst = trait->IsGoodyUnitUpgradeFirst();
 
 			for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 			{
@@ -3206,6 +3220,7 @@ void CvPlayerTraits::Reset()
 	m_bStaysAliveZeroCities = false;
 	m_bFaithFromUnimprovedForest = false;
 	m_bWLKDCityNoResearchCost = false;
+	m_bGoodyUnitUpgradeFirst = false;
 #if defined(MOD_TRAITS_ANY_BELIEF)
 	m_bAnyBelief = false;
 #endif
@@ -4978,11 +4993,13 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	kStream >> m_iGoldenAgeResearchTotalCostModifier;
 	kStream >> m_iGoldenAgeResearchCityCountCostModifier;
+	kStream >> m_iInternationalConnectionModifier;
 	kStream >> m_iGoldenAgeGrowThresholdModifier;
 	kStream >> m_iShareAllyResearchPercent;
 
 	kStream >> m_bCanDiplomaticMarriage;
 	kStream >> m_bWLKDCityNoResearchCost;
+	kStream >> m_bGoodyUnitUpgradeFirst;
 }
 
 /// Serialization write
@@ -5266,11 +5283,13 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 
 	kStream << m_iGoldenAgeResearchTotalCostModifier;
 	kStream << m_iGoldenAgeResearchCityCountCostModifier;
+	kStream << m_iInternationalConnectionModifier;
 	kStream << m_iGoldenAgeGrowThresholdModifier;
 	kStream << m_iShareAllyResearchPercent;
 
 	kStream << m_bCanDiplomaticMarriage;
 	kStream << m_bWLKDCityNoResearchCost;
+	kStream << m_bGoodyUnitUpgradeFirst;
 }
 
 // PRIVATE METHODS
@@ -5507,6 +5526,10 @@ int CvPlayerTraits::GetGoldenAgeResearchCityCountCostModifier() const
 {
 	return m_iGoldenAgeResearchCityCountCostModifier;
 }
+int CvPlayerTraits::GetInternationalConnectionModifier() const
+{
+	return m_iInternationalConnectionModifier;
+}
 int CvPlayerTraits::GetGoldenAgeGrowThresholdModifier() const
 {
 	return m_iGoldenAgeGrowThresholdModifier;
@@ -5522,4 +5545,8 @@ bool CvPlayerTraits::CanDiplomaticMarriage() const
 bool CvPlayerTraits::IsWLKDCityNoResearchCost() const
 {
 	return m_bWLKDCityNoResearchCost;
+}
+bool CvPlayerTraits::IsGoodyUnitUpgradeFirst() const
+{
+	return m_bGoodyUnitUpgradeFirst;
 }

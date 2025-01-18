@@ -2708,6 +2708,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 						int iModifier = 100;
 						int iDomainModifier = GetTradeConnectionDomainValueModifierTimes100(kTradeConnection, eYield);
 						int iDestRiverModifier = GetTradeConnectionRiverValueModifierTimes100(kTradeConnection, eYield, false);
+						int iDestTraitModifier = kDestPlayer.GetPlayerTraits()->GetInternationalConnectionModifier();
 						int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, false);
 						iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, false);
 
@@ -2718,6 +2719,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 
 						iModifier += iDomainModifier;
 						iModifier += iDestRiverModifier;
+						iModifier += iDestTraitModifier;
 
 						iValue *= iModifier;
 						iValue /= 100;
@@ -2742,11 +2744,14 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #endif
 
 						int iModifier = 100;
+						int iDestTraitModifier = kDestPlayer.GetPlayerTraits()->GetInternationalConnectionModifier();
 
 						iValue = iBaseValue;
 #if defined(MOD_API_UNIFIED_YIELDS)
 						iValue += iTraitBonus;
 #endif
+
+						iModifier += iDestTraitModifier;
 
 						iValue *= iModifier;
 						iValue /= 100;						

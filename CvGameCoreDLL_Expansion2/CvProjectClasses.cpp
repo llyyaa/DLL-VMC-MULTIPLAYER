@@ -21,7 +21,8 @@ CvProjectEntry::CvProjectEntry(void):
 	m_piFlavorValue(NULL),
 
 	m_piYieldChange(NULL),
-	m_piYieldModifier(NULL)
+	m_piYieldModifier(NULL),
+	m_vePolicyNeeded()
 {
 }
 //------------------------------------------------------------------------------
@@ -111,6 +112,21 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	kUtility.SetYields(m_piYieldChange, "Project_YieldChanges", "ProjectType", szProjectType);
 	kUtility.SetYields(m_piYieldModifier, "Project_YieldModifiers", "ProjectType", szProjectType);
+
+	{
+		std::string strKey("Project_PolicyNeeded");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Policies.ID from Project_PolicyNeeded inner join Policies on Policies.Type = PolicyType where ProjectType = ?;");
+		}
+		pResults->Bind(1, szProjectType);
+		while(pResults->Step())
+		{
+			const PolicyTypes ePolicy = (PolicyTypes)pResults->GetInt(0);
+			m_vePolicyNeeded.push_back(ePolicy);
+		}
+	}
 
 	return true;
 }
@@ -348,6 +364,11 @@ int* CvProjectEntry::GetYieldModifierArray() const
 	return m_piYieldModifier;
 }
 
+/// vector of policy needed
+const std::vector<PolicyTypes>& CvProjectEntry::GetPolicyNeeded() const
+{
+	return m_vePolicyNeeded;
+}
 //=====================================
 // CvProjectXMLEntries
 //=====================================
