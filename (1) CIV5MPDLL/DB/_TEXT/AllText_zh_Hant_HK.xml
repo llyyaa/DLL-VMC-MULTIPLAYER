@@ -783,5 +783,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_NUCLEAR_WINTER_DEBUFF_YIELD_MULTIPLIER">
 			<Text>{1_IconString}{2_Description}總值[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_WONDER_TRAIT">
+			<Text>[NEWLINE][ICON_BULLET]奇跡的特質修正值： {1_Num}%</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

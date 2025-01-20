@@ -6634,6 +6634,29 @@ int CvCity::getProductionModifier(BuildingTypes eBuilding, CvString* toolTipSink
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_BUILDING_CITY", iTempMod);
 		}
 	}
+	
+	int iNumFreeWorldWonder = GET_PLAYER(getOwner()).GetPlayerTraits()->GetNumFreeWorldWonder();
+	if(iNumFreeWorldWonder > 0 && iNumFreeWorldWonder - getNumWorldWonders() > 0 && ::isWorldWonderClass(kBuildingClassInfo))
+	{
+		int iBaseYield = getBaseYieldRate(YIELD_PRODUCTION, false) * 100;
+		iBaseYield += (GetYieldPerPopTimes100(YIELD_PRODUCTION) * getPopulation());
+		iBaseYield += (GET_PLAYER(getOwner()).GetYieldPerPopChange(YIELD_PRODUCTION) * getPopulation());
+		iBaseYield += (GetYieldPerReligionTimes100(YIELD_PRODUCTION) * GetCityReligions()->GetNumReligionsWithFollowers());
+
+#if defined(MOD_ROG_CORE)
+		iBaseYield += (GetYieldPerPopInEmpireTimes100(YIELD_PRODUCTION) * GET_PLAYER(getOwner()).getTotalPopulation());
+#endif
+		iBaseYield /= 100;
+		iTempMod = getProductionNeeded(eBuilding) * 100 / iBaseYield;
+		if(iTempMod > 0)
+		{
+			iMultiplier += iTempMod;
+			if(toolTipSink)
+			{
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_WONDER_TRAIT", iTempMod);
+			}
+		}
+	}
 
 	// From policies
 	iTempMod = GET_PLAYER(getOwner()).GetPlayerPolicies()->GetBuildingClassProductionModifier((BuildingClassTypes)kBuildingClassInfo.GetID());

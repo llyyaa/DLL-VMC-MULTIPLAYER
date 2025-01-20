@@ -786,6 +786,10 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_NUCLEAR_WINTER_DEBUFF_YIELD_MULTIPLIER">
 			<Text>{1_IconString}{2_Description}Total Output[COLOR_NEGATIVE_TEXT]{3_Num}%[ENDCOLOR]</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_PRODMOD_WONDER_TRAIT">
+			<Text>[NEWLINE][ICON_BULLET]Trait Modifier for Wonders: {1_Num}%</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>
