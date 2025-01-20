@@ -205,6 +205,7 @@ CvCity::CvCity() :
 	, m_iGameTurnLastExpanded("CvCity::m_iGameTurnLastExpanded", m_syncArchive)
 
 #if defined(MOD_ROG_CORE)
+	, m_iExtraDamageHealPercent(0)
 	, m_iExtraDamageHeal("CvCity::m_iExtraDamageHeal", m_syncArchive)
 	, m_iBombardRange("CvCity::m_iBombardRange", m_syncArchive)
 	, m_iBombardIndirect(0)
@@ -1084,6 +1085,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #if defined(MOD_ROG_CORE)
 	m_aiNumTimesAttackedThisTurn.resize(REALLY_MAX_PLAYERS);
 	m_aiSpecialistRateModifier.resize(GC.getNumSpecialistInfos());
+	m_iExtraDamageHealPercent = 0;
 	m_iExtraDamageHeal = 0;
 	m_iBombardRange = 0;
 	m_iBombardIndirect = 0;
@@ -2197,7 +2199,7 @@ void CvCity::doTurn()
 
 		iHitsHealed += getExtraDamageHeal();
 #endif
-
+		iHitsHealed += getExtraDamageHealPercent() * GetMaxHitPoints() / 100;
 
 
 		changeDamage(-iHitsHealed);
@@ -7669,6 +7671,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		ChangeNoOccupiedUnhappinessCount(pBuildingInfo->IsNoOccupiedUnhappiness() * iChange);
 
 #if defined(MOD_ROG_CORE)
+		changeExtraDamageHealPercent(pBuildingInfo->GetExtraDamageHealPercent()* iChange);
 		changeExtraDamageHeal(pBuildingInfo->GetExtraDamageHeal()* iChange);
 		changeExtraBombardRange(pBuildingInfo->GetBombardRange()* iChange);
 		changeBombardIndirect(pBuildingInfo->IsBombardIndirect()* iChange);
@@ -19743,6 +19746,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iForbiddenForeignSpyCount;
 #ifdef MOD_ROG_CORE
 	kStream >> m_iCityBuildingRangeStrikeModifier;
+	kStream >> m_iExtraDamageHealPercent;
 	kStream >> m_iExtraDamageHeal;
 	kStream >> m_iBombardRange;
 	kStream >> m_iBombardIndirect;
@@ -20246,6 +20250,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iForbiddenForeignSpyCount;
 #ifdef MOD_ROG_CORE
 	kStream << m_iCityBuildingRangeStrikeModifier;
+	kStream << m_iExtraDamageHealPercent;
 	kStream << m_iExtraDamageHeal;
 	kStream << m_iBombardRange;
 	kStream << m_iBombardIndirect;
@@ -20821,6 +20826,21 @@ void CvCity::changeCityBuildingRangeStrikeModifier(int iValue)
 	if (iValue != 0)
 	{
 		m_iCityBuildingRangeStrikeModifier += iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::getExtraDamageHealPercent() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraDamageHealPercent;
+}
+void CvCity::changeExtraDamageHealPercent(int iChange)
+{
+	VALIDATE_OBJECT
+	if (iChange != 0)
+	{
+		m_iExtraDamageHealPercent += iChange;
 	}
 }
 

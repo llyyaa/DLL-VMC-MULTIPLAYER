@@ -226,6 +226,7 @@ public:
 	int GetNukeInterceptionChance() const;
 
 #if defined(MOD_ROG_CORE)
+	int GetExtraDamageHealPercent() const;
 	int GetExtraDamageHeal() const;
 	int GetBombardRange() const;
 	int IsBombardIndirect() const;
@@ -679,6 +680,7 @@ private:
 
 #if defined(MOD_ROG_CORE)
 	int* m_piGreatWorkYieldChange;
+	int m_iExtraDamageHealPercent;
 	int m_iExtraDamageHeal;
 	int m_iBombardRange;
 	int m_bBombardIndirect;
