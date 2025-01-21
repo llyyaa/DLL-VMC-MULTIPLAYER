@@ -6650,6 +6650,19 @@ int CvCity::getProductionModifier(BuildingTypes eBuilding, CvString* toolTipSink
 #endif
 		iBaseYield /= 100;
 		iTempMod = getProductionNeeded(eBuilding) * 100 / iBaseYield;
+		// Make sure it is not affected by multiplications
+		{
+			int iYieldMultiplier = 100 + getYieldRateMultiplier(YIELD_PRODUCTION);
+			if(iYieldMultiplier > 0) iTempMod = iTempMod * 100 / iYieldMultiplier;
+			// if 0, then it is meanless
+			else iTempMod = 0;
+		}
+		if(!IsNoNuclearWinterLocal())
+		{
+			int iYieldMultiplier = 100 + GC.getGame().GetNuclearWinterYieldMultiplier(YIELD_PRODUCTION);
+			if(iYieldMultiplier > 0) iTempMod = iTempMod * 100 / iYieldMultiplier;
+			else iTempMod = 0;
+		}
 		if(iTempMod > 0)
 		{
 			iMultiplier += iTempMod;
