@@ -145,7 +145,7 @@ public:
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-	int GetNumFreeWorldWonder() const;
+	int GetNumFreeWorldWonderPerCity() const;
 	int GetExceedingHappinessImmigrationModifier() const;
 	int GetNumCityYieldPerAdjacentFeature() const;
 	int GetNumCityAdjacentFeatureModifier() const;
@@ -429,7 +429,7 @@ protected:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-	int m_iNumFreeWorldWonder;
+	int m_iNumFreeWorldWonderPerCity;
 	int m_iExceedingHappinessImmigrationModifier;
 	int m_iNumCityAdjacentFeatureModifier;
 	int m_iNumCityYieldPerAdjacentFeature;
@@ -986,9 +986,9 @@ public:
 	}
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-	int GetNumFreeWorldWonder() const
+	int GetNumFreeWorldWonderPerCity() const
 	{
-		return m_iNumFreeWorldWonder;
+		return m_iNumFreeWorldWonderPerCity;
 	}
 	int GetExceedingHappinessImmigrationModifier() const
 	{
@@ -1486,7 +1486,7 @@ private:
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	int m_iExceedingHappinessImmigrationModifier;
-	int m_iNumFreeWorldWonder;
+	int m_iNumFreeWorldWonderPerCity;
 	bool m_bHasCityYieldPerAdjacentFeature = false;
 	bool m_bHasCityAdjacentFeatureModifier = false;
 	int m_iPromotionWhenKilledUnit;

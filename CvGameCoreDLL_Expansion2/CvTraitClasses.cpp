@@ -125,7 +125,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-	m_iNumFreeWorldWonder(0),
+	m_iNumFreeWorldWonderPerCity(0),
 	m_iExceedingHappinessImmigrationModifier(0),
 	m_iNumCityAdjacentFeatureModifier(0),
 	m_iNumCityYieldPerAdjacentFeature(0),
@@ -730,9 +730,9 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-int CvTraitEntry::GetNumFreeWorldWonder() const
+int CvTraitEntry::GetNumFreeWorldWonderPerCity() const
 {
-	return m_iNumFreeWorldWonder;
+	return m_iNumFreeWorldWonderPerCity;
 }
 int CvTraitEntry::GetExceedingHappinessImmigrationModifier() const
 {
@@ -1718,7 +1718,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-	m_iNumFreeWorldWonder = kResults.GetInt("NumFreeWorldWonder");
+	m_iNumFreeWorldWonderPerCity = kResults.GetInt("NumFreeWorldWonderPerCity");
 	m_iExceedingHappinessImmigrationModifier = kResults.GetInt("ExceedingHappinessImmigrationModifier");
 	szTextVal = kResults.GetText("PromotionWhenKilledUnit");
 	if(szTextVal)
@@ -2651,7 +2651,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-			m_iNumFreeWorldWonder += trait->GetNumFreeWorldWonder();
+			m_iNumFreeWorldWonderPerCity += trait->GetNumFreeWorldWonderPerCity();
 			m_iExceedingHappinessImmigrationModifier += trait->GetExceedingHappinessImmigrationModifier();
 			m_bHasCityYieldPerAdjacentFeature = trait->GetNumCityYieldPerAdjacentFeature() > 0;
 			m_bHasCityAdjacentFeatureModifier = trait->GetNumCityAdjacentFeatureModifier() > 0;
@@ -3197,7 +3197,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-	m_iNumFreeWorldWonder = 0;
+	m_iNumFreeWorldWonderPerCity = 0;
 	m_iExceedingHappinessImmigrationModifier = 0;
 	m_bHasCityYieldPerAdjacentFeature = false;
 	m_bHasCityAdjacentFeatureModifier = false;
@@ -4693,7 +4693,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-	kStream >> m_iNumFreeWorldWonder;
+	kStream >> m_iNumFreeWorldWonderPerCity;
 	kStream >> m_iExceedingHappinessImmigrationModifier;
 	kStream >> m_bHasCityYieldPerAdjacentFeature;
 	kStream >> m_bHasCityAdjacentFeatureModifier;
@@ -5106,7 +5106,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
-	kStream << m_iNumFreeWorldWonder;
+	kStream << m_iNumFreeWorldWonderPerCity;
 	kStream << m_iExceedingHappinessImmigrationModifier;
 	kStream << m_bHasCityYieldPerAdjacentFeature;
 	kStream << m_bHasCityAdjacentFeatureModifier;

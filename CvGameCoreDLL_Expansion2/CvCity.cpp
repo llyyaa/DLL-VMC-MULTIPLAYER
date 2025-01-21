@@ -6637,8 +6637,8 @@ int CvCity::getProductionModifier(BuildingTypes eBuilding, CvString* toolTipSink
 		}
 	}
 	
-	int iNumFreeWorldWonder = GET_PLAYER(getOwner()).GetPlayerTraits()->GetNumFreeWorldWonder();
-	if(iNumFreeWorldWonder > 0 && iNumFreeWorldWonder - getNumWorldWonders() > 0 && ::isWorldWonderClass(kBuildingClassInfo))
+	int iNumFreeWorldWonderPerCity = GET_PLAYER(getOwner()).GetPlayerTraits()->GetNumFreeWorldWonderPerCity();
+	if(iNumFreeWorldWonderPerCity > 0 && iNumFreeWorldWonderPerCity - getNumWorldWonders() > 0 && ::isWorldWonderClass(kBuildingClassInfo))
 	{
 		int iBaseYield = getBaseYieldRate(YIELD_PRODUCTION, false) * 100;
 		iBaseYield += (GetYieldPerPopTimes100(YIELD_PRODUCTION) * getPopulation());
