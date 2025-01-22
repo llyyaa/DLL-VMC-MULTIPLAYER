@@ -609,6 +609,7 @@
     <ClInclude Include="CvDllVictoryInfo.h" />
     <ClInclude Include="CvDllWorldBuilderMapLoader.h" />
     <ClInclude Include="CvDllWorldInfo.h" />
+    <ClInclude Include="Lua\CvLuaExtraScript.h" />
     <ClInclude Include="Lua\CvLuaArea.h" />
     <ClInclude Include="Lua\CvLuaArgsHandle.h" />
     <ClInclude Include="Lua\CvLuaCity.h" />

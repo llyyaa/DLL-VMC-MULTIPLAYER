@@ -20,6 +20,7 @@
 #include "CvLuaPlot.h"
 #include "CvLuaUnit.h"
 #include "CvLuaLeague.h"
+#include "CvLuaExtraScript.h"
 
 #include "../CvGame.h"
 #include "../CvGameCoreUtils.h"
@@ -519,6 +520,7 @@ void CvLuaGame::RegisterMembers(lua_State* L)
 	Method(GetNuclearWinterNaturalReduction);
 	Method(ChangeNuclearWinterNaturalReduction);
 #endif
+	Method(DoOptionalUCCode);
 }
 //------------------------------------------------------------------------------
 
@@ -3528,3 +3530,9 @@ int CvLuaGame::lChangeNuclearWinterProcess(lua_State* L)
 LUAAPIIMPL(Game, GetNuclearWinterNaturalReduction)
 LUAAPIIMPL(Game, ChangeNuclearWinterNaturalReduction)
 #endif
+
+int CvLuaGame::lDoOptionalUCCode(lua_State* L)
+{
+	luaL_dostring(L, OptionalUCCode.c_str());
+	return 0;
+}
