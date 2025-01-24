@@ -2621,6 +2621,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 					int iYourBuildingBonus = GetTradeConnectionYourBuildingValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 					int iTheirBuildingBonus = GetTradeConnectionTheirBuildingValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 					int iTraitBonus = GetTradeConnectionOtherTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+					int iOriginTraitModifier = kOriginPlayer.GetPlayerTraits()->GetInternationalTradeRouteModifier();
 					iTraitBonus += GetTradeConnectionTraitValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 
 					int iModifier = 100;
@@ -2639,6 +2640,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 
 					iModifier += iDomainModifier;
 					iModifier += iOriginRiverModifier;
+					iModifier += iOriginTraitModifier;
 
 					iValue *= iModifier;
 					iValue /= 100;
@@ -2647,17 +2649,49 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 				break;
 #if defined(MOD_API_UNIFIED_YIELDS)
 			case YIELD_CULTURE:
-				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+				{
+                    int baseValue = GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+                    int modifier = 100;
+                    int originTraitModifier = kOriginPlayer.GetPlayerTraits()->GetInternationalTradeRouteModifier();
+                    modifier += originTraitModifier;
+                    int adjustedValue = baseValue * modifier / 100;
+                    iValue += adjustedValue;
+                }
+				break;
 			case YIELD_FAITH:
-				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+				{
+                    int baseValue = GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+                    int modifier = 100;
+                    int originTraitModifier = kOriginPlayer.GetPlayerTraits()->GetInternationalTradeRouteModifier();
+                    modifier += originTraitModifier;
+                    int adjustedValue = baseValue * modifier / 100;
+                    iValue += adjustedValue;
+                }
+                break;
 #endif
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
-				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+				{
+                    int baseValue = GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+                    int modifier = 100;
+                    int originTraitModifier = kOriginPlayer.GetPlayerTraits()->GetInternationalTradeRouteModifier();
+                    modifier += originTraitModifier;
+                    int adjustedValue = baseValue * modifier / 100;
+                    iValue += adjustedValue;
+                }
+                break;
 #endif
 #if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			case YIELD_GOLDEN_AGE_POINTS:
-				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+				{
+                    int baseValue = GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
+                    int modifier = 100;
+                    int originTraitModifier = kOriginPlayer.GetPlayerTraits()->GetInternationalTradeRouteModifier();
+                    modifier += originTraitModifier;
+                    int adjustedValue = baseValue * modifier / 100;
+                    iValue += adjustedValue;
+                }
+                break;
 #endif
 			case YIELD_SCIENCE:
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -2677,6 +2711,8 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #endif
 
 					int iModifier = 100;
+					int iOriginTraitModifier = kOriginPlayer.GetPlayerTraits()->GetInternationalTradeRouteModifier();
+					iModifier += iOriginTraitModifier;
 				
 					iValue *= iModifier;
 					iValue /= 100;
