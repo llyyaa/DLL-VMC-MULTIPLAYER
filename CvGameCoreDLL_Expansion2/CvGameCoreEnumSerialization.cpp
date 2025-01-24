@@ -191,11 +191,9 @@ std::string toString(const YieldTypes& v)
 	case YIELD_FAITH:
 		return std::string("YIELD_FAITH");
 		break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	case YIELD_TOURISM:
 		return std::string("YIELD_TOURISM");
 		break;
-#endif
 	case YIELD_GOLDEN_AGE_POINTS:
 		return std::string("YIELD_GOLDEN_AGE_POINTS");
 		break;

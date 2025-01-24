@@ -207,10 +207,8 @@ CvString CvGameCulture::GetGreatWorkTooltip(int iIndex, PlayerTypes eOwner) cons
 		
 		if (eYield == YIELD_CULTURE) {
 			iValue = GC.getBASE_CULTURE_PER_GREAT_WORK();
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 		} else if (eYield == YIELD_TOURISM) {
 			iValue = iTourismPerWork;
-#endif
 		} else {
 			iValue = 0;
 		}
@@ -241,15 +239,12 @@ CvString CvGameCulture::GetGreatWorkTooltip(int iIndex, PlayerTypes eOwner) cons
 			sPrefix = ", ";
 		}
 	}
-	
-#if !defined(MOD_API_UNIFIED_YIELDS_TOURISM)
-	cultureString.Format("%s, +%d [ICON_TOURISM]", cultureString.c_str(), iTourismPerWork);
-#endif
+
 #else
 	int iCulturePerWork = GC.getBASE_CULTURE_PER_GREAT_WORK();
 	iCulturePerWork += GET_PLAYER(eOwner).GetGreatWorkYieldChange(YIELD_CULTURE);
 	int iTourismPerWork = GC.getBASE_TOURISM_PER_GREAT_WORK();
-		cultureString.Format ("+%d [ICON_CULTURE], +%d [ICON_TOURISM]", iCulturePerWork, iTourismPerWork);
+	cultureString.Format ("+%d [ICON_CULTURE], +%d [ICON_TOURISM]", iCulturePerWork, iTourismPerWork);
 #endif
 
 	szTooltip += cultureString;
@@ -2789,7 +2784,6 @@ int CvPlayerCulture::GetInfluencePerTurn(PlayerTypes ePlayer) const
 			iRtnValue += iInfluenceToAdd;
 		}
 
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 		int iExtraInfluenceToAdd = 0;
 
 		// Tourism from religion
@@ -2809,7 +2803,6 @@ int CvPlayerCulture::GetInfluencePerTurn(PlayerTypes ePlayer) const
 		}
 
 		iRtnValue += iExtraInfluenceToAdd;
-#endif
 
 		iRtnValue = iRtnValue * (100 + iModifier) / 100;
 	}
@@ -3185,13 +3178,11 @@ int CvPlayerCulture::GetTourism()
 {
 	int iRtnValue = 0;
 
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	int iStartEra = GD_INT_GET(TOURISM_START_ERA);
 	int iStartTech = GD_INT_GET(TOURISM_START_TECH);
 	
 	if (!MOD_API_UNIFIED_YIELDS_TOURISM || ((iStartTech == -1 || m_pPlayer->HasTech((TechTypes) iStartTech)) && (iStartEra == -1 || m_pPlayer->GetCurrentEra() >= iStartEra)))
 	{
-#endif
 		CvCity *pCity;
 		int iLoop;
 		for(pCity = m_pPlayer->firstCity(&iLoop); pCity != NULL; pCity = m_pPlayer->nextCity(&iLoop))
@@ -3199,14 +3190,12 @@ int CvPlayerCulture::GetTourism()
 			iRtnValue += pCity->GetBaseTourism();
 		}
 
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 		// Tourism from religion
 		iRtnValue += m_pPlayer->GetYieldPerTurnFromReligion(YIELD_TOURISM);
 
 		// Trait bonus which adds Tourism for trade partners? 
 		iRtnValue += m_pPlayer->GetYieldPerTurnFromTraits(YIELD_TOURISM);
 	}
-#endif
 
 	return iRtnValue;
 }
@@ -4515,7 +4504,6 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 	}
 	iBase += iThemingBonuses;
 
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	// Add in all the tourism from yields
 	int iYieldRate = m_pCity->getYieldRate(YIELD_TOURISM, false);
 	//getYieldRate() multiplied BaseYieldRateModifier()
@@ -4528,7 +4516,6 @@ void CvCityCulture::CalculateBaseTourismBeforeModifiers(CvString& toolTipSink)
 		toolTipSink += m_pCity->getYieldRateInfoTool(YIELD_TOURISM, true);
 	}
 	iBase += iYieldRate;
-#endif
 
 	int iPercent = m_pCity->GetCityBuildings()->GetLandmarksTourismPercent() + kPlayer.getLandmarksTourismPercentGlobal();
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)

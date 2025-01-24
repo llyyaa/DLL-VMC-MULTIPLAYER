@@ -1158,9 +1158,7 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 	iCultureYieldValue += (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlayer->specialistYield(eSpecialist, YIELD_CULTURE));
 #endif
 	int iFaithYieldValue = (GC.getAI_CITIZEN_VALUE_FAITH() * pPlayer->specialistYield(eSpecialist, YIELD_FAITH));
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	int iTourismYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlayer->specialistYield(eSpecialist, YIELD_TOURISM));
-#endif
 	int iGoldenAgeYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlayer->specialistYield(eSpecialist, YIELD_GOLDEN_AGE_POINTS));
 	int iGPPYieldValue = pSpecialistInfo->getGreatPeopleRateChange() * 3; // TODO: un-hardcode this
 	int iHappinessYieldValue = (m_pCity->GetPlayer()->isHalfSpecialistUnhappiness()) ? 5 : 0; // TODO: un-hardcode this
@@ -1194,14 +1192,10 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 	else if(eFocus == CITY_AI_FOCUS_TYPE_SCIENCE)
 		iScienceYieldValue *= 3;
 	else if(eFocus == CITY_AI_FOCUS_TYPE_CULTURE)
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	{
 		iCultureYieldValue *= 3;
 		iTourismYieldValue *= 2;
 	}
-#else
-		iCultureYieldValue *= 3;
-#endif
 	else if(eFocus == CITY_AI_FOCUS_TYPE_GOLD_GROWTH)
 	{
 		iFoodYieldValue *= 2;
@@ -1267,9 +1261,7 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 	iValue += iScienceYieldValue;
 	iValue += iCultureYieldValue;
 	iValue += iFaithYieldValue;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	iValue += iTourismYieldValue;
-#endif
 	iValue += iGoldenAgeYieldValue;
 	iValue += iGPPYieldValue;
 	iValue += iHappinessYieldValue;

@@ -723,10 +723,8 @@ double CvCityStrategyAI::GetDeficientYieldValue(YieldTypes eYieldType)
 		break;
 	case YIELD_FAITH:
 		break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	case YIELD_TOURISM:
 		break;
-#endif
 	case YIELD_GOLDEN_AGE_POINTS:
 		break;
 

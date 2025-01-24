@@ -1382,11 +1382,9 @@ void CvEconomicAI::LogMonitor(void)
 		case YIELD_FAITH:
 			AppendToLog(strHeader, strLog, "Faith", m_pPlayer->GetTotalFaithPerTurn());
 			break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 		case YIELD_TOURISM:
 			AppendToLog(strHeader, strLog, "Tourism", m_pPlayer->calculateTotalYield((YieldTypes)ui));
 			break;
-#endif
 		case YIELD_GOLDEN_AGE_POINTS:
 			AppendToLog(strHeader, strLog, "Golden Age", m_pPlayer->calculateTotalYield((YieldTypes)ui));
 			break;
@@ -1620,11 +1618,9 @@ void CvEconomicAI::LogCityMonitor()
 			case YIELD_FAITH:
 				AppendToLog(strHeader, strLog, "faith", aiCityYields[ui]);
 				break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
 				AppendToLog(strHeader, strLog, "tourism", aiCityYields[ui]);
 				break;
-#endif
 			case YIELD_GOLDEN_AGE_POINTS:
 				AppendToLog(strHeader, strLog, "goldenage", aiCityYields[ui]);
 				break;
@@ -1660,11 +1656,9 @@ void CvEconomicAI::LogCityMonitor()
 			case YIELD_FAITH:
 				AppendToLog(strHeader, strLog, "faith / pop", fRatio);
 				break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
 				AppendToLog(strHeader, strLog, "tourism / pop", fRatio);
 				break;
-#endif
 			case YIELD_GOLDEN_AGE_POINTS:
 				AppendToLog(strHeader, strLog, "goldenage / pop", fRatio);
 				break;
@@ -1695,11 +1689,9 @@ void CvEconomicAI::LogCityMonitor()
 			case YIELD_FAITH:
 				AppendToLog(strHeader, strLog, "faith specialist", aiSpecialistsYields[ui]);
 				break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
 				AppendToLog(strHeader, strLog, "tourism specialist", aiSpecialistsYields[ui]);
 				break;
-#endif
 			case YIELD_GOLDEN_AGE_POINTS:
 				AppendToLog(strHeader, strLog, "goldenage specialist", aiSpecialistsYields[ui]);
 				break;
@@ -1734,11 +1726,9 @@ void CvEconomicAI::LogCityMonitor()
 			case YIELD_FAITH:
 				AppendToLog(strHeader, strLog, "faith specialist / faith", fRatio);
 				break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
 				AppendToLog(strHeader, strLog, "tourism specialist / tourism", fRatio);
 				break;
-#endif
 			case YIELD_GOLDEN_AGE_POINTS:
 				AppendToLog(strHeader, strLog, "goldenage specialist / tourism", fRatio);
 				break;

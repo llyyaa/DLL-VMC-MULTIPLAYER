@@ -4376,11 +4376,9 @@ int CvLuaPlayer::lGetTradeYourRoutesTTString(lua_State* L)
 					case YIELD_FAITH:
 						strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_FAITH_YIELD_TT", iYieldQuantity / 100);
 						break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 					case YIELD_TOURISM:
 						strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_TOURISM_YIELD_TT", iYieldQuantity / 100);
 						break;
-#endif
 					case YIELD_GOLDEN_AGE_POINTS:
 						strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_GOLDEN_AGE_POINTS_YIELD_TT", iYieldQuantity / 100);
 						break;
@@ -4415,11 +4413,9 @@ int CvLuaPlayer::lGetTradeYourRoutesTTString(lua_State* L)
 					case YIELD_FAITH:
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_FAITH_YIELD_TT", iYieldQuantity / 100);
 						break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 					case YIELD_TOURISM:
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_TOURISM_YIELD_TT", iYieldQuantity / 100);
 						break;
-#endif
 					case YIELD_GOLDEN_AGE_POINTS:
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_GOLDEN_AGE_POINTS_YIELD_TT", iYieldQuantity / 100);
 						break;
@@ -4576,11 +4572,9 @@ int CvLuaPlayer::lGetTradeToYouRoutesTTString(lua_State* L)
 					case YIELD_FAITH:
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_FAITH_YIELD_TT", iYieldQuantity / 100);
 						break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 					case YIELD_TOURISM:
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_TOURISM_YIELD_TT", iYieldQuantity / 100);
 						break;
-#endif
 					case YIELD_GOLDEN_AGE_POINTS:
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_GOLDEN_AGE_POINTS_YIELD_TT", iYieldQuantity / 100);
 						break;

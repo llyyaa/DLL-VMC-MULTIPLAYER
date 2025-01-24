@@ -2575,9 +2575,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 	case YIELD_SCIENCE:
 	case YIELD_CULTURE:
 	case YIELD_FAITH:
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	case YIELD_TOURISM:
-#endif
 	case YIELD_GOLDEN_AGE_POINTS:
 		break; // Yields applicable to trade.
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
@@ -2649,10 +2647,8 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 			case YIELD_FAITH:
 				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
 				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
-#endif
 			case YIELD_GOLDEN_AGE_POINTS:
 				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 			case YIELD_SCIENCE:
@@ -2725,9 +2721,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 				case YIELD_CULTURE:
 				case YIELD_FAITH:
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 				case YIELD_TOURISM:
-#endif
 				case YIELD_GOLDEN_AGE_POINTS:
 				case YIELD_SCIENCE:
 					{

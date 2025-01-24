@@ -11976,11 +11976,9 @@ void CvPlayer::DoYieldBonusFromKill(YieldTypes eYield, UnitTypes eAttackingUnitT
 				break;
 			case YIELD_SCIENCE:
 				break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
 				// Not supported, as not accumulated turn-on-turn
 				break;
-#endif
 			case YIELD_GOLDEN_AGE_POINTS:
 				break;
 
@@ -19455,9 +19453,7 @@ int CvPlayer::calculateEconomicMight() const
 	iEconomicMight += calculateTotalYield(YIELD_GOLD);
 	//iEconomicMight += calculateTotalYield(YIELD_CULTURE);
 	//iEconomicMight += calculateTotalYield(YIELD_FAITH);
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	//iEconomicMight += calculateTotalYield(YIELD_TOURISM);
-#endif
 	//iEconomicMight += calculateTotalYield(YIELD_GOLDEN_AGE_POINTS);
 
 	return iEconomicMight;

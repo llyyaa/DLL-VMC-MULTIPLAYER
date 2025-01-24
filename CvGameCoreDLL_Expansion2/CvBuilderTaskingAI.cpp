@@ -217,11 +217,9 @@ void CvBuilderTaskingAI::Update(void)
 				case YIELD_FAITH:
 					strYield = "faith      ";
 					break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 				case YIELD_TOURISM:
 					strYield = "tourism    ";
 					break;
-#endif
 				case YIELD_GOLDEN_AGE_POINTS:
 					strYield = "goldenage  ";
 					break;
@@ -1482,10 +1480,8 @@ void CvBuilderTaskingAI::AddChopDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMo
 				break;
 			case YIELD_FAITH:
 				break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
 				break;
-#endif
 			case YIELD_GOLDEN_AGE_POINTS:
 				break;
 
