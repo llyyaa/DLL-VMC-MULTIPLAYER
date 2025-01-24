@@ -13073,15 +13073,12 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
 			break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 		case YIELD_GOLDEN_AGE_POINTS:
 			iTempMod = GC.getPUPPET_GOLDEN_AGE_MODIFIER();
 			iModifier += iTempMod;
 			if(iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
 			break;
-#endif
-
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 		case YIELD_GREAT_GENERAL_POINTS:
@@ -13259,13 +13256,10 @@ int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bSta
 			return 0;
 		}
 #endif
-
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 		if(eIndex == YIELD_GOLDEN_AGE_POINTS)
 		{
 			return 0;
 		}
-#endif
 	}
 
 	int iProcessYield = 0;
@@ -15181,12 +15175,10 @@ int CvCity::GetTradeYieldModifier(YieldTypes eIndex, CvString* toolTipSink) cons
 				*toolTipSink += GetLocalizedText("TXT_KEY_TOURISM_FROM_TRADE_ROUTES", iReturnValue / 100.0f);
 				break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			case YIELD_GOLDEN_AGE_POINTS:
 				*toolTipSink += "[NEWLINE][BULLET]";
 				*toolTipSink += GetLocalizedText("TXT_KEY_GOLDEN_AGE_POINTS_FROM_TRADE_ROUTES", iReturnValue / 100.0f);
 				break;
-#endif
 			}
 		}
 	}

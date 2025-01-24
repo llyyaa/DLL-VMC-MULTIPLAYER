@@ -2578,9 +2578,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	case YIELD_TOURISM:
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	case YIELD_GOLDEN_AGE_POINTS:
-#endif
 		break; // Yields applicable to trade.
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 	case NO_YIELD:
@@ -2655,10 +2653,8 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 			case YIELD_TOURISM:
 				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			case YIELD_GOLDEN_AGE_POINTS:
 				iValue += GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);
-#endif
 			case YIELD_SCIENCE:
 #if defined(MOD_API_UNIFIED_YIELDS)
 				{
@@ -2732,9 +2728,7 @@ int CvPlayerTrade::GetTradeConnectionValueTimes100 (const TradeConnection& kTrad
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 				case YIELD_TOURISM:
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 				case YIELD_GOLDEN_AGE_POINTS:
-#endif
 				case YIELD_SCIENCE:
 					{
 						int iBaseValue = GetTradeConnectionBaseValueTimes100(kTradeConnection, eYield, bAsOriginPlayer);

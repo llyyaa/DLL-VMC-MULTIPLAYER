@@ -343,11 +343,9 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetJONSCultureEverGenerated);
 
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	Method(GetGoldenAgePointPerTurnFromReligion);
 	Method(GetGoldenAgePointPerTurnFromTraits);
 	Method(GetGoldenAgePointPerTurnFromCitys);
-#endif	
 
 	Method(GetLastTurnLifetimeCulture);
 	Method(GetInfluenceOn);
@@ -2763,7 +2761,6 @@ int CvLuaPlayer::lGetJONSCultureEverGenerated(lua_State* L)
 	return BasicLuaMethod(L, &CvPlayerAI::GetJONSCultureEverGenerated);
 }
 //------------------------------------------------------------------------------
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 int CvLuaPlayer::lGetGoldenAgePointPerTurnFromReligion(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
@@ -2785,7 +2782,7 @@ int CvLuaPlayer::lGetGoldenAgePointPerTurnFromCitys(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
-#endif
+//------------------------------------------------------------------------------
 //int GetLastTurnLifetimeCulture();
 int CvLuaPlayer::lGetLastTurnLifetimeCulture(lua_State* L)
 {
@@ -4384,11 +4381,9 @@ int CvLuaPlayer::lGetTradeYourRoutesTTString(lua_State* L)
 						strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_TOURISM_YIELD_TT", iYieldQuantity / 100);
 						break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 					case YIELD_GOLDEN_AGE_POINTS:
 						strOriginYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_GOLDEN_AGE_POINTS_YIELD_TT", iYieldQuantity / 100);
 						break;
-#endif
 					}
 				}
 			}
@@ -4425,11 +4420,9 @@ int CvLuaPlayer::lGetTradeYourRoutesTTString(lua_State* L)
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_TOURISM_YIELD_TT", iYieldQuantity / 100);
 						break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 					case YIELD_GOLDEN_AGE_POINTS:
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_GOLDEN_AGE_POINTS_YIELD_TT", iYieldQuantity / 100);
 						break;
-#endif
 					}
 				}
 			}
@@ -4588,11 +4581,9 @@ int CvLuaPlayer::lGetTradeToYouRoutesTTString(lua_State* L)
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_TOURISM_YIELD_TT", iYieldQuantity / 100);
 						break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 					case YIELD_GOLDEN_AGE_POINTS:
 						strDestYieldsStr += GetLocalizedText("TXT_KEY_TOP_PANEL_ITR_GOLDEN_AGE_POINTS_YIELD_TT", iYieldQuantity / 100);
 						break;
-#endif
 					}
 				}
 			}

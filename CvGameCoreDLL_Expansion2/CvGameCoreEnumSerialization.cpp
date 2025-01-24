@@ -196,11 +196,9 @@ std::string toString(const YieldTypes& v)
 		return std::string("YIELD_TOURISM");
 		break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	case YIELD_GOLDEN_AGE_POINTS:
 		return std::string("YIELD_GOLDEN_AGE_POINTS");
 		break;
-#endif
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 	case YIELD_GREAT_GENERAL_POINTS:

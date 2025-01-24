@@ -1161,9 +1161,7 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	int iTourismYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlayer->specialistYield(eSpecialist, YIELD_TOURISM));
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	int iGoldenAgeYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlayer->specialistYield(eSpecialist, YIELD_GOLDEN_AGE_POINTS));
-#endif
 	int iGPPYieldValue = pSpecialistInfo->getGreatPeopleRateChange() * 3; // TODO: un-hardcode this
 	int iHappinessYieldValue = (m_pCity->GetPlayer()->isHalfSpecialistUnhappiness()) ? 5 : 0; // TODO: un-hardcode this
 	iHappinessYieldValue = m_pCity->GetPlayer()->IsEmpireUnhappy() ? iHappinessYieldValue * 2 : iHappinessYieldValue; // TODO: un-hardcode this
@@ -1272,9 +1270,7 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	iValue += iTourismYieldValue;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	iValue += iGoldenAgeYieldValue;
-#endif
 	iValue += iGPPYieldValue;
 	iValue += iHappinessYieldValue;
 	iValue += iResourceValue;

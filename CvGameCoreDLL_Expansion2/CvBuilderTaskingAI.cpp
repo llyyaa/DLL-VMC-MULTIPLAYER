@@ -222,11 +222,9 @@ void CvBuilderTaskingAI::Update(void)
 					strYield = "tourism    ";
 					break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 				case YIELD_GOLDEN_AGE_POINTS:
 					strYield = "goldenage  ";
 					break;
-#endif
 				}
 
 				CvString strNumbers;
@@ -1488,10 +1486,8 @@ void CvBuilderTaskingAI::AddChopDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMo
 			case YIELD_TOURISM:
 				break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			case YIELD_GOLDEN_AGE_POINTS:
 				break;
-#endif
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 			case YIELD_GREAT_GENERAL_POINTS:

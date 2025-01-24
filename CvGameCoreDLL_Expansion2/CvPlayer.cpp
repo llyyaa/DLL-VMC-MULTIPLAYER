@@ -11981,10 +11981,8 @@ void CvPlayer::DoYieldBonusFromKill(YieldTypes eYield, UnitTypes eAttackingUnitT
 				// Not supported, as not accumulated turn-on-turn
 				break;
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			case YIELD_GOLDEN_AGE_POINTS:
 				break;
-#endif
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 			case YIELD_GREAT_GENERAL_POINTS:
@@ -15042,7 +15040,6 @@ void CvPlayer::DoChangeGreatAdmiralRate()
 #endif
 
 //	--------------------------------------------------------------------------------
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 int CvPlayer::GetGoldenAgePointPerTurnFromCitys() const
 {
 	const CvCity* pLoopCity;
@@ -15054,7 +15051,7 @@ int CvPlayer::GetGoldenAgePointPerTurnFromCitys() const
 	}
 	return result;
 }
-#endif
+//	--------------------------------------------------------------------------------
 /// Update all Golden-Age related stuff
 void CvPlayer::DoProcessGoldenAge()
 {
@@ -15067,6 +15064,7 @@ void CvPlayer::DoProcessGoldenAge()
 	if(!isMinorCiv() && !isBarbarian())
 	{
 #if defined(MOD_GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA)
+#endif
 		bool isInGA = false;
 		int GAMeterBouns = 100;
 		// Already in a GA - don't decrement counter while in Anarchy
@@ -15088,7 +15086,6 @@ void CvPlayer::DoProcessGoldenAge()
 			// Note: This will actually REDUCE the GA meter if the player is running in the red
 			ChangeGoldenAgeProgressMeter(GetExcessHappiness()*GAMeterBouns/100);
 			
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			// GA points from religion
 			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromReligion(YIELD_GOLDEN_AGE_POINTS)*GAMeterBouns/100);
 
@@ -15097,7 +15094,6 @@ void CvPlayer::DoProcessGoldenAge()
 
 			// Add in all the GA points from city yields
 			ChangeGoldenAgeProgressMeter(GetGoldenAgePointPerTurnFromCitys()*GAMeterBouns/100);
-#endif
 
 			// Enough GA Progress to trigger new GA?
 			if(GetGoldenAgeProgressMeter() >= GetGoldenAgeProgressThreshold())
@@ -15128,66 +15124,6 @@ void CvPlayer::DoProcessGoldenAge()
 				}
 			}
 		}
-#else
-		// Already in a GA - don't decrement counter while in Anarchy
-		if(getGoldenAgeTurns() > 0)
-		{
-			if(!IsAnarchy())
-			{
-				changeGoldenAgeTurns(-1);
-			}
-		}
-
-		// Not in GA
-		else
-		{
-			// Note: This will actually REDUCE the GA meter if the player is running in the red
-			ChangeGoldenAgeProgressMeter(GetExcessHappiness());
-			
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
-			// GA points from religion
-			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromReligion(YIELD_GOLDEN_AGE_POINTS));
-
-			// Trait bonus which adds GA points for trade partners? 
-			ChangeGoldenAgeProgressMeter(GetYieldPerTurnFromTraits(YIELD_GOLDEN_AGE_POINTS));
-
-			// Add in all the GA points from city yields
-			CvCity* pLoopCity;
-			int iLoop;
-
-			for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
-			{
-				ChangeGoldenAgeProgressMeter(pLoopCity->getYieldRate(YIELD_GOLDEN_AGE_POINTS, false));
-			}
-#endif
-
-			// Enough GA Progress to trigger new GA?
-			if(GetGoldenAgeProgressMeter() >= GetGoldenAgeProgressThreshold())
-			{
-				int iOverflow = GetGoldenAgeProgressMeter() - GetGoldenAgeProgressThreshold();
-
-				SetGoldenAgeProgressMeter(iOverflow);
-				
-				int iLength = getGoldenAgeLength();
-				changeGoldenAgeTurns(iLength);
-
-				// If it's the active player then show the popup
-				if(GetID() == GC.getGame().getActivePlayer())
-				{
-					// Don't show in MP
-#if defined(MOD_API_EXTENSIONS)
-					if(!GC.getGame().isReallyNetworkMultiPlayer())
-#else
-					if(!GC.getGame().isNetworkMultiPlayer())	// KWG: Candidate for !GC.getGame().isOption(GAMEOPTION_SIMULTANEOUS_TURNS)
-#endif
-					{
-						CvPopupInfo kPopupInfo(BUTTONPOPUP_GOLDEN_AGE_REWARD);
-						GC.GetEngineUserInterface()->AddPopup(kPopupInfo);
-					}
-				}
-			}
-		}
-#endif
 	}
 }
 
@@ -19522,9 +19458,7 @@ int CvPlayer::calculateEconomicMight() const
 #if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	//iEconomicMight += calculateTotalYield(YIELD_TOURISM);
 #endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	//iEconomicMight += calculateTotalYield(YIELD_GOLDEN_AGE_POINTS);
-#endif
 
 	return iEconomicMight;
 }
