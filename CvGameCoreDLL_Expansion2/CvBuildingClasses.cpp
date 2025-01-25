@@ -4439,6 +4439,7 @@ void CvBuildingXMLEntries::DeleteArray()
 /// Get a specific entry
 CvBuildingEntry* CvBuildingXMLEntries::GetEntry(int index)
 {
+	if (index < 0) return nullptr;
 	return m_paBuildingEntries[index];
 }
 
