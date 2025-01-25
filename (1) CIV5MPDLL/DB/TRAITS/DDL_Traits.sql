@@ -76,4 +76,4 @@ alter table Traits add column `InfluenceFromGreatPeopleBirth` INTEGER DEFAULT 0;
 alter table Traits add column `WLKDLengthChangeModifier` INTEGER DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN `WLKDCityNoResearchCost` BOOLEAN NOT NULL DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN `GoodyUnitUpgradeFirst` BOOLEAN NOT NULL DEFAULT 0;
-alter table Traits add column `InternationalConnectionModifier` int not null default 0;
+alter table Traits add column `OthersTradeBonusModifier` int not null default 0;
