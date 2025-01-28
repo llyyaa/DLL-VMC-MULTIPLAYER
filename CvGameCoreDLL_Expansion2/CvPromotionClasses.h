@@ -512,6 +512,8 @@ public:
 	int GetSiegeInflictDamageChange() const;
 	int GetSiegeInflictDamageChangeMaxHPPercent() const;
 
+	bool IsRangeBackWhenDefense() const;
+
 	int GetHeavyChargeAddMoves() const;
 	int GetHeavyChargeExtraDamage() const;
 	int GetHeavyChargeCollateralFixed() const;
@@ -952,6 +954,8 @@ protected:
 
 	int m_iSiegeInflictDamageChange = 0;
 	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	bool m_bRangeBackWhenDefense = 0;
 
 	int m_iHeavyChargeAddMoves = 0;
 	int m_iHeavyChargeExtraDamage = 0;

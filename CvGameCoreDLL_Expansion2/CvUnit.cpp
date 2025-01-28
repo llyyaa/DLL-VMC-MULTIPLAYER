@@ -1631,6 +1631,8 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 	m_iSiegeInflictDamageChange = 0;
 	m_iSiegeInflictDamageChangeMaxHPPercent = 0;
 
+	m_iNumRangeBackWhenDefense = 0;
+
 	m_iHeavyChargeAddMoves = 0;
 	m_iHeavyChargeExtraDamage = 0;
 	m_iHeavyChargeCollateralFixed = 0;
@@ -26712,6 +26714,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeDefenseInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetDefenseInflictDamageChangeMaxHPPercent());
 		ChangeSiegeInflictDamageChange(iChange * thisPromotion.GetSiegeInflictDamageChange());
 		ChangeSiegeInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetSiegeInflictDamageChangeMaxHPPercent());
+		ChangeNumRangeBackWhenDefense(thisPromotion.IsRangeBackWhenDefense() ? iChange : 0);
 		ChangeHeavyChargeAddMoves(iChange * thisPromotion.GetHeavyChargeAddMoves());
 		ChangeHeavyChargeExtraDamage(iChange * thisPromotion.GetHeavyChargeExtraDamage());
 		ChangeHeavyChargeCollateralFixed(iChange * thisPromotion.GetHeavyChargeCollateralFixed());
@@ -27257,6 +27260,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iSiegeInflictDamageChange;
 	kStream >> m_iSiegeInflictDamageChangeMaxHPPercent;
 
+	kStream >> m_iNumRangeBackWhenDefense;
+
 	kStream >> m_iHeavyChargeAddMoves;
 	kStream >> m_iHeavyChargeExtraDamage;
 	kStream >> m_iHeavyChargeCollateralFixed;
@@ -27584,6 +27589,8 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iSiegeInflictDamageChange;
 	kStream << m_iSiegeInflictDamageChangeMaxHPPercent;
+
+	kStream << m_iNumRangeBackWhenDefense;
 
 	kStream << m_iHeavyChargeAddMoves;
 	kStream << m_iHeavyChargeExtraDamage;
@@ -32193,6 +32200,15 @@ void CvUnit::ChangeSiegeInflictDamageChange(int iChange)
 void CvUnit::ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange)
 {
 	m_iSiegeInflictDamageChangeMaxHPPercent += iChange;
+}
+
+bool CvUnit::IsRangeBackWhenDefense() const
+{
+	return m_iNumRangeBackWhenDefense > 0;
+}
+void CvUnit::ChangeNumRangeBackWhenDefense(int iChange)
+{
+	m_iNumRangeBackWhenDefense += iChange;
 }
 
 int CvUnit::GetHeavyChargeAddMoves() const

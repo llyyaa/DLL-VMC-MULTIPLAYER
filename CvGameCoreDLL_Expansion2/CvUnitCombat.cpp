@@ -5566,7 +5566,7 @@ void CvUnitCombat::DoStackingFightBack(const CvCombatInfo & kCombatInfo)
 	for (int iUnitIndex = 0; iUnitIndex < pTargetPlot->getNumUnits(); iUnitIndex++)
 	{
 		CvUnit *pFoundUnit = pTargetPlot->getUnitByIndex(iUnitIndex);
-		if (pFoundUnit == nullptr || pFoundUnit == pDefenderUnit)
+		if (pFoundUnit == nullptr || (pFoundUnit == pDefenderUnit && !pDefenderUnit->IsRangeBackWhenDefense()))
 			continue;
 		if (!pFoundUnit->canRangeStrike())
 			continue;
