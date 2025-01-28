@@ -145,6 +145,7 @@ public:
 	int GetTradeReligionModifier() const;
 	int GetTradeBuildingModifier() const;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetNumFreeWorldWonderPerCity() const;
 	int GetExceedingHappinessImmigrationModifier() const;
 	int GetNumCityYieldPerAdjacentFeature() const;
 	int GetNumCityAdjacentFeatureModifier() const;
@@ -319,7 +320,7 @@ public:
 
 	int GetGoldenAgeResearchTotalCostModifier() const;
 	int GetGoldenAgeResearchCityCountCostModifier() const;
-	int GetInternationalConnectionModifier() const;
+	int GetOthersTradeBonusModifier() const;
 
 	int GetGoldenAgeGrowThresholdModifier() const;
 
@@ -428,6 +429,7 @@ protected:
 	int m_iTradeReligionModifier;
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int m_iNumFreeWorldWonderPerCity;
 	int m_iExceedingHappinessImmigrationModifier;
 	int m_iNumCityAdjacentFeatureModifier;
 	int m_iNumCityYieldPerAdjacentFeature;
@@ -585,7 +587,7 @@ protected:
 
 	int m_iGoldenAgeResearchTotalCostModifier= 0;
 	int m_iGoldenAgeResearchCityCountCostModifier = 0;
-	int m_iInternationalConnectionModifier = 0;
+	int m_iOthersTradeBonusModifier = 0;
 
 	int m_iGoldenAgeGrowThresholdModifier = 0;
 
@@ -984,6 +986,10 @@ public:
 	}
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	int GetNumFreeWorldWonderPerCity() const
+	{
+		return m_iNumFreeWorldWonderPerCity;
+	}
 	int GetExceedingHappinessImmigrationModifier() const
 	{
 		return m_iExceedingHappinessImmigrationModifier;
@@ -1362,7 +1368,7 @@ public:
 
 	int GetGoldenAgeResearchTotalCostModifier() const;
 	int GetGoldenAgeResearchCityCountCostModifier() const;
-	int GetInternationalConnectionModifier() const;
+	int GetOthersTradeBonusModifier() const;
 
 	int GetGoldenAgeGrowThresholdModifier() const;
 
@@ -1480,6 +1486,7 @@ private:
 	int m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
 	int m_iExceedingHappinessImmigrationModifier;
+	int m_iNumFreeWorldWonderPerCity;
 	bool m_bHasCityYieldPerAdjacentFeature = false;
 	bool m_bHasCityAdjacentFeatureModifier = false;
 	int m_iPromotionWhenKilledUnit;
@@ -1642,7 +1649,7 @@ private:
 
 	int m_iGoldenAgeResearchTotalCostModifier= 0;
 	int m_iGoldenAgeResearchCityCountCostModifier = 0;
-	int m_iInternationalConnectionModifier = 0;
+	int m_iOthersTradeBonusModifier = 0;
 
 	int m_iGoldenAgeGrowThresholdModifier = 0;
 

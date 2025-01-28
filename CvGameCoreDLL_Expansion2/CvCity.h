@@ -1060,6 +1060,9 @@ public:
 #endif
 
 #if defined(MOD_ROG_CORE)
+	int getExtraDamageHealPercent() const;
+	void changeExtraDamageHealPercent(int iChange);
+
 	int getExtraDamageHeal() const;
 	void changeExtraDamageHeal(int iChange);
 
@@ -1526,6 +1529,7 @@ protected:
 	FAutoVariable<int, CvCity> m_iExtraAttackOnKill;
 	int m_iForbiddenForeignSpyCount;
 #if defined(MOD_ROG_CORE)
+	int m_iExtraDamageHealPercent;
 	FAutoVariable<int, CvCity> m_iExtraDamageHeal;
 	FAutoVariable<int, CvCity> m_iBombardRange;
 	int m_iBombardIndirect;

@@ -672,10 +672,7 @@ public:
 	void ChangeTourismBonusTurns(int iChange);
 	CvString GetInternationalTourismTooltip();
 
-
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	int GetGoldenAgePointPerTurnFromCitys() const;
-#endif	
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 	void DoChangeGreatGeneralRate();

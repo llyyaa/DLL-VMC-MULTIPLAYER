@@ -205,12 +205,8 @@ int CvLuaEnums::pRegister(lua_State* L)
 	RegisterEnum(YIELD_SCIENCE);
 	RegisterEnum(YIELD_CULTURE);
 	RegisterEnum(YIELD_FAITH);
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 	RegisterEnum(YIELD_TOURISM);
-#endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 	RegisterEnum(YIELD_GOLDEN_AGE_POINTS);
-#endif
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 	RegisterEnum(YIELD_GREAT_GENERAL_POINTS);

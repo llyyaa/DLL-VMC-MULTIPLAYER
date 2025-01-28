@@ -125,6 +125,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_iTradeBuildingModifier(0),
 #endif
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iNumFreeWorldWonderPerCity(0),
 	m_iExceedingHappinessImmigrationModifier(0),
 	m_iNumCityAdjacentFeatureModifier(0),
 	m_iNumCityYieldPerAdjacentFeature(0),
@@ -729,6 +730,10 @@ int CvTraitEntry::GetTradeBuildingModifier() const
 }
 
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+int CvTraitEntry::GetNumFreeWorldWonderPerCity() const
+{
+	return m_iNumFreeWorldWonderPerCity;
+}
 int CvTraitEntry::GetExceedingHappinessImmigrationModifier() const
 {
 	return m_iExceedingHappinessImmigrationModifier;
@@ -1549,9 +1554,9 @@ int CvTraitEntry::GetGoldenAgeResearchCityCountCostModifier() const
 {
 	return m_iGoldenAgeResearchCityCountCostModifier;
 }
-int CvTraitEntry::GetInternationalConnectionModifier() const
+int CvTraitEntry::GetOthersTradeBonusModifier() const
 {
-	return m_iInternationalConnectionModifier;
+	return m_iOthersTradeBonusModifier;
 }
 int CvTraitEntry::GetGoldenAgeGrowThresholdModifier() const
 {
@@ -1713,6 +1718,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_iPrereqTech = GC.getInfoTypeForString(szTextVal, true);
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iNumFreeWorldWonderPerCity = kResults.GetInt("NumFreeWorldWonderPerCity");
 	m_iExceedingHappinessImmigrationModifier = kResults.GetInt("ExceedingHappinessImmigrationModifier");
 	szTextVal = kResults.GetText("PromotionWhenKilledUnit");
 	if(szTextVal)
@@ -2456,7 +2462,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 
 	m_iGoldenAgeResearchTotalCostModifier = kResults.GetInt("GoldenAgeResearchTotalCostModifier");
 	m_iGoldenAgeResearchCityCountCostModifier = kResults.GetInt("GoldenAgeResearchCityCountCostModifier");
-	m_iInternationalConnectionModifier = kResults.GetInt("InternationalConnectionModifier");
+	m_iOthersTradeBonusModifier = kResults.GetInt("OthersTradeBonusModifier");
 	m_iGoldenAgeGrowThresholdModifier = kResults.GetInt("GoldenAgeGrowThresholdModifier");
 	m_iShareAllyResearchPercent = kResults.GetInt("ShareAllyResearchPercent");
 	m_bCanDiplomaticMarriage = kResults.GetBool("CanDiplomaticMarriage");
@@ -2645,6 +2651,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iTradeReligionModifier += trait->GetTradeReligionModifier();
 			m_iTradeBuildingModifier += trait->GetTradeBuildingModifier();
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+			m_iNumFreeWorldWonderPerCity += trait->GetNumFreeWorldWonderPerCity();
 			m_iExceedingHappinessImmigrationModifier += trait->GetExceedingHappinessImmigrationModifier();
 			m_bHasCityYieldPerAdjacentFeature = trait->GetNumCityYieldPerAdjacentFeature() > 0;
 			m_bHasCityAdjacentFeatureModifier = trait->GetNumCityAdjacentFeatureModifier() > 0;
@@ -2839,7 +2846,7 @@ void CvPlayerTraits::InitPlayerTraits()
 
 			m_iGoldenAgeResearchTotalCostModifier = trait->GetGoldenAgeResearchTotalCostModifier();
 			m_iGoldenAgeResearchCityCountCostModifier = trait->GetGoldenAgeResearchCityCountCostModifier();
-			m_iInternationalConnectionModifier = trait->GetInternationalConnectionModifier();
+			m_iOthersTradeBonusModifier = trait->GetOthersTradeBonusModifier();
 			m_iGoldenAgeGrowThresholdModifier = trait->GetGoldenAgeGrowThresholdModifier();
 			m_iShareAllyResearchPercent = trait->GetShareAllyResearchPercent();
 			m_bCanDiplomaticMarriage = trait->CanDiplomaticMarriage();
@@ -3190,6 +3197,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeReligionModifier = 0;
 	m_iTradeBuildingModifier = 0;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	m_iNumFreeWorldWonderPerCity = 0;
 	m_iExceedingHappinessImmigrationModifier = 0;
 	m_bHasCityYieldPerAdjacentFeature = false;
 	m_bHasCityAdjacentFeatureModifier = false;
@@ -4685,6 +4693,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 		m_iTradeBuildingModifier = 0;
 	}
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream >> m_iNumFreeWorldWonderPerCity;
 	kStream >> m_iExceedingHappinessImmigrationModifier;
 	kStream >> m_bHasCityYieldPerAdjacentFeature;
 	kStream >> m_bHasCityAdjacentFeatureModifier;
@@ -4993,7 +5002,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 
 	kStream >> m_iGoldenAgeResearchTotalCostModifier;
 	kStream >> m_iGoldenAgeResearchCityCountCostModifier;
-	kStream >> m_iInternationalConnectionModifier;
+	kStream >> m_iOthersTradeBonusModifier;
 	kStream >> m_iGoldenAgeGrowThresholdModifier;
 	kStream >> m_iShareAllyResearchPercent;
 
@@ -5097,6 +5106,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iTradeReligionModifier;
 	kStream << m_iTradeBuildingModifier;
 #if defined(MOD_TRAIT_NEW_EFFECT_FOR_SP)
+	kStream << m_iNumFreeWorldWonderPerCity;
 	kStream << m_iExceedingHappinessImmigrationModifier;
 	kStream << m_bHasCityYieldPerAdjacentFeature;
 	kStream << m_bHasCityAdjacentFeatureModifier;
@@ -5283,7 +5293,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 
 	kStream << m_iGoldenAgeResearchTotalCostModifier;
 	kStream << m_iGoldenAgeResearchCityCountCostModifier;
-	kStream << m_iInternationalConnectionModifier;
+	kStream << m_iOthersTradeBonusModifier;
 	kStream << m_iGoldenAgeGrowThresholdModifier;
 	kStream << m_iShareAllyResearchPercent;
 
@@ -5526,9 +5536,9 @@ int CvPlayerTraits::GetGoldenAgeResearchCityCountCostModifier() const
 {
 	return m_iGoldenAgeResearchCityCountCostModifier;
 }
-int CvPlayerTraits::GetInternationalConnectionModifier() const
+int CvPlayerTraits::GetOthersTradeBonusModifier() const
 {
-	return m_iInternationalConnectionModifier;
+	return m_iOthersTradeBonusModifier;
 }
 int CvPlayerTraits::GetGoldenAgeGrowThresholdModifier() const
 {

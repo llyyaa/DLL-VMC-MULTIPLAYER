@@ -205,6 +205,7 @@ CvCity::CvCity() :
 	, m_iGameTurnLastExpanded("CvCity::m_iGameTurnLastExpanded", m_syncArchive)
 
 #if defined(MOD_ROG_CORE)
+	, m_iExtraDamageHealPercent(0)
 	, m_iExtraDamageHeal("CvCity::m_iExtraDamageHeal", m_syncArchive)
 	, m_iBombardRange("CvCity::m_iBombardRange", m_syncArchive)
 	, m_iBombardIndirect(0)
@@ -1084,6 +1085,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 #if defined(MOD_ROG_CORE)
 	m_aiNumTimesAttackedThisTurn.resize(REALLY_MAX_PLAYERS);
 	m_aiSpecialistRateModifier.resize(GC.getNumSpecialistInfos());
+	m_iExtraDamageHealPercent = 0;
 	m_iExtraDamageHeal = 0;
 	m_iBombardRange = 0;
 	m_iBombardIndirect = 0;
@@ -2197,7 +2199,7 @@ void CvCity::doTurn()
 
 		iHitsHealed += getExtraDamageHeal();
 #endif
-
+		iHitsHealed += getExtraDamageHealPercent() * GetMaxHitPoints() / 100;
 
 
 		changeDamage(-iHitsHealed);
@@ -6634,6 +6636,42 @@ int CvCity::getProductionModifier(BuildingTypes eBuilding, CvString* toolTipSink
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_BUILDING_CITY", iTempMod);
 		}
 	}
+	
+	int iNumFreeWorldWonderPerCity = GET_PLAYER(getOwner()).GetPlayerTraits()->GetNumFreeWorldWonderPerCity();
+	if(iNumFreeWorldWonderPerCity > 0 && iNumFreeWorldWonderPerCity - getNumWorldWonders() > 0 && ::isWorldWonderClass(kBuildingClassInfo))
+	{
+		int iBaseYield = getBaseYieldRate(YIELD_PRODUCTION, false) * 100;
+		iBaseYield += (GetYieldPerPopTimes100(YIELD_PRODUCTION) * getPopulation());
+		iBaseYield += (GET_PLAYER(getOwner()).GetYieldPerPopChange(YIELD_PRODUCTION) * getPopulation());
+		iBaseYield += (GetYieldPerReligionTimes100(YIELD_PRODUCTION) * GetCityReligions()->GetNumReligionsWithFollowers());
+
+#if defined(MOD_ROG_CORE)
+		iBaseYield += (GetYieldPerPopInEmpireTimes100(YIELD_PRODUCTION) * GET_PLAYER(getOwner()).getTotalPopulation());
+#endif
+		iBaseYield /= 100;
+		iTempMod = getProductionNeeded(eBuilding) * 100 / iBaseYield;
+		// Make sure it is not affected by multiplications
+		{
+			int iYieldMultiplier = 100 + getYieldRateMultiplier(YIELD_PRODUCTION);
+			if(iYieldMultiplier > 0) iTempMod = iTempMod * 100 / iYieldMultiplier;
+			// if 0, then it is meanless
+			else iTempMod = 0;
+		}
+		if(!IsNoNuclearWinterLocal())
+		{
+			int iYieldMultiplier = 100 + GC.getGame().GetNuclearWinterYieldMultiplier(YIELD_PRODUCTION);
+			if(iYieldMultiplier > 0) iTempMod = iTempMod * 100 / iYieldMultiplier;
+			else iTempMod = 0;
+		}
+		if(iTempMod > 0)
+		{
+			iMultiplier += iTempMod;
+			if(toolTipSink)
+			{
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_WONDER_TRAIT", iTempMod);
+			}
+		}
+	}
 
 	// From policies
 	iTempMod = GET_PLAYER(getOwner()).GetPlayerPolicies()->GetBuildingClassProductionModifier((BuildingClassTypes)kBuildingClassInfo.GetID());
@@ -7646,6 +7684,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		ChangeNoOccupiedUnhappinessCount(pBuildingInfo->IsNoOccupiedUnhappiness() * iChange);
 
 #if defined(MOD_ROG_CORE)
+		changeExtraDamageHealPercent(pBuildingInfo->GetExtraDamageHealPercent()* iChange);
 		changeExtraDamageHeal(pBuildingInfo->GetExtraDamageHeal()* iChange);
 		changeExtraBombardRange(pBuildingInfo->GetBombardRange()* iChange);
 		changeBombardIndirect(pBuildingInfo->IsBombardIndirect()* iChange);
@@ -13015,34 +13054,25 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			iModifier += iTempMod;
 			if(iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
-#if defined(MOD_BUGFIX_MINOR)
 			break;
-#endif
 		case YIELD_GOLD:
 			iTempMod = GC.getPUPPET_GOLD_MODIFIER();
 			iModifier += iTempMod;
 			if(iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
-#if defined(MOD_BUGFIX_MINOR)
 			break;
-#endif
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 		case YIELD_TOURISM:
 			iTempMod = GC.getPUPPET_TOURISM_MODIFIER();
 			iModifier += iTempMod;
 			if(iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
 			break;
-#endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 		case YIELD_GOLDEN_AGE_POINTS:
 			iTempMod = GC.getPUPPET_GOLDEN_AGE_MODIFIER();
 			iModifier += iTempMod;
 			if(iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
 			break;
-#endif
-
 
 #if defined(MOD_API_UNIFIED_YIELDS_MORE)
 		case YIELD_GREAT_GENERAL_POINTS:
@@ -13213,20 +13243,14 @@ int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, bool bSta
 		{
 			return 0;
 		}
-
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 		if(eIndex == YIELD_TOURISM)
 		{
 			return 0;
 		}
-#endif
-
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 		if(eIndex == YIELD_GOLDEN_AGE_POINTS)
 		{
 			return 0;
 		}
-#endif
 	}
 
 	int iProcessYield = 0;
@@ -15136,18 +15160,14 @@ int CvCity::GetTradeYieldModifier(YieldTypes eIndex, CvString* toolTipSink) cons
 				*toolTipSink += "[NEWLINE][BULLET]";
 				*toolTipSink += GetLocalizedText("TXT_KEY_FAITH_FROM_TRADE_ROUTES", iReturnValue / 100.0f);
 				break;
-#if defined(MOD_API_UNIFIED_YIELDS_TOURISM)
 			case YIELD_TOURISM:
 				*toolTipSink += "[NEWLINE][BULLET]";
 				*toolTipSink += GetLocalizedText("TXT_KEY_TOURISM_FROM_TRADE_ROUTES", iReturnValue / 100.0f);
 				break;
-#endif
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			case YIELD_GOLDEN_AGE_POINTS:
 				*toolTipSink += "[NEWLINE][BULLET]";
 				*toolTipSink += GetLocalizedText("TXT_KEY_GOLDEN_AGE_POINTS_FROM_TRADE_ROUTES", iReturnValue / 100.0f);
 				break;
-#endif
 			}
 		}
 	}
@@ -19720,6 +19740,7 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iForbiddenForeignSpyCount;
 #ifdef MOD_ROG_CORE
 	kStream >> m_iCityBuildingRangeStrikeModifier;
+	kStream >> m_iExtraDamageHealPercent;
 	kStream >> m_iExtraDamageHeal;
 	kStream >> m_iBombardRange;
 	kStream >> m_iBombardIndirect;
@@ -20223,6 +20244,7 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iForbiddenForeignSpyCount;
 #ifdef MOD_ROG_CORE
 	kStream << m_iCityBuildingRangeStrikeModifier;
+	kStream << m_iExtraDamageHealPercent;
 	kStream << m_iExtraDamageHeal;
 	kStream << m_iBombardRange;
 	kStream << m_iBombardIndirect;
@@ -20798,6 +20820,21 @@ void CvCity::changeCityBuildingRangeStrikeModifier(int iValue)
 	if (iValue != 0)
 	{
 		m_iCityBuildingRangeStrikeModifier += iValue;
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::getExtraDamageHealPercent() const
+{
+	VALIDATE_OBJECT
+	return m_iExtraDamageHealPercent;
+}
+void CvCity::changeExtraDamageHealPercent(int iChange)
+{
+	VALIDATE_OBJECT
+	if (iChange != 0)
+	{
+		m_iExtraDamageHealPercent += iChange;
 	}
 }
 

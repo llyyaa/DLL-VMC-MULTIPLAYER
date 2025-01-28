@@ -4520,13 +4520,9 @@ void CvUnitCombat::ApplyPostCombatTraitEffects(CvUnit* pkWinner, CvUnit* pkLoser
 			int iValue = iCombatStrength * pkWinner->GetGoldenAgeValueFromKills() / 100;
 			kPlayer.ChangeGoldenAgeProgressMeter(iValue);
 
-#if defined(MOD_API_UNIFIED_YIELDS_GOLDEN_AGE)
 			CvYieldInfo* pYieldInfo = GC.getYieldInfo(YIELD_GOLDEN_AGE_POINTS);
 			CvString yieldString;
 			yieldString.Format("%s+%%d[ENDCOLOR]%s", pYieldInfo->getColorString(), pYieldInfo->getIconString());
-#else
-			CvString yieldString = "[COLOR_WHITE]+%d[ENDCOLOR][ICON_GOLDEN_AGE]";
-#endif
 
 			if(pkWinner->getOwner() == GC.getGame().getActivePlayer())
 			{

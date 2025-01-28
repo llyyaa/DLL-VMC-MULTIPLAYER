@@ -1033,6 +1033,9 @@
     <ClInclude Include="CvDllWorldInfo.h">
       <Filter>Dll Interface</Filter>
     </ClInclude>
+    <ClInclude Include="Lua\CvLuaExtraScript.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
     <ClInclude Include="Lua\CvLuaArea.h">
       <Filter>Lua</Filter>
     </ClInclude>

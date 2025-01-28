@@ -65,6 +65,7 @@ create table Trait_CityYieldPerAdjacentFeature (
 );
 
 ALTER TABLE Traits ADD COLUMN 'ExceedingHappinessImmigrationModifier' INTEGER DEFAULT 0;
+ALTER TABLE Traits ADD COLUMN 'NumFreeWorldWonderPerCity' INTEGER DEFAULT 0;
 
 alter table Traits add column `CanDiplomaticMarriage` boolean not null default 0;
 alter table Traits add column `AbleToDualEmpire` boolean not null default 0;
@@ -75,4 +76,4 @@ alter table Traits add column `InfluenceFromGreatPeopleBirth` INTEGER DEFAULT 0;
 alter table Traits add column `WLKDLengthChangeModifier` INTEGER DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN `WLKDCityNoResearchCost` BOOLEAN NOT NULL DEFAULT 0;
 ALTER TABLE Traits ADD COLUMN `GoodyUnitUpgradeFirst` BOOLEAN NOT NULL DEFAULT 0;
-alter table Traits add column `InternationalConnectionModifier` int not null default 0;
+alter table Traits add column `OthersTradeBonusModifier` int not null default 0;
