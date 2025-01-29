@@ -936,7 +936,7 @@ public:
 	void finishMoves();
 
 	bool IsImmobile() const;
-	void SetImmobile(bool bValue);
+	void ChangesNumImmobile(int iValue);
 
 	bool IsInFriendlyTerritory() const;
 	bool IsUnderEnemyRangedAttack() const;
@@ -2154,7 +2154,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iGameTurnCreated;
 	FAutoVariable<int, CvUnit> m_iDamage;
 	FAutoVariable<int, CvUnit> m_iMoves;
-	FAutoVariable<bool, CvUnit> m_bImmobile;
+	int m_iNumImmobile;
 	FAutoVariable<int, CvUnit> m_iExperience;
 #if defined(MOD_UNITS_XP_TIMES_100)
 	int m_iExperienceTimes100;

@@ -182,7 +182,7 @@ CvUnit::CvUnit() :
 	, m_iGameTurnCreated("CvUnit::m_iGameTurnCreated", m_syncArchive)
 	, m_iDamage("CvUnit::m_iDamage", m_syncArchive, true)
 	, m_iMoves("CvUnit::m_iMoves", m_syncArchive, true)
-	, m_bImmobile("CvUnit::m_bImmobile", m_syncArchive)
+	, m_iNumImmobile(0)
 	, m_iExperience("CvUnit::m_iExperience", m_syncArchive)
 #if defined(MOD_UNITS_XP_TIMES_100)
 	, m_iExperienceTimes100(0)
@@ -944,7 +944,7 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	// Is this Unit immobile?
 	if(getUnitInfo().IsImmobile())
 	{
-		SetImmobile(true);
+		ChangesNumImmobile(1);
 	}
 
 	setMoves(maxMoves());
@@ -1194,7 +1194,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iGameTurnCreated = 0;
 	m_iDamage = 0;
 	m_iMoves = 0;
-	m_bImmobile = false;
+	m_iNumImmobile = 0;
 	m_iExperience = 0;
 #if defined(MOD_UNITS_XP_TIMES_100)
 	m_iExperienceTimes100 = 0;
@@ -3594,8 +3594,7 @@ bool CvUnit::canEnterTerrain(const CvPlot& enterPlot, byte bMoveFlags) const
 	DomainTypes eDomain = getDomainType();
 
 	// Immobile Unit?
-
-	if(eDomain == DOMAIN_IMMOBILE || m_bImmobile)
+	if(IsImmobile())
 	{
 		return false;
 	}
@@ -4916,7 +4915,7 @@ bool CvUnit::CanAutomate(AutomateTypes eAutomate, bool bTestVisibility) const
 		break;
 
 	case AUTOMATE_EXPLORE:
-		if((GetBaseCombatStrength(true) == 0) || (getDomainType() == DOMAIN_AIR) || (getDomainType() == DOMAIN_IMMOBILE))
+		if((GetBaseCombatStrength(true) == 0) || (getDomainType() == DOMAIN_AIR) || IsImmobile())
 		{
 			return false;
 		}
@@ -21502,16 +21501,13 @@ bool CvUnit::IsImmobile() const
 		return true;
 	}
 
-	return m_bImmobile;
+	return m_iNumImmobile > 0;
 }
 
 /// Is this unit capable of moving on its own?
-void CvUnit::SetImmobile(bool bValue)
+void CvUnit::ChangesNumImmobile(int iValue)
 {
-	if(IsImmobile() != bValue)
-	{
-		m_bImmobile = bValue;
-	}
+	m_iNumImmobile += iValue;
 }
 
 //	--------------------------------------------------------------------------------
@@ -26404,6 +26400,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeNumEstablishCorps(thisPromotion.GetNumEstablishCorps() * iChange);
 		ChangeNumCannotBeEstablishedCorps(thisPromotion.IsCannotBeEstablishedCorps() ? iChange: 0);
 #endif
+		ChangesNumImmobile(thisPromotion.IsImmobile() ? iChange: 0);
 		ChangeReligiousStrengthLossRivalTerritory((thisPromotion.GetReligiousStrengthLossRivalTerritory()) *  iChange);
 		ChangeTradeMissionInfluenceModifier((thisPromotion.GetTradeMissionInfluenceModifier()) * iChange);
 		ChangeTradeMissionGoldModifier((thisPromotion.GetTradeMissionGoldModifier()) * iChange);
@@ -29377,7 +29374,7 @@ bool CvUnit::CanDoInterfaceMode(InterfaceModeTypes eInterfaceMode, bool bTestVis
 	switch(eInterfaceMode)
 	{
 	case INTERFACEMODE_MOVE_TO:
-		if((getDomainType() != DOMAIN_AIR) && (getDomainType() != DOMAIN_IMMOBILE) && (!IsImmobile()))
+		if(getDomainType() != DOMAIN_AIR && !IsImmobile())
 		{
 			return true;
 		}

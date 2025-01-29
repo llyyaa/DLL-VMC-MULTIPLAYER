@@ -96,6 +96,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iFriendlyLandsAttackModifier(0),
 	m_iOutsideFriendlyLandsModifier(0),
 	m_iCommandType(NO_COMMAND),
+	m_bImmobile(false),
 #if defined(MOD_UNITS_NO_SUPPLY)
 	m_bNoSupply(false),
 #endif
@@ -697,6 +698,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iFriendlyLandsModifier = kResults.GetInt("FriendlyLandsModifier");
 	m_iFriendlyLandsAttackModifier = kResults.GetInt("FriendlyLandsAttackModifier");
 	m_iOutsideFriendlyLandsModifier = kResults.GetInt("OutsideFriendlyLandsModifier");
+	m_bImmobile = kResults.GetBool("Immobile");
 #if defined(MOD_UNITS_NO_SUPPLY)
 	if (MOD_UNITS_NO_SUPPLY) {
 		m_bNoSupply = (kResults.GetInt("NoSupply") != 0);
@@ -2356,6 +2358,11 @@ int CvPromotionEntry::GetCommandType() const
 void CvPromotionEntry::SetCommandType(int iNewType)
 {
 	m_iCommandType = iNewType;
+}
+
+bool CvPromotionEntry::IsImmobile() const
+{
+	return m_bImmobile;
 }
 
 #if defined(MOD_UNITS_NO_SUPPLY)
