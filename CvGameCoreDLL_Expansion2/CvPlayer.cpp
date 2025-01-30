@@ -1255,7 +1255,9 @@ void CvPlayer::uninit()
 	m_iMaxEffectiveCities = 1;
 	m_iLastSliceMoved = 0;
 
-	
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_mAuraPromotionUnits.clear();
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iNumCropsTotal = 0;
 	m_iNumCropsUsed = 0;
@@ -17741,6 +17743,43 @@ void CvPlayer::ChangeUnitTypePrmoteHealGlobal(UnitTypes eIndex, int iChange)
 #endif
 
 
+//	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+const std::multimap<PromotionTypes, int>& CvPlayer::GetAuraPromotionUnits() const
+{
+	return m_mAuraPromotionUnits;
+}
+void CvPlayer::AddUnitAuraPromotion(int iUnitID, PromotionTypes ePromotion)
+{
+	m_mAuraPromotionUnits.insert(std::make_pair(ePromotion, iUnitID));
+}
+void CvPlayer::RemoveUnitAuraPromotion(int iUnitID, PromotionTypes ePromotion)
+{
+	for (auto it = m_mAuraPromotionUnits.begin(); it != m_mAuraPromotionUnits.end(); ++it)
+	{
+		if (it->first == ePromotion && it->second == iUnitID)
+		{
+			m_mAuraPromotionUnits.erase(it);
+			// only remove once
+			return;
+		}
+	}
+}
+void CvPlayer::RemoveAuraUnit(int iUnitID)
+{
+	for (auto it = m_mAuraPromotionUnits.begin(); it != m_mAuraPromotionUnits.end();)
+	{
+		if (it->second == iUnitID)
+		{
+			it = m_mAuraPromotionUnits.erase(it);
+		}
+		else ++it;
+	}
+}
+#endif
+//	--------------------------------------------------------------------------------
+
+
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetDomainTroopsTotalTimes100(DomainTypes eIndex) const
@@ -28636,6 +28675,19 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iProductionNeededBuildingModifier;
 	kStream >> m_iProductionNeededProjectModifier;
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	int iAuraPromotionUnitsLen = 0;
+	kStream >> iAuraPromotionUnitsLen;
+	m_mAuraPromotionUnits.clear();
+	for (int i = 0; i < iAuraPromotionUnitsLen; i++)
+	{
+		int iAuraPromotion = -1;
+		int iAuraPromotionUnit = -1;
+		kStream >> iAuraPromotion;
+		kStream >> iAuraPromotionUnit;
+		m_mAuraPromotionUnits.insert(std::make_pair((PromotionTypes)iAuraPromotion, iAuraPromotionUnit));
+	}
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	kStream >> m_aiDomainTroopsTotal;
 	kStream >> m_aiDomainTroopsUsed;
@@ -29324,6 +29376,14 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iProductionNeededBuildingModifier;
 	kStream << m_iProductionNeededProjectModifier;
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	kStream << m_mAuraPromotionUnits.size();
+	for (auto iter = m_mAuraPromotionUnits.begin(); iter != m_mAuraPromotionUnits.end(); iter++)
+	{
+		kStream << (int) iter->first;
+		kStream << iter->second;
+	}
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	kStream << m_aiDomainTroopsTotal;
 	kStream << m_aiDomainTroopsUsed;

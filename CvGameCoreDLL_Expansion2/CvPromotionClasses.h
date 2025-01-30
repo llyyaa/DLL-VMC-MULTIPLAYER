@@ -268,6 +268,10 @@ public:
 	int GetCapitalDefenseModifier() const;
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	int GetAuraPromotionType() const;
+	int GetAuraPromotionRange() const;
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int GetMeleeAttackModifier() const;
 	int GetCaptureEmenyExtraMax() const;
@@ -642,6 +646,10 @@ protected:
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	int m_iAuraPromotionType;
+	int m_iAuraPromotionRange;
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int m_iMeleeAttackModifier;
 	int m_iCaptureEmenyExtraMax;

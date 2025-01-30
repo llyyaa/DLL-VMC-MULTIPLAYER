@@ -1471,6 +1471,9 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCityAttackPlunderModifier = 0;
 	m_iExtraPopConsume = 0;
 	m_iAttackBonusFromDeathUnit = 0;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_sAuraPromotions.clear();
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMeleeAttackModifier = 0;
 	m_iCaptureEmenyExtraMax = 0;
@@ -2430,6 +2433,10 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 	}
 #endif
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	CheckAuraToOtherUnits();
+	GET_PLAYER(getOwner()).RemoveAuraUnit(GetID());
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	if(!IsNoTroops())
 	{
@@ -7034,6 +7041,63 @@ int CvUnit::GetAttackModifierFromWorldCongress() const
 {
 	return GC.getGame().GetGameLeagues()->GetGlobalAttackModifier();
 }
+//	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+bool CvUnit::HasAuraPromotions() const
+{
+	return m_sAuraPromotions.size() > 0;
+}
+const std::tr1::unordered_set<PromotionTypes>& CvUnit::GetAuraPromotions() const
+{
+	return m_sAuraPromotions;
+}
+void CvUnit::CheckAuraToOtherUnits()
+{
+	if(!MOD_PROMOTION_AURA_PROMOTION || !HasAuraPromotions()) return;
+	CvPlayerAI &kPlayer = GET_MY_PLAYER();
+	int iLoopUnit = 0;
+	for (CvUnit* pLoopUnit = kPlayer.firstUnit(&iLoopUnit); pLoopUnit != NULL; pLoopUnit = kPlayer.nextUnit(&iLoopUnit))
+	{
+		if (!pLoopUnit->IsCombatUnit()) continue;
+		for (auto ePromotion : m_sAuraPromotions) pLoopUnit->CheckAuraPromotionFromOtherUnits(ePromotion);
+	}
+}
+void CvUnit::CheckAuraFromOtherUnits()
+{
+	if(!MOD_PROMOTION_AURA_PROMOTION || !IsCombatUnit()) return;
+	CvPlayerAI& kPlayer = GET_MY_PLAYER();
+	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
+	for (auto it = auraPromotionUnits.begin(); it != auraPromotionUnits.end();)
+	{
+		CheckAuraPromotionFromOtherUnits(it->first);
+		it = auraPromotionUnits.upper_bound(it->first);
+	}
+}
+void CvUnit::CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion)
+{
+	if (plot() == nullptr) return;
+	CvPromotionEntry *pPromotion = GC.getPromotionInfo(ePromotion);
+	if (pPromotion == nullptr) return;
+	CvPlayerAI& kPlayer = GET_MY_PLAYER();
+	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
+	
+	bool bShouldObtain = false;
+	int iAuraRange = pPromotion->GetAuraPromotionRange();
+	auto range = auraPromotionUnits.equal_range(ePromotion);
+	for (auto it = range.first; it != range.second; ++it)
+	{
+		CvUnit* pUnit = kPlayer.getUnit(it->second);
+		if (pUnit == nullptr || pUnit->plot() == nullptr) continue;
+		if (plotDistance(getX(), getY(), pUnit->getX(), pUnit->getY()) > iAuraRange) continue;
+		// Add other conditions here
+		bShouldObtain = true;
+		break;
+	}
+	PromotionTypes eObtainPromotion = (PromotionTypes)pPromotion->GetAuraPromotionType();
+	setHasPromotion(eObtainPromotion, bShouldObtain);
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 //	--------------------------------------------------------------------------------
@@ -20347,6 +20411,10 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 		MoveToEnemyPlotDamage(pNewPlot);
 
 #endif
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+		CheckAuraToOtherUnits();
+		CheckAuraFromOtherUnits();
+#endif
 
 
 		//update facing direction
@@ -26125,7 +26193,6 @@ bool CvUnit::isHasPromotion(PromotionTypes eIndex) const
 void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 {
 	VALIDATE_OBJECT
-	int iChange;
 	int iI;
 
 	if(isHasPromotion(eIndex) != bNewValue)
@@ -26159,7 +26226,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 #endif
 
 		m_Promotions.SetPromotion(eIndex, bNewValue);
-		iChange = ((isHasPromotion(eIndex)) ? 1 : -1);
+		const int iChange = ((isHasPromotion(eIndex)) ? 1 : -1);
 
 		// Promotions will set Invisibility once but not change it later
 		if(getInvisibleType() == NO_INVISIBLE && thisPromotion.GetInvisibleType() != NO_INVISIBLE)
@@ -26370,6 +26437,22 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseModifier((thisPromotion.GetCapitalDefenseModifier()) * iChange);
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+		if(thisPromotion.GetAuraPromotionType() != NO_PROMOTION && thisPromotion.GetAuraPromotionRange() > 0)
+		{
+			if (iChange == 1)
+			{
+				m_sAuraPromotions.insert(eIndex);
+				GET_MY_PLAYER().AddUnitAuraPromotion(GetID(), eIndex);
+			}
+			else if (iChange == -1)
+			{
+				m_sAuraPromotions.erase(eIndex);
+				GET_MY_PLAYER().RemoveUnitAuraPromotion(GetID(), eIndex);
+			}
+			CheckAuraToOtherUnits();
+		}
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		ChangeMeleeAttackModifier((thisPromotion.GetMeleeAttackModifier()) * iChange);
 		ChangeCaptureEmenyExtraMax((thisPromotion.GetCaptureEmenyExtraMax()) * iChange);
@@ -26943,6 +27026,16 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 	kStream >> m_iExtraPopConsume;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	int iNumAuraPromotionType = 0;
+	kStream >> iNumAuraPromotionType;
+	for (int i = 0; i < iNumAuraPromotionType; i++)
+	{
+		int iAuraPromotionType = 0;
+		kStream >> iAuraPromotionType;
+		m_sAuraPromotions.insert((PromotionTypes)iAuraPromotionType);
+	}
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream >> m_iMeleeAttackModifier;
 	kStream >> m_iCaptureEmenyExtraMax;
@@ -27348,6 +27441,13 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
 	kStream << m_iExtraPopConsume;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	kStream << m_sAuraPromotions.size();
+	for (auto iter = m_sAuraPromotions.begin(); iter != m_sAuraPromotions.end(); iter++)
+	{
+		kStream << (int) *iter;
+	}
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream << m_iMeleeAttackModifier;
 	kStream << m_iCaptureEmenyExtraMax;

@@ -198,6 +198,10 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseModifier(0),
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_iAuraPromotionType(NO_PROMOTION),
+	m_iAuraPromotionRange(0),
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMeleeAttackModifier(0),
 	m_iCaptureEmenyExtraMax(0),
@@ -735,6 +739,11 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseModifier = kResults.GetInt("CapitalDefenseModifier");
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	const char* szAuraPromotionType = kResults.GetText("AuraPromotionType");
+	m_iAuraPromotionType = GC.getInfoTypeForString(szAuraPromotionType, true);
+	m_iAuraPromotionRange = kResults.GetInt("AuraPromotionRange");
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMeleeAttackModifier = kResults.GetInt("MeleeAttackModifier");
 	m_iCaptureEmenyExtraMax = kResults.GetInt("CaptureEmenyExtraMax");
@@ -2516,6 +2525,17 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 {
 	return m_iCityAttackPlunderModifier;
 }
+
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+int CvPromotionEntry::GetAuraPromotionType() const
+{
+	return m_iAuraPromotionType;
+}
+int CvPromotionEntry::GetAuraPromotionRange() const
+{
+	return m_iAuraPromotionRange;
+}
+#endif
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 int CvPromotionEntry::GetMeleeAttackModifier() const

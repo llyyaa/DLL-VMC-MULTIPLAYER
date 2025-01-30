@@ -284,3 +284,7 @@ CREATE TABLE IF NOT EXISTS Project_PolicyNeeded (
 
 ALTER TABLE Civilizations ADD COLUMN `SpecialGAText` TEXT DEFAULT 'TXT_KEY_GOLDEN_AGE_ANNOUNCE';
 ALTER TABLE Civilizations ADD COLUMN `SpecialGAHelpText` TEXT DEFAULT 'TXT_KEY_TP_GOLDEN_AGE_EFFECT';
+
+
+ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionType' TEXT DEFAULT '' references UnitPromotions(Type);
+ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionRange' INTEGER DEFAULT 0;

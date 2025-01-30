@@ -1889,6 +1889,14 @@ public:
 	void ChangeAttackBonusFromDeathUnit(int iValue);
 	int GetAttackBonusFromDeathUnit() const;
 	int GetAttackModifierFromWorldCongress() const;
+
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	bool HasAuraPromotions() const;
+	const std::tr1::unordered_set<PromotionTypes>& GetAuraPromotions() const;
+	void CheckAuraToOtherUnits();
+	void CheckAuraFromOtherUnits();
+	void CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion);
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	const int GetMeleeAttackModifier() const;
 	void ChangeMeleeAttackModifier(int iValue);
@@ -2580,6 +2588,9 @@ protected:
 	int m_iCityAttackPlunderModifier;
 	int m_iExtraPopConsume;
 	int m_iAttackBonusFromDeathUnit;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	std::tr1::unordered_set<PromotionTypes> m_sAuraPromotions;
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int m_iMeleeAttackModifier;
 	int m_iCaptureEmenyExtraMax;
