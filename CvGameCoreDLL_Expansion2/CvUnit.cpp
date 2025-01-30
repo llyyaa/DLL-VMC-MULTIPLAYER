@@ -7058,13 +7058,13 @@ void CvUnit::CheckAuraToOtherUnits()
 	int iLoopUnit = 0;
 	for (CvUnit* pLoopUnit = kPlayer.firstUnit(&iLoopUnit); pLoopUnit != NULL; pLoopUnit = kPlayer.nextUnit(&iLoopUnit))
 	{
-		if (!pLoopUnit->IsCombatUnit()) continue;
+		if (pLoopUnit->IsCivilianUnit()) continue;
 		for (auto ePromotion : m_sAuraPromotions) pLoopUnit->CheckAuraPromotionFromOtherUnits(ePromotion);
 	}
 }
 void CvUnit::CheckAuraFromOtherUnits()
 {
-	if(!MOD_PROMOTION_AURA_PROMOTION || !IsCombatUnit()) return;
+	if(!MOD_PROMOTION_AURA_PROMOTION || IsCivilianUnit()) return;
 	CvPlayerAI& kPlayer = GET_MY_PLAYER();
 	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
 	for (auto it = auraPromotionUnits.begin(); it != auraPromotionUnits.end();)
@@ -7078,6 +7078,8 @@ void CvUnit::CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion)
 	if (plot() == nullptr) return;
 	CvPromotionEntry *pPromotion = GC.getPromotionInfo(ePromotion);
 	if (pPromotion == nullptr) return;
+	if (!pPromotion->GetDomainAuraValid(getDomainType())) return;
+
 	CvPlayerAI& kPlayer = GET_MY_PLAYER();
 	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
 	

@@ -369,7 +369,10 @@ CvPromotionEntry::CvPromotionEntry():
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	m_pbUnitName(NULL),
 #endif
-	m_pbPostCombatRandomPromotion(NULL)
+	m_pbPostCombatRandomPromotion(NULL),
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_pbDomainAuraValid(NULL)
+#endif
 {
 }
 
@@ -419,6 +422,9 @@ CvPromotionEntry::~CvPromotionEntry(void)
 	SAFE_DELETE_ARRAY(m_pbPostCombatRandomPromotion);
 #if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 	m_vPrePromotions.clear();
+#endif
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	SAFE_DELETE_ARRAY(m_pbDomainAuraValid);
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	if(m_pUpgradePromotions)
@@ -936,6 +942,26 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 	const char* szPromotionType = GetType();
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	{
+		kUtility.InitializeArray(m_pbDomainAuraValid, NUM_DOMAIN_TYPES, false);
+		std::string strKey("Promotion_AuraPromotionDomains");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Domains.ID from Promotion_AuraPromotionDomains inner join Domains on DomainType = Domains.Type where PromotionType = ?;");
+		}
+
+		pResults->Bind(1, szPromotionType);
+		while (pResults->Step())
+		{
+			const int iDomainsID = pResults->GetInt(0);
+			m_pbDomainAuraValid[iDomainsID] = true;
+		}
+
+		pResults->Reset();
+	}
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	{
 		std::string strKey("UnitPromotions_PromotionUpgrade_MaxRow");
@@ -2534,6 +2560,14 @@ int CvPromotionEntry::GetAuraPromotionType() const
 int CvPromotionEntry::GetAuraPromotionRange() const
 {
 	return m_iAuraPromotionRange;
+}
+bool CvPromotionEntry::GetDomainAuraValid(int i) const
+{
+	if (i > -1 && i < NUM_DOMAIN_TYPES)
+	{
+		return m_pbDomainAuraValid[i];
+	}
+	return false;
 }
 #endif
 

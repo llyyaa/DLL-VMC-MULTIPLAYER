@@ -285,6 +285,11 @@ CREATE TABLE IF NOT EXISTS Project_PolicyNeeded (
 ALTER TABLE Civilizations ADD COLUMN `SpecialGAText` TEXT DEFAULT 'TXT_KEY_GOLDEN_AGE_ANNOUNCE';
 ALTER TABLE Civilizations ADD COLUMN `SpecialGAHelpText` TEXT DEFAULT 'TXT_KEY_TP_GOLDEN_AGE_EFFECT';
 
-
-ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionType' TEXT DEFAULT '' references UnitPromotions(Type);
+-- Add Promotion to other Units in Range, need CustomModOptions PROMOTION_AURA_PROMOTION to make it valid
+ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionType' TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
 ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionRange' INTEGER DEFAULT 0;
+CREATE TABLE Promotion_AuraPromotionDomains (
+    -- UnitPromotions.Type
+    `PromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type),
+    'DomainType' TEXT REFERENCES Domains(Type)
+);
