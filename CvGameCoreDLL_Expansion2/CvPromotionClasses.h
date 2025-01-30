@@ -271,6 +271,7 @@ public:
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	int GetAuraPromotionType() const;
 	int GetAuraPromotionRange() const;
+	int GetAuraPromotionRangeAIBonus() const;
 	bool GetDomainAuraValid(int i) const;
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
@@ -650,6 +651,7 @@ protected:
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	int m_iAuraPromotionType;
 	int m_iAuraPromotionRange;
+	int m_iAuraPromotionRangeAIBonus;
 	bool* m_pbDomainAuraValid;
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)

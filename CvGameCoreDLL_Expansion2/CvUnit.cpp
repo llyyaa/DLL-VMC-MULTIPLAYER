@@ -2434,8 +2434,8 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 #endif
 
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
-	CheckAuraToOtherUnits();
 	GET_PLAYER(getOwner()).RemoveAuraUnit(GetID());
+	CheckAuraToOtherUnits();
 #endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	if(!IsNoTroops())
@@ -7085,6 +7085,7 @@ void CvUnit::CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion)
 	
 	bool bShouldObtain = false;
 	int iAuraRange = pPromotion->GetAuraPromotionRange();
+	if (!kPlayer.isHuman()) iAuraRange += pPromotion->GetAuraPromotionRangeAIBonus();
 	auto range = auraPromotionUnits.equal_range(ePromotion);
 	for (auto it = range.first; it != range.second; ++it)
 	{

@@ -288,6 +288,7 @@ ALTER TABLE Civilizations ADD COLUMN `SpecialGAHelpText` TEXT DEFAULT 'TXT_KEY_T
 -- Add Promotion to other Units in Range, need CustomModOptions PROMOTION_AURA_PROMOTION to make it valid
 ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionType' TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
 ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionRange' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionRangeAIBonus' INTEGER DEFAULT 0;
 CREATE TABLE Promotion_AuraPromotionDomains (
     -- UnitPromotions.Type
     `PromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type),
