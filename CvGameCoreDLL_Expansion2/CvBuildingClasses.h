@@ -585,6 +585,9 @@ public:
 	int GetGlobalProductionNeededUnitModifier() const;
 	int GetGlobalProductionNeededBuildingModifier() const;
 	int GetGlobalProductionNeededProjectModifier() const;
+	int GetGlobalProductionNeededUnitMax() const;
+	int GetGlobalProductionNeededBuildingMax() const;
+	int GetGlobalProductionNeededProjectMax() const;
 	bool IsDummyBuilding() const;
 	bool IsNoPuppet() const;
 
@@ -1006,6 +1009,9 @@ private:
 	int m_iGlobalProductionNeededUnitModifier = 0;
 	int m_iGlobalProductionNeededBuildingModifier = 0;
 	int m_iGlobalProductionNeededProjectModifier = 0;
+	int m_iGlobalProductionNeededUnitMax = 0;
+	int m_iGlobalProductionNeededBuildingMax = 0;
+	int m_iGlobalProductionNeededProjectMax = 0;
 	bool m_bDummyBuilding = false;
 	bool m_bNoPuppet = false;
 

@@ -2179,6 +2179,12 @@ public:
 	void ChangeProductionNeededBuildingModifier(int change);
 	int GetProductionNeededProjectModifier() const;
 	void ChangeProductionNeededProjectModifier(int change);
+	int GetProductionNeededUnitMax() const;
+	void ChangeProductionNeededUnitMax(int change);
+	int GetProductionNeededBuildingMax() const;
+	void ChangeProductionNeededBuildingMax(int change);
+	int GetProductionNeededProjectMax() const;
+	void ChangeProductionNeededProjectMax(int change);
 
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	const std::multimap<PromotionTypes, int>& GetAuraPromotionUnits() const;
@@ -2962,6 +2968,9 @@ protected:
 	int m_iProductionNeededUnitModifier = 0;
 	int m_iProductionNeededBuildingModifier = 0;
 	int m_iProductionNeededProjectModifier = 0;
+	int m_iProductionNeededUnitMax = -20;
+	int m_iProductionNeededBuildingMax = -20;
+	int m_iProductionNeededProjectMax = -20;
 
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	std::multimap<PromotionTypes, int> m_mAuraPromotionUnits;

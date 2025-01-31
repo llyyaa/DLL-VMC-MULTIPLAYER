@@ -1255,6 +1255,30 @@ void CvPlayer::uninit()
 	m_iMaxEffectiveCities = 1;
 	m_iLastSliceMoved = 0;
 
+	m_iDishonestyCounter = 0;
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	m_iWarCasualtiesCounter = 0;
+#endif
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	m_iResourceUnhappinessModifier = 0;
+	m_iResourceCityConnectionTradeRouteGoldModifier = 0;
+#endif
+	m_iCaptureCityResistanceTurnsChangeFormula = NO_LUA_FORMULA;
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+  	m_iCachedCapturedHolyCity = 0;
+#endif
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_iCorruptionScoreModifierFromPolicy = 0;
+	m_iCorruptionLevelReduceByOneRC = 0;
+	m_iCorruptionPolicyCostModifier = 0;
+#endif
+	m_iProductionNeededUnitModifier = 0;
+	m_iProductionNeededBuildingModifier = 0;
+	m_iProductionNeededProjectModifier = 0;
+	m_iProductionNeededUnitMax = -20;
+	m_iProductionNeededBuildingMax = -20;
+	m_iProductionNeededProjectMax = -20;
+
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	m_mAuraPromotionUnits.clear();
 #endif
@@ -9329,7 +9353,7 @@ int CvPlayer::getProductionNeeded(UnitTypes eUnit) const
 
 	iProductionNeeded += getUnitExtraCost(eUnitClass);
 
-	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededUnitModifier()));
+	iProductionNeeded *= (100 + std::max(GetProductionNeededUnitMax(), GetProductionNeededUnitModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
@@ -9423,7 +9447,7 @@ int CvPlayer::getProductionNeeded(BuildingTypes eBuilding) const
 		iProductionNeeded /= 100;
 	}
 
-	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededBuildingModifier()));
+	iProductionNeeded *= (100 + std::max(GetProductionNeededBuildingMax(), GetProductionNeededBuildingModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
@@ -9469,7 +9493,7 @@ int CvPlayer::getProductionNeeded(ProjectTypes eProject) const
 		iProductionNeeded /= 100;
 	}
 
-	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededProjectModifier()));
+	iProductionNeeded *= (100 + std::max(GetProductionNeededProjectMax(), GetProductionNeededProjectModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
@@ -28674,6 +28698,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iProductionNeededUnitModifier;
 	kStream >> m_iProductionNeededBuildingModifier;
 	kStream >> m_iProductionNeededProjectModifier;
+	kStream >> m_iProductionNeededUnitMax;
+	kStream >> m_iProductionNeededBuildingMax;
+	kStream >> m_iProductionNeededProjectMax;
 
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	int iAuraPromotionUnitsLen = 0;
@@ -29375,6 +29402,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iProductionNeededUnitModifier;
 	kStream << m_iProductionNeededBuildingModifier;
 	kStream << m_iProductionNeededProjectModifier;
+	kStream << m_iProductionNeededUnitMax;
+	kStream << m_iProductionNeededBuildingMax;
+	kStream << m_iProductionNeededProjectMax;
 
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	kStream << m_mAuraPromotionUnits.size();
@@ -33239,6 +33269,31 @@ void CvPlayer::ChangeProductionNeededProjectModifier(int change) {
 	m_iProductionNeededProjectModifier += change;
 }
 
+int CvPlayer::GetProductionNeededUnitMax() const {
+	return m_iProductionNeededUnitMax;
+}
+
+void CvPlayer::ChangeProductionNeededUnitMax(int change) {
+	m_iProductionNeededUnitMax += change;
+}
+
+int CvPlayer::GetProductionNeededBuildingMax() const {
+	return m_iProductionNeededBuildingMax;
+}
+
+void CvPlayer::ChangeProductionNeededBuildingMax(int change) {
+	m_iProductionNeededBuildingMax += change;
+}
+
+int CvPlayer::GetProductionNeededProjectMax() const {
+	return m_iProductionNeededProjectMax;
+}
+
+void CvPlayer::ChangeProductionNeededProjectMax(int change) {
+	m_iProductionNeededProjectMax += change;
+}
+
+//	--------------------------------------------------------------------------------
 void CvPlayer::GetUCTypesFromPlayer(const CvPlayer& player,
 	std::tr1::unordered_set<UnitTypes>* m_sUU,
 	std::tr1::unordered_set<BuildingTypes>* m_sUB,
