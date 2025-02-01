@@ -294,3 +294,9 @@ CREATE TABLE Promotion_AuraPromotionDomains (
     `PromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type),
     'DomainType' TEXT REFERENCES Domains(Type)
 );
+-- Add Promotions when providers that have a complex number
+CREATE TABLE Promotion_AuraPromotionProviderNum (
+    `PromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type),
+    `AuraPromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type),
+    'ProviderNum' INTEGER DEFAULT 0
+);

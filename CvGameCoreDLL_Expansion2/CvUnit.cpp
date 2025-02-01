@@ -7078,26 +7078,33 @@ void CvUnit::CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion)
 	if (plot() == nullptr) return;
 	CvPromotionEntry *pPromotion = GC.getPromotionInfo(ePromotion);
 	if (pPromotion == nullptr) return;
+	const std::vector<std::pair<PromotionTypes, int>>& vAuraPromotionsProviderNum = pPromotion->GetAuraPromotionsProviderNum();
+	if (vAuraPromotionsProviderNum.size() < 1) return;
 	if (!pPromotion->GetDomainAuraValid(getDomainType())) return;
 
 	CvPlayerAI& kPlayer = GET_MY_PLAYER();
 	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
 	
-	bool bShouldObtain = false;
-	int iAuraRange = pPromotion->GetAuraPromotionRange();
-	if (!kPlayer.isHuman()) iAuraRange += pPromotion->GetAuraPromotionRangeAIBonus();
-	auto range = auraPromotionUnits.equal_range(ePromotion);
-	for (auto it = range.first; it != range.second; ++it)
+	int iNumProvider = 0;
+	int iMaxNeeded = vAuraPromotionsProviderNum.back().second;
+	if (!isEmbarked())
 	{
-		CvUnit* pUnit = kPlayer.getUnit(it->second);
-		if (pUnit == nullptr || pUnit->plot() == nullptr) continue;
-		if (plotDistance(getX(), getY(), pUnit->getX(), pUnit->getY()) > iAuraRange) continue;
-		// Add other conditions here
-		bShouldObtain = true;
-		break;
+		int iAuraRange = pPromotion->GetAuraPromotionRange();
+		if (!kPlayer.isHuman()) iAuraRange += pPromotion->GetAuraPromotionRangeAIBonus();
+		auto range = auraPromotionUnits.equal_range(ePromotion);
+		for (auto it = range.first; it != range.second; ++it)
+		{
+			CvUnit* pUnit = kPlayer.getUnit(it->second);
+			if (pUnit == nullptr || pUnit->plot() == nullptr) continue;
+			if (plotDistance(getX(), getY(), pUnit->getX(), pUnit->getY()) > iAuraRange) continue;
+			iNumProvider++;
+			if (iNumProvider >= iMaxNeeded) break;
+		}
 	}
-	PromotionTypes eObtainPromotion = (PromotionTypes)pPromotion->GetAuraPromotionType();
-	setHasPromotion(eObtainPromotion, bShouldObtain);
+	for (auto promotionWithProviders : vAuraPromotionsProviderNum)
+	{
+		setHasPromotion(promotionWithProviders.first, promotionWithProviders.second <= iNumProvider);
+	}
 }
 #endif
 
@@ -26441,7 +26448,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
-		if(thisPromotion.GetAuraPromotionType() != NO_PROMOTION && thisPromotion.GetAuraPromotionRange() > 0)
+		if(thisPromotion.GetAuraPromotionsProviderNum().size() > 0)
 		{
 			if (iChange == 1)
 			{

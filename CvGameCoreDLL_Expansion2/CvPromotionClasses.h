@@ -269,7 +269,7 @@ public:
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
-	int GetAuraPromotionType() const;
+	const std::vector<std::pair<PromotionTypes, int>>& GetAuraPromotionsProviderNum() const;
 	int GetAuraPromotionRange() const;
 	int GetAuraPromotionRangeAIBonus() const;
 	bool GetDomainAuraValid(int i) const;
@@ -649,7 +649,7 @@ protected:
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
-	int m_iAuraPromotionType;
+	std::vector<std::pair<PromotionTypes, int>> m_vAuraPromotionsProviderNum;
 	int m_iAuraPromotionRange;
 	int m_iAuraPromotionRangeAIBonus;
 	bool* m_pbDomainAuraValid;

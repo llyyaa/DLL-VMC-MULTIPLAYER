@@ -199,7 +199,6 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
-	m_iAuraPromotionType(NO_PROMOTION),
 	m_iAuraPromotionRange(0),
 	m_iAuraPromotionRangeAIBonus(0),
 #endif
@@ -747,8 +746,6 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
-	const char* szAuraPromotionType = kResults.GetText("AuraPromotionType");
-	m_iAuraPromotionType = GC.getInfoTypeForString(szAuraPromotionType, true);
 	m_iAuraPromotionRange = kResults.GetInt("AuraPromotionRange");
 	m_iAuraPromotionRangeAIBonus = kResults.GetInt("AuraPromotionRangeAIBonus");
 #endif
@@ -959,6 +956,32 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		{
 			const int iDomainsID = pResults->GetInt(0);
 			m_pbDomainAuraValid[iDomainsID] = true;
+		}
+
+		pResults->Reset();
+	}
+	{
+		m_vAuraPromotionsProviderNum.clear();
+		{
+			const char* szAuraPromotionType = kResults.GetText("AuraPromotionType");
+			const int iAuraPromotionID = GC.getInfoTypeForString(szAuraPromotionType, true);
+			if(iAuraPromotionID != NO_PROMOTION) 
+				m_vAuraPromotionsProviderNum.push_back(std::make_pair((PromotionTypes)iAuraPromotionID, 1));
+		}
+
+		std::string strKey("Promotion_AuraPromotionProviderNum");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select t1.ID as AuraPromotionID, t2.ProviderNum from Promotion_AuraPromotionProviderNum t2 inner join UnitPromotions t1 on t1.Type = t2.AuraPromotionType where PromotionType = ? and ProviderNum > 0 order by ProviderNum ASC;");
+		}
+
+		pResults->Bind(1, szPromotionType);
+		while (pResults->Step())
+		{
+			const int iAuraPromotionID = pResults->GetInt(0);
+			const int iProviderNum = pResults->GetInt(1);
+			m_vAuraPromotionsProviderNum.push_back(std::make_pair((PromotionTypes)iAuraPromotionID, iProviderNum));
 		}
 
 		pResults->Reset();
@@ -2555,9 +2578,9 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 }
 
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
-int CvPromotionEntry::GetAuraPromotionType() const
+const std::vector<std::pair<PromotionTypes, int>>& CvPromotionEntry::GetAuraPromotionsProviderNum() const
 {
-	return m_iAuraPromotionType;
+	return m_vAuraPromotionsProviderNum;
 }
 int CvPromotionEntry::GetAuraPromotionRange() const
 {
