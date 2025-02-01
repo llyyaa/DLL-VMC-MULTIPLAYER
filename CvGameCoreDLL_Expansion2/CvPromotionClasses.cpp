@@ -201,6 +201,7 @@ CvPromotionEntry::CvPromotionEntry():
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	m_iAuraPromotionRange(0),
 	m_iAuraPromotionRangeAIBonus(0),
+	m_bAuraPromotionNoSelf(false),
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMeleeAttackModifier(0),
@@ -748,6 +749,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	m_iAuraPromotionRange = kResults.GetInt("AuraPromotionRange");
 	m_iAuraPromotionRangeAIBonus = kResults.GetInt("AuraPromotionRangeAIBonus");
+	m_bAuraPromotionNoSelf = kResults.GetBool("AuraPromotionNoSelf");
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMeleeAttackModifier = kResults.GetInt("MeleeAttackModifier");
@@ -2611,6 +2613,10 @@ int CvPromotionEntry::GetAuraPromotionRange() const
 int CvPromotionEntry::GetAuraPromotionRangeAIBonus() const
 {
 	return m_iAuraPromotionRangeAIBonus;
+}
+bool CvPromotionEntry::IsAuraPromotionNoSelf() const
+{
+	return m_bAuraPromotionNoSelf;
 }
 bool CvPromotionEntry::GetDomainAuraValid(int i) const
 {

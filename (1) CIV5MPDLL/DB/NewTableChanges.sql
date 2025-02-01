@@ -289,6 +289,7 @@ ALTER TABLE Civilizations ADD COLUMN `SpecialGAHelpText` TEXT DEFAULT 'TXT_KEY_T
 ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionType' TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
 ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionRange' INTEGER DEFAULT 0;
 ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionRangeAIBonus' INTEGER DEFAULT 0;
+ALTER TABLE UnitPromotions ADD COLUMN 'AuraPromotionNoSelf' BOOLEAN DEFAULT 0;
 -- Only Valid Domain Units can get Promotions
 CREATE TABLE Promotion_AuraPromotionDomains (
     -- UnitPromotions.Type
@@ -301,7 +302,7 @@ CREATE TABLE Promotion_AuraPromotionPrePromotionOr (
     `PromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type),
     `PrePromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type)
 );
--- Add Promotions when providers that have a complex number
+-- Add Promotions when providers that have a complex number, at least 1
 CREATE TABLE Promotion_AuraPromotionProviderNum (
     `PromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type),
     `AuraPromotionType` TEXT DEFAULT '' REFERENCES UnitPromotions(Type),

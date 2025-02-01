@@ -273,6 +273,7 @@ public:
 	const std::vector<PromotionTypes>& GetAuraPromotionPrePromotionOr() const;
 	int GetAuraPromotionRange() const;
 	int GetAuraPromotionRangeAIBonus() const;
+	bool IsAuraPromotionNoSelf() const;
 	bool GetDomainAuraValid(int i) const;
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
@@ -654,6 +655,7 @@ protected:
 	std::vector<PromotionTypes> m_vAuraPromotionPrePromotionOr;
 	int m_iAuraPromotionRange;
 	int m_iAuraPromotionRangeAIBonus;
+	bool m_bAuraPromotionNoSelf;
 	bool* m_pbDomainAuraValid;
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)

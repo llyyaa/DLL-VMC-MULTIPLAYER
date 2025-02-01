@@ -7083,8 +7083,14 @@ void CvUnit::CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion)
 	if (pPromotion == nullptr) return;
 	const std::vector<std::pair<PromotionTypes, int>>& vAuraPromotionsProviderNum = pPromotion->GetAuraPromotionsProviderNum();
 	if (vAuraPromotionsProviderNum.size() < 1) return;
+
+	int iNumProvider = 0;
+	// Embarked filter
+	if (isEmbarked()) goto SetAuraPromotions;
+	// Self filter
+	if (pPromotion->IsAuraPromotionNoSelf() && isHasPromotion(ePromotion)) goto SetAuraPromotions;
 	// Domain filter
-	if (!pPromotion->GetDomainAuraValid(getDomainType())) return;
+	if (!pPromotion->GetDomainAuraValid(getDomainType())) goto SetAuraPromotions;
 	const std::vector<PromotionTypes>& vPreOrPromotions = pPromotion->GetAuraPromotionPrePromotionOr();
 	// PrePromotion filter
 	bool bHasPrePromotion = vPreOrPromotions.size() < 1;
@@ -7094,27 +7100,25 @@ void CvUnit::CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion)
 		bHasPrePromotion = true;
 		break;
 	}
-	if (!bHasPrePromotion) return;
+	if (!bHasPrePromotion) goto SetAuraPromotions;
 
 	CvPlayerAI& kPlayer = GET_MY_PLAYER();
 	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
 	
-	int iNumProvider = 0;
 	int iMaxNeeded = vAuraPromotionsProviderNum.back().second;
-	if (!isEmbarked())
+	int iAuraRange = pPromotion->GetAuraPromotionRange();
+	if (!kPlayer.isHuman()) iAuraRange += pPromotion->GetAuraPromotionRangeAIBonus();
+	auto range = auraPromotionUnits.equal_range(ePromotion);
+	for (auto it = range.first; it != range.second; ++it)
 	{
-		int iAuraRange = pPromotion->GetAuraPromotionRange();
-		if (!kPlayer.isHuman()) iAuraRange += pPromotion->GetAuraPromotionRangeAIBonus();
-		auto range = auraPromotionUnits.equal_range(ePromotion);
-		for (auto it = range.first; it != range.second; ++it)
-		{
-			CvUnit* pUnit = kPlayer.getUnit(it->second);
-			if (pUnit == nullptr || pUnit->plot() == nullptr) continue;
-			if (plotDistance(getX(), getY(), pUnit->getX(), pUnit->getY()) > iAuraRange) continue;
-			iNumProvider++;
-			if (iNumProvider >= iMaxNeeded) break;
-		}
+		CvUnit* pUnit = kPlayer.getUnit(it->second);
+		if (pUnit == nullptr || pUnit->plot() == nullptr) continue;
+		if (plotDistance(getX(), getY(), pUnit->getX(), pUnit->getY()) > iAuraRange) continue;
+		iNumProvider++;
+		if (iNumProvider >= iMaxNeeded) break;
 	}
+
+SetAuraPromotions:
 	for (auto promotionWithProviders : vAuraPromotionsProviderNum)
 	{
 		setHasPromotion(promotionWithProviders.first, promotionWithProviders.second <= iNumProvider);
