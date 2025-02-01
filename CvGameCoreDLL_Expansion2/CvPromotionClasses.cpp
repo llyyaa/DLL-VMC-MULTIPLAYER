@@ -961,6 +961,24 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		pResults->Reset();
 	}
 	{
+		m_vAuraPromotionPrePromotionOr.clear();
+		std::string strKey("Promotion_AuraPromotionPrePromotionOr");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select t1.ID as PrePromotionID from Promotion_AuraPromotionPrePromotionOr t2 inner join UnitPromotions t1 on t1.Type = t2.PrePromotionType where PromotionType = ?;");
+		}
+
+		pResults->Bind(1, szPromotionType);
+		while (pResults->Step())
+		{
+			const int iPrePromotionID = pResults->GetInt(0);
+			m_vAuraPromotionPrePromotionOr.push_back((PromotionTypes)iPrePromotionID);
+		}
+
+		pResults->Reset();
+	}
+	{
 		m_vAuraPromotionsProviderNum.clear();
 		{
 			const char* szAuraPromotionType = kResults.GetText("AuraPromotionType");
@@ -2581,6 +2599,10 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 const std::vector<std::pair<PromotionTypes, int>>& CvPromotionEntry::GetAuraPromotionsProviderNum() const
 {
 	return m_vAuraPromotionsProviderNum;
+}
+const std::vector<PromotionTypes>& CvPromotionEntry::GetAuraPromotionPrePromotionOr() const
+{
+	return m_vAuraPromotionPrePromotionOr;
 }
 int CvPromotionEntry::GetAuraPromotionRange() const
 {

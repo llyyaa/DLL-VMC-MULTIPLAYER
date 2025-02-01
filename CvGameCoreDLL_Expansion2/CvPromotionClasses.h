@@ -270,6 +270,7 @@ public:
 	int GetCityAttackPlunderModifier() const;
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	const std::vector<std::pair<PromotionTypes, int>>& GetAuraPromotionsProviderNum() const;
+	const std::vector<PromotionTypes>& GetAuraPromotionPrePromotionOr() const;
 	int GetAuraPromotionRange() const;
 	int GetAuraPromotionRangeAIBonus() const;
 	bool GetDomainAuraValid(int i) const;
@@ -650,6 +651,7 @@ protected:
 	int m_iCityAttackPlunderModifier;
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
 	std::vector<std::pair<PromotionTypes, int>> m_vAuraPromotionsProviderNum;
+	std::vector<PromotionTypes> m_vAuraPromotionPrePromotionOr;
 	int m_iAuraPromotionRange;
 	int m_iAuraPromotionRangeAIBonus;
 	bool* m_pbDomainAuraValid;

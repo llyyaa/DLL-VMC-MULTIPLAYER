@@ -1117,6 +1117,9 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	if(bSetupGraphical)
 		setupGraphical();
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	CheckAuraFromOtherUnits();
+#endif
 #if defined(MOD_UNIT_BOUND_IMPROVEMENT)
 	if(MOD_UNIT_BOUND_IMPROVEMENT)
 	{
@@ -7080,7 +7083,18 @@ void CvUnit::CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion)
 	if (pPromotion == nullptr) return;
 	const std::vector<std::pair<PromotionTypes, int>>& vAuraPromotionsProviderNum = pPromotion->GetAuraPromotionsProviderNum();
 	if (vAuraPromotionsProviderNum.size() < 1) return;
+	// Domain filter
 	if (!pPromotion->GetDomainAuraValid(getDomainType())) return;
+	const std::vector<PromotionTypes>& vPreOrPromotions = pPromotion->GetAuraPromotionPrePromotionOr();
+	// PrePromotion filter
+	bool bHasPrePromotion = vPreOrPromotions.size() < 1;
+	for(auto promotion : vPreOrPromotions)
+	{
+		if (!isHasPromotion(promotion)) continue;
+		bHasPrePromotion = true;
+		break;
+	}
+	if (!bHasPrePromotion) return;
 
 	CvPlayerAI& kPlayer = GET_MY_PLAYER();
 	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
@@ -20422,8 +20436,8 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 
 #endif
 #if defined(MOD_PROMOTION_AURA_PROMOTION)
-		CheckAuraToOtherUnits();
 		CheckAuraFromOtherUnits();
+		CheckAuraToOtherUnits();
 #endif
 
 
