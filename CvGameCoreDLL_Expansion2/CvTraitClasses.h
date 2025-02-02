@@ -181,6 +181,7 @@ public:
 	bool IsEmbarkedToLandFlatCost() const;
 	bool IsNoHillsImprovementMaintenance() const;
 	bool IsTechBoostFromCapitalScienceBuildings() const;
+	bool IsScienceOutputFromArtistConsumption() const;
 	bool IsStaysAliveZeroCities() const;
 	bool IsFaithFromUnimprovedForest() const;
 #if defined(MOD_TRAITS_ANY_BELIEF)
@@ -464,6 +465,7 @@ protected:
 	bool m_bEmbarkedToLandFlatCost;
 	bool m_bNoHillsImprovementMaintenance;
 	bool m_bTechBoostFromCapitalScienceBuildings;
+	bool m_bScienceOutputFromArtistConsumption;
 	bool m_bStaysAliveZeroCities;
 	bool m_bFaithFromUnimprovedForest;
 	bool m_bWLKDCityNoResearchCost;
@@ -1097,6 +1099,10 @@ public:
 	{
 		return m_bTechBoostFromCapitalScienceBuildings;
 	};
+	bool IsScienceOutputFromArtistConsumption() const
+	{
+		return m_bScienceOutputFromArtistConsumption;
+	};
 	bool IsStaysAliveZeroCities() const
 	{
 		return m_bStaysAliveZeroCities;
@@ -1514,6 +1520,7 @@ private:
 	bool m_bEmbarkedToLandFlatCost = false;
 	bool m_bNoHillsImprovementMaintenance = false;
 	bool m_bTechBoostFromCapitalScienceBuildings = false;
+	bool m_bScienceOutputFromArtistConsumption = false;
 	bool m_bStaysAliveZeroCities = false;
 	bool m_bFaithFromUnimprovedForest = false;
 #if defined(MOD_TRAITS_ANY_BELIEF)

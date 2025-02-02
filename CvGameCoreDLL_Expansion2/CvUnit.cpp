@@ -12342,6 +12342,26 @@ bool CvUnit::goldenAge()
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_GoldenAgeDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
 	}
 #endif
+    CvTeam& owningTeam = GET_TEAM(getTeam());
+    UnitClassTypes eUnitClass = getUnitClassType();
+	if (eUnitClass == GC.getInfoTypeForString("UNITCLASS_ARTIST"))
+	{
+		CvPlayer& owningPlayer = GET_PLAYER(getOwner());
+		if (owningPlayer.GetPlayerTraits()->IsScienceOutputFromArtistConsumption())
+		{
+			int iMedianTechResearch = owningPlayer.GetPlayerTechs()->GetMedianTechResearch();
+			iMedianTechResearch = (iMedianTechResearch * owningPlayer.GetMedianTechPercentage()) / 100;
+			TechTypes eCurrentTech = owningPlayer.GetPlayerTechs()->GetCurrentResearch();
+			if (eCurrentTech == NO_TECH)
+			{
+				owningPlayer.changeOverflowResearch(iMedianTechResearch);
+			}
+			else
+			{
+				owningTeam.GetTeamTechs()->ChangeResearchProgress(eCurrentTech, iMedianTechResearch, owningPlayer.GetID());
+			}
+		}
+	}
 
 	if(IsGreatPerson())
 	{
