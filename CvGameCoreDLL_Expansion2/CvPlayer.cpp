@@ -8985,6 +8985,13 @@ bool CvPlayer::canCreate(ProjectTypes eProject, bool bContinue, bool bTestVisibl
 		}
 	}
 
+	if(pProjectInfo.GetPolicyBranchPrereq() != NO_POLICY_BRANCH_TYPE)
+	{
+		if (!HasPolicyBranch((PolicyBranchTypes)pProjectInfo.GetPolicyBranchPrereq()))
+		{
+			return false;
+		}
+	}
 	// Policy requirement?
 	for(auto ePolicy : pProjectInfo.GetPolicyNeeded())
 	{

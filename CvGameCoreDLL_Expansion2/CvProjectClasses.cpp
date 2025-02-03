@@ -64,6 +64,9 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 	const char* szTechPrereq = kResults.GetText("TechPrereq");
 	m_iTechPrereq = GC.getInfoTypeForString(szTechPrereq, true);
 
+	const char* szPolicyBranchPrereq = kResults.GetText("PolicyBranchPrereq");
+	m_iPolicyBranchPrereq = GC.getInfoTypeForString(szPolicyBranchPrereq, true);
+
 	const char* szEveryoneSpecialUnit = kResults.GetText("EveryoneSpecialUnit");
 	m_iEveryoneSpecialUnit = GC.getInfoTypeForString(szEveryoneSpecialUnit, true);
 
@@ -141,6 +144,11 @@ int CvProjectEntry::GetVictoryPrereq() const
 int CvProjectEntry::GetTechPrereq() const
 {
 	return m_iTechPrereq;
+}
+
+int CvProjectEntry::GetPolicyBranchPrereq() const
+{
+	return m_iPolicyBranchPrereq;
 }
 
 /// Is there a project someone must have completed?
