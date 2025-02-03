@@ -500,6 +500,7 @@ public:
 	int GetSplashDamagePlotUnitLimit() const;
 	bool GetSplashDamageImmune() const;
 	int GetSplashXP() const;
+	bool IsTriggerSplashFinish() const;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -715,6 +716,7 @@ protected:
 	int m_iSplashDamagePlotUnitLimit = 0;
 	bool m_iSplashDamageImmune = 0;
 	int m_iSplashXP = 0;
+	bool m_bTriggerSplashFinish = false;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE

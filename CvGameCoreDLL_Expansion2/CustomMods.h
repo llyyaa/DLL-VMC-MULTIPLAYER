@@ -1321,17 +1321,19 @@ enum BattleTypeTypes
 
 #define GAMEEVENT_OnImprovementUpgrade			"OnImprovementUpgrade",			"iiiiii"
 #define GAMEEVENT_OnImprovementDowngrade		"OnImprovementDowngrade",		"iiiiii"
-#define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		        "iiiiii"
+#define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		"iiiiii"
 
-#define GAMEEVENT_DoWarPopulationLoss			"DoWarPopulationLoss",		        "iii"
+#define GAMEEVENT_DoWarPopulationLoss			"DoWarPopulationLoss",		    "iii"
 
-#define GAMEEVENT_OnCityScaleChange			"OnCityScaleChange",		        "iiii"
+#define GAMEEVENT_OnCityScaleChange				"OnCityScaleChange",		    "iiii"
 
-#define GAMEEVENT_CanAddEnemyPromotion			"CanAddEnemyPromotion",		        "iiiiiii"
-#define GAMEEVENT_OnTriggerAddEnemyPromotion			"OnTriggerAddEnemyPromotion",		        "iiiiiiiiiii"
-#define GAMEEVENT_CanRemovePromotion "CanRemovePromotion", "iii"
+#define GAMEEVENT_OnTriggerSplashFinish			"OnTriggerSplashFinish",		"iiiib"
 
-#define GAMEEVENT_LoyaltyStateChanged       "LoyaltyStateChanged", "iiii"
+#define GAMEEVENT_CanAddEnemyPromotion			"CanAddEnemyPromotion",		    "iiiiiii"
+#define GAMEEVENT_OnTriggerAddEnemyPromotion	"OnTriggerAddEnemyPromotion",	"iiiiiiiiiii"
+#define GAMEEVENT_CanRemovePromotion			"CanRemovePromotion",			"iii"
+
+#define GAMEEVENT_LoyaltyStateChanged       	"LoyaltyStateChanged",			"iiii"
 
 // Serialization wrappers
 #define MOD_SERIALIZE

@@ -1599,6 +1599,7 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 
 	m_iSplashImmuneRC = 0;
 	m_iSplashXP = 0;
+	m_iNumTriggerSplashFinish = 0;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -26713,6 +26714,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		
 		ChangeSplashImmuneRC(thisPromotion.GetSplashDamageImmune() ? iChange : 0);
 		ChangeSplashXP(thisPromotion.GetSplashXP() * iChange);
+		ChangeNumTriggerSplashFinish(thisPromotion.IsTriggerSplashFinish() ? iChange : 0);
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -27277,6 +27279,7 @@ void CvUnit::read(FDataStream& kStream)
 
 	kStream >> m_iSplashImmuneRC;
 	kStream >> m_iSplashXP;
+	kStream >> m_iNumTriggerSplashFinish;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -27639,6 +27642,7 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iSplashImmuneRC;
 	kStream << m_iSplashXP;
+	kStream << m_iNumTriggerSplashFinish;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -32179,6 +32183,14 @@ void CvUnit::ChangeSplashXP(int iChange) {
 }
 void CvUnit::SetSplashXP(int iValue) {
 	this->m_iSplashXP = iValue;
+}
+bool CvUnit::IsTriggerSplashFinish() const
+{
+	return m_iNumTriggerSplashFinish > 0;
+}
+void CvUnit::ChangeNumTriggerSplashFinish(int iChange)
+{
+	m_iNumTriggerSplashFinish += iChange;
 }
 #endif
 

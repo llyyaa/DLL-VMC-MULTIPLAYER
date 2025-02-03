@@ -5147,6 +5147,7 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 	}
 
 	ICvUserInterface2* pkDLLInterface = GC.GetEngineUserInterface();
+	int iNumAOEKill = 0;
 	for (auto iter = mUnitDamageSumMap.begin(); iter != mUnitDamageSumMap.end(); iter++)
 	{
 		CvUnit* pAOEUnit = iter->first;
@@ -5192,6 +5193,7 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 		{
 			if (bAOEKill)
 			{
+				iNumAOEKill++;
 				CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_ENEMY_DEATH", pAttackerUnit->getNameKey(), pAOEUnit->getNameKey());
 				pkDLLInterface->AddMessage(0, kAttackPlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
 			}
@@ -5205,6 +5207,7 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 		{
 			if (bAOEKill)
 			{
+				iNumAOEKill++;
 				CvString strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_SPLASH_DAMAGE_DEATH", pAttackerUnit->getNameKey(), pAOEUnit->getNameKey());
 				pkDLLInterface->AddMessage(0, kDefensePlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
 			}
@@ -5214,6 +5217,10 @@ void CvUnitCombat::DoSplashDamage(const CvCombatInfo& kCombatInfo)
 				pkDLLInterface->AddMessage(0, kDefensePlayer.GetID(), true, GC.getEVENT_MESSAGE_TIME(), strBuffer /*, "AS2D_COMBAT", MESSAGE_TYPE_INFO, pkDefender->getUnitInfo().GetButton(), (ColorTypes)GC.getInfoTypeForString("COLOR_GREEN"), pkTargetPlot->getX(), pkTargetPlot->getY()*/);
 			}
 		}
+	}
+	if (pAttackerUnit->IsTriggerSplashFinish())
+	{
+		GAMEEVENTINVOKE_HOOK(GAMEEVENT_OnTriggerSplashFinish, kAttackPlayer.GetID(), pAttackerUnit->GetID(), kDefensePlayer.GetID(), iNumAOEKill, bRangedAttack);
 	}
 }
 #endif

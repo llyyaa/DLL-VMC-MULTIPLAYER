@@ -797,6 +797,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iSplashDamagePlotUnitLimit = kResults.GetInt("SplashDamagePlotUnitLimit");
 	m_iSplashDamageImmune = kResults.GetBool("SplashDamageImmune");
 	m_iSplashXP = kResults.GetInt("SplashXP");
+	m_bTriggerSplashFinish = kResults.GetBool("TriggerSplashFinish");
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -3766,6 +3767,10 @@ bool CvPromotionEntry::GetSplashDamageImmune() const
 int CvPromotionEntry::GetSplashXP() const
 {
 	return m_iSplashXP;
+}
+bool CvPromotionEntry::IsTriggerSplashFinish() const
+{
+	return m_bTriggerSplashFinish;
 }
 #endif
 

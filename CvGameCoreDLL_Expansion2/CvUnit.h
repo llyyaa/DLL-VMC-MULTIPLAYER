@@ -2071,6 +2071,9 @@ public:
 	int GetSplashXP() const;
 	void ChangeSplashXP(int iChange);
 	void SetSplashXP(int iValue);
+
+	bool IsTriggerSplashFinish() const;
+	void ChangeNumTriggerSplashFinish(int iChange);
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS
@@ -2552,6 +2555,7 @@ protected:
 
 	int m_iSplashImmuneRC = 0;
 	int m_iSplashXP = 0;
+	int m_iNumTriggerSplashFinish = 0;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
