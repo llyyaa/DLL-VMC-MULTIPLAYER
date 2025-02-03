@@ -8388,6 +8388,14 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 		}
 	}
 
+	PolicyBranchTypes ePolicyBranch = (PolicyBranchTypes)pUnitInfo.GetPolicyBranchType();
+	if (ePolicyBranch != NO_POLICY_BRANCH_TYPE)
+	{
+		if (!HasPolicyBranch(ePolicyBranch))
+		{
+			return false;
+		}
+	}
 
 	if (GC.getGame().isOption(GAMEOPTION_NO_RELIGION))
 	{
