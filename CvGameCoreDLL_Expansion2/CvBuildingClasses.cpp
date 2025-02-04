@@ -745,6 +745,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iGlobalProductionNeededUnitModifier = kResults.GetInt("GlobalProductionNeededUnitModifier");
 	m_iGlobalProductionNeededBuildingModifier = kResults.GetInt("GlobalProductionNeededBuildingModifier");
 	m_iGlobalProductionNeededProjectModifier = kResults.GetInt("GlobalProductionNeededProjectModifier");
+	m_iGlobalProductionNeededUnitMax = kResults.GetInt("GlobalProductionNeededUnitMax");
+	m_iGlobalProductionNeededBuildingMax = kResults.GetInt("GlobalProductionNeededBuildingMax");
+	m_iGlobalProductionNeededProjectMax = kResults.GetInt("GlobalProductionNeededProjectMax");
 	m_bDummyBuilding = kResults.GetBool("DummyBuilding");
 	m_bNoPuppet = kResults.GetBool("NoPuppet");
 
@@ -2510,6 +2513,15 @@ int CvBuildingEntry::GetGlobalProductionNeededBuildingModifier() const {
 }
 int CvBuildingEntry::GetGlobalProductionNeededProjectModifier() const {
 	return m_iGlobalProductionNeededProjectModifier;
+}
+int CvBuildingEntry::GetGlobalProductionNeededUnitMax() const {
+	return m_iGlobalProductionNeededUnitMax;
+}
+int CvBuildingEntry::GetGlobalProductionNeededBuildingMax() const {
+	return m_iGlobalProductionNeededBuildingMax;
+}
+int CvBuildingEntry::GetGlobalProductionNeededProjectMax() const {
+	return m_iGlobalProductionNeededProjectMax;
 }
 
 bool CvBuildingEntry::IsDummyBuilding() const {

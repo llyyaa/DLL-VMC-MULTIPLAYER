@@ -33,6 +33,10 @@ ALTER TABLE Buildings ADD 'GlobalProductionNeededUnitModifier' INTEGER DEFAULT 0
 ALTER TABLE Buildings ADD 'GlobalProductionNeededBuildingModifier' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'GlobalProductionNeededProjectModifier' INTEGER DEFAULT 0;
 
+ALTER TABLE Buildings ADD 'GlobalProductionNeededUnitMax' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'GlobalProductionNeededBuildingMax' INTEGER DEFAULT 0;
+ALTER TABLE Buildings ADD 'GlobalProductionNeededProjectMax' INTEGER DEFAULT 0;
+
 ALTER TABLE Buildings ADD 'DummyBuilding' BOOLEAN DEFAULT 0;
 ALTER TABLE Buildings ADD COLUMN 'GlobalEspionageSpeedModifier' INTEGER DEFAULT 0;
 ALTER TABLE Buildings ADD 'InstantResearchFromFriendlyGreatScientist' INTEGER DEFAULT 0;

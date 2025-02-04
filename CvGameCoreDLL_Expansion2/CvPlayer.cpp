@@ -1255,7 +1255,33 @@ void CvPlayer::uninit()
 	m_iMaxEffectiveCities = 1;
 	m_iLastSliceMoved = 0;
 
-	
+	m_iDishonestyCounter = 0;
+#ifdef MOD_GLOBAL_WAR_CASUALTIES
+	m_iWarCasualtiesCounter = 0;
+#endif
+#ifdef MOD_RESOURCE_EXTRA_BUFF
+	m_iResourceUnhappinessModifier = 0;
+	m_iResourceCityConnectionTradeRouteGoldModifier = 0;
+#endif
+	m_iCaptureCityResistanceTurnsChangeFormula = NO_LUA_FORMULA;
+#ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
+  	m_iCachedCapturedHolyCity = 0;
+#endif
+#ifdef MOD_GLOBAL_CORRUPTION
+	m_iCorruptionScoreModifierFromPolicy = 0;
+	m_iCorruptionLevelReduceByOneRC = 0;
+	m_iCorruptionPolicyCostModifier = 0;
+#endif
+	m_iProductionNeededUnitModifier = 0;
+	m_iProductionNeededBuildingModifier = 0;
+	m_iProductionNeededProjectModifier = 0;
+	m_iProductionNeededUnitMax = -20;
+	m_iProductionNeededBuildingMax = -20;
+	m_iProductionNeededProjectMax = -20;
+
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_mAuraPromotionUnits.clear();
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	m_iNumCropsTotal = 0;
 	m_iNumCropsUsed = 0;
@@ -8362,6 +8388,14 @@ bool CvPlayer::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool
 		}
 	}
 
+	PolicyBranchTypes ePolicyBranch = (PolicyBranchTypes)pUnitInfo.GetPolicyBranchType();
+	if (ePolicyBranch != NO_POLICY_BRANCH_TYPE)
+	{
+		if (!HasPolicyBranch(ePolicyBranch))
+		{
+			return false;
+		}
+	}
 
 	if (GC.getGame().isOption(GAMEOPTION_NO_RELIGION))
 	{
@@ -8951,6 +8985,13 @@ bool CvPlayer::canCreate(ProjectTypes eProject, bool bContinue, bool bTestVisibl
 		}
 	}
 
+	if(pProjectInfo.GetPolicyBranchPrereq() != NO_POLICY_BRANCH_TYPE)
+	{
+		if (!HasPolicyBranch((PolicyBranchTypes)pProjectInfo.GetPolicyBranchPrereq()))
+		{
+			return false;
+		}
+	}
 	// Policy requirement?
 	for(auto ePolicy : pProjectInfo.GetPolicyNeeded())
 	{
@@ -9327,7 +9368,7 @@ int CvPlayer::getProductionNeeded(UnitTypes eUnit) const
 
 	iProductionNeeded += getUnitExtraCost(eUnitClass);
 
-	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededUnitModifier()));
+	iProductionNeeded *= (100 + std::max(GetProductionNeededUnitMax(), GetProductionNeededUnitModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
@@ -9421,7 +9462,7 @@ int CvPlayer::getProductionNeeded(BuildingTypes eBuilding) const
 		iProductionNeeded /= 100;
 	}
 
-	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededBuildingModifier()));
+	iProductionNeeded *= (100 + std::max(GetProductionNeededBuildingMax(), GetProductionNeededBuildingModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
@@ -9467,7 +9508,7 @@ int CvPlayer::getProductionNeeded(ProjectTypes eProject) const
 		iProductionNeeded /= 100;
 	}
 
-	iProductionNeeded *= (100 + std::max(-30, GetProductionNeededProjectModifier()));
+	iProductionNeeded *= (100 + std::max(GetProductionNeededProjectMax(), GetProductionNeededProjectModifier()));
 	iProductionNeeded /= 100;
 
 	return std::max(1, iProductionNeeded);
@@ -17739,6 +17780,43 @@ void CvPlayer::ChangeUnitTypePrmoteHealGlobal(UnitTypes eIndex, int iChange)
 	m_piUnitTypePrmoteHealGlobal[(int)eIndex] += iChange;
 }
 #endif
+
+
+//	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+const std::multimap<PromotionTypes, int>& CvPlayer::GetAuraPromotionUnits() const
+{
+	return m_mAuraPromotionUnits;
+}
+void CvPlayer::AddUnitAuraPromotion(int iUnitID, PromotionTypes ePromotion)
+{
+	m_mAuraPromotionUnits.insert(std::make_pair(ePromotion, iUnitID));
+}
+void CvPlayer::RemoveUnitAuraPromotion(int iUnitID, PromotionTypes ePromotion)
+{
+	for (auto it = m_mAuraPromotionUnits.begin(); it != m_mAuraPromotionUnits.end(); ++it)
+	{
+		if (it->first == ePromotion && it->second == iUnitID)
+		{
+			m_mAuraPromotionUnits.erase(it);
+			// only remove once
+			return;
+		}
+	}
+}
+void CvPlayer::RemoveAuraUnit(int iUnitID)
+{
+	for (auto it = m_mAuraPromotionUnits.begin(); it != m_mAuraPromotionUnits.end();)
+	{
+		if (it->second == iUnitID)
+		{
+			it = m_mAuraPromotionUnits.erase(it);
+		}
+		else ++it;
+	}
+}
+#endif
+//	--------------------------------------------------------------------------------
 
 
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
@@ -28635,7 +28713,23 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iProductionNeededUnitModifier;
 	kStream >> m_iProductionNeededBuildingModifier;
 	kStream >> m_iProductionNeededProjectModifier;
+	kStream >> m_iProductionNeededUnitMax;
+	kStream >> m_iProductionNeededBuildingMax;
+	kStream >> m_iProductionNeededProjectMax;
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	int iAuraPromotionUnitsLen = 0;
+	kStream >> iAuraPromotionUnitsLen;
+	m_mAuraPromotionUnits.clear();
+	for (int i = 0; i < iAuraPromotionUnitsLen; i++)
+	{
+		int iAuraPromotion = -1;
+		int iAuraPromotionUnit = -1;
+		kStream >> iAuraPromotion;
+		kStream >> iAuraPromotionUnit;
+		m_mAuraPromotionUnits.insert(std::make_pair((PromotionTypes)iAuraPromotion, iAuraPromotionUnit));
+	}
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	kStream >> m_aiDomainTroopsTotal;
 	kStream >> m_aiDomainTroopsUsed;
@@ -29323,7 +29417,18 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iProductionNeededUnitModifier;
 	kStream << m_iProductionNeededBuildingModifier;
 	kStream << m_iProductionNeededProjectModifier;
+	kStream << m_iProductionNeededUnitMax;
+	kStream << m_iProductionNeededBuildingMax;
+	kStream << m_iProductionNeededProjectMax;
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	kStream << m_mAuraPromotionUnits.size();
+	for (auto iter = m_mAuraPromotionUnits.begin(); iter != m_mAuraPromotionUnits.end(); iter++)
+	{
+		kStream << (int) iter->first;
+		kStream << iter->second;
+	}
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	kStream << m_aiDomainTroopsTotal;
 	kStream << m_aiDomainTroopsUsed;
@@ -33179,6 +33284,31 @@ void CvPlayer::ChangeProductionNeededProjectModifier(int change) {
 	m_iProductionNeededProjectModifier += change;
 }
 
+int CvPlayer::GetProductionNeededUnitMax() const {
+	return m_iProductionNeededUnitMax;
+}
+
+void CvPlayer::ChangeProductionNeededUnitMax(int change) {
+	m_iProductionNeededUnitMax += change;
+}
+
+int CvPlayer::GetProductionNeededBuildingMax() const {
+	return m_iProductionNeededBuildingMax;
+}
+
+void CvPlayer::ChangeProductionNeededBuildingMax(int change) {
+	m_iProductionNeededBuildingMax += change;
+}
+
+int CvPlayer::GetProductionNeededProjectMax() const {
+	return m_iProductionNeededProjectMax;
+}
+
+void CvPlayer::ChangeProductionNeededProjectMax(int change) {
+	m_iProductionNeededProjectMax += change;
+}
+
+//	--------------------------------------------------------------------------------
 void CvPlayer::GetUCTypesFromPlayer(const CvPlayer& player,
 	std::tr1::unordered_set<UnitTypes>* m_sUU,
 	std::tr1::unordered_set<BuildingTypes>* m_sUB,

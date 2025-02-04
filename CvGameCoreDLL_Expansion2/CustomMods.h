@@ -928,6 +928,7 @@
 #define MOD_VOTING_NEW_EFFECT_FOR_SP           				gCustomMods.isVOTING_NEW_EFFECT_FOR_SP()
 #define MOD_BELIEF_NEW_EFFECT_FOR_SP             			(MOD_GLOBAL_BUILDING_INSTANT_YIELD && gCustomMods.isBELIEF_NEW_EFFECT_FOR_SP())
 #define MOD_PROMOTION_NEW_EFFECT_FOR_SP           			gCustomMods.isPROMOTION_NEW_EFFECT_FOR_SP()
+#define MOD_PROMOTION_AURA_PROMOTION           				gCustomMods.isPROMOTION_AURA_PROMOTION()
 #define MOD_TRAIT_NEW_EFFECT_FOR_SP           				gCustomMods.isTRAIT_NEW_EFFECT_FOR_SP()
 #define MOD_TRAIT_WOOD_AS_ROAD_SP           				gCustomMods.isTRAIT_WOOD_AS_ROAD_SP()
 #define MOD_TROOPS_AND_CROPS_FOR_SP           				gCustomMods.isTROOPS_AND_CROPS_FOR_SP()
@@ -1320,17 +1321,19 @@ enum BattleTypeTypes
 
 #define GAMEEVENT_OnImprovementUpgrade			"OnImprovementUpgrade",			"iiiiii"
 #define GAMEEVENT_OnImprovementDowngrade		"OnImprovementDowngrade",		"iiiiii"
-#define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		        "iiiiii"
+#define GAMEEVENT_GetImprovementXPPerTurn		"GetImprovementXPPerTurn",		"iiiiii"
 
-#define GAMEEVENT_DoWarPopulationLoss			"DoWarPopulationLoss",		        "iii"
+#define GAMEEVENT_DoWarPopulationLoss			"DoWarPopulationLoss",		    "iii"
 
-#define GAMEEVENT_OnCityScaleChange			"OnCityScaleChange",		        "iiii"
+#define GAMEEVENT_OnCityScaleChange				"OnCityScaleChange",		    "iiii"
 
-#define GAMEEVENT_CanAddEnemyPromotion			"CanAddEnemyPromotion",		        "iiiiiii"
-#define GAMEEVENT_OnTriggerAddEnemyPromotion			"OnTriggerAddEnemyPromotion",		        "iiiiiiiiiii"
-#define GAMEEVENT_CanRemovePromotion "CanRemovePromotion", "iii"
+#define GAMEEVENT_OnTriggerSplashFinish			"OnTriggerSplashFinish",		"iiiib"
 
-#define GAMEEVENT_LoyaltyStateChanged       "LoyaltyStateChanged", "iiii"
+#define GAMEEVENT_CanAddEnemyPromotion			"CanAddEnemyPromotion",		    "iiiiiii"
+#define GAMEEVENT_OnTriggerAddEnemyPromotion	"OnTriggerAddEnemyPromotion",	"iiiiiiiiiii"
+#define GAMEEVENT_CanRemovePromotion			"CanRemovePromotion",			"iii"
+
+#define GAMEEVENT_LoyaltyStateChanged       	"LoyaltyStateChanged",			"iiii"
 
 // Serialization wrappers
 #define MOD_SERIALIZE
@@ -1693,6 +1696,7 @@ public:
 	MOD_OPT_DECL(UNIT_BOUND_IMPROVEMENT);
 	MOD_OPT_DECL(PROMOTION_FEATURE_INVISIBLE);
 	MOD_OPT_DECL(PROMOTION_NEW_EFFECT_FOR_SP);
+	MOD_OPT_DECL(PROMOTION_AURA_PROMOTION);
 	MOD_OPT_DECL(POLICY_FREE_PROMOTION_FOR_PROMOTION);
 	MOD_OPT_DECL(GLOBAL_TRIGGER_NEW_GOLDEN_AGE_IN_GA);
 	MOD_OPT_DECL(POLICY_NEW_EFFECT_FOR_SP);

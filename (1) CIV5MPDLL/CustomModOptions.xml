@@ -1105,9 +1105,12 @@
     <!-- table changes: -->
     <!-- see NewTableChanges.sql DDL_Policies.sql -->
     <Row Class="6" Name="POLICY_NEW_EFFECT_FOR_SP" Value="1"/>
-     <!-- table changes: -->
+    <!-- table changes: -->
     <!-- see NewTableChanges.sql -->
     <Row Class="6" Name="PROMOTION_NEW_EFFECT_FOR_SP" Value="1"/>
+    <!-- table changes: -->
+    <!-- see NewTableChanges.sql -->
+    <Row Class="6" Name="PROMOTION_AURA_PROMOTION" Value="0"/>
     <!-- table changes: -->
     <!-- see Belief_Table_Changes.sql -->
     <Row Class="6" Name="BELIEF_NEW_EFFECT_FOR_SP" Value="1"/>

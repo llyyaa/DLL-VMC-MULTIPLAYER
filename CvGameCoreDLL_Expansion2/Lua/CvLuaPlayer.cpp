@@ -128,6 +128,7 @@ void CvLuaPlayer::RegistStaticFunctions() {
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeUIFromExtra);
 
 	REGIST_STATIC_FUNCTION(CvLuaPlayer::lSetLostUC);
+	REGIST_STATIC_FUNCTION(CvLuaPlayer::lChangeFreeBuildingCount);
 }
 
 //------------------------------------------------------------------------------
@@ -1377,6 +1378,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(SetLostUC);
 	
 	Method(GetNumTechsKnown);
+	Method(GetFreeBuildingCount);
+	Method(ChangeFreeBuildingCount);
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -12887,4 +12890,21 @@ int CvLuaPlayer::lGetNumTechsKnown(lua_State* L)
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	lua_pushinteger(L, GET_TEAM(pkPlayer->getTeam()).GetTeamTechs()->GetNumTechsKnown());
 	return 1;
+}
+
+int CvLuaPlayer::lGetFreeBuildingCount(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	BuildingTypes eBuildingTypes = (BuildingTypes)lua_tointeger(L, 2);
+	lua_pushinteger(L, pkPlayer->getFreeBuildingCount(eBuildingTypes));
+	return 1;
+}
+
+int CvLuaPlayer::lChangeFreeBuildingCount(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	BuildingTypes eBuildingTypes = (BuildingTypes)lua_tointeger(L, 2);
+	int iNum = lua_tointeger(L, 3);
+	pkPlayer->changeFreeBuildingCount(eBuildingTypes, iNum);
+	return 0;
 }

@@ -133,6 +133,7 @@ public:
 	int  GetCommandType() const;
 	void SetCommandType(int iNewType);
 
+	bool IsImmobile() const;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	bool IsNoSupply() const;
 #endif
@@ -267,6 +268,14 @@ public:
 	int GetCapitalDefenseModifier() const;
 	int GetCapitalDefenseFalloff() const;
 	int GetCityAttackPlunderModifier() const;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	const std::vector<std::pair<PromotionTypes, int>>& GetAuraPromotionsProviderNum() const;
+	const std::vector<PromotionTypes>& GetAuraPromotionPrePromotionOr() const;
+	int GetAuraPromotionRange() const;
+	int GetAuraPromotionRangeAIBonus() const;
+	bool IsAuraPromotionNoSelf() const;
+	bool GetDomainAuraValid(int i) const;
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int GetMeleeAttackModifier() const;
 	int GetCaptureEmenyExtraMax() const;
@@ -491,6 +500,7 @@ public:
 	int GetSplashDamagePlotUnitLimit() const;
 	bool GetSplashDamageImmune() const;
 	int GetSplashXP() const;
+	bool IsTriggerSplashFinish() const;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -511,6 +521,8 @@ public:
 
 	int GetSiegeInflictDamageChange() const;
 	int GetSiegeInflictDamageChangeMaxHPPercent() const;
+
+	bool IsRangeBackWhenDefense() const;
 
 	int GetHeavyChargeAddMoves() const;
 	int GetHeavyChargeExtraDamage() const;
@@ -606,6 +618,7 @@ protected:
 	int m_iFriendlyLandsAttackModifier;
 	int m_iOutsideFriendlyLandsModifier;
 	int m_iCommandType;
+	bool m_bImmobile;
 #if defined(MOD_UNITS_NO_SUPPLY)
 	bool m_bNoSupply;
 #endif
@@ -638,6 +651,14 @@ protected:
 	int m_iCapitalDefenseModifier;
 	int m_iCapitalDefenseFalloff;
 	int m_iCityAttackPlunderModifier;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	std::vector<std::pair<PromotionTypes, int>> m_vAuraPromotionsProviderNum;
+	std::vector<PromotionTypes> m_vAuraPromotionPrePromotionOr;
+	int m_iAuraPromotionRange;
+	int m_iAuraPromotionRangeAIBonus;
+	bool m_bAuraPromotionNoSelf;
+	bool* m_pbDomainAuraValid;
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int m_iMeleeAttackModifier;
 	int m_iCaptureEmenyExtraMax;
@@ -695,6 +716,7 @@ protected:
 	int m_iSplashDamagePlotUnitLimit = 0;
 	bool m_iSplashDamageImmune = 0;
 	int m_iSplashXP = 0;
+	bool m_bTriggerSplashFinish = false;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -952,6 +974,8 @@ protected:
 
 	int m_iSiegeInflictDamageChange = 0;
 	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	bool m_bRangeBackWhenDefense = 0;
 
 	int m_iHeavyChargeAddMoves = 0;
 	int m_iHeavyChargeExtraDamage = 0;

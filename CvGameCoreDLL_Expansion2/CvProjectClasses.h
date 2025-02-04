@@ -29,6 +29,7 @@ public:
 
 	int GetVictoryPrereq() const;
 	int GetTechPrereq() const;
+	int GetPolicyBranchPrereq() const;
 	int GetAnyoneProjectPrereq() const;
 	void SetAnyoneProjectPrereq(int i);
 	int GetMaxGlobalInstances() const;
@@ -67,6 +68,7 @@ public:
 protected:
 	int m_iVictoryPrereq;
 	int m_iTechPrereq;
+	int m_iPolicyBranchPrereq = NO_POLICY_BRANCH_TYPE;
 	int m_iAnyoneProjectPrereq;
 	int m_iMaxGlobalInstances;
 	int m_iCityMaxNum;

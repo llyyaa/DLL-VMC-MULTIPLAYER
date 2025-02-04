@@ -4,6 +4,7 @@ ALTER TABLE UnitPromotions ADD COLUMN SplashDamageRadius integer not null defaul
 ALTER TABLE UnitPromotions ADD COLUMN SplashDamagePlotUnitLimit integer not null default 0;
 ALTER TABLE UnitPromotions ADD COLUMN SplashDamageImmune boolean not null default 0;
 ALTER TABLE UnitPromotions ADD COLUMN SplashXP int not null default 0;
+ALTER TABLE UnitPromotions ADD COLUMN TriggerSplashFinish boolean not null default 0;
 
 ALTER TABLE UnitPromotions ADD COLUMN CollateralDamagePercent integer not null default 0;
 ALTER TABLE UnitPromotions ADD COLUMN CollateralDamageFixed integer not null default 0;
@@ -30,6 +31,7 @@ alter table Buildings add column 'SiegeKillCitizensModifier' integer default 0 n
 
 alter table PromotionCollections add column 'StackingFightBack' boolean not null default 0;
 alter table PromotionCollections add column 'StopAttacker' boolean not null default 0;
+alter table UnitPromotions add column 'RangeBackWhenDefense' boolean not null default 0;
 
 alter table UnitPromotions add column 'HeavyChargeAddMoves' integer not null default 0;
 alter table UnitPromotions add column 'HeavyChargeExtraDamage' integer not null default 0;

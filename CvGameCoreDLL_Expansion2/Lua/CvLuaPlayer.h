@@ -1291,6 +1291,8 @@ protected:
 	LUAAPIEXTN(SetLostUC, void, bIsLost);
 
 	LUAAPIEXTN(GetNumTechsKnown, int);
+	LUAAPIEXTN(GetFreeBuildingCount, int);
+	LUAAPIEXTN(ChangeFreeBuildingCount, void, BuildingTypes, int);
 };
 
 #endif //CVLUAPLAYER_H

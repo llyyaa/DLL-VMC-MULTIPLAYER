@@ -96,6 +96,7 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iFriendlyLandsAttackModifier(0),
 	m_iOutsideFriendlyLandsModifier(0),
 	m_iCommandType(NO_COMMAND),
+	m_bImmobile(false),
 #if defined(MOD_UNITS_NO_SUPPLY)
 	m_bNoSupply(false),
 #endif
@@ -197,6 +198,11 @@ CvPromotionEntry::CvPromotionEntry():
 	m_iCapitalDefenseModifier(0),
 	m_iCapitalDefenseFalloff(0),
 	m_iCityAttackPlunderModifier(0),
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_iAuraPromotionRange(0),
+	m_iAuraPromotionRangeAIBonus(0),
+	m_bAuraPromotionNoSelf(false),
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMeleeAttackModifier(0),
 	m_iCaptureEmenyExtraMax(0),
@@ -364,7 +370,10 @@ CvPromotionEntry::CvPromotionEntry():
 #if defined(MOD_PROMOTIONS_UNIT_NAMING)
 	m_pbUnitName(NULL),
 #endif
-	m_pbPostCombatRandomPromotion(NULL)
+	m_pbPostCombatRandomPromotion(NULL),
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_pbDomainAuraValid(NULL)
+#endif
 {
 }
 
@@ -414,6 +423,9 @@ CvPromotionEntry::~CvPromotionEntry(void)
 	SAFE_DELETE_ARRAY(m_pbPostCombatRandomPromotion);
 #if defined(MOD_POLICY_FREE_PROMOTION_FOR_PROMOTION)
 	m_vPrePromotions.clear();
+#endif
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	SAFE_DELETE_ARRAY(m_pbDomainAuraValid);
 #endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	if(m_pUpgradePromotions)
@@ -697,6 +709,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iFriendlyLandsModifier = kResults.GetInt("FriendlyLandsModifier");
 	m_iFriendlyLandsAttackModifier = kResults.GetInt("FriendlyLandsAttackModifier");
 	m_iOutsideFriendlyLandsModifier = kResults.GetInt("OutsideFriendlyLandsModifier");
+	m_bImmobile = kResults.GetBool("Immobile");
 #if defined(MOD_UNITS_NO_SUPPLY)
 	if (MOD_UNITS_NO_SUPPLY) {
 		m_bNoSupply = (kResults.GetInt("NoSupply") != 0);
@@ -733,6 +746,11 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCapitalDefenseModifier = kResults.GetInt("CapitalDefenseModifier");
 	m_iCapitalDefenseFalloff = kResults.GetInt("CapitalDefenseFalloff");
 	m_iCityAttackPlunderModifier = kResults.GetInt("CityAttackPlunderModifier");
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_iAuraPromotionRange = kResults.GetInt("AuraPromotionRange");
+	m_iAuraPromotionRangeAIBonus = kResults.GetInt("AuraPromotionRangeAIBonus");
+	m_bAuraPromotionNoSelf = kResults.GetBool("AuraPromotionNoSelf");
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMeleeAttackModifier = kResults.GetInt("MeleeAttackModifier");
 	m_iCaptureEmenyExtraMax = kResults.GetInt("CaptureEmenyExtraMax");
@@ -779,6 +797,7 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iSplashDamagePlotUnitLimit = kResults.GetInt("SplashDamagePlotUnitLimit");
 	m_iSplashDamageImmune = kResults.GetBool("SplashDamageImmune");
 	m_iSplashXP = kResults.GetInt("SplashXP");
+	m_bTriggerSplashFinish = kResults.GetBool("TriggerSplashFinish");
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -862,6 +881,8 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iSiegeInflictDamageChange = kResults.GetInt("SiegeInflictDamageChange");
 	m_iSiegeInflictDamageChangeMaxHPPercent = kResults.GetInt("SiegeInflictDamageChangeMaxHPPercent");
 
+	m_bRangeBackWhenDefense = kResults.GetBool("RangeBackWhenDefense");
+
 	m_iHeavyChargeAddMoves = kResults.GetInt("HeavyChargeAddMoves");
 	m_iHeavyChargeExtraDamage = kResults.GetInt("HeavyChargeExtraDamage");
 	m_iHeavyChargeCollateralFixed = kResults.GetInt("HeavyChargeCollateralFixed");
@@ -923,6 +944,70 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 	const char* szPromotionType = GetType();
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	{
+		kUtility.InitializeArray(m_pbDomainAuraValid, NUM_DOMAIN_TYPES, false);
+		std::string strKey("Promotion_AuraPromotionDomains");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Domains.ID from Promotion_AuraPromotionDomains inner join Domains on DomainType = Domains.Type where PromotionType = ?;");
+		}
+
+		pResults->Bind(1, szPromotionType);
+		while (pResults->Step())
+		{
+			const int iDomainsID = pResults->GetInt(0);
+			m_pbDomainAuraValid[iDomainsID] = true;
+		}
+
+		pResults->Reset();
+	}
+	{
+		m_vAuraPromotionPrePromotionOr.clear();
+		std::string strKey("Promotion_AuraPromotionPrePromotionOr");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select t1.ID as PrePromotionID from Promotion_AuraPromotionPrePromotionOr t2 inner join UnitPromotions t1 on t1.Type = t2.PrePromotionType where PromotionType = ?;");
+		}
+
+		pResults->Bind(1, szPromotionType);
+		while (pResults->Step())
+		{
+			const int iPrePromotionID = pResults->GetInt(0);
+			m_vAuraPromotionPrePromotionOr.push_back((PromotionTypes)iPrePromotionID);
+		}
+
+		pResults->Reset();
+	}
+	{
+		m_vAuraPromotionsProviderNum.clear();
+		{
+			const char* szAuraPromotionType = kResults.GetText("AuraPromotionType");
+			const int iAuraPromotionID = GC.getInfoTypeForString(szAuraPromotionType, true);
+			if(iAuraPromotionID != NO_PROMOTION) 
+				m_vAuraPromotionsProviderNum.push_back(std::make_pair((PromotionTypes)iAuraPromotionID, 1));
+		}
+
+		std::string strKey("Promotion_AuraPromotionProviderNum");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select t1.ID as AuraPromotionID, t2.ProviderNum from Promotion_AuraPromotionProviderNum t2 inner join UnitPromotions t1 on t1.Type = t2.AuraPromotionType where PromotionType = ? and ProviderNum > 0 order by ProviderNum ASC;");
+		}
+
+		pResults->Bind(1, szPromotionType);
+		while (pResults->Step())
+		{
+			const int iAuraPromotionID = pResults->GetInt(0);
+			const int iProviderNum = pResults->GetInt(1);
+			m_vAuraPromotionsProviderNum.push_back(std::make_pair((PromotionTypes)iAuraPromotionID, iProviderNum));
+		}
+
+		pResults->Reset();
+	}
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	{
 		std::string strKey("UnitPromotions_PromotionUpgrade_MaxRow");
@@ -2356,6 +2441,11 @@ void CvPromotionEntry::SetCommandType(int iNewType)
 	m_iCommandType = iNewType;
 }
 
+bool CvPromotionEntry::IsImmobile() const
+{
+	return m_bImmobile;
+}
+
 #if defined(MOD_UNITS_NO_SUPPLY)
 /// Accessor: Unit has no supply cost
 bool CvPromotionEntry::IsNoSupply() const
@@ -2507,6 +2597,37 @@ int CvPromotionEntry::GetCityAttackPlunderModifier() const
 {
 	return m_iCityAttackPlunderModifier;
 }
+
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+const std::vector<std::pair<PromotionTypes, int>>& CvPromotionEntry::GetAuraPromotionsProviderNum() const
+{
+	return m_vAuraPromotionsProviderNum;
+}
+const std::vector<PromotionTypes>& CvPromotionEntry::GetAuraPromotionPrePromotionOr() const
+{
+	return m_vAuraPromotionPrePromotionOr;
+}
+int CvPromotionEntry::GetAuraPromotionRange() const
+{
+	return m_iAuraPromotionRange;
+}
+int CvPromotionEntry::GetAuraPromotionRangeAIBonus() const
+{
+	return m_iAuraPromotionRangeAIBonus;
+}
+bool CvPromotionEntry::IsAuraPromotionNoSelf() const
+{
+	return m_bAuraPromotionNoSelf;
+}
+bool CvPromotionEntry::GetDomainAuraValid(int i) const
+{
+	if (i > -1 && i < NUM_DOMAIN_TYPES)
+	{
+		return m_pbDomainAuraValid[i];
+	}
+	return false;
+}
+#endif
 
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 int CvPromotionEntry::GetMeleeAttackModifier() const
@@ -3647,6 +3768,10 @@ int CvPromotionEntry::GetSplashXP() const
 {
 	return m_iSplashXP;
 }
+bool CvPromotionEntry::IsTriggerSplashFinish() const
+{
+	return m_bTriggerSplashFinish;
+}
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -3705,6 +3830,11 @@ int CvPromotionEntry::GetSiegeInflictDamageChange() const
 int CvPromotionEntry::GetSiegeInflictDamageChangeMaxHPPercent() const
 {
 	return m_iSiegeInflictDamageChangeMaxHPPercent;
+}
+
+bool CvPromotionEntry::IsRangeBackWhenDefense() const
+{
+	return m_bRangeBackWhenDefense;
 }
 
 int CvPromotionEntry::GetHeavyChargeAddMoves() const

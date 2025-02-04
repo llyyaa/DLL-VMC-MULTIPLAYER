@@ -2179,7 +2179,19 @@ public:
 	void ChangeProductionNeededBuildingModifier(int change);
 	int GetProductionNeededProjectModifier() const;
 	void ChangeProductionNeededProjectModifier(int change);
+	int GetProductionNeededUnitMax() const;
+	void ChangeProductionNeededUnitMax(int change);
+	int GetProductionNeededBuildingMax() const;
+	void ChangeProductionNeededBuildingMax(int change);
+	int GetProductionNeededProjectMax() const;
+	void ChangeProductionNeededProjectMax(int change);
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	const std::multimap<PromotionTypes, int>& GetAuraPromotionUnits() const;
+	void AddUnitAuraPromotion(int iUnitID, PromotionTypes ePromotion);
+	void RemoveUnitAuraPromotion(int iUnitID, PromotionTypes ePromotion);
+	void RemoveAuraUnit(int iUnitID);
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	int GetDomainTroopsTotalTimes100(DomainTypes eDomain = DOMAIN_SEA) const;
 	void ChangeDomainTroopsTotalTimes100(int iChange, DomainTypes eDomain = DOMAIN_SEA);
@@ -2956,7 +2968,13 @@ protected:
 	int m_iProductionNeededUnitModifier = 0;
 	int m_iProductionNeededBuildingModifier = 0;
 	int m_iProductionNeededProjectModifier = 0;
+	int m_iProductionNeededUnitMax = -20;
+	int m_iProductionNeededBuildingMax = -20;
+	int m_iProductionNeededProjectMax = -20;
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	std::multimap<PromotionTypes, int> m_mAuraPromotionUnits;
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	std::vector<int> m_aiDomainTroopsTotal;
 	std::vector<int> m_aiDomainTroopsUsed;

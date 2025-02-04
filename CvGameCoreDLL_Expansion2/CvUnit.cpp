@@ -182,7 +182,7 @@ CvUnit::CvUnit() :
 	, m_iGameTurnCreated("CvUnit::m_iGameTurnCreated", m_syncArchive)
 	, m_iDamage("CvUnit::m_iDamage", m_syncArchive, true)
 	, m_iMoves("CvUnit::m_iMoves", m_syncArchive, true)
-	, m_bImmobile("CvUnit::m_bImmobile", m_syncArchive)
+	, m_iNumImmobile(0)
 	, m_iExperience("CvUnit::m_iExperience", m_syncArchive)
 #if defined(MOD_UNITS_XP_TIMES_100)
 	, m_iExperienceTimes100(0)
@@ -944,7 +944,7 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	// Is this Unit immobile?
 	if(getUnitInfo().IsImmobile())
 	{
-		SetImmobile(true);
+		ChangesNumImmobile(1);
 	}
 
 	setMoves(maxMoves());
@@ -1117,6 +1117,9 @@ void CvUnit::initWithNameOffset(int iID, UnitTypes eUnit, int iNameOffset, UnitA
 	if(bSetupGraphical)
 		setupGraphical();
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	CheckAuraFromOtherUnits();
+#endif
 #if defined(MOD_UNIT_BOUND_IMPROVEMENT)
 	if(MOD_UNIT_BOUND_IMPROVEMENT)
 	{
@@ -1194,7 +1197,7 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iGameTurnCreated = 0;
 	m_iDamage = 0;
 	m_iMoves = 0;
-	m_bImmobile = false;
+	m_iNumImmobile = 0;
 	m_iExperience = 0;
 #if defined(MOD_UNITS_XP_TIMES_100)
 	m_iExperienceTimes100 = 0;
@@ -1471,6 +1474,9 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iCityAttackPlunderModifier = 0;
 	m_iExtraPopConsume = 0;
 	m_iAttackBonusFromDeathUnit = 0;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	m_sAuraPromotions.clear();
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	m_iMeleeAttackModifier = 0;
 	m_iCaptureEmenyExtraMax = 0;
@@ -1593,6 +1599,7 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 
 	m_iSplashImmuneRC = 0;
 	m_iSplashXP = 0;
+	m_iNumTriggerSplashFinish = 0;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -1630,6 +1637,8 @@ if (MOD_API_UNIT_CANNOT_BE_RANGED_ATTACKED)
 
 	m_iSiegeInflictDamageChange = 0;
 	m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	m_iNumRangeBackWhenDefense = 0;
 
 	m_iHeavyChargeAddMoves = 0;
 	m_iHeavyChargeExtraDamage = 0;
@@ -2428,6 +2437,10 @@ void CvUnit::kill(bool bDelay, PlayerTypes ePlayer /*= NO_PLAYER*/)
 	}
 #endif
 
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	GET_PLAYER(getOwner()).RemoveAuraUnit(GetID());
+	CheckAuraToOtherUnits();
+#endif
 #if defined(MOD_TROOPS_AND_CROPS_FOR_SP)
 	if(!IsNoTroops())
 	{
@@ -3592,8 +3605,7 @@ bool CvUnit::canEnterTerrain(const CvPlot& enterPlot, byte bMoveFlags) const
 	DomainTypes eDomain = getDomainType();
 
 	// Immobile Unit?
-
-	if(eDomain == DOMAIN_IMMOBILE || m_bImmobile)
+	if(IsImmobile())
 	{
 		return false;
 	}
@@ -4914,7 +4926,7 @@ bool CvUnit::CanAutomate(AutomateTypes eAutomate, bool bTestVisibility) const
 		break;
 
 	case AUTOMATE_EXPLORE:
-		if((GetBaseCombatStrength(true) == 0) || (getDomainType() == DOMAIN_AIR) || (getDomainType() == DOMAIN_IMMOBILE))
+		if((GetBaseCombatStrength(true) == 0) || (getDomainType() == DOMAIN_AIR) || IsImmobile())
 		{
 			return false;
 		}
@@ -7033,6 +7045,88 @@ int CvUnit::GetAttackModifierFromWorldCongress() const
 {
 	return GC.getGame().GetGameLeagues()->GetGlobalAttackModifier();
 }
+//	--------------------------------------------------------------------------------
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+bool CvUnit::HasAuraPromotions() const
+{
+	return m_sAuraPromotions.size() > 0;
+}
+const std::tr1::unordered_set<PromotionTypes>& CvUnit::GetAuraPromotions() const
+{
+	return m_sAuraPromotions;
+}
+void CvUnit::CheckAuraToOtherUnits()
+{
+	if(!MOD_PROMOTION_AURA_PROMOTION || !HasAuraPromotions()) return;
+	CvPlayerAI &kPlayer = GET_MY_PLAYER();
+	int iLoopUnit = 0;
+	for (CvUnit* pLoopUnit = kPlayer.firstUnit(&iLoopUnit); pLoopUnit != NULL; pLoopUnit = kPlayer.nextUnit(&iLoopUnit))
+	{
+		if (pLoopUnit->IsCivilianUnit()) continue;
+		for (auto ePromotion : m_sAuraPromotions) pLoopUnit->CheckAuraPromotionFromOtherUnits(ePromotion);
+	}
+}
+void CvUnit::CheckAuraFromOtherUnits()
+{
+	if(!MOD_PROMOTION_AURA_PROMOTION || IsCivilianUnit()) return;
+	CvPlayerAI& kPlayer = GET_MY_PLAYER();
+	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
+	for (auto it = auraPromotionUnits.begin(); it != auraPromotionUnits.end();)
+	{
+		CheckAuraPromotionFromOtherUnits(it->first);
+		it = auraPromotionUnits.upper_bound(it->first);
+	}
+}
+void CvUnit::CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion)
+{
+	if (plot() == nullptr) return;
+	CvPromotionEntry *pPromotion = GC.getPromotionInfo(ePromotion);
+	if (pPromotion == nullptr) return;
+	const std::vector<std::pair<PromotionTypes, int>>& vAuraPromotionsProviderNum = pPromotion->GetAuraPromotionsProviderNum();
+	if (vAuraPromotionsProviderNum.size() < 1) return;
+
+	int iNumProvider = 0;
+	// Embarked filter
+	if (isEmbarked()) goto SetAuraPromotions;
+	// Self filter
+	if (pPromotion->IsAuraPromotionNoSelf() && isHasPromotion(ePromotion)) goto SetAuraPromotions;
+	// Domain filter
+	if (!pPromotion->GetDomainAuraValid(getDomainType())) goto SetAuraPromotions;
+	const std::vector<PromotionTypes>& vPreOrPromotions = pPromotion->GetAuraPromotionPrePromotionOr();
+	// PrePromotion filter
+	bool bHasPrePromotion = vPreOrPromotions.size() < 1;
+	for(auto promotion : vPreOrPromotions)
+	{
+		if (!isHasPromotion(promotion)) continue;
+		bHasPrePromotion = true;
+		break;
+	}
+	if (!bHasPrePromotion) goto SetAuraPromotions;
+
+	CvPlayerAI& kPlayer = GET_MY_PLAYER();
+	const std::multimap<PromotionTypes, int>& auraPromotionUnits = kPlayer.GetAuraPromotionUnits();
+	
+	int iMaxNeeded = vAuraPromotionsProviderNum.back().second;
+	int iAuraRange = pPromotion->GetAuraPromotionRange();
+	if (!kPlayer.isHuman()) iAuraRange += pPromotion->GetAuraPromotionRangeAIBonus();
+	auto range = auraPromotionUnits.equal_range(ePromotion);
+	for (auto it = range.first; it != range.second; ++it)
+	{
+		CvUnit* pUnit = kPlayer.getUnit(it->second);
+		if (pUnit == nullptr || pUnit->plot() == nullptr) continue;
+		if (plotDistance(getX(), getY(), pUnit->getX(), pUnit->getY()) > iAuraRange) continue;
+		iNumProvider++;
+		if (iNumProvider >= iMaxNeeded) break;
+	}
+
+SetAuraPromotions:
+	for (auto promotionWithProviders : vAuraPromotionsProviderNum)
+	{
+		setHasPromotion(promotionWithProviders.first, promotionWithProviders.second <= iNumProvider);
+	}
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 //	--------------------------------------------------------------------------------
@@ -20346,6 +20440,10 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 		MoveToEnemyPlotDamage(pNewPlot);
 
 #endif
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+		CheckAuraFromOtherUnits();
+		CheckAuraToOtherUnits();
+#endif
 
 
 		//update facing direction
@@ -21500,16 +21598,13 @@ bool CvUnit::IsImmobile() const
 		return true;
 	}
 
-	return m_bImmobile;
+	return m_iNumImmobile > 0;
 }
 
 /// Is this unit capable of moving on its own?
-void CvUnit::SetImmobile(bool bValue)
+void CvUnit::ChangesNumImmobile(int iValue)
 {
-	if(IsImmobile() != bValue)
-	{
-		m_bImmobile = bValue;
-	}
+	m_iNumImmobile += iValue;
 }
 
 //	--------------------------------------------------------------------------------
@@ -26127,7 +26222,6 @@ bool CvUnit::isHasPromotion(PromotionTypes eIndex) const
 void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 {
 	VALIDATE_OBJECT
-	int iChange;
 	int iI;
 
 	if(isHasPromotion(eIndex) != bNewValue)
@@ -26161,7 +26255,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 #endif
 
 		m_Promotions.SetPromotion(eIndex, bNewValue);
-		iChange = ((isHasPromotion(eIndex)) ? 1 : -1);
+		const int iChange = ((isHasPromotion(eIndex)) ? 1 : -1);
 
 		// Promotions will set Invisibility once but not change it later
 		if(getInvisibleType() == NO_INVISIBLE && thisPromotion.GetInvisibleType() != NO_INVISIBLE)
@@ -26372,6 +26466,22 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeCapitalDefenseModifier((thisPromotion.GetCapitalDefenseModifier()) * iChange);
 		ChangeCapitalDefenseFalloff((thisPromotion.GetCapitalDefenseFalloff()) * iChange);
 		ChangeCityAttackPlunderModifier((thisPromotion.GetCityAttackPlunderModifier()) *  iChange);
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+		if(thisPromotion.GetAuraPromotionsProviderNum().size() > 0)
+		{
+			if (iChange == 1)
+			{
+				m_sAuraPromotions.insert(eIndex);
+				GET_MY_PLAYER().AddUnitAuraPromotion(GetID(), eIndex);
+			}
+			else if (iChange == -1)
+			{
+				m_sAuraPromotions.erase(eIndex);
+				GET_MY_PLAYER().RemoveUnitAuraPromotion(GetID(), eIndex);
+			}
+			CheckAuraToOtherUnits();
+		}
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 		ChangeMeleeAttackModifier((thisPromotion.GetMeleeAttackModifier()) * iChange);
 		ChangeCaptureEmenyExtraMax((thisPromotion.GetCaptureEmenyExtraMax()) * iChange);
@@ -26402,6 +26512,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeNumEstablishCorps(thisPromotion.GetNumEstablishCorps() * iChange);
 		ChangeNumCannotBeEstablishedCorps(thisPromotion.IsCannotBeEstablishedCorps() ? iChange: 0);
 #endif
+		ChangesNumImmobile(thisPromotion.IsImmobile() ? iChange: 0);
 		ChangeReligiousStrengthLossRivalTerritory((thisPromotion.GetReligiousStrengthLossRivalTerritory()) *  iChange);
 		ChangeTradeMissionInfluenceModifier((thisPromotion.GetTradeMissionInfluenceModifier()) * iChange);
 		ChangeTradeMissionGoldModifier((thisPromotion.GetTradeMissionGoldModifier()) * iChange);
@@ -26603,6 +26714,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		
 		ChangeSplashImmuneRC(thisPromotion.GetSplashDamageImmune() ? iChange : 0);
 		ChangeSplashXP(thisPromotion.GetSplashXP() * iChange);
+		ChangeNumTriggerSplashFinish(thisPromotion.IsTriggerSplashFinish() ? iChange : 0);
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -26712,6 +26824,7 @@ void CvUnit::setHasPromotion(PromotionTypes eIndex, bool bNewValue)
 		ChangeDefenseInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetDefenseInflictDamageChangeMaxHPPercent());
 		ChangeSiegeInflictDamageChange(iChange * thisPromotion.GetSiegeInflictDamageChange());
 		ChangeSiegeInflictDamageChangeMaxHPPercent(iChange * thisPromotion.GetSiegeInflictDamageChangeMaxHPPercent());
+		ChangeNumRangeBackWhenDefense(thisPromotion.IsRangeBackWhenDefense() ? iChange : 0);
 		ChangeHeavyChargeAddMoves(iChange * thisPromotion.GetHeavyChargeAddMoves());
 		ChangeHeavyChargeExtraDamage(iChange * thisPromotion.GetHeavyChargeExtraDamage());
 		ChangeHeavyChargeCollateralFixed(iChange * thisPromotion.GetHeavyChargeCollateralFixed());
@@ -26943,6 +27056,16 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iCapitalDefenseFalloff;
 	kStream >> m_iCityAttackPlunderModifier;
 	kStream >> m_iExtraPopConsume;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	int iNumAuraPromotionType = 0;
+	kStream >> iNumAuraPromotionType;
+	for (int i = 0; i < iNumAuraPromotionType; i++)
+	{
+		int iAuraPromotionType = 0;
+		kStream >> iAuraPromotionType;
+		m_sAuraPromotions.insert((PromotionTypes)iAuraPromotionType);
+	}
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream >> m_iMeleeAttackModifier;
 	kStream >> m_iCaptureEmenyExtraMax;
@@ -27156,6 +27279,7 @@ void CvUnit::read(FDataStream& kStream)
 
 	kStream >> m_iSplashImmuneRC;
 	kStream >> m_iSplashXP;
+	kStream >> m_iNumTriggerSplashFinish;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -27257,6 +27381,8 @@ void CvUnit::read(FDataStream& kStream)
 	kStream >> m_iSiegeInflictDamageChange;
 	kStream >> m_iSiegeInflictDamageChangeMaxHPPercent;
 
+	kStream >> m_iNumRangeBackWhenDefense;
+
 	kStream >> m_iHeavyChargeAddMoves;
 	kStream >> m_iHeavyChargeExtraDamage;
 	kStream >> m_iHeavyChargeCollateralFixed;
@@ -27346,6 +27472,13 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iCapitalDefenseFalloff;
 	kStream << m_iCityAttackPlunderModifier;
 	kStream << m_iExtraPopConsume;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	kStream << m_sAuraPromotions.size();
+	for (auto iter = m_sAuraPromotions.begin(); iter != m_sAuraPromotions.end(); iter++)
+	{
+		kStream << (int) *iter;
+	}
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	kStream << m_iMeleeAttackModifier;
 	kStream << m_iCaptureEmenyExtraMax;
@@ -27509,6 +27642,7 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iSplashImmuneRC;
 	kStream << m_iSplashXP;
+	kStream << m_iNumTriggerSplashFinish;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -27584,6 +27718,8 @@ void CvUnit::write(FDataStream& kStream) const
 
 	kStream << m_iSiegeInflictDamageChange;
 	kStream << m_iSiegeInflictDamageChangeMaxHPPercent;
+
+	kStream << m_iNumRangeBackWhenDefense;
 
 	kStream << m_iHeavyChargeAddMoves;
 	kStream << m_iHeavyChargeExtraDamage;
@@ -29370,7 +29506,7 @@ bool CvUnit::CanDoInterfaceMode(InterfaceModeTypes eInterfaceMode, bool bTestVis
 	switch(eInterfaceMode)
 	{
 	case INTERFACEMODE_MOVE_TO:
-		if((getDomainType() != DOMAIN_AIR) && (getDomainType() != DOMAIN_IMMOBILE) && (!IsImmobile()))
+		if(getDomainType() != DOMAIN_AIR && !IsImmobile())
 		{
 			return true;
 		}
@@ -32048,6 +32184,14 @@ void CvUnit::ChangeSplashXP(int iChange) {
 void CvUnit::SetSplashXP(int iValue) {
 	this->m_iSplashXP = iValue;
 }
+bool CvUnit::IsTriggerSplashFinish() const
+{
+	return m_iNumTriggerSplashFinish > 0;
+}
+void CvUnit::ChangeNumTriggerSplashFinish(int iChange)
+{
+	m_iNumTriggerSplashFinish += iChange;
+}
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -32193,6 +32337,15 @@ void CvUnit::ChangeSiegeInflictDamageChange(int iChange)
 void CvUnit::ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange)
 {
 	m_iSiegeInflictDamageChangeMaxHPPercent += iChange;
+}
+
+bool CvUnit::IsRangeBackWhenDefense() const
+{
+	return m_iNumRangeBackWhenDefense > 0;
+}
+void CvUnit::ChangeNumRangeBackWhenDefense(int iChange)
+{
+	m_iNumRangeBackWhenDefense += iChange;
 }
 
 int CvUnit::GetHeavyChargeAddMoves() const

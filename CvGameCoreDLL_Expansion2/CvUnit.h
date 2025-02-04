@@ -936,7 +936,7 @@ public:
 	void finishMoves();
 
 	bool IsImmobile() const;
-	void SetImmobile(bool bValue);
+	void ChangesNumImmobile(int iValue);
 
 	bool IsInFriendlyTerritory() const;
 	bool IsUnderEnemyRangedAttack() const;
@@ -1066,6 +1066,9 @@ public:
 	int GetSiegeInflictDamageChangeMaxHPPercent() const;
 	void ChangeSiegeInflictDamageChange(int iChange);
 	void ChangeSiegeInflictDamageChangeMaxHPPercent(int iChange);
+
+	bool IsRangeBackWhenDefense() const;
+	void ChangeNumRangeBackWhenDefense(int iChange);
 
 	int GetHeavyChargeAddMoves() const;
 	int GetHeavyChargeExtraDamage() const;
@@ -1886,6 +1889,14 @@ public:
 	void ChangeAttackBonusFromDeathUnit(int iValue);
 	int GetAttackBonusFromDeathUnit() const;
 	int GetAttackModifierFromWorldCongress() const;
+
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	bool HasAuraPromotions() const;
+	const std::tr1::unordered_set<PromotionTypes>& GetAuraPromotions() const;
+	void CheckAuraToOtherUnits();
+	void CheckAuraFromOtherUnits();
+	void CheckAuraPromotionFromOtherUnits(PromotionTypes ePromotion);
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	const int GetMeleeAttackModifier() const;
 	void ChangeMeleeAttackModifier(int iValue);
@@ -2060,6 +2071,9 @@ public:
 	int GetSplashXP() const;
 	void ChangeSplashXP(int iChange);
 	void SetSplashXP(int iValue);
+
+	bool IsTriggerSplashFinish() const;
+	void ChangeNumTriggerSplashFinish(int iChange);
 #endif
 
 #ifdef MOD_PROMOTION_COLLECTIONS
@@ -2151,7 +2165,7 @@ protected:
 	FAutoVariable<int, CvUnit> m_iGameTurnCreated;
 	FAutoVariable<int, CvUnit> m_iDamage;
 	FAutoVariable<int, CvUnit> m_iMoves;
-	FAutoVariable<bool, CvUnit> m_bImmobile;
+	int m_iNumImmobile;
 	FAutoVariable<int, CvUnit> m_iExperience;
 #if defined(MOD_UNITS_XP_TIMES_100)
 	int m_iExperienceTimes100;
@@ -2541,6 +2555,7 @@ protected:
 
 	int m_iSplashImmuneRC = 0;
 	int m_iSplashXP = 0;
+	int m_iNumTriggerSplashFinish = 0;
 #endif
 
 #ifdef MOD_PROMOTION_COLLATERAL_DAMAGE
@@ -2577,6 +2592,9 @@ protected:
 	int m_iCityAttackPlunderModifier;
 	int m_iExtraPopConsume;
 	int m_iAttackBonusFromDeathUnit;
+#if defined(MOD_PROMOTION_AURA_PROMOTION)
+	std::tr1::unordered_set<PromotionTypes> m_sAuraPromotions;
+#endif
 #if defined(MOD_PROMOTION_NEW_EFFECT_FOR_SP)
 	int m_iMeleeAttackModifier;
 	int m_iCaptureEmenyExtraMax;
@@ -2622,6 +2640,8 @@ protected:
 
 	int m_iSiegeInflictDamageChange = 0;
 	int m_iSiegeInflictDamageChangeMaxHPPercent = 0;
+
+	int m_iNumRangeBackWhenDefense = 0;
 
 	int m_iHeavyChargeAddMoves = 0;
 	int m_iHeavyChargeExtraDamage = 0;
