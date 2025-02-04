@@ -134,6 +134,12 @@ public:
 	int GetScienceModifierFromRANum() const;
 	int GetDiplomatPropagandaModifier() const;
 
+	int GetYieldFromNonSpecialistCitizens(int i) const;
+	int* GetYieldFromNonSpecialistCitizensArray() const;
+	int GetYieldChangesPerReligionTimes100(int i) const;
+	int* GetYieldChangesPerReligionTimes100Array() const;
+	int GetUnitClassProductionModifiers(int i) const;
+
 	int GetYieldModifierFromActiveSpies(int i) const;
 	int* GetYieldModifierFromActiveSpiesArray() const;
 
@@ -608,6 +614,10 @@ private:
 	int* m_piYieldChangesNaturalWonder;
 	int* m_piYieldChangeWorldWonder;
 #endif
+	int* m_piYieldFromNonSpecialistCitizens;
+	int* m_piYieldChangesPerReligion;
+	int* m_paiUnitClassProductionModifiers;
+
 	int* m_piYieldModifierFromActiveSpies;
 	int* m_piYieldModifierPerArtifacts;
 	int* m_piGreatPersonOutputModifierPerGWs;

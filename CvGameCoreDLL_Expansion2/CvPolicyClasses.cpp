@@ -257,6 +257,10 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_piYieldChangesNaturalWonder(NULL),
 	m_piYieldChangeWorldWonder(NULL),
 #endif
+	m_piYieldFromNonSpecialistCitizens(NULL),
+	m_piYieldChangesPerReligion(NULL),
+	m_paiUnitClassProductionModifiers(NULL),
+
 	m_piYieldModifierFromActiveSpies(NULL),
 	m_piYieldModifierPerArtifacts(NULL),
 	m_piGreatPersonOutputModifierPerGWs(NULL),
@@ -317,6 +321,10 @@ CvPolicyEntry::~CvPolicyEntry(void)
 	SAFE_DELETE_ARRAY(m_piYieldChangesNaturalWonder);
 	SAFE_DELETE_ARRAY(m_piYieldChangeWorldWonder);
 #endif
+	SAFE_DELETE_ARRAY(m_piYieldFromNonSpecialistCitizens);
+	SAFE_DELETE_ARRAY(m_piYieldChangesPerReligion);
+	SAFE_DELETE_ARRAY(m_paiUnitClassProductionModifiers);
+
 	SAFE_DELETE_ARRAY(m_piYieldModifierFromActiveSpies);
 	SAFE_DELETE_ARRAY(m_piYieldModifierPerArtifacts);
 	SAFE_DELETE_ARRAY(m_piGreatPersonOutputModifierPerGWs);
@@ -944,6 +952,11 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.SetYields(m_piYieldChangesNaturalWonder, "Policy_YieldChangesNaturalWonder", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piYieldChangeWorldWonder, "Policy_YieldChangeWorldWonder", "PolicyType", szPolicyType);
 #endif
+
+	kUtility.SetYields(m_piYieldFromNonSpecialistCitizens, "Policy_YieldFromNonSpecialistCitizens", "PolicyType", szPolicyType);
+	kUtility.SetYields(m_piYieldChangesPerReligion, "Policy_YieldChangesPerReligion", "PolicyType", szPolicyType);
+	kUtility.PopulateArrayByValue(m_paiUnitClassProductionModifiers, "UnitClasses", "Policy_UnitClassProductionModifiers", "UnitClassType", "PolicyType", szPolicyType, "ProductionModifier");
+
 	kUtility.SetYields(m_piYieldModifierFromActiveSpies, "Policy_YieldModifierFromActiveSpies", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piYieldModifierPerArtifacts, "Policy_YieldModifierPerArtifacts", "PolicyType", szPolicyType);
 	kUtility.PopulateArrayByValue(m_piGreatPersonOutputModifierPerGWs, "GreatPersons", "Policy_GreatPersonOutputModifierPerGWs", "GreatPersonType", "PolicyType", szPolicyType, "Modifier");
@@ -5488,6 +5501,41 @@ int PolicyHelpers::GetNumFreePolicies(PolicyBranchTypes eBranch)
 	}
 
 	return iFreePolicies;
+}
+
+
+int CvPolicyEntry::GetYieldFromNonSpecialistCitizens(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldFromNonSpecialistCitizens ? m_piYieldFromNonSpecialistCitizens[i] : 0;
+}
+
+int* CvPolicyEntry::GetYieldFromNonSpecialistCitizensArray() const
+{
+	return m_piYieldFromNonSpecialistCitizens;
+}
+
+
+int CvPolicyEntry::GetYieldChangesPerReligionTimes100(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+
+	return m_piYieldChangesPerReligion ? m_piYieldChangesPerReligion[i] : 0;
+}
+/// What is the golden age modifier for the specific yield type?
+int* CvPolicyEntry::GetYieldChangesPerReligionTimes100Array() const
+{
+	return m_piYieldChangesPerReligion;
+}
+
+/// Production modifier for a specific UnitClass
+int CvPolicyEntry::GetUnitClassProductionModifiers(int i) const
+{
+	CvAssertMsg(i < GC.getNumUnitClassInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_paiUnitClassProductionModifiers[i];
 }
 
 

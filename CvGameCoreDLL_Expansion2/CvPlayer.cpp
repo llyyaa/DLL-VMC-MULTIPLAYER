@@ -1379,6 +1379,13 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiPolicyModifiers.clear();
 	m_aiPolicyModifiers.resize(NUM_POLICY_MODIFIER_TYPE, 0);
 
+	m_aiYieldFromNonSpecialistCitizens.clear();
+	m_aiYieldFromNonSpecialistCitizens.resize(NUM_YIELD_TYPES, 0);
+	m_piYieldChangesPerReligion.clear();
+	m_piYieldChangesPerReligion.resize(NUM_YIELD_TYPES, 0);
+	m_paiUnitClassProductionModifiers.clear();
+	m_paiUnitClassProductionModifiers.resize(GC.getNumUnitClassInfos(), 0);
+
 	m_aiYieldModifierFromActiveSpies.clear();
 	m_aiYieldModifierFromActiveSpies.resize(NUM_YIELD_TYPES, 0);
 
@@ -27035,6 +27042,8 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 		if (iMod != 0)
 			changeCityLoveKingDayYieldMod(eYield, (pPolicy->GetCityLoveKingDayYieldMod(iI) * iChange));
 
+		changeYieldFromNonSpecialistCitizens(eYield, (pPolicy->GetYieldFromNonSpecialistCitizens(iI) * iChange));
+		ChangeYieldChangesPerReligionTimes100(eYield, (pPolicy->GetYieldChangesPerReligionTimes100(iI) * iChange));
 
 		changeYieldModifierFromActiveSpies(eYield, (pPolicy->GetYieldModifierFromActiveSpies(iI) * iChange));
 		changeYieldModifierPerArtifacts(eYield, (pPolicy->GetYieldModifierPerArtifacts(iI) * iChange));
@@ -27048,6 +27057,14 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 #endif
 	}
 
+	// Unit classes
+	for (int iI = 0; iI < GC.getNumUnitClassInfos(); iI++)
+	{
+		const UnitClassTypes eUnitClass = static_cast<UnitClassTypes>(iI);
+		ChangeUnitClassProductionModifier(eUnitClass, pPolicy->GetUnitClassProductionModifiers(iI) * iChange);
+	}
+
+	// Unit combats
 	for(iI = 0; iI < GC.getNumUnitCombatClassInfos(); iI++)
 	{
 		changeUnitCombatProductionModifiers((UnitCombatTypes)iI, (pPolicy->GetUnitCombatProductionModifiers(iI) * iChange));
@@ -28375,7 +28392,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_aiYieldFromPillage;
 #endif
 	kStream >> m_aiPolicyModifiers;
-
+	kStream >> m_aiYieldFromNonSpecialistCitizens;
+	kStream >> m_piYieldChangesPerReligion;
+	kStream >> m_paiUnitClassProductionModifiers;
 	kStream >> m_aiYieldModifierFromActiveSpies;
 	kStream >> m_aiYieldModifierPerArtifacts;
 	kStream >> m_aiGreatPersonOutputModifierPerGWs;
@@ -29131,7 +29150,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiYieldFromPillage;
 #endif
 	kStream << m_aiPolicyModifiers;
-
+	kStream << m_aiYieldFromNonSpecialistCitizens;
+	kStream << m_piYieldChangesPerReligion;
+	kStream << m_paiUnitClassProductionModifiers;
 	kStream << m_aiYieldModifierFromActiveSpies;
 	kStream << m_aiYieldModifierPerArtifacts;
 	kStream << m_aiGreatPersonOutputModifierPerGWs;
@@ -33191,6 +33212,68 @@ void CvPlayer::ChangeCorruptionLevelPolicyCostModifier(CorruptionLevelTypes leve
 
 #endif
 
+
+int CvPlayer::getYieldFromNonSpecialistCitizens(YieldTypes eIndex)	const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	return m_aiYieldFromNonSpecialistCitizens[eIndex];
+}
+
+void CvPlayer::changeYieldFromNonSpecialistCitizens(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_aiYieldFromNonSpecialistCitizens[eIndex] += iChange;
+
+		invalidateYieldRankCache(eIndex);
+
+		if (getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
+
+
+int CvPlayer::GetYieldChangesPerReligionTimes100(YieldTypes eYield) const
+{
+	CvAssertMsg(eYield >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	return m_piYieldChangesPerReligion[eYield];
+}
+
+void CvPlayer::ChangeYieldChangesPerReligionTimes100(YieldTypes eYield, int iChange)
+{
+	CvAssertMsg(eYield >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eYield < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if (iChange != 0)
+	{
+		m_piYieldChangesPerReligion[eYield] += iChange;
+		updateYield();
+	}
+}
+
+void CvPlayer::ChangeUnitClassProductionModifier(UnitClassTypes eUnitClass, int iValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eUnitClass >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eUnitClass < GC.getNumUnitClassInfos(), "eUnitClass expected to be < GC.getNumUnitClassInfos()");
+	m_paiUnitClassProductionModifiers[eUnitClass] = m_paiUnitClassProductionModifiers[eUnitClass] + iValue;
+}
+
+int CvPlayer::GetUnitClassProductionModifier(UnitClassTypes eUnitClass) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eUnitClass >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eUnitClass < GC.getNumUnitClassInfos(), "eUnitClass expected to be < GC.getNumUnitClassInfos()");
+	return m_paiUnitClassProductionModifiers[eUnitClass];
+}
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::getYieldModifierFromActiveSpies(YieldTypes eIndex)	const

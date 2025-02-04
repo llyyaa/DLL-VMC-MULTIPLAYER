@@ -44,6 +44,9 @@
 		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_RESET_PLOT_COST">
 			<Text>昭昭天命!</Text>
 		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_UNIT_CLASS">
+			<Text>[NEWLINE][ICON_BULLET]來自单位种类的修正: {1_Num}%</Text>
+		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_FEATURES">
 			<Text>[NEWLINE][ICON_BULLET]來自有市民工作的地貌的修正: {1_Num}%</Text>
 		</Row>
@@ -520,6 +523,9 @@
 		</Row>
 		<Row Tag="TXT_KEY_TOURISM_HELP_INFO">
 			<Text>[ICON_TOURISM]魅力由傑作、文物或建築來產生，是你將你的文化影響力擴張到其它文明的主要途徑。 </Text>
+		</Row>
+		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_NON_SPECIALIST_CITIZENS">
+			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自非专家人口</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CITYVIEW_BASE_YIELD_TT_FROM_ESPIONAGE_SPY">
 			<Text>[NEWLINE][ICON_BULLET]{1_Num}{2_IconString} 來自间谍获取</Text>

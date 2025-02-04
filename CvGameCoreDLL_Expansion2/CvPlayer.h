@@ -2003,6 +2003,12 @@ public:
 #if defined(MOD_ROG_CORE)
 	int CountAllOriginalCapitalCity();
 #endif
+	int getYieldFromNonSpecialistCitizens(YieldTypes eIndex)	const;
+	void changeYieldFromNonSpecialistCitizens(YieldTypes eIndex, int iChange);
+	int GetYieldChangesPerReligionTimes100(YieldTypes eYield) const;
+	void ChangeYieldChangesPerReligionTimes100(YieldTypes eYield, int iChange);
+	void ChangeUnitClassProductionModifier(UnitClassTypes eUnitClass, int iValue);
+	int GetUnitClassProductionModifier(UnitClassTypes eUnitClass) const;
 
 	int getYieldModifierFromActiveSpies(YieldTypes eIndex) const;
 	void changeYieldModifierFromActiveSpies(YieldTypes eIndex, int iChange);
@@ -2703,6 +2709,11 @@ protected:
 	std::map<int, int> m_piUnitTypePrmoteHealGlobal;
 #endif
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiPolicyModifiers;
+
+	std::vector<int> m_aiYieldFromNonSpecialistCitizens;
+	std::vector<int> m_piYieldChangesPerReligion;
+	std::vector<int> m_paiUnitClassProductionModifiers;
+
 	std::vector<int> m_aiYieldModifierFromActiveSpies;
 	std::vector<int> m_aiYieldModifierPerArtifacts;
 	std::vector<int> m_aiGreatPersonOutputModifierPerGWs;
