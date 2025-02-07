@@ -27204,6 +27204,7 @@ void CvUnit::read(FDataStream& kStream)
 		m_iNumExoticGoods = 0;
 	}
 
+	kStream >> m_iNumImmobile;
 #if defined(MOD_UNITS_XP_TIMES_100)
 	MOD_SERIALIZE_READ(74, kStream, m_iExperienceTimes100, m_iExperience * 100);
 #endif
@@ -27586,6 +27587,7 @@ void CvUnit::write(FDataStream& kStream) const
 	kStream << m_iSapperCount;
 	kStream << m_iCanHeavyCharge;
 	kStream << m_iNumExoticGoods;
+	kStream << m_iNumImmobile;
 #if defined(MOD_UNITS_XP_TIMES_100)
 	MOD_SERIALIZE_WRITE(kStream, m_iExperienceTimes100);
 #endif
