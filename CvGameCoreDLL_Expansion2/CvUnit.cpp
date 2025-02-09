@@ -12343,6 +12343,20 @@ bool CvUnit::goldenAge()
 		GAMEEVENTINVOKE_HOOK(GAMEEVENT_GoldenAgeDiscover, getOwner(), GetID(), getX(), getY(), IsGreatPerson());
 	}
 #endif
+	if (kPlayer.GetPlayerTraits()->IsArtistGoldenAgeTechBoost() && getUnitClassType() == GC.getInfoTypeForString("UNITCLASS_ARTIST"))
+	{
+		int iMedianTechResearch = kPlayer.GetPlayerTechs()->GetMedianTechResearch();
+		iMedianTechResearch = (iMedianTechResearch * kPlayer.GetMedianTechPercentage()) / 100;
+		TechTypes eCurrentTech = kPlayer.GetPlayerTechs()->GetCurrentResearch();
+		if (eCurrentTech == NO_TECH)
+		{
+			kPlayer.changeOverflowResearch(iMedianTechResearch);
+		}
+		else
+		{
+			GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgress(eCurrentTech, iMedianTechResearch, kPlayer.GetID());
+		}
+	}
 
 	if(IsGreatPerson())
 	{
