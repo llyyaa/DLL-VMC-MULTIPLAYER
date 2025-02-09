@@ -686,6 +686,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetCivUnit);
 	Method(GetCivBuildingWithDefault);
 	Method(GetCivUnitWithDefault);
+	Method(GetCivUnitNowTech);
 #endif
 	Method(IsMinorCiv);
 	Method(GetMinorCivType);
@@ -6682,13 +6683,28 @@ int CvLuaPlayer::lGetCivUnitWithDefault(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	UnitClassTypes eUnitClass = (UnitClassTypes)lua_tointeger(L, 2);
-	int iResult = pkPlayer->GetCivUnit(eUnitClass);
-	if (iResult == NO_UNIT)
+	lua_pushinteger(L, pkPlayer->GetCivUnitWithDefault(eUnitClass));
+	return 1;
+}
+int CvLuaPlayer::lGetCivUnitNowTech(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	UnitClassTypes eUnitClass = (UnitClassTypes)lua_tointeger(L, 2);
+	UnitTypes eResUnitType = NO_UNIT;
+	while(eUnitClass != NO_UNITCLASS)
 	{
-		CvUnitClassInfo* pUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
-		if(pUnitClassInfo) iResult = pUnitClassInfo->getDefaultUnitIndex();
+		UnitTypes eUnitType = pkPlayer->GetCivUnitWithDefault(eUnitClass);
+		CvUnitEntry* pUnitEntry = GC.getUnitInfo(eUnitType);
+		if(pUnitEntry == nullptr) break;
+		// eResUnitType should have a default value
+		if(eResUnitType == NO_UNIT || pkPlayer->HasTech((TechTypes)pUnitEntry->GetPrereqAndTech()))
+		{
+			eResUnitType = eUnitType;
+		}
+		else break;
+		eUnitClass = (UnitClassTypes)pUnitEntry->GetGoodyHutUpgradeUnitClass();
 	}
-	lua_pushinteger(L, iResult);
+	lua_pushinteger(L, eResUnitType);
 	return 1;
 }
 #endif

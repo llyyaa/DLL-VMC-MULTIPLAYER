@@ -33762,3 +33762,13 @@ void CvPlayer::doInstantYield(YieldTypes eYield, int iValue)
 		break;
 	}
 }
+UnitTypes CvPlayer::GetCivUnitWithDefault(UnitClassTypes eUnitClass) const
+{
+	UnitTypes eUnitType = GetCivUnit(eUnitClass);
+	if (eUnitType == NO_UNIT)
+	{
+		CvUnitClassInfo* pUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
+		if(pUnitClassInfo) eUnitType = (UnitTypes)pUnitClassInfo->getDefaultUnitIndex();
+	}
+	return eUnitType;
+}

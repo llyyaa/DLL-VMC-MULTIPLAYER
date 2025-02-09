@@ -2292,6 +2292,7 @@ public:
 	void ChangeNumSpaceshipPartPurchased(int iChange);
 
 	void doInstantYield(YieldTypes iYield, int iValue);
+	UnitTypes GetCivUnitWithDefault(UnitClassTypes eUnitClass) const;
 protected:
 	class ConqueredByBoolField
 	{
