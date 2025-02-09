@@ -17882,7 +17882,7 @@ int CvPlayer::GetTroopsRateTimes100() const
 }
 int CvPlayer::GetDomainTroopsTotal(DomainTypes eIndex) const
 {
-	return  GetDomainTroopsTotalTimes100(eIndex) / 100;
+	return GetDomainTroopsTotalTimes100(eIndex) / 100;
 }
 bool CvPlayer::IsLackingTroops(DomainTypes eIndex) const
 {

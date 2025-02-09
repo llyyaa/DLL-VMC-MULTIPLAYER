@@ -684,6 +684,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(IsMajorCiv);
 	Method(GetCivBuilding);
 	Method(GetCivUnit);
+	Method(GetCivBuildingWithDefault);
+	Method(GetCivUnitWithDefault);
 #endif
 	Method(IsMinorCiv);
 	Method(GetMinorCivType);
@@ -6660,6 +6662,34 @@ int CvLuaPlayer::lGetCivBuilding(lua_State* L)
 int CvLuaPlayer::lGetCivUnit(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetCivUnit);
+}
+
+int CvLuaPlayer::lGetCivBuildingWithDefault(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	BuildingClassTypes eBuildingClass = (BuildingClassTypes)lua_tointeger(L, 2);
+	int iResult = pkPlayer->GetCivBuilding(eBuildingClass);
+	if (iResult == NO_BUILDING)
+	{
+		CvBuildingClassInfo* pBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
+		if(pBuildingClassInfo) iResult = pBuildingClassInfo->getDefaultBuildingIndex();
+	}
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+
+int CvLuaPlayer::lGetCivUnitWithDefault(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	UnitClassTypes eUnitClass = (UnitClassTypes)lua_tointeger(L, 2);
+	int iResult = pkPlayer->GetCivUnit(eUnitClass);
+	if (iResult == NO_UNIT)
+	{
+		CvUnitClassInfo* pUnitClassInfo = GC.getUnitClassInfo(eUnitClass);
+		if(pUnitClassInfo) iResult = pUnitClassInfo->getDefaultUnitIndex();
+	}
+	lua_pushinteger(L, iResult);
+	return 1;
 }
 #endif
 //------------------------------------------------------------------------------
