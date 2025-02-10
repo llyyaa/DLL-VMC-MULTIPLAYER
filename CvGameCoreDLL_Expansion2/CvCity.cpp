@@ -4035,8 +4035,6 @@ void CvCity::ChangeNumResourceLocal(ResourceTypes eResource, int iChange)
 		{
 			if(IsHasResourceLocal(eResource, /*bTestVisible*/ false))
 			{
-				processResource(eResource, 1);
-
 				// Notification letting player know his city gets a bonus for wonders
 				int iWonderMod = GC.getResourceInfo(eResource)->getWonderProductionMod();
 				if(iWonderMod != 0)
@@ -4051,10 +4049,6 @@ void CvCity::ChangeNumResourceLocal(ResourceTypes eResource, int iChange)
 						pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strText.toUTF8(), strSummary.toUTF8(), getX(), getY(), eResource);
 					}
 				}
-			}
-			else
-			{
-				processResource(eResource, -1);
 			}
 		}
 
@@ -4088,6 +4082,7 @@ void CvCity::ChangeNumResourceLocal(ResourceTypes eResource, int iChange)
 				}
 			}
 		}
+		processResource(eResource, iChange);
 	}
 }
 
