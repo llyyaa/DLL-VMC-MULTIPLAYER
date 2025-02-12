@@ -3518,13 +3518,15 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 
 #ifdef MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY
 	if (MOD_TRAITS_COMBAT_BONUS_FROM_CAPTURED_HOLY_CITY && pNewCity && pNewCity->GetCityReligions()->IsHolyCityAnyReligion()) {
-		kOldCityPlayer.UpdateCachedCapturedHolyCity();
+		GET_PLAYER(eOldOwner).UpdateCachedCapturedHolyCity();
 		this->UpdateCachedCapturedHolyCity();
 	}
 #endif
 
-	if (pNewCity && pNewCity->IsOriginalCapital() && GC.getGame().isOption(GAMEOPTION_CIV_CONQUER)) {
-		kOldCityPlayer.UpdateUCsFromCapturedOriginalCapitals();
+	if (pNewCity && pNewCity->IsOriginalCapital() 
+		&& (GC.getGame().isOption(GAMEOPTION_CIV_CONQUER) || GET_PLAYER(eOldOwner).GetPlayerTraits()->IsCanConquerUC() || this->GetPlayerTraits()->IsCanConquerUC()))
+	{
+		GET_PLAYER(eOldOwner).UpdateUCsFromCapturedOriginalCapitals();
 		this->UpdateUCsFromCapturedOriginalCapitals();
 	}
 
@@ -20159,6 +20161,15 @@ UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass, int iFakeSeed) const
 		if (GC.getUnitInfo(iUnit)->GetUnitClassType() != eUnitClass) continue;
 		if (iUnit == eCivUnit) continue;
 		vUnitTypes.push_back(iUnit);
+	}
+	if(GetPlayerTraits()->IsCanConquerUC())
+	{
+		for (auto iUnit : const_cast<CvPlayer*>(this)->GetCanTrainUnitsFromCapturedOriginalCapitals())
+		{
+			if (GC.getUnitInfo(iUnit)->GetUnitClassType() != eUnitClass) continue;
+			if (iUnit == eCivUnit) continue;
+			vUnitTypes.push_back(iUnit);
+		}
 	}
 	if(const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eCivUnit) == 0) vUnitTypes.push_back(eCivUnit);
 	if (vUnitTypes.size() > 1)

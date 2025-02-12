@@ -148,6 +148,7 @@ CvTraitEntry::CvTraitEntry() :
 	m_eFreeBuilding(NO_BUILDING),
 	m_eFreeBuildingOnConquest(NO_BUILDING),
 	m_bTrainedAll(false),
+	m_bCanConquerUC(false),
 	m_bFightWellDamaged(false),
 	m_bBuyOwnedTiles(false),
 	m_bMoveFriendlyWoodsAsRoad(false),
@@ -840,6 +841,11 @@ bool CvTraitEntry::IsBuyOwnedTiles() const
 bool CvTraitEntry::IsTrainedAll() const
 {
 	return m_bTrainedAll;
+}
+
+bool CvTraitEntry::IsCanConquerUC() const
+{
+	return m_bCanConquerUC;
 }
 
 /// Accessor:: does this civ move units through forest as if it is road?
@@ -1793,6 +1799,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		m_eFreeBuildingOnConquest = (BuildingTypes)GC.getInfoTypeForString(szTextVal, true);
 	}
 	m_bTrainedAll = kResults.GetBool("TrainedAll");
+	m_bCanConquerUC = kResults.GetBool("CanConquerUC");
 	m_bFightWellDamaged = kResults.GetBool("FightWellDamaged");
 	m_bBuyOwnedTiles = kResults.GetBool("BuyOwnedTiles");
 	m_bMoveFriendlyWoodsAsRoad = kResults.GetBool("MoveFriendlyWoodsAsRoad");
@@ -2704,6 +2711,10 @@ void CvPlayerTraits::InitPlayerTraits()
 			{
 				m_bTrainedAll = true;
 			}
+			if (trait->IsCanConquerUC())
+			{
+				m_bCanConquerUC = true;
+			}
 
 			if(trait->IsFightWellDamaged())
 			{
@@ -3227,6 +3238,7 @@ void CvPlayerTraits::Reset()
 	m_iTradeRouteSeaGoldBonus = 0;
 #endif
 	m_bTrainedAll = false;
+	m_bCanConquerUC = false;
 	m_bFightWellDamaged = false;
 	m_bBuyOwnedTiles = false;
 	m_bMoveFriendlyWoodsAsRoad = false;
@@ -4728,6 +4740,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	MOD_SERIALIZE_READ(52, kStream, m_iSeaTradeRouteRangeBonus, 0);
 #endif
 	kStream >> m_bTrainedAll;
+	kStream >> m_bCanConquerUC;
 	kStream >> m_bFightWellDamaged;
 	kStream >> m_bBuyOwnedTiles;
 	kStream >> m_bMoveFriendlyWoodsAsRoad;
@@ -5141,6 +5154,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	MOD_SERIALIZE_WRITE(kStream, m_iSeaTradeRouteRangeBonus);
 #endif
 	kStream << m_bTrainedAll;
+	kStream << m_bCanConquerUC;
 	kStream << m_bFightWellDamaged;
 	kStream << m_bBuyOwnedTiles;
 	kStream << m_bMoveFriendlyWoodsAsRoad;

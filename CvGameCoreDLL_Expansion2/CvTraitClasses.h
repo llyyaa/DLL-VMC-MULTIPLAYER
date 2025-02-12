@@ -170,6 +170,7 @@ public:
 	BuildingTypes GetFreeBuildingOnConquest() const;
 
 	bool IsTrainedAll() const;
+	bool IsCanConquerUC() const;
 	bool IsWLKDCityNoResearchCost() const;
 	bool IsGoodyUnitUpgradeFirst() const;
 	bool IsFightWellDamaged() const;
@@ -456,6 +457,7 @@ protected:
 
 	
 	bool m_bTrainedAll;
+	bool m_bCanConquerUC;
 	bool m_bFightWellDamaged;
 	bool m_bBuyOwnedTiles;
 	bool m_bMoveFriendlyWoodsAsRoad;
@@ -1063,6 +1065,10 @@ public:
 	{
 		return m_bTrainedAll;
 	};
+	bool IsCanConquerUC() const
+	{
+		return m_bCanConquerUC;
+	};
 	bool IsFightWellDamaged() const
 	{
 		return m_bFightWellDamaged;
@@ -1511,6 +1517,7 @@ private:
 #endif
 	// Saved
 	bool m_bTrainedAll = false;
+	bool m_bCanConquerUC = false;
 	bool m_bFightWellDamaged = false;
 	bool m_bBuyOwnedTiles = false;
 	bool m_bMoveFriendlyWoodsAsRoad = false;
