@@ -20603,6 +20603,18 @@ bool CvCity::isValidBuildingLocation(BuildingTypes eBuilding) const
 	if(pkBuildingInfo == NULL)
 		return false;
 
+	// Requires Capital
+	if(pkBuildingInfo->IsCapitalOnly())
+	{
+		if (!isCapital())
+			return false;
+	}
+	// Requires Original Capital
+	if(pkBuildingInfo->IsOriginalCapitalOnly())
+	{
+		if (!IsOriginalCapital())
+			return false;
+	}
 	// Requires coast
 	if(pkBuildingInfo->IsWater())
 	{
