@@ -20171,14 +20171,15 @@ UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass, int iFakeSeed) const
 			vUnitTypes.push_back(iUnit);
 		}
 	}
-	if(const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eCivUnit) == 0) vUnitTypes.push_back(eCivUnit);
+
+	// if player is not lost UC, and has UU, add it
+	if(pUnitClassInfo->getDefaultUnitIndex() != eCivUnit && const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eCivUnit) == 0) vUnitTypes.push_back(eCivUnit);
 	if (vUnitTypes.size() > 1)
 	{
 		eCivUnit = vUnitTypes[GC.getGame().getSmallFakeRandNum(vUnitTypes.size(), iFakeSeed)];
 	}
 	else if(vUnitTypes.size() == 1) eCivUnit = vUnitTypes[0];
-	else eCivUnit = NO_UNIT;
-
+	// if player is not has extra UU, keep eCivUnit
 	return eCivUnit;
 }
 
