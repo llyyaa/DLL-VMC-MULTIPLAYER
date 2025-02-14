@@ -2433,6 +2433,37 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 #endif
 	}
 
+	if(MOD_GLOBAL_HOLY_CITY_FOUNDER_CHANGE && !GetReligions()->HasCreatedReligion() && isMajorCiv())
+	{
+		ReligionTypes eMajorityReligion = pOldCity->GetCityReligions()->GetReligiousMajority();
+		if(pOldCity->GetCityReligions()->IsHolyCityForReligion(eMajorityReligion))
+		{
+			const CvReligion* pkReligion = GC.getGame().GetGameReligions()->GetReligion(eMajorityReligion, NO_PLAYER);
+			CvString strSummary;
+			CvString strBuffer;
+			if(pkReligion->m_eOriginalFounder == GetID())
+			{
+				strSummary = GetLocalizedText("TXT_KEY_HOLY_CITY_REGAINED");
+				strBuffer = GetLocalizedText("TXT_KEY_HOLY_CITY_REGAINED_TT", getCivilizationShortDescriptionKey(), pkReligion->GetName(), pOldCity->getNameKey());
+			}
+			else
+			{
+				strSummary = GetLocalizedText("TXT_KEY_HOLY_CITY_OCCUPIED");
+				strBuffer = GetLocalizedText("TXT_KEY_HOLY_CITY_OCCUPIED_TT", getCivilizationShortDescriptionKey(), pkReligion->GetName(), pOldCity->getNameKey());
+			}
+			if (GET_PLAYER(pOldCity->getOwner()).isHuman())
+			{
+				CvNotifications *pNotifications = GET_PLAYER(pOldCity->getOwner()).GetNotifications();
+				if(pNotifications) pNotifications->Add(NOTIFICATION_RELIGION_ENHANCED, strBuffer, strSummary, -1, -1, eMajorityReligion, -1);
+			}
+			if (isHuman())
+			{
+				CvNotifications *pNotifications = GetNotifications();
+				if (pNotifications) pNotifications->Add(NOTIFICATION_RELIGION_FOUNDED, strBuffer, strSummary, -1, -1, eMajorityReligion, -1);
+			}
+		}
+	}
+
 	iCaptureGold = 0;
 	iCaptureCulture = 0;
 	iCaptureGreatWorks = 0;
