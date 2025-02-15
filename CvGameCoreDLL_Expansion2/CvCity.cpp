@@ -2252,6 +2252,7 @@ void CvCity::doTurn()
 	if(!bRazed)
 	{
 		DoResistanceTurn();
+		DoReligionFounderChange();
 
 		bool bAllowNoProduction = !doCheckProduction();
 
@@ -23144,7 +23145,61 @@ int CvCity::CountWorkedTerrain(TerrainTypes iTerrainType) const
 	return iCount;
 }
 #endif
+//-------------------------------------------------------------------------------
+void CvCity::DoReligionFounderChange()
+{
+	if(!MOD_GLOBAL_HOLY_CITY_FOUNDER_CHANGE) return;
+	if(IsResistance() || IsRazing()) return;
 
+	CvPlayerAI &pPlayer = GET_PLAYER(getOwner());
+	if(pPlayer.GetReligions()->HasCreatedReligion() || !pPlayer.isMajorCiv()) return;
+
+	ReligionTypes eMajorityReligion = GetCityReligions()->GetReligiousMajority();
+	if(!GetCityReligions()->IsHolyCityForReligion(eMajorityReligion)) return;
+	
+	CvGameReligions* pGameReligions = GC.getGame().GetGameReligions();
+	const CvReligion* pkReligion = pGameReligions->GetReligion(eMajorityReligion, NO_PLAYER);
+	bool bHasAlter = false;
+	// Regained
+	if(pkReligion->m_eOriginalFounder == getOwner())
+	{
+		bHasAlter = true;
+	}
+	else
+	{
+		int iNumCityThisReligion = 0;
+		int iNumFollowers = 0;
+		int iLoop = 0;
+		for(CvCity* pLoopCity = pPlayer.firstCity(&iLoop); pLoopCity != NULL; pLoopCity = pPlayer.nextCity(&iLoop))
+		{
+			iNumFollowers += pLoopCity->GetCityReligions()->GetNumFollowers(eMajorityReligion);
+			if (pLoopCity->GetCityReligions()->GetReligiousMajority() != eMajorityReligion) continue;
+			iNumCityThisReligion++;
+		}
+		if (iNumCityThisReligion < pPlayer.getNumCities() * 3 / 4) return;
+		if (iNumFollowers * 2  < pGameReligions->GetNumFollowers(eMajorityReligion)) return;
+		bHasAlter = true;
+	}
+
+	if(!bHasAlter) return;
+
+	pGameReligions->SetFounder(eMajorityReligion, getOwner());
+	pGameReligions->UpdateAllCitiesThisReligion(eMajorityReligion);
+	CvString strSummary = GetLocalizedText("TXT_KEY_HOLY_CITY_OCCUPIED_ALTER");
+	CvString strBuffer = GetLocalizedText("TXT_KEY_HOLY_CITY_OCCUPIED_ALTER_TT", pPlayer.getCivilizationShortDescriptionKey(), pkReligion->GetName(), getNameKey());
+	for(int iI = 0; iI < MAX_PLAYERS; iI++)
+	{
+		PlayerTypes ePlayer = (PlayerTypes)iI;
+		if(ePlayer != GC.getGame().getActivePlayer()) continue;
+		if(!GET_PLAYER(ePlayer).isAlive()) continue;
+		if(ePlayer == getOwner() || GET_TEAM(pPlayer.getTeam()).isHasMet(GET_PLAYER(ePlayer).getTeam()))
+		{
+			CvNotifications *pNotifications = GET_PLAYER(ePlayer).GetNotifications();
+			if(pNotifications) pNotifications->Add(NOTIFICATION_RELIGION_ENHANCED, strBuffer, strSummary, -1, -1, eMajorityReligion, -1);
+		}
+	}
+}
+//-------------------------------------------------------------------------------
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 bool CvCity::HasYieldFromOtherYield() const
 {

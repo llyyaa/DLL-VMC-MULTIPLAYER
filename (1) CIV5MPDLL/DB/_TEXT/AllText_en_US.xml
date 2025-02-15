@@ -807,7 +807,10 @@
 			<Text>[ICON_RELIGION] Holy City Occupied!</Text>
 		</Replace>
 		<Replace Tag="TXT_KEY_HOLY_CITY_OCCUPIED_TT">
-			<Text>{1_LeaderName} has occupied the [ICON_RELIGION][COLOR_POSITIVE_TEXT]Holy City[ENDCOLOR] of {2_ReligionName}: {3_HolyCity}. If the number of followers of {2_ReligionName} in this civilization exceeds half of the total followers of {2_ReligionName}, and more than 3/4 of the cities follow {2_ReligionName}, they will become the leader of {2_ReligionName} in the new Turn!</Text>
+			<Text>{1_LeaderName} has occupied the [ICON_RELIGION][COLOR_POSITIVE_TEXT]Holy City[ENDCOLOR] of {2_ReligionName}: {3_HolyCity}. After City's [ICON_RESISTANCE] Resistance, if the number of followers of {2_ReligionName} in this civilization exceeds half of the total followers of {2_ReligionName}, and more than 3/4 of the cities follow {2_ReligionName}, they will become the leader of {2_ReligionName} in the new Turn!</Text>
+		</Replace>
+		<Replace Tag="TXT_KEY_HOLY_CITY_OCCUPIED_ALTER">
+			<Text>New Religion leader!</Text>
 		</Replace>
 		<Replace Tag="TXT_KEY_HOLY_CITY_OCCUPIED_ALTER_TT">
 			<Text>{1_LeaderName} has claimed the [ICON_RELIGION][COLOR_POSITIVE_TEXT]Holy City[ENDCOLOR] of {2_ReligionName}: {3_HolyCity}, and become the Religion leader of {2_ReligionName}!</Text>

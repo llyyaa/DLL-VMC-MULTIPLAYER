@@ -804,7 +804,10 @@
 			<Text>[ICON_RELIGION]聖城占領！</Text>
 		</Replace>
 		<Replace Tag="TXT_KEY_HOLY_CITY_OCCUPIED_TT">
-			<Text>{1_LeaderName}占領了{2_ReligionName}的[ICON_RELIGION][COLOR_POSITIVE_TEXT]聖城[ENDCOLOR]：{3_HolyCity}。如果該文明中{2_ReligionName}信徒數量超過{2_ReligionName}總信徒的1/2，且超過3/4的城市信仰{2_ReligionName}，其將在新的回合成為{2_ReligionName}的領袖！</Text>
+			<Text>{1_LeaderName}占領了{2_ReligionName}的[ICON_RELIGION][COLOR_POSITIVE_TEXT]聖城[ENDCOLOR]：{3_HolyCity}。城市[ICON_RESISTANCE]抵抗結束後，如果該文明中{2_ReligionName}信徒數量超過{2_ReligionName}總信徒的1/2，且超過3/4的城市信仰{2_ReligionName}，其將在新的回合成為{2_ReligionName}的領袖！</Text>
+		</Replace>
+		<Replace Tag="TXT_KEY_HOLY_CITY_OCCUPIED_ALTER">
+			<Text>新的宗教領袖！</Text>
 		</Replace>
 		<Replace Tag="TXT_KEY_HOLY_CITY_OCCUPIED_ALTER_TT">
 			<Text>{1_LeaderName}從{2_ReligionName}的[ICON_RELIGION][COLOR_POSITIVE_TEXT]聖城[ENDCOLOR]：{3_HolyCity}獲得宣稱，成為{2_ReligionName}的宗教領袖！</Text>
