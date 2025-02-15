@@ -1263,6 +1263,7 @@ enum BattleTypeTypes
 #define GAMEEVENT_ReligionEnhanced				"ReligionEnhanced",				"iiii"
 #define GAMEEVENT_ReligionFounded				"ReligionFounded",				"iiiiiiii"
 #define GAMEEVENT_ReligionReformed				"ReligionReformed",				"iiiiiii"
+#define GAMEEVENT_ReligionFounderChanged		"ReligionFounderChanged",		"iiiib"
 #define GAMEEVENT_ResolutionProposing			"ResolutionProposing",			"ii"
 #define GAMEEVENT_ResolutionResult				"ResolutionResult",				"iibb"
 #define GAMEEVENT_ResolutionVoting				"ResolutionVoting",				"ii"

@@ -23183,6 +23183,7 @@ void CvCity::DoReligionFounderChange()
 
 	if(!bHasAlter) return;
 
+	PlayerTypes eOldFounder = pkReligion->m_eFounder;
 	pGameReligions->SetFounder(eMajorityReligion, getOwner());
 	pGameReligions->UpdateAllCitiesThisReligion(eMajorityReligion);
 	CvString strSummary = GetLocalizedText("TXT_KEY_HOLY_CITY_OCCUPIED_ALTER");
@@ -23198,6 +23199,7 @@ void CvCity::DoReligionFounderChange()
 			if(pNotifications) pNotifications->Add(NOTIFICATION_RELIGION_ENHANCED, strBuffer, strSummary, -1, -1, eMajorityReligion, -1);
 		}
 	}
+	GAMEEVENTINVOKE_HOOK(GAMEEVENT_ReligionFounderChanged, eOldFounder, GetID(), getOwner(), eMajorityReligion, pkReligion->m_eOriginalFounder == getOwner());
 }
 //-------------------------------------------------------------------------------
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
