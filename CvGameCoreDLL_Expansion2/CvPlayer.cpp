@@ -31211,6 +31211,44 @@ void CvPlayer::DoAnnounceReligionAdoption()
 	}
 }
 
+//	--------------------------------------------------------------------------------
+void CvPlayer::processReligion(ReligionTypes eReligion, int iChange)
+{
+	// will be called in the function CvGameReligions::SetFounder
+	const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion, GetID());
+	if(!pReligion) return;
+
+	const CvReligionBeliefs& beliefs = pReligion->m_Beliefs;
+	for(int iI = 0; iI < beliefs.GetNumBeliefs(); iI++)
+	{
+		processBelief(beliefs.GetBelief(iI), iChange);
+	}
+}
+void CvPlayer::processBelief(BeliefTypes eBelief, int iChange, bool bFirst)
+{
+	// Used to change some global Belief effects that only apply to founders
+	CvBeliefEntry* belief = GC.GetGameBeliefs()->GetEntry(eBelief);
+	if(!belief) return;
+
+	int iGoldenAgeModifier = belief->GetGoldenAgeModifier();
+	if(iGoldenAgeModifier != 0)
+	{
+		changeGoldenAgeModifier(iGoldenAgeModifier * iChange);
+	}
+	
+	// The followering effect only works once
+	if(!bFirst) return;
+
+	int iNumSpies = belief->GetExtraSpies();
+	if (iNumSpies > 0)
+	{
+		CvPlayerEspionage* pEspionage = GetEspionage();
+		CvAssertMsg(pEspionage, "pEspionage is null! What's up with that?!");
+		if (pEspionage) for (int i = 0; i < iNumSpies; i++) pEspionage->CreateSpy();
+	}
+}
+
+//	--------------------------------------------------------------------------------
 bool CvPlayer::IsAllowedToTradeWith(PlayerTypes eOtherPlayer)
 {
 	if (GC.getGame().GetGameLeagues()->IsTradeEmbargoed(GetID(), eOtherPlayer) && eOtherPlayer != m_eID)

@@ -1579,28 +1579,9 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief, PlayerTypes ePlayer)
 	m_iFaithBuildingTourism += belief->GetFaithBuildingTourism();
 
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
-	//Attention !!! in CanFoundReligion(), ePlayer is NO_PLAYER(to avoid adding Repeated value)
-	if(belief->GetGoldenAgeModifier() && ePlayer != NO_PLAYER)
-	{
-		m_iGoldenAgeModifier += belief->GetGoldenAgeModifier();
-		GET_PLAYER(ePlayer).changeGoldenAgeModifier(belief->GetGoldenAgeModifier());
-	}
-
-	if (belief->GetExtraSpies() > 0 && ePlayer != NO_PLAYER)
-	{
-		m_iExtraSpies += belief->GetExtraSpies();
-		CvPlayerEspionage* pEspionage = GET_PLAYER(ePlayer).GetEspionage();
-		CvAssertMsg(pEspionage, "pEspionage is null! What's up with that?!");
-		if (pEspionage)
-		{
-			int iNumSpies = belief->GetExtraSpies();
-
-			for (int i = 0; i < iNumSpies; i++)
-			{
-				pEspionage->CreateSpy();
-			}
-		}
-	}
+	m_iGoldenAgeModifier += belief->GetGoldenAgeModifier();
+	m_iExtraSpies += belief->GetExtraSpies();
+	// The actual effect is added in the CvPlayer::processBelief
 	
 	m_bGreatPersonPoints = m_bGreatPersonPoints || belief->IsGreatPersonPointsCapital() || belief->IsGreatPersonPointsPerCity() || belief->IsGreatPersonPointsHolyCity();	
 	if(belief->GetFreePromotionForProphet() != NO_PROMOTION)
@@ -1635,6 +1616,9 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief, PlayerTypes ePlayer)
 	}
 
 	m_ReligionBeliefs.push_back((int)eBelief);
+
+	//Attention !!! in CanFoundReligion(), ePlayer is NO_PLAYER(to avoid adding Repeated value)
+	if(ePlayer != NO_PLAYER) GET_PLAYER(ePlayer).processBelief(eBelief, 1, true);
 }
 
 /// Does this religion possess a specific belief?

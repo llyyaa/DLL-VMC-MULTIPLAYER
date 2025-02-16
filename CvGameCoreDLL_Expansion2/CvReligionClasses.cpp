@@ -1632,15 +1632,20 @@ void CvGameReligions::SetHolyCity(ReligionTypes eReligion, CvCity* pkHolyCity)
 void CvGameReligions::SetFounder(ReligionTypes eReligion, PlayerTypes eFounder)
 {
 	ReligionList::iterator it;
+	PlayerTypes eOldFounder = NO_PLAYER;
 	for(it = m_CurrentReligions.begin(); it != m_CurrentReligions.end(); it++)
 	{
 		// If talking about a pantheon, make sure to match the player
 		if(it->m_eReligion == eReligion)
 		{
+			eOldFounder = it->m_eFounder;
 			it->m_eFounder = eFounder;
 			break;
 		}
 	}
+	// apply some global effect
+	if(eOldFounder != NO_PLAYER) GET_PLAYER(eOldFounder).processReligion(eReligion, -1);
+	if(eFounder != NO_PLAYER) GET_PLAYER(eFounder).processReligion(eReligion, 1);
 }
 
 /// After a religion is enhanced, the newly chosen beliefs need to be turned on in all cities

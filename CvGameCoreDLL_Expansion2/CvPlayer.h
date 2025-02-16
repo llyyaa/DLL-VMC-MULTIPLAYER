@@ -1826,6 +1826,8 @@ public:
 #endif
 
 	void DoAnnounceReligionAdoption();
+	void processReligion(ReligionTypes eReligion, int iChange);
+	void processBelief(BeliefTypes eBelief, int iChange, bool bFirst = false);
 	// End New Religion Stuff
 
 #if defined(MOD_ROG_CORE)
