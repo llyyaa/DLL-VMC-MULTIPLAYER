@@ -1817,6 +1817,7 @@ public:
 
 	int GetNumCitiesWithStateReligion();
 
+	// the following 2 functions seem to have no use
 	CvCity* GetHolyCity();
 	void SetHolyCity(int iCityID);
 

@@ -1538,8 +1538,7 @@ bool CvPlot::isFreshWater() const
 	CvPlot* pLoopPlot;
 	int iDX, iDY;
 
-	if(isWater()) return false;
-	if((isImpassable() || isMountain()) && !isCity()) return false;
+	if((isWater() || isImpassable() || isMountain()) && !isCity()) return false;
 
 	if(isRiver()) return true;
 

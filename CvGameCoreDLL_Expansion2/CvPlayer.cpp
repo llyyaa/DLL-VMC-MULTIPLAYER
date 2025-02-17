@@ -31164,6 +31164,7 @@ PromotionTypes CvPlayer::GetDeepWaterEmbarkationPromotion() const
 void CvPlayer::DoAnnounceReligionAdoption()
 {
 	CvCity* pHolyCity = GetHolyCity();
+	if(pHolyCity == nullptr) return;
 
 	for(int iI = 0; iI < MAX_PLAYERS; iI++)
 	{
