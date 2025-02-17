@@ -812,5 +812,8 @@
 		<Replace Tag="TXT_KEY_HOLY_CITY_OCCUPIED_ALTER_TT">
 			<Text>{1_LeaderName}從{2_ReligionName}的[ICON_RELIGION][COLOR_POSITIVE_TEXT]聖城[ENDCOLOR]：{3_HolyCity}獲得宣稱，成為{2_ReligionName}的宗教領袖！</Text>
 		</Replace>
+		<Row Tag="TXT_KEY_DIPLO_CAPTURED_RELIGION">
+			<Text>[COLOR_NEGATIVE_TEXT]你與他們爭奪宗教正統。[ENDCOLOR]</Text>
+		</Row>
 	</Language_zh_Hant_HK>
 </GameData>

@@ -23176,7 +23176,7 @@ void CvCity::DoReligionFounderChange()
 			if (pLoopCity->GetCityReligions()->GetReligiousMajority() != eMajorityReligion) continue;
 			iNumCityThisReligion++;
 		}
-		if (iNumCityThisReligion < pPlayer.getNumCities() * 3 / 4) return;
+		if (iNumCityThisReligion * 4 / 3 < pPlayer.getNumCities()) return;
 		if (iNumFollowers * 2  < pGameReligions->GetNumFollowers(eMajorityReligion)) return;
 		bHasAlter = true;
 	}

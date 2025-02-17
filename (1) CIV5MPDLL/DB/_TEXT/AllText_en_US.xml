@@ -815,6 +815,9 @@
 		<Replace Tag="TXT_KEY_HOLY_CITY_OCCUPIED_ALTER_TT">
 			<Text>{1_LeaderName} has claimed the [ICON_RELIGION][COLOR_POSITIVE_TEXT]Holy City[ENDCOLOR] of {2_ReligionName}: {3_HolyCity}, and become the Religion leader of {2_ReligionName}!</Text>
 		</Replace>
+		<Row Tag="TXT_KEY_DIPLO_CAPTURED_RELIGION">
+			<Text>[COLOR_NEGATIVE_TEXT]You are competing with them for Religious orthodoxy.[ENDCOLOR]</Text>
+		</Row>
 	</Language_en_US>
 
 </GameData>
