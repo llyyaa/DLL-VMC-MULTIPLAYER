@@ -15751,7 +15751,7 @@ int CvCity::getFreePromotionCount(PromotionTypes eIndex) const
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < GC.getNumPromotionInfos(), "eIndex expected to be < GC.getNumPromotionInfos()");
-	return m_paiFreePromotionCount[eIndex];
+    return m_paiFreePromotionCount[eIndex] + getFreeFollowingPromotionCount(eIndex);
 }
 
 
@@ -15773,6 +15773,33 @@ void CvCity::changeFreePromotionCount(PromotionTypes eIndex, int iChange)
 	CvAssert(getFreePromotionCount(eIndex) >= 0);
 }
 
+//	--------------------------------------------------------------------------------
+int CvCity::getFreeFollowingPromotionCount(PromotionTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumPromotionInfos(), "eIndex expected to be < GC.getNumPromotionInfos()");
+	if (MOD_BELIEF_NEW_EFFECT_FOR_SP)
+    {
+        ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
+        if (eMajority != NO_RELIGION)
+        {
+            const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority,getOwner());
+            if (pReligion)
+            {
+                const std::vector<int>& eReligionPromotion = pReligion->m_Beliefs.GetFollowingCityFreePromotion();
+                for (int i = 0; i < eReligionPromotion.size(); i++)
+                {
+                    if (eReligionPromotion[i] == eIndex)
+                    {
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
 
 //	--------------------------------------------------------------------------------
 int CvCity::getTradeRouteDomainRangeModifier(DomainTypes eIndex) const

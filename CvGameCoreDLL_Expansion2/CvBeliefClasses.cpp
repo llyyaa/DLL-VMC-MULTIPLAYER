@@ -67,6 +67,8 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_piGreatPersonPoints(NULL),
 	m_piTerrainCityFoodConsumption(NULL),
 	m_iFreePromotionForProphet(NO_PROMOTION),
+	m_iFounderFreePromotion(NO_PROMOTION),
+	m_iFollowingCityFreePromotion(NO_PROMOTION),
 	m_iLandmarksTourismPercent(0),
 	m_iHolyCityUnitExperence(0),
 	m_iHolyCityPressureModifier(0),
@@ -780,6 +782,16 @@ int CvBeliefEntry::GetFreePromotionForProphet() const
 {
 	return m_iFreePromotionForProphet;
 }
+//Extra Free Promotion For Founder
+int CvBeliefEntry::GetFounderFreePromotion() const
+{
+	return m_iFounderFreePromotion;
+}
+//Extra Free Promotion For Following City
+int CvBeliefEntry::GetFollowingCityFreePromotion() const
+{
+	return m_iFollowingCityFreePromotion;
+}
 //Extra Landmarks Tourism Percent
 int CvBeliefEntry::GetLandmarksTourismPercent() const
 {
@@ -999,6 +1011,10 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 #if defined(MOD_BELIEF_NEW_EFFECT_FOR_SP)
 	szTextVal						  = kResults.GetText("FreePromotionForProphet");
 	m_iFreePromotionForProphet 		  = GC.getInfoTypeForString(szTextVal, true);
+	szTextVal						  = kResults.GetText("FounderFreePromotion");
+	m_iFounderFreePromotion 		  = GC.getInfoTypeForString(szTextVal, true);
+	szTextVal						  = kResults.GetText("FollowingCityFreePromotion");
+	m_iFollowingCityFreePromotion	  = GC.getInfoTypeForString(szTextVal, true);
 #endif
 
 	//Arrays
@@ -1444,6 +1460,8 @@ CvReligionBeliefs::CvReligionBeliefs(const CvReligionBeliefs& source)
 	m_iExtraSpies = source.m_iExtraSpies;
 	m_bGreatPersonPoints = source.m_bGreatPersonPoints;
 	m_vFreePromotionForProphet = source.m_vFreePromotionForProphet;
+	m_iFounderFreePromotion = source.m_iFounderFreePromotion;
+	m_vFollowingCityFreePromotion = source.m_vFollowingCityFreePromotion;
 	m_iLandmarksTourismPercent = source.m_iLandmarksTourismPercent;
 	m_iHolyCityUnitExperence = source.m_iHolyCityUnitExperence;
 	m_iHolyCityPressureModifier = source.m_iHolyCityPressureModifier;
@@ -1512,6 +1530,8 @@ void CvReligionBeliefs::Reset()
 	m_iExtraSpies = 0;
 	m_bGreatPersonPoints = false;
 	m_vFreePromotionForProphet.clear();
+	m_iFounderFreePromotion = NO_PROMOTION;
+	m_vFollowingCityFreePromotion.clear();
 	m_iLandmarksTourismPercent = 0;
 	m_iHolyCityUnitExperence = 0;
 	m_iHolyCityPressureModifier = 0;
@@ -1606,6 +1626,15 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief, PlayerTypes ePlayer)
 	if(belief->GetFreePromotionForProphet() != NO_PROMOTION)
 	{
 		m_vFreePromotionForProphet.push_back(belief->GetFreePromotionForProphet());
+	}
+	if(belief->GetFounderFreePromotion() != NO_PROMOTION && ePlayer != NO_PLAYER)
+	{
+		PromotionTypes ePromotion = (PromotionTypes)belief->GetFounderFreePromotion();
+		GET_PLAYER(ePlayer).ChangeFreePromotionCount(ePromotion, 1);
+	}
+	if(belief->GetFollowingCityFreePromotion() != NO_PROMOTION)
+	{
+		m_vFollowingCityFreePromotion.push_back(belief->GetFollowingCityFreePromotion());
 	}
 	m_iLandmarksTourismPercent += belief->GetLandmarksTourismPercent();
 	m_iHolyCityUnitExperence += belief->GetHolyCityUnitExperence();
@@ -2592,6 +2621,8 @@ void CvReligionBeliefs::Read(FDataStream& kStream)
 	kStream >> m_iExtraSpies;
 	kStream >> m_bGreatPersonPoints;
 	kStream >> m_vFreePromotionForProphet;
+	kStream >> m_iFounderFreePromotion;
+	kStream >> m_vFollowingCityFreePromotion;
 	kStream >> m_iLandmarksTourismPercent;
 	kStream >> m_iHolyCityUnitExperence;
 	kStream >> m_iHolyCityPressureModifier;
@@ -2656,6 +2687,8 @@ void CvReligionBeliefs::Write(FDataStream& kStream) const
 	kStream << m_iExtraSpies;
 	kStream << m_bGreatPersonPoints;
 	kStream << m_vFreePromotionForProphet;
+	kStream << m_iFounderFreePromotion;
+	kStream << m_vFollowingCityFreePromotion;
 	kStream << m_iLandmarksTourismPercent;
 	kStream << m_iHolyCityUnitExperence;
 	kStream << m_iHolyCityPressureModifier;
