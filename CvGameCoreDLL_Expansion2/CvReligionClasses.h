@@ -90,6 +90,7 @@ public:
 	// Public data
 	ReligionTypes m_eReligion;
 	PlayerTypes m_eFounder;
+	PlayerTypes m_eOriginalFounder;
 	int m_iHolyCityX;
 	int m_iHolyCityY;
 	int m_iTurnFounded;

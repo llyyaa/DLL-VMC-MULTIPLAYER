@@ -118,6 +118,7 @@ CvReligionEntry* CvReligionXMLEntries::GetEntry(int index)
 CvReligion::CvReligion()
 	: m_eReligion(NO_RELIGION)
 	, m_eFounder(NO_PLAYER)
+	, m_eOriginalFounder(NO_PLAYER)
 	, m_iHolyCityX(-1)
 	, m_iHolyCityY(-1)
 	, m_iTurnFounded(-1)
@@ -131,6 +132,7 @@ CvReligion::CvReligion()
 CvReligion::CvReligion(ReligionTypes eReligion, PlayerTypes eFounder, CvCity* pHolyCity, bool bPantheon)
 	: m_eReligion(eReligion)
 	, m_eFounder(eFounder)
+	, m_eOriginalFounder(eFounder)
 	, m_bPantheon(bPantheon)
 	, m_bEnhanced(false)
 {
@@ -152,6 +154,7 @@ FDataStream& operator>>(FDataStream& loadFrom, CvReligion& writeTo)
 
 	loadFrom >> writeTo.m_eReligion;
 	loadFrom >> writeTo.m_eFounder;
+	loadFrom >> writeTo.m_eOriginalFounder;
 	loadFrom >> writeTo.m_iHolyCityX;
 	loadFrom >> writeTo.m_iHolyCityY;
 	loadFrom >> writeTo.m_iTurnFounded;
@@ -194,6 +197,7 @@ FDataStream& operator<<(FDataStream& saveTo, const CvReligion& readFrom)
 
 	saveTo << readFrom.m_eReligion;
 	saveTo << readFrom.m_eFounder;
+	saveTo << readFrom.m_eOriginalFounder;
 	saveTo << readFrom.m_iHolyCityX;
 	saveTo << readFrom.m_iHolyCityY;
 	saveTo << readFrom.m_iTurnFounded;
@@ -1628,15 +1632,20 @@ void CvGameReligions::SetHolyCity(ReligionTypes eReligion, CvCity* pkHolyCity)
 void CvGameReligions::SetFounder(ReligionTypes eReligion, PlayerTypes eFounder)
 {
 	ReligionList::iterator it;
+	PlayerTypes eOldFounder = NO_PLAYER;
 	for(it = m_CurrentReligions.begin(); it != m_CurrentReligions.end(); it++)
 	{
 		// If talking about a pantheon, make sure to match the player
 		if(it->m_eReligion == eReligion)
 		{
+			eOldFounder = it->m_eFounder;
 			it->m_eFounder = eFounder;
 			break;
 		}
 	}
+	// apply some global effect
+	if(eOldFounder != NO_PLAYER) GET_PLAYER(eOldFounder).processReligion(eReligion, -1);
+	if(eFounder != NO_PLAYER) GET_PLAYER(eFounder).processReligion(eReligion, 1);
 }
 
 /// After a religion is enhanced, the newly chosen beliefs need to be turned on in all cities

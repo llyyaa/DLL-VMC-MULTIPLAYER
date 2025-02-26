@@ -2433,6 +2433,37 @@ CvCity* CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift, bool
 #endif
 	}
 
+	if(MOD_GLOBAL_HOLY_CITY_FOUNDER_CHANGE && !GetReligions()->HasCreatedReligion() && isMajorCiv())
+	{
+		ReligionTypes eMajorityReligion = pOldCity->GetCityReligions()->GetReligiousMajority();
+		if(pOldCity->GetCityReligions()->IsHolyCityForReligion(eMajorityReligion))
+		{
+			const CvReligion* pkReligion = GC.getGame().GetGameReligions()->GetReligion(eMajorityReligion, NO_PLAYER);
+			CvString strSummary;
+			CvString strBuffer;
+			if(pkReligion->m_eOriginalFounder == GetID())
+			{
+				strSummary = GetLocalizedText("TXT_KEY_HOLY_CITY_REGAINED");
+				strBuffer = GetLocalizedText("TXT_KEY_HOLY_CITY_REGAINED_TT", getCivilizationShortDescriptionKey(), pkReligion->GetName(), pOldCity->getNameKey());
+			}
+			else
+			{
+				strSummary = GetLocalizedText("TXT_KEY_HOLY_CITY_OCCUPIED");
+				strBuffer = GetLocalizedText("TXT_KEY_HOLY_CITY_OCCUPIED_TT", getCivilizationShortDescriptionKey(), pkReligion->GetName(), pOldCity->getNameKey());
+			}
+			if (GET_PLAYER(pOldCity->getOwner()).isHuman())
+			{
+				CvNotifications *pNotifications = GET_PLAYER(pOldCity->getOwner()).GetNotifications();
+				if(pNotifications) pNotifications->Add(NOTIFICATION_RELIGION_ENHANCED, strBuffer, strSummary, -1, -1, eMajorityReligion, -1);
+			}
+			if (isHuman())
+			{
+				CvNotifications *pNotifications = GetNotifications();
+				if (pNotifications) pNotifications->Add(NOTIFICATION_RELIGION_FOUNDED, strBuffer, strSummary, -1, -1, eMajorityReligion, -1);
+			}
+		}
+	}
+
 	iCaptureGold = 0;
 	iCaptureCulture = 0;
 	iCaptureGreatWorks = 0;
@@ -20171,14 +20202,15 @@ UnitTypes CvPlayer::GetCivUnit(UnitClassTypes eUnitClass, int iFakeSeed) const
 			vUnitTypes.push_back(iUnit);
 		}
 	}
-	if(const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eCivUnit) == 0) vUnitTypes.push_back(eCivUnit);
+
+	// if player is not lost UC, and has UU, add it
+	if(pUnitClassInfo->getDefaultUnitIndex() != eCivUnit && const_cast<CvPlayer*>(this)->GetUUFromExtra().count(eCivUnit) == 0) vUnitTypes.push_back(eCivUnit);
 	if (vUnitTypes.size() > 1)
 	{
 		eCivUnit = vUnitTypes[GC.getGame().getSmallFakeRandNum(vUnitTypes.size(), iFakeSeed)];
 	}
 	else if(vUnitTypes.size() == 1) eCivUnit = vUnitTypes[0];
-	else eCivUnit = NO_UNIT;
-
+	// if player is not has extra UU, keep eCivUnit
 	return eCivUnit;
 }
 
@@ -31132,6 +31164,7 @@ PromotionTypes CvPlayer::GetDeepWaterEmbarkationPromotion() const
 void CvPlayer::DoAnnounceReligionAdoption()
 {
 	CvCity* pHolyCity = GetHolyCity();
+	if(pHolyCity == nullptr) return;
 
 	for(int iI = 0; iI < MAX_PLAYERS; iI++)
 	{
@@ -31179,6 +31212,44 @@ void CvPlayer::DoAnnounceReligionAdoption()
 	}
 }
 
+//	--------------------------------------------------------------------------------
+void CvPlayer::processReligion(ReligionTypes eReligion, int iChange)
+{
+	// will be called in the function CvGameReligions::SetFounder
+	const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eReligion, GetID());
+	if(!pReligion) return;
+
+	const CvReligionBeliefs& beliefs = pReligion->m_Beliefs;
+	for(int iI = 0; iI < beliefs.GetNumBeliefs(); iI++)
+	{
+		processBelief(beliefs.GetBelief(iI), iChange);
+	}
+}
+void CvPlayer::processBelief(BeliefTypes eBelief, int iChange, bool bFirst)
+{
+	// Used to change some global Belief effects that only apply to founders
+	CvBeliefEntry* belief = GC.GetGameBeliefs()->GetEntry(eBelief);
+	if(!belief) return;
+
+	int iGoldenAgeModifier = belief->GetGoldenAgeModifier();
+	if(iGoldenAgeModifier != 0)
+	{
+		changeGoldenAgeModifier(iGoldenAgeModifier * iChange);
+	}
+	
+	// The followering effect only works once
+	if(!bFirst) return;
+
+	int iNumSpies = belief->GetExtraSpies();
+	if (iNumSpies > 0)
+	{
+		CvPlayerEspionage* pEspionage = GetEspionage();
+		CvAssertMsg(pEspionage, "pEspionage is null! What's up with that?!");
+		if (pEspionage) for (int i = 0; i < iNumSpies; i++) pEspionage->CreateSpy();
+	}
+}
+
+//	--------------------------------------------------------------------------------
 bool CvPlayer::IsAllowedToTradeWith(PlayerTypes eOtherPlayer)
 {
 	if (GC.getGame().GetGameLeagues()->IsTradeEmbargoed(GetID(), eOtherPlayer) && eOtherPlayer != m_eID)

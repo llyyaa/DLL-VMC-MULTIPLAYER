@@ -21619,6 +21619,11 @@ bool CvUnit::IsImmobile() const
 void CvUnit::ChangesNumImmobile(int iValue)
 {
 	m_iNumImmobile += iValue;
+	if(iValue != 0 && m_iNumImmobile == 0 || m_iNumImmobile == 1)
+	{
+		auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(this));
+		gDLL->GameplayUnitShouldDimFlag(pDllUnit.get(), /*bDim*/ getMoves() <= 0);
+	}
 }
 
 //	--------------------------------------------------------------------------------

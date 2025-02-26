@@ -1299,6 +1299,7 @@ public:
 	int CountWorkedTerrain(TerrainTypes iTerrainType) const;
 #endif
 
+	void DoReligionFounderChange();
 #ifdef MOD_BUILDINGS_YIELD_FROM_OTHER_YIELD
 	//int GetYieldFromOtherYield(const YieldTypes eInType, const YieldTypes eOutType, const YieldFromYield eConvertType) const;
 	bool HasYieldFromOtherYield() const;
