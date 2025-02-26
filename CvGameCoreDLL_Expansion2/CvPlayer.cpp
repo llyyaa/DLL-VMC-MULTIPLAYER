@@ -31236,6 +31236,12 @@ void CvPlayer::processBelief(BeliefTypes eBelief, int iChange, bool bFirst)
 	{
 		changeGoldenAgeModifier(iGoldenAgeModifier * iChange);
 	}
+
+	PromotionTypes eFounderPromotion = (PromotionTypes)belief->GetFounderFreePromotion();
+	if(eFounderPromotion != NO_PROMOTION)
+	{
+		ChangeFreePromotionCount(eFounderPromotion, iChange);
+	}
 	
 	// The followering effect only works once
 	if(!bFirst) return;

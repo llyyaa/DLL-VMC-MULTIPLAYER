@@ -137,6 +137,8 @@ public:
 	int GetGreatPersonPoints(int i, bool bCapital, bool bHolyCity) const;
 	int GetTerrainCityFoodConsumption(int i) const;
 	int GetFreePromotionForProphet() const;
+	int GetFounderFreePromotion() const;
+	int GetFollowingCityFreePromotion() const;
 	int GetLandmarksTourismPercent() const;
 	int GetHolyCityUnitExperence() const;
 	int GetHolyCityPressureModifier() const;
@@ -212,6 +214,8 @@ protected:
 	int* m_piGreatPersonPoints;
 	int* m_piTerrainCityFoodConsumption;
 	int m_iFreePromotionForProphet;
+	int m_iFounderFreePromotion;
+	int m_iFollowingCityFreePromotion;
 	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;
@@ -463,6 +467,14 @@ public:
 	{
 		return m_vFreePromotionForProphet;
 	}
+	int GetFounderFreePromotion() const
+	{
+		return m_iFounderFreePromotion;
+	}
+	const std::tr1::unordered_set<int>& GetFollowingCityFreePromotion() const
+	{
+		return m_vFollowingCityFreePromotion;
+	}
 	int GetLandmarksTourismPercent() const
 	{
 		return m_iLandmarksTourismPercent;
@@ -618,6 +630,8 @@ private:
 	int m_iExtraSpies;
 	bool m_bGreatPersonPoints;
 	std::vector<int> m_vFreePromotionForProphet;
+	int m_iFounderFreePromotion;
+	std::tr1::unordered_set<int> m_vFollowingCityFreePromotion;
 	int m_iLandmarksTourismPercent;
 	int m_iHolyCityUnitExperence;
 	int m_iHolyCityPressureModifier;

@@ -1033,6 +1033,7 @@ public:
 	int getFreePromotionCount(PromotionTypes eIndex) const;
 	bool isFreePromotion(PromotionTypes eIndex) const;
 	void changeFreePromotionCount(PromotionTypes eIndex, int iChange);
+	int getFreeFollowingPromotionCount(PromotionTypes eIndex) const;
 
 	int getTradeRouteDomainRangeModifier(DomainTypes eIndex) const;
 	void changeTradeRouteDomainRangeModifier(DomainTypes eIndex, int iChange);

@@ -4848,30 +4848,57 @@ void CvCity::addProductionExperience(CvUnit* pUnit, bool bConscript)
 #endif
 	}
 
+	std::tr1::unordered_set<int> vCityFreePromotions;
+	
+	ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
+	if (eMajority != NO_RELIGION)
+	{
+		const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner());
+		if (pReligion)
+		{
+			for(const auto iPromotion : pReligion->m_Beliefs.GetFollowingCityFreePromotion())
+			{
+				vCityFreePromotions.insert(iPromotion);
+			}
+		}
+	}
+	if(GetCityReligions()->IsSecondaryReligionActive())
+	{
+		BeliefTypes eBelief = GetCityReligions()->GetSecondaryReligionPantheonBelief();
+		if(eBelief != NO_BELIEF)
+		{
+			const CvBeliefEntry* pkBelief = GC.GetGameBeliefs()->GetEntry(eBelief);
+			int iPromotion = pkBelief->GetFollowingCityFreePromotion();
+			if(iPromotion != NO_PROMOTION) vCityFreePromotions.insert(iPromotion);
+		}
+	}
 	for(int iI = 0; iI < GC.getNumPromotionInfos(); iI++)
 	{
 		const PromotionTypes ePromotion = static_cast<PromotionTypes>(iI);
+		if(isFreePromotion(ePromotion)) vCityFreePromotions.insert(ePromotion);
+	}
+
+	for(const auto iI : vCityFreePromotions)
+	{
+		const PromotionTypes ePromotion = static_cast<PromotionTypes>(iI);
 		CvPromotionEntry* pkPromotionInfo = GC.getPromotionInfo(ePromotion);
-		if(pkPromotionInfo)
+		if(pkPromotionInfo && !pUnit->isHasPromotion(ePromotion))
 		{
-			if(isFreePromotion(ePromotion) && !pUnit->isHasPromotion(ePromotion))
+			if((pUnit->getUnitCombatType() != NO_UNITCOMBAT) && pkPromotionInfo->GetUnitCombatClass(pUnit->getUnitCombatType()))
 			{
-				if((pUnit->getUnitCombatType() != NO_UNITCOMBAT) && pkPromotionInfo->GetUnitCombatClass(pUnit->getUnitCombatType()))
-				{
-					pUnit->setHasPromotion(ePromotion, true);
-				}
-				else if(::IsPromotionValidForUnitPromotions(ePromotion, *pUnit))
-				{
-					pUnit->setHasPromotion(ePromotion, true);
-				}
-				else if (::IsPromotionValidForUnitType(ePromotion, pUnit->getUnitType()))
-				{
-					pUnit->setHasPromotion(ePromotion, true);
-				}
-				else if(::IsPromotionValidForCivilianUnitType(ePromotion, pUnit->getUnitType()))
-				{
-					pUnit->setHasPromotion(ePromotion, true);
-				}
+				pUnit->setHasPromotion(ePromotion, true);
+			}
+			else if(::IsPromotionValidForUnitPromotions(ePromotion, *pUnit))
+			{
+				pUnit->setHasPromotion(ePromotion, true);
+			}
+			else if (::IsPromotionValidForUnitType(ePromotion, pUnit->getUnitType()))
+			{
+				pUnit->setHasPromotion(ePromotion, true);
+			}
+			else if(::IsPromotionValidForCivilianUnitType(ePromotion, pUnit->getUnitType()))
+			{
+				pUnit->setHasPromotion(ePromotion, true);
 			}
 		}
 	}
@@ -15774,6 +15801,24 @@ void CvCity::changeFreePromotionCount(PromotionTypes eIndex, int iChange)
 	CvAssert(getFreePromotionCount(eIndex) >= 0);
 }
 
+//	--------------------------------------------------------------------------------
+int CvCity::getFreeFollowingPromotionCount(PromotionTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumPromotionInfos(), "eIndex expected to be < GC.getNumPromotionInfos()");
+	if (!MOD_BELIEF_NEW_EFFECT_FOR_SP) return 0;
+
+	ReligionTypes eMajority = GetCityReligions()->GetReligiousMajority();
+	if (eMajority == NO_RELIGION) return 0;
+
+	const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eMajority, getOwner());
+	if (!pReligion) return 0;
+
+	const std::tr1::unordered_set<int>& eReligionPromotions = pReligion->m_Beliefs.GetFollowingCityFreePromotion();
+	if (eReligionPromotions.count(eIndex) > 0) return 1;
+    return 0;
+}
 
 //	--------------------------------------------------------------------------------
 int CvCity::getTradeRouteDomainRangeModifier(DomainTypes eIndex) const

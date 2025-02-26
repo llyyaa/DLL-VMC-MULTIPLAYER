@@ -59,3 +59,5 @@ CREATE TABLE Belief_RiverPlotYieldChanges (
 );
 
 ALTER TABLE Beliefs ADD COLUMN 'CuttingBonusModifier' INTEGER DEFAULT 0;
+ALTER TABLE Beliefs ADD COLUMN 'FounderFreePromotion' TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
+ALTER TABLE Beliefs ADD COLUMN 'FollowingCityFreePromotion' TEXT DEFAULT NULL REFERENCES UnitPromotions(Type);
